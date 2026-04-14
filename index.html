@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SS14 Chemistry Database</title>
+<link rel="stylesheet" href="style.css">
+<script src="https://unpkg.com/vis-network@9.1.6/standalone/umd/vis-network.min.js"></script>
+</head>
+<body>
+
+<header>
+  <div class="header-left">
+    <h1>SS14 <span class="accent">Chemistry</span> Database</h1>
+    <span class="header-meta" id="headerMeta">Loading...</span>
+  </div>
+  <div class="header-right">
+    <input type="text" id="searchInput" class="search-input" placeholder="Search reagents, reactions, effects..." autocomplete="off" aria-label="Search reagents, reactions, effects">
+    <span class="result-count" id="resultCount"></span>
+    <button class="antag-toggle" id="antagToggle" title="Toggle Antag Mode">
+      <span class="antag-icon">&#9760;</span>
+      <span class="antag-label">ANTAG</span>
+    </button>
+    <button class="share-btn" id="shareBtn" title="Copy shareable link">&#128279;</button>
+  </div>
+</header>
+
+<div class="layout">
+  <nav class="sidebar" id="sidebar">
+    <button class="sidebar-toggle" id="sidebarToggle">Filters</button>
+    <div class="sidebar-content" id="sidebarContent">
+
+      <div class="filter-section">
+        <h3>Source</h3>
+        <label class="radio-label"><input type="radio" name="source" value="all" checked> All</label>
+        <label class="radio-label"><input type="radio" name="source" value="vanilla"> Vanilla SS14</label>
+        <label class="radio-label"><input type="radio" name="source" value="rmc14"> RMC14 (all available)</label>
+        <div id="rmcDisclaimer" class="rmc-disclaimer" style="display:none">
+          RMC14 availability based on YAML prototypes. Some recipes may be additionally blocked by server C# code. 33 known blocked reactions filtered out.
+        </div>
+      </div>
+
+      <div class="filter-section">
+        <h3>Type</h3>
+        <label class="radio-label"><input type="radio" name="basetype" value="all" checked> All</label>
+        <label class="radio-label"><input type="radio" name="basetype" value="base"> Base only</label>
+        <label class="radio-label"><input type="radio" name="basetype" value="crafted"> Crafted only</label>
+      </div>
+
+      <div class="filter-section">
+        <h3>Effects <button class="btn-small" id="clearEffects">Clear</button></h3>
+        <div id="effectFilters" class="effect-filters"></div>
+      </div>
+
+      <div class="filter-section">
+        <h3>Categories <button class="btn-small" id="clearCats">Clear</button></h3>
+        <div id="categoryFilters"></div>
+      </div>
+
+      <div class="filter-section">
+        <h3>Stats</h3>
+        <div id="statsPanel" class="stats-panel"></div>
+      </div>
+    </div>
+  </nav>
+
+  <main>
+    <div class="tab-bar" role="tablist">
+      <button class="tab-btn active" data-tab="reagents" role="tab" aria-selected="true">Reagents</button>
+      <button class="tab-btn" data-tab="reactions" role="tab" aria-selected="false">Reactions</button>
+      <button class="tab-btn" data-tab="calculator" role="tab" aria-selected="false">Calculator</button>
+      <button class="tab-btn" data-tab="trees" role="tab" aria-selected="false">Craft Trees</button>
+      <button class="tab-btn" data-tab="graph" role="tab" aria-selected="false">Graph</button>
+    </div>
+
+    <!-- Reagents Tab -->
+    <div class="tab-panel active" id="tab-reagents">
+      <div class="antag-strategies-bar" id="antagStrategies" style="display:none"></div>
+      <div class="antag-delivery-section" id="antagDelivery" style="display:none"></div>
+      <div class="reagent-grid" id="reagentGrid"></div>
+    </div>
+
+    <!-- Reactions Tab -->
+    <div class="tab-panel" id="tab-reactions">
+      <table class="data-table" id="reactionsTable">
+        <thead>
+          <tr>
+            <th>Reaction</th>
+            <th>Reactants</th>
+            <th>Products</th>
+            <th>Temp</th>
+            <th>Mixer</th>
+            <th>Source</th>
+          </tr>
+        </thead>
+        <tbody id="reactionsBody"></tbody>
+      </table>
+    </div>
+
+    <!-- Calculator Tab -->
+    <div class="tab-panel" id="tab-calculator">
+      <div class="calc-controls">
+        <div class="calc-input-group">
+          <label>Target Reagent</label>
+          <input type="text" id="calcTarget" class="search-input" placeholder="Type to search..." autocomplete="off" aria-label="Target reagent">
+          <div class="calc-suggestions" id="calcSuggestions"></div>
+        </div>
+        <div class="calc-input-group">
+          <label>Amount (units)</label>
+          <input type="number" id="calcAmount" class="search-input" value="30" min="1" max="9999" aria-label="Amount in units">
+        </div>
+        <button class="btn-primary" id="calcBtn">Calculate</button>
+      </div>
+      <div class="calc-results" id="calcResults"></div>
+
+      <div class="batch-section">
+        <h3 class="reverse-title">Batch / Shift Planner</h3>
+        <p class="reverse-desc">Add multiple targets to get one optimized shopping list</p>
+        <div class="batch-controls">
+          <div class="batch-row">
+            <input type="text" id="batchInput" class="search-input" placeholder="Type reagent..." autocomplete="off" aria-label="Add batch target reagent" style="width:220px">
+            <div class="calc-suggestions" id="batchSuggestions"></div>
+            <input type="number" id="batchAmount" class="search-input" value="30" min="1" max="9999" aria-label="Batch target amount" style="width:80px">
+            <button class="btn-small" id="batchAddBtn">+ Add</button>
+          </div>
+        </div>
+        <div class="reverse-chips" id="batchChips"></div>
+        <button class="btn-primary" id="batchPlanBtn" style="margin-bottom:12px">Plan Batch</button>
+        <div id="batchWarnings"></div>
+        <div class="calc-results" id="batchResults"></div>
+      </div>
+
+      <div class="reverse-section">
+        <h3 class="reverse-title">What Can I Make?</h3>
+        <p class="reverse-desc">Select available ingredients to find craftable recipes</p>
+        <div class="reverse-controls">
+          <input type="text" id="reverseInput" class="search-input" placeholder="Type to add ingredient..." autocomplete="off" aria-label="Add ingredient for reverse lookup">
+          <div class="calc-suggestions" id="reverseSuggestions"></div>
+        </div>
+        <div class="reverse-chips" id="reverseChips"></div>
+        <div class="reverse-results" id="reverseResults"></div>
+      </div>
+    </div>
+
+    <!-- Craft Trees Tab -->
+    <div class="tab-panel" id="tab-trees">
+      <div class="tree-controls">
+        <input type="text" id="treeTarget" class="search-input" placeholder="Type reagent name..." autocomplete="off" aria-label="Craft tree reagent search">
+        <div class="calc-suggestions" id="treeSuggestions"></div>
+      </div>
+      <div class="tree-output" id="treeOutput"></div>
+    </div>
+
+    <!-- Graph Tab -->
+    <div class="tab-panel" id="tab-graph">
+      <div class="graph-controls">
+        <button class="btn-small" id="graphReset">Reset View</button>
+        <button class="btn-small" id="graphPhysics">Toggle Physics</button>
+        <span class="graph-info" id="graphInfo"></span>
+      </div>
+      <div id="graphContainer" class="graph-container"></div>
+    </div>
+  </main>
+</div>
+
+<!-- Detail Panel (slides in from right) -->
+<aside class="detail-panel" id="detailPanel">
+  <button class="detail-close" id="detailClose">&times;</button>
+  <div id="detailContent"></div>
+</aside>
+
+<div class="toast" id="toast"></div>
+
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="loading-spinner"></div>
+  <div class="loading-text">Loading chemistry data...</div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
