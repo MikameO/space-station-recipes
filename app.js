@@ -13,6 +13,7 @@ let selectedReagentId = null;
 let detailHistory = []; // stack for back navigation
 let antagMode = false;
 let activeSort = 'name-asc'; // 'name-asc' | 'name-desc' | 'category' | 'used-in' | 'antag-desc'
+let activeTaste = 'all'; // 'all' | 'has-taste' | 'tasteless'
 
 // ─────────────────────────────────────────────
 // Init
@@ -111,6 +112,8 @@ function filterReagents(query) {
     }
     if (activeBaseType === 'base' && !r.isBase) return false;
     if (activeBaseType === 'crafted' && r.isBase) return false;
+    if (activeTaste === 'tasteless' && r.flavor) return false;
+    if (activeTaste === 'has-taste' && !r.flavor) return false;
     if (activeCategories.size > 0 && !activeCategories.has(r.category)) return false;
     if (activeEffectTags.size > 0 && !(r.effectTags || []).some(t => activeEffectTags.has(t))) return false;
     if (tokens.length > 0) {
@@ -207,6 +210,29 @@ function buildSidebar() {
     catDiv.querySelectorAll('input').forEach(cb => cb.checked = false);
     activeCategories.clear();
     renderCurrentTab();
+  });
+
+  // Taste filter
+  document.querySelectorAll('input[name="taste"]').forEach(radio => {
+    radio.addEventListener('change', () => {
+      activeTaste = radio.value;
+      renderCurrentTab();
+    });
+  });
+
+  // Collapsible filter sections
+  document.querySelectorAll('.filter-section[data-collapsible]').forEach(section => {
+    const h3 = section.querySelector('h3');
+    h3.addEventListener('click', (e) => {
+      // Don't collapse when clicking Clear buttons
+      if (e.target.classList.contains('btn-small')) return;
+      section.classList.toggle('collapsed');
+    });
+  });
+
+  // Sidebar collapse (desktop)
+  document.getElementById('sidebarCollapse').addEventListener('click', () => {
+    document.getElementById('sidebar').classList.toggle('collapsed');
   });
 
   // Sidebar toggle (mobile)
@@ -1473,6 +1499,7 @@ function encodeURLState() {
   if (selectedReagentId) params.set('r', selectedReagentId);
   if (activeSource !== 'all') params.set('src', activeSource);
   if (activeBaseType !== 'all') params.set('bt', activeBaseType);
+  if (activeTaste !== 'all') params.set('taste', activeTaste);
   if (antagMode) params.set('antag', '1');
   if (activeSort !== 'name-asc') params.set('sort', activeSort);
   if (activeCategories.size) params.set('cats', [...activeCategories].join(','));
@@ -1511,6 +1538,13 @@ function decodeURLState() {
   if (bt) {
     const radio = document.querySelector(`input[name="basetype"][value="${bt}"]`);
     if (radio) { radio.checked = true; activeBaseType = bt; }
+  }
+
+  // Taste filter
+  const taste = params.get('taste');
+  if (taste) {
+    const radio = document.querySelector(`input[name="taste"][value="${taste}"]`);
+    if (radio) { radio.checked = true; activeTaste = taste; }
   }
 
   // Sort

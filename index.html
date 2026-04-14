@@ -27,34 +27,54 @@
 
 <div class="layout">
   <nav class="sidebar" id="sidebar">
+    <button class="sidebar-collapse" id="sidebarCollapse" title="Collapse sidebar">&#9664;</button>
     <button class="sidebar-toggle" id="sidebarToggle">Filters</button>
     <div class="sidebar-content" id="sidebarContent">
 
-      <div class="filter-section">
-        <h3>Source</h3>
-        <div id="sourceFilters"><!-- Populated dynamically from DATA.meta.forks --></div>
+      <div class="filter-section" data-collapsible>
+        <h3>Source <span class="section-chevron">&#9660;</span></h3>
+        <div class="section-body">
+          <div id="sourceFilters"><!-- Populated dynamically from DATA.meta.forks --></div>
+        </div>
       </div>
 
-      <div class="filter-section">
-        <h3>Type</h3>
-        <label class="radio-label"><input type="radio" name="basetype" value="all" checked> All</label>
-        <label class="radio-label"><input type="radio" name="basetype" value="base"> Base only</label>
-        <label class="radio-label"><input type="radio" name="basetype" value="crafted"> Crafted only</label>
+      <div class="filter-section" data-collapsible>
+        <h3>Type <span class="section-chevron">&#9660;</span></h3>
+        <div class="section-body">
+          <label class="radio-label"><input type="radio" name="basetype" value="all" checked> All</label>
+          <label class="radio-label"><input type="radio" name="basetype" value="base"> Base only</label>
+          <label class="radio-label"><input type="radio" name="basetype" value="crafted"> Crafted only</label>
+        </div>
       </div>
 
-      <div class="filter-section">
-        <h3>Effects <button class="btn-small" id="clearEffects">Clear</button></h3>
-        <div id="effectFilters" class="effect-filters"></div>
+      <div class="filter-section" data-collapsible>
+        <h3>Taste <span class="section-chevron">&#9660;</span></h3>
+        <div class="section-body">
+          <label class="radio-label"><input type="radio" name="taste" value="all" checked> All</label>
+          <label class="radio-label"><input type="radio" name="taste" value="has-taste"> Has taste</label>
+          <label class="radio-label"><input type="radio" name="taste" value="tasteless"> Tasteless</label>
+        </div>
       </div>
 
-      <div class="filter-section">
-        <h3>Categories <button class="btn-small" id="clearCats">Clear</button></h3>
-        <div id="categoryFilters"></div>
+      <div class="filter-section" data-collapsible>
+        <h3>Effects <button class="btn-small" id="clearEffects">Clear</button> <span class="section-chevron">&#9660;</span></h3>
+        <div class="section-body">
+          <div id="effectFilters" class="effect-filters"></div>
+        </div>
       </div>
 
-      <div class="filter-section">
-        <h3>Stats</h3>
-        <div id="statsPanel" class="stats-panel"></div>
+      <div class="filter-section" data-collapsible>
+        <h3>Categories <button class="btn-small" id="clearCats">Clear</button> <span class="section-chevron">&#9660;</span></h3>
+        <div class="section-body">
+          <div id="categoryFilters"></div>
+        </div>
+      </div>
+
+      <div class="filter-section" data-collapsible>
+        <h3>Stats <span class="section-chevron">&#9660;</span></h3>
+        <div class="section-body">
+          <div id="statsPanel" class="stats-panel"></div>
+        </div>
       </div>
     </div>
   </nav>
