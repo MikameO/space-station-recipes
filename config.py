@@ -161,17 +161,32 @@ FORK_REGISTRY = {
         "seed_files": [],
         "botany_locale_files": [],
         "blocked_reactions": {
-            "Synaptizine", "Cognizine", "Saline", "Arcryox", "Heparin", "Hemorrhinol",
-            "Desoxyephedrine", "Lye",
-            "OrangeLimeSoda", "Neurotoxin", "Singulo",
+            # Commented out in medicine.yml
+            "Synaptizine", "Cognizine", "Saline",
+            # Missing from all reaction files
+            "Arcryox", "Heparin", "Hemorrhinol", "Lye",
+            # Commented out in chemicals.yml
+            "Desoxyephedrine",
+            # Commented out in food.yml
             "CookingMustard", "BananaBreakdown", "AllicinBreakdown", "NutrimentBreakdown",
             "FatBreakdown", "UncookedAnimalProteinBreakdown", "ProteinBreakdown", "VitaminBreakdown",
+            # Commented out in drinks.yml
+            "OrangeLimeSoda", "Neurotoxin", "Singulo",
+            # Missing from cleaning.yml
             "CreateSoapRegular", "CreateSoapNT", "CreateSoapDeluxe",
             "CreateSoapBlood", "CreateSoapSyndie", "CreateSoapOmega",
+            # Missing from fun.yml
             "Felinase", "Caninase", "CaninaseFelinaseReaction",
+            # Missing from biological.yml
             "SulfurBloodBreakdown",
-            "Pax", "Opporozidone", "Ethyloxyephedrine", "Diphenylmethylamine",
-            "Arithrazine", "DoctorsDelight",
+            # Cascade-blocked (reactant is blocked)
+            "Pax",              # requires Synaptizine (blocked)
+            "Opporozidone",     # requires Cognizine (blocked)
+            "Ethyloxyephedrine",  # requires Desoxyephedrine (blocked)
+            "Diphenylmethylamine",  # requires Ethyloxyephedrine (cascade)
+            # User-confirmed blocked in-game (YAML active but C#-level block suspected)
+            "ChloralHydrate",
+            "DoctorsDelight",  # User-confirmed: doesn't work despite YAML being active
         },
         "modified_reactions": {
             "MuteToxin": "Added Uranium as extra reactant",
@@ -180,6 +195,8 @@ FORK_REGISTRY = {
             "IronMetalFoam": "Priority changed from -10 to 10",
             "AluminiumMetalFoam": "Priority changed from -10 to 10",
             "AmmoniaFromBlood": "Stir mixer requirement removed",
+            "Laughter": "Reactants changed: added RMCBlackGoo(0.5) as extra reactant",
+            "Arithrazine": "YAML active — verify in-game (may be C#-blocked like ChloralHydrate)",
         },
         "dispenser_chemicals": {
             "RMCAluminum", "RMCCarbon", "RMCChlorine", "RMCCopper", "RMCEthanol",
@@ -227,8 +244,18 @@ FORK_REGISTRY = {
         "locale_files": [],
         "seed_files": [],
         "botany_locale_files": [],
-        "blocked_reactions": set(),
-        "modified_reactions": {},
+        "blocked_reactions": set(),  # Goob doesn't block vanilla reactions — modifies in-place
+        "modified_reactions": {
+            "Stimulants": "Product yield increased from 2 to 3",
+            "MuteToxin": "Added Uranium(1) as extra reactant; yield doubled from 2 to 4",
+            "Nocturine": "Product yield doubled from 1 to 2",
+            "Tazinide": "Product yield doubled from 1 to 2",
+            "Ethyloxyephedrine": "Added minTemp: 370 temperature requirement",
+            "Opporozidone": "Removed Cognizine reactant, uses Phalanximine(2) instead; easier recipe",
+            "InsectBloodBreakdown": "Products changed: Water 14→11, added Saline(6), removed Sodium(3)",
+            "Licoxide": "Added Lead(1) as extra reactant; added maxTemp: 265",
+            "PlasticSheet": "Reactant amounts doubled: Oil 5→10, Ash 3→6, SulfuricAcid 2→4",
+        },
         "dispenser_chemicals": set(),
     },
 
@@ -259,8 +286,14 @@ FORK_REGISTRY = {
         "locale_files": [],
         "seed_files": [],
         "botany_locale_files": [],
-        "blocked_reactions": set(),
-        "modified_reactions": {},
+        "blocked_reactions": {
+            "Heparin",  # Replaced by Warfarin in Starlight's vanilla medicine.yml override
+        },
+        "modified_reactions": {
+            "Hemorrhinol": "Uses Warfarin instead of Heparin as reactant",
+            # NOTE: Starlight adds Necrosol & Warfarin reactions in vanilla medicine.yml path
+            # (not in _Starlight/) — parser limitation, these won't be auto-detected
+        },
         "dispenser_chemicals": set(),
     },
 
@@ -316,7 +349,9 @@ FORK_REGISTRY = {
         "locale_files": [],
         "seed_files": [],
         "botany_locale_files": [],
-        "blocked_reactions": set(),
+        "blocked_reactions": {
+            "Lye",  # Missing from Frontier's vanilla chemicals.yml
+        },
         "modified_reactions": {},
         "dispenser_chemicals": set(),
     },
@@ -350,8 +385,21 @@ FORK_REGISTRY = {
         "locale_files": [],
         "seed_files": [],
         "botany_locale_files": [],
-        "blocked_reactions": set(),
-        "modified_reactions": {},
+        "blocked_reactions": {
+            "Lye",           # Missing from Funky's vanilla chemicals.yml
+            "ArtifactGlue",  # Missing from Funky's vanilla chemicals.yml
+        },
+        "modified_reactions": {
+            # Funky uses a Multiver-based medicine system (DeltaV/TG lineage)
+            "Acetone": "Product amount 2 → 3",
+            "Oil": "Product amount 3 → 4",
+            "ChloralHydrate": "Product amount 1 → 3 (DeltaV change)",
+            "Ethylredoxrazine": "Recipe changed: uses Multiver instead of Diethylamine",
+            "Tricordrazine": "Recipe changed: uses Multiver instead of Dylovene",
+            "MindbreakerToxin": "Recipe changed: uses Multiver, minTemp added",
+            "Ambuzol": "Recipe changed: uses Multiver instead of Dylovene",
+            "Opporozidone": "Recipe changed: Cognizine as catalyst + Plasma(5) + Doxarubixadone",
+        },
         "dispenser_chemicals": set(),
     },
 }

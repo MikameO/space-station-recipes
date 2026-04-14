@@ -1,6 +1,6 @@
 {
  "meta": {
-  "generated": "2026-04-15T01:23:38",
+  "generated": "2026-04-15T02:05:38",
   "forks": {
    "vanilla": {
     "name": "Vanilla SS14",
@@ -25618,6 +25618,12 @@
    "mixer": [],
    "effects": "",
    "impact": null,
+   "forkStatus": {
+    "funky": "modified"
+   },
+   "forkNotes": {
+    "funky": "Product amount 2 → 3"
+   },
    "rmcStatus": "available",
    "rmcNote": ""
   },
@@ -26079,6 +26085,12 @@
    "mixer": [],
    "effects": "",
    "impact": null,
+   "forkStatus": {
+    "funky": "modified"
+   },
+   "forkNotes": {
+    "funky": "Recipe changed: uses Multiver instead of Dylovene"
+   },
    "rmcStatus": "available",
    "rmcNote": ""
   },
@@ -26482,10 +26494,13 @@
    "effects": "",
    "impact": null,
    "forkStatus": {
-    "rmc14": "blocked"
+    "rmc14": "modified"
    },
-   "rmcStatus": "blocked",
-   "rmcNote": ""
+   "forkNotes": {
+    "rmc14": "YAML active — verify in-game (may be C#-blocked like ChloralHydrate)"
+   },
+   "rmcStatus": "modified",
+   "rmcNote": "YAML active — verify in-game (may be C#-blocked like ChloralHydrate)"
   },
   "ArnoldPalmer": {
    "id": "ArnoldPalmer",
@@ -26532,6 +26547,9 @@
    "mixer": [],
    "effects": "",
    "impact": null,
+   "forkStatus": {
+    "funky": "blocked"
+   },
    "rmcStatus": "available",
    "rmcNote": ""
   },
@@ -28687,7 +28705,14 @@
    "mixer": [],
    "effects": "",
    "impact": "Medium",
-   "rmcStatus": "available",
+   "forkStatus": {
+    "rmc14": "blocked",
+    "funky": "modified"
+   },
+   "forkNotes": {
+    "funky": "Product amount 1 → 3 (DeltaV change)"
+   },
+   "rmcStatus": "blocked",
    "rmcNote": ""
   },
   "ChlorineTrifluoride": {
@@ -31433,7 +31458,11 @@
    "effects": "",
    "impact": "Medium",
    "forkStatus": {
-    "rmc14": "blocked"
+    "rmc14": "blocked",
+    "goob": "modified"
+   },
+   "forkNotes": {
+    "goob": "Added minTemp: 370 temperature requirement"
    },
    "rmcStatus": "blocked",
    "rmcNote": ""
@@ -31463,6 +31492,12 @@
    "mixer": [],
    "effects": "",
    "impact": null,
+   "forkStatus": {
+    "funky": "modified"
+   },
+   "forkNotes": {
+    "funky": "Recipe changed: uses Multiver instead of Diethylamine"
+   },
    "rmcStatus": "available",
    "rmcNote": ""
   },
@@ -32444,7 +32479,11 @@
    "effects": "",
    "impact": null,
    "forkStatus": {
-    "rmc14": "blocked"
+    "rmc14": "blocked",
+    "starlight": "modified"
+   },
+   "forkNotes": {
+    "starlight": "Uses Warfarin instead of Heparin as reactant"
    },
    "rmcStatus": "blocked",
    "rmcNote": ""
@@ -33128,6 +33167,12 @@
    ],
    "effects": "",
    "impact": null,
+   "forkStatus": {
+    "goob": "modified"
+   },
+   "forkNotes": {
+    "goob": "Products changed: Water 14→11, added Saline(6), removed Sodium(3)"
+   },
    "rmcStatus": "available",
    "rmcNote": ""
   },
@@ -33502,8 +33547,14 @@
    "mixer": [],
    "effects": "",
    "impact": null,
-   "rmcStatus": "available",
-   "rmcNote": ""
+   "forkStatus": {
+    "rmc14": "modified"
+   },
+   "forkNotes": {
+    "rmc14": "Reactants changed: added RMCBlackGoo(0.5) as extra reactant"
+   },
+   "rmcStatus": "modified",
+   "rmcNote": "Reactants changed: added RMCBlackGoo(0.5) as extra reactant"
   },
   "Left4Zed": {
    "id": "Left4Zed",
@@ -33794,6 +33845,12 @@
    "mixer": [],
    "effects": "",
    "impact": null,
+   "forkStatus": {
+    "goob": "modified"
+   },
+   "forkNotes": {
+    "goob": "Added Lead(1) as extra reactant; added maxTemp: 265"
+   },
    "rmcStatus": "available",
    "rmcNote": ""
   },
@@ -33973,7 +34030,9 @@
    "effects": "",
    "impact": null,
    "forkStatus": {
-    "rmc14": "blocked"
+    "rmc14": "blocked",
+    "frontier": "blocked",
+    "funky": "blocked"
    },
    "rmcStatus": "blocked",
    "rmcNote": ""
@@ -34623,6 +34682,12 @@
    "mixer": [],
    "effects": "",
    "impact": null,
+   "forkStatus": {
+    "funky": "modified"
+   },
+   "forkNotes": {
+    "funky": "Recipe changed: uses Multiver, minTemp added"
+   },
    "rmcStatus": "available",
    "rmcNote": ""
   },
@@ -34954,10 +35019,12 @@
    "effects": "",
    "impact": "Medium",
    "forkStatus": {
-    "rmc14": "modified"
+    "rmc14": "modified",
+    "goob": "modified"
    },
    "forkNotes": {
-    "rmc14": "Added Uranium as extra reactant"
+    "rmc14": "Added Uranium as extra reactant",
+    "goob": "Added Uranium(1) as extra reactant; yield doubled from 2 to 4"
    },
    "rmcStatus": "modified",
    "rmcNote": "Added Uranium as extra reactant"
@@ -35332,6 +35399,12 @@
    "mixer": [],
    "effects": "",
    "impact": "High",
+   "forkStatus": {
+    "goob": "modified"
+   },
+   "forkNotes": {
+    "goob": "Product yield doubled from 1 to 2"
+   },
    "rmcStatus": "available",
    "rmcNote": ""
   },
@@ -35516,6 +35589,12 @@
    "mixer": [],
    "effects": "",
    "impact": null,
+   "forkStatus": {
+    "funky": "modified"
+   },
+   "forkNotes": {
+    "funky": "Product amount 3 → 4"
+   },
    "rmcStatus": "available",
    "rmcNote": ""
   },
@@ -35593,7 +35672,13 @@
    "effects": "",
    "impact": null,
    "forkStatus": {
-    "rmc14": "blocked"
+    "rmc14": "blocked",
+    "goob": "modified",
+    "funky": "modified"
+   },
+   "forkNotes": {
+    "goob": "Removed Cognizine reactant, uses Phalanximine(2) instead; easier recipe",
+    "funky": "Recipe changed: Cognizine as catalyst + Plasma(5) + Doxarubixadone"
    },
    "rmcStatus": "blocked",
    "rmcNote": ""
@@ -36287,6 +36372,12 @@
    "mixer": [],
    "effects": "Spawns: SheetPlastic1",
    "impact": "Low",
+   "forkStatus": {
+    "goob": "modified"
+   },
+   "forkNotes": {
+    "goob": "Reactant amounts doubled: Oil 5→10, Ash 3→6, SulfuricAcid 2→4"
+   },
    "rmcStatus": "available",
    "rmcNote": ""
   },
@@ -39201,6 +39292,12 @@
    "mixer": [],
    "effects": "",
    "impact": "Medium",
+   "forkStatus": {
+    "goob": "modified"
+   },
+   "forkNotes": {
+    "goob": "Product yield increased from 2 to 3"
+   },
    "rmcStatus": "available",
    "rmcNote": ""
   },
@@ -39676,6 +39773,12 @@
    "mixer": [],
    "effects": "",
    "impact": "Medium",
+   "forkStatus": {
+    "goob": "modified"
+   },
+   "forkNotes": {
+    "goob": "Product yield doubled from 1 to 2"
+   },
    "rmcStatus": "available",
    "rmcNote": ""
   },
@@ -40162,6 +40265,12 @@
    "mixer": [],
    "effects": "",
    "impact": null,
+   "forkStatus": {
+    "funky": "modified"
+   },
+   "forkNotes": {
+    "funky": "Recipe changed: uses Multiver instead of Dylovene"
+   },
    "rmcStatus": "available",
    "rmcNote": ""
   },
