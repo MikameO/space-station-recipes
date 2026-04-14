@@ -1,169 +1,380 @@
 """Configuration for SS14 Chemistry Database Extractor."""
 
-# GitHub raw URL templates
-VANILLA_RAW = "https://raw.githubusercontent.com/space-wizards/space-station-14/master/{path}"
-RMC14_RAW = "https://raw.githubusercontent.com/RMC-14/RMC-14/master/{path}"
+# ═══════════════════════════════════════════════════════════════════
+# FORK REGISTRY — Central definition of all supported SS14 forks
+# ═══════════════════════════════════════════════════════════════════
+#
+# Each fork entry defines: repo URL, branch, custom prototype directory,
+# file manifests, known blocked/modified reactions, and UI color.
+# The extractor iterates this registry to fetch & merge all forks.
 
-# === FILE MANIFESTS ===
+FORK_REGISTRY = {
+    # ── Vanilla SS14 (upstream) ──
+    "vanilla": {
+        "name": "Vanilla SS14",
+        "repo": "space-wizards/space-station-14",
+        "branch": "master",
+        "raw_url": "https://raw.githubusercontent.com/space-wizards/space-station-14/master/{path}",
+        "custom_dir": None,
+        "color": "#22c55e",
+        "reagent_files": [
+            "Resources/Prototypes/Reagents/biological.yml",
+            "Resources/Prototypes/Reagents/botany.yml",
+            "Resources/Prototypes/Reagents/chemicals.yml",
+            "Resources/Prototypes/Reagents/cleaning.yml",
+            "Resources/Prototypes/Reagents/elements.yml",
+            "Resources/Prototypes/Reagents/fun.yml",
+            "Resources/Prototypes/Reagents/gases.yml",
+            "Resources/Prototypes/Reagents/medicine.yml",
+            "Resources/Prototypes/Reagents/narcotics.yml",
+            "Resources/Prototypes/Reagents/pyrotechnic.yml",
+            "Resources/Prototypes/Reagents/toxins.yml",
+            "Resources/Prototypes/Reagents/Consumable/Drink/alcohol.yml",
+            "Resources/Prototypes/Reagents/Consumable/Drink/base_drink.yml",
+            "Resources/Prototypes/Reagents/Consumable/Drink/drinks.yml",
+            "Resources/Prototypes/Reagents/Consumable/Drink/juice.yml",
+            "Resources/Prototypes/Reagents/Consumable/Drink/soda.yml",
+            "Resources/Prototypes/Reagents/Consumable/Food/condiments.yml",
+            "Resources/Prototypes/Reagents/Consumable/Food/food.yml",
+            "Resources/Prototypes/Reagents/Consumable/Food/ingredients.yml",
+            "Resources/Prototypes/Reagents/Materials/glass.yml",
+            "Resources/Prototypes/Reagents/Materials/materials.yml",
+            "Resources/Prototypes/Reagents/Materials/metals.yml",
+            "Resources/Prototypes/Reagents/Materials/ores.yml",
+        ],
+        "reaction_files": [
+            "Resources/Prototypes/Recipes/Reactions/biological.yml",
+            "Resources/Prototypes/Recipes/Reactions/botany.yml",
+            "Resources/Prototypes/Recipes/Reactions/chemicals.yml",
+            "Resources/Prototypes/Recipes/Reactions/cleaning.yml",
+            "Resources/Prototypes/Recipes/Reactions/drinks.yml",
+            "Resources/Prototypes/Recipes/Reactions/food.yml",
+            "Resources/Prototypes/Recipes/Reactions/fun.yml",
+            "Resources/Prototypes/Recipes/Reactions/gas.yml",
+            "Resources/Prototypes/Recipes/Reactions/medicine.yml",
+            "Resources/Prototypes/Recipes/Reactions/pyrotechnic.yml",
+            "Resources/Prototypes/Recipes/Reactions/single_reagent.yml",
+            "Resources/Prototypes/Recipes/Reactions/soap.yml",
+        ],
+        "locale_files": [
+            "Resources/Locale/en-US/reagents/meta/biological.ftl",
+            "Resources/Locale/en-US/reagents/meta/botany.ftl",
+            "Resources/Locale/en-US/reagents/meta/chemicals.ftl",
+            "Resources/Locale/en-US/reagents/meta/cleaning.ftl",
+            "Resources/Locale/en-US/reagents/meta/elements.ftl",
+            "Resources/Locale/en-US/reagents/meta/fun.ftl",
+            "Resources/Locale/en-US/reagents/meta/gases.ftl",
+            "Resources/Locale/en-US/reagents/meta/medicine.ftl",
+            "Resources/Locale/en-US/reagents/meta/narcotics.ftl",
+            "Resources/Locale/en-US/reagents/meta/physical-desc.ftl",
+            "Resources/Locale/en-US/reagents/meta/pyrotechnic.ftl",
+            "Resources/Locale/en-US/reagents/meta/toxins.ftl",
+            "Resources/Locale/en-US/reagents/meta/consumable/drink/alcohol.ftl",
+            "Resources/Locale/en-US/reagents/meta/consumable/drink/drinks.ftl",
+            "Resources/Locale/en-US/reagents/meta/consumable/drink/juice.ftl",
+            "Resources/Locale/en-US/reagents/meta/consumable/drink/soda.ftl",
+            "Resources/Locale/en-US/reagents/meta/consumable/food/condiments.ftl",
+            "Resources/Locale/en-US/reagents/meta/consumable/food/food.ftl",
+            "Resources/Locale/en-US/reagents/meta/consumable/food/ingredients.ftl",
+            "Resources/Locale/en-US/reagents/Capsaicin.ftl",
+            "Resources/Locale/en-US/reagents/absinthe.ftl",
+            "Resources/Locale/en-US/reagents/barozine.ftl",
+            "Resources/Locale/en-US/reagents/buzzochloricbees.ftl",
+            "Resources/Locale/en-US/reagents/carpetium.ftl",
+            "Resources/Locale/en-US/reagents/clf3.ftl",
+            "Resources/Locale/en-US/reagents/ephedrine.ftl",
+            "Resources/Locale/en-US/reagents/ethyloxyephedrine.ftl",
+            "Resources/Locale/en-US/reagents/fresium.ftl",
+            "Resources/Locale/en-US/reagents/frezon.ftl",
+            "Resources/Locale/en-US/reagents/frostoil.ftl",
+            "Resources/Locale/en-US/reagents/generic.ftl",
+            "Resources/Locale/en-US/reagents/histamine.ftl",
+            "Resources/Locale/en-US/reagents/laughter.ftl",
+            "Resources/Locale/en-US/reagents/leporazine.ftl",
+            "Resources/Locale/en-US/reagents/mannitol.ftl",
+            "Resources/Locale/en-US/reagents/norepinephricacid.ftl",
+            "Resources/Locale/en-US/reagents/phlogiston.ftl",
+            "Resources/Locale/en-US/reagents/psicodine.ftl",
+        ],
+        "seed_files": ["Resources/Prototypes/Hydroponics/seeds.yml"],
+        "botany_locale_files": [
+            "Resources/Locale/en-US/ss14-entities/objects/specific/hydroponics/seeds.ftl",
+        ],
+        "blocked_reactions": set(),
+        "modified_reactions": {},
+        "dispenser_chemicals": {
+            "Aluminium", "Carbon", "Chlorine", "Copper", "Ethanol", "Fluorine",
+            "Hydrogen", "Iodine", "Iron", "Lithium", "Mercury", "Nitrogen",
+            "Oxygen", "Phosphorus", "Plasma", "Potassium", "Radium", "Silicon",
+            "Silver", "Sodium", "Sulfur", "Sugar", "Water", "WeldingFuel", "Oil",
+        },
+    },
 
-VANILLA_REAGENT_FILES = [
-    "Resources/Prototypes/Reagents/biological.yml",
-    "Resources/Prototypes/Reagents/botany.yml",
-    "Resources/Prototypes/Reagents/chemicals.yml",
-    "Resources/Prototypes/Reagents/cleaning.yml",
-    "Resources/Prototypes/Reagents/elements.yml",
-    "Resources/Prototypes/Reagents/fun.yml",
-    "Resources/Prototypes/Reagents/gases.yml",
-    "Resources/Prototypes/Reagents/medicine.yml",
-    "Resources/Prototypes/Reagents/narcotics.yml",
-    "Resources/Prototypes/Reagents/pyrotechnic.yml",
-    "Resources/Prototypes/Reagents/toxins.yml",
-    "Resources/Prototypes/Reagents/Consumable/Drink/alcohol.yml",
-    "Resources/Prototypes/Reagents/Consumable/Drink/base_drink.yml",
-    "Resources/Prototypes/Reagents/Consumable/Drink/drinks.yml",
-    "Resources/Prototypes/Reagents/Consumable/Drink/juice.yml",
-    "Resources/Prototypes/Reagents/Consumable/Drink/soda.yml",
-    "Resources/Prototypes/Reagents/Consumable/Food/condiments.yml",
-    "Resources/Prototypes/Reagents/Consumable/Food/food.yml",
-    "Resources/Prototypes/Reagents/Consumable/Food/ingredients.yml",
-    "Resources/Prototypes/Reagents/Materials/glass.yml",
-    "Resources/Prototypes/Reagents/Materials/materials.yml",
-    "Resources/Prototypes/Reagents/Materials/metals.yml",
-    "Resources/Prototypes/Reagents/Materials/ores.yml",
-]
+    # ── RMC14 ──
+    "rmc14": {
+        "name": "RMC14",
+        "repo": "RMC-14/RMC-14",
+        "branch": "master",
+        "raw_url": "https://raw.githubusercontent.com/RMC-14/RMC-14/master/{path}",
+        "custom_dir": "_RMC14",
+        "color": "#06b6d4",
+        "reagent_files": [
+            "Resources/Prototypes/_RMC14/Reagents/base_reagent.yml",
+            "Resources/Prototypes/_RMC14/Reagents/elements.yml",
+            "Resources/Prototypes/_RMC14/Reagents/medicine.yml",
+            "Resources/Prototypes/_RMC14/Reagents/narcotics.yml",
+            "Resources/Prototypes/_RMC14/Reagents/other.yml",
+            "Resources/Prototypes/_RMC14/Reagents/pyrotechnic.yml",
+            "Resources/Prototypes/_RMC14/Reagents/synth_blood.yml",
+            "Resources/Prototypes/_RMC14/Reagents/toxins.yml",
+            "Resources/Prototypes/_RMC14/Reagents/Consumable/ingredients.yml",
+            "Resources/Prototypes/_RMC14/Reagents/Consumable/Drink/alcohol.yml",
+            "Resources/Prototypes/_RMC14/Reagents/Consumable/Drink/juice.yml",
+            "Resources/Prototypes/_RMC14/Reagents/Consumable/Drink/other_drinks.yml",
+            "Resources/Prototypes/_RMC14/Reagents/Consumable/Drink/soda.yml",
+        ],
+        "reaction_files": [
+            "Resources/Prototypes/_RMC14/Recipes/Reactions/chemicals.yml",
+            "Resources/Prototypes/_RMC14/Recipes/Reactions/elements.yml",
+            "Resources/Prototypes/_RMC14/Recipes/Reactions/ingredients.yml",
+            "Resources/Prototypes/_RMC14/Recipes/Reactions/medicine.yml",
+            "Resources/Prototypes/_RMC14/Recipes/Reactions/narcotics.yml",
+            "Resources/Prototypes/_RMC14/Recipes/Reactions/other.yml",
+            "Resources/Prototypes/_RMC14/Recipes/Reactions/pyrotechnic.yml",
+            "Resources/Prototypes/_RMC14/Recipes/Reactions/toxins.yml",
+        ],
+        "locale_files": [
+            "Resources/Locale/en-US/_RMC14/reagents/flavors.ftl",
+            "Resources/Locale/en-US/_RMC14/reagents/ingredients.ftl",
+            "Resources/Locale/en-US/_RMC14/reagents/other.ftl",
+            "Resources/Locale/en-US/_RMC14/reagents/pyrotechnic.ftl",
+            "Resources/Locale/en-US/_RMC14/reagents/toxins.ftl",
+            "Resources/Locale/en-US/_RMC14/reagents/meta/elements.ftl",
+            "Resources/Locale/en-US/_RMC14/reagents/meta/consumable/drink/alcohol.ftl",
+            "Resources/Locale/en-US/_RMC14/reagents/meta/consumable/drink/juice.ftl",
+            "Resources/Locale/en-US/_RMC14/reagents/meta/consumable/drink/soda.ftl",
+            "Resources/Locale/en-US/_RMC14/medical/medicine.ftl",
+            "Resources/Locale/en-US/_RMC14/medical/narcotics.ftl",
+            "Resources/Locale/en-US/_RMC14/medical/toxins.ftl",
+            "Resources/Locale/en-US/_RMC14/medical/synth.ftl",
+        ],
+        "seed_files": [],
+        "botany_locale_files": [],
+        "blocked_reactions": {
+            "Synaptizine", "Cognizine", "Saline", "Arcryox", "Heparin", "Hemorrhinol",
+            "Desoxyephedrine", "Lye",
+            "OrangeLimeSoda", "Neurotoxin", "Singulo",
+            "CookingMustard", "BananaBreakdown", "AllicinBreakdown", "NutrimentBreakdown",
+            "FatBreakdown", "UncookedAnimalProteinBreakdown", "ProteinBreakdown", "VitaminBreakdown",
+            "CreateSoapRegular", "CreateSoapNT", "CreateSoapDeluxe",
+            "CreateSoapBlood", "CreateSoapSyndie", "CreateSoapOmega",
+            "Felinase", "Caninase", "CaninaseFelinaseReaction",
+            "SulfurBloodBreakdown",
+            "Pax", "Opporozidone", "Ethyloxyephedrine", "Diphenylmethylamine",
+            "Arithrazine", "DoctorsDelight",
+        },
+        "modified_reactions": {
+            "MuteToxin": "Added Uranium as extra reactant",
+            "Smoke": "Priority changed from -10 to 10",
+            "Foam": "Priority changed from -10 to 10",
+            "IronMetalFoam": "Priority changed from -10 to 10",
+            "AluminiumMetalFoam": "Priority changed from -10 to 10",
+            "AmmoniaFromBlood": "Stir mixer requirement removed",
+        },
+        "dispenser_chemicals": {
+            "RMCAluminum", "RMCCarbon", "RMCChlorine", "RMCCopper", "RMCEthanol",
+            "RMCFluorine", "RMCHydrogen", "RMCIodine", "RMCIron", "RMCLithium",
+            "RMCMercury", "RMCNitrogen", "RMCOxygen", "RMCPhosphorus", "RMCPhoron",
+            "RMCPotassium", "RMCRadium", "RMCSilicon", "RMCSilver", "RMCSodium",
+            "RMCSulfur", "RMCSugar", "RMCGold", "RMCTungsten", "RMCWater",
+            "RMCSulphuricAcid", "RMCHydrochloricAcid",
+        },
+    },
 
-VANILLA_REACTION_FILES = [
-    "Resources/Prototypes/Recipes/Reactions/biological.yml",
-    "Resources/Prototypes/Recipes/Reactions/botany.yml",
-    "Resources/Prototypes/Recipes/Reactions/chemicals.yml",
-    "Resources/Prototypes/Recipes/Reactions/cleaning.yml",
-    "Resources/Prototypes/Recipes/Reactions/drinks.yml",
-    "Resources/Prototypes/Recipes/Reactions/food.yml",
-    "Resources/Prototypes/Recipes/Reactions/fun.yml",
-    "Resources/Prototypes/Recipes/Reactions/gas.yml",
-    "Resources/Prototypes/Recipes/Reactions/medicine.yml",
-    "Resources/Prototypes/Recipes/Reactions/pyrotechnic.yml",
-    "Resources/Prototypes/Recipes/Reactions/single_reagent.yml",
-    "Resources/Prototypes/Recipes/Reactions/soap.yml",
-]
+    # ── Goob Station ──
+    "goob": {
+        "name": "Goob Station",
+        "repo": "Goob-Station/Goob-Station",
+        "branch": "master",
+        "raw_url": "https://raw.githubusercontent.com/Goob-Station/Goob-Station/master/{path}",
+        "custom_dir": "_Goobstation",
+        "color": "#f472b6",
+        "reagent_files": [
+            "Resources/Prototypes/_Goobstation/Reagents/biological.yml",
+            "Resources/Prototypes/_Goobstation/Reagents/botany.yml",
+            "Resources/Prototypes/_Goobstation/Reagents/chemicals.yml",
+            "Resources/Prototypes/_Goobstation/Reagents/drinks.yml",
+            "Resources/Prototypes/_Goobstation/Reagents/fun.yml",
+            "Resources/Prototypes/_Goobstation/Reagents/gases.yml",
+            "Resources/Prototypes/_Goobstation/Reagents/medicine.yml",
+            "Resources/Prototypes/_Goobstation/Reagents/narcotics.yml",
+            "Resources/Prototypes/_Goobstation/Reagents/pyrotechnics.yml",
+            "Resources/Prototypes/_Goobstation/Reagents/toxins.yml",
+        ],
+        "reaction_files": [
+            "Resources/Prototypes/_Goobstation/Recipes/Reactions/biological.yml",
+            "Resources/Prototypes/_Goobstation/Recipes/Reactions/botany.yml",
+            "Resources/Prototypes/_Goobstation/Recipes/Reactions/changeling.yml",
+            "Resources/Prototypes/_Goobstation/Recipes/Reactions/chemicals.yml",
+            "Resources/Prototypes/_Goobstation/Recipes/Reactions/drinks.yml",
+            "Resources/Prototypes/_Goobstation/Recipes/Reactions/fun.yml",
+            "Resources/Prototypes/_Goobstation/Recipes/Reactions/medicine.yml",
+            "Resources/Prototypes/_Goobstation/Recipes/Reactions/narcotics.yml",
+            "Resources/Prototypes/_Goobstation/Recipes/Reactions/pyrotechnics.yml",
+            "Resources/Prototypes/_Goobstation/Recipes/Reactions/single_reagent.yml",
+            "Resources/Prototypes/_Goobstation/Recipes/Reactions/toxins.yml",
+        ],
+        "locale_files": [],
+        "seed_files": [],
+        "botany_locale_files": [],
+        "blocked_reactions": set(),
+        "modified_reactions": {},
+        "dispenser_chemicals": set(),
+    },
 
-VANILLA_LOCALE_FILES = [
-    # Meta category files (main name/desc localization)
-    "Resources/Locale/en-US/reagents/meta/biological.ftl",
-    "Resources/Locale/en-US/reagents/meta/botany.ftl",
-    "Resources/Locale/en-US/reagents/meta/chemicals.ftl",
-    "Resources/Locale/en-US/reagents/meta/cleaning.ftl",
-    "Resources/Locale/en-US/reagents/meta/elements.ftl",
-    "Resources/Locale/en-US/reagents/meta/fun.ftl",
-    "Resources/Locale/en-US/reagents/meta/gases.ftl",
-    "Resources/Locale/en-US/reagents/meta/medicine.ftl",
-    "Resources/Locale/en-US/reagents/meta/narcotics.ftl",
-    "Resources/Locale/en-US/reagents/meta/physical-desc.ftl",
-    "Resources/Locale/en-US/reagents/meta/pyrotechnic.ftl",
-    "Resources/Locale/en-US/reagents/meta/toxins.ftl",
-    # Consumable locale
-    "Resources/Locale/en-US/reagents/meta/consumable/drink/alcohol.ftl",
-    "Resources/Locale/en-US/reagents/meta/consumable/drink/drinks.ftl",
-    "Resources/Locale/en-US/reagents/meta/consumable/drink/juice.ftl",
-    "Resources/Locale/en-US/reagents/meta/consumable/drink/soda.ftl",
-    "Resources/Locale/en-US/reagents/meta/consumable/food/condiments.ftl",
-    "Resources/Locale/en-US/reagents/meta/consumable/food/food.ftl",
-    "Resources/Locale/en-US/reagents/meta/consumable/food/ingredients.ftl",
-    # Individual reagent files
-    "Resources/Locale/en-US/reagents/Capsaicin.ftl",
-    "Resources/Locale/en-US/reagents/absinthe.ftl",
-    "Resources/Locale/en-US/reagents/barozine.ftl",
-    "Resources/Locale/en-US/reagents/buzzochloricbees.ftl",
-    "Resources/Locale/en-US/reagents/carpetium.ftl",
-    "Resources/Locale/en-US/reagents/clf3.ftl",
-    "Resources/Locale/en-US/reagents/ephedrine.ftl",
-    "Resources/Locale/en-US/reagents/ethyloxyephedrine.ftl",
-    "Resources/Locale/en-US/reagents/fresium.ftl",
-    "Resources/Locale/en-US/reagents/frezon.ftl",
-    "Resources/Locale/en-US/reagents/frostoil.ftl",
-    "Resources/Locale/en-US/reagents/generic.ftl",
-    "Resources/Locale/en-US/reagents/histamine.ftl",
-    "Resources/Locale/en-US/reagents/laughter.ftl",
-    "Resources/Locale/en-US/reagents/leporazine.ftl",
-    "Resources/Locale/en-US/reagents/mannitol.ftl",
-    "Resources/Locale/en-US/reagents/norepinephricacid.ftl",
-    "Resources/Locale/en-US/reagents/phlogiston.ftl",
-    "Resources/Locale/en-US/reagents/psicodine.ftl",
-]
+    # ── Starlight ──
+    "starlight": {
+        "name": "Starlight",
+        "repo": "fskx/starlight-ss14",
+        "branch": "Starlight",
+        "raw_url": "https://raw.githubusercontent.com/fskx/starlight-ss14/Starlight/{path}",
+        "custom_dir": "_Starlight",
+        "color": "#facc15",
+        "reagent_files": [
+            "Resources/Prototypes/_Starlight/Reagents/biological.yml",
+            "Resources/Prototypes/_Starlight/Reagents/cantrips.yml",
+            "Resources/Prototypes/_Starlight/Reagents/cleaning.yml",
+            "Resources/Prototypes/_Starlight/Reagents/fun.yml",
+            "Resources/Prototypes/_Starlight/Reagents/medicine.yml",
+            "Resources/Prototypes/_Starlight/Reagents/xenobiology.yml",
+        ],
+        "reaction_files": [
+            "Resources/Prototypes/_Starlight/Recipes/Reactions/cleaning.yml",
+            "Resources/Prototypes/_Starlight/Recipes/Reactions/drinks.yml",
+            "Resources/Prototypes/_Starlight/Recipes/Reactions/food.yml",
+            "Resources/Prototypes/_Starlight/Recipes/Reactions/fun.yml",
+            "Resources/Prototypes/_Starlight/Recipes/Reactions/medicine.yml",
+            "Resources/Prototypes/_Starlight/Recipes/Reactions/xenobiology.yml",
+        ],
+        "locale_files": [],
+        "seed_files": [],
+        "botany_locale_files": [],
+        "blocked_reactions": set(),
+        "modified_reactions": {},
+        "dispenser_chemicals": set(),
+    },
 
-RMC14_REAGENT_FILES = [
-    "Resources/Prototypes/_RMC14/Reagents/base_reagent.yml",
-    "Resources/Prototypes/_RMC14/Reagents/elements.yml",
-    "Resources/Prototypes/_RMC14/Reagents/medicine.yml",
-    "Resources/Prototypes/_RMC14/Reagents/narcotics.yml",
-    "Resources/Prototypes/_RMC14/Reagents/other.yml",
-    "Resources/Prototypes/_RMC14/Reagents/pyrotechnic.yml",
-    "Resources/Prototypes/_RMC14/Reagents/synth_blood.yml",
-    "Resources/Prototypes/_RMC14/Reagents/toxins.yml",
-    "Resources/Prototypes/_RMC14/Reagents/Consumable/ingredients.yml",
-    "Resources/Prototypes/_RMC14/Reagents/Consumable/Drink/alcohol.yml",
-    "Resources/Prototypes/_RMC14/Reagents/Consumable/Drink/juice.yml",
-    "Resources/Prototypes/_RMC14/Reagents/Consumable/Drink/other_drinks.yml",
-    "Resources/Prototypes/_RMC14/Reagents/Consumable/Drink/soda.yml",
-]
+    # ── Dead Space ──
+    "deadspace": {
+        "name": "Dead Space",
+        "repo": "dead-space-server/dead-space-14",
+        "branch": "master",
+        "raw_url": "https://raw.githubusercontent.com/dead-space-server/dead-space-14/master/{path}",
+        "custom_dir": "_DeadSpace",
+        "color": "#94a3b8",
+        "reagent_files": [
+            "Resources/Prototypes/_DeadSpace/Reagents/biological.yml",
+            "Resources/Prototypes/_DeadSpace/Reagents/elements.yml",
+            "Resources/Prototypes/_DeadSpace/Reagents/narcotics.yml",
+            "Resources/Prototypes/_DeadSpace/Reagents/toxins.yml",
+        ],
+        "reaction_files": [
+            "Resources/Prototypes/_DeadSpace/Recipes/Reactions/chemicals.yml",
+            "Resources/Prototypes/_DeadSpace/Recipes/Reactions/drinks.yml",
+            "Resources/Prototypes/_DeadSpace/Recipes/Reactions/medicine.yml",
+        ],
+        "locale_files": [],
+        "seed_files": [],
+        "botany_locale_files": [],
+        "blocked_reactions": set(),
+        "modified_reactions": {},
+        "dispenser_chemicals": set(),
+    },
 
-RMC14_REACTION_FILES = [
-    "Resources/Prototypes/_RMC14/Recipes/Reactions/chemicals.yml",
-    "Resources/Prototypes/_RMC14/Recipes/Reactions/elements.yml",
-    "Resources/Prototypes/_RMC14/Recipes/Reactions/ingredients.yml",
-    "Resources/Prototypes/_RMC14/Recipes/Reactions/medicine.yml",
-    "Resources/Prototypes/_RMC14/Recipes/Reactions/narcotics.yml",
-    "Resources/Prototypes/_RMC14/Recipes/Reactions/other.yml",
-    "Resources/Prototypes/_RMC14/Recipes/Reactions/pyrotechnic.yml",
-    "Resources/Prototypes/_RMC14/Recipes/Reactions/toxins.yml",
-]
+    # ── Frontier ──
+    "frontier": {
+        "name": "Frontier",
+        "repo": "new-frontiers-14/frontier-station-14",
+        "branch": "master",
+        "raw_url": "https://raw.githubusercontent.com/new-frontiers-14/frontier-station-14/master/{path}",
+        "custom_dir": "_NF",
+        "color": "#fb923c",
+        "reagent_files": [
+            "Resources/Prototypes/_NF/Reagents/biological.yml",
+            "Resources/Prototypes/_NF/Reagents/chemicals.yml",
+            "Resources/Prototypes/_NF/Reagents/gases.yml",
+            "Resources/Prototypes/_NF/Reagents/medicine.yml",
+            "Resources/Prototypes/_NF/Reagents/narcotics.yml",
+            "Resources/Prototypes/_NF/Reagents/toxins.yml",
+        ],
+        "reaction_files": [
+            "Resources/Prototypes/_NF/Recipes/Reactions/chemicals.yml",
+            "Resources/Prototypes/_NF/Recipes/Reactions/drinks.yml",
+            "Resources/Prototypes/_NF/Recipes/Reactions/food.yml",
+            "Resources/Prototypes/_NF/Recipes/Reactions/medicine.yml",
+        ],
+        "locale_files": [],
+        "seed_files": [],
+        "botany_locale_files": [],
+        "blocked_reactions": set(),
+        "modified_reactions": {},
+        "dispenser_chemicals": set(),
+    },
 
-RMC14_LOCALE_FILES = [
-    "Resources/Locale/en-US/_RMC14/reagents/flavors.ftl",
-    "Resources/Locale/en-US/_RMC14/reagents/ingredients.ftl",
-    "Resources/Locale/en-US/_RMC14/reagents/other.ftl",
-    "Resources/Locale/en-US/_RMC14/reagents/pyrotechnic.ftl",
-    "Resources/Locale/en-US/_RMC14/reagents/toxins.ftl",
-    "Resources/Locale/en-US/_RMC14/reagents/meta/elements.ftl",
-    "Resources/Locale/en-US/_RMC14/reagents/meta/consumable/drink/alcohol.ftl",
-    "Resources/Locale/en-US/_RMC14/reagents/meta/consumable/drink/juice.ftl",
-    "Resources/Locale/en-US/_RMC14/reagents/meta/consumable/drink/soda.ftl",
-    # Medical locale with reagent names
-    "Resources/Locale/en-US/_RMC14/medical/medicine.ftl",
-    "Resources/Locale/en-US/_RMC14/medical/narcotics.ftl",
-    "Resources/Locale/en-US/_RMC14/medical/toxins.ftl",
-    "Resources/Locale/en-US/_RMC14/medical/synth.ftl",
-]
-
-# Known base chemicals available from the chemical dispenser
-BASE_DISPENSER_CHEMICALS = {
-    # Vanilla SS14 dispenser
-    "Aluminium", "Carbon", "Chlorine", "Copper", "Ethanol", "Fluorine",
-    "Hydrogen", "Iodine", "Iron", "Lithium", "Mercury", "Nitrogen",
-    "Oxygen", "Phosphorus", "Plasma", "Potassium", "Radium", "Silicon",
-    "Silver", "Sodium", "Sulfur", "Sugar", "Water", "WeldingFuel", "Oil",
-    # RMC14 dispenser equivalents (CM chemistry uses its own element IDs)
-    "RMCAluminum", "RMCCarbon", "RMCChlorine", "RMCCopper", "RMCEthanol",
-    "RMCFluorine", "RMCHydrogen", "RMCIodine", "RMCIron", "RMCLithium",
-    "RMCMercury", "RMCNitrogen", "RMCOxygen", "RMCPhosphorus", "RMCPhoron",
-    "RMCPotassium", "RMCRadium", "RMCSilicon", "RMCSilver", "RMCSodium",
-    "RMCSulfur", "RMCSugar", "RMCGold", "RMCTungsten", "RMCWater",
-    "RMCSulphuricAcid", "RMCHydrochloricAcid",
+    # ── Funky Station (forks from Goob Station) ──
+    "funky": {
+        "name": "Funky Station",
+        "repo": "funky-station/funky-station",
+        "branch": "master",
+        "raw_url": "https://raw.githubusercontent.com/funky-station/funky-station/master/{path}",
+        "custom_dir": "_Funkystation",
+        "color": "#c084fc",
+        "parent_fork": "goob",  # inherits Goob's custom chemistry too
+        "reagent_files": [
+            "Resources/Prototypes/_Funkystation/Reagents/biological.yml",
+            "Resources/Prototypes/_Funkystation/Reagents/bloodcult.yml",
+            "Resources/Prototypes/_Funkystation/Reagents/exotic.yml",
+            "Resources/Prototypes/_Funkystation/Reagents/fun.yml",
+            "Resources/Prototypes/_Funkystation/Reagents/medicine.yml",
+            "Resources/Prototypes/_Funkystation/Reagents/toxins.yml",
+        ],
+        "reaction_files": [
+            "Resources/Prototypes/_Funkystation/Recipes/Reactions/alcohol.yml",
+            "Resources/Prototypes/_Funkystation/Recipes/Reactions/drinks.yml",
+            "Resources/Prototypes/_Funkystation/Recipes/Reactions/exotic.yml",
+            "Resources/Prototypes/_Funkystation/Recipes/Reactions/food.yml",
+            "Resources/Prototypes/_Funkystation/Recipes/Reactions/medicine.yml",
+            "Resources/Prototypes/_Funkystation/Recipes/Reactions/pyrotechnic.yml",
+            "Resources/Prototypes/_Funkystation/Recipes/Reactions/toxins.yml",
+        ],
+        "locale_files": [],
+        "seed_files": [],
+        "botany_locale_files": [],
+        "blocked_reactions": set(),
+        "modified_reactions": {},
+        "dispenser_chemicals": set(),
+    },
 }
 
-# Seed/plant files for extracting plant-to-reagent mappings
-VANILLA_SEED_FILES = [
-    "Resources/Prototypes/Hydroponics/seeds.yml",
-]
+# ── Backward-compatible aliases (used by extractor during transition) ──
+VANILLA_RAW = FORK_REGISTRY["vanilla"]["raw_url"]
+RMC14_RAW = FORK_REGISTRY["rmc14"]["raw_url"]
+VANILLA_REAGENT_FILES = FORK_REGISTRY["vanilla"]["reagent_files"]
+VANILLA_REACTION_FILES = FORK_REGISTRY["vanilla"]["reaction_files"]
+VANILLA_LOCALE_FILES = FORK_REGISTRY["vanilla"]["locale_files"]
+RMC14_REAGENT_FILES = FORK_REGISTRY["rmc14"]["reagent_files"]
+RMC14_REACTION_FILES = FORK_REGISTRY["rmc14"]["reaction_files"]
+RMC14_LOCALE_FILES = FORK_REGISTRY["rmc14"]["locale_files"]
+VANILLA_SEED_FILES = FORK_REGISTRY["vanilla"]["seed_files"]
+VANILLA_BOTANY_LOCALE_FILES = FORK_REGISTRY["vanilla"]["botany_locale_files"]
+RMC14_SEED_FILES = FORK_REGISTRY["rmc14"]["seed_files"]
+RMC14_BLOCKED_REACTIONS = FORK_REGISTRY["rmc14"]["blocked_reactions"]
+RMC14_MODIFIED_REACTIONS = FORK_REGISTRY["rmc14"]["modified_reactions"]
 
-# Botany locale files (for resolving seed names)
-VANILLA_BOTANY_LOCALE_FILES = [
-    "Resources/Locale/en-US/ss14-entities/objects/specific/hydroponics/seeds.ftl",
-]
-
-RMC14_SEED_FILES = [
-    # RMC14 may have custom seeds — add paths here if discovered
-]
+# Combined dispenser chemicals (all forks)
+BASE_DISPENSER_CHEMICALS = set()
+for _fork in FORK_REGISTRY.values():
+    BASE_DISPENSER_CHEMICALS |= _fork.get("dispenser_chemicals", set())
 
 # Non-chemistry sources for reagents (vending machines, dispensers, mobs, etc.)
 # Format: reagent_id -> list of source descriptions

@@ -32,12 +32,7 @@
 
       <div class="filter-section">
         <h3>Source</h3>
-        <label class="radio-label"><input type="radio" name="source" value="all" checked> All</label>
-        <label class="radio-label"><input type="radio" name="source" value="vanilla"> Vanilla SS14</label>
-        <label class="radio-label"><input type="radio" name="source" value="rmc14"> RMC14 (all available)</label>
-        <div id="rmcDisclaimer" class="rmc-disclaimer" style="display:none">
-          RMC14 availability based on YAML prototypes. Some recipes may be additionally blocked by server C# code. 33 known blocked reactions filtered out.
-        </div>
+        <div id="sourceFilters"><!-- Populated dynamically from DATA.meta.forks --></div>
       </div>
 
       <div class="filter-section">

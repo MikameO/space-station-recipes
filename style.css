@@ -258,7 +258,7 @@ header h1 {
 }
 .radio-label input:checked::after { border-radius: 50%; }
 
-.rmc-disclaimer {
+.rmc-disclaimer, .fork-disclaimer {
   font-size: 0.6rem;
   color: var(--amber);
   background: var(--amber-dim);
@@ -267,6 +267,22 @@ header h1 {
   padding: 6px 8px;
   margin-top: 6px;
   line-height: 1.4;
+}
+.fork-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 4px;
+  vertical-align: middle;
+}
+.badge-fork {
+  background: var(--panel-raised);
+  border-left: 2px solid;
+  font-size: 0.5rem;
+  padding: 1px 5px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
 
 .cat-label .cat-dot {

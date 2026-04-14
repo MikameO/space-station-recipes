@@ -95,13 +95,16 @@ function filterReagents(query) {
 
   return searchIndex.filter(entry => {
     const r = entry.reagent;
-    // Source filter: "rmc14" shows ALL available on RMC14 servers (vanilla unblocked + rmc14 native)
-    if (activeSource === 'rmc14') {
-      // Show rmc14-native reagents + vanilla reagents whose recipe isn't blocked
+    // Source filter: fork mode shows fork-native + vanilla (minus blocked)
+    if (activeSource !== 'all' && activeSource !== 'vanilla') {
+      const forkId = activeSource;
       if (r.source === 'vanilla') {
-        // Check if this reagent's recipe is blocked in RMC14
         const rxn = r.recipe ? Object.values(DATA.reactions).find(rx => rx.products[r.id]) : null;
-        if (rxn && rxn.rmcStatus === 'blocked') return false;
+        if (rxn && rxn.forkStatus && rxn.forkStatus[forkId] === 'blocked') return false;
+        // Backward compat: check rmcStatus for rmc14 if forkStatus missing
+        if (forkId === 'rmc14' && rxn && !rxn.forkStatus && rxn.rmcStatus === 'blocked') return false;
+      } else if (r.source !== forkId) {
+        return false; // reagent from a different fork — hide
       }
     } else if (activeSource === 'vanilla') {
       if (r.source !== 'vanilla') return false;
@@ -122,9 +125,15 @@ function filterReactions(query) {
   const tokens = q.split(/\s+/).filter(Boolean);
 
   return Object.values(DATA.reactions).filter(rxn => {
-    // Source filter: "rmc14" shows all available on RMC14 (unblocked vanilla + rmc14 native)
-    if (activeSource === 'rmc14') {
-      if (rxn.source === 'vanilla' && rxn.rmcStatus === 'blocked') return false;
+    // Source filter: fork mode hides blocked vanilla + other-fork reactions
+    if (activeSource !== 'all' && activeSource !== 'vanilla') {
+      const forkId = activeSource;
+      if (rxn.source === 'vanilla') {
+        if (rxn.forkStatus && rxn.forkStatus[forkId] === 'blocked') return false;
+        if (forkId === 'rmc14' && !rxn.forkStatus && rxn.rmcStatus === 'blocked') return false;
+      } else if (rxn.source !== forkId) {
+        return false; // reaction from a different fork
+      }
     } else if (activeSource === 'vanilla') {
       if (rxn.source !== 'vanilla') return false;
     }
@@ -157,20 +166,11 @@ function buildSidebar() {
     counts[r.category] = (counts[r.category] || 0) + 1;
   }
 
-  const catColors = {
-    'Medicine': '#a855f7', 'Toxins': '#ef4444', 'Elements': '#64748b',
-    'Chemicals': '#3b82f6', 'Drinks (Alcoholic)': '#f59e0b', 'Drinks (Non-Alc)': '#eab308',
-    'Food & Condiments': '#22c55e', 'Pyrotechnic': '#f97316', 'Gases': '#8b5cf6',
-    'Botany': '#10b981', 'Biological': '#ec4899', 'Cleaning': '#14b8a6',
-    'Fun': '#f472b6', 'Narcotics': '#fb923c', 'Materials': '#6b7280',
-    'RMC14 Medicine': '#06b6d4', 'RMC14 Elements': '#0891b2', 'RMC14 Toxins': '#0e7490',
-    'RMC14 Drinks': '#0284c7', 'RMC14 Narcotics': '#0369a1', 'RMC14 Pyrotechnic': '#075985',
-    'RMC14 Other': '#0c4a6e',
-  };
+  // Use getCatColor() instead of static map — it handles fork categories dynamically
 
   let html = '';
   for (const cat of DATA.categories) {
-    const color = catColors[cat] || '#64748b';
+    const color = getCatColor(cat);
     const count = counts[cat] || 0;
     html += `<label class="cat-label">
       <input type="checkbox" value="${cat}">
@@ -181,16 +181,8 @@ function buildSidebar() {
   }
   catDiv.innerHTML = html;
 
-  // Source filter
-  document.querySelectorAll('input[name="source"]').forEach(radio => {
-    radio.addEventListener('change', () => {
-      activeSource = radio.value;
-      // Show/hide RMC14 disclaimer
-      const disc = document.getElementById('rmcDisclaimer');
-      if (disc) disc.style.display = radio.value === 'rmc14' ? 'block' : 'none';
-      renderCurrentTab();
-    });
-  });
+  // Source filter — dynamic from DATA.meta.forks
+  buildSourceFilters();
 
   // Base/Crafted filter
   document.querySelectorAll('input[name="basetype"]').forEach(radio => {
@@ -225,10 +217,69 @@ function buildSidebar() {
 
 function updateStats() {
   const panel = document.getElementById('statsPanel');
-  const vanilla = Object.values(DATA.reagents).filter(r => r.source === 'vanilla').length;
-  const rmc = Object.values(DATA.reagents).filter(r => r.source === 'rmc14').length;
+  let statsHTML = '';
+  if (DATA.meta?.forks) {
+    for (const [fid, meta] of Object.entries(DATA.meta.forks)) {
+      statsHTML += `<span class="fork-dot" style="background:${meta.color}"></span>${meta.name}: ${meta.reagentCount}<br>`;
+    }
+  }
   const base = DATA.baseChemicals.length;
-  panel.innerHTML = `Vanilla: ${vanilla}<br>RMC14: ${rmc}<br>Base chemicals: ${base}<br>Reactions: ${Object.keys(DATA.reactions).length}<br>Graph edges: ${DATA.edges.length}`;
+  statsHTML += `Base chemicals: ${base}<br>Reactions: ${Object.keys(DATA.reactions).length}<br>Graph edges: ${DATA.edges.length}`;
+  panel.innerHTML = statsHTML;
+}
+
+// ─────────────────────────────────────────────
+// Dynamic Source Filters
+// ─────────────────────────────────────────────
+
+function buildSourceFilters() {
+  const container = document.getElementById('sourceFilters');
+  if (!container) return;
+
+  let html = '<label class="radio-label"><input type="radio" name="source" value="all" checked> All</label>';
+  html += '<label class="radio-label"><input type="radio" name="source" value="vanilla"> Vanilla SS14</label>';
+
+  if (DATA.meta?.forks) {
+    for (const [forkId, meta] of Object.entries(DATA.meta.forks)) {
+      if (forkId === 'vanilla') continue;
+      html += `<label class="radio-label">
+        <input type="radio" name="source" value="${forkId}">
+        <span class="fork-dot" style="background:${meta.color}"></span>
+        ${meta.name}
+      </label>`;
+    }
+  }
+
+  container.innerHTML = html;
+
+  // Disclaimer div
+  container.insertAdjacentHTML('afterend',
+    '<div id="forkDisclaimer" class="fork-disclaimer" style="display:none"></div>');
+
+  // Bind change events
+  container.querySelectorAll('input[name="source"]').forEach(radio => {
+    radio.addEventListener('change', () => {
+      activeSource = radio.value;
+      // Show disclaimer for forks with blocked reactions
+      const disc = document.getElementById('forkDisclaimer');
+      if (disc) {
+        if (radio.value !== 'all' && radio.value !== 'vanilla' && DATA.meta?.forks?.[radio.value]) {
+          const forkMeta = DATA.meta.forks[radio.value];
+          disc.textContent = `${forkMeta.name}: showing vanilla + fork-exclusive chemistry. Blocked reactions filtered out.`;
+          disc.style.display = 'block';
+        } else {
+          disc.style.display = 'none';
+        }
+      }
+      renderCurrentTab();
+    });
+  });
+
+  // Restore active source if already set
+  if (activeSource !== 'all') {
+    const radio = container.querySelector(`input[value="${activeSource}"]`);
+    if (radio) radio.checked = true;
+  }
 }
 
 // ─────────────────────────────────────────────
@@ -283,8 +334,14 @@ function getCatColor(cat) {
     'Botany': '#10b981', 'Biological': '#ec4899', 'Cleaning': '#14b8a6',
     'Fun': '#f472b6', 'Narcotics': '#fb923c', 'Materials': '#6b7280',
   };
-  if (cat.startsWith('RMC14')) return '#06b6d4';
-  return map[cat] || '#64748b';
+  if (map[cat]) return map[cat];
+  // Dynamic: check if category starts with a fork name → use fork color
+  if (DATA?.meta?.forks) {
+    for (const [fid, meta] of Object.entries(DATA.meta.forks)) {
+      if (cat.startsWith(meta.name)) return meta.color;
+    }
+  }
+  return '#64748b';
 }
 
 function sortResults(results) {
@@ -357,7 +414,7 @@ function reagentCardHTML(r) {
       <span class="badge badge-cat" style="border-left-color:${catColor}">${esc(r.category)}</span>
       ${r.isBase ? `<span class="badge badge-base">${r.isDispenser ? 'DISPENSER' : 'BASE'}</span>` : ''}
       ${r.overdose ? `<span class="badge badge-od">OD ${r.overdose}u</span>` : ''}
-      ${r.source === 'rmc14' ? '<span class="badge badge-rmc">RMC14</span>' : ''}
+      ${r.source !== 'vanilla' && DATA.meta?.forks?.[r.source] ? `<span class="badge badge-fork" style="border-color:${DATA.meta.forks[r.source].color}">${DATA.meta.forks[r.source].name}</span>` : ''}
       ${antagMode && r.antagScore ? `<span class="badge badge-antag">${'\u2620'} ${r.antagScore}/10</span>` : ''}
       ${antagMode && r.antagTags ? r.antagTags.map(t => `<span class="badge badge-antag-tag">${esc(t)}</span>`).join('') : ''}
     </div>
@@ -389,7 +446,7 @@ function renderReactions(query = '') {
       <td>${esc(products)}</td>
       <td>${esc(temp)}</td>
       <td>${esc(mixer)}</td>
-      <td>${rxn.source === 'rmc14' ? '<span class="badge badge-rmc">RMC14</span>' : 'Vanilla'}${rxn.rmcStatus === 'modified' ? ' <span class="badge badge-modified" title="' + esc(rxn.rmcNote) + '">MOD</span>' : ''}</td>
+      <td>${rxn.source !== 'vanilla' && DATA.meta?.forks?.[rxn.source] ? '<span class="badge badge-fork" style="border-color:' + DATA.meta.forks[rxn.source].color + '">' + esc(DATA.meta.forks[rxn.source].name) + '</span>' : 'Vanilla'}${(() => { const fs = rxn.forkStatus || {}; const fn = rxn.forkNotes || {}; const mods = Object.entries(fs).filter(([,s]) => s === 'modified'); return mods.length ? ' <span class="badge badge-modified" title="' + mods.map(([f]) => esc((DATA.meta.forks?.[f]?.name || f) + ': ' + (fn[f] || 'Modified'))).join('; ') + '">MOD</span>' : ''; })()}</td>
     </tr>`;
   });
 
@@ -465,7 +522,7 @@ function openDetail(reagentId, pushHistory = true) {
         <span class="used-in-arrow">&rarr;</span>
         <span class="used-in-product">${productNames.map(n => esc(n)).join(', ')}</span>
         ${isCat ? '<span class="node-badge badge-c">CAT</span>' : ''}
-        ${rxn.source === 'rmc14' ? '<span class="badge badge-rmc" style="margin-left:auto">RMC14</span>' : ''}
+        ${rxn.source !== 'vanilla' && DATA.meta?.forks?.[rxn.source] ? '<span class="badge badge-fork" style="margin-left:auto;border-color:' + DATA.meta.forks[rxn.source].color + '">' + esc(DATA.meta.forks[rxn.source].name) + '</span>' : ''}
       </div>`;
     }).join('') + '</div>';
   }
@@ -480,7 +537,7 @@ function openDetail(reagentId, pushHistory = true) {
       <span class="color-swatch" style="background:${safeColor(r.color)};width:20px;height:20px"></span>
       ${esc(capName(r.name || r.id))}
     </div>
-    <div class="detail-id">${esc(r.id)} | ${esc(r.category)} | ${r.source === 'rmc14' ? 'RMC14' : 'Vanilla'}</div>
+    <div class="detail-id">${esc(r.id)} | ${esc(r.category)} | ${r.source !== 'vanilla' && DATA.meta?.forks?.[r.source] ? esc(DATA.meta.forks[r.source].name) : 'Vanilla'}</div>
     ${r.desc ? `<div class="detail-desc">${esc(r.desc)}</div>` : ''}
 
     <div class="detail-section">

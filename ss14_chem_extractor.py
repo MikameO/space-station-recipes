@@ -19,6 +19,7 @@ from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
 from openpyxl.utils import get_column_letter
 
 from config import (
+    FORK_REGISTRY,
     VANILLA_RAW, RMC14_RAW,
     VANILLA_REAGENT_FILES, VANILLA_REACTION_FILES, VANILLA_LOCALE_FILES,
     RMC14_REAGENT_FILES, RMC14_REACTION_FILES, RMC14_LOCALE_FILES,
@@ -29,6 +30,21 @@ from config import (
     REAGENT_COLUMNS, REACTION_COLUMNS,
     ANTAG_DATA, ANTAG_STRATEGIES, DELIVERY_MECHANISMS, SYNDICATE_ITEMS,
 )
+
+# ─────────────────────────────────────────────
+# Fork source detection (generalized from hardcoded _RMC14 check)
+# ─────────────────────────────────────────────
+
+def detect_fork_source(source_file: str) -> str:
+    """Determine which fork a file belongs to based on its path.
+    Returns fork ID from FORK_REGISTRY, or 'vanilla' if no match."""
+    for fork_id, config in FORK_REGISTRY.items():
+        if fork_id == "vanilla":
+            continue
+        custom_dir = config.get("custom_dir")
+        if custom_dir and custom_dir in source_file:
+            return fork_id
+    return "vanilla"
 
 SCRIPT_DIR = Path(__file__).parent
 CACHE_DIR = SCRIPT_DIR / "cache"
@@ -758,23 +774,25 @@ def categorize_reagent(reagent: dict) -> str:
     source = reagent.get("_source_file", "")
     group = reagent.get("group", "")
 
-    # RMC14 reagents go to RMC14 sheets
-    if "_RMC14" in source:
+    # Fork-specific reagents get "{ForkName} SubCategory" sheets
+    fork_id = detect_fork_source(source)
+    if fork_id != "vanilla":
+        fork_name = FORK_REGISTRY[fork_id]["name"]
         src_lower = source.lower()
         if "medicine" in src_lower or group == "Medicine":
-            return "RMC14 Medicine"
+            return f"{fork_name} Medicine"
         elif "toxin" in src_lower or group == "Toxins":
-            return "RMC14 Toxins"
+            return f"{fork_name} Toxins"
         elif "element" in src_lower or group == "Elements":
-            return "RMC14 Elements"
+            return f"{fork_name} Elements"
         elif "drink" in src_lower:
-            return "RMC14 Drinks"
+            return f"{fork_name} Drinks"
         elif "narcotic" in src_lower or group == "Narcotics":
-            return "RMC14 Narcotics"
+            return f"{fork_name} Narcotics"
         elif "pyrotechnic" in src_lower or group == "Pyrotechnic":
-            return "RMC14 Pyrotechnic"
+            return f"{fork_name} Pyrotechnic"
         else:
-            return "RMC14 Other"
+            return f"{fork_name} Other"
 
     # Vanilla categorization by source file path
     if "Drink/alcohol" in source:
@@ -813,8 +831,9 @@ def categorize_reagent(reagent: dict) -> str:
 def categorize_reaction(reaction: dict) -> str:
     """Determine sheet for a reaction."""
     source = reaction.get("_source_file", "")
-    if "_RMC14" in source:
-        return "RMC14 Recipes"
+    fork_id = detect_fork_source(source)
+    if fork_id != "vanilla":
+        return f"{FORK_REGISTRY[fork_id]['name']} Recipes"
 
     fname = source.split("/")[-1].replace(".yml", "")
     mapping = {
@@ -953,7 +972,7 @@ def write_reagent_row(ws, row: int, reagent: dict, locale: dict,
 
     # Source
     source = reagent.get("_source_file", "")
-    source_label = "RMC14" if "_RMC14" in source else "Vanilla"
+    source_label = FORK_REGISTRY.get(detect_fork_source(source), {}).get("name", "Vanilla")
     source_short = f"{source_label}: {source.split('/')[-1]}"
 
     # Notes
@@ -1027,7 +1046,7 @@ def write_reaction_row(ws, row: int, reaction: dict, reaction_lookup: dict, base
             craft_chain = "[TOO DEEP]"
 
     source = reaction.get("_source_file", "")
-    source_label = "RMC14" if "_RMC14" in source else "Vanilla"
+    source_label = FORK_REGISTRY.get(detect_fork_source(source), {}).get("name", "Vanilla")
     source_short = f"{source_label}: {source.split('/')[-1]}"
 
     values = [
@@ -1290,13 +1309,32 @@ def export_json(reagents: dict, reactions: dict, locale: dict,
                 reaction_lookup: dict, base_set: set,
                 all_sources: dict | None = None):
     """Export all data as a JSON file for the web frontend."""
+    # Compute per-fork reagent counts
+    fork_reagent_counts = {}
+    for r in reagents.values():
+        if r.get("abstract"):
+            continue
+        fid = detect_fork_source(r.get("_source_file", ""))
+        fork_reagent_counts[fid] = fork_reagent_counts.get(fid, 0) + 1
+
+    # Build fork metadata for frontend
+    forks_meta = {}
+    for fid, fconf in FORK_REGISTRY.items():
+        count = fork_reagent_counts.get(fid, 0)
+        if fid == "vanilla" or count > 0:
+            forks_meta[fid] = {
+                "name": fconf["name"],
+                "color": fconf["color"],
+                "reagentCount": count,
+            }
+
     data = {
         "meta": {
             "generated": time.strftime("%Y-%m-%dT%H:%M:%S"),
-            "vanillaReagentCount": sum(1 for r in reagents.values()
-                                       if not r.get("abstract") and "_RMC14" not in r.get("_source_file", "")),
-            "rmcReagentCount": sum(1 for r in reagents.values()
-                                   if not r.get("abstract") and "_RMC14" in r.get("_source_file", "")),
+            "forks": forks_meta,
+            # Backward compat
+            "vanillaReagentCount": fork_reagent_counts.get("vanilla", 0),
+            "rmcReagentCount": fork_reagent_counts.get("rmc14", 0),
             "reactionCount": len(reactions),
         },
         "reagents": {},
@@ -1314,7 +1352,7 @@ def export_json(reagents: dict, reactions: dict, locale: dict,
 
         cat = categorize_reagent(reagent)
         cats_seen.add(cat)
-        source = "rmc14" if "_RMC14" in reagent.get("_source_file", "") else "vanilla"
+        source = detect_fork_source(reagent.get("_source_file", ""))
         effects_str, metab_paths = summarize_metabolisms(reagent.get("metabolisms", {}))
 
         recipe_obj = None
@@ -1385,22 +1423,30 @@ def export_json(reagents: dict, reactions: dict, locale: dict,
 
     # Build reactions
     for rid, rxn in sorted(reactions.items()):
-        source = "rmc14" if "_RMC14" in rxn.get("_source_file", "") else "vanilla"
+        source = detect_fork_source(rxn.get("_source_file", ""))
         reactants_obj = {}
         for react_id, info in rxn.get("reactants", {}).items():
             amount = info.get("amount", 1) if isinstance(info, dict) else 1
             catalyst = info.get("catalyst", False) if isinstance(info, dict) else False
             reactants_obj[react_id] = {"amount": amount, "catalyst": catalyst}
 
-        # RMC14 availability status for vanilla reactions
-        rmc_status = "available"  # default
+        # Per-fork availability status for vanilla reactions
+        fork_status = {}
+        fork_notes = {}
         if source == "vanilla":
-            if rid in RMC14_BLOCKED_REACTIONS:
-                rmc_status = "blocked"
-            elif rid in RMC14_MODIFIED_REACTIONS:
-                rmc_status = "modified"
+            for fid, fconf in FORK_REGISTRY.items():
+                if fid == "vanilla":
+                    continue
+                blocked = fconf.get("blocked_reactions", set())
+                modified = fconf.get("modified_reactions", {})
+                if rid in blocked:
+                    fork_status[fid] = "blocked"
+                elif rid in modified:
+                    fork_status[fid] = "modified"
+                    fork_notes[fid] = modified[rid]
+                # "available" is default — omit to save space
 
-        data["reactions"][rid] = {
+        reaction_obj = {
             "id": rid,
             "source": source,
             "reactants": reactants_obj,
@@ -1410,9 +1456,21 @@ def export_json(reagents: dict, reactions: dict, locale: dict,
             "mixer": rxn.get("requiredMixerCategories", []),
             "effects": summarize_reaction_effects(rxn),
             "impact": rxn.get("impact"),
-            "rmcStatus": rmc_status,
-            "rmcNote": RMC14_MODIFIED_REACTIONS.get(rid, ""),
         }
+        # Only add fork fields if there's something to report
+        if fork_status:
+            reaction_obj["forkStatus"] = fork_status
+        if fork_notes:
+            reaction_obj["forkNotes"] = fork_notes
+        # Backward compat: rmcStatus / rmcNote
+        rmc_status = fork_status.get("rmc14", "available")
+        reaction_obj["rmcStatus"] = rmc_status
+        if rmc_status == "modified":
+            reaction_obj["rmcNote"] = fork_notes.get("rmc14", "")
+        else:
+            reaction_obj["rmcNote"] = ""
+
+        data["reactions"][rid] = reaction_obj
 
     # Build edges for vis.js graph
     for rid, rxn in reactions.items():
@@ -1453,72 +1511,73 @@ def export_json(reagents: dict, reactions: dict, locale: dict,
 def main():
     loader = make_yaml_loader()
 
-    # Phase 1: Fetch
+    # Phase 1: Fetch all forks
     print("=== Phase 1: Fetching files from GitHub ===")
 
-    print("\n[Vanilla SS14] Reagents...")
-    v_reagent_files = fetch_all_files(VANILLA_REAGENT_FILES, VANILLA_RAW, "vanilla")
-    print(f"  Fetched {len(v_reagent_files)} reagent files")
+    fork_data = {}  # fork_id -> {"reagent_files": {}, "reaction_files": {}, "locale_files": {}, "seed_files": {}}
+    for fork_id, fconf in FORK_REGISTRY.items():
+        url = fconf["raw_url"]
 
-    print("\n[Vanilla SS14] Reactions...")
-    v_reaction_files = fetch_all_files(VANILLA_REACTION_FILES, VANILLA_RAW, "vanilla")
-    print(f"  Fetched {len(v_reaction_files)} reaction files")
+        print(f"\n[{fconf['name']}] Reagents...")
+        reagent_files = fetch_all_files(fconf["reagent_files"], url, fork_id)
+        print(f"  Fetched {len(reagent_files)} reagent files")
 
-    print("\n[Vanilla SS14] Locale...")
-    v_locale_files = fetch_all_files(VANILLA_LOCALE_FILES, VANILLA_RAW, "vanilla")
-    print(f"  Fetched {len(v_locale_files)} locale files")
+        print(f"[{fconf['name']}] Reactions...")
+        reaction_files = fetch_all_files(fconf["reaction_files"], url, fork_id)
+        print(f"  Fetched {len(reaction_files)} reaction files")
 
-    print("\n[RMC14] Reagents...")
-    r_reagent_files = fetch_all_files(RMC14_REAGENT_FILES, RMC14_RAW, "rmc14")
-    print(f"  Fetched {len(r_reagent_files)} reagent files")
+        print(f"[{fconf['name']}] Locale...")
+        locale_files = fetch_all_files(fconf.get("locale_files", []), url, fork_id)
+        print(f"  Fetched {len(locale_files)} locale files")
 
-    print("\n[RMC14] Reactions...")
-    r_reaction_files = fetch_all_files(RMC14_REACTION_FILES, RMC14_RAW, "rmc14")
-    print(f"  Fetched {len(r_reaction_files)} reaction files")
+        seed_files = fetch_all_files(fconf.get("seed_files", []), url, fork_id)
+        if seed_files:
+            print(f"  Fetched {len(seed_files)} seed files")
 
-    print("\n[RMC14] Locale...")
-    r_locale_files = fetch_all_files(RMC14_LOCALE_FILES, RMC14_RAW, "rmc14")
-    print(f"  Fetched {len(r_locale_files)} locale files")
+        fork_data[fork_id] = {
+            "reagent_files": reagent_files,
+            "reaction_files": reaction_files,
+            "locale_files": locale_files,
+            "seed_files": seed_files,
+        }
 
-    print("\n[Seeds] Vanilla...")
-    v_seed_files = fetch_all_files(VANILLA_SEED_FILES, VANILLA_RAW, "vanilla")
-    print(f"  Fetched {len(v_seed_files)} seed files")
-
-    print("\n[Seeds] RMC14...")
-    r_seed_files = fetch_all_files(RMC14_SEED_FILES, RMC14_RAW, "rmc14")
-    print(f"  Fetched {len(r_seed_files)} seed files")
-
-    print("\n[Botany Locale]...")
-    botany_locale_files = fetch_all_files(VANILLA_BOTANY_LOCALE_FILES, VANILLA_RAW, "vanilla")
-    print(f"  Fetched {len(botany_locale_files)} botany locale files")
+    # Botany locale (vanilla only for now)
+    botany_locale_files = fetch_all_files(
+        FORK_REGISTRY["vanilla"].get("botany_locale_files", []),
+        FORK_REGISTRY["vanilla"]["raw_url"], "vanilla")
+    print(f"  Botany locale: {len(botany_locale_files)} files")
 
     # Phase 2: Parse YAML
     print("\n=== Phase 2: Parsing YAML prototypes ===")
-    v_reagents, v_reactions = parse_all_prototypes(v_reagent_files, loader)
-    print(f"  Vanilla reagents: {len(v_reagents)}")
 
-    v_r2, v_rxn2 = parse_all_prototypes(v_reaction_files, loader)
-    v_reactions.update(v_rxn2)
-    print(f"  Vanilla reactions: {len(v_reactions)}")
-
-    r_reagents, r_reactions = parse_all_prototypes(r_reagent_files, loader)
-    print(f"  RMC14 reagents: {len(r_reagents)}")
-
-    r_r2, r_rxn2 = parse_all_prototypes(r_reaction_files, loader)
-    r_reactions.update(r_rxn2)
-    print(f"  RMC14 reactions: {len(r_reactions)}")
+    parsed = {}  # fork_id -> {"reagents": {}, "reactions": {}}
+    for fork_id, fdata in fork_data.items():
+        reagents, reactions = parse_all_prototypes(fdata["reagent_files"], loader)
+        r2, rxn2 = parse_all_prototypes(fdata["reaction_files"], loader)
+        reactions.update(rxn2)
+        parsed[fork_id] = {"reagents": reagents, "reactions": reactions}
+        print(f"  {FORK_REGISTRY[fork_id]['name']}: {len(reagents)} reagents, {len(reactions)} reactions")
 
     # Phase 3: Localization
     print("\n=== Phase 3: Loading localization ===")
-    locale = load_all_localization(v_locale_files)
-    locale.update(load_all_localization(r_locale_files))
+    locale = {}
+    for fork_id, fdata in fork_data.items():
+        locale.update(load_all_localization(fdata["locale_files"]))
     print(f"  Locale entries: {len(locale)}")
 
     # Phase 4: Merge & resolve parents
     print("\n=== Phase 4: Resolving parent inheritance ===")
-    # Merge vanilla first, then RMC14
-    all_reagents = {**v_reagents, **r_reagents}
-    all_reactions = {**v_reactions, **r_reactions}
+    # Merge: vanilla first, then each fork layers on top (fork reagents override vanilla by ID)
+    all_reagents = dict(parsed["vanilla"]["reagents"])
+    all_reactions = dict(parsed["vanilla"]["reactions"])
+    for fork_id, pdata in parsed.items():
+        if fork_id == "vanilla":
+            continue
+        all_reagents.update(pdata["reagents"])
+        all_reactions.update(pdata["reactions"])
+
+    # Seed files — combine from all forks
+    v_seed_files = fork_data.get("vanilla", {}).get("seed_files", {})
 
     all_reagents = resolve_parents(all_reagents)
     print(f"  Total reagents after resolution: {len(all_reagents)}")
@@ -1535,7 +1594,9 @@ def main():
     print("\n=== Phase 5b: Parsing plant/seed sources ===")
     botany_locale = load_all_localization(botany_locale_files)
     all_seed_locale = {**locale, **botany_locale}
-    all_seed_files = {**v_seed_files, **r_seed_files}
+    all_seed_files = {}
+    for fdata in fork_data.values():
+        all_seed_files.update(fdata.get("seed_files", {}))
     reagent_plants = parse_seed_sources(all_seed_files, loader, all_seed_locale)
     print(f"  Plant reagent sources: {len(reagent_plants)}")
     all_sources = build_all_sources(reagent_plants, reaction_lookup, base_set)
