@@ -75,6 +75,16 @@
 
     <!-- Reagents Tab -->
     <div class="tab-panel active" id="tab-reagents">
+      <div class="sort-bar">
+        <label class="sort-label" for="sortSelect">Sort by</label>
+        <select class="sort-select" id="sortSelect" aria-label="Sort reagents">
+          <option value="name-asc">Name A→Z</option>
+          <option value="name-desc">Name Z→A</option>
+          <option value="category">Category</option>
+          <option value="used-in">Most Used</option>
+          <option value="antag-desc">Antag Score ↓</option>
+        </select>
+      </div>
       <div class="antag-strategies-bar" id="antagStrategies" style="display:none"></div>
       <div class="antag-delivery-section" id="antagDelivery" style="display:none"></div>
       <div class="reagent-grid" id="reagentGrid"></div>

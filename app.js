@@ -12,6 +12,7 @@ let graphPhysicsOn = true;
 let selectedReagentId = null;
 let detailHistory = []; // stack for back navigation
 let antagMode = false;
+let activeSort = 'name-asc'; // 'name-asc' | 'name-desc' | 'category' | 'used-in' | 'antag-desc'
 
 // ─────────────────────────────────────────────
 // Init
@@ -52,6 +53,7 @@ async function init() {
   setupBatchPlanner();
   setupShareButton();
   setupAntagMode();
+  setupSortSelect();
   decodeURLState();
 
   renderReagents();
@@ -284,12 +286,33 @@ function getCatColor(cat) {
   return map[cat] || '#64748b';
 }
 
+function sortResults(results) {
+  const getName = e => (e.reagent.name || e.reagent.id).toLowerCase();
+  switch (activeSort) {
+    case 'name-asc':  return results.sort((a, b) => getName(a).localeCompare(getName(b)));
+    case 'name-desc': return results.sort((a, b) => getName(b).localeCompare(getName(a)));
+    case 'category':  return results.sort((a, b) =>
+      a.reagent.category.localeCompare(b.reagent.category) || getName(a).localeCompare(getName(b)));
+    case 'used-in':   return results.sort((a, b) =>
+      (usedInLookup[b.reagent.id] || 0) - (usedInLookup[a.reagent.id] || 0) || getName(a).localeCompare(getName(b)));
+    case 'antag-desc': return results.sort((a, b) =>
+      (b.reagent.antagScore || 0) - (a.reagent.antagScore || 0) || getName(a).localeCompare(getName(b)));
+    default: return results;
+  }
+}
+
+function setupSortSelect() {
+  const sel = document.getElementById('sortSelect');
+  if (!sel) return;
+  sel.addEventListener('change', () => {
+    activeSort = sel.value;
+    renderCurrentTab();
+  });
+}
+
 function renderReagents(query = '') {
   const results = filterReagents(query);
-  // In antag mode, sort by antag score descending (highest threat first)
-  if (antagMode) {
-    results.sort((a, b) => (b.reagent.antagScore || 0) - (a.reagent.antagScore || 0));
-  }
+  sortResults(results);
   const grid = document.getElementById('reagentGrid');
   document.getElementById('resultCount').textContent = `${results.length} results`;
 
@@ -1193,6 +1216,15 @@ function setupAntagMode() {
   btn.addEventListener('click', () => {
     antagMode = !antagMode;
     document.body.classList.toggle('antag-active', antagMode);
+    // Auto-switch sort when toggling antag mode
+    const sortSel = document.getElementById('sortSelect');
+    if (antagMode) {
+      activeSort = 'antag-desc';
+      if (sortSel) sortSel.value = 'antag-desc';
+    } else if (activeSort === 'antag-desc') {
+      activeSort = 'name-asc';
+      if (sortSel) sortSel.value = 'name-asc';
+    }
     // Show/hide antag sections
     const stratEl = document.getElementById('antagStrategies');
     const delivEl = document.getElementById('antagDelivery');
@@ -1382,6 +1414,7 @@ function encodeURLState() {
   if (activeSource !== 'all') params.set('src', activeSource);
   if (activeBaseType !== 'all') params.set('bt', activeBaseType);
   if (antagMode) params.set('antag', '1');
+  if (activeSort !== 'name-asc') params.set('sort', activeSort);
   if (activeCategories.size) params.set('cats', [...activeCategories].join(','));
   if (activeEffectTags.size) params.set('fx', [...activeEffectTags].join(','));
   const q = document.getElementById('searchInput')?.value;
@@ -1413,6 +1446,14 @@ function decodeURLState() {
   if (bt) {
     const radio = document.querySelector(`input[name="basetype"][value="${bt}"]`);
     if (radio) { radio.checked = true; activeBaseType = bt; }
+  }
+
+  // Sort
+  const sortVal = params.get('sort');
+  if (sortVal) {
+    activeSort = sortVal;
+    const sortSel = document.getElementById('sortSelect');
+    if (sortSel) sortSel.value = sortVal;
   }
 
   // Antag mode

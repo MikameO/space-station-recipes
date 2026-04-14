@@ -1161,6 +1161,29 @@ main {
 ::-webkit-scrollbar-thumb:hover { background: var(--phosphor-dim); }
 
 /* ══════════════════════════════════════════
+   SORT BAR
+   ══════════════════════════════════════════ */
+.sort-bar {
+  display: flex; align-items: center; gap: 8px;
+  margin-bottom: 10px; padding: 6px 0;
+}
+.sort-label {
+  font-family: 'Oxanium', sans-serif; font-size: 0.65rem;
+  color: var(--text-sub); text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+.sort-select {
+  background: var(--panel); color: var(--text-main);
+  border: 1px solid var(--border-subtle); border-radius: 2px;
+  font-family: 'Oxanium', sans-serif; font-size: 0.7rem;
+  padding: 4px 8px; cursor: pointer;
+  outline: none;
+}
+.sort-select:hover { border-color: var(--phosphor-dim); }
+.sort-select:focus { border-color: var(--phosphor); box-shadow: 0 0 4px var(--phosphor-glow); }
+.sort-select option { background: var(--hull-plate); color: var(--text-main); }
+
+/* ══════════════════════════════════════════
    ANTAG MODE — "Syndicate Terminal" Override
    ══════════════════════════════════════════ */
 body.antag-active {
