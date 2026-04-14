@@ -71,6 +71,7 @@
       <button class="tab-btn" data-tab="calculator" role="tab" aria-selected="false">Calculator</button>
       <button class="tab-btn" data-tab="trees" role="tab" aria-selected="false">Craft Trees</button>
       <button class="tab-btn" data-tab="graph" role="tab" aria-selected="false">Graph</button>
+      <button class="tab-btn tab-btn-antag" data-tab="antag" role="tab" aria-selected="false" style="display:none">&#9760; Antag</button>
     </div>
 
     <!-- Reagents Tab -->
@@ -85,8 +86,6 @@
           <option value="antag-desc">Antag Score ↓</option>
         </select>
       </div>
-      <div class="antag-strategies-bar" id="antagStrategies" style="display:none"></div>
-      <div class="antag-delivery-section" id="antagDelivery" style="display:none"></div>
       <div class="reagent-grid" id="reagentGrid"></div>
     </div>
 
@@ -169,6 +168,14 @@
         <span class="graph-info" id="graphInfo"></span>
       </div>
       <div id="graphContainer" class="graph-container"></div>
+    </div>
+
+    <!-- Antag Tab (visible only in Antag Mode) -->
+    <div class="tab-panel" id="tab-antag">
+      <div class="antag-tab-content">
+        <div id="antagStrategies"></div>
+        <div id="antagDelivery"></div>
+      </div>
     </div>
   </main>
 </div>

@@ -355,6 +355,21 @@ main {
   text-shadow: 0 0 8px var(--phosphor-glow);
 }
 
+/* Antag tab — always red, independent of phosphor cascade */
+.tab-btn-antag { color: var(--red-alert); }
+.tab-btn-antag:hover { color: var(--red-alert); opacity: 0.8; }
+.tab-btn-antag.active {
+  color: var(--red-alert);
+  border-bottom-color: var(--red-alert);
+  text-shadow: 0 0 8px rgba(255,61,90,0.4);
+}
+@keyframes antag-pulse {
+  0%, 100% { text-shadow: 0 0 4px rgba(255,61,90,0.2); }
+  50% { text-shadow: 0 0 16px rgba(255,61,90,0.6); }
+}
+.tab-btn-antag.pulse { animation: antag-pulse 0.8s ease-in-out 2; }
+.antag-tab-content { display: flex; flex-direction: column; gap: 24px; }
+
 .tab-panel {
   display: none;
   flex: 1;

@@ -255,6 +255,7 @@ function renderCurrentTab() {
   if (activeTab === 'reagents') renderReagents(query);
   else if (activeTab === 'reactions') renderReactions(query);
   else if (activeTab === 'graph') renderGraph();
+  else if (activeTab === 'antag') { renderAntagStrategies(); renderDeliveryMechanisms(); }
   // calculator and trees tabs have their own autocomplete — no re-render needed on filter change
 }
 
@@ -1225,14 +1226,19 @@ function setupAntagMode() {
       activeSort = 'name-asc';
       if (sortSel) sortSel.value = 'name-asc';
     }
-    // Show/hide antag sections
-    const stratEl = document.getElementById('antagStrategies');
-    const delivEl = document.getElementById('antagDelivery');
-    if (stratEl) stratEl.style.display = antagMode ? '' : 'none';
-    if (delivEl) delivEl.style.display = antagMode ? '' : 'none';
-    if (antagMode) {
-      renderAntagStrategies();
-      renderDeliveryMechanisms();
+    // Show/hide Antag tab button
+    const antagTabBtn = document.querySelector('.tab-btn-antag');
+    if (antagTabBtn) {
+      antagTabBtn.style.display = antagMode ? '' : 'none';
+      if (antagMode) {
+        antagTabBtn.classList.add('pulse');
+        setTimeout(() => antagTabBtn.classList.remove('pulse'), 2000);
+      } else if (activeTab === 'antag') {
+        // Switch away from antag tab when disabling antag mode
+        const reagentsBtn = document.querySelector('.tab-btn[data-tab="reagents"]');
+        if (reagentsBtn) reagentsBtn.click();
+        return; // click triggers renderCurrentTab already
+      }
     }
     renderCurrentTab();
   });
@@ -1242,12 +1248,9 @@ function activateAntagMode() {
   if (antagMode) return;
   antagMode = true;
   document.body.classList.add('antag-active');
-  const stratEl = document.getElementById('antagStrategies');
-  const delivEl = document.getElementById('antagDelivery');
-  if (stratEl) stratEl.style.display = '';
-  if (delivEl) delivEl.style.display = '';
-  renderAntagStrategies();
-  renderDeliveryMechanisms();
+  // Show the Antag tab button
+  const antagTabBtn = document.querySelector('.tab-btn-antag');
+  if (antagTabBtn) antagTabBtn.style.display = '';
 }
 
 function getAntagIntelHTML(r) {
@@ -1427,6 +1430,11 @@ function decodeURLState() {
   if (!hash) return;
   const params = new URLSearchParams(hash);
 
+  // Antag mode (must be decoded BEFORE tab, so the Antag tab button is visible)
+  if (params.get('antag') === '1') {
+    activateAntagMode();
+  }
+
   // Tab
   const tab = params.get('tab');
   if (tab) {
@@ -1454,11 +1462,6 @@ function decodeURLState() {
     activeSort = sortVal;
     const sortSel = document.getElementById('sortSelect');
     if (sortSel) sortSel.value = sortVal;
-  }
-
-  // Antag mode
-  if (params.get('antag') === '1') {
-    activateAntagMode();
   }
 
   // Categories
