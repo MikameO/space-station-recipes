@@ -126,16 +126,31 @@ def compare_reaction(vanilla_rxn: dict, fork_rxn: dict) -> list[str]:
 
 def diff_fork_reactions(
     vanilla_rxns: dict, fork_vanilla_rxns: dict,
-    manual_blocked: set, manual_modified: dict
+    manual_blocked: set, manual_modified: dict,
+    blocked_categories: set | None = None,
+    all_reagents: dict | None = None,
 ) -> tuple[set, dict]:
     """Compare fork's vanilla-path reactions against originals.
-    Returns (blocked_ids, modified_dict). Manual overrides take precedence."""
+    Returns (blocked_ids, modified_dict). Manual overrides take precedence.
+    blocked_categories: if set, block all vanilla reactions whose products
+    belong to these categories (e.g. RMC14 replaces all Medicine)."""
     blocked = set(manual_blocked)
     modified = dict(manual_modified)
 
     for rid, v_rxn in vanilla_rxns.items():
         if rid in manual_blocked or rid in manual_modified:
             continue  # Manual override takes precedence
+
+        # Category-level blocking (e.g. RMC14 replaces entire Medicine category)
+        if blocked_categories and all_reagents:
+            products = v_rxn.get("products", {})
+            if any(
+                all_reagents.get(pid, {}).get("category", "") in blocked_categories
+                for pid in products
+            ):
+                blocked.add(rid)
+                continue
+
         if rid not in fork_vanilla_rxns:
             # Reaction removed/commented out in fork
             blocked.add(rid)
@@ -1679,35 +1694,6 @@ def main():
         parsed[fork_id] = {"reagents": reagents, "reactions": reactions}
         print(f"  {FORK_REGISTRY[fork_id]['name']}: {len(reagents)} reagents, {len(reactions)} reactions")
 
-    # Phase 2b: Auto-diff fork vanilla overrides against vanilla originals
-    print("\n=== Phase 2b: Auto-detecting fork reaction diffs ===")
-    fork_diffs = {}  # fork_id -> (blocked_set, modified_dict)
-    for fork_id, override_files in fork_vanilla_overrides.items():
-        if not override_files:
-            continue
-        _, fork_vanilla_rxns = parse_all_prototypes(override_files, loader)
-        manual_blocked = FORK_REGISTRY[fork_id].get("blocked_reactions", set())
-        manual_modified = FORK_REGISTRY[fork_id].get("modified_reactions", {})
-        blocked, modified = diff_fork_reactions(
-            parsed["vanilla"]["reactions"], fork_vanilla_rxns,
-            manual_blocked, manual_modified
-        )
-        fork_diffs[fork_id] = (blocked, modified)
-        auto_b = len(blocked) - len(manual_blocked)
-        auto_m = len(modified) - len(manual_modified)
-        total_b = len(blocked)
-        total_m = len(modified)
-        print(f"  {FORK_REGISTRY[fork_id]['name']}: {total_b} blocked ({auto_b} auto), {total_m} modified ({auto_m} auto)")
-
-    # For forks without override files, fall back to manual config
-    for fork_id, fconf in FORK_REGISTRY.items():
-        if fork_id == "vanilla" or fork_id in fork_diffs:
-            continue
-        fork_diffs[fork_id] = (
-            fconf.get("blocked_reactions", set()),
-            fconf.get("modified_reactions", {}),
-        )
-
     # Phase 3: Localization
     print("\n=== Phase 3: Loading localization ===")
     locale = {}
@@ -1732,6 +1718,44 @@ def main():
     all_reagents = resolve_parents(all_reagents)
     print(f"  Total reagents after resolution: {len(all_reagents)}")
     print(f"  Total reactions: {len(all_reactions)}")
+
+    # Phase 4b: Auto-diff fork vanilla overrides against vanilla originals
+    # (runs after Phase 4 so all_reagents is available for category-level blocking)
+    print("\n=== Phase 4b: Auto-detecting fork reaction diffs ===")
+    # Build a quick category lookup from resolved reagents
+    reagent_categories = {}
+    for rid, rdata in all_reagents.items():
+        cat = categorize_reagent(rdata)
+        reagent_categories[rid] = {"category": cat}
+
+    fork_diffs = {}  # fork_id -> (blocked_set, modified_dict)
+    for fork_id, override_files in fork_vanilla_overrides.items():
+        if not override_files:
+            continue
+        _, fork_vanilla_rxns = parse_all_prototypes(override_files, loader)
+        fconf = FORK_REGISTRY[fork_id]
+        manual_blocked = fconf.get("blocked_reactions", set())
+        manual_modified = fconf.get("modified_reactions", {})
+        blocked_cats = fconf.get("blocked_categories", set())
+        blocked, modified = diff_fork_reactions(
+            parsed["vanilla"]["reactions"], fork_vanilla_rxns,
+            manual_blocked, manual_modified,
+            blocked_categories=blocked_cats,
+            all_reagents=reagent_categories,
+        )
+        fork_diffs[fork_id] = (blocked, modified)
+        auto_b = len(blocked) - len(manual_blocked)
+        auto_m = len(modified) - len(manual_modified)
+        print(f"  {fconf['name']}: {len(blocked)} blocked ({auto_b} auto), {len(modified)} modified ({auto_m} auto)")
+
+    # For forks without override files, fall back to manual config
+    for fork_id, fconf in FORK_REGISTRY.items():
+        if fork_id == "vanilla" or fork_id in fork_diffs:
+            continue
+        fork_diffs[fork_id] = (
+            fconf.get("blocked_reactions", set()),
+            fconf.get("modified_reactions", {}),
+        )
 
     # Phase 5: Build dependency trees
     print("\n=== Phase 5: Building craft dependency trees ===")

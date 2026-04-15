@@ -1,6 +1,6 @@
 {
  "meta": {
-  "generated": "2026-04-15T02:45:09",
+  "generated": "2026-04-15T05:21:35",
   "forks": {
    "vanilla": {
     "name": "Vanilla SS14",
@@ -25619,12 +25619,13 @@
    "effects": "",
    "impact": null,
    "forkStatus": {
+    "rmc14": "blocked",
     "funky": "modified"
    },
    "forkNotes": {
     "funky": "Product amount 2 → 3"
    },
-   "rmcStatus": "available",
+   "rmcStatus": "blocked",
    "rmcNote": ""
   },
   "AcidSpit": {
@@ -25846,12 +25847,13 @@
    "effects": "",
    "impact": "Medium",
    "forkStatus": {
+    "rmc14": "blocked",
     "funky": "modified"
    },
    "forkNotes": {
     "funky": "Added Sigynate(1) reactant; Removed Leporazine reactant; Cryoxadone amount 2->3; Aloxadone yield 4->5"
    },
-   "rmcStatus": "available",
+   "rmcStatus": "blocked",
    "rmcNote": ""
   },
   "Aluite": {
@@ -26100,12 +26102,13 @@
    "effects": "",
    "impact": null,
    "forkStatus": {
+    "rmc14": "blocked",
     "funky": "modified"
    },
    "forkNotes": {
     "funky": "Recipe changed: uses Multiver instead of Dylovene"
    },
-   "rmcStatus": "available",
+   "rmcStatus": "blocked",
    "rmcNote": ""
   },
   "AmbuzolPlus": {
@@ -26130,13 +26133,14 @@
    "effects": "",
    "impact": null,
    "forkStatus": {
+    "rmc14": "blocked",
     "frontier": "modified",
     "funky": "blocked"
    },
    "forkNotes": {
     "frontier": "Added minTemp: 350"
    },
-   "rmcStatus": "available",
+   "rmcStatus": "blocked",
    "rmcNote": ""
   },
   "Ammonia": {
@@ -26160,7 +26164,10 @@
    "mixer": [],
    "effects": "",
    "impact": null,
-   "rmcStatus": "available",
+   "forkStatus": {
+    "rmc14": "blocked"
+   },
+   "rmcStatus": "blocked",
    "rmcNote": ""
   },
   "AmmoniaBloodBreakdown": {
@@ -26584,9 +26591,10 @@
    "effects": "",
    "impact": null,
    "forkStatus": {
+    "rmc14": "blocked",
     "funky": "blocked"
    },
-   "rmcStatus": "available",
+   "rmcStatus": "blocked",
    "rmcNote": ""
   },
   "Ash": {
@@ -26606,7 +26614,10 @@
    "mixer": [],
    "effects": "",
    "impact": null,
-   "rmcStatus": "available",
+   "forkStatus": {
+    "rmc14": "blocked"
+   },
+   "rmcStatus": "blocked",
    "rmcNote": ""
   },
   "AtomicBomb": {
@@ -27070,7 +27081,10 @@
    "mixer": [],
    "effects": "",
    "impact": null,
-   "rmcStatus": "available",
+   "forkStatus": {
+    "rmc14": "blocked"
+   },
+   "rmcStatus": "blocked",
    "rmcNote": ""
   },
   "BetweenTheSheets": {
@@ -27213,9 +27227,10 @@
    "effects": "",
    "impact": null,
    "forkStatus": {
+    "rmc14": "blocked",
     "funky": "blocked"
    },
-   "rmcStatus": "available",
+   "rmcStatus": "blocked",
    "rmcNote": ""
   },
   "BittersAndSoda": {
@@ -27400,7 +27415,10 @@
    "mixer": [],
    "effects": "",
    "impact": null,
-   "rmcStatus": "available",
+   "forkStatus": {
+    "rmc14": "blocked"
+   },
+   "rmcStatus": "blocked",
    "rmcNote": ""
   },
   "BloodBreakdown": {
@@ -27823,12 +27841,13 @@
    "effects": "",
    "impact": "Medium",
    "forkStatus": {
+    "rmc14": "blocked",
     "funky": "modified"
    },
    "forkNotes": {
     "funky": "Added Libital(1) reactant; Removed Bicaridine reactant"
    },
-   "rmcStatus": "available",
+   "rmcStatus": "blocked",
    "rmcNote": ""
   },
   "BruizineLacerinol": {
@@ -28627,7 +28646,10 @@
    "mixer": [],
    "effects": "",
    "impact": null,
-   "rmcStatus": "available",
+   "forkStatus": {
+    "rmc14": "blocked"
+   },
+   "rmcStatus": "blocked",
    "rmcNote": ""
   },
   "CatDrugs": {
@@ -28706,7 +28728,10 @@
    "mixer": [],
    "effects": "",
    "impact": null,
-   "rmcStatus": "available",
+   "forkStatus": {
+    "rmc14": "blocked"
+   },
+   "rmcStatus": "blocked",
    "rmcNote": ""
   },
   "CherryBlossom": {
@@ -30582,7 +30607,10 @@
    "mixer": [],
    "effects": "",
    "impact": null,
-   "rmcStatus": "available",
+   "forkStatus": {
+    "rmc14": "blocked"
+   },
+   "rmcStatus": "blocked",
    "rmcNote": ""
   },
   "Cryptobiolin": {
@@ -30610,7 +30638,10 @@
    "mixer": [],
    "effects": "",
    "impact": null,
-   "rmcStatus": "available",
+   "forkStatus": {
+    "rmc14": "blocked"
+   },
+   "rmcStatus": "blocked",
    "rmcNote": ""
   },
   "CubaLibre": {
@@ -30865,9 +30896,10 @@
    "effects": "",
    "impact": null,
    "forkStatus": {
+    "rmc14": "blocked",
     "funky": "blocked"
    },
-   "rmcStatus": "available",
+   "rmcStatus": "blocked",
    "rmcNote": ""
   },
   "Desoxyephedrine": {
@@ -31038,7 +31070,10 @@
    "mixer": [],
    "effects": "",
    "impact": null,
-   "rmcStatus": "available",
+   "forkStatus": {
+    "rmc14": "blocked"
+   },
+   "rmcStatus": "blocked",
    "rmcNote": ""
   },
   "DexalinPlus": {
@@ -31067,9 +31102,10 @@
    "effects": "",
    "impact": null,
    "forkStatus": {
+    "rmc14": "blocked",
     "funky": "blocked"
    },
-   "rmcStatus": "available",
+   "rmcStatus": "blocked",
    "rmcNote": ""
   },
   "Diethylamine": {
@@ -31093,7 +31129,10 @@
    "mixer": [],
    "effects": "",
    "impact": null,
-   "rmcStatus": "available",
+   "forkStatus": {
+    "rmc14": "blocked"
+   },
+   "rmcStatus": "blocked",
    "rmcNote": ""
   },
   "Diphenhydramine": {
@@ -31129,7 +31168,10 @@
    "mixer": [],
    "effects": "",
    "impact": "Medium",
-   "rmcStatus": "available",
+   "forkStatus": {
+    "rmc14": "blocked"
+   },
+   "rmcStatus": "blocked",
    "rmcNote": ""
   },
   "Diphenylmethylamine": {
@@ -31230,12 +31272,13 @@
    "effects": "",
    "impact": null,
    "forkStatus": {
+    "rmc14": "blocked",
     "frontier": "modified"
    },
    "forkNotes": {
     "frontier": "Added Phalanximine(1) reactant; Removed UnstableMutagen reactant"
    },
-   "rmcStatus": "available",
+   "rmcStatus": "blocked",
    "rmcNote": ""
   },
   "DraganSpecial": {
@@ -31320,9 +31363,10 @@
    "effects": "",
    "impact": null,
    "forkStatus": {
+    "rmc14": "blocked",
     "funky": "blocked"
    },
-   "rmcStatus": "available",
+   "rmcStatus": "blocked",
    "rmcNote": ""
   },
   "EZNutrient": {
@@ -31350,7 +31394,10 @@
    "mixer": [],
    "effects": "",
    "impact": null,
-   "rmcStatus": "available",
+   "forkStatus": {
+    "rmc14": "blocked"
+   },
+   "rmcStatus": "blocked",
    "rmcNote": ""
   },
   "Ebifin": {
@@ -31532,7 +31579,10 @@
    "mixer": [],
    "effects": "",
    "impact": "Medium",
-   "rmcStatus": "available",
+   "forkStatus": {
+    "rmc14": "blocked"
+   },
+   "rmcStatus": "blocked",
    "rmcNote": ""
   },
   "Epinephrine": {
@@ -31564,7 +31614,10 @@
    "mixer": [],
    "effects": "",
    "impact": null,
-   "rmcStatus": "available",
+   "forkStatus": {
+    "rmc14": "blocked"
+   },
+   "rmcStatus": "blocked",
    "rmcNote": ""
   },
   "ErikaSurprise": {
@@ -31712,12 +31765,13 @@
    "effects": "",
    "impact": null,
    "forkStatus": {
+    "rmc14": "blocked",
     "funky": "modified"
    },
    "forkNotes": {
     "funky": "Recipe changed: uses Multiver instead of Diethylamine"
    },
-   "rmcStatus": "available",
+   "rmcStatus": "blocked",
    "rmcNote": ""
   },
   "ExoticBarozine": {
@@ -31904,7 +31958,10 @@
    "mixer": [],
    "effects": "",
    "impact": null,
-   "rmcStatus": "available",
+   "forkStatus": {
+    "rmc14": "blocked"
+   },
+   "rmcStatus": "blocked",
    "rmcNote": ""
   },
   "FiberBreakdown": {
@@ -32624,7 +32681,10 @@
    "mixer": [],
    "effects": "",
    "impact": null,
-   "rmcStatus": "available",
+   "forkStatus": {
+    "rmc14": "blocked"
+   },
+   "rmcStatus": "blocked",
    "rmcNote": ""
   },
   "Happiness": {
@@ -32656,7 +32716,10 @@
    "mixer": [],
    "effects": "",
    "impact": null,
-   "rmcStatus": "available",
+   "forkStatus": {
+    "rmc14": "blocked"
+   },
+   "rmcStatus": "blocked",
    "rmcNote": ""
   },
   "HeartbreakerToxin": {
@@ -33006,7 +33069,10 @@
    "mixer": [],
    "effects": "",
    "impact": null,
-   "rmcStatus": "available",
+   "forkStatus": {
+    "rmc14": "blocked"
+   },
+   "rmcStatus": "blocked",
    "rmcNote": ""
   },
   "Hypothium": {
@@ -33059,12 +33125,13 @@
    "effects": "",
    "impact": null,
    "forkStatus": {
+    "rmc14": "blocked",
     "funky": "modified"
    },
    "forkNotes": {
     "funky": "Added PotassiumIodide(1) reactant; Removed Dylovene reactant"
    },
-   "rmcStatus": "available",
+   "rmcStatus": "blocked",
    "rmcNote": ""
   },
   "Ibuprofen": {
@@ -33364,7 +33431,10 @@
    "mixer": [],
    "effects": "",
    "impact": null,
-   "rmcStatus": "available",
+   "forkStatus": {
+    "rmc14": "blocked"
+   },
+   "rmcStatus": "blocked",
    "rmcNote": ""
   },
   "Inaprovaline": {
@@ -33392,7 +33462,10 @@
    "mixer": [],
    "effects": "",
    "impact": null,
-   "rmcStatus": "available",
+   "forkStatus": {
+    "rmc14": "blocked"
+   },
+   "rmcStatus": "blocked",
    "rmcNote": ""
   },
   "InsectBloodBreakdown": {
@@ -33455,12 +33528,13 @@
    "effects": "",
    "impact": "Medium",
    "forkStatus": {
+    "rmc14": "blocked",
     "funky": "modified"
    },
    "forkNotes": {
     "funky": "Added Aiuri(1) reactant; Removed Kelotane reactant"
    },
-   "rmcStatus": "available",
+   "rmcStatus": "blocked",
    "rmcNote": ""
   },
   "InsuzineLone": {
@@ -33512,7 +33586,10 @@
    "mixer": [],
    "effects": "",
    "impact": null,
-   "rmcStatus": "available",
+   "forkStatus": {
+    "rmc14": "blocked"
+   },
+   "rmcStatus": "blocked",
    "rmcNote": ""
   },
   "IrishBool": {
@@ -33779,9 +33856,10 @@
    "effects": "",
    "impact": null,
    "forkStatus": {
+    "rmc14": "blocked",
     "funky": "blocked"
    },
-   "rmcStatus": "available",
+   "rmcStatus": "blocked",
    "rmcNote": ""
   },
   "Lacerinol": {
@@ -33806,12 +33884,13 @@
    "effects": "",
    "impact": "Medium",
    "forkStatus": {
+    "rmc14": "blocked",
     "funky": "modified"
    },
    "forkNotes": {
     "funky": "Added Libital(1) reactant; Removed Bicaridine reactant"
    },
-   "rmcStatus": "available",
+   "rmcStatus": "blocked",
    "rmcNote": ""
   },
   "Laughter": {
@@ -33865,7 +33944,10 @@
    "mixer": [],
    "effects": "",
    "impact": null,
-   "rmcStatus": "available",
+   "forkStatus": {
+    "rmc14": "blocked"
+   },
+   "rmcStatus": "blocked",
    "rmcNote": ""
   },
   "LemonLime": {
@@ -33987,7 +34069,10 @@
    "mixer": [],
    "effects": "",
    "impact": null,
-   "rmcStatus": "available",
+   "forkStatus": {
+    "rmc14": "blocked"
+   },
+   "rmcStatus": "blocked",
    "rmcNote": ""
   },
   "LeporazineInsu": {
@@ -34207,7 +34292,10 @@
    "mixer": [],
    "effects": "",
    "impact": null,
-   "rmcStatus": "available",
+   "forkStatus": {
+    "rmc14": "blocked"
+   },
+   "rmcStatus": "blocked",
    "rmcNote": ""
   },
   "LongHaul": {
@@ -34495,7 +34583,10 @@
    "mixer": [],
    "effects": "",
    "impact": null,
-   "rmcStatus": "available",
+   "forkStatus": {
+    "rmc14": "blocked"
+   },
+   "rmcStatus": "blocked",
    "rmcNote": ""
   },
   "Margarita": {
@@ -34671,10 +34762,10 @@
     "rmc14": "modified"
    },
    "forkNotes": {
-    "rmc14": "Added RMCBlackGoo(0.5) reactant; Added RMCSugar(1) reactant; Removed Sugar reactant"
+    "rmc14": "Added RMCSugar(1) reactant; Added RMCBlackGoo(0.5) reactant; Removed Sugar reactant"
    },
    "rmcStatus": "modified",
-   "rmcNote": "Added RMCBlackGoo(0.5) reactant; Added RMCSugar(1) reactant; Removed Sugar reactant"
+   "rmcNote": "Added RMCSugar(1) reactant; Added RMCBlackGoo(0.5) reactant; Removed Sugar reactant"
   },
   "MeatCoagulating": {
    "id": "MeatCoagulating",
@@ -35725,12 +35816,13 @@
    "effects": "",
    "impact": "High",
    "forkStatus": {
+    "rmc14": "blocked",
     "goob": "modified"
    },
    "forkNotes": {
     "goob": "Product yield doubled from 1 to 2"
    },
-   "rmcStatus": "available",
+   "rmcStatus": "blocked",
    "rmcNote": ""
   },
   "NorepinephricAcid": {
@@ -35754,7 +35846,10 @@
    "mixer": [],
    "effects": "",
    "impact": "Medium",
-   "rmcStatus": "available",
+   "forkStatus": {
+    "rmc14": "blocked"
+   },
+   "rmcStatus": "blocked",
    "rmcNote": ""
   },
   "NuclearCola": {
@@ -35804,13 +35899,10 @@
    "effects": "",
    "impact": null,
    "forkStatus": {
-    "rmc14": "modified"
+    "rmc14": "blocked"
    },
-   "forkNotes": {
-    "rmc14": "Added product RMCSugar; Removed product Sugar"
-   },
-   "rmcStatus": "modified",
-   "rmcNote": "Added product RMCSugar; Removed product Sugar"
+   "rmcStatus": "blocked",
+   "rmcNote": ""
   },
   "NutrimentBreakdown": {
    "id": "NutrimentBreakdown",
@@ -35864,7 +35956,10 @@
    "mixer": [],
    "effects": "",
    "impact": null,
-   "rmcStatus": "available",
+   "forkStatus": {
+    "rmc14": "blocked"
+   },
+   "rmcStatus": "blocked",
    "rmcNote": ""
   },
   "OculineLing": {
@@ -36445,7 +36540,10 @@
    "mixer": [],
    "effects": "",
    "impact": null,
-   "rmcStatus": "available",
+   "forkStatus": {
+    "rmc14": "blocked"
+   },
+   "rmcStatus": "blocked",
    "rmcNote": ""
   },
   "Phenol": {
@@ -36469,7 +36567,10 @@
    "mixer": [],
    "effects": "",
    "impact": null,
-   "rmcStatus": "available",
+   "forkStatus": {
+    "rmc14": "blocked"
+   },
+   "rmcStatus": "blocked",
    "rmcNote": ""
   },
   "Phenylacetone": {
@@ -36691,7 +36792,10 @@
    "mixer": [],
    "effects": "",
    "impact": null,
-   "rmcStatus": "available",
+   "forkStatus": {
+    "rmc14": "blocked"
+   },
+   "rmcStatus": "blocked",
    "rmcNote": ""
   },
   "PlasticSheet": {
@@ -36853,7 +36957,10 @@
    "mixer": [],
    "effects": "",
    "impact": null,
-   "rmcStatus": "available",
+   "forkStatus": {
+    "rmc14": "blocked"
+   },
+   "rmcStatus": "blocked",
    "rmcNote": ""
   },
   "Probital": {
@@ -37043,7 +37150,10 @@
    "mixer": [],
    "effects": "",
    "impact": "Medium",
-   "rmcStatus": "available",
+   "forkStatus": {
+    "rmc14": "blocked"
+   },
+   "rmcStatus": "blocked",
    "rmcNote": ""
   },
   "PumpkinSpiceLatte": {
@@ -37100,12 +37210,13 @@
    "effects": "",
    "impact": "Medium",
    "forkStatus": {
+    "rmc14": "blocked",
     "funky": "modified"
    },
    "forkNotes": {
     "funky": "Added Libital(1) reactant; Removed Bicaridine reactant"
    },
-   "rmcStatus": "available",
+   "rmcStatus": "blocked",
    "rmcNote": ""
   },
   "PuncturaseLacerinol": {
@@ -37158,12 +37269,13 @@
    "effects": "",
    "impact": "Medium",
    "forkStatus": {
+    "rmc14": "blocked",
     "funky": "modified"
    },
    "forkNotes": {
     "funky": "Added Aiuri(1) reactant; Removed Dermaline reactant"
    },
-   "rmcStatus": "available",
+   "rmcStatus": "blocked",
    "rmcNote": ""
   },
   "PyrazineInsu": {
@@ -38303,7 +38415,10 @@
    "mixer": [],
    "effects": "",
    "impact": null,
-   "rmcStatus": "available",
+   "forkStatus": {
+    "rmc14": "blocked"
+   },
+   "rmcStatus": "blocked",
    "rmcNote": ""
   },
   "Romerol": {
@@ -38756,7 +38871,10 @@
    "mixer": [],
    "effects": "",
    "impact": null,
-   "rmcStatus": "available",
+   "forkStatus": {
+    "rmc14": "blocked"
+   },
+   "rmcStatus": "blocked",
    "rmcNote": ""
   },
   "SentaiQuencha": {
@@ -38864,7 +38982,10 @@
    "mixer": [],
    "effects": "",
    "impact": null,
-   "rmcStatus": "available",
+   "forkStatus": {
+    "rmc14": "blocked"
+   },
+   "rmcStatus": "blocked",
    "rmcNote": ""
   },
   "Sievertadone": {
@@ -38933,12 +39054,13 @@
    "effects": "",
    "impact": "Medium",
    "forkStatus": {
+    "rmc14": "blocked",
     "funky": "modified"
    },
    "forkNotes": {
     "funky": "Added Lenturi(1) reactant; Removed Kelotane reactant"
    },
-   "rmcStatus": "available",
+   "rmcStatus": "blocked",
    "rmcNote": ""
   },
   "Silencer": {
@@ -39147,7 +39269,10 @@
    "mixer": [],
    "effects": "",
    "impact": "Medium",
-   "rmcStatus": "available",
+   "forkStatus": {
+    "rmc14": "blocked"
+   },
+   "rmcStatus": "blocked",
    "rmcNote": ""
   },
   "SodiumExplosion": {
@@ -39193,7 +39318,10 @@
    "mixer": [],
    "effects": "",
    "impact": null,
-   "rmcStatus": "available",
+   "forkStatus": {
+    "rmc14": "blocked"
+   },
+   "rmcStatus": "blocked",
    "rmcNote": ""
   },
   "SodiumPolyacrylate": {
@@ -39221,7 +39349,10 @@
    "mixer": [],
    "effects": "",
    "impact": "Medium",
-   "rmcStatus": "available",
+   "forkStatus": {
+    "rmc14": "blocked"
+   },
+   "rmcStatus": "blocked",
    "rmcNote": ""
   },
   "SolidifyGold": {
@@ -39389,7 +39520,10 @@
    "mixer": [],
    "effects": "",
    "impact": null,
-   "rmcStatus": "available",
+   "forkStatus": {
+    "rmc14": "blocked"
+   },
+   "rmcStatus": "blocked",
    "rmcNote": ""
   },
   "SpaceDrugs": {
@@ -39417,7 +39551,10 @@
    "mixer": [],
    "effects": "",
    "impact": null,
-   "rmcStatus": "available",
+   "forkStatus": {
+    "rmc14": "blocked"
+   },
+   "rmcStatus": "blocked",
    "rmcNote": ""
   },
   "SpaceGlue": {
@@ -39444,19 +39581,18 @@
    "effects": "",
    "impact": null,
    "forkStatus": {
-    "rmc14": "modified",
+    "rmc14": "blocked",
     "goob": "modified",
     "frontier": "modified",
     "funky": "modified"
    },
    "forkNotes": {
-    "rmc14": "Removed mixer requirement",
     "goob": "Removed mixer requirement",
     "frontier": "Removed mixer requirement",
     "funky": "Removed mixer requirement"
    },
-   "rmcStatus": "modified",
-   "rmcNote": "Removed mixer requirement"
+   "rmcStatus": "blocked",
+   "rmcNote": ""
   },
   "SpaceLube": {
    "id": "SpaceLube",
@@ -39483,7 +39619,10 @@
    "mixer": [],
    "effects": "",
    "impact": "Medium",
-   "rmcStatus": "available",
+   "forkStatus": {
+    "rmc14": "blocked"
+   },
+   "rmcStatus": "blocked",
    "rmcNote": ""
   },
   "Spaceacilin": {
@@ -39706,12 +39845,13 @@
    "effects": "",
    "impact": "Medium",
    "forkStatus": {
+    "rmc14": "blocked",
     "goob": "modified"
    },
    "forkNotes": {
     "goob": "Product yield increased from 2 to 3"
    },
-   "rmcStatus": "available",
+   "rmcStatus": "blocked",
    "rmcNote": ""
   },
   "StypticCrystalCatalyst": {
@@ -40608,7 +40748,10 @@
    "mixer": [],
    "effects": "",
    "impact": null,
-   "rmcStatus": "available",
+   "forkStatus": {
+    "rmc14": "blocked"
+   },
+   "rmcStatus": "blocked",
    "rmcNote": ""
   },
   "Traumoxadone": {
@@ -40689,12 +40832,13 @@
    "effects": "",
    "impact": null,
    "forkStatus": {
+    "rmc14": "blocked",
     "funky": "modified"
    },
    "forkNotes": {
     "funky": "Recipe changed: uses Multiver instead of Dylovene"
    },
-   "rmcStatus": "available",
+   "rmcStatus": "blocked",
    "rmcNote": ""
   },
   "TripleCitrus": {
@@ -40782,7 +40926,10 @@
    "mixer": [],
    "effects": "",
    "impact": null,
-   "rmcStatus": "available",
+   "forkStatus": {
+    "rmc14": "blocked"
+   },
+   "rmcStatus": "blocked",
    "rmcNote": ""
   },
   "UncookedAnimalProteinBreakdown": {
@@ -41242,7 +41389,10 @@
    ],
    "effects": "",
    "impact": "Low",
-   "rmcStatus": "available",
+   "forkStatus": {
+    "rmc14": "blocked"
+   },
+   "rmcStatus": "blocked",
    "rmcNote": ""
   },
   "WehHewExplosion": {

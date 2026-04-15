@@ -134,6 +134,9 @@ FORK_REGISTRY = {
         "raw_url": "https://raw.githubusercontent.com/RMC-14/RMC-14/master/{path}",
         "custom_dir": "_RMC14",
         "color": "#06b6d4",
+        # RMC14 completely replaces these vanilla categories with its own CM system
+        # Vanilla reactions producing reagents in these categories are blocked
+        "blocked_categories": {"Medicine", "Narcotics", "Cleaning", "Fun", "Chemicals", "Botany"},
         "reagent_files": [
             "Resources/Prototypes/_RMC14/Reagents/base_reagent.yml",
             "Resources/Prototypes/_RMC14/Reagents/elements.yml",
