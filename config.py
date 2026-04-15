@@ -319,6 +319,41 @@ FORK_REGISTRY = {
         "vanilla_override_reaction_files": VANILLA_REACTION_PATHS,
     },
 
+    # ── Delta-V ──
+    "deltav": {
+        "name": "Delta-V",
+        "repo": "DeltaV-Station/Delta-v",
+        "branch": "master",
+        "raw_url": "https://raw.githubusercontent.com/DeltaV-Station/Delta-v/master/{path}",
+        "custom_dir": "_DV",
+        "color": "#3b82f6",
+        "reagent_files": [
+            "Resources/Prototypes/_DV/Reagents/biological.yml",
+            "Resources/Prototypes/_DV/Reagents/fun.yml",
+            "Resources/Prototypes/_DV/Reagents/medicine.yml",
+            "Resources/Prototypes/_DV/Reagents/Consumable/Drink/alcohol.yml",
+            "Resources/Prototypes/_DV/Reagents/Consumable/Drink/drinks.yml",
+            "Resources/Prototypes/_DV/Reagents/Consumable/Drink/powdered_drinks.yml",
+            "Resources/Prototypes/_DV/Reagents/Consumable/Drink/soda.yml",
+            "Resources/Prototypes/_DV/Reagents/Materials/materials.yml",
+        ],
+        "reaction_files": [
+            "Resources/Prototypes/_DV/Recipes/Reactions/drinks.yml",
+            "Resources/Prototypes/_DV/Recipes/Reactions/food.yml",
+            "Resources/Prototypes/_DV/Recipes/Reactions/fun.yml",
+            "Resources/Prototypes/_DV/Recipes/Reactions/medicine.yml",
+            "Resources/Prototypes/_DV/Recipes/Reactions/powdered_drinks.yml",
+            "Resources/Prototypes/_DV/Recipes/Reactions/psionic.yml",
+        ],
+        "locale_files": [],
+        "seed_files": [],
+        "botany_locale_files": [],
+        "blocked_reactions": set(),
+        "modified_reactions": {},
+        "dispenser_chemicals": set(),
+        "vanilla_override_reaction_files": VANILLA_REACTION_PATHS,
+    },
+
     # ── Dead Space ──
     "deadspace": {
         "name": "Dead Space",

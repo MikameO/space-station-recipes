@@ -1,6 +1,6 @@
 {
  "meta": {
-  "generated": "2026-04-15T05:21:35",
+  "generated": "2026-04-15T06:44:48",
   "forks": {
    "vanilla": {
     "name": "Vanilla SS14",
@@ -22,6 +22,11 @@
     "color": "#facc15",
     "reagentCount": 21
    },
+   "deltav": {
+    "name": "Delta-V",
+    "color": "#3b82f6",
+    "reagentCount": 39
+   },
    "deadspace": {
     "name": "Dead Space",
     "color": "#94a3b8",
@@ -40,7 +45,7 @@
   },
   "vanillaReagentCount": 405,
   "rmcReagentCount": 94,
-  "reactionCount": 565
+  "reactionCount": 607
  },
  "reagents": {
   "AbductorBlood": {
@@ -227,6 +232,58 @@
    "criticalOverdose": null,
    "recipe": null,
    "obtainSources": []
+  },
+  "Affogato": {
+   "id": "Affogato",
+   "name": "Affogato",
+   "group": "Drinks",
+   "category": "Delta-V Drinks",
+   "source": "deltav",
+   "color": "#fff3ce",
+   "desc": "",
+   "physicalDesc": "creamy",
+   "flavor": "affogato",
+   "isBase": false,
+   "isDispenser": false,
+   "effects": "[Digestion] Thirst x2; [Drink] Thirst x2; [Drink] Adds 0.07u Ethanol",
+   "effectTags": [
+    "thirst"
+   ],
+   "metabolismPaths": [
+    "Digestion",
+    "Drink"
+   ],
+   "overdose": null,
+   "criticalOverdose": null,
+   "recipe": {
+    "reactants": {
+     "IceCream": {
+      "amount": 5,
+      "catalyst": false
+     },
+     "Cognac": {
+      "amount": 2,
+      "catalyst": false
+     },
+     "CoffeeLiqueur": {
+      "amount": 2,
+      "catalyst": false
+     },
+     "Angobitters": {
+      "amount": 1,
+      "catalyst": false
+     }
+    },
+    "products": {
+     "Affogato": 10
+    },
+    "minTemp": null,
+    "maxTemp": null,
+    "mixer": []
+   },
+   "obtainSources": [
+    "Chemistry reaction"
+   ]
   },
   "Aiuri": {
    "id": "Aiuri",
@@ -1121,6 +1178,79 @@
     "Chemistry reaction"
    ]
   },
+  "Angobitters": {
+   "id": "Angobitters",
+   "name": "Angobitters",
+   "group": "Drinks",
+   "category": "Delta-V Drinks",
+   "source": "deltav",
+   "color": "#331002",
+   "desc": "",
+   "physicalDesc": "strong smelling",
+   "flavor": "alcohol",
+   "isBase": true,
+   "isDispenser": false,
+   "effects": "[Digestion] Thirst x2; [Drink] Thirst x1; [Drink] Adds 0.3u Ethanol",
+   "effectTags": [
+    "thirst"
+   ],
+   "metabolismPaths": [
+    "Digestion",
+    "Drink"
+   ],
+   "overdose": null,
+   "criticalOverdose": null,
+   "recipe": null,
+   "obtainSources": []
+  },
+  "Anodynafil": {
+   "id": "Anodynafil",
+   "name": "Anodynafil",
+   "group": "Medicine",
+   "category": "Delta-V Medicine",
+   "source": "deltav",
+   "color": "#8FABA3",
+   "desc": "",
+   "physicalDesc": "sticky",
+   "flavor": "tingly",
+   "isBase": false,
+   "isDispenser": false,
+   "effects": "[Medicine] Status: Anesthesia; [Medicine] Status: PainNumbness; [Medicine] Speed walk=0.5 sprint=0.5",
+   "effectTags": [
+    "speed"
+   ],
+   "metabolismPaths": [
+    "Medicine"
+   ],
+   "overdose": null,
+   "criticalOverdose": null,
+   "recipe": {
+    "reactants": {
+     "SalicylicAcid": {
+      "amount": 1,
+      "catalyst": false
+     },
+     "Ethanol": {
+      "amount": 1,
+      "catalyst": false
+     },
+     "Iodine": {
+      "amount": 1,
+      "catalyst": false
+     }
+    },
+    "products": {
+     "Anodynafil": 4
+    },
+    "minTemp": 400,
+    "maxTemp": null,
+    "mixer": []
+   },
+   "obtainSources": [
+    "Chemistry reaction"
+   ],
+   "antagScore": 1
+  },
   "AntiSepticFluid": {
    "id": "AntiSepticFluid",
    "name": "Anti Septic Fluid",
@@ -1478,6 +1608,67 @@
    "obtainSources": [
     "Chemistry reaction"
    ]
+  },
+  "ArsonistsBrew": {
+   "id": "ArsonistsBrew",
+   "name": "Arsonists Brew",
+   "group": "Drinks",
+   "category": "Delta-V Drinks",
+   "source": "deltav",
+   "color": "#fff789",
+   "desc": "",
+   "physicalDesc": "volatile",
+   "flavor": "arsonistsbrew",
+   "isBase": false,
+   "isDispenser": false,
+   "effects": "[Digestion] Thirst x3; [Drink] Thirst x2; [Drink] Adds 0.3u Ethanol; [Poison] Deals Heat 2; [Poison] Flammable; [Poison] Effect: Ignite; [Poison] Emote: Laugh @25%",
+   "effectTags": [
+    "deals:heat",
+    "emote",
+    "flammable",
+    "thirst"
+   ],
+   "metabolismPaths": [
+    "Digestion",
+    "Drink",
+    "Poison"
+   ],
+   "overdose": null,
+   "criticalOverdose": null,
+   "recipe": {
+    "reactants": {
+     "Thermite": {
+      "amount": 1,
+      "catalyst": false
+     },
+     "WeldingFuel": {
+      "amount": 1,
+      "catalyst": false
+     },
+     "CapsaicinOil": {
+      "amount": 1,
+      "catalyst": false
+     },
+     "Whiskey": {
+      "amount": 1,
+      "catalyst": false
+     },
+     "Phosphorus": {
+      "amount": 1,
+      "catalyst": false
+     }
+    },
+    "products": {
+     "ArsonistsBrew": 5
+    },
+    "minTemp": 373.15,
+    "maxTemp": null,
+    "mixer": []
+   },
+   "obtainSources": [
+    "Chemistry reaction"
+   ],
+   "antagScore": 4
   },
   "ArtifactGlue": {
    "id": "ArtifactGlue",
@@ -6429,21 +6620,21 @@
    "criticalOverdose": null,
    "recipe": {
     "reactants": {
-     "Rum": {
-      "amount": 4,
-      "catalyst": false
-     },
-     "Sugar": {
-      "amount": 1,
+     "DeadRum": {
+      "amount": 5,
       "catalyst": false
      },
      "JuiceLime": {
-      "amount": 1,
+      "amount": 3,
+      "catalyst": false
+     },
+     "Sugar": {
+      "amount": 2,
       "catalyst": false
      }
     },
     "products": {
-     "Daiquiri": 6
+     "Daiquiri": 10
     },
     "minTemp": null,
     "maxTemp": null,
@@ -6538,7 +6729,7 @@
    "desc": "Distilled alcoholic drink made from saltwater.",
    "physicalDesc": "strong smelling",
    "flavor": "rum",
-   "isBase": true,
+   "isBase": false,
    "isDispenser": false,
    "effects": "[Digestion] Thirst x2",
    "effectTags": [
@@ -6549,8 +6740,31 @@
    ],
    "overdose": null,
    "criticalOverdose": null,
-   "recipe": null,
-   "obtainSources": []
+   "recipe": {
+    "reactants": {
+     "Saline": {
+      "amount": 1,
+      "catalyst": false
+     },
+     "Rum": {
+      "amount": 1,
+      "catalyst": false
+     },
+     "TableSalt": {
+      "amount": 1,
+      "catalyst": false
+     }
+    },
+    "products": {
+     "DeadRum": 3
+    },
+    "minTemp": null,
+    "maxTemp": null,
+    "mixer": []
+   },
+   "obtainSources": [
+    "Chemistry reaction"
+   ]
   },
   "DeathInTheAfternoon": {
    "id": "DeathInTheAfternoon",
@@ -7212,6 +7426,53 @@
     "Golden Apple (plant)"
    ]
   },
+  "DoubleIceCream": {
+   "id": "DoubleIceCream",
+   "name": "Double Ice Cream",
+   "group": "Drinks",
+   "category": "Delta-V Drinks",
+   "source": "deltav",
+   "color": "#a06f42",
+   "desc": "",
+   "physicalDesc": "fizzy and creamy",
+   "flavor": "doubleicecream",
+   "isBase": false,
+   "isDispenser": false,
+   "effects": "[Digestion] Thirst x2",
+   "effectTags": [
+    "thirst"
+   ],
+   "metabolismPaths": [
+    "Digestion"
+   ],
+   "overdose": null,
+   "criticalOverdose": null,
+   "recipe": {
+    "reactants": {
+     "RootBeerFloat": {
+      "amount": 1,
+      "catalyst": false
+     },
+     "IceCream": {
+      "amount": 1,
+      "catalyst": false
+     },
+     "Sugar": {
+      "amount": 1,
+      "catalyst": false
+     }
+    },
+    "products": {
+     "DoubleIceCream": 3
+    },
+    "minTemp": null,
+    "maxTemp": null,
+    "mixer": []
+   },
+   "obtainSources": [
+    "Chemistry reaction"
+   ]
+  },
   "Doxarubixadone": {
    "id": "Doxarubixadone",
    "name": "doxarubixadone",
@@ -7278,6 +7539,55 @@
    "criticalOverdose": null,
    "recipe": null,
    "obtainSources": []
+  },
+  "DrGibbBloodRed": {
+   "id": "DrGibbBloodRed",
+   "name": "Dr Gibb Blood Red",
+   "group": "Drinks",
+   "category": "Delta-V Drinks",
+   "source": "deltav",
+   "color": "#570303",
+   "desc": "",
+   "physicalDesc": "fizzy",
+   "flavor": "drgibbbloodred",
+   "isBase": false,
+   "isDispenser": false,
+   "effects": "[Digestion] Thirst x2; [Drink] Thirst x2.0 (if MetabolizerTypeCondition); [Food] Adds 0.05u UncookedAnimalProteins",
+   "effectTags": [
+    "thirst"
+   ],
+   "metabolismPaths": [
+    "Digestion",
+    "Drink",
+    "Food"
+   ],
+   "overdose": null,
+   "criticalOverdose": null,
+   "recipe": {
+    "reactants": {
+     "DrGibb": {
+      "amount": 3,
+      "catalyst": false
+     },
+     "Blood": {
+      "amount": 2,
+      "catalyst": false
+     },
+     "Sugar": {
+      "amount": 1,
+      "catalyst": false
+     }
+    },
+    "products": {
+     "DrGibbBloodRed": 6
+    },
+    "minTemp": null,
+    "maxTemp": null,
+    "mixer": []
+   },
+   "obtainSources": [
+    "Chemistry reaction"
+   ]
   },
   "DriestMartini": {
    "id": "DriestMartini",
@@ -8566,6 +8876,58 @@
    "obtainSources": [],
    "antagScore": 1
   },
+  "FiveOClock": {
+   "id": "FiveOClock",
+   "name": "Five O Clock",
+   "group": "Drinks",
+   "category": "Delta-V Drinks",
+   "source": "deltav",
+   "color": "#851800",
+   "desc": "",
+   "physicalDesc": "aromatic",
+   "flavor": "fiveoclock",
+   "isBase": false,
+   "isDispenser": false,
+   "effects": "[Digestion] Thirst x2; [Drink] Thirst x2; [Drink] Adds 0.07u Ethanol",
+   "effectTags": [
+    "thirst"
+   ],
+   "metabolismPaths": [
+    "Digestion",
+    "Drink"
+   ],
+   "overdose": null,
+   "criticalOverdose": null,
+   "recipe": {
+    "reactants": {
+     "Tea": {
+      "amount": 5,
+      "catalyst": false
+     },
+     "Cognac": {
+      "amount": 2,
+      "catalyst": false
+     },
+     "JuiceLemon": {
+      "amount": 2,
+      "catalyst": false
+     },
+     "Angobitters": {
+      "amount": 1,
+      "catalyst": false
+     }
+    },
+    "products": {
+     "FiveOClock": 10
+    },
+    "minTemp": null,
+    "maxTemp": null,
+    "mixer": []
+   },
+   "obtainSources": [
+    "Chemistry reaction"
+   ]
+  },
   "Flour": {
    "id": "Flour",
    "name": "flour",
@@ -9437,6 +9799,54 @@
    "recipe": null,
    "obtainSources": []
   },
+  "GreenGrass": {
+   "id": "GreenGrass",
+   "name": "Green Grass",
+   "group": "Drinks",
+   "category": "Delta-V Drinks",
+   "source": "deltav",
+   "color": "#66aa55",
+   "desc": "",
+   "physicalDesc": "tangy",
+   "flavor": "greengrass",
+   "isBase": false,
+   "isDispenser": false,
+   "effects": "[Digestion] Thirst x3; [Drink] Thirst x2; [Drink] Adds 0.05u Ethanol",
+   "effectTags": [
+    "thirst"
+   ],
+   "metabolismPaths": [
+    "Digestion",
+    "Drink"
+   ],
+   "overdose": null,
+   "criticalOverdose": null,
+   "recipe": {
+    "reactants": {
+     "BlueCuracao": {
+      "amount": 2,
+      "catalyst": false
+     },
+     "JuiceOrange": {
+      "amount": 3,
+      "catalyst": false
+     },
+     "Ice": {
+      "amount": 1,
+      "catalyst": false
+     }
+    },
+    "products": {
+     "GreenGrass": 6
+    },
+    "minTemp": null,
+    "maxTemp": null,
+    "mixer": []
+   },
+   "obtainSources": [
+    "Chemistry reaction"
+   ]
+  },
   "GreenTea": {
    "id": "GreenTea",
    "name": "green tea",
@@ -9646,6 +10056,57 @@
     "Chemistry reaction"
    ]
   },
+  "Gunmetal": {
+   "id": "Gunmetal",
+   "name": "Gunmetal",
+   "group": "Drinks",
+   "category": "Delta-V Drinks",
+   "source": "deltav",
+   "color": "#994422",
+   "desc": "",
+   "physicalDesc": "strong smelling",
+   "flavor": "gunmetal",
+   "isBase": false,
+   "isDispenser": false,
+   "effects": "[Digestion] Thirst x3; [Drink] Thirst x2; [Drink] Adds 0.2u Ethanol; [Poison] Deals Poison 0.5",
+   "effectTags": [
+    "deals:poison",
+    "thirst"
+   ],
+   "metabolismPaths": [
+    "Digestion",
+    "Drink",
+    "Poison"
+   ],
+   "overdose": null,
+   "criticalOverdose": null,
+   "recipe": {
+    "reactants": {
+     "Cream": {
+      "amount": 1,
+      "catalyst": false
+     },
+     "WeldingFuel": {
+      "amount": 1,
+      "catalyst": false
+     },
+     "Rum": {
+      "amount": 1,
+      "catalyst": false
+     }
+    },
+    "products": {
+     "Gunmetal": 3
+    },
+    "minTemp": null,
+    "maxTemp": null,
+    "mixer": []
+   },
+   "obtainSources": [
+    "Chemistry reaction"
+   ],
+   "antagScore": 2
+  },
   "Haloperidol": {
    "id": "Haloperidol",
    "name": "haloperidol",
@@ -9784,6 +10245,60 @@
    "criticalOverdose": null,
    "recipe": null,
    "obtainSources": []
+  },
+  "HealthViolation": {
+   "id": "HealthViolation",
+   "name": "Health Violation",
+   "group": "Drinks",
+   "category": "Delta-V Drinks",
+   "source": "deltav",
+   "color": "#ff7f00",
+   "desc": "",
+   "physicalDesc": "strong smelling",
+   "flavor": "healthcodeviolation",
+   "isBase": false,
+   "isDispenser": false,
+   "effects": "[Digestion] Thirst x3; [Drink] Thirst x2; [Drink] Adds 0.3u Ethanol; [Drink] Message popup (if ReagentCondition) @20%; [Drink] Vomit (if ReagentCondition) @2%",
+   "effectTags": [
+    "thirst",
+    "vomit"
+   ],
+   "metabolismPaths": [
+    "Digestion",
+    "Drink"
+   ],
+   "overdose": 30,
+   "criticalOverdose": null,
+   "recipe": {
+    "reactants": {
+     "GargleBlaster": {
+      "amount": 10,
+      "catalyst": false
+     },
+     "Moonshine": {
+      "amount": 6,
+      "catalyst": false
+     },
+     "VodkaMartini": {
+      "amount": 3,
+      "catalyst": false
+     },
+     "Vermouth": {
+      "amount": 1,
+      "catalyst": false
+     }
+    },
+    "products": {
+     "HealthViolation": 20
+    },
+    "minTemp": null,
+    "maxTemp": null,
+    "mixer": []
+   },
+   "obtainSources": [
+    "Chemistry reaction"
+   ],
+   "antagScore": 1
   },
   "HeartbreakerToxin": {
    "id": "HeartbreakerToxin",
@@ -11676,7 +12191,7 @@
    "desc": "It's a little piece of Eden.",
    "physicalDesc": "crisp",
    "flavor": "apple",
-   "isBase": true,
+   "isBase": false,
    "isDispenser": false,
    "effects": "[Digestion] Thirst x3",
    "effectTags": [
@@ -11687,8 +12202,29 @@
    ],
    "overdose": null,
    "criticalOverdose": null,
-   "recipe": null,
-   "obtainSources": []
+   "recipe": {
+    "reactants": {
+     "Water": {
+      "amount": 1,
+      "catalyst": false
+     },
+     "PowderedJuiceApple": {
+      "amount": 1,
+      "catalyst": false
+     }
+    },
+    "products": {
+     "JuiceApple": 2
+    },
+    "minTemp": null,
+    "maxTemp": null,
+    "mixer": [
+     "Stir"
+    ]
+   },
+   "obtainSources": [
+    "Chemistry reaction"
+   ]
   },
   "JuiceBanana": {
    "id": "JuiceBanana",
@@ -11700,7 +12236,7 @@
    "desc": "The raw essence of a banana. HONK.",
    "physicalDesc": "crisp",
    "flavor": "banana",
-   "isBase": true,
+   "isBase": false,
    "isDispenser": false,
    "effects": "[Digestion] Thirst x3",
    "effectTags": [
@@ -11711,8 +12247,29 @@
    ],
    "overdose": null,
    "criticalOverdose": null,
-   "recipe": null,
-   "obtainSources": []
+   "recipe": {
+    "reactants": {
+     "Water": {
+      "amount": 1,
+      "catalyst": false
+     },
+     "PowderedJuiceBanana": {
+      "amount": 1,
+      "catalyst": false
+     }
+    },
+    "products": {
+     "JuiceBanana": 2
+    },
+    "minTemp": null,
+    "maxTemp": null,
+    "mixer": [
+     "Stir"
+    ]
+   },
+   "obtainSources": [
+    "Chemistry reaction"
+   ]
   },
   "JuiceBerry": {
    "id": "JuiceBerry",
@@ -11724,7 +12281,7 @@
    "desc": "A delicious blend of several different kinds of berries.",
    "physicalDesc": "sweet",
    "flavor": "berry",
-   "isBase": true,
+   "isBase": false,
    "isDispenser": false,
    "effects": "[Digestion] Thirst x3",
    "effectTags": [
@@ -11735,8 +12292,29 @@
    ],
    "overdose": null,
    "criticalOverdose": null,
-   "recipe": null,
-   "obtainSources": []
+   "recipe": {
+    "reactants": {
+     "Water": {
+      "amount": 1,
+      "catalyst": false
+     },
+     "PowderedJuiceBerry": {
+      "amount": 1,
+      "catalyst": false
+     }
+    },
+    "products": {
+     "JuiceBerry": 2
+    },
+    "minTemp": null,
+    "maxTemp": null,
+    "mixer": [
+     "Stir"
+    ]
+   },
+   "obtainSources": [
+    "Chemistry reaction"
+   ]
   },
   "JuiceBerryPoison": {
    "id": "JuiceBerryPoison",
@@ -11822,7 +12400,7 @@
    "desc": "It's like a carrot, but less crunchy.",
    "physicalDesc": "crisp",
    "flavor": "carrot",
-   "isBase": true,
+   "isBase": false,
    "isDispenser": false,
    "effects": "[Digestion] Thirst x3",
    "effectTags": [
@@ -11833,8 +12411,28 @@
    ],
    "overdose": null,
    "criticalOverdose": null,
-   "recipe": null,
+   "recipe": {
+    "reactants": {
+     "Water": {
+      "amount": 1,
+      "catalyst": false
+     },
+     "PowderedJuiceCarrot": {
+      "amount": 1,
+      "catalyst": false
+     }
+    },
+    "products": {
+     "JuiceCarrot": 2
+    },
+    "minTemp": null,
+    "maxTemp": null,
+    "mixer": [
+     "Stir"
+    ]
+   },
    "obtainSources": [
+    "Chemistry reaction",
     "Carrots (plant)"
    ]
   },
@@ -11848,7 +12446,7 @@
    "desc": "Tasty cherry juice, sweet and tangy.",
    "physicalDesc": "sweet",
    "flavor": "cherry",
-   "isBase": true,
+   "isBase": false,
    "isDispenser": false,
    "effects": "[Digestion] Thirst x3",
    "effectTags": [
@@ -11859,8 +12457,29 @@
    ],
    "overdose": null,
    "criticalOverdose": null,
-   "recipe": null,
-   "obtainSources": []
+   "recipe": {
+    "reactants": {
+     "Water": {
+      "amount": 1,
+      "catalyst": false
+     },
+     "PowderedJuiceCherry": {
+      "amount": 1,
+      "catalyst": false
+     }
+    },
+    "products": {
+     "JuiceCherry": 2
+    },
+    "minTemp": null,
+    "maxTemp": null,
+    "mixer": [
+     "Stir"
+    ]
+   },
+   "obtainSources": [
+    "Chemistry reaction"
+   ]
   },
   "JuiceGrape": {
    "id": "JuiceGrape",
@@ -11872,7 +12491,7 @@
    "desc": "Freshly squeezed juice from red grapes. Quite sweet.",
    "physicalDesc": "crisp",
    "flavor": "juice",
-   "isBase": true,
+   "isBase": false,
    "isDispenser": false,
    "effects": "[Digestion] Thirst x3",
    "effectTags": [
@@ -11883,8 +12502,29 @@
    ],
    "overdose": null,
    "criticalOverdose": null,
-   "recipe": null,
-   "obtainSources": []
+   "recipe": {
+    "reactants": {
+     "Water": {
+      "amount": 1,
+      "catalyst": false
+     },
+     "PowderedJuiceGrape": {
+      "amount": 1,
+      "catalyst": false
+     }
+    },
+    "products": {
+     "JuiceGrape": 2
+    },
+    "minTemp": null,
+    "maxTemp": null,
+    "mixer": [
+     "Stir"
+    ]
+   },
+   "obtainSources": [
+    "Chemistry reaction"
+   ]
   },
   "JuiceLemon": {
    "id": "JuiceLemon",
@@ -11896,7 +12536,7 @@
    "desc": "This juice is VERY sour.",
    "physicalDesc": "citric",
    "flavor": "sour",
-   "isBase": true,
+   "isBase": false,
    "isDispenser": false,
    "effects": "[Digestion] Thirst x3",
    "effectTags": [
@@ -11907,8 +12547,28 @@
    ],
    "overdose": null,
    "criticalOverdose": null,
-   "recipe": null,
+   "recipe": {
+    "reactants": {
+     "Water": {
+      "amount": 1,
+      "catalyst": false
+     },
+     "PowderedJuiceLemon": {
+      "amount": 1,
+      "catalyst": false
+     }
+    },
+    "products": {
+     "JuiceLemon": 2
+    },
+    "minTemp": null,
+    "maxTemp": null,
+    "mixer": [
+     "Stir"
+    ]
+   },
    "obtainSources": [
+    "Chemistry reaction",
     "Soda Dispenser (Lime Juice)"
    ]
   },
@@ -11922,7 +12582,7 @@
    "desc": "The sweet-sour juice of limes.",
    "physicalDesc": "citric",
    "flavor": "sour",
-   "isBase": true,
+   "isBase": false,
    "isDispenser": false,
    "effects": "[Digestion] Thirst x3",
    "effectTags": [
@@ -11933,8 +12593,29 @@
    ],
    "overdose": null,
    "criticalOverdose": null,
-   "recipe": null,
-   "obtainSources": []
+   "recipe": {
+    "reactants": {
+     "Water": {
+      "amount": 1,
+      "catalyst": false
+     },
+     "PowderedJuiceLime": {
+      "amount": 1,
+      "catalyst": false
+     }
+    },
+    "products": {
+     "JuiceLime": 2
+    },
+    "minTemp": null,
+    "maxTemp": null,
+    "mixer": [
+     "Stir"
+    ]
+   },
+   "obtainSources": [
+    "Chemistry reaction"
+   ]
   },
   "JuiceOrange": {
    "id": "JuiceOrange",
@@ -11946,7 +12627,7 @@
    "desc": "Both delicious AND rich in Vitamin C. What more do you need?",
    "physicalDesc": "citric",
    "flavor": "orange",
-   "isBase": true,
+   "isBase": false,
    "isDispenser": false,
    "effects": "[Digestion] Thirst x3",
    "effectTags": [
@@ -11957,8 +12638,28 @@
    ],
    "overdose": null,
    "criticalOverdose": null,
-   "recipe": null,
+   "recipe": {
+    "reactants": {
+     "Water": {
+      "amount": 1,
+      "catalyst": false
+     },
+     "PowderedJuiceOrange": {
+      "amount": 1,
+      "catalyst": false
+     }
+    },
+    "products": {
+     "JuiceOrange": 2
+    },
+    "minTemp": null,
+    "maxTemp": null,
+    "mixer": [
+     "Stir"
+    ]
+   },
    "obtainSources": [
+    "Chemistry reaction",
     "Soda Dispenser"
    ]
   },
@@ -11972,7 +12673,7 @@
    "desc": "The delicious juice of a pineapple.",
    "physicalDesc": "tropical",
    "flavor": "pineapple",
-   "isBase": true,
+   "isBase": false,
    "isDispenser": false,
    "effects": "[Digestion] Thirst x3",
    "effectTags": [
@@ -11983,8 +12684,29 @@
    ],
    "overdose": null,
    "criticalOverdose": null,
-   "recipe": null,
-   "obtainSources": []
+   "recipe": {
+    "reactants": {
+     "Water": {
+      "amount": 1,
+      "catalyst": false
+     },
+     "PowderedJuicePineapple": {
+      "amount": 1,
+      "catalyst": false
+     }
+    },
+    "products": {
+     "JuicePineapple": 2
+    },
+    "minTemp": null,
+    "maxTemp": null,
+    "mixer": [
+     "Stir"
+    ]
+   },
+   "obtainSources": [
+    "Chemistry reaction"
+   ]
   },
   "JuiceThatMakesYouHew": {
    "id": "JuiceThatMakesYouHew",
@@ -12046,7 +12768,7 @@
    "desc": "Tomatoes made into juice. What a waste of good tomatoes, huh?",
    "physicalDesc": "saucey",
    "flavor": "tomato",
-   "isBase": true,
+   "isBase": false,
    "isDispenser": false,
    "effects": "[Digestion] Thirst x3",
    "effectTags": [
@@ -12057,8 +12779,28 @@
    ],
    "overdose": null,
    "criticalOverdose": null,
-   "recipe": null,
+   "recipe": {
+    "reactants": {
+     "Water": {
+      "amount": 1,
+      "catalyst": false
+     },
+     "PowderedJuiceTomato": {
+      "amount": 1,
+      "catalyst": false
+     }
+    },
+    "products": {
+     "JuiceTomato": 2
+    },
+    "minTemp": null,
+    "maxTemp": null,
+    "mixer": [
+     "Stir"
+    ]
+   },
    "obtainSources": [
+    "Chemistry reaction",
     "Killertomato (plant)"
    ]
   },
@@ -12072,7 +12814,7 @@
    "desc": "The delicious juice of a watermelon.",
    "physicalDesc": "sweet",
    "flavor": "watermelon",
-   "isBase": true,
+   "isBase": false,
    "isDispenser": false,
    "effects": "[Digestion] Thirst x3",
    "effectTags": [
@@ -12083,8 +12825,28 @@
    ],
    "overdose": null,
    "criticalOverdose": null,
-   "recipe": null,
+   "recipe": {
+    "reactants": {
+     "Water": {
+      "amount": 1,
+      "catalyst": false
+     },
+     "PowderedJuiceWatermelon": {
+      "amount": 1,
+      "catalyst": false
+     }
+    },
+    "products": {
+     "JuiceWatermelon": 2
+    },
+    "minTemp": null,
+    "maxTemp": null,
+    "mixer": [
+     "Stir"
+    ]
+   },
    "obtainSources": [
+    "Chemistry reaction",
     "Soda Dispenser"
    ]
   },
@@ -12309,6 +13071,30 @@
     "Chemistry reaction"
    ]
   },
+  "Kvass": {
+   "id": "Kvass",
+   "name": "Kvass",
+   "group": "Drinks",
+   "category": "Delta-V Drinks",
+   "source": "deltav",
+   "color": "#381600",
+   "desc": "",
+   "physicalDesc": "bubbly",
+   "flavor": "kvass",
+   "isBase": true,
+   "isDispenser": false,
+   "effects": "[Digestion] Thirst x3",
+   "effectTags": [
+    "thirst"
+   ],
+   "metabolismPaths": [
+    "Digestion"
+   ],
+   "overdose": null,
+   "criticalOverdose": null,
+   "recipe": null,
+   "obtainSources": []
+  },
   "Lacerinol": {
    "id": "Lacerinol",
    "name": "lacerinol",
@@ -12450,6 +13236,37 @@
    ],
    "antagTips": "Slow-acting heavy metal poison. Hard to detect, accumulates over time. Excellent for long-term covert poisoning via food/drink."
   },
+  "Lean": {
+   "id": "Lean",
+   "name": "Lean",
+   "group": "Drinks",
+   "category": "Delta-V Drinks",
+   "source": "deltav",
+   "color": "#9400D3",
+   "desc": "",
+   "physicalDesc": "strong smelling",
+   "flavor": "",
+   "isBase": true,
+   "isDispenser": false,
+   "effects": "[Digestion] Thirst x2; [Narcotic] Status: Stutter; [Narcotic] Jitter; [Poison] Deals Caustic 0.5 (if ReagentCondition); [Poison] Electrocution (if ReagentCondition) @10%; [Medicine] Vomit (if ReagentCondition) @20%",
+   "effectTags": [
+    "deals:caustic",
+    "jitter",
+    "thirst",
+    "vomit"
+   ],
+   "metabolismPaths": [
+    "Digestion",
+    "Narcotic",
+    "Poison",
+    "Medicine"
+   ],
+   "overdose": 25,
+   "criticalOverdose": null,
+   "recipe": null,
+   "obtainSources": [],
+   "antagScore": 3
+  },
   "Left4Zed": {
    "id": "Left4Zed",
    "name": "left-4-zed",
@@ -12495,6 +13312,54 @@
    ],
    "antagScore": 2
   },
+  "LemonDrop": {
+   "id": "LemonDrop",
+   "name": "Lemon Drop",
+   "group": "Drinks",
+   "category": "Delta-V Drinks",
+   "source": "deltav",
+   "color": "#fff789",
+   "desc": "",
+   "physicalDesc": "lemony fresh",
+   "flavor": "lemondrop",
+   "isBase": false,
+   "isDispenser": false,
+   "effects": "[Digestion] Thirst x3; [Drink] Thirst x2; [Drink] Adds 0.15u Ethanol",
+   "effectTags": [
+    "thirst"
+   ],
+   "metabolismPaths": [
+    "Digestion",
+    "Drink"
+   ],
+   "overdose": null,
+   "criticalOverdose": null,
+   "recipe": {
+    "reactants": {
+     "Vodka": {
+      "amount": 2,
+      "catalyst": false
+     },
+     "Sugar": {
+      "amount": 2,
+      "catalyst": false
+     },
+     "JuiceLemon": {
+      "amount": 1,
+      "catalyst": false
+     }
+    },
+    "products": {
+     "LemonDrop": 5
+    },
+    "minTemp": null,
+    "maxTemp": null,
+    "mixer": []
+   },
+   "obtainSources": [
+    "Chemistry reaction"
+   ]
+  },
   "LemonLime": {
    "id": "LemonLime",
    "name": "Smite",
@@ -12539,6 +13404,58 @@
     "mixer": [
      "Stir"
     ]
+   },
+   "obtainSources": [
+    "Chemistry reaction"
+   ]
+  },
+  "LemonLimeBitters": {
+   "id": "LemonLimeBitters",
+   "name": "Lemon Lime Bitters",
+   "group": "Drinks",
+   "category": "Delta-V Drinks",
+   "source": "deltav",
+   "color": "#ffa37e",
+   "desc": "",
+   "physicalDesc": "fizzy",
+   "flavor": "lemonlimebitters",
+   "isBase": false,
+   "isDispenser": false,
+   "effects": "[Digestion] Thirst x3; [Drink] Thirst x2",
+   "effectTags": [
+    "thirst"
+   ],
+   "metabolismPaths": [
+    "Digestion",
+    "Drink"
+   ],
+   "overdose": null,
+   "criticalOverdose": null,
+   "recipe": {
+    "reactants": {
+     "Lemonade": {
+      "amount": 5,
+      "catalyst": false
+     },
+     "JuiceLime": {
+      "amount": 2,
+      "catalyst": false
+     },
+     "Sugar": {
+      "amount": 2,
+      "catalyst": false
+     },
+     "Angobitters": {
+      "amount": 1,
+      "catalyst": false
+     }
+    },
+    "products": {
+     "LemonLimeBitters": 10
+    },
+    "minTemp": null,
+    "maxTemp": null,
+    "mixer": []
    },
    "obtainSources": [
     "Chemistry reaction"
@@ -13800,7 +14717,7 @@
    "desc": "An opaque white liquid produced by the mammary glands of mammals.",
    "physicalDesc": "opaque",
    "flavor": "milk",
-   "isBase": true,
+   "isBase": false,
    "isDispenser": false,
    "effects": "[Digestion] Thirst x4",
    "effectTags": [
@@ -13811,8 +14728,28 @@
    ],
    "overdose": null,
    "criticalOverdose": null,
-   "recipe": null,
+   "recipe": {
+    "reactants": {
+     "Water": {
+      "amount": 1,
+      "catalyst": false
+     },
+     "PowderedMilk": {
+      "amount": 1,
+      "catalyst": false
+     }
+    },
+    "products": {
+     "Milk": 2
+    },
+    "minTemp": null,
+    "maxTemp": null,
+    "mixer": [
+     "Stir"
+    ]
+   },
    "obtainSources": [
+    "Chemistry reaction",
     "Lemoon (plant)",
     "Cows",
     "Lemoon (plant mutation)"
@@ -13876,7 +14813,7 @@
    "desc": "Consumers favorite.",
    "physicalDesc": "refreshing",
    "flavor": "soy",
-   "isBase": true,
+   "isBase": false,
    "isDispenser": false,
    "effects": "[Digestion] Thirst x4",
    "effectTags": [
@@ -13887,8 +14824,29 @@
    ],
    "overdose": null,
    "criticalOverdose": null,
-   "recipe": null,
-   "obtainSources": []
+   "recipe": {
+    "reactants": {
+     "Water": {
+      "amount": 1,
+      "catalyst": false
+     },
+     "PowderedMilkSoy": {
+      "amount": 1,
+      "catalyst": false
+     }
+    },
+    "products": {
+     "MilkSoy": 2
+    },
+    "minTemp": null,
+    "maxTemp": null,
+    "mixer": [
+     "Stir"
+    ]
+   },
+   "obtainSources": [
+    "Chemistry reaction"
+   ]
   },
   "MilkSpoiled": {
    "id": "MilkSpoiled",
@@ -14124,6 +15082,106 @@
     "Chemistry reaction"
    ],
    "antagScore": 2
+  },
+  "Mliko": {
+   "id": "Mliko",
+   "name": "Mliko",
+   "group": "Drinks",
+   "category": "Delta-V Drinks",
+   "source": "deltav",
+   "color": "#fefff1",
+   "desc": "",
+   "physicalDesc": "foamy",
+   "flavor": "mliko",
+   "isBase": false,
+   "isDispenser": false,
+   "effects": "[Digestion] Thirst x2; [Drink] Thirst x1; [Drink] Adds 0.02u Ethanol",
+   "effectTags": [
+    "thirst"
+   ],
+   "metabolismPaths": [
+    "Digestion",
+    "Drink"
+   ],
+   "overdose": null,
+   "criticalOverdose": null,
+   "recipe": {
+    "reactants": {
+     "Beer": {
+      "amount": 1,
+      "catalyst": false
+     }
+    },
+    "products": {
+     "Mliko": 3
+    },
+    "minTemp": null,
+    "maxTemp": null,
+    "mixer": [
+     "Shake"
+    ]
+   },
+   "obtainSources": [
+    "Chemistry reaction"
+   ]
+  },
+  "MnatsaCollins": {
+   "id": "MnatsaCollins",
+   "name": "Mnatsa Collins",
+   "group": "Drinks",
+   "category": "Delta-V Drinks",
+   "source": "deltav",
+   "color": "#fcb76f",
+   "desc": "",
+   "physicalDesc": "fizzy",
+   "flavor": "mnatsacollins",
+   "isBase": false,
+   "isDispenser": false,
+   "effects": "[Digestion] Thirst x2; [Drink] Thirst x2; [Drink] Adds 0.07u Ethanol",
+   "effectTags": [
+    "thirst"
+   ],
+   "metabolismPaths": [
+    "Digestion",
+    "Drink"
+   ],
+   "overdose": null,
+   "criticalOverdose": null,
+   "recipe": {
+    "reactants": {
+     "Cognac": {
+      "amount": 5,
+      "catalyst": false
+     },
+     "SodaWater": {
+      "amount": 5,
+      "catalyst": false
+     },
+     "JuiceLemon": {
+      "amount": 2,
+      "catalyst": false
+     },
+     "Sugar": {
+      "amount": 2,
+      "catalyst": false
+     },
+     "Angobitters": {
+      "amount": 1,
+      "catalyst": false
+     }
+    },
+    "products": {
+     "MnatsaCollins": 15
+    },
+    "minTemp": null,
+    "maxTemp": null,
+    "mixer": [
+     "Stir"
+    ]
+   },
+   "obtainSources": [
+    "Chemistry reaction"
+   ]
   },
   "Mojito": {
    "id": "Mojito",
@@ -14443,6 +15501,56 @@
     "mixer": [
      "Stir"
     ]
+   },
+   "obtainSources": [
+    "Chemistry reaction"
+   ]
+  },
+  "Mothamphetamine": {
+   "id": "Mothamphetamine",
+   "name": "Mothamphetamine",
+   "group": "Drinks",
+   "category": "Delta-V Drinks",
+   "source": "deltav",
+   "color": "#2fa1ef",
+   "desc": "",
+   "physicalDesc": "fuzzy",
+   "flavor": "mothamphetamine",
+   "isBase": false,
+   "isDispenser": false,
+   "effects": "[Digestion] Thirst x3; [Drink] Thirst x2; [Drink] Adds 0.25u Ethanol; [Poison] Jitter",
+   "effectTags": [
+    "jitter",
+    "thirst"
+   ],
+   "metabolismPaths": [
+    "Digestion",
+    "Drink",
+    "Poison"
+   ],
+   "overdose": null,
+   "criticalOverdose": null,
+   "recipe": {
+    "reactants": {
+     "FourteenLoko": {
+      "amount": 1,
+      "catalyst": false
+     },
+     "EnergyDrink": {
+      "amount": 1,
+      "catalyst": false
+     },
+     "BlueCuracao": {
+      "amount": 1,
+      "catalyst": false
+     }
+    },
+    "products": {
+     "Mothamphetamine": 3
+    },
+    "minTemp": null,
+    "maxTemp": null,
+    "mixer": []
    },
    "obtainSources": [
     "Chemistry reaction"
@@ -14914,6 +16022,51 @@
      "Negacordrazine": 1
     },
     "minTemp": null,
+    "maxTemp": null,
+    "mixer": []
+   },
+   "obtainSources": [
+    "Chemistry reaction"
+   ]
+  },
+  "Netinadone": {
+   "id": "Netinadone",
+   "name": "Netinadone",
+   "group": "Medicine",
+   "category": "Delta-V Medicine",
+   "source": "deltav",
+   "color": "#e3d56d",
+   "desc": "",
+   "physicalDesc": "sickly",
+   "flavor": "acid",
+   "isBase": false,
+   "isDispenser": false,
+   "effects": "[Medicine] Effect: ReduceRotting (if HasComponentCondition, temp cond, MobStateCondition)",
+   "effectTags": [],
+   "metabolismPaths": [
+    "Medicine"
+   ],
+   "overdose": null,
+   "criticalOverdose": null,
+   "recipe": {
+    "reactants": {
+     "Plasma": {
+      "amount": 2,
+      "catalyst": false
+     },
+     "Traumoxadone": {
+      "amount": 1,
+      "catalyst": false
+     },
+     "Doxarubixadone": {
+      "amount": 1,
+      "catalyst": false
+     }
+    },
+    "products": {
+     "Netinadone": 2
+    },
+    "minTemp": 400,
     "maxTemp": null,
     "mixer": []
    },
@@ -15443,6 +16596,60 @@
    "criticalOverdose": null,
    "recipe": null,
    "obtainSources": []
+  },
+  "OldFashioned": {
+   "id": "OldFashioned",
+   "name": "Old Fashioned",
+   "group": "Drinks",
+   "category": "Delta-V Drinks",
+   "source": "deltav",
+   "color": "#c8753f",
+   "desc": "",
+   "physicalDesc": "reagent-physical-desc-bittersweet",
+   "flavor": "oldfashioned",
+   "isBase": false,
+   "isDispenser": false,
+   "effects": "[Digestion] Thirst x2; [Drink] Thirst x2; [Drink] Adds 0.2u Ethanol",
+   "effectTags": [
+    "thirst"
+   ],
+   "metabolismPaths": [
+    "Digestion",
+    "Drink"
+   ],
+   "overdose": null,
+   "criticalOverdose": null,
+   "recipe": {
+    "reactants": {
+     "Whiskey": {
+      "amount": 5,
+      "catalyst": false
+     },
+     "Angobitters": {
+      "amount": 2,
+      "catalyst": false
+     },
+     "Sugar": {
+      "amount": 2,
+      "catalyst": false
+     },
+     "JuiceOrange": {
+      "amount": 1,
+      "catalyst": false
+     }
+    },
+    "products": {
+     "OldFashioned": 10
+    },
+    "minTemp": null,
+    "maxTemp": null,
+    "mixer": [
+     "Stir"
+    ]
+   },
+   "obtainSources": [
+    "Chemistry reaction"
+   ]
   },
   "OleoresinCapsaicin": {
    "id": "OleoresinCapsaicin",
@@ -16423,6 +17630,53 @@
     "Chemical Dispenser"
    ]
   },
+  "Photoxadone": {
+   "id": "Photoxadone",
+   "name": "Photoxadone",
+   "group": "Medicine",
+   "category": "Delta-V Medicine",
+   "source": "deltav",
+   "color": "#A695AD",
+   "desc": "",
+   "physicalDesc": "enigmatic",
+   "flavor": "clean",
+   "isBase": false,
+   "isDispenser": false,
+   "effects": "[Medicine] Heals Metaphysical 5 (even) (if temp cond)",
+   "effectTags": [
+    "heals:metaphysical"
+   ],
+   "metabolismPaths": [
+    "Medicine"
+   ],
+   "overdose": null,
+   "criticalOverdose": null,
+   "recipe": {
+    "reactants": {
+     "Mercury": {
+      "amount": 1,
+      "catalyst": false
+     },
+     "Holywater": {
+      "amount": 1,
+      "catalyst": false
+     },
+     "Cryoxadone": {
+      "amount": 1,
+      "catalyst": false
+     }
+    },
+    "products": {
+     "Photoxadone": 3
+    },
+    "minTemp": null,
+    "maxTemp": null,
+    "mixer": []
+   },
+   "obtainSources": [
+    "Chemistry reaction"
+   ]
+  },
   "Pielovene": {
    "id": "Pielovene",
    "name": "Pielovene",
@@ -16995,6 +18249,362 @@
    ],
    "antagScore": 2
   },
+  "PowderedJuiceApple": {
+   "id": "PowderedJuiceApple",
+   "name": "Powdered Juice Apple",
+   "group": "Foods",
+   "category": "Delta-V Drinks",
+   "source": "deltav",
+   "color": "#FFC67E",
+   "desc": "",
+   "physicalDesc": "powdery",
+   "flavor": "sour",
+   "isBase": true,
+   "isDispenser": false,
+   "effects": "[Poison] Emote: Cough @33%",
+   "effectTags": [
+    "emote"
+   ],
+   "metabolismPaths": [
+    "Poison"
+   ],
+   "overdose": null,
+   "criticalOverdose": null,
+   "recipe": null,
+   "obtainSources": [],
+   "antagScore": 1
+  },
+  "PowderedJuiceBanana": {
+   "id": "PowderedJuiceBanana",
+   "name": "Powdered Juice Banana",
+   "group": "Foods",
+   "category": "Delta-V Drinks",
+   "source": "deltav",
+   "color": "#FFFEBF",
+   "desc": "",
+   "physicalDesc": "powdery",
+   "flavor": "terrible",
+   "isBase": true,
+   "isDispenser": false,
+   "effects": "[Poison] Emote: Cough @33%",
+   "effectTags": [
+    "emote"
+   ],
+   "metabolismPaths": [
+    "Poison"
+   ],
+   "overdose": null,
+   "criticalOverdose": null,
+   "recipe": null,
+   "obtainSources": [],
+   "antagScore": 1
+  },
+  "PowderedJuiceBerry": {
+   "id": "PowderedJuiceBerry",
+   "name": "Powdered Juice Berry",
+   "group": "Foods",
+   "category": "Delta-V Drinks",
+   "source": "deltav",
+   "color": "#D366FF",
+   "desc": "",
+   "physicalDesc": "powdery",
+   "flavor": "bitter",
+   "isBase": true,
+   "isDispenser": false,
+   "effects": "[Poison] Emote: Cough @33%",
+   "effectTags": [
+    "emote"
+   ],
+   "metabolismPaths": [
+    "Poison"
+   ],
+   "overdose": null,
+   "criticalOverdose": null,
+   "recipe": null,
+   "obtainSources": [],
+   "antagScore": 1
+  },
+  "PowderedJuiceCarrot": {
+   "id": "PowderedJuiceCarrot",
+   "name": "Powdered Juice Carrot",
+   "group": "Foods",
+   "category": "Delta-V Drinks",
+   "source": "deltav",
+   "color": "#FFA06B",
+   "desc": "",
+   "physicalDesc": "powdery",
+   "flavor": "bitter",
+   "isBase": true,
+   "isDispenser": false,
+   "effects": "[Poison] Emote: Cough @33%",
+   "effectTags": [
+    "emote"
+   ],
+   "metabolismPaths": [
+    "Poison"
+   ],
+   "overdose": null,
+   "criticalOverdose": null,
+   "recipe": null,
+   "obtainSources": [],
+   "antagScore": 1
+  },
+  "PowderedJuiceCherry": {
+   "id": "PowderedJuiceCherry",
+   "name": "Powdered Juice Cherry",
+   "group": "Foods",
+   "category": "Delta-V Drinks",
+   "source": "deltav",
+   "color": "#A9536C",
+   "desc": "",
+   "physicalDesc": "powdery",
+   "flavor": "sour",
+   "isBase": true,
+   "isDispenser": false,
+   "effects": "[Poison] Emote: Cough @33%",
+   "effectTags": [
+    "emote"
+   ],
+   "metabolismPaths": [
+    "Poison"
+   ],
+   "overdose": null,
+   "criticalOverdose": null,
+   "recipe": null,
+   "obtainSources": [],
+   "antagScore": 1
+  },
+  "PowderedJuiceGrape": {
+   "id": "PowderedJuiceGrape",
+   "name": "Powdered Juice Grape",
+   "group": "Foods",
+   "category": "Delta-V Drinks",
+   "source": "deltav",
+   "color": "#E57DFF",
+   "desc": "",
+   "physicalDesc": "powdery",
+   "flavor": "sour",
+   "isBase": true,
+   "isDispenser": false,
+   "effects": "[Poison] Emote: Cough @33%",
+   "effectTags": [
+    "emote"
+   ],
+   "metabolismPaths": [
+    "Poison"
+   ],
+   "overdose": null,
+   "criticalOverdose": null,
+   "recipe": null,
+   "obtainSources": [],
+   "antagScore": 1
+  },
+  "PowderedJuiceLemon": {
+   "id": "PowderedJuiceLemon",
+   "name": "Powdered Juice Lemon",
+   "group": "Foods",
+   "category": "Delta-V Drinks",
+   "source": "deltav",
+   "color": "#FFFC69",
+   "desc": "",
+   "physicalDesc": "powdery",
+   "flavor": "sour",
+   "isBase": true,
+   "isDispenser": false,
+   "effects": "[Poison] Deals Caustic 0.5; [Poison] Emote: Cough @33%; [Poison] Vomit (if ReagentCondition) @10%",
+   "effectTags": [
+    "deals:caustic",
+    "emote",
+    "vomit"
+   ],
+   "metabolismPaths": [
+    "Poison"
+   ],
+   "overdose": 15,
+   "criticalOverdose": null,
+   "recipe": null,
+   "obtainSources": [],
+   "antagScore": 4
+  },
+  "PowderedJuiceLime": {
+   "id": "PowderedJuiceLime",
+   "name": "Powdered Juice Lime",
+   "group": "Foods",
+   "category": "Delta-V Drinks",
+   "source": "deltav",
+   "color": "#B4FF64",
+   "desc": "",
+   "physicalDesc": "powdery",
+   "flavor": "sour",
+   "isBase": true,
+   "isDispenser": false,
+   "effects": "[Poison] Deals Caustic 0.5; [Poison] Emote: Cough @33%; [Poison] Vomit (if ReagentCondition) @10%",
+   "effectTags": [
+    "deals:caustic",
+    "emote",
+    "vomit"
+   ],
+   "metabolismPaths": [
+    "Poison"
+   ],
+   "overdose": 15,
+   "criticalOverdose": null,
+   "recipe": null,
+   "obtainSources": [],
+   "antagScore": 4
+  },
+  "PowderedJuiceOrange": {
+   "id": "PowderedJuiceOrange",
+   "name": "Powdered Juice Orange",
+   "group": "Foods",
+   "category": "Delta-V Drinks",
+   "source": "deltav",
+   "color": "#FFC420",
+   "desc": "",
+   "physicalDesc": "powdery",
+   "flavor": "sour",
+   "isBase": true,
+   "isDispenser": false,
+   "effects": "[Poison] Emote: Cough @33%",
+   "effectTags": [
+    "emote"
+   ],
+   "metabolismPaths": [
+    "Poison"
+   ],
+   "overdose": null,
+   "criticalOverdose": null,
+   "recipe": null,
+   "obtainSources": [],
+   "antagScore": 1
+  },
+  "PowderedJuicePineapple": {
+   "id": "PowderedJuicePineapple",
+   "name": "Powdered Juice Pineapple",
+   "group": "Foods",
+   "category": "Delta-V Drinks",
+   "source": "deltav",
+   "color": "#FFD644",
+   "desc": "",
+   "physicalDesc": "powdery",
+   "flavor": "sour",
+   "isBase": true,
+   "isDispenser": false,
+   "effects": "[Poison] Deals Caustic 0.5; [Poison] Emote: Cough @33%; [Poison] Vomit (if ReagentCondition) @10%",
+   "effectTags": [
+    "deals:caustic",
+    "emote",
+    "vomit"
+   ],
+   "metabolismPaths": [
+    "Poison"
+   ],
+   "overdose": 15,
+   "criticalOverdose": null,
+   "recipe": null,
+   "obtainSources": [],
+   "antagScore": 4
+  },
+  "PowderedJuiceTomato": {
+   "id": "PowderedJuiceTomato",
+   "name": "Powdered Juice Tomato",
+   "group": "Foods",
+   "category": "Delta-V Drinks",
+   "source": "deltav",
+   "color": "#D85553",
+   "desc": "",
+   "physicalDesc": "powdery",
+   "flavor": "bitter",
+   "isBase": true,
+   "isDispenser": false,
+   "effects": "[Poison] Emote: Cough @33%",
+   "effectTags": [
+    "emote"
+   ],
+   "metabolismPaths": [
+    "Poison"
+   ],
+   "overdose": null,
+   "criticalOverdose": null,
+   "recipe": null,
+   "obtainSources": [],
+   "antagScore": 1
+  },
+  "PowderedJuiceWatermelon": {
+   "id": "PowderedJuiceWatermelon",
+   "name": "Powdered Juice Watermelon",
+   "group": "Foods",
+   "category": "Delta-V Drinks",
+   "source": "deltav",
+   "color": "#FFBCDB",
+   "desc": "",
+   "physicalDesc": "powdery",
+   "flavor": "terrible",
+   "isBase": true,
+   "isDispenser": false,
+   "effects": "[Poison] Emote: Cough @33%",
+   "effectTags": [
+    "emote"
+   ],
+   "metabolismPaths": [
+    "Poison"
+   ],
+   "overdose": null,
+   "criticalOverdose": null,
+   "recipe": null,
+   "obtainSources": [],
+   "antagScore": 1
+  },
+  "PowderedMilk": {
+   "id": "PowderedMilk",
+   "name": "Powdered Milk",
+   "group": "Foods",
+   "category": "Delta-V Drinks",
+   "source": "deltav",
+   "color": "#FAFAFA",
+   "desc": "",
+   "physicalDesc": "powdery",
+   "flavor": "sweet",
+   "isBase": true,
+   "isDispenser": false,
+   "effects": "[Poison] Emote: Cough @33%",
+   "effectTags": [
+    "emote"
+   ],
+   "metabolismPaths": [
+    "Poison"
+   ],
+   "overdose": null,
+   "criticalOverdose": null,
+   "recipe": null,
+   "obtainSources": [],
+   "antagScore": 1
+  },
+  "PowderedMilkSoy": {
+   "id": "PowderedMilkSoy",
+   "name": "Powdered Milk Soy",
+   "group": "Foods",
+   "category": "Delta-V Drinks",
+   "source": "deltav",
+   "color": "#FFFCE3",
+   "desc": "",
+   "physicalDesc": "powdery",
+   "flavor": "soy",
+   "isBase": true,
+   "isDispenser": false,
+   "effects": "[Poison] Emote: Cough @33%",
+   "effectTags": [
+    "emote"
+   ],
+   "metabolismPaths": [
+    "Poison"
+   ],
+   "overdose": null,
+   "criticalOverdose": null,
+   "recipe": null,
+   "obtainSources": [],
+   "antagScore": 1
+  },
   "Primatine": {
    "id": "Primatine",
    "name": "Primatine",
@@ -17527,6 +19137,32 @@
    "obtainSources": [
     "Chemistry reaction"
    ]
+  },
+  "Quartzite": {
+   "id": "Quartzite",
+   "name": "Quartzite",
+   "group": "Toxins",
+   "category": "Delta-V Toxins",
+   "source": "deltav",
+   "color": "#ffffff",
+   "desc": "",
+   "physicalDesc": "reflective",
+   "flavor": "sharp",
+   "isBase": true,
+   "isDispenser": false,
+   "effects": "[Poison] Deals Slash 3; [Poison] Message popup @33%; [Poison] Emote: Scream @30%",
+   "effectTags": [
+    "deals:slash",
+    "emote"
+   ],
+   "metabolismPaths": [
+    "Poison"
+   ],
+   "overdose": null,
+   "criticalOverdose": null,
+   "recipe": null,
+   "obtainSources": [],
+   "antagScore": 3
   },
   "RMCAluminum": {
    "id": "RMCAluminum",
@@ -20737,6 +22373,32 @@
     "Chemistry reaction"
    ]
   },
+  "SentientGreyMatter": {
+   "id": "SentientGreyMatter",
+   "name": "Sentient Grey Matter",
+   "group": "Biological",
+   "category": "Delta-V Other",
+   "source": "deltav",
+   "color": "#C584B8",
+   "desc": "",
+   "physicalDesc": "neural",
+   "flavor": "mindful",
+   "isBase": true,
+   "isDispenser": false,
+   "effects": "[Digestion] Hunger x1.5; [Digestion] Deals Cellular 2",
+   "effectTags": [
+    "deals:cellular",
+    "hunger"
+   ],
+   "metabolismPaths": [
+    "Digestion"
+   ],
+   "overdose": null,
+   "criticalOverdose": null,
+   "recipe": null,
+   "obtainSources": [],
+   "antagScore": 2
+  },
   "ShamblersJuice": {
    "id": "ShamblersJuice",
    "name": "Shambler's Juice",
@@ -22002,6 +23664,30 @@
    "obtainSources": [
     "Chemistry reaction"
    ]
+  },
+  "Stabilizine": {
+   "id": "Stabilizine",
+   "name": "Stabilizine",
+   "group": "Medicine",
+   "category": "Delta-V Medicine",
+   "source": "deltav",
+   "color": "#ff7db5",
+   "desc": "",
+   "physicalDesc": "thick",
+   "flavor": "medicine",
+   "isBase": true,
+   "isDispenser": false,
+   "effects": "[Medicine] Temp +40000 (if temp cond); [Medicine] Temp +60000 (if temp cond); [Medicine] Temp -10000 (if temp cond)",
+   "effectTags": [
+    "temperature"
+   ],
+   "metabolismPaths": [
+    "Medicine"
+   ],
+   "overdose": null,
+   "criticalOverdose": null,
+   "recipe": null,
+   "obtainSources": []
   },
   "Starkist": {
    "id": "Starkist",
@@ -24230,6 +25916,55 @@
    ],
    "antagScore": 2
   },
+  "Umbroxol": {
+   "id": "Umbroxol",
+   "name": "Umbroxol",
+   "group": "Medicine",
+   "category": "Delta-V Medicine",
+   "source": "deltav",
+   "color": "#211f3d",
+   "desc": "",
+   "physicalDesc": "reagent-physical-desc-dark",
+   "flavor": "medicine",
+   "isBase": false,
+   "isDispenser": false,
+   "effects": "[Medicine] Heals Holy 2; [Medicine] Deals Cold 2",
+   "effectTags": [
+    "deals:cold",
+    "heals:holy"
+   ],
+   "metabolismPaths": [
+    "Medicine"
+   ],
+   "overdose": null,
+   "criticalOverdose": null,
+   "recipe": {
+    "reactants": {
+     "UnholyWater": {
+      "amount": 2,
+      "catalyst": false
+     },
+     "TableSalt": {
+      "amount": 1,
+      "catalyst": false
+     },
+     "Mercury": {
+      "amount": 1,
+      "catalyst": false
+     }
+    },
+    "products": {
+     "Umbroxol": 2
+    },
+    "minTemp": null,
+    "maxTemp": null,
+    "mixer": []
+   },
+   "obtainSources": [
+    "Chemistry reaction"
+   ],
+   "antagScore": 1
+  },
   "UncookedAnimalProteins": {
    "id": "UncookedAnimalProteins",
    "name": "uncooked animal proteins",
@@ -24258,6 +25993,54 @@
     "Butchered meat"
    ],
    "antagScore": 3
+  },
+  "UnholyWater": {
+   "id": "UnholyWater",
+   "name": "Unholy Water",
+   "group": "Toxins",
+   "category": "Delta-V Medicine",
+   "source": "deltav",
+   "color": "#c4c4c4",
+   "desc": "",
+   "physicalDesc": "reagent-physical-desc-menacing",
+   "flavor": "UnholyWater",
+   "isBase": false,
+   "isDispenser": false,
+   "effects": "[Medicine] Deals Cold 1",
+   "effectTags": [
+    "deals:cold"
+   ],
+   "metabolismPaths": [
+    "Medicine"
+   ],
+   "overdose": null,
+   "criticalOverdose": null,
+   "recipe": {
+    "reactants": {
+     "BloodChangeling": {
+      "amount": 1,
+      "catalyst": false
+     },
+     "Sulfur": {
+      "amount": 1,
+      "catalyst": false
+     },
+     "Water": {
+      "amount": 1,
+      "catalyst": false
+     }
+    },
+    "products": {
+     "UnholyWater": 3
+    },
+    "minTemp": null,
+    "maxTemp": null,
+    "mixer": []
+   },
+   "obtainSources": [
+    "Chemistry reaction"
+   ],
+   "antagScore": 1
   },
   "UnstableMutagen": {
    "id": "UnstableMutagen",
@@ -25620,9 +27403,11 @@
    "impact": null,
    "forkStatus": {
     "rmc14": "blocked",
+    "deltav": "modified",
     "funky": "modified"
    },
    "forkNotes": {
+    "deltav": "Acetone yield 2->3",
     "funky": "Product amount 2 → 3"
    },
    "rmcStatus": "blocked",
@@ -25677,6 +27462,38 @@
    "mixer": [
     "Shake"
    ],
+   "effects": "",
+   "impact": null,
+   "rmcStatus": "available",
+   "rmcNote": ""
+  },
+  "Affogato": {
+   "id": "Affogato",
+   "source": "deltav",
+   "reactants": {
+    "IceCream": {
+     "amount": 5,
+     "catalyst": false
+    },
+    "Cognac": {
+     "amount": 2,
+     "catalyst": false
+    },
+    "CoffeeLiqueur": {
+     "amount": 2,
+     "catalyst": false
+    },
+    "Angobitters": {
+     "amount": 1,
+     "catalyst": false
+    }
+   },
+   "products": {
+    "Affogato": 10
+   },
+   "minTemp": null,
+   "maxTemp": null,
+   "mixer": [],
    "effects": "",
    "impact": null,
    "rmcStatus": "available",
@@ -26373,6 +28190,34 @@
    "rmcStatus": "available",
    "rmcNote": ""
   },
+  "Anodynafil": {
+   "id": "Anodynafil",
+   "source": "deltav",
+   "reactants": {
+    "SalicylicAcid": {
+     "amount": 1,
+     "catalyst": false
+    },
+    "Ethanol": {
+     "amount": 1,
+     "catalyst": false
+    },
+    "Iodine": {
+     "amount": 1,
+     "catalyst": false
+    }
+   },
+   "products": {
+    "Anodynafil": 4
+   },
+   "minTemp": 400,
+   "maxTemp": null,
+   "mixer": [],
+   "effects": "",
+   "impact": null,
+   "rmcStatus": "available",
+   "rmcNote": ""
+  },
   "Antifreeze": {
    "id": "Antifreeze",
    "source": "vanilla",
@@ -26562,6 +28407,42 @@
     "ArnoldPalmer": 2
    },
    "minTemp": null,
+   "maxTemp": null,
+   "mixer": [],
+   "effects": "",
+   "impact": null,
+   "rmcStatus": "available",
+   "rmcNote": ""
+  },
+  "ArsonistsBrew": {
+   "id": "ArsonistsBrew",
+   "source": "deltav",
+   "reactants": {
+    "Thermite": {
+     "amount": 1,
+     "catalyst": false
+    },
+    "WeldingFuel": {
+     "amount": 1,
+     "catalyst": false
+    },
+    "CapsaicinOil": {
+     "amount": 1,
+     "catalyst": false
+    },
+    "Whiskey": {
+     "amount": 1,
+     "catalyst": false
+    },
+    "Phosphorus": {
+     "amount": 1,
+     "catalyst": false
+    }
+   },
+   "products": {
+    "ArsonistsBrew": 5
+   },
+   "minTemp": 373.15,
    "maxTemp": null,
    "mixer": [],
    "effects": "",
@@ -28839,9 +30720,11 @@
    "impact": "Medium",
    "forkStatus": {
     "rmc14": "blocked",
+    "deltav": "modified",
     "funky": "modified"
    },
    "forkNotes": {
+    "deltav": "ChloralHydrate yield 1->3",
     "funky": "Product amount 1 → 3 (DeltaV change)"
    },
    "rmcStatus": "blocked",
@@ -29109,10 +30992,10 @@
     "rmc14": "modified"
    },
    "forkNotes": {
-    "rmc14": "Added RMCOxygen(1) reactant; Added RMCSugar(1) reactant; Removed Oxygen reactant; Removed Sugar reactant"
+    "rmc14": "Added RMCSugar(1) reactant; Added RMCOxygen(1) reactant; Removed Oxygen reactant; Removed Sugar reactant"
    },
    "rmcStatus": "modified",
-   "rmcNote": "Added RMCOxygen(1) reactant; Added RMCSugar(1) reactant; Removed Oxygen reactant; Removed Sugar reactant"
+   "rmcNote": "Added RMCSugar(1) reactant; Added RMCOxygen(1) reactant; Removed Oxygen reactant; Removed Sugar reactant"
   },
   "ConcentratedCorgiJuice": {
    "id": "ConcentratedCorgiJuice",
@@ -29199,6 +31082,34 @@
    },
    "rmcStatus": "modified",
    "rmcNote": "Added RMCSugar(1) reactant; Removed Sugar reactant"
+  },
+  "CookingBechamel": {
+   "id": "CookingBechamel",
+   "source": "deltav",
+   "reactants": {
+    "Milk": {
+     "amount": 1,
+     "catalyst": false
+    },
+    "Flour": {
+     "amount": 1,
+     "catalyst": false
+    },
+    "OilOlive": {
+     "amount": 1,
+     "catalyst": false
+    }
+   },
+   "products": {
+    "Bechamel": 3
+   },
+   "minTemp": null,
+   "maxTemp": null,
+   "mixer": [],
+   "effects": "",
+   "impact": null,
+   "rmcStatus": "available",
+   "rmcNote": ""
   },
   "CookingColdsauce": {
    "id": "CookingColdsauce",
@@ -29433,6 +31344,34 @@
    "rmcStatus": "blocked",
    "rmcNote": ""
   },
+  "CookingPesto": {
+   "id": "CookingPesto",
+   "source": "deltav",
+   "reactants": {
+    "OilOlive": {
+     "amount": 1,
+     "catalyst": false
+    },
+    "TableSalt": {
+     "amount": 1,
+     "catalyst": false
+    },
+    "Allicin": {
+     "amount": 1,
+     "catalyst": false
+    }
+   },
+   "products": {
+    "Pesto": 3
+   },
+   "minTemp": null,
+   "maxTemp": null,
+   "mixer": [],
+   "effects": "",
+   "impact": null,
+   "rmcStatus": "available",
+   "rmcNote": ""
+  },
   "CookingSoysauce": {
    "id": "CookingSoysauce",
    "source": "vanilla",
@@ -29448,6 +31387,62 @@
    },
    "products": {
     "Soysauce": 3
+   },
+   "minTemp": null,
+   "maxTemp": null,
+   "mixer": [],
+   "effects": "",
+   "impact": null,
+   "rmcStatus": "available",
+   "rmcNote": ""
+  },
+  "CookingTomatoSauceCorn": {
+   "id": "CookingTomatoSauceCorn",
+   "source": "deltav",
+   "reactants": {
+    "Cornoil": {
+     "amount": 1,
+     "catalyst": false
+    },
+    "TableSalt": {
+     "amount": 1,
+     "catalyst": false
+    },
+    "JuiceTomato": {
+     "amount": 1,
+     "catalyst": false
+    }
+   },
+   "products": {
+    "TomatoSauce": 3
+   },
+   "minTemp": null,
+   "maxTemp": null,
+   "mixer": [],
+   "effects": "",
+   "impact": null,
+   "rmcStatus": "available",
+   "rmcNote": ""
+  },
+  "CookingTomatoSauceOlive": {
+   "id": "CookingTomatoSauceOlive",
+   "source": "deltav",
+   "reactants": {
+    "OilOlive": {
+     "amount": 1,
+     "catalyst": false
+    },
+    "TableSalt": {
+     "amount": 1,
+     "catalyst": false
+    },
+    "JuiceTomato": {
+     "amount": 1,
+     "catalyst": false
+    }
+   },
+   "products": {
+    "TomatoSauce": 3
    },
    "minTemp": null,
    "maxTemp": null,
@@ -29623,6 +31618,7 @@
    "effects": "",
    "impact": null,
    "forkStatus": {
+    "deltav": "blocked",
     "funky": "blocked"
    },
    "rmcStatus": "available",
@@ -30644,6 +32640,40 @@
    "rmcStatus": "blocked",
    "rmcNote": ""
   },
+  "CrystalNormality": {
+   "id": "CrystalNormality",
+   "source": "deltav",
+   "reactants": {
+    "Ash": {
+     "amount": 5,
+     "catalyst": false
+    },
+    "Holywater": {
+     "amount": 5,
+     "catalyst": false
+    },
+    "Blood": {
+     "amount": 5,
+     "catalyst": false
+    },
+    "Ectoplasm": {
+     "amount": 5,
+     "catalyst": false
+    },
+    "Plasma": {
+     "amount": 5,
+     "catalyst": true
+    }
+   },
+   "products": {},
+   "minTemp": 400,
+   "maxTemp": null,
+   "mixer": [],
+   "effects": "Spawns: CrystalNormality; Effect: AffectsGlimmer",
+   "impact": "Low",
+   "rmcStatus": "available",
+   "rmcNote": ""
+  },
   "CubaLibre": {
    "id": "CubaLibre",
    "source": "vanilla",
@@ -30720,23 +32750,23 @@
   },
   "Daiquiri": {
    "id": "Daiquiri",
-   "source": "vanilla",
+   "source": "deltav",
    "reactants": {
-    "Rum": {
-     "amount": 4,
-     "catalyst": false
-    },
-    "Sugar": {
-     "amount": 1,
+    "DeadRum": {
+     "amount": 5,
      "catalyst": false
     },
     "JuiceLime": {
-     "amount": 1,
+     "amount": 3,
+     "catalyst": false
+    },
+    "Sugar": {
+     "amount": 2,
      "catalyst": false
     }
    },
    "products": {
-    "Daiquiri": 6
+    "Daiquiri": 10
    },
    "minTemp": null,
    "maxTemp": null,
@@ -30745,14 +32775,8 @@
    ],
    "effects": "",
    "impact": null,
-   "forkStatus": {
-    "rmc14": "modified"
-   },
-   "forkNotes": {
-    "rmc14": "Added RMCSugar(1) reactant; Removed Sugar reactant"
-   },
-   "rmcStatus": "modified",
-   "rmcNote": "Added RMCSugar(1) reactant; Removed Sugar reactant"
+   "rmcStatus": "available",
+   "rmcNote": ""
   },
   "DarkandStormy": {
    "id": "DarkandStormy",
@@ -30769,6 +32793,34 @@
    },
    "products": {
     "DarkandStormy": 2
+   },
+   "minTemp": null,
+   "maxTemp": null,
+   "mixer": [],
+   "effects": "",
+   "impact": null,
+   "rmcStatus": "available",
+   "rmcNote": ""
+  },
+  "DeadRum": {
+   "id": "DeadRum",
+   "source": "deltav",
+   "reactants": {
+    "Saline": {
+     "amount": 1,
+     "catalyst": false
+    },
+    "Rum": {
+     "amount": 1,
+     "catalyst": false
+    },
+    "TableSalt": {
+     "amount": 1,
+     "catalyst": false
+    }
+   },
+   "products": {
+    "DeadRum": 3
    },
    "minTemp": null,
    "maxTemp": null,
@@ -31103,6 +33155,7 @@
    "impact": null,
    "forkStatus": {
     "rmc14": "blocked",
+    "deltav": "blocked",
     "funky": "blocked"
    },
    "rmcStatus": "blocked",
@@ -31250,6 +33303,34 @@
    "rmcStatus": "blocked",
    "rmcNote": ""
   },
+  "DoubleIceCream": {
+   "id": "DoubleIceCream",
+   "source": "deltav",
+   "reactants": {
+    "RootBeerFloat": {
+     "amount": 1,
+     "catalyst": false
+    },
+    "IceCream": {
+     "amount": 1,
+     "catalyst": false
+    },
+    "Sugar": {
+     "amount": 1,
+     "catalyst": false
+    }
+   },
+   "products": {
+    "DoubleIceCream": 3
+   },
+   "minTemp": null,
+   "maxTemp": null,
+   "mixer": [],
+   "effects": "",
+   "impact": null,
+   "rmcStatus": "available",
+   "rmcNote": ""
+  },
   "Doxarubixadone": {
    "id": "Doxarubixadone",
    "source": "vanilla",
@@ -31279,6 +33360,34 @@
     "frontier": "Added Phalanximine(1) reactant; Removed UnstableMutagen reactant"
    },
    "rmcStatus": "blocked",
+   "rmcNote": ""
+  },
+  "DrGibbBloodRed": {
+   "id": "DrGibbBloodRed",
+   "source": "deltav",
+   "reactants": {
+    "DrGibb": {
+     "amount": 3,
+     "catalyst": false
+    },
+    "Blood": {
+     "amount": 2,
+     "catalyst": false
+    },
+    "Sugar": {
+     "amount": 1,
+     "catalyst": false
+    }
+   },
+   "products": {
+    "DrGibbBloodRed": 6
+   },
+   "minTemp": null,
+   "maxTemp": null,
+   "mixer": [],
+   "effects": "",
+   "impact": null,
+   "rmcStatus": "available",
    "rmcNote": ""
   },
   "DraganSpecial": {
@@ -31449,6 +33558,9 @@
    "mixer": [],
    "effects": "",
    "impact": "Low",
+   "forkStatus": {
+    "deltav": "blocked"
+   },
    "rmcStatus": "available",
    "rmcNote": ""
   },
@@ -31991,6 +34103,38 @@
    "rmcStatus": "available",
    "rmcNote": ""
   },
+  "FiveOClock": {
+   "id": "FiveOClock",
+   "source": "deltav",
+   "reactants": {
+    "Tea": {
+     "amount": 5,
+     "catalyst": false
+    },
+    "Cognac": {
+     "amount": 2,
+     "catalyst": false
+    },
+    "JuiceLemon": {
+     "amount": 2,
+     "catalyst": false
+    },
+    "Angobitters": {
+     "amount": 1,
+     "catalyst": false
+    }
+   },
+   "products": {
+    "FiveOClock": 10
+   },
+   "minTemp": null,
+   "maxTemp": null,
+   "mixer": [],
+   "effects": "",
+   "impact": null,
+   "rmcStatus": "available",
+   "rmcNote": ""
+  },
   "Flash": {
    "id": "Flash",
    "source": "vanilla",
@@ -32449,6 +34593,12 @@
    "mixer": [],
    "effects": "",
    "impact": null,
+   "forkStatus": {
+    "deltav": "modified"
+   },
+   "forkNotes": {
+    "deltav": "Added JuiceLemon(1) reactant; Removed JuiceLime reactant"
+   },
    "rmcStatus": "available",
    "rmcNote": ""
   },
@@ -32473,6 +34623,24 @@
    "mixer": [],
    "effects": "",
    "impact": null,
+   "rmcStatus": "available",
+   "rmcNote": ""
+  },
+  "GlassSheet": {
+   "id": "GlassSheet",
+   "source": "deltav",
+   "reactants": {
+    "Quartzite": {
+     "amount": 10,
+     "catalyst": false
+    }
+   },
+   "products": {},
+   "minTemp": 370,
+   "maxTemp": null,
+   "mixer": [],
+   "effects": "Spawns: SheetGlass1",
+   "impact": "Low",
    "rmcStatus": "available",
    "rmcNote": ""
   },
@@ -32525,6 +34693,34 @@
    },
    "products": {
     "Granibitulari": 3
+   },
+   "minTemp": null,
+   "maxTemp": null,
+   "mixer": [],
+   "effects": "",
+   "impact": null,
+   "rmcStatus": "available",
+   "rmcNote": ""
+  },
+  "GreenGrass": {
+   "id": "GreenGrass",
+   "source": "deltav",
+   "reactants": {
+    "BlueCuracao": {
+     "amount": 2,
+     "catalyst": false
+    },
+    "JuiceOrange": {
+     "amount": 3,
+     "catalyst": false
+    },
+    "Ice": {
+     "amount": 1,
+     "catalyst": false
+    }
+   },
+   "products": {
+    "GreenGrass": 6
    },
    "minTemp": null,
    "maxTemp": null,
@@ -32588,10 +34784,12 @@
    "effects": "",
    "impact": null,
    "forkStatus": {
-    "rmc14": "modified"
+    "rmc14": "modified",
+    "deltav": "modified"
    },
    "forkNotes": {
-    "rmc14": "Added RMCSugar(1) reactant; Removed Sugar reactant"
+    "rmc14": "Added RMCSugar(1) reactant; Removed Sugar reactant",
+    "deltav": "Added JuiceLime(1) reactant; Water amount 2->3; Grog yield 4->6; Added mixer: Stir"
    },
    "rmcStatus": "modified",
    "rmcNote": "Added RMCSugar(1) reactant; Removed Sugar reactant"
@@ -32617,6 +34815,34 @@
    "mixer": [
     "Stir"
    ],
+   "effects": "",
+   "impact": null,
+   "rmcStatus": "available",
+   "rmcNote": ""
+  },
+  "Gunmetal": {
+   "id": "Gunmetal",
+   "source": "deltav",
+   "reactants": {
+    "Cream": {
+     "amount": 1,
+     "catalyst": false
+    },
+    "WeldingFuel": {
+     "amount": 1,
+     "catalyst": false
+    },
+    "Rum": {
+     "amount": 1,
+     "catalyst": false
+    }
+   },
+   "products": {
+    "Gunmetal": 3
+   },
+   "minTemp": null,
+   "maxTemp": null,
+   "mixer": [],
    "effects": "",
    "impact": null,
    "rmcStatus": "available",
@@ -32722,6 +34948,38 @@
    "rmcStatus": "blocked",
    "rmcNote": ""
   },
+  "HealthViolation": {
+   "id": "HealthViolation",
+   "source": "deltav",
+   "reactants": {
+    "GargleBlaster": {
+     "amount": 10,
+     "catalyst": false
+    },
+    "Moonshine": {
+     "amount": 6,
+     "catalyst": false
+    },
+    "VodkaMartini": {
+     "amount": 3,
+     "catalyst": false
+    },
+    "Vermouth": {
+     "amount": 1,
+     "catalyst": false
+    }
+   },
+   "products": {
+    "HealthViolation": 20
+   },
+   "minTemp": null,
+   "maxTemp": null,
+   "mixer": [],
+   "effects": "",
+   "impact": null,
+   "rmcStatus": "available",
+   "rmcNote": ""
+  },
   "HeartbreakerToxin": {
    "id": "HeartbreakerToxin",
    "source": "vanilla",
@@ -32744,9 +35002,11 @@
    "effects": "",
    "impact": null,
    "forkStatus": {
+    "deltav": "modified",
     "funky": "modified"
    },
    "forkNotes": {
+    "deltav": "Added Salbutamol(1) reactant; Removed DexalinPlus reactant",
     "funky": "Added Salbutamol(1) reactant; Removed DexalinPlus reactant"
    },
    "rmcStatus": "available",
@@ -32781,11 +35041,13 @@
     "rmc14": "blocked",
     "goob": "blocked",
     "starlight": "modified",
+    "deltav": "modified",
     "frontier": "blocked",
     "funky": "blocked"
    },
    "forkNotes": {
-    "starlight": "Uses Warfarin instead of Heparin as reactant"
+    "starlight": "Uses Warfarin instead of Heparin as reactant",
+    "deltav": "Added Warfarin(2) reactant; Removed Heparin reactant"
    },
    "rmcStatus": "blocked",
    "rmcNote": ""
@@ -33950,6 +36212,34 @@
    "rmcStatus": "blocked",
    "rmcNote": ""
   },
+  "LemonDrop": {
+   "id": "LemonDrop",
+   "source": "deltav",
+   "reactants": {
+    "Vodka": {
+     "amount": 2,
+     "catalyst": false
+    },
+    "Sugar": {
+     "amount": 2,
+     "catalyst": false
+    },
+    "JuiceLemon": {
+     "amount": 1,
+     "catalyst": false
+    }
+   },
+   "products": {
+    "LemonDrop": 5
+   },
+   "minTemp": null,
+   "maxTemp": null,
+   "mixer": [],
+   "effects": "",
+   "impact": null,
+   "rmcStatus": "available",
+   "rmcNote": ""
+  },
   "LemonLime": {
    "id": "LemonLime",
    "source": "vanilla",
@@ -33975,6 +36265,38 @@
    "mixer": [
     "Stir"
    ],
+   "effects": "",
+   "impact": null,
+   "rmcStatus": "available",
+   "rmcNote": ""
+  },
+  "LemonLimeBitters": {
+   "id": "LemonLimeBitters",
+   "source": "deltav",
+   "reactants": {
+    "Lemonade": {
+     "amount": 5,
+     "catalyst": false
+    },
+    "JuiceLime": {
+     "amount": 2,
+     "catalyst": false
+    },
+    "Sugar": {
+     "amount": 2,
+     "catalyst": false
+    },
+    "Angobitters": {
+     "amount": 1,
+     "catalyst": false
+    }
+   },
+   "products": {
+    "LemonLimeBitters": 10
+   },
+   "minTemp": null,
+   "maxTemp": null,
+   "mixer": [],
    "effects": "",
    "impact": null,
    "rmcStatus": "available",
@@ -35167,6 +37489,66 @@
    "rmcStatus": "available",
    "rmcNote": ""
   },
+  "Mliko": {
+   "id": "Mliko",
+   "source": "deltav",
+   "reactants": {
+    "Beer": {
+     "amount": 1,
+     "catalyst": false
+    }
+   },
+   "products": {
+    "Mliko": 3
+   },
+   "minTemp": null,
+   "maxTemp": null,
+   "mixer": [
+    "Shake"
+   ],
+   "effects": "",
+   "impact": null,
+   "rmcStatus": "available",
+   "rmcNote": ""
+  },
+  "MnatsaCollins": {
+   "id": "MnatsaCollins",
+   "source": "deltav",
+   "reactants": {
+    "Cognac": {
+     "amount": 5,
+     "catalyst": false
+    },
+    "SodaWater": {
+     "amount": 5,
+     "catalyst": false
+    },
+    "JuiceLemon": {
+     "amount": 2,
+     "catalyst": false
+    },
+    "Sugar": {
+     "amount": 2,
+     "catalyst": false
+    },
+    "Angobitters": {
+     "amount": 1,
+     "catalyst": false
+    }
+   },
+   "products": {
+    "MnatsaCollins": 15
+   },
+   "minTemp": null,
+   "maxTemp": null,
+   "mixer": [
+    "Stir"
+   ],
+   "effects": "",
+   "impact": null,
+   "rmcStatus": "available",
+   "rmcNote": ""
+  },
   "Mojito": {
    "id": "Mojito",
    "source": "vanilla",
@@ -35327,6 +37709,34 @@
    "rmcStatus": "available",
    "rmcNote": ""
   },
+  "Mothamphetamine": {
+   "id": "Mothamphetamine",
+   "source": "deltav",
+   "reactants": {
+    "FourteenLoko": {
+     "amount": 1,
+     "catalyst": false
+    },
+    "EnergyDrink": {
+     "amount": 1,
+     "catalyst": false
+    },
+    "BlueCuracao": {
+     "amount": 1,
+     "catalyst": false
+    }
+   },
+   "products": {
+    "Mothamphetamine": 3
+   },
+   "minTemp": null,
+   "maxTemp": null,
+   "mixer": [],
+   "effects": "",
+   "impact": null,
+   "rmcStatus": "available",
+   "rmcNote": ""
+  },
   "Muigroc": {
    "id": "Muigroc",
    "source": "funky",
@@ -35432,6 +37842,7 @@
     "rmc14": "modified",
     "goob": "modified",
     "starlight": "modified",
+    "deltav": "modified",
     "frontier": "modified",
     "funky": "modified"
    },
@@ -35439,6 +37850,7 @@
     "rmc14": "Added Uranium as extra reactant",
     "goob": "Added Uranium(1) as extra reactant; yield doubled from 2 to 4",
     "starlight": "Added Uranium(1) reactant",
+    "deltav": "Added Uranium(1) reactant",
     "frontier": "Added Uranium(1) reactant",
     "funky": "Added Uranium(1) reactant"
    },
@@ -35771,6 +38183,34 @@
    "rmcStatus": "available",
    "rmcNote": ""
   },
+  "Netinadone": {
+   "id": "Netinadone",
+   "source": "deltav",
+   "reactants": {
+    "Plasma": {
+     "amount": 2,
+     "catalyst": false
+    },
+    "Traumoxadone": {
+     "amount": 1,
+     "catalyst": false
+    },
+    "Doxarubixadone": {
+     "amount": 1,
+     "catalyst": false
+    }
+   },
+   "products": {
+    "Netinadone": 2
+   },
+   "minTemp": 400,
+   "maxTemp": null,
+   "mixer": [],
+   "effects": "",
+   "impact": null,
+   "rmcStatus": "available",
+   "rmcNote": ""
+  },
   "NitrousOxideBreakdown": {
    "id": "NitrousOxideBreakdown",
    "source": "vanilla",
@@ -36016,9 +38456,11 @@
    "effects": "",
    "impact": null,
    "forkStatus": {
+    "deltav": "modified",
     "funky": "modified"
    },
    "forkNotes": {
+    "deltav": "Oil yield 3->4",
     "funky": "Product amount 3 → 4"
    },
    "rmcStatus": "available",
@@ -36051,6 +38493,40 @@
    "forkNotes": {
     "frontier": "Removed product Protein"
    },
+   "rmcStatus": "available",
+   "rmcNote": ""
+  },
+  "OldFashioned": {
+   "id": "OldFashioned",
+   "source": "deltav",
+   "reactants": {
+    "Whiskey": {
+     "amount": 5,
+     "catalyst": false
+    },
+    "Angobitters": {
+     "amount": 2,
+     "catalyst": false
+    },
+    "Sugar": {
+     "amount": 2,
+     "catalyst": false
+    },
+    "JuiceOrange": {
+     "amount": 1,
+     "catalyst": false
+    }
+   },
+   "products": {
+    "OldFashioned": 10
+   },
+   "minTemp": null,
+   "maxTemp": null,
+   "mixer": [
+    "Stir"
+   ],
+   "effects": "",
+   "impact": null,
    "rmcStatus": "available",
    "rmcNote": ""
   },
@@ -36635,6 +39111,62 @@
    "rmcStatus": "available",
    "rmcNote": ""
   },
+  "PhotoxadoneDark": {
+   "id": "PhotoxadoneDark",
+   "source": "deltav",
+   "reactants": {
+    "Silver": {
+     "amount": 1,
+     "catalyst": false
+    },
+    "Umbroxol": {
+     "amount": 1,
+     "catalyst": false
+    },
+    "Cryoxadone": {
+     "amount": 1,
+     "catalyst": false
+    }
+   },
+   "products": {
+    "Photoxadone": 3
+   },
+   "minTemp": null,
+   "maxTemp": null,
+   "mixer": [],
+   "effects": "",
+   "impact": null,
+   "rmcStatus": "available",
+   "rmcNote": ""
+  },
+  "PhotoxadoneLight": {
+   "id": "PhotoxadoneLight",
+   "source": "deltav",
+   "reactants": {
+    "Mercury": {
+     "amount": 1,
+     "catalyst": false
+    },
+    "Holywater": {
+     "amount": 1,
+     "catalyst": false
+    },
+    "Cryoxadone": {
+     "amount": 1,
+     "catalyst": false
+    }
+   },
+   "products": {
+    "Photoxadone": 3
+   },
+   "minTemp": null,
+   "maxTemp": null,
+   "mixer": [],
+   "effects": "",
+   "impact": null,
+   "rmcStatus": "available",
+   "rmcNote": ""
+  },
   "Pielovene": {
    "id": "Pielovene",
    "source": "funky",
@@ -36883,6 +39415,12 @@
    "mixer": [],
    "effects": "",
    "impact": null,
+   "forkStatus": {
+    "deltav": "modified"
+   },
+   "forkNotes": {
+    "deltav": "Removed TableSalt reactant; Water amount 1->2"
+   },
    "rmcStatus": "available",
    "rmcNote": ""
   },
@@ -38188,6 +40726,370 @@
    "rmcStatus": "available",
    "rmcNote": ""
   },
+  "ReconstitutePowderedJuiceApple": {
+   "id": "ReconstitutePowderedJuiceApple",
+   "source": "deltav",
+   "reactants": {
+    "Water": {
+     "amount": 1,
+     "catalyst": false
+    },
+    "PowderedJuiceApple": {
+     "amount": 1,
+     "catalyst": false
+    }
+   },
+   "products": {
+    "JuiceApple": 2
+   },
+   "minTemp": null,
+   "maxTemp": null,
+   "mixer": [
+    "Stir"
+   ],
+   "effects": "",
+   "impact": null,
+   "rmcStatus": "available",
+   "rmcNote": ""
+  },
+  "ReconstitutePowderedJuiceBanana": {
+   "id": "ReconstitutePowderedJuiceBanana",
+   "source": "deltav",
+   "reactants": {
+    "Water": {
+     "amount": 1,
+     "catalyst": false
+    },
+    "PowderedJuiceBanana": {
+     "amount": 1,
+     "catalyst": false
+    }
+   },
+   "products": {
+    "JuiceBanana": 2
+   },
+   "minTemp": null,
+   "maxTemp": null,
+   "mixer": [
+    "Stir"
+   ],
+   "effects": "",
+   "impact": null,
+   "rmcStatus": "available",
+   "rmcNote": ""
+  },
+  "ReconstitutePowderedJuiceBerry": {
+   "id": "ReconstitutePowderedJuiceBerry",
+   "source": "deltav",
+   "reactants": {
+    "Water": {
+     "amount": 1,
+     "catalyst": false
+    },
+    "PowderedJuiceBerry": {
+     "amount": 1,
+     "catalyst": false
+    }
+   },
+   "products": {
+    "JuiceBerry": 2
+   },
+   "minTemp": null,
+   "maxTemp": null,
+   "mixer": [
+    "Stir"
+   ],
+   "effects": "",
+   "impact": null,
+   "rmcStatus": "available",
+   "rmcNote": ""
+  },
+  "ReconstitutePowderedJuiceCarrot": {
+   "id": "ReconstitutePowderedJuiceCarrot",
+   "source": "deltav",
+   "reactants": {
+    "Water": {
+     "amount": 1,
+     "catalyst": false
+    },
+    "PowderedJuiceCarrot": {
+     "amount": 1,
+     "catalyst": false
+    }
+   },
+   "products": {
+    "JuiceCarrot": 2
+   },
+   "minTemp": null,
+   "maxTemp": null,
+   "mixer": [
+    "Stir"
+   ],
+   "effects": "",
+   "impact": null,
+   "rmcStatus": "available",
+   "rmcNote": ""
+  },
+  "ReconstitutePowderedJuiceCherry": {
+   "id": "ReconstitutePowderedJuiceCherry",
+   "source": "deltav",
+   "reactants": {
+    "Water": {
+     "amount": 1,
+     "catalyst": false
+    },
+    "PowderedJuiceCherry": {
+     "amount": 1,
+     "catalyst": false
+    }
+   },
+   "products": {
+    "JuiceCherry": 2
+   },
+   "minTemp": null,
+   "maxTemp": null,
+   "mixer": [
+    "Stir"
+   ],
+   "effects": "",
+   "impact": null,
+   "rmcStatus": "available",
+   "rmcNote": ""
+  },
+  "ReconstitutePowderedJuiceGrape": {
+   "id": "ReconstitutePowderedJuiceGrape",
+   "source": "deltav",
+   "reactants": {
+    "Water": {
+     "amount": 1,
+     "catalyst": false
+    },
+    "PowderedJuiceGrape": {
+     "amount": 1,
+     "catalyst": false
+    }
+   },
+   "products": {
+    "JuiceGrape": 2
+   },
+   "minTemp": null,
+   "maxTemp": null,
+   "mixer": [
+    "Stir"
+   ],
+   "effects": "",
+   "impact": null,
+   "rmcStatus": "available",
+   "rmcNote": ""
+  },
+  "ReconstitutePowderedJuiceLemon": {
+   "id": "ReconstitutePowderedJuiceLemon",
+   "source": "deltav",
+   "reactants": {
+    "Water": {
+     "amount": 1,
+     "catalyst": false
+    },
+    "PowderedJuiceLemon": {
+     "amount": 1,
+     "catalyst": false
+    }
+   },
+   "products": {
+    "JuiceLemon": 2
+   },
+   "minTemp": null,
+   "maxTemp": null,
+   "mixer": [
+    "Stir"
+   ],
+   "effects": "",
+   "impact": null,
+   "rmcStatus": "available",
+   "rmcNote": ""
+  },
+  "ReconstitutePowderedJuiceLime": {
+   "id": "ReconstitutePowderedJuiceLime",
+   "source": "deltav",
+   "reactants": {
+    "Water": {
+     "amount": 1,
+     "catalyst": false
+    },
+    "PowderedJuiceLime": {
+     "amount": 1,
+     "catalyst": false
+    }
+   },
+   "products": {
+    "JuiceLime": 2
+   },
+   "minTemp": null,
+   "maxTemp": null,
+   "mixer": [
+    "Stir"
+   ],
+   "effects": "",
+   "impact": null,
+   "rmcStatus": "available",
+   "rmcNote": ""
+  },
+  "ReconstitutePowderedJuiceOrange": {
+   "id": "ReconstitutePowderedJuiceOrange",
+   "source": "deltav",
+   "reactants": {
+    "Water": {
+     "amount": 1,
+     "catalyst": false
+    },
+    "PowderedJuiceOrange": {
+     "amount": 1,
+     "catalyst": false
+    }
+   },
+   "products": {
+    "JuiceOrange": 2
+   },
+   "minTemp": null,
+   "maxTemp": null,
+   "mixer": [
+    "Stir"
+   ],
+   "effects": "",
+   "impact": null,
+   "rmcStatus": "available",
+   "rmcNote": ""
+  },
+  "ReconstitutePowderedJuicePineapple": {
+   "id": "ReconstitutePowderedJuicePineapple",
+   "source": "deltav",
+   "reactants": {
+    "Water": {
+     "amount": 1,
+     "catalyst": false
+    },
+    "PowderedJuicePineapple": {
+     "amount": 1,
+     "catalyst": false
+    }
+   },
+   "products": {
+    "JuicePineapple": 2
+   },
+   "minTemp": null,
+   "maxTemp": null,
+   "mixer": [
+    "Stir"
+   ],
+   "effects": "",
+   "impact": null,
+   "rmcStatus": "available",
+   "rmcNote": ""
+  },
+  "ReconstitutePowderedJuiceTomato": {
+   "id": "ReconstitutePowderedJuiceTomato",
+   "source": "deltav",
+   "reactants": {
+    "Water": {
+     "amount": 1,
+     "catalyst": false
+    },
+    "PowderedJuiceTomato": {
+     "amount": 1,
+     "catalyst": false
+    }
+   },
+   "products": {
+    "JuiceTomato": 2
+   },
+   "minTemp": null,
+   "maxTemp": null,
+   "mixer": [
+    "Stir"
+   ],
+   "effects": "",
+   "impact": null,
+   "rmcStatus": "available",
+   "rmcNote": ""
+  },
+  "ReconstitutePowderedJuiceWatermelon": {
+   "id": "ReconstitutePowderedJuiceWatermelon",
+   "source": "deltav",
+   "reactants": {
+    "Water": {
+     "amount": 1,
+     "catalyst": false
+    },
+    "PowderedJuiceWatermelon": {
+     "amount": 1,
+     "catalyst": false
+    }
+   },
+   "products": {
+    "JuiceWatermelon": 2
+   },
+   "minTemp": null,
+   "maxTemp": null,
+   "mixer": [
+    "Stir"
+   ],
+   "effects": "",
+   "impact": null,
+   "rmcStatus": "available",
+   "rmcNote": ""
+  },
+  "ReconstitutePowderedMilk": {
+   "id": "ReconstitutePowderedMilk",
+   "source": "deltav",
+   "reactants": {
+    "Water": {
+     "amount": 1,
+     "catalyst": false
+    },
+    "PowderedMilk": {
+     "amount": 1,
+     "catalyst": false
+    }
+   },
+   "products": {
+    "Milk": 2
+   },
+   "minTemp": null,
+   "maxTemp": null,
+   "mixer": [
+    "Stir"
+   ],
+   "effects": "",
+   "impact": null,
+   "rmcStatus": "available",
+   "rmcNote": ""
+  },
+  "ReconstitutePowderedMilkSoy": {
+   "id": "ReconstitutePowderedMilkSoy",
+   "source": "deltav",
+   "reactants": {
+    "Water": {
+     "amount": 1,
+     "catalyst": false
+    },
+    "PowderedMilkSoy": {
+     "amount": 1,
+     "catalyst": false
+    }
+   },
+   "products": {
+    "MilkSoy": 2
+   },
+   "minTemp": null,
+   "maxTemp": null,
+   "mixer": [
+    "Stir"
+   ],
+   "effects": "",
+   "impact": null,
+   "rmcStatus": "available",
+   "rmcNote": ""
+  },
   "RedCityAM": {
    "id": "RedCityAM",
    "source": "funky",
@@ -39156,6 +42058,36 @@
    "rmcStatus": "available",
    "rmcNote": ""
   },
+  "SmileTheSlime": {
+   "id": "SmileTheSlime",
+   "source": "deltav",
+   "reactants": {
+    "Happiness": {
+     "amount": 4,
+     "catalyst": false
+    },
+    "SentientGreyMatter": {
+     "amount": 5,
+     "catalyst": false
+    },
+    "JuiceThatMakesYouWeh": {
+     "amount": 10,
+     "catalyst": false
+    },
+    "Slime": {
+     "amount": 20,
+     "catalyst": false
+    }
+   },
+   "products": {},
+   "minTemp": null,
+   "maxTemp": null,
+   "mixer": [],
+   "effects": "Spawns: MobSlimesPet",
+   "impact": "Low",
+   "rmcStatus": "available",
+   "rmcNote": ""
+  },
   "Smoke": {
    "id": "Smoke",
    "source": "vanilla",
@@ -40025,6 +42957,7 @@
     "rmc14": "blocked",
     "goob": "blocked",
     "starlight": "blocked",
+    "deltav": "blocked",
     "frontier": "blocked",
     "funky": "blocked"
    },
@@ -40932,6 +43865,34 @@
    "rmcStatus": "blocked",
    "rmcNote": ""
   },
+  "Umbroxol": {
+   "id": "Umbroxol",
+   "source": "deltav",
+   "reactants": {
+    "UnholyWater": {
+     "amount": 2,
+     "catalyst": false
+    },
+    "TableSalt": {
+     "amount": 1,
+     "catalyst": false
+    },
+    "Mercury": {
+     "amount": 1,
+     "catalyst": false
+    }
+   },
+   "products": {
+    "Umbroxol": 2
+   },
+   "minTemp": null,
+   "maxTemp": null,
+   "mixer": [],
+   "effects": "",
+   "impact": null,
+   "rmcStatus": "available",
+   "rmcNote": ""
+  },
   "UncookedAnimalProteinBreakdown": {
    "id": "UncookedAnimalProteinBreakdown",
    "source": "vanilla",
@@ -40958,6 +43919,34 @@
     "rmc14": "blocked"
    },
    "rmcStatus": "blocked",
+   "rmcNote": ""
+  },
+  "UnholyWater": {
+   "id": "UnholyWater",
+   "source": "deltav",
+   "reactants": {
+    "Blood": {
+     "amount": 1,
+     "catalyst": false
+    },
+    "Sulfur": {
+     "amount": 1,
+     "catalyst": false
+    },
+    "Water": {
+     "amount": 1,
+     "catalyst": false
+    }
+   },
+   "products": {
+    "UnholyWater": 3
+   },
+   "minTemp": null,
+   "maxTemp": null,
+   "mixer": [],
+   "effects": "",
+   "impact": null,
+   "rmcStatus": "available",
    "rmcNote": ""
   },
   "UnholyWaterLing": {
@@ -41801,6 +44790,7 @@
   "Aluminium",
   "Amatoxin",
   "AmmoniaBlood",
+  "Angobitters",
   "AntiSepticFluid",
   "Artifexium",
   "Astrotame",
@@ -41811,6 +44801,7 @@
   "BaseAlcohol",
   "BaseDrink",
   "BaseJuice",
+  "BasePowderedBeverage",
   "BasePyrotechnic",
   "BaseSoda",
   "Beer",
@@ -41854,7 +44845,6 @@
   "Cornoil",
   "CycloriteBlood",
   "DarkBlood",
-  "DeadRum",
   "DrGibb",
   "DryRamen",
   "EdgeEssentia",
@@ -41890,35 +44880,23 @@
   "InsectBlood",
   "Iodine",
   "Iron",
-  "JuiceApple",
-  "JuiceBanana",
-  "JuiceBerry",
   "JuiceBerryPoison",
   "JuiceBluePumpkin",
   "JuiceBungo",
-  "JuiceCarrot",
-  "JuiceCherry",
-  "JuiceGrape",
-  "JuiceLemon",
-  "JuiceLime",
-  "JuiceOrange",
-  "JuicePineapple",
   "JuiceThatMakesYouHew",
   "JuiceThatMakesYouWeh",
-  "JuiceTomato",
-  "JuiceWatermelon",
+  "Kvass",
   "LaughinSyrup",
   "Lead",
+  "Lean",
   "LemonLimeCranberry",
   "Lithium",
   "MachineOil",
   "Mechanotoxin",
   "Mercury",
   "Microplastics",
-  "Milk",
   "MilkGoat",
   "MilkOat",
-  "MilkSoy",
   "MilkSpoiled",
   "Mitogen",
   "Mopwata",
@@ -41948,10 +44926,25 @@
   "PolypyryliumOligomers",
   "PolystaticAmylostyronate",
   "Potassium",
+  "PowderedJuiceApple",
+  "PowderedJuiceBanana",
+  "PowderedJuiceBerry",
+  "PowderedJuiceCarrot",
+  "PowderedJuiceCherry",
+  "PowderedJuiceGrape",
+  "PowderedJuiceLemon",
+  "PowderedJuiceLime",
+  "PowderedJuiceOrange",
+  "PowderedJuicePineapple",
+  "PowderedJuiceTomato",
+  "PowderedJuiceWatermelon",
+  "PowderedMilk",
+  "PowderedMilkSoy",
   "Primatine",
   "PulpedBananaPeel",
   "PumpkinFlesh",
   "PwrGame",
+  "Quartzite",
   "RMCAluminum",
   "RMCAntiZed",
   "RMCBGel",
@@ -42014,6 +45007,7 @@
   "Sap",
   "Sarin",
   "Saxoite",
+  "SentientGreyMatter",
   "ShamblersJuice",
   "ShroomMix",
   "Silicon",
@@ -42025,6 +45019,7 @@
   "SolDry",
   "SpaceMountainWind",
   "SpaceUp",
+  "Stabilizine",
   "Stasizium",
   "Stellibinin",
   "Sugar",
@@ -42067,6 +45062,10 @@
   "Dead Space Narcotics",
   "Dead Space Other",
   "Dead Space Toxins",
+  "Delta-V Drinks",
+  "Delta-V Medicine",
+  "Delta-V Other",
+  "Delta-V Toxins",
   "Drinks (Alcoholic)",
   "Drinks (Non-Alc)",
   "Elements",
@@ -45239,24 +48238,24 @@
    "catalyst": false
   },
   {
-   "from": "Rum",
+   "from": "DeadRum",
    "to": "Daiquiri",
    "reaction": "Daiquiri",
-   "amount": 4,
-   "catalyst": false
-  },
-  {
-   "from": "Sugar",
-   "to": "Daiquiri",
-   "reaction": "Daiquiri",
-   "amount": 1,
+   "amount": 5,
    "catalyst": false
   },
   {
    "from": "JuiceLime",
    "to": "Daiquiri",
    "reaction": "Daiquiri",
-   "amount": 1,
+   "amount": 3,
+   "catalyst": false
+  },
+  {
+   "from": "Sugar",
+   "to": "Daiquiri",
+   "reaction": "Daiquiri",
+   "amount": 2,
    "catalyst": false
   },
   {
@@ -50170,6 +53169,776 @@
    "from": "Necrosol",
    "to": "Chronexaline",
    "reaction": "Chronexaline",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "Saline",
+   "to": "DeadRum",
+   "reaction": "DeadRum",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "Rum",
+   "to": "DeadRum",
+   "reaction": "DeadRum",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "TableSalt",
+   "to": "DeadRum",
+   "reaction": "DeadRum",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "GargleBlaster",
+   "to": "HealthViolation",
+   "reaction": "HealthViolation",
+   "amount": 10,
+   "catalyst": false
+  },
+  {
+   "from": "Moonshine",
+   "to": "HealthViolation",
+   "reaction": "HealthViolation",
+   "amount": 6,
+   "catalyst": false
+  },
+  {
+   "from": "VodkaMartini",
+   "to": "HealthViolation",
+   "reaction": "HealthViolation",
+   "amount": 3,
+   "catalyst": false
+  },
+  {
+   "from": "Vermouth",
+   "to": "HealthViolation",
+   "reaction": "HealthViolation",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "Cream",
+   "to": "Gunmetal",
+   "reaction": "Gunmetal",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "WeldingFuel",
+   "to": "Gunmetal",
+   "reaction": "Gunmetal",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "Rum",
+   "to": "Gunmetal",
+   "reaction": "Gunmetal",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "Vodka",
+   "to": "LemonDrop",
+   "reaction": "LemonDrop",
+   "amount": 2,
+   "catalyst": false
+  },
+  {
+   "from": "Sugar",
+   "to": "LemonDrop",
+   "reaction": "LemonDrop",
+   "amount": 2,
+   "catalyst": false
+  },
+  {
+   "from": "JuiceLemon",
+   "to": "LemonDrop",
+   "reaction": "LemonDrop",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "BlueCuracao",
+   "to": "GreenGrass",
+   "reaction": "GreenGrass",
+   "amount": 2,
+   "catalyst": false
+  },
+  {
+   "from": "JuiceOrange",
+   "to": "GreenGrass",
+   "reaction": "GreenGrass",
+   "amount": 3,
+   "catalyst": false
+  },
+  {
+   "from": "Ice",
+   "to": "GreenGrass",
+   "reaction": "GreenGrass",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "Thermite",
+   "to": "ArsonistsBrew",
+   "reaction": "ArsonistsBrew",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "WeldingFuel",
+   "to": "ArsonistsBrew",
+   "reaction": "ArsonistsBrew",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "CapsaicinOil",
+   "to": "ArsonistsBrew",
+   "reaction": "ArsonistsBrew",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "Whiskey",
+   "to": "ArsonistsBrew",
+   "reaction": "ArsonistsBrew",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "Phosphorus",
+   "to": "ArsonistsBrew",
+   "reaction": "ArsonistsBrew",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "FourteenLoko",
+   "to": "Mothamphetamine",
+   "reaction": "Mothamphetamine",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "EnergyDrink",
+   "to": "Mothamphetamine",
+   "reaction": "Mothamphetamine",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "BlueCuracao",
+   "to": "Mothamphetamine",
+   "reaction": "Mothamphetamine",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "RootBeerFloat",
+   "to": "DoubleIceCream",
+   "reaction": "DoubleIceCream",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "IceCream",
+   "to": "DoubleIceCream",
+   "reaction": "DoubleIceCream",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "Sugar",
+   "to": "DoubleIceCream",
+   "reaction": "DoubleIceCream",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "DrGibb",
+   "to": "DrGibbBloodRed",
+   "reaction": "DrGibbBloodRed",
+   "amount": 3,
+   "catalyst": false
+  },
+  {
+   "from": "Blood",
+   "to": "DrGibbBloodRed",
+   "reaction": "DrGibbBloodRed",
+   "amount": 2,
+   "catalyst": false
+  },
+  {
+   "from": "Sugar",
+   "to": "DrGibbBloodRed",
+   "reaction": "DrGibbBloodRed",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "Lemonade",
+   "to": "LemonLimeBitters",
+   "reaction": "LemonLimeBitters",
+   "amount": 5,
+   "catalyst": false
+  },
+  {
+   "from": "JuiceLime",
+   "to": "LemonLimeBitters",
+   "reaction": "LemonLimeBitters",
+   "amount": 2,
+   "catalyst": false
+  },
+  {
+   "from": "Sugar",
+   "to": "LemonLimeBitters",
+   "reaction": "LemonLimeBitters",
+   "amount": 2,
+   "catalyst": false
+  },
+  {
+   "from": "Angobitters",
+   "to": "LemonLimeBitters",
+   "reaction": "LemonLimeBitters",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "Whiskey",
+   "to": "OldFashioned",
+   "reaction": "OldFashioned",
+   "amount": 5,
+   "catalyst": false
+  },
+  {
+   "from": "Angobitters",
+   "to": "OldFashioned",
+   "reaction": "OldFashioned",
+   "amount": 2,
+   "catalyst": false
+  },
+  {
+   "from": "Sugar",
+   "to": "OldFashioned",
+   "reaction": "OldFashioned",
+   "amount": 2,
+   "catalyst": false
+  },
+  {
+   "from": "JuiceOrange",
+   "to": "OldFashioned",
+   "reaction": "OldFashioned",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "Cognac",
+   "to": "MnatsaCollins",
+   "reaction": "MnatsaCollins",
+   "amount": 5,
+   "catalyst": false
+  },
+  {
+   "from": "SodaWater",
+   "to": "MnatsaCollins",
+   "reaction": "MnatsaCollins",
+   "amount": 5,
+   "catalyst": false
+  },
+  {
+   "from": "JuiceLemon",
+   "to": "MnatsaCollins",
+   "reaction": "MnatsaCollins",
+   "amount": 2,
+   "catalyst": false
+  },
+  {
+   "from": "Sugar",
+   "to": "MnatsaCollins",
+   "reaction": "MnatsaCollins",
+   "amount": 2,
+   "catalyst": false
+  },
+  {
+   "from": "Angobitters",
+   "to": "MnatsaCollins",
+   "reaction": "MnatsaCollins",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "IceCream",
+   "to": "Affogato",
+   "reaction": "Affogato",
+   "amount": 5,
+   "catalyst": false
+  },
+  {
+   "from": "Cognac",
+   "to": "Affogato",
+   "reaction": "Affogato",
+   "amount": 2,
+   "catalyst": false
+  },
+  {
+   "from": "CoffeeLiqueur",
+   "to": "Affogato",
+   "reaction": "Affogato",
+   "amount": 2,
+   "catalyst": false
+  },
+  {
+   "from": "Angobitters",
+   "to": "Affogato",
+   "reaction": "Affogato",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "Tea",
+   "to": "FiveOClock",
+   "reaction": "FiveOClock",
+   "amount": 5,
+   "catalyst": false
+  },
+  {
+   "from": "Cognac",
+   "to": "FiveOClock",
+   "reaction": "FiveOClock",
+   "amount": 2,
+   "catalyst": false
+  },
+  {
+   "from": "JuiceLemon",
+   "to": "FiveOClock",
+   "reaction": "FiveOClock",
+   "amount": 2,
+   "catalyst": false
+  },
+  {
+   "from": "Angobitters",
+   "to": "FiveOClock",
+   "reaction": "FiveOClock",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "Beer",
+   "to": "Mliko",
+   "reaction": "Mliko",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "OilOlive",
+   "to": "TomatoSauce",
+   "reaction": "CookingTomatoSauceOlive",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "TableSalt",
+   "to": "TomatoSauce",
+   "reaction": "CookingTomatoSauceOlive",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "JuiceTomato",
+   "to": "TomatoSauce",
+   "reaction": "CookingTomatoSauceOlive",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "Cornoil",
+   "to": "TomatoSauce",
+   "reaction": "CookingTomatoSauceCorn",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "TableSalt",
+   "to": "TomatoSauce",
+   "reaction": "CookingTomatoSauceCorn",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "JuiceTomato",
+   "to": "TomatoSauce",
+   "reaction": "CookingTomatoSauceCorn",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "OilOlive",
+   "to": "Pesto",
+   "reaction": "CookingPesto",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "TableSalt",
+   "to": "Pesto",
+   "reaction": "CookingPesto",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "Allicin",
+   "to": "Pesto",
+   "reaction": "CookingPesto",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "Milk",
+   "to": "Bechamel",
+   "reaction": "CookingBechamel",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "Flour",
+   "to": "Bechamel",
+   "reaction": "CookingBechamel",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "OilOlive",
+   "to": "Bechamel",
+   "reaction": "CookingBechamel",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "Plasma",
+   "to": "Netinadone",
+   "reaction": "Netinadone",
+   "amount": 2,
+   "catalyst": false
+  },
+  {
+   "from": "Traumoxadone",
+   "to": "Netinadone",
+   "reaction": "Netinadone",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "Doxarubixadone",
+   "to": "Netinadone",
+   "reaction": "Netinadone",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "UnholyWater",
+   "to": "Umbroxol",
+   "reaction": "Umbroxol",
+   "amount": 2,
+   "catalyst": false
+  },
+  {
+   "from": "TableSalt",
+   "to": "Umbroxol",
+   "reaction": "Umbroxol",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "Mercury",
+   "to": "Umbroxol",
+   "reaction": "Umbroxol",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "Blood",
+   "to": "UnholyWater",
+   "reaction": "UnholyWater",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "Sulfur",
+   "to": "UnholyWater",
+   "reaction": "UnholyWater",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "Water",
+   "to": "UnholyWater",
+   "reaction": "UnholyWater",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "SalicylicAcid",
+   "to": "Anodynafil",
+   "reaction": "Anodynafil",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "Ethanol",
+   "to": "Anodynafil",
+   "reaction": "Anodynafil",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "Iodine",
+   "to": "Anodynafil",
+   "reaction": "Anodynafil",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "Mercury",
+   "to": "Photoxadone",
+   "reaction": "PhotoxadoneLight",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "Holywater",
+   "to": "Photoxadone",
+   "reaction": "PhotoxadoneLight",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "Cryoxadone",
+   "to": "Photoxadone",
+   "reaction": "PhotoxadoneLight",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "Silver",
+   "to": "Photoxadone",
+   "reaction": "PhotoxadoneDark",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "Umbroxol",
+   "to": "Photoxadone",
+   "reaction": "PhotoxadoneDark",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "Cryoxadone",
+   "to": "Photoxadone",
+   "reaction": "PhotoxadoneDark",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "Water",
+   "to": "Milk",
+   "reaction": "ReconstitutePowderedMilk",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "PowderedMilk",
+   "to": "Milk",
+   "reaction": "ReconstitutePowderedMilk",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "Water",
+   "to": "MilkSoy",
+   "reaction": "ReconstitutePowderedMilkSoy",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "PowderedMilkSoy",
+   "to": "MilkSoy",
+   "reaction": "ReconstitutePowderedMilkSoy",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "Water",
+   "to": "JuiceOrange",
+   "reaction": "ReconstitutePowderedJuiceOrange",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "PowderedJuiceOrange",
+   "to": "JuiceOrange",
+   "reaction": "ReconstitutePowderedJuiceOrange",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "Water",
+   "to": "JuiceLemon",
+   "reaction": "ReconstitutePowderedJuiceLemon",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "PowderedJuiceLemon",
+   "to": "JuiceLemon",
+   "reaction": "ReconstitutePowderedJuiceLemon",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "Water",
+   "to": "JuiceLime",
+   "reaction": "ReconstitutePowderedJuiceLime",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "PowderedJuiceLime",
+   "to": "JuiceLime",
+   "reaction": "ReconstitutePowderedJuiceLime",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "Water",
+   "to": "JuicePineapple",
+   "reaction": "ReconstitutePowderedJuicePineapple",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "PowderedJuicePineapple",
+   "to": "JuicePineapple",
+   "reaction": "ReconstitutePowderedJuicePineapple",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "Water",
+   "to": "JuiceBanana",
+   "reaction": "ReconstitutePowderedJuiceBanana",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "PowderedJuiceBanana",
+   "to": "JuiceBanana",
+   "reaction": "ReconstitutePowderedJuiceBanana",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "Water",
+   "to": "JuiceWatermelon",
+   "reaction": "ReconstitutePowderedJuiceWatermelon",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "PowderedJuiceWatermelon",
+   "to": "JuiceWatermelon",
+   "reaction": "ReconstitutePowderedJuiceWatermelon",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "Water",
+   "to": "JuiceBerry",
+   "reaction": "ReconstitutePowderedJuiceBerry",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "PowderedJuiceBerry",
+   "to": "JuiceBerry",
+   "reaction": "ReconstitutePowderedJuiceBerry",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "Water",
+   "to": "JuiceGrape",
+   "reaction": "ReconstitutePowderedJuiceGrape",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "PowderedJuiceGrape",
+   "to": "JuiceGrape",
+   "reaction": "ReconstitutePowderedJuiceGrape",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "Water",
+   "to": "JuiceApple",
+   "reaction": "ReconstitutePowderedJuiceApple",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "PowderedJuiceApple",
+   "to": "JuiceApple",
+   "reaction": "ReconstitutePowderedJuiceApple",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "Water",
+   "to": "JuiceCherry",
+   "reaction": "ReconstitutePowderedJuiceCherry",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "PowderedJuiceCherry",
+   "to": "JuiceCherry",
+   "reaction": "ReconstitutePowderedJuiceCherry",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "Water",
+   "to": "JuiceCarrot",
+   "reaction": "ReconstitutePowderedJuiceCarrot",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "PowderedJuiceCarrot",
+   "to": "JuiceCarrot",
+   "reaction": "ReconstitutePowderedJuiceCarrot",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "Water",
+   "to": "JuiceTomato",
+   "reaction": "ReconstitutePowderedJuiceTomato",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "PowderedJuiceTomato",
+   "to": "JuiceTomato",
+   "reaction": "ReconstitutePowderedJuiceTomato",
    "amount": 1,
    "catalyst": false
   },
