@@ -192,21 +192,20 @@ header h1 {
 
 .sidebar-toggle { display: none; }
 
-/* Sidebar collapse button (desktop) */
+/* Sidebar collapse button — fixed to viewport, outside sidebar scroll */
 .sidebar-collapse {
-  position: absolute; top: 8px; right: -14px; z-index: 12;
+  position: fixed; top: 60px; left: 216px; z-index: 20;
   width: 28px; height: 28px; border-radius: 50%;
   background: var(--panel-raised); border: 1px solid var(--border-subtle);
   color: var(--text-ghost); font-size: 0.6rem; cursor: pointer;
   display: flex; align-items: center; justify-content: center;
-  transition: transform 0.2s, background 0.2s;
+  transition: transform 0.25s, background 0.2s, left 0.25s ease;
 }
 .sidebar-collapse:hover { background: var(--panel); color: var(--phosphor); }
-.sidebar.collapsed .sidebar-collapse { transform: rotate(180deg); right: -14px; }
+.sidebar-collapse.collapsed { left: 0; transform: rotate(180deg); border-radius: 0 50% 50% 0; }
 .sidebar { position: relative; transition: width 0.25s ease, min-width 0.25s ease, padding 0.25s ease; }
 .sidebar.collapsed { width: 0; min-width: 0; padding: 0; overflow: hidden; }
 .sidebar.collapsed .sidebar-content { display: none; }
-.sidebar.collapsed .sidebar-collapse { position: fixed; left: 0; top: 50%; transform: rotate(180deg) translateY(50%); border-radius: 0 50% 50% 0; right: auto; }
 
 /* Collapsible filter sections */
 .filter-section {
@@ -560,11 +559,24 @@ main {
 .reagent-effects {
   font-size: 0.65rem;
   color: var(--text-ghost);
-  max-height: 2.2em;
+  max-height: 3.6em;
   overflow: hidden;
-  text-overflow: ellipsis;
   line-height: 1.4;
 }
+
+/* Human-readable effect chips */
+.effects-wrap { display: flex; flex-wrap: wrap; gap: 2px; }
+.effect-chip {
+  display: inline-flex; align-items: center; gap: 2px;
+  font-size: 0.58rem; padding: 1px 5px; border-radius: 2px;
+  font-family: 'Oxanium', sans-serif; letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+.effect-heal { background: rgba(34,197,94,0.12); color: #4ade80; border-left: 2px solid #22c55e; }
+.effect-damage { background: rgba(239,68,68,0.12); color: #f87171; border-left: 2px solid #ef4444; }
+.effect-status { background: rgba(96,165,250,0.12); color: #93bbfd; border-left: 2px solid #60a5fa; }
+.effect-speed { background: rgba(250,204,21,0.12); color: #fde047; border-left: 2px solid #facc15; }
+.effect-other { background: rgba(148,163,184,0.10); color: #94a3b8; border-left: 2px solid #64748b; }
 
 /* Effect filters in sidebar */
 .effect-filters { display: flex; flex-wrap: wrap; gap: 3px; }
@@ -833,8 +845,19 @@ main {
 .tree-controls {
   margin-bottom: 16px;
   position: relative;
-  max-width: 400px;
+  max-width: 500px;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
 }
+.tree-controls .search-input { flex: 1; min-width: 200px; }
+.tree-amount-input {
+  width: 72px; padding: 8px 10px;
+  background: var(--hull); border: 1px solid var(--border-subtle);
+  color: var(--text-main); font-family: 'Oxanium', sans-serif;
+  font-size: 0.75rem; border-radius: 2px; text-align: center;
+}
+.tree-amount-input:focus { border-color: var(--phosphor); outline: none; }
 
 .tree-output { padding: 4px; }
 
@@ -876,6 +899,8 @@ main {
 }
 
 .tree-node .node-name { color: var(--text-main); }
+.tree-node .node-name.clickable { cursor: pointer; }
+.tree-node .node-name.clickable:hover { color: var(--phosphor); text-decoration: underline; }
 .tree-node.is-base .node-name { color: var(--phosphor); }
 .tree-node.is-catalyst .node-name { color: var(--amber); }
 

@@ -230,9 +230,11 @@ function buildSidebar() {
     });
   });
 
-  // Sidebar collapse (desktop)
-  document.getElementById('sidebarCollapse').addEventListener('click', () => {
+  // Sidebar collapse (desktop) — button is outside sidebar, toggle both
+  const collapseBtn = document.getElementById('sidebarCollapse');
+  collapseBtn.addEventListener('click', () => {
     document.getElementById('sidebar').classList.toggle('collapsed');
+    collapseBtn.classList.toggle('collapsed');
   });
 
   // Sidebar toggle (mobile)
@@ -446,9 +448,69 @@ function reagentCardHTML(r) {
     </div>
     ${recipe ? `<div class="reagent-recipe">${esc(recipe)}</div>` : ''}
     ${!recipe && r.obtainSources && r.obtainSources.length ? `<div class="reagent-sources">${r.obtainSources.map(s => esc(s)).join(' | ')}</div>` : ''}
-    ${r.effects ? `<div class="reagent-effects">${esc(r.effects)}</div>` : ''}
+    ${r.effects ? `<div class="reagent-effects">${renderEffectsHTML(r.effects, true)}</div>` : ''}
     ${usedInLookup[r.id] ? `<div class="reagent-used-in">Used in ${usedInLookup[r.id]} recipe${usedInLookup[r.id] > 1 ? 's' : ''}</div>` : ''}
   </div>`;
+}
+
+// ─────────────────────────────────────────────
+// Human-readable Effects Renderer
+// ─────────────────────────────────────────────
+
+function renderEffectsHTML(effectsStr, compact = false) {
+  if (!effectsStr) return '';
+  const parts = effectsStr.split('; ');
+  const chips = parts.map(part => {
+    // Strip [Path] prefix — e.g. "[Bloodstream] Heals Brute 1.5"
+    const pathMatch = part.match(/^\[([^\]]+)\]\s*/);
+    const body = pathMatch ? part.slice(pathMatch[0].length) : part;
+
+    let cls = 'effect-other';
+    let icon = '';
+    let text = body;
+
+    if (/^Heals\s/i.test(body)) {
+      cls = 'effect-heal';
+      icon = '+';
+      // "Heals Brute 1.5 (even)" → "+1.5 Brute (even)"
+      const m = body.match(/^Heals\s+(\S+)\s+([\d.]+)(.*)$/);
+      if (m) text = `${icon}${m[2]} ${m[1]}${m[3]}`;
+      else text = body;
+    } else if (/^Deals\s/i.test(body)) {
+      cls = 'effect-damage';
+      icon = '-';
+      const m = body.match(/^Deals\s+(\S+)\s+([\d.]+)(.*)$/);
+      if (m) text = `${icon}${m[2]} ${m[1]}${m[3]}`;
+      else text = body;
+    } else if (/^Status:|StatusEffect|Emote:/i.test(body)) {
+      cls = 'effect-status';
+      // Clean up "Status: ModifyStatusEffect" → "Status: ..."
+      text = body.replace(/^Status:\s*/, '').replace('ModifyStatusEffect', 'Status Effect');
+    } else if (/^Speed\s/i.test(body)) {
+      cls = 'effect-speed';
+      const m = body.match(/walk=([\d.]+)\s*sprint=([\d.]+)/);
+      if (m) text = `Speed ${m[1]}/${m[2]}`;
+    } else if (/^Thirst|^Hunger/i.test(body)) {
+      cls = 'effect-other';
+    } else if (/^Message|popup/i.test(body)) {
+      cls = 'effect-status';
+      text = body.replace(/\s*@\d+%/, '');
+    } else if (/^Adds\s/i.test(body)) {
+      cls = 'effect-status';
+    } else if (/^Removes\s/i.test(body)) {
+      cls = 'effect-status';
+    } else if (/Flammable|Foam|Smoke|Explosion/i.test(body)) {
+      cls = 'effect-damage';
+    } else if (/^EvenHealthChange$|^HealthChange$/i.test(body)) {
+      cls = 'effect-other';
+    }
+
+    // Compact mode: truncate long effects for cards
+    if (compact && text.length > 35) text = text.slice(0, 32) + '...';
+
+    return `<span class="effect-chip ${cls}">${esc(text)}</span>`;
+  });
+  return `<div class="effects-wrap">${chips.join('')}</div>`;
 }
 
 // ─────────────────────────────────────────────
@@ -574,7 +636,7 @@ function openDetail(reagentId, pushHistory = true) {
       ${recipeHTML}
     </div>
 
-    ${r.effects ? `<div class="detail-section"><h4>Effects</h4><p>${esc(r.effects)}</p></div>` : ''}
+    ${r.effects ? `<div class="detail-section"><h4>Effects</h4>${renderEffectsHTML(r.effects)}</div>` : ''}
 
     ${r.overdose ? `<div class="detail-section"><h4>Overdose</h4><p class="overdose-warn">${r.overdose}u${r.criticalOverdose ? ' | Critical: ' + r.criticalOverdose + 'u' : ''}</p></div>` : ''}
 
@@ -666,7 +728,7 @@ function renderTreeHTML(node, depth = 0) {
     <div class="${cls}">
       <span class="node-swatch" style="background:${color}"></span>
       <span class="node-amount">${amt}</span>
-      <span class="node-name">${esc(name)}</span>
+      <span class="node-name clickable" onclick="openDetail('${node.id}')">${esc(name)}</span>
       ${badges}
       ${node.children.length > 0 ? `<button class="tree-toggle" onclick="this.parentElement.nextElementSibling.classList.toggle('collapsed')">-</button>` : ''}
     </div>`;
@@ -683,17 +745,30 @@ function renderTreeHTML(node, depth = 0) {
   return depth === 0 ? `<ul class="craft-tree">${html}</ul>` : html;
 }
 
+let currentTreeReagentId = null;
+
+function rebuildTree() {
+  if (!currentTreeReagentId) return;
+  const amountInput = document.getElementById('treeAmount');
+  const amount = Math.max(1, parseFloat(amountInput.value) || 1);
+  const tree = buildCraftTree(currentTreeReagentId, amount);
+  document.getElementById('treeOutput').innerHTML = renderTreeHTML(tree);
+}
+
 function setupCraftTrees() {
   const input = document.getElementById('treeTarget');
   const suggestions = document.getElementById('treeSuggestions');
-  const output = document.getElementById('treeOutput');
+  const amountInput = document.getElementById('treeAmount');
 
   setupAutocomplete(input, suggestions, (id) => {
     input.value = DATA.reagents[id]?.name || id;
     suggestions.classList.remove('open');
-    const tree = buildCraftTree(id, 1);
-    output.innerHTML = renderTreeHTML(tree);
+    currentTreeReagentId = id;
+    rebuildTree();
   });
+
+  // Amount input — rebuild tree when changed
+  amountInput.addEventListener('input', rebuildTree);
 }
 
 // ─────────────────────────────────────────────
