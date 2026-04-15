@@ -1,6 +1,6 @@
 {
  "meta": {
-  "generated": "2026-04-15T02:05:38",
+  "generated": "2026-04-15T02:45:09",
   "forks": {
    "vanilla": {
     "name": "Vanilla SS14",
@@ -25845,6 +25845,12 @@
    "mixer": [],
    "effects": "",
    "impact": "Medium",
+   "forkStatus": {
+    "funky": "modified"
+   },
+   "forkNotes": {
+    "funky": "Added Sigynate(1) reactant; Removed Leporazine reactant; Cryoxadone amount 2->3; Aloxadone yield 4->5"
+   },
    "rmcStatus": "available",
    "rmcNote": ""
   },
@@ -25900,10 +25906,12 @@
    "effects": "Effect: AreaEffect",
    "impact": "High",
    "forkStatus": {
-    "rmc14": "modified"
+    "rmc14": "modified",
+    "funky": "modified"
    },
    "forkNotes": {
-    "rmc14": "Priority changed from -10 to 10"
+    "rmc14": "Priority changed from -10 to 10",
+    "funky": "Priority -10->10"
    },
    "rmcStatus": "modified",
    "rmcNote": "Priority changed from -10 to 10"
@@ -25995,8 +26003,14 @@
    ],
    "effects": "",
    "impact": null,
-   "rmcStatus": "available",
-   "rmcNote": ""
+   "forkStatus": {
+    "rmc14": "modified"
+   },
+   "forkNotes": {
+    "rmc14": "Added RMCIron(1) reactant; Removed Iron reactant"
+   },
+   "rmcStatus": "modified",
+   "rmcNote": "Added RMCIron(1) reactant; Removed Iron reactant"
   },
   "Amasec2": {
    "id": "Amasec2",
@@ -26115,6 +26129,13 @@
    "mixer": [],
    "effects": "",
    "impact": null,
+   "forkStatus": {
+    "frontier": "modified",
+    "funky": "blocked"
+   },
+   "forkNotes": {
+    "frontier": "Added minTemp: 350"
+   },
    "rmcStatus": "available",
    "rmcNote": ""
   },
@@ -26164,6 +26185,12 @@
    ],
    "effects": "",
    "impact": null,
+   "forkStatus": {
+    "frontier": "modified"
+   },
+   "forkNotes": {
+    "frontier": "Removed product Protein"
+   },
    "rmcStatus": "available",
    "rmcNote": ""
   },
@@ -26187,10 +26214,16 @@
    "effects": "",
    "impact": null,
    "forkStatus": {
-    "rmc14": "modified"
+    "rmc14": "modified",
+    "goob": "modified",
+    "frontier": "modified",
+    "funky": "modified"
    },
    "forkNotes": {
-    "rmc14": "Stir mixer requirement removed"
+    "rmc14": "Stir mixer requirement removed",
+    "goob": "Removed mixer requirement",
+    "frontier": "Removed mixer requirement",
+    "funky": "Removed mixer requirement"
    },
    "rmcStatus": "modified",
    "rmcNote": "Stir mixer requirement removed"
@@ -26439,7 +26472,10 @@
    "effects": "",
    "impact": null,
    "forkStatus": {
-    "rmc14": "blocked"
+    "rmc14": "blocked",
+    "goob": "blocked",
+    "frontier": "blocked",
+    "funky": "blocked"
    },
    "rmcStatus": "blocked",
    "rmcNote": ""
@@ -26594,6 +26630,12 @@
    "mixer": [],
    "effects": "",
    "impact": null,
+   "forkStatus": {
+    "funky": "modified"
+   },
+   "forkNotes": {
+    "funky": "AtomicBomb yield 10->11"
+   },
    "rmcStatus": "available",
    "rmcNote": ""
   },
@@ -26654,6 +26696,14 @@
    "mixer": [],
    "effects": "",
    "impact": null,
+   "forkStatus": {
+    "goob": "modified",
+    "starlight": "modified"
+   },
+   "forkNotes": {
+    "goob": "Added IrishCarBomb(1) reactant; Removed IrishSlammer reactant",
+    "starlight": "Added IrishCarBomb(1) reactant; Removed IrishSlammer reactant"
+   },
    "rmcStatus": "available",
    "rmcNote": ""
   },
@@ -26686,6 +26736,9 @@
    "mixer": [],
    "effects": "",
    "impact": null,
+   "forkStatus": {
+    "funky": "blocked"
+   },
    "rmcStatus": "available",
    "rmcNote": ""
   },
@@ -26782,8 +26835,14 @@
    "mixer": [],
    "effects": "",
    "impact": null,
-   "rmcStatus": "available",
-   "rmcNote": ""
+   "forkStatus": {
+    "rmc14": "modified"
+   },
+   "forkNotes": {
+    "rmc14": "Added RMCSugar(1) reactant; Removed Sugar reactant"
+   },
+   "rmcStatus": "modified",
+   "rmcNote": "Added RMCSugar(1) reactant; Removed Sugar reactant"
   },
   "BanzaiTi": {
    "id": "BanzaiTi",
@@ -26856,6 +26915,9 @@
    "mixer": [],
    "effects": "",
    "impact": null,
+   "forkStatus": {
+    "funky": "blocked"
+   },
    "rmcStatus": "available",
    "rmcNote": ""
   },
@@ -26946,8 +27008,14 @@
    ],
    "effects": "",
    "impact": null,
-   "rmcStatus": "available",
-   "rmcNote": ""
+   "forkStatus": {
+    "rmc14": "modified"
+   },
+   "forkNotes": {
+    "rmc14": "Added RMCIron(1) reactant; Removed Iron reactant"
+   },
+   "rmcStatus": "modified",
+   "rmcNote": "Added RMCIron(1) reactant; Removed Iron reactant"
   },
   "BeesKnees": {
    "id": "BeesKnees",
@@ -27060,6 +27128,12 @@
    "mixer": [],
    "effects": "",
    "impact": "Medium",
+   "forkStatus": {
+    "funky": "modified"
+   },
+   "forkNotes": {
+    "funky": "Added SalicylicAcid(1) reactant; Removed Bicaridine reactant"
+   },
    "rmcStatus": "available",
    "rmcNote": ""
   },
@@ -27084,6 +27158,9 @@
    "mixer": [],
    "effects": "",
    "impact": "Medium",
+   "forkStatus": {
+    "funky": "blocked"
+   },
    "rmcStatus": "available",
    "rmcNote": ""
   },
@@ -27108,6 +27185,9 @@
    "mixer": [],
    "effects": "",
    "impact": "Medium",
+   "forkStatus": {
+    "funky": "blocked"
+   },
    "rmcStatus": "available",
    "rmcNote": ""
   },
@@ -27132,6 +27212,9 @@
    "mixer": [],
    "effects": "",
    "impact": null,
+   "forkStatus": {
+    "funky": "blocked"
+   },
    "rmcStatus": "available",
    "rmcNote": ""
   },
@@ -27343,6 +27426,12 @@
    ],
    "effects": "",
    "impact": null,
+   "forkStatus": {
+    "frontier": "modified"
+   },
+   "forkNotes": {
+    "frontier": "Removed product Protein"
+   },
    "rmcStatus": "available",
    "rmcNote": ""
   },
@@ -27733,6 +27822,12 @@
    "mixer": [],
    "effects": "",
    "impact": "Medium",
+   "forkStatus": {
+    "funky": "modified"
+   },
+   "forkNotes": {
+    "funky": "Added Libital(1) reactant; Removed Bicaridine reactant"
+   },
    "rmcStatus": "available",
    "rmcNote": ""
   },
@@ -28363,8 +28458,14 @@
    ],
    "effects": "",
    "impact": null,
-   "rmcStatus": "available",
-   "rmcNote": ""
+   "forkStatus": {
+    "rmc14": "modified"
+   },
+   "forkNotes": {
+    "rmc14": "Added RMCSugar(1) reactant; Removed Sugar reactant"
+   },
+   "rmcStatus": "modified",
+   "rmcNote": "Added RMCSugar(1) reactant; Removed Sugar reactant"
   },
   "Calomel": {
    "id": "Calomel",
@@ -28420,7 +28521,10 @@
    "effects": "",
    "impact": null,
    "forkStatus": {
-    "rmc14": "blocked"
+    "rmc14": "blocked",
+    "goob": "blocked",
+    "frontier": "blocked",
+    "funky": "blocked"
    },
    "rmcStatus": "blocked",
    "rmcNote": ""
@@ -28447,7 +28551,10 @@
    "effects": "Explosion",
    "impact": "High",
    "forkStatus": {
-    "rmc14": "blocked"
+    "rmc14": "blocked",
+    "goob": "blocked",
+    "frontier": "blocked",
+    "funky": "blocked"
    },
    "rmcStatus": "blocked",
    "rmcNote": ""
@@ -28973,8 +29080,14 @@
    "mixer": [],
    "effects": "",
    "impact": null,
-   "rmcStatus": "available",
-   "rmcNote": ""
+   "forkStatus": {
+    "rmc14": "modified"
+   },
+   "forkNotes": {
+    "rmc14": "Added RMCOxygen(1) reactant; Added RMCSugar(1) reactant; Removed Oxygen reactant; Removed Sugar reactant"
+   },
+   "rmcStatus": "modified",
+   "rmcNote": "Added RMCOxygen(1) reactant; Added RMCSugar(1) reactant; Removed Oxygen reactant; Removed Sugar reactant"
   },
   "ConcentratedCorgiJuice": {
    "id": "ConcentratedCorgiJuice",
@@ -29053,8 +29166,14 @@
    "mixer": [],
    "effects": "",
    "impact": null,
-   "rmcStatus": "available",
-   "rmcNote": ""
+   "forkStatus": {
+    "rmc14": "modified"
+   },
+   "forkNotes": {
+    "rmc14": "Added RMCSugar(1) reactant; Removed Sugar reactant"
+   },
+   "rmcStatus": "modified",
+   "rmcNote": "Added RMCSugar(1) reactant; Removed Sugar reactant"
   },
   "CookingColdsauce": {
    "id": "CookingColdsauce",
@@ -29157,8 +29276,14 @@
    "mixer": [],
    "effects": "",
    "impact": null,
-   "rmcStatus": "available",
-   "rmcNote": ""
+   "forkStatus": {
+    "rmc14": "modified"
+   },
+   "forkNotes": {
+    "rmc14": "Added RMCSugar(1) reactant; Removed Sugar reactant"
+   },
+   "rmcStatus": "modified",
+   "rmcNote": "Added RMCSugar(1) reactant; Removed Sugar reactant"
   },
   "CookingMayoLemon": {
    "id": "CookingMayoLemon",
@@ -29185,6 +29310,12 @@
    "mixer": [],
    "effects": "",
    "impact": null,
+   "forkStatus": {
+    "frontier": "modified"
+   },
+   "forkNotes": {
+    "frontier": "Added Cornoil(5) reactant; Removed Oil reactant"
+   },
    "rmcStatus": "available",
    "rmcNote": ""
   },
@@ -29241,6 +29372,12 @@
    "mixer": [],
    "effects": "",
    "impact": null,
+   "forkStatus": {
+    "frontier": "modified"
+   },
+   "forkNotes": {
+    "frontier": "Added Cornoil(5) reactant; Removed Oil reactant"
+   },
    "rmcStatus": "available",
    "rmcNote": ""
   },
@@ -29426,6 +29563,12 @@
    ],
    "effects": "",
    "impact": null,
+   "forkStatus": {
+    "frontier": "modified"
+   },
+   "forkNotes": {
+    "frontier": "Removed product Protein"
+   },
    "rmcStatus": "available",
    "rmcNote": ""
   },
@@ -29454,6 +29597,9 @@
    "mixer": [],
    "effects": "",
    "impact": null,
+   "forkStatus": {
+    "funky": "blocked"
+   },
    "rmcStatus": "available",
    "rmcNote": ""
   },
@@ -29570,8 +29716,14 @@
    "mixer": [],
    "effects": "",
    "impact": null,
-   "rmcStatus": "available",
-   "rmcNote": ""
+   "forkStatus": {
+    "rmc14": "modified"
+   },
+   "forkNotes": {
+    "rmc14": "Added RMCSugar(1) reactant; Removed Sugar reactant"
+   },
+   "rmcStatus": "modified",
+   "rmcNote": "Added RMCSugar(1) reactant; Removed Sugar reactant"
   },
   "CreateBananaSoap": {
    "id": "CreateBananaSoap",
@@ -29618,6 +29770,12 @@
    "mixer": [],
    "effects": "Spawns: FoodButter",
    "impact": "Low",
+   "forkStatus": {
+    "funky": "modified"
+   },
+   "forkNotes": {
+    "funky": "Milk amount 15->30"
+   },
    "rmcStatus": "available",
    "rmcNote": ""
   },
@@ -29648,8 +29806,14 @@
    "mixer": [],
    "effects": "Spawns: FoodCakeBatter",
    "impact": "Low",
-   "rmcStatus": "available",
-   "rmcNote": ""
+   "forkStatus": {
+    "rmc14": "modified"
+   },
+   "forkNotes": {
+    "rmc14": "Added RMCSugar(5) reactant; Removed Sugar reactant"
+   },
+   "rmcStatus": "modified",
+   "rmcNote": "Added RMCSugar(5) reactant; Removed Sugar reactant"
   },
   "CreateChocolate": {
    "id": "CreateChocolate",
@@ -29674,8 +29838,14 @@
    "mixer": [],
    "effects": "Spawns: FoodSnackChocolateBar",
    "impact": "Low",
-   "rmcStatus": "available",
-   "rmcNote": ""
+   "forkStatus": {
+    "rmc14": "modified"
+   },
+   "forkNotes": {
+    "rmc14": "Added RMCSugar(2) reactant; Removed Sugar reactant"
+   },
+   "rmcStatus": "modified",
+   "rmcNote": "Added RMCSugar(2) reactant; Removed Sugar reactant"
   },
   "CreateCorgiPuppy": {
    "id": "CreateCorgiPuppy",
@@ -29951,7 +30121,10 @@
    "effects": "Spawns: SoapHomemade",
    "impact": "Low",
    "forkStatus": {
-    "rmc14": "blocked"
+    "rmc14": "blocked",
+    "goob": "blocked",
+    "frontier": "blocked",
+    "funky": "blocked"
    },
    "rmcStatus": "blocked",
    "rmcNote": ""
@@ -29984,7 +30157,10 @@
    "effects": "Spawns: SoapDeluxe",
    "impact": "Low",
    "forkStatus": {
-    "rmc14": "blocked"
+    "rmc14": "blocked",
+    "goob": "blocked",
+    "frontier": "blocked",
+    "funky": "blocked"
    },
    "rmcStatus": "blocked",
    "rmcNote": ""
@@ -30043,7 +30219,10 @@
    "effects": "Spawns: SoapNT",
    "impact": "Low",
    "forkStatus": {
-    "rmc14": "blocked"
+    "rmc14": "blocked",
+    "goob": "blocked",
+    "frontier": "blocked",
+    "funky": "blocked"
    },
    "rmcStatus": "blocked",
    "rmcNote": ""
@@ -30104,7 +30283,10 @@
    "effects": "Spawns: SoapOmega",
    "impact": "Medium",
    "forkStatus": {
-    "rmc14": "blocked"
+    "rmc14": "blocked",
+    "goob": "blocked",
+    "frontier": "blocked",
+    "funky": "blocked"
    },
    "rmcStatus": "blocked",
    "rmcNote": ""
@@ -30133,7 +30315,10 @@
    "effects": "Spawns: Soap",
    "impact": "Low",
    "forkStatus": {
-    "rmc14": "blocked"
+    "rmc14": "blocked",
+    "goob": "blocked",
+    "frontier": "blocked",
+    "funky": "blocked"
    },
    "rmcStatus": "blocked",
    "rmcNote": ""
@@ -30166,7 +30351,10 @@
    "effects": "Spawns: SoapSyndie",
    "impact": "Medium",
    "forkStatus": {
-    "rmc14": "blocked"
+    "rmc14": "blocked",
+    "goob": "blocked",
+    "frontier": "blocked",
+    "funky": "blocked"
    },
    "rmcStatus": "blocked",
    "rmcNote": ""
@@ -30238,8 +30426,14 @@
    "mixer": [],
    "effects": "Spawns: FoodCakeBatter",
    "impact": "Low",
-   "rmcStatus": "available",
-   "rmcNote": ""
+   "forkStatus": {
+    "rmc14": "modified"
+   },
+   "forkNotes": {
+    "rmc14": "Added RMCSugar(5) reactant; Removed Sugar reactant"
+   },
+   "rmcStatus": "modified",
+   "rmcNote": "Added RMCSugar(5) reactant; Removed Sugar reactant"
   },
   "CreviceSpike": {
    "id": "CreviceSpike",
@@ -30520,8 +30714,14 @@
    ],
    "effects": "",
    "impact": null,
-   "rmcStatus": "available",
-   "rmcNote": ""
+   "forkStatus": {
+    "rmc14": "modified"
+   },
+   "forkNotes": {
+    "rmc14": "Added RMCSugar(1) reactant; Removed Sugar reactant"
+   },
+   "rmcStatus": "modified",
+   "rmcNote": "Added RMCSugar(1) reactant; Removed Sugar reactant"
   },
   "DarkandStormy": {
    "id": "DarkandStormy",
@@ -30664,6 +30864,9 @@
    "mixer": [],
    "effects": "",
    "impact": null,
+   "forkStatus": {
+    "funky": "blocked"
+   },
    "rmcStatus": "available",
    "rmcNote": ""
   },
@@ -30863,6 +31066,9 @@
    "mixer": [],
    "effects": "",
    "impact": null,
+   "forkStatus": {
+    "funky": "blocked"
+   },
    "rmcStatus": "available",
    "rmcNote": ""
   },
@@ -30952,7 +31158,11 @@
    "effects": "",
    "impact": "Medium",
    "forkStatus": {
-    "rmc14": "blocked"
+    "rmc14": "blocked",
+    "deadspace": "modified"
+   },
+   "forkNotes": {
+    "deadspace": "Added Methylamine(1) reactant; Removed Ethyloxyephedrine reactant"
    },
    "rmcStatus": "blocked",
    "rmcNote": ""
@@ -31019,6 +31229,12 @@
    "mixer": [],
    "effects": "",
    "impact": null,
+   "forkStatus": {
+    "frontier": "modified"
+   },
+   "forkNotes": {
+    "frontier": "Added Phalanximine(1) reactant; Removed UnstableMutagen reactant"
+   },
    "rmcStatus": "available",
    "rmcNote": ""
   },
@@ -31103,6 +31319,9 @@
    "mixer": [],
    "effects": "",
    "impact": null,
+   "forkStatus": {
+    "funky": "blocked"
+   },
    "rmcStatus": "available",
    "rmcNote": ""
   },
@@ -31622,7 +31841,10 @@
    "effects": "",
    "impact": null,
    "forkStatus": {
-    "rmc14": "blocked"
+    "rmc14": "blocked",
+    "goob": "blocked",
+    "frontier": "blocked",
+    "funky": "blocked"
    },
    "rmcStatus": "blocked",
    "rmcNote": ""
@@ -31842,10 +32064,12 @@
    "effects": "Effect: AreaEffect",
    "impact": "High",
    "forkStatus": {
-    "rmc14": "modified"
+    "rmc14": "modified",
+    "funky": "modified"
    },
    "forkNotes": {
-    "rmc14": "Priority changed from -10 to 10"
+    "rmc14": "Priority changed from -10 to 10",
+    "funky": "Priority -10->10"
    },
    "rmcStatus": "modified",
    "rmcNote": "Priority changed from -10 to 10"
@@ -32306,8 +32530,14 @@
    "mixer": [],
    "effects": "",
    "impact": null,
-   "rmcStatus": "available",
-   "rmcNote": ""
+   "forkStatus": {
+    "rmc14": "modified"
+   },
+   "forkNotes": {
+    "rmc14": "Added RMCSugar(1) reactant; Removed Sugar reactant"
+   },
+   "rmcStatus": "modified",
+   "rmcNote": "Added RMCSugar(1) reactant; Removed Sugar reactant"
   },
   "Gunfire": {
    "id": "Gunfire",
@@ -32450,6 +32680,12 @@
    "mixer": [],
    "effects": "",
    "impact": null,
+   "forkStatus": {
+    "funky": "modified"
+   },
+   "forkNotes": {
+    "funky": "Added Salbutamol(1) reactant; Removed DexalinPlus reactant"
+   },
    "rmcStatus": "available",
    "rmcNote": ""
   },
@@ -32480,7 +32716,10 @@
    "impact": null,
    "forkStatus": {
     "rmc14": "blocked",
-    "starlight": "modified"
+    "goob": "blocked",
+    "starlight": "modified",
+    "frontier": "blocked",
+    "funky": "blocked"
    },
    "forkNotes": {
     "starlight": "Uses Warfarin instead of Heparin as reactant"
@@ -32819,6 +33058,12 @@
    "mixer": [],
    "effects": "",
    "impact": null,
+   "forkStatus": {
+    "funky": "modified"
+   },
+   "forkNotes": {
+    "funky": "Added PotassiumIodide(1) reactant; Removed Dylovene reactant"
+   },
    "rmcStatus": "available",
    "rmcNote": ""
   },
@@ -32901,8 +33146,14 @@
    "mixer": [],
    "effects": "",
    "impact": null,
-   "rmcStatus": "available",
-   "rmcNote": ""
+   "forkStatus": {
+    "rmc14": "modified"
+   },
+   "forkNotes": {
+    "rmc14": "Added RMCSugar(1) reactant; Removed Sugar reactant"
+   },
+   "rmcStatus": "modified",
+   "rmcNote": "Added RMCSugar(1) reactant; Removed Sugar reactant"
   },
   "IcedBeer": {
    "id": "IcedBeer",
@@ -33168,10 +33419,12 @@
    "effects": "",
    "impact": null,
    "forkStatus": {
-    "goob": "modified"
+    "goob": "modified",
+    "frontier": "modified"
    },
    "forkNotes": {
-    "goob": "Products changed: Water 14→11, added Saline(6), removed Sodium(3)"
+    "goob": "Products changed: Water 14→11, added Saline(6), removed Sodium(3)",
+    "frontier": "Removed product Protein"
    },
    "rmcStatus": "available",
    "rmcNote": ""
@@ -33201,6 +33454,12 @@
    "mixer": [],
    "effects": "",
    "impact": "Medium",
+   "forkStatus": {
+    "funky": "modified"
+   },
+   "forkNotes": {
+    "funky": "Added Aiuri(1) reactant; Removed Kelotane reactant"
+   },
    "rmcStatus": "available",
    "rmcNote": ""
   },
@@ -33277,6 +33536,14 @@
    "mixer": [],
    "effects": "",
    "impact": null,
+   "forkStatus": {
+    "goob": "modified",
+    "starlight": "modified"
+   },
+   "forkNotes": {
+    "goob": "Added IrishCarBomb(1) reactant; Removed IrishSlammer reactant",
+    "starlight": "Added IrishCarBomb(1) reactant; Removed IrishSlammer reactant"
+   },
    "rmcStatus": "available",
    "rmcNote": ""
   },
@@ -33351,6 +33618,10 @@
    "mixer": [],
    "effects": "",
    "impact": null,
+   "forkStatus": {
+    "goob": "blocked",
+    "starlight": "blocked"
+   },
    "rmcStatus": "available",
    "rmcNote": ""
   },
@@ -33378,10 +33649,12 @@
    "effects": "Effect: AreaEffect",
    "impact": "High",
    "forkStatus": {
-    "rmc14": "modified"
+    "rmc14": "modified",
+    "funky": "modified"
    },
    "forkNotes": {
-    "rmc14": "Priority changed from -10 to 10"
+    "rmc14": "Priority changed from -10 to 10",
+    "funky": "Priority -10->10"
    },
    "rmcStatus": "modified",
    "rmcNote": "Priority changed from -10 to 10"
@@ -33417,6 +33690,12 @@
    ],
    "effects": "",
    "impact": null,
+   "forkStatus": {
+    "funky": "modified"
+   },
+   "forkNotes": {
+    "funky": "Added Applejack(1) reactant; Removed JuiceApple reactant"
+   },
    "rmcStatus": "available",
    "rmcNote": ""
   },
@@ -33499,6 +33778,9 @@
    "mixer": [],
    "effects": "",
    "impact": null,
+   "forkStatus": {
+    "funky": "blocked"
+   },
    "rmcStatus": "available",
    "rmcNote": ""
   },
@@ -33523,6 +33805,12 @@
    "mixer": [],
    "effects": "",
    "impact": "Medium",
+   "forkStatus": {
+    "funky": "modified"
+   },
+   "forkNotes": {
+    "funky": "Added Libital(1) reactant; Removed Bicaridine reactant"
+   },
    "rmcStatus": "available",
    "rmcNote": ""
   },
@@ -33637,8 +33925,14 @@
    ],
    "effects": "",
    "impact": null,
-   "rmcStatus": "available",
-   "rmcNote": ""
+   "forkStatus": {
+    "rmc14": "modified"
+   },
+   "forkNotes": {
+    "rmc14": "Added RMCSugar(1) reactant; Removed Sugar reactant"
+   },
+   "rmcStatus": "modified",
+   "rmcNote": "Added RMCSugar(1) reactant; Removed Sugar reactant"
   },
   "Lenturi": {
    "id": "Lenturi",
@@ -33846,13 +34140,19 @@
    "effects": "",
    "impact": null,
    "forkStatus": {
-    "goob": "modified"
+    "rmc14": "modified",
+    "goob": "modified",
+    "frontier": "modified",
+    "funky": "modified"
    },
    "forkNotes": {
-    "goob": "Added Lead(1) as extra reactant; added maxTemp: 265"
+    "rmc14": "Added Lead(1) reactant; Removed Lithium reactant",
+    "goob": "Added Lead(1) as extra reactant; added maxTemp: 265",
+    "frontier": "Added Lead(1) reactant; Removed Lithium reactant",
+    "funky": "Added Lead(1) reactant; Removed Lithium reactant"
    },
-   "rmcStatus": "available",
-   "rmcNote": ""
+   "rmcStatus": "modified",
+   "rmcNote": "Added Lead(1) reactant; Removed Lithium reactant"
   },
   "Lipolicide": {
    "id": "Lipolicide",
@@ -34031,6 +34331,7 @@
    "impact": null,
    "forkStatus": {
     "rmc14": "blocked",
+    "goob": "blocked",
     "frontier": "blocked",
     "funky": "blocked"
    },
@@ -34218,6 +34519,12 @@
    "mixer": [],
    "effects": "",
    "impact": null,
+   "forkStatus": {
+    "funky": "modified"
+   },
+   "forkNotes": {
+    "funky": "Added mixer: Shake"
+   },
    "rmcStatus": "available",
    "rmcNote": ""
   },
@@ -34360,8 +34667,14 @@
    "mixer": [],
    "effects": "",
    "impact": null,
-   "rmcStatus": "available",
-   "rmcNote": ""
+   "forkStatus": {
+    "rmc14": "modified"
+   },
+   "forkNotes": {
+    "rmc14": "Added RMCBlackGoo(0.5) reactant; Added RMCSugar(1) reactant; Removed Sugar reactant"
+   },
+   "rmcStatus": "modified",
+   "rmcNote": "Added RMCBlackGoo(0.5) reactant; Added RMCSugar(1) reactant; Removed Sugar reactant"
   },
   "MeatCoagulating": {
    "id": "MeatCoagulating",
@@ -34794,8 +35107,14 @@
    ],
    "effects": "",
    "impact": null,
-   "rmcStatus": "available",
-   "rmcNote": ""
+   "forkStatus": {
+    "rmc14": "modified"
+   },
+   "forkNotes": {
+    "rmc14": "Added RMCSugar(1) reactant; Removed Sugar reactant"
+   },
+   "rmcStatus": "modified",
+   "rmcNote": "Added RMCSugar(1) reactant; Removed Sugar reactant"
   },
   "MonkeyBusiness": {
    "id": "MonkeyBusiness",
@@ -35020,11 +35339,17 @@
    "impact": "Medium",
    "forkStatus": {
     "rmc14": "modified",
-    "goob": "modified"
+    "goob": "modified",
+    "starlight": "modified",
+    "frontier": "modified",
+    "funky": "modified"
    },
    "forkNotes": {
     "rmc14": "Added Uranium as extra reactant",
-    "goob": "Added Uranium(1) as extra reactant; yield doubled from 2 to 4"
+    "goob": "Added Uranium(1) as extra reactant; yield doubled from 2 to 4",
+    "starlight": "Added Uranium(1) reactant",
+    "frontier": "Added Uranium(1) reactant",
+    "funky": "Added Uranium(1) reactant"
    },
    "rmcStatus": "modified",
    "rmcNote": "Added Uranium as extra reactant"
@@ -35478,8 +35803,14 @@
    ],
    "effects": "",
    "impact": null,
-   "rmcStatus": "available",
-   "rmcNote": ""
+   "forkStatus": {
+    "rmc14": "modified"
+   },
+   "forkNotes": {
+    "rmc14": "Added product RMCSugar; Removed product Sugar"
+   },
+   "rmcStatus": "modified",
+   "rmcNote": "Added product RMCSugar; Removed product Sugar"
   },
   "NutrimentBreakdown": {
    "id": "NutrimentBreakdown",
@@ -35619,6 +35950,12 @@
    ],
    "effects": "",
    "impact": null,
+   "forkStatus": {
+    "frontier": "modified"
+   },
+   "forkNotes": {
+    "frontier": "Removed product Protein"
+   },
    "rmcStatus": "available",
    "rmcNote": ""
   },
@@ -35711,7 +36048,9 @@
    "effects": "",
    "impact": null,
    "forkStatus": {
-    "rmc14": "blocked"
+    "rmc14": "blocked",
+    "goob": "blocked",
+    "frontier": "blocked"
    },
    "rmcStatus": "blocked",
    "rmcNote": ""
@@ -36186,6 +36525,12 @@
    "mixer": [],
    "effects": "Creates gas: Plasma; Message popup",
    "impact": null,
+   "forkStatus": {
+    "goob": "modified"
+   },
+   "forkNotes": {
+    "goob": "Priority None->20"
+   },
    "rmcStatus": "available",
    "rmcNote": ""
   },
@@ -36754,6 +37099,12 @@
    "mixer": [],
    "effects": "",
    "impact": "Medium",
+   "forkStatus": {
+    "funky": "modified"
+   },
+   "forkNotes": {
+    "funky": "Added Libital(1) reactant; Removed Bicaridine reactant"
+   },
    "rmcStatus": "available",
    "rmcNote": ""
   },
@@ -36806,6 +37157,12 @@
    "mixer": [],
    "effects": "",
    "impact": "Medium",
+   "forkStatus": {
+    "funky": "modified"
+   },
+   "forkNotes": {
+    "funky": "Added Aiuri(1) reactant; Removed Dermaline reactant"
+   },
    "rmcStatus": "available",
    "rmcNote": ""
   },
@@ -37780,8 +38137,20 @@
    ],
    "effects": "",
    "impact": null,
-   "rmcStatus": "available",
-   "rmcNote": ""
+   "forkStatus": {
+    "rmc14": "modified",
+    "goob": "modified",
+    "frontier": "modified",
+    "funky": "modified"
+   },
+   "forkNotes": {
+    "rmc14": "Removed mixer requirement",
+    "goob": "Removed mixer requirement",
+    "frontier": "Removed mixer requirement",
+    "funky": "Removed mixer requirement"
+   },
+   "rmcStatus": "modified",
+   "rmcNote": "Removed mixer requirement"
   },
   "RedMeadLing": {
    "id": "RedMeadLing",
@@ -38076,8 +38445,14 @@
    "mixer": [],
    "effects": "",
    "impact": null,
-   "rmcStatus": "available",
-   "rmcNote": ""
+   "forkStatus": {
+    "rmc14": "modified"
+   },
+   "forkNotes": {
+    "rmc14": "Added RMCSugar(1) reactant; Removed Sugar reactant"
+   },
+   "rmcStatus": "modified",
+   "rmcNote": "Added RMCSugar(1) reactant; Removed Sugar reactant"
   },
   "Sake": {
    "id": "Sake",
@@ -38291,8 +38666,20 @@
    ],
    "effects": "Creates gas: WaterVapor",
    "impact": "Low",
-   "rmcStatus": "available",
-   "rmcNote": ""
+   "forkStatus": {
+    "rmc14": "modified",
+    "goob": "modified",
+    "frontier": "modified",
+    "funky": "modified"
+   },
+   "forkNotes": {
+    "rmc14": "Removed mixer requirement",
+    "goob": "Removed mixer requirement",
+    "frontier": "Removed mixer requirement",
+    "funky": "Removed mixer requirement"
+   },
+   "rmcStatus": "modified",
+   "rmcNote": "Removed mixer requirement"
   },
   "Sbiten": {
    "id": "Sbiten",
@@ -38545,6 +38932,12 @@
    "mixer": [],
    "effects": "",
    "impact": "Medium",
+   "forkStatus": {
+    "funky": "modified"
+   },
+   "forkNotes": {
+    "funky": "Added Lenturi(1) reactant; Removed Kelotane reactant"
+   },
    "rmcStatus": "available",
    "rmcNote": ""
   },
@@ -38573,8 +38966,14 @@
    "mixer": [],
    "effects": "",
    "impact": null,
-   "rmcStatus": "available",
-   "rmcNote": ""
+   "forkStatus": {
+    "rmc14": "modified"
+   },
+   "forkNotes": {
+    "rmc14": "Added RMCSugar(1) reactant; Removed Sugar reactant"
+   },
+   "rmcStatus": "modified",
+   "rmcNote": "Added RMCSugar(1) reactant; Removed Sugar reactant"
   },
   "SilverSulfadiazine": {
    "id": "SilverSulfadiazine",
@@ -38659,10 +39058,12 @@
    "effects": "Effect: AreaEffect",
    "impact": "High",
    "forkStatus": {
-    "rmc14": "modified"
+    "rmc14": "modified",
+    "funky": "modified"
    },
    "forkNotes": {
-    "rmc14": "Priority changed from -10 to 10"
+    "rmc14": "Priority changed from -10 to 10",
+    "funky": "Priority -10->10"
    },
    "rmcStatus": "modified",
    "rmcNote": "Priority changed from -10 to 10"
@@ -39042,8 +39443,20 @@
    ],
    "effects": "",
    "impact": null,
-   "rmcStatus": "available",
-   "rmcNote": ""
+   "forkStatus": {
+    "rmc14": "modified",
+    "goob": "modified",
+    "frontier": "modified",
+    "funky": "modified"
+   },
+   "forkNotes": {
+    "rmc14": "Removed mixer requirement",
+    "goob": "Removed mixer requirement",
+    "frontier": "Removed mixer requirement",
+    "funky": "Removed mixer requirement"
+   },
+   "rmcStatus": "modified",
+   "rmcNote": "Removed mixer requirement"
   },
   "SpaceLube": {
    "id": "SpaceLube",
@@ -39469,7 +39882,11 @@
    "effects": "",
    "impact": null,
    "forkStatus": {
-    "rmc14": "blocked"
+    "rmc14": "blocked",
+    "goob": "blocked",
+    "starlight": "blocked",
+    "frontier": "blocked",
+    "funky": "blocked"
    },
    "rmcStatus": "blocked",
    "rmcNote": ""
@@ -40099,8 +40516,14 @@
    ],
    "effects": "",
    "impact": null,
-   "rmcStatus": "available",
-   "rmcNote": ""
+   "forkStatus": {
+    "rmc14": "modified"
+   },
+   "forkNotes": {
+    "rmc14": "Added RMCSugar(1) reactant; Removed Sugar reactant"
+   },
+   "rmcStatus": "modified",
+   "rmcNote": "Added RMCSugar(1) reactant; Removed Sugar reactant"
   },
   "ToxinsSpecial": {
    "id": "ToxinsSpecial",
@@ -40947,8 +41370,14 @@
    ],
    "effects": "",
    "impact": null,
-   "rmcStatus": "available",
-   "rmcNote": ""
+   "forkStatus": {
+    "rmc14": "modified"
+   },
+   "forkNotes": {
+    "rmc14": "Added RMCSugar(1) reactant; Removed Sugar reactant"
+   },
+   "rmcStatus": "modified",
+   "rmcNote": "Added RMCSugar(1) reactant; Removed Sugar reactant"
   },
   "WhiteGilgamesh": {
    "id": "WhiteGilgamesh",
@@ -41125,6 +41554,12 @@
    ],
    "effects": "",
    "impact": null,
+   "forkStatus": {
+    "frontier": "modified"
+   },
+   "forkNotes": {
+    "frontier": "Removed product Protein"
+   },
    "rmcStatus": "available",
    "rmcNote": ""
   },

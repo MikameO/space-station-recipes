@@ -53,6 +53,102 @@ JSON_FILE = SCRIPT_DIR / "data.json"
 
 
 # ─────────────────────────────────────────────
+# Auto-diff: compare fork's vanilla-path reactions against originals
+# ─────────────────────────────────────────────
+
+def compare_reaction(vanilla_rxn: dict, fork_rxn: dict) -> list[str]:
+    """Compare two parsed reaction dicts. Returns list of human-readable diff strings."""
+    diffs = []
+
+    # Compare reactants
+    v_reacts = vanilla_rxn.get("reactants", {})
+    f_reacts = fork_rxn.get("reactants", {})
+    v_rids = set(v_reacts.keys()) if isinstance(v_reacts, dict) else set()
+    f_rids = set(f_reacts.keys()) if isinstance(f_reacts, dict) else set()
+
+    for rid in f_rids - v_rids:
+        amt = f_reacts[rid].get("amount", 1) if isinstance(f_reacts[rid], dict) else f_reacts[rid]
+        diffs.append(f"Added {rid}({amt}) reactant")
+    for rid in v_rids - f_rids:
+        diffs.append(f"Removed {rid} reactant")
+    for rid in v_rids & f_rids:
+        v_amt = v_reacts[rid].get("amount", 1) if isinstance(v_reacts[rid], dict) else v_reacts[rid]
+        f_amt = f_reacts[rid].get("amount", 1) if isinstance(f_reacts[rid], dict) else f_reacts[rid]
+        if v_amt != f_amt:
+            diffs.append(f"{rid} amount {v_amt}->{f_amt}")
+        v_cat = v_reacts[rid].get("catalyst", False) if isinstance(v_reacts[rid], dict) else False
+        f_cat = f_reacts[rid].get("catalyst", False) if isinstance(f_reacts[rid], dict) else False
+        if v_cat != f_cat:
+            diffs.append(f"{rid} catalyst {'added' if f_cat else 'removed'}")
+
+    # Compare products
+    v_prods = vanilla_rxn.get("products", {})
+    f_prods = fork_rxn.get("products", {})
+    for pid in set(f_prods) - set(v_prods):
+        diffs.append(f"Added product {pid}")
+    for pid in set(v_prods) - set(f_prods):
+        diffs.append(f"Removed product {pid}")
+    for pid in set(v_prods) & set(f_prods):
+        if v_prods[pid] != f_prods[pid]:
+            diffs.append(f"{pid} yield {v_prods[pid]}->{f_prods[pid]}")
+
+    # Compare temperature
+    for temp_key, label in [("minTemp", "minTemp"), ("maxTemp", "maxTemp")]:
+        v_t = vanilla_rxn.get(temp_key)
+        f_t = fork_rxn.get(temp_key)
+        if v_t != f_t:
+            if v_t is None and f_t is not None:
+                diffs.append(f"Added {label}: {f_t}")
+            elif v_t is not None and f_t is None:
+                diffs.append(f"Removed {label}")
+            else:
+                diffs.append(f"{label} {v_t}->{f_t}")
+
+    # Compare mixer requirements
+    v_mix = vanilla_rxn.get("requiredMixerCategories", [])
+    f_mix = fork_rxn.get("requiredMixerCategories", [])
+    if v_mix != f_mix:
+        if not v_mix and f_mix:
+            diffs.append(f"Added mixer: {', '.join(f_mix)}")
+        elif v_mix and not f_mix:
+            diffs.append("Removed mixer requirement")
+        else:
+            diffs.append(f"Mixer changed: {v_mix}->{f_mix}")
+
+    # Compare priority
+    v_pri = vanilla_rxn.get("priority")
+    f_pri = fork_rxn.get("priority")
+    if v_pri != f_pri and (v_pri is not None or f_pri is not None):
+        diffs.append(f"Priority {v_pri}->{f_pri}")
+
+    return diffs
+
+
+def diff_fork_reactions(
+    vanilla_rxns: dict, fork_vanilla_rxns: dict,
+    manual_blocked: set, manual_modified: dict
+) -> tuple[set, dict]:
+    """Compare fork's vanilla-path reactions against originals.
+    Returns (blocked_ids, modified_dict). Manual overrides take precedence."""
+    blocked = set(manual_blocked)
+    modified = dict(manual_modified)
+
+    for rid, v_rxn in vanilla_rxns.items():
+        if rid in manual_blocked or rid in manual_modified:
+            continue  # Manual override takes precedence
+        if rid not in fork_vanilla_rxns:
+            # Reaction removed/commented out in fork
+            blocked.add(rid)
+        else:
+            f_rxn = fork_vanilla_rxns[rid]
+            diffs = compare_reaction(v_rxn, f_rxn)
+            if diffs:
+                modified[rid] = "; ".join(diffs)
+
+    return blocked, modified
+
+
+# ─────────────────────────────────────────────
 # Phase 1: Data Fetching
 # ─────────────────────────────────────────────
 
@@ -1307,8 +1403,10 @@ def compute_antag_score(effect_tags: list[str]) -> int:
 
 def export_json(reagents: dict, reactions: dict, locale: dict,
                 reaction_lookup: dict, base_set: set,
-                all_sources: dict | None = None):
-    """Export all data as a JSON file for the web frontend."""
+                all_sources: dict | None = None,
+                fork_diffs: dict | None = None):
+    """Export all data as a JSON file for the web frontend.
+    fork_diffs: {fork_id: (blocked_set, modified_dict)} from auto-diff."""
     # Compute per-fork reagent counts
     fork_reagent_counts = {}
     for r in reagents.values():
@@ -1430,10 +1528,22 @@ def export_json(reagents: dict, reactions: dict, locale: dict,
             catalyst = info.get("catalyst", False) if isinstance(info, dict) else False
             reactants_obj[react_id] = {"amount": amount, "catalyst": catalyst}
 
-        # Per-fork availability status for vanilla reactions
+        # Per-fork availability status for vanilla reactions (uses auto-diff results)
         fork_status = {}
         fork_notes = {}
-        if source == "vanilla":
+        if source == "vanilla" and fork_diffs:
+            for fid in FORK_REGISTRY:
+                if fid == "vanilla":
+                    continue
+                blocked, modified = fork_diffs.get(fid, (set(), {}))
+                if rid in blocked:
+                    fork_status[fid] = "blocked"
+                elif rid in modified:
+                    fork_status[fid] = "modified"
+                    fork_notes[fid] = modified[rid]
+                # "available" is default — omit to save space
+        elif source == "vanilla":
+            # Fallback: use manual config if fork_diffs not provided
             for fid, fconf in FORK_REGISTRY.items():
                 if fid == "vanilla":
                     continue
@@ -1444,7 +1554,6 @@ def export_json(reagents: dict, reactions: dict, locale: dict,
                 elif rid in modified:
                     fork_status[fid] = "modified"
                     fork_notes[fid] = modified[rid]
-                # "available" is default — omit to save space
 
         reaction_obj = {
             "id": rid,
@@ -1541,6 +1650,18 @@ def main():
             "seed_files": seed_files,
         }
 
+    # Phase 1b: Fetch vanilla-path files from each fork for auto-diff
+    fork_vanilla_overrides = {}  # fork_id -> {path: content}
+    for fork_id, fconf in FORK_REGISTRY.items():
+        if fork_id == "vanilla":
+            continue
+        override_files = fconf.get("vanilla_override_reaction_files", [])
+        if override_files:
+            print(f"\n[{fconf['name']}] Vanilla-path overrides...")
+            overrides = fetch_all_files(override_files, fconf["raw_url"], f"{fork_id}_vanilla_overrides")
+            fork_vanilla_overrides[fork_id] = overrides
+            print(f"  Fetched {len(overrides)} vanilla-path override files")
+
     # Botany locale (vanilla only for now)
     botany_locale_files = fetch_all_files(
         FORK_REGISTRY["vanilla"].get("botany_locale_files", []),
@@ -1557,6 +1678,35 @@ def main():
         reactions.update(rxn2)
         parsed[fork_id] = {"reagents": reagents, "reactions": reactions}
         print(f"  {FORK_REGISTRY[fork_id]['name']}: {len(reagents)} reagents, {len(reactions)} reactions")
+
+    # Phase 2b: Auto-diff fork vanilla overrides against vanilla originals
+    print("\n=== Phase 2b: Auto-detecting fork reaction diffs ===")
+    fork_diffs = {}  # fork_id -> (blocked_set, modified_dict)
+    for fork_id, override_files in fork_vanilla_overrides.items():
+        if not override_files:
+            continue
+        _, fork_vanilla_rxns = parse_all_prototypes(override_files, loader)
+        manual_blocked = FORK_REGISTRY[fork_id].get("blocked_reactions", set())
+        manual_modified = FORK_REGISTRY[fork_id].get("modified_reactions", {})
+        blocked, modified = diff_fork_reactions(
+            parsed["vanilla"]["reactions"], fork_vanilla_rxns,
+            manual_blocked, manual_modified
+        )
+        fork_diffs[fork_id] = (blocked, modified)
+        auto_b = len(blocked) - len(manual_blocked)
+        auto_m = len(modified) - len(manual_modified)
+        total_b = len(blocked)
+        total_m = len(modified)
+        print(f"  {FORK_REGISTRY[fork_id]['name']}: {total_b} blocked ({auto_b} auto), {total_m} modified ({auto_m} auto)")
+
+    # For forks without override files, fall back to manual config
+    for fork_id, fconf in FORK_REGISTRY.items():
+        if fork_id == "vanilla" or fork_id in fork_diffs:
+            continue
+        fork_diffs[fork_id] = (
+            fconf.get("blocked_reactions", set()),
+            fconf.get("modified_reactions", {}),
+        )
 
     # Phase 3: Localization
     print("\n=== Phase 3: Loading localization ===")
@@ -1614,7 +1764,7 @@ def main():
 
     # Phase 8: Generate JSON for web frontend
     print("\n=== Phase 8: Generating JSON for web frontend ===")
-    export_json(all_reagents, all_reactions, locale, reaction_lookup, base_set, all_sources)
+    export_json(all_reagents, all_reactions, locale, reaction_lookup, base_set, all_sources, fork_diffs)
 
     print("\n=== Phase 9: Extracting sprites from SS14 repo ===")
     fetch_and_extract_sprites()

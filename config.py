@@ -8,6 +8,22 @@
 # file manifests, known blocked/modified reactions, and UI color.
 # The extractor iterates this registry to fetch & merge all forks.
 
+# Vanilla reaction files — shared reference for auto-diff across forks
+VANILLA_REACTION_PATHS = [
+    "Resources/Prototypes/Recipes/Reactions/biological.yml",
+    "Resources/Prototypes/Recipes/Reactions/botany.yml",
+    "Resources/Prototypes/Recipes/Reactions/chemicals.yml",
+    "Resources/Prototypes/Recipes/Reactions/cleaning.yml",
+    "Resources/Prototypes/Recipes/Reactions/drinks.yml",
+    "Resources/Prototypes/Recipes/Reactions/food.yml",
+    "Resources/Prototypes/Recipes/Reactions/fun.yml",
+    "Resources/Prototypes/Recipes/Reactions/gas.yml",
+    "Resources/Prototypes/Recipes/Reactions/medicine.yml",
+    "Resources/Prototypes/Recipes/Reactions/pyrotechnic.yml",
+    "Resources/Prototypes/Recipes/Reactions/single_reagent.yml",
+    "Resources/Prototypes/Recipes/Reactions/soap.yml",
+]
+
 FORK_REGISTRY = {
     # ── Vanilla SS14 (upstream) ──
     "vanilla": {
@@ -206,6 +222,7 @@ FORK_REGISTRY = {
             "RMCSulfur", "RMCSugar", "RMCGold", "RMCTungsten", "RMCWater",
             "RMCSulphuricAcid", "RMCHydrochloricAcid",
         },
+        "vanilla_override_reaction_files": VANILLA_REACTION_PATHS,
     },
 
     # ── Goob Station ──
@@ -257,6 +274,7 @@ FORK_REGISTRY = {
             "PlasticSheet": "Reactant amounts doubled: Oil 5→10, Ash 3→6, SulfuricAcid 2→4",
         },
         "dispenser_chemicals": set(),
+        "vanilla_override_reaction_files": VANILLA_REACTION_PATHS,
     },
 
     # ── Starlight ──
@@ -295,6 +313,7 @@ FORK_REGISTRY = {
             # (not in _Starlight/) — parser limitation, these won't be auto-detected
         },
         "dispenser_chemicals": set(),
+        "vanilla_override_reaction_files": VANILLA_REACTION_PATHS,
     },
 
     # ── Dead Space ──
@@ -322,6 +341,7 @@ FORK_REGISTRY = {
         "blocked_reactions": set(),
         "modified_reactions": {},
         "dispenser_chemicals": set(),
+        "vanilla_override_reaction_files": VANILLA_REACTION_PATHS,
     },
 
     # ── Frontier ──
@@ -354,6 +374,7 @@ FORK_REGISTRY = {
         },
         "modified_reactions": {},
         "dispenser_chemicals": set(),
+        "vanilla_override_reaction_files": VANILLA_REACTION_PATHS,
     },
 
     # ── Funky Station (forks from Goob Station) ──
@@ -401,6 +422,7 @@ FORK_REGISTRY = {
             "Opporozidone": "Recipe changed: Cognizine as catalyst + Plasma(5) + Doxarubixadone",
         },
         "dispenser_chemicals": set(),
+        "vanilla_override_reaction_files": VANILLA_REACTION_PATHS,
     },
 }
 
