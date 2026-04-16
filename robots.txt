@@ -1,0 +1,7 @@
+# NanoTrasen ChemDB — SS14 Chemistry Database
+# https://mikameo.github.io/space-station-recipes/
+
+User-agent: *
+Allow: /
+
+Sitemap: https://mikameo.github.io/space-station-recipes/sitemap.xml
