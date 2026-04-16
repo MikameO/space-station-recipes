@@ -132,7 +132,21 @@ header h1 {
   white-space: nowrap;
 }
 
-.accent { color: var(--phosphor); text-shadow: 0 0 10px var(--phosphor-glow); }
+.accent {
+  color: var(--phosphor);
+  text-shadow: 0 0 10px var(--phosphor-glow);
+  background: linear-gradient(90deg, var(--phosphor) 0%, #7dffb8 50%, var(--phosphor) 100%);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: phosphor-sweep 4s linear infinite;
+}
+
+@keyframes phosphor-sweep {
+  0% { background-position: 0% center; }
+  100% { background-position: 200% center; }
+}
 
 .header-meta {
   font-size: 0.7rem;
@@ -398,6 +412,18 @@ main {
   text-shadow: 0 0 8px var(--phosphor-glow);
 }
 
+.tab-btn.active::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 20%;
+  right: 20%;
+  height: 2px;
+  background: var(--phosphor);
+  box-shadow: 0 0 8px var(--phosphor), 0 0 16px var(--phosphor-glow);
+  border-radius: 1px;
+}
+
 /* Antag tab — always red, independent of phosphor cascade */
 .tab-btn-antag { color: var(--red-alert); }
 .tab-btn-antag:hover { color: var(--red-alert); opacity: 0.8; }
@@ -421,7 +447,12 @@ main {
   background: var(--hull);
 }
 
-.tab-panel.active { display: block; }
+.tab-panel.active { display: block; animation: tab-fade-in 0.25s ease; }
+
+@keyframes tab-fade-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
 
 /* ══════════════════════════════════════════
    REAGENT CARDS — "Vial Sample" readouts
@@ -1121,35 +1152,79 @@ main {
   align-items: center;
   justify-content: center;
   z-index: 10000;
-  transition: opacity 0.4s ease;
+  transition: opacity 0.5s ease;
 }
 
 .loading-overlay.hidden { opacity: 0; pointer-events: none; }
 
 .loading-spinner {
-  width: 36px;
-  height: 36px;
+  width: 48px;
+  height: 48px;
   border: 2px solid var(--border-subtle);
   border-top-color: var(--phosphor);
   border-radius: 50%;
   animation: spin 0.7s linear infinite;
-  box-shadow: 0 0 12px var(--phosphor-glow);
+  box-shadow: 0 0 20px var(--phosphor-glow), inset 0 0 8px var(--phosphor-glow);
 }
 
 @keyframes spin { to { transform: rotate(360deg); } }
 
+.loading-brand {
+  font-family: 'Oxanium', sans-serif;
+  font-weight: 700;
+  font-size: 1.2rem;
+  color: var(--phosphor);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  margin-bottom: 24px;
+  text-shadow: 0 0 20px var(--phosphor-glow), 0 0 40px rgba(57,255,133,0.06);
+  animation: boot-flicker 2s ease-in-out infinite;
+}
+
+@keyframes boot-flicker {
+  0%, 100% { opacity: 1; }
+  92% { opacity: 1; }
+  93% { opacity: 0.6; }
+  94% { opacity: 1; }
+  96% { opacity: 0.8; }
+  97% { opacity: 1; }
+}
+
 .loading-text {
   margin-top: 16px;
-  font-family: 'Oxanium', sans-serif;
-  font-size: 0.75rem;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.7rem;
   color: var(--text-ghost);
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
+  letter-spacing: 0.08em;
   animation: pulse 1.5s ease infinite;
 }
 
+.loading-bar {
+  width: 200px;
+  height: 3px;
+  background: var(--border-subtle);
+  border-radius: 2px;
+  margin-top: 12px;
+  overflow: hidden;
+}
+
+.loading-bar-fill {
+  height: 100%;
+  width: 30%;
+  background: var(--phosphor);
+  border-radius: 2px;
+  box-shadow: 0 0 8px var(--phosphor-glow);
+  animation: loading-slide 1.2s ease-in-out infinite;
+}
+
+@keyframes loading-slide {
+  0% { transform: translateX(-100%); width: 30%; }
+  50% { width: 60%; }
+  100% { transform: translateX(400%); width: 30%; }
+}
+
 @keyframes pulse {
-  0%, 100% { opacity: 0.5; }
+  0%, 100% { opacity: 0.4; }
   50% { opacity: 1; }
 }
 
@@ -1484,25 +1559,48 @@ body.antag-active .antag-toggle {
   background: var(--panel-raised);
   border: 1px solid var(--phosphor-dim);
   border-radius: 6px;
-  padding: 16px;
+  padding: 18px 16px;
   text-align: center;
+  position: relative;
+  overflow: hidden;
+  animation: stats-card-in 0.5s ease both;
+}
+
+.stats-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--phosphor), transparent);
+  opacity: 0.6;
+}
+
+.stats-card:nth-child(1) { animation-delay: 0s; }
+.stats-card:nth-child(2) { animation-delay: 0.06s; }
+.stats-card:nth-child(3) { animation-delay: 0.12s; }
+.stats-card:nth-child(4) { animation-delay: 0.18s; }
+.stats-card:nth-child(5) { animation-delay: 0.24s; }
+
+@keyframes stats-card-in {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .stats-card-value {
   font-family: 'Share Tech Mono', monospace;
   font-size: 2rem;
   color: var(--phosphor);
-  text-shadow: 0 0 8px var(--phosphor-glow);
+  text-shadow: 0 0 12px var(--phosphor-glow), 0 0 30px rgba(57,255,133,0.06);
   line-height: 1.1;
 }
 
 .stats-card-label {
   font-family: 'Chakra Petch', sans-serif;
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   color: var(--text-ghost);
   text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin-top: 4px;
+  letter-spacing: 0.08em;
+  margin-top: 6px;
 }
 
 .stats-section {
@@ -1510,14 +1608,26 @@ body.antag-active .antag-toggle {
 }
 
 .stats-section-title {
-  font-family: 'Chakra Petch', sans-serif;
+  font-family: 'Oxanium', sans-serif;
   color: var(--phosphor);
-  font-size: 0.95rem;
+  font-size: 0.85rem;
+  font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 1px;
-  margin-bottom: 12px;
+  letter-spacing: 0.14em;
+  margin-bottom: 14px;
+  padding-bottom: 8px;
   border-bottom: 1px solid var(--phosphor-dim);
-  padding-bottom: 6px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.stats-section-title::before {
+  content: '//';
+  color: var(--phosphor-dim);
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.75rem;
 }
 
 .stats-bars {
@@ -1565,8 +1675,13 @@ body.antag-active .antag-toggle {
   height: 100%;
   background: var(--phosphor-dim);
   border-radius: 2px;
-  transition: width 0.4s ease;
+  animation: bar-grow 0.6s ease both;
   min-width: 2px;
+}
+
+@keyframes bar-grow {
+  from { max-width: 0; }
+  to { max-width: 100%; }
 }
 
 .stats-bar-base {

@@ -1,62 +1,85 @@
+<div align="center">
+
+<img src="sprites/beaker.png" width="64" height="64" style="image-rendering: pixelated;" alt="SS14 Chemistry Database">
+
 # SS14 Chemistry Database
 
-Interactive chemistry reference for [Space Station 14](https://spacestation14.com/) and 8 community forks.
+**Interactive chemistry reference for [Space Station 14](https://spacestation14.com/)**
 
-Search reagents, plan reactions, explore craft trees, and calculate batch recipes — all in one tool.
+Search reagents, plan reactions, explore craft trees, and calculate batch recipes across 8 community forks.
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-22c55e?style=flat-square)](LICENSE)
+![Reagents](https://img.shields.io/badge/Reagents-683-39ff85?style=flat-square)
+![Reactions](https://img.shields.io/badge/Reactions-607-00e5ff?style=flat-square)
+![Forks](https://img.shields.io/badge/Forks-8-ffb627?style=flat-square)
+
+</div>
+
+---
 
 ## Features
 
-- **Multi-fork support** — 683 reagents and 607 reactions across 8 SS14 forks
-- **Search** — full-text search across names, effects, descriptions, and flavors
-- **Calculator** — single recipe calculator, batch shift planner, and reverse lookup ("What can I make?")
-- **Craft Trees** — visual dependency chains showing exactly what you need to synthesize any reagent
-- **Graph** — interactive network visualization of all reagent relationships
-- **Stats** — fork comparison, category distribution, most complex recipes, most used base chemicals
-- **Antag Mode** — curated antagonist strategies with lethality scores and delivery mechanisms
-- **Shareable links** — URL encodes your current filters and selection for easy sharing
+| | Feature | Description |
+|---|---------|-------------|
+| **Search** | Full-text search | Search across names, effects, descriptions, and flavors |
+| **Multi-fork** | 8 SS14 forks | Vanilla, RMC14, Goob, Funky, Delta-V, Starlight, Frontier, Dead Space |
+| **Calculator** | Recipe planner | Single recipe calc, batch shift planner, and reverse lookup |
+| **Trees** | Craft trees | Visual dependency chains for any reagent synthesis path |
+| **Graph** | Network viz | Interactive graph of all reagent relationships |
+| **Stats** | Database stats | Fork comparison, complexity rankings, base chemical usage |
+| **Antag** | Antag Mode | Curated strategies with lethality scores and delivery methods |
+| **Share** | Deep links | URL encodes filters and selection for easy sharing |
 
 ## Supported Forks
 
-| Fork | Reagents | Reactions |
-|------|----------|-----------|
-| Vanilla SS14 | 405 | 310 |
-| RMC14 | 94 | 60 |
-| Goob Station | 66 | 72 |
-| Funky Station | 36 | 81 |
-| Delta-V | 39 | 43 |
-| Starlight | 21 | 9 |
-| Frontier | 12 | 21 |
-| Dead Space | 10 | 11 |
+| Fork | Reagents | Reactions | |
+|------|:--------:|:---------:|---|
+| **Vanilla SS14** | 405 | 310 | `upstream` |
+| **RMC14** | 94 | 60 | Colonial Marines |
+| **Goob Station** | 66 | 72 | |
+| **Funky Station** | 36 | 81 | Goob-based |
+| **Delta-V** | 39 | 43 | |
+| **Starlight** | 21 | 9 | |
+| **Frontier** | 12 | 21 | |
+| **Dead Space** | 10 | 11 | |
+
+## Quick Start
+
+```bash
+# Start local dev server
+python -m http.server 8090
+```
+
+Then open [localhost:8090](http://localhost:8090). No build step — pure HTML/CSS/JS.
 
 ## Adding a New Fork
 
-1. Open `config.py` and add an entry to `FORK_REGISTRY` with:
-   - GitHub repo URL, branch, and raw file base URL
-   - Custom content directories (e.g., `_MyFork/`)
+1. Add an entry to `FORK_REGISTRY` in [`config.py`](config.py):
+   - GitHub repo URL, branch, raw file base URL
+   - Custom content directories (e.g. `_MyFork/`)
    - Blocked/modified reactions (if any)
-   - Dispenser chemicals
-   - UI color
+   - Dispenser chemicals and UI color
 
-2. Run the extractor to regenerate data:
+2. Regenerate data:
    ```bash
    pip install pyyaml openpyxl
    python ss14_chem_extractor.py
    ```
 
-3. Open `index.html` locally to verify the new fork appears in the Source filter.
+3. Verify the new fork appears in the Source filter.
 
-## Development
+## Architecture
 
-```bash
-# Start local dev server
-python -m http.server 8090
-
-# Open in browser
-# http://localhost:8090
 ```
-
-No build step required — the site is pure HTML/CSS/JS served statically.
+index.html          Static frontend shell
+app.js              All interactive logic (search, calc, trees, graph, stats)
+style.css           NanoTrasen terminal theme with CRT effects
+data.json           Generated chemistry database (1.1MB, all forks merged)
+config.py           Fork registry and extraction configuration
+ss14_chem_extractor.py   Scrapes SS14 GitHub repos → data.json
+sprites/            Reagent sprite assets (pixel art)
+```
 
 ## License
 
-[MIT](LICENSE) — compatible with the SS14 project license.
+[MIT](LICENSE)
