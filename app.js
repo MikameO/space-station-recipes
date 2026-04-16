@@ -1499,7 +1499,7 @@ function getAntagIntelHTML(r) {
 
   return `
     <div class="antag-intel">
-      <h4>\u2620 Antag Intel</h4>
+      <h4>\u2620 Antag Intel <span class="game-label">(SS14 gameplay)</span></h4>
       <div class="antag-score-bar">
         <span class="score-label">${score}/10</span>
         <div class="score-track">
@@ -1509,7 +1509,7 @@ function getAntagIntelHTML(r) {
       ${tags.length ? `<div class="antag-tags">${tags.map(t => `<span class="badge badge-antag-tag">${esc(t)}</span>`).join('')}</div>` : ''}
       ${tips ? `<div class="antag-tips">${esc(tips)}</div>` : ''}
       <div class="antag-delivery-suggest">
-        <h5>Suggested Delivery</h5>
+        <h5>In-game Delivery</h5>
         ${deliverySuggestHTML}
       </div>
     </div>
@@ -1538,7 +1538,7 @@ function renderAntagStrategies() {
     </div>`;
   }).join('');
 
-  el.innerHTML = `<h3>\u2620 Antag Strategies</h3>${cards}`;
+  el.innerHTML = `<h3>\u2620 Antag Strategies <span class="game-label">(SS14 gameplay)</span></h3>${cards}`;
 }
 
 function renderDeliveryMechanisms() {
@@ -1586,9 +1586,9 @@ function renderDeliveryMechanisms() {
   }
 
   el.innerHTML = `
-    <h3>\u2620 Delivery Mechanisms</h3>
+    <h3>\u2620 In-game Delivery Mechanisms <span class="game-label">(SS14 gameplay)</span></h3>
     <div class="delivery-grid">${cards}</div>
-    ${synCards ? `<h3 style="margin-top:12px">\u2620 Syndicate Items</h3><div class="delivery-grid">${synCards}</div>` : ''}
+    ${synCards ? `<h3 style="margin-top:12px">\u2620 Syndicate Items <span class="game-label">(SS14 gameplay)</span></h3><div class="delivery-grid">${synCards}</div>` : ''}
   `;
 }
 

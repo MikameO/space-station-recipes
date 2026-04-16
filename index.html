@@ -10,16 +10,16 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>NanoTrasen ChemDB — SS14 Chemistry Database</title>
-<meta name="description" content="Interactive chemistry reference for Space Station 14. Reagents, reactions, craft trees, and calculators across 8 community forks.">
+<meta name="description" content="SS14 game chemistry database: interactive reference for Space Station 14 fictional reagents, reactions, craft trees, and calculators across 8 community forks. In-game mechanics only — not real-world chemistry.">
 <meta property="og:title" content="NanoTrasen ChemDB — SS14 Chemistry Database">
-<meta property="og:description" content="NanoTrasen ChemDB — interactive chemistry reference for Space Station 14. Search reagents, plan reactions, and explore craft trees across 8 forks.">
+<meta property="og:description" content="NanoTrasen ChemDB — SS14 game chemistry database. Search fictional reagents, plan in-game reactions, and explore craft trees across 8 community forks. Not real-world chemistry.">
 <meta property="og:image" content="https://mikameo.github.io/space-station-recipes/og-image.png">
 <meta property="og:url" content="https://mikameo.github.io/space-station-recipes/">
 <meta property="og:type" content="website">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="theme-color" content="#22c55e">
 <link rel="icon" type="image/x-icon" href="favicon.ico">
-<link rel="stylesheet" href="style.css?v=2">
+<link rel="stylesheet" href="style.css?v=3">
 <script defer src="https://unpkg.com/vis-network@9.1.6/standalone/umd/vis-network.min.js"></script>
 </head>
 <body>
@@ -42,6 +42,11 @@
     <button class="share-btn" id="shareBtn" title="Copy shareable link">&#128279;</button>
   </div>
 </header>
+
+<div class="disclaimer-bar" role="banner">
+  <span class="disclaimer-bar-icon">&#9888;</span>
+  <a href="#site-footer" class="disclaimer-bar-text">Space Station 14 fictional game data &mdash; not real-world chemistry</a>
+</div>
 
 <button class="sidebar-collapse" id="sidebarCollapse" title="Collapse sidebar">&#9664;</button>
 <div class="layout">
@@ -226,10 +231,18 @@
   <div id="detailContent"></div>
 </aside>
 
+<footer class="site-footer" id="site-footer">
+  <div class="footer-disclaimer">
+    <p><strong>NanoTrasen ChemDB</strong> is an unofficial community tool for <a href="https://spacestation14.com" target="_blank" rel="noopener noreferrer">Space Station 14</a>, an open-source multiplayer game. All content&nbsp;&mdash; including reagent names, chemical formulas, synthesis recipes, toxicity ratings, delivery methods, and antagonist strategies&nbsp;&mdash; describes <em>fictional in-game mechanics</em>. Real chemical names are used by the game for flavor; the properties, reactions, and effects shown here do not reflect real-world chemistry. This site provides no real-world medical, chemical, or safety guidance.</p>
+    <p class="footer-copy">&copy; 2025 MikameO &middot; Not affiliated with or endorsed by the SS14 development team</p>
+  </div>
+</footer>
+
 <div class="toast" id="toast"></div>
 
 <div class="loading-overlay" id="loadingOverlay">
   <div class="loading-brand">NanoTrasen ChemDB</div>
+  <div class="loading-disclaimer">This is a reference database for <strong>Space Station 14</strong>, a fictional multiplayer game.<br>All reagent data, including toxicity values, synthesis routes, and &ldquo;antag&rdquo; strategies,<br>describe <em>in-game mechanics only</em>. Nothing here is real-world chemistry guidance.</div>
   <div class="loading-spinner"></div>
   <div class="loading-text">Initializing chemistry database...</div>
   <div class="loading-bar"><div class="loading-bar-fill"></div></div>
