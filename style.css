@@ -45,7 +45,7 @@
 /* ── RESET ── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-html { font-size: 15px; }
+html { font-size: 17px; }
 
 body {
   font-family: 'Share Tech Mono', 'Consolas', monospace;
@@ -1739,7 +1739,7 @@ body.antag-active .antag-toggle {
 }
 
 @media (max-width: 768px) {
-  html { font-size: 14px; }
+  html { font-size: 15px; }
   .layout { flex-direction: column; }
   .sidebar {
     width: 100% !important; min-width: 100% !important;
