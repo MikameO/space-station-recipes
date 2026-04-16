@@ -4,8 +4,16 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SS14 Chemistry Database</title>
+<meta name="description" content="Interactive chemistry reference for Space Station 14. Reagents, reactions, craft trees, and calculators across 8 community forks.">
+<meta property="og:title" content="SS14 Chemistry Database">
+<meta property="og:description" content="Interactive chemistry reference for Space Station 14. Search reagents, plan reactions, and explore craft trees across 8 forks.">
+<meta property="og:image" content="og-image.png">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#22c55e">
+<link rel="icon" type="image/x-icon" href="favicon.ico">
 <link rel="stylesheet" href="style.css">
-<script src="https://unpkg.com/vis-network@9.1.6/standalone/umd/vis-network.min.js"></script>
+<script defer src="https://unpkg.com/vis-network@9.1.6/standalone/umd/vis-network.min.js"></script>
 </head>
 <body>
 
@@ -86,6 +94,7 @@
       <button class="tab-btn" data-tab="calculator" role="tab" aria-selected="false">Calculator</button>
       <button class="tab-btn" data-tab="trees" role="tab" aria-selected="false">Craft Trees</button>
       <button class="tab-btn" data-tab="graph" role="tab" aria-selected="false">Graph</button>
+      <button class="tab-btn" data-tab="stats" role="tab" aria-selected="false">Stats</button>
       <button class="tab-btn tab-btn-antag" data-tab="antag" role="tab" aria-selected="false" style="display:none">&#9760; Antag Strategies</button>
     </div>
 
@@ -184,6 +193,11 @@
         <span class="graph-info" id="graphInfo"></span>
       </div>
       <div id="graphContainer" class="graph-container"></div>
+    </div>
+
+    <!-- Stats Tab -->
+    <div class="tab-panel" id="tab-stats">
+      <div id="statsTabContent"></div>
     </div>
 
     <!-- Antag Tab (visible only in Antag Mode) -->

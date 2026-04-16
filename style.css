@@ -1471,6 +1471,137 @@ body.antag-active .antag-toggle {
 /* ══════════════════════════════════════════
    RESPONSIVE
    ══════════════════════════════════════════ */
+/* ── Stats Tab ────────────────────────────────── */
+
+.stats-overview {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.stats-card {
+  background: var(--panel-raised);
+  border: 1px solid var(--phosphor-dim);
+  border-radius: 6px;
+  padding: 16px;
+  text-align: center;
+}
+
+.stats-card-value {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 2rem;
+  color: var(--phosphor);
+  text-shadow: 0 0 8px var(--phosphor-glow);
+  line-height: 1.1;
+}
+
+.stats-card-label {
+  font-family: 'Chakra Petch', sans-serif;
+  font-size: 0.75rem;
+  color: var(--text-ghost);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-top: 4px;
+}
+
+.stats-section {
+  margin-bottom: 28px;
+}
+
+.stats-section-title {
+  font-family: 'Chakra Petch', sans-serif;
+  color: var(--phosphor);
+  font-size: 0.95rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 12px;
+  border-bottom: 1px solid var(--phosphor-dim);
+  padding-bottom: 6px;
+}
+
+.stats-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.stats-bar-row {
+  display: grid;
+  grid-template-columns: 160px 1fr 80px;
+  align-items: center;
+  gap: 10px;
+  height: 28px;
+}
+
+.stats-bar-label {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.8rem;
+  color: var(--text-dim);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.stats-bar-label.clickable {
+  color: var(--cyan);
+  cursor: pointer;
+}
+
+.stats-bar-label.clickable:hover {
+  color: var(--phosphor);
+  text-decoration: underline;
+}
+
+.stats-bar-track {
+  height: 18px;
+  background: var(--hull-plate);
+  border-radius: 3px;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.04);
+}
+
+.stats-bar-fill {
+  height: 100%;
+  background: var(--phosphor-dim);
+  border-radius: 2px;
+  transition: width 0.4s ease;
+  min-width: 2px;
+}
+
+.stats-bar-base {
+  background: var(--amber);
+  opacity: 0.7;
+}
+
+.stats-bar-depth {
+  background: var(--violet);
+  opacity: 0.8;
+}
+
+.stats-bar-value {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.75rem;
+  color: var(--text-ghost);
+  text-align: right;
+  white-space: nowrap;
+}
+
+.stats-bar-sub {
+  color: var(--text-ghost);
+  opacity: 0.6;
+}
+
+.stats-footer {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.7rem;
+  color: var(--text-ghost);
+  text-align: center;
+  margin-top: 24px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255,255,255,0.04);
+}
+
 @media (max-width: 768px) {
   html { font-size: 14px; }
   .layout { flex-direction: column; }
@@ -1497,6 +1628,9 @@ body.antag-active .antag-toggle {
   .reagent-grid { grid-template-columns: 1fr; }
   .calc-results { grid-template-columns: 1fr; }
   .detail-panel { width: 100%; right: -100%; }
+  .stats-bar-row { grid-template-columns: 100px 1fr 60px; gap: 6px; }
+  .stats-bar-label { font-size: 0.7rem; }
+  .stats-overview { grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 8px; }
   header { flex-direction: column; align-items: stretch; height: auto; padding: 10px 14px; }
   .header-right { max-width: 100%; }
 }

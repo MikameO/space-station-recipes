@@ -334,6 +334,7 @@ function renderCurrentTab() {
   if (activeTab === 'reagents') renderReagents(query);
   else if (activeTab === 'reactions') renderReactions(query);
   else if (activeTab === 'graph') renderGraph();
+  else if (activeTab === 'stats') renderStatsTab();
   else if (activeTab === 'antag') { renderAntagStrategies(); renderDeliveryMechanisms(); }
   // calculator and trees tabs have their own autocomplete — no re-render needed on filter change
 }
@@ -1678,6 +1679,151 @@ function showToast(msg) {
   toast.textContent = msg;
   toast.classList.add('show');
   setTimeout(() => toast.classList.remove('show'), 2000);
+}
+
+// ─────────────────────────────────────────────
+// Stats Tab
+// ─────────────────────────────────────────────
+
+let statsRendered = false;
+
+function computeTreeDepth(reagentId, visited = new Set()) {
+  if (DATA.baseChemicals.includes(reagentId) || visited.has(reagentId)) return 0;
+  const rxns = Object.values(DATA.reactions).filter(rx => rx.products[reagentId]);
+  if (rxns.length === 0) return 0;
+  const rxn = rxns[0];
+  visited = new Set(visited);
+  visited.add(reagentId);
+  let maxChild = 0;
+  for (const [reactId, info] of Object.entries(rxn.reactants)) {
+    if (info.catalyst) continue;
+    const d = computeTreeDepth(reactId, visited);
+    if (d > maxChild) maxChild = d;
+  }
+  return maxChild + 1;
+}
+
+function renderStatsTab() {
+  if (statsRendered) return;
+  statsRendered = true;
+
+  const container = document.getElementById('statsTabContent');
+  const reagents = DATA.reagents;
+  const reactions = DATA.reactions;
+  const forks = DATA.meta?.forks || {};
+
+  const totalReagents = Object.keys(reagents).length;
+  const totalReactions = Object.keys(reactions).length;
+  const totalBase = DATA.baseChemicals.length;
+  const totalForks = Object.keys(forks).length;
+  const totalEdges = DATA.edges.length;
+
+  // --- Overview Cards ---
+  let html = `<div class="stats-overview">
+    <div class="stats-card"><div class="stats-card-value">${totalReagents}</div><div class="stats-card-label">Reagents</div></div>
+    <div class="stats-card"><div class="stats-card-value">${totalReactions}</div><div class="stats-card-label">Reactions</div></div>
+    <div class="stats-card"><div class="stats-card-value">${totalBase}</div><div class="stats-card-label">Base Chemicals</div></div>
+    <div class="stats-card"><div class="stats-card-value">${totalEdges}</div><div class="stats-card-label">Graph Edges</div></div>
+    <div class="stats-card"><div class="stats-card-value">${totalForks}</div><div class="stats-card-label">Forks</div></div>
+  </div>`;
+
+  // --- Fork Comparison ---
+  const maxForkReagents = Math.max(...Object.values(forks).map(f => f.reagentCount || 0));
+  html += `<div class="stats-section"><h3 class="stats-section-title">Fork Comparison</h3><div class="stats-bars">`;
+  for (const [fid, meta] of Object.entries(forks)) {
+    const pct = maxForkReagents > 0 ? (meta.reagentCount / maxForkReagents * 100) : 0;
+    const rxCount = meta.reactionCount || 0;
+    html += `<div class="stats-bar-row">
+      <span class="stats-bar-label">${esc(meta.name)}</span>
+      <div class="stats-bar-track">
+        <div class="stats-bar-fill" style="width:${pct}%;background:${meta.color}"></div>
+      </div>
+      <span class="stats-bar-value">${meta.reagentCount} <span class="stats-bar-sub">(${rxCount} rxn)</span></span>
+    </div>`;
+  }
+  html += `</div></div>`;
+
+  // --- Category Distribution ---
+  const catCounts = {};
+  for (const r of Object.values(reagents)) {
+    const cat = r.category || 'Uncategorized';
+    catCounts[cat] = (catCounts[cat] || 0) + 1;
+  }
+  const sortedCats = Object.entries(catCounts).sort((a, b) => b[1] - a[1]).slice(0, 15);
+  const maxCat = sortedCats.length > 0 ? sortedCats[0][1] : 1;
+
+  html += `<div class="stats-section"><h3 class="stats-section-title">Top Categories</h3><div class="stats-bars">`;
+  for (const [cat, count] of sortedCats) {
+    const pct = (count / maxCat * 100);
+    html += `<div class="stats-bar-row">
+      <span class="stats-bar-label">${esc(cat)}</span>
+      <div class="stats-bar-track">
+        <div class="stats-bar-fill" style="width:${pct}%"></div>
+      </div>
+      <span class="stats-bar-value">${count}</span>
+    </div>`;
+  }
+  html += `</div></div>`;
+
+  // --- Most Used Base Chemicals ---
+  const baseCounts = {};
+  for (const rxn of Object.values(reactions)) {
+    for (const reactId of Object.keys(rxn.reactants)) {
+      if (DATA.baseChemicals.includes(reactId)) {
+        baseCounts[reactId] = (baseCounts[reactId] || 0) + 1;
+      }
+    }
+  }
+  const sortedBases = Object.entries(baseCounts).sort((a, b) => b[1] - a[1]).slice(0, 10);
+  const maxBase = sortedBases.length > 0 ? sortedBases[0][1] : 1;
+
+  html += `<div class="stats-section"><h3 class="stats-section-title">Most Used Base Chemicals</h3><div class="stats-bars">`;
+  for (const [id, count] of sortedBases) {
+    const r = reagents[id];
+    const name = r ? (r.name || id) : id;
+    const pct = (count / maxBase * 100);
+    html += `<div class="stats-bar-row">
+      <span class="stats-bar-label clickable" onclick="openDetail('${id}')">${esc(name)}</span>
+      <div class="stats-bar-track">
+        <div class="stats-bar-fill stats-bar-base" style="width:${pct}%"></div>
+      </div>
+      <span class="stats-bar-value">${count} rxn</span>
+    </div>`;
+  }
+  html += `</div></div>`;
+
+  // --- Most Complex Recipes (deepest craft trees) ---
+  const depths = [];
+  for (const [id, r] of Object.entries(reagents)) {
+    if (DATA.baseChemicals.includes(id)) continue;
+    const d = computeTreeDepth(id);
+    if (d >= 3) depths.push({ id, name: r.name || id, depth: d });
+  }
+  depths.sort((a, b) => b.depth - a.depth);
+  const top10 = depths.slice(0, 10);
+
+  if (top10.length > 0) {
+    const maxDepth = top10[0].depth;
+    html += `<div class="stats-section"><h3 class="stats-section-title">Most Complex Recipes</h3><div class="stats-bars">`;
+    for (const item of top10) {
+      const pct = (item.depth / maxDepth * 100);
+      html += `<div class="stats-bar-row">
+        <span class="stats-bar-label clickable" onclick="openDetail('${item.id}')">${esc(item.name)}</span>
+        <div class="stats-bar-track">
+          <div class="stats-bar-fill stats-bar-depth" style="width:${pct}%"></div>
+        </div>
+        <span class="stats-bar-value">${item.depth} steps</span>
+      </div>`;
+    }
+    html += `</div></div>`;
+  }
+
+  // --- Generated timestamp ---
+  if (DATA.meta?.generated) {
+    html += `<div class="stats-footer">Data generated: ${esc(DATA.meta.generated)}</div>`;
+  }
+
+  container.innerHTML = html;
 }
 
 // ─────────────────────────────────────────────
