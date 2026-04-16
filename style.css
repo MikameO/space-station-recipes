@@ -1786,63 +1786,66 @@ body.antag-active .antag-toggle {
   z-index: 99;
   flex-shrink: 0;
 }
+.disclaimer-bar-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  height: 100%;
+  background: none;
+  border: none;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  padding: 0;
+}
 .disclaimer-bar-icon {
   font-size: 0.8rem;
   opacity: 0.6;
 }
 .disclaimer-bar-text {
-  color: var(--phosphor-dim);
-  text-decoration: none;
   opacity: 0.85;
-  transition: opacity 0.2s;
 }
-.disclaimer-bar-text:hover {
-  opacity: 1;
-  text-decoration: underline;
+.disclaimer-bar-chevron {
+  font-size: 0.55rem;
+  opacity: 0.4;
+  transition: transform 0.25s;
 }
+.disclaimer-bar.open .disclaimer-bar-chevron {
+  transform: rotate(180deg);
+}
+.disclaimer-bar-toggle:hover .disclaimer-bar-text { opacity: 1; }
+.disclaimer-bar-toggle:hover .disclaimer-bar-chevron { opacity: 0.7; }
 body.antag-active .disclaimer-bar {
   background: rgba(255,61,90,0.06);
   border-bottom-color: rgba(255,61,90,0.12);
 }
 
-/* ── SITE FOOTER ── */
-.site-footer {
-  flex-shrink: 0;
+/* ── DISCLAIMER COLLAPSIBLE PANEL ── */
+.disclaimer-panel {
   background: var(--hull-plate);
-  border-top: 1px solid var(--border-subtle);
-  padding: 24px 32px;
+  border-bottom: 1px solid var(--border-subtle);
+  padding: 14px 32px;
   text-align: center;
   font-family: 'Share Tech Mono', monospace;
-  font-size: 0.7rem;
+  font-size: 0.68rem;
   line-height: 1.7;
   color: var(--text-ghost);
+  flex-shrink: 0;
 }
-.footer-disclaimer p {
-  max-width: 720px;
-  margin: 0 auto;
-}
-.footer-disclaimer a {
+.disclaimer-panel[hidden] { display: none; }
+.disclaimer-panel p { max-width: 720px; margin: 0 auto; }
+.disclaimer-panel a {
   color: var(--phosphor-dim);
   text-decoration: none;
   border-bottom: 1px solid rgba(57,255,133,0.2);
-  transition: color 0.2s, border-color 0.2s;
 }
-.footer-disclaimer a:hover {
-  color: var(--phosphor);
-  border-bottom-color: var(--phosphor);
-}
-.footer-disclaimer em {
-  color: var(--text-sub);
-}
-.footer-disclaimer strong {
-  color: var(--text-sub);
-  font-weight: 600;
-}
-.footer-copy {
-  margin-top: 10px;
-  opacity: 0.6;
-  font-size: 0.65rem;
-}
+.disclaimer-panel a:hover { color: var(--phosphor); border-bottom-color: var(--phosphor); }
+.disclaimer-panel em { color: var(--text-sub); }
+.disclaimer-panel strong { color: var(--text-sub); font-weight: 600; }
+.disclaimer-panel-copy { margin-top: 8px; opacity: 0.6; font-size: 0.62rem; }
+
 
 /* ── LOADING DISCLAIMER ── */
 .loading-disclaimer {
@@ -1901,12 +1904,12 @@ body.antag-active .disclaimer-bar {
   .stats-overview { grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 8px; }
   header { flex-direction: column; align-items: stretch; height: auto; padding: 10px 14px; }
   .header-right { max-width: 100%; }
-  .disclaimer-bar { font-size: 0.62rem; height: 28px; gap: 5px; }
+  .disclaimer-bar { font-size: 0.62rem; height: 28px; }
   .disclaimer-bar-icon { font-size: 0.7rem; }
+  .disclaimer-bar-chevron { display: none; }
   .layout { flex: 1; min-height: 0; }
-  .site-footer { padding: 8px 12px; font-size: 0.56rem; line-height: 1.5; }
-  .footer-disclaimer p { max-width: 100%; }
-  .footer-copy { margin-top: 4px; }
+  .disclaimer-panel { padding: 10px 14px; font-size: 0.58rem; }
+  .disclaimer-panel-copy { font-size: 0.52rem; }
   .loading-disclaimer { font-size: 0.6rem; max-width: 90vw; padding: 8px 10px; margin-bottom: 20px; }
   .loading-disclaimer br { display: none; }
 }

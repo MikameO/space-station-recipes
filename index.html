@@ -49,8 +49,15 @@
 </header>
 
 <div class="disclaimer-bar" role="banner">
-  <span class="disclaimer-bar-icon">&#9888;</span>
-  <a href="#site-footer" class="disclaimer-bar-text">Space Station 14 fictional game data &mdash; not real-world chemistry</a>
+  <button class="disclaimer-bar-toggle" id="disclaimerToggle" aria-expanded="false" aria-controls="disclaimerPanel">
+    <span class="disclaimer-bar-icon">&#9888;</span>
+    <span class="disclaimer-bar-text">Space Station 14 fictional game data &mdash; not real-world chemistry</span>
+    <span class="disclaimer-bar-chevron">&#9660;</span>
+  </button>
+</div>
+<div class="disclaimer-panel" id="disclaimerPanel" hidden>
+  <p><strong>NanoTrasen ChemDB</strong> is an unofficial community tool for <a href="https://spacestation14.com" target="_blank" rel="noopener noreferrer">Space Station 14</a>, an open-source multiplayer game. All content&nbsp;&mdash; including reagent names, chemical formulas, synthesis recipes, toxicity ratings, delivery methods, and antagonist strategies&nbsp;&mdash; describes <em>fictional in-game mechanics</em>. Real chemical names are used by the game for flavor; the properties, reactions, and effects shown here do not reflect real-world chemistry. This site provides no real-world medical, chemical, or safety guidance.</p>
+  <p class="disclaimer-panel-copy">&copy; 2025 MikameO &middot; Not affiliated with or endorsed by the SS14 development team</p>
 </div>
 
 <button class="sidebar-collapse" id="sidebarCollapse" title="Collapse sidebar">&#9664;</button>
@@ -235,13 +242,6 @@
   <button class="detail-close" id="detailClose">&times;</button>
   <div id="detailContent"></div>
 </aside>
-
-<footer class="site-footer" id="site-footer">
-  <div class="footer-disclaimer">
-    <p><strong>NanoTrasen ChemDB</strong> is an unofficial community tool for <a href="https://spacestation14.com" target="_blank" rel="noopener noreferrer">Space Station 14</a>, an open-source multiplayer game. All content&nbsp;&mdash; including reagent names, chemical formulas, synthesis recipes, toxicity ratings, delivery methods, and antagonist strategies&nbsp;&mdash; describes <em>fictional in-game mechanics</em>. Real chemical names are used by the game for flavor; the properties, reactions, and effects shown here do not reflect real-world chemistry. This site provides no real-world medical, chemical, or safety guidance.</p>
-    <p class="footer-copy">&copy; 2025 MikameO &middot; Not affiliated with or endorsed by the SS14 development team &middot; <a href="https://github.com/MikameO/space-station-recipes" target="_blank" rel="noopener noreferrer">GitHub</a> &middot; <a href="https://github.com/MikameO/space-station-recipes/issues" target="_blank" rel="noopener noreferrer">Feedback</a></p>
-  </div>
-</footer>
 
 <div class="toast" id="toast"></div>
 

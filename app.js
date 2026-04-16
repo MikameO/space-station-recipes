@@ -60,6 +60,7 @@ async function init() {
   setupReverseLookup();
   setupBatchPlanner();
   setupShareButton();
+  setupDisclaimer();
   setupAntagMode();
   setupSortSelect();
   decodeURLState();
@@ -1742,6 +1743,18 @@ function setupShareButton() {
       document.execCommand('copy'); document.body.removeChild(ta);
       showToast('Link copied!');
     });
+  });
+}
+
+function setupDisclaimer() {
+  const toggle = document.getElementById('disclaimerToggle');
+  const panel = document.getElementById('disclaimerPanel');
+  if (!toggle || !panel) return;
+  toggle.addEventListener('click', () => {
+    const open = !panel.hidden;
+    panel.hidden = open;
+    toggle.setAttribute('aria-expanded', !open);
+    toggle.closest('.disclaimer-bar').classList.toggle('open', !open);
   });
 }
 
