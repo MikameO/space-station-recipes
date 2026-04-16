@@ -850,8 +850,30 @@ function setupCalculator() {
     if (!selectedCalcId) return;
     const amount = parseFloat(document.getElementById('calcAmount').value) || 30;
     const result = calculateIngredients(selectedCalcId, amount);
+    document.getElementById('batchResults').innerHTML = '';
+    document.getElementById('batchWarnings').innerHTML = '';
     renderCalcResults(selectedCalcId, amount, result);
   });
+}
+
+function mergeSteps(steps) {
+  const stepMap = new Map();
+  for (const step of steps) {
+    if (stepMap.has(step.reagentId)) {
+      const existing = stepMap.get(step.reagentId);
+      existing.amount += step.amount;
+      existing.depth = Math.max(existing.depth, step.depth);
+      for (let i = 0; i < existing.reactants.length; i++) {
+        existing.reactants[i].amount += step.reactants[i].amount;
+      }
+    } else {
+      stepMap.set(step.reagentId, {
+        ...step,
+        reactants: step.reactants.map(r => ({ ...r })),
+      });
+    }
+  }
+  return [...stepMap.values()];
 }
 
 function calculateIngredients(targetId, targetAmount) {
@@ -900,8 +922,9 @@ function calculateIngredients(targetId, targetAmount) {
   }
 
   resolve(targetId, targetAmount, 0);
-  steps.sort((a, b) => b.depth - a.depth);
-  return { baseNeeds, steps };
+  const merged = mergeSteps(steps);
+  merged.sort((a, b) => b.depth - a.depth);
+  return { baseNeeds, steps: merged };
 }
 
 function renderCalcResults(targetId, amount, result) {
@@ -1357,6 +1380,7 @@ function setupBatchPlanner() {
 
   document.getElementById('batchPlanBtn').addEventListener('click', () => {
     if (batchTargets.length === 0) return;
+    document.getElementById('calcResults').innerHTML = '';
     const result = planBatch(batchTargets);
     renderBatchResults(result, resultsDiv, warningsDiv);
   });
@@ -1374,26 +1398,18 @@ function setupBatchPlanner() {
 
 function planBatch(targets) {
   const totalBase = {};
-  const stepMap = new Map(); // reagentId -> step with accumulated amount
+  const allRawSteps = [];
 
   for (const { id, amount } of targets) {
     const result = calculateIngredients(id, amount);
     for (const [reagentId, amt] of Object.entries(result.baseNeeds)) {
       totalBase[reagentId] = (totalBase[reagentId] || 0) + amt;
     }
-    for (const step of result.steps) {
-      if (stepMap.has(step.reagentId)) {
-        stepMap.get(step.reagentId).amount += step.amount;
-        // Recalculate reactant amounts
-        const ratio = step.amount / (stepMap.get(step.reagentId).amount - step.amount + step.amount);
-        // Keep the step, amounts already accumulated
-      } else {
-        stepMap.set(step.reagentId, { ...step, reactants: step.reactants.map(r => ({ ...r })) });
-      }
-    }
+    allRawSteps.push(...result.steps);
   }
 
-  const allSteps = [...stepMap.values()].sort((a, b) => b.depth - a.depth);
+  const allSteps = mergeSteps(allRawSteps);
+  allSteps.sort((a, b) => b.depth - a.depth);
   return { totalBase, allSteps, targets };
 }
 
