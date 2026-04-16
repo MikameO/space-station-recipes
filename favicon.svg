@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <defs>
+    <linearGradient id="liquid" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#39ff85" stop-opacity="0.25"/>
+      <stop offset="100%" stop-color="#39ff85" stop-opacity="0.65"/>
+    </linearGradient>
+    <style>
+      @media (prefers-color-scheme: light) {
+        .bg { fill: #1a1f2e; }
+      }
+    </style>
+  </defs>
+  <!-- Background -->
+  <rect class="bg" width="128" height="128" rx="16" fill="#06090f"/>
+  <!-- Beaker (Erlenmeyer flask) -->
+  <g transform="translate(24, 8)">
+    <!-- Neck -->
+    <rect x="26" y="4" width="28" height="28" fill="none" stroke="#39ff85" stroke-width="5" rx="2"/>
+    <!-- Body -->
+    <path d="M26,32 L6,74 Q0,88 12,96 L68,96 Q80,88 74,74 L54,32"
+          fill="none" stroke="#39ff85" stroke-width="5" stroke-linejoin="round"/>
+    <!-- Liquid fill -->
+    <path d="M16,72 Q10,84 16,92 L64,92 Q70,84 64,72 Z"
+          fill="url(#liquid)"/>
+    <!-- Bubbles -->
+    <circle cx="32" cy="78" r="3.5" fill="none" stroke="#39ff85" stroke-width="2" opacity="0.6"/>
+    <circle cx="50" cy="84" r="4.5" fill="none" stroke="#39ff85" stroke-width="2" opacity="0.5"/>
+  </g>
+</svg>
