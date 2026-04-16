@@ -594,9 +594,13 @@ function openDetail(reagentId, pushHistory = true) {
   let treeHTML = '';
   if (!r.isBase) {
     const tree = buildCraftTree(reagentId, 1);
-    treeHTML = `<input type="number" id="detailTreeAmount" class="tree-amount-input"
-      value="1" min="1" max="9999" step="1" oninput="rebuildDetailTree()"
-      title="Target amount (units)">
+    treeHTML = `<div class="tree-amount-row">
+      <label for="detailTreeAmount">Target</label>
+      <input type="number" id="detailTreeAmount" class="tree-amount-input"
+        value="1" min="1" max="9999" step="1" oninput="rebuildDetailTree()"
+        title="Target amount (units)">
+      <span class="tree-amount-unit">u</span>
+    </div>
     <div id="detailTreeOutput">${renderTreeHTML(tree)}</div>`;
   }
 

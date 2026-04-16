@@ -889,7 +889,23 @@ main {
   font-size: 0.75rem; border-radius: 2px; text-align: center;
 }
 .tree-amount-input:focus { border-color: var(--phosphor); outline: none; }
-.detail-section .tree-amount-input { margin-bottom: 8px; }
+
+.tree-amount-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+.tree-amount-row label {
+  font-size: 0.68rem;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.tree-amount-unit {
+  font-size: 0.68rem;
+  color: var(--text-ghost);
+}
 
 .tree-output { padding: 4px; }
 
