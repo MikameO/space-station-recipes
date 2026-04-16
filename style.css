@@ -1371,6 +1371,11 @@ body.antag-active {
 }
 body.antag-active .accent { color: var(--red-alert); }
 
+/* Logo toggle: NanoTrasen ↔ Syndicate */
+.logo-antag { display: none; }
+.antag-active .logo-normal { display: none; }
+.antag-active .logo-antag { display: inline; }
+
 /* Antag toggle button */
 .antag-toggle {
   display: flex; align-items: center; gap: 5px;

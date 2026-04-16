@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 200" width="800" height="200">
+  <defs>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <filter id="glow-strong">
+      <feGaussianBlur stdDeviation="6" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <linearGradient id="liquid" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ff3d5a" stop-opacity="0.3"/>
+      <stop offset="100%" stop-color="#ff3d5a" stop-opacity="0.7"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="800" height="200" fill="#0f0609" rx="8"/>
+
+  <!-- Skull icon -->
+  <g transform="translate(80, 30)" filter="url(#glow)">
+    <!-- Skull outline -->
+    <ellipse cx="60" cy="50" rx="50" ry="55" fill="none" stroke="#ff3d5a" stroke-width="3"/>
+    <!-- Jaw -->
+    <path d="M25,75 Q25,110 40,115 L50,115 L50,100 L60,105 L70,100 L70,115 L80,115 Q95,110 95,75"
+          fill="none" stroke="#ff3d5a" stroke-width="3"/>
+    <!-- Left eye -->
+    <ellipse cx="42" cy="42" rx="14" ry="16" fill="#ff3d5a" opacity="0.3" stroke="#ff3d5a" stroke-width="2"/>
+    <!-- Right eye -->
+    <ellipse cx="78" cy="42" rx="14" ry="16" fill="#ff3d5a" opacity="0.3" stroke="#ff3d5a" stroke-width="2"/>
+    <!-- Nose -->
+    <path d="M55,62 L60,70 L65,62" fill="none" stroke="#ff3d5a" stroke-width="2"/>
+  </g>
+
+  <!-- Text: Syndicate -->
+  <text x="220" y="95" font-family="'Share Tech Mono', 'Courier New', monospace"
+        font-size="52" font-weight="400" fill="#ff3d5a" filter="url(#glow)" letter-spacing="3">
+    Syndicate
+  </text>
+
+  <!-- Text: ChemDB -->
+  <text x="220" y="152" font-family="'Oxanium', 'Courier New', monospace"
+        font-size="58" font-weight="700" fill="#ff3d5a" filter="url(#glow-strong)" letter-spacing="5">
+    ChemDB
+  </text>
+
+  <!-- Decorative line -->
+  <line x1="220" y1="105" x2="720" y2="105" stroke="#ff3d5a" stroke-width="1" opacity="0.2"/>
+
+  <!-- Classification badge -->
+  <text x="720" y="170" font-family="'Share Tech Mono', 'Courier New', monospace"
+        font-size="14" fill="#ff3d5a" opacity="0.6" text-anchor="end">
+    CLASSIFIED // ANTAG
+  </text>
+
+  <!-- Scanline effect -->
+  <pattern id="scanlines" width="4" height="4" patternUnits="userSpaceOnUse">
+    <rect width="4" height="2" fill="transparent"/>
+    <rect y="2" width="4" height="2" fill="#000" opacity="0.1"/>
+  </pattern>
+  <rect width="800" height="200" fill="url(#scanlines)" rx="8"/>
+</svg>
