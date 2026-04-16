@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 120" width="520" height="120">
+  <defs>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="2" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <filter id="glow-strong">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Skull icon — compact -->
+  <g transform="translate(18, 10) scale(0.7)" filter="url(#glow)">
+    <ellipse cx="60" cy="50" rx="50" ry="55" fill="none" stroke="#ff3d5a" stroke-width="3"/>
+    <path d="M25,75 Q25,110 40,115 L50,115 L50,100 L60,105 L70,100 L70,115 L80,115 Q95,110 95,75"
+          fill="none" stroke="#ff3d5a" stroke-width="3"/>
+    <ellipse cx="42" cy="42" rx="14" ry="16" fill="#ff3d5a" opacity="0.3" stroke="#ff3d5a" stroke-width="2"/>
+    <ellipse cx="78" cy="42" rx="14" ry="16" fill="#ff3d5a" opacity="0.3" stroke="#ff3d5a" stroke-width="2"/>
+    <path d="M55,62 L60,70 L65,62" fill="none" stroke="#ff3d5a" stroke-width="2"/>
+  </g>
+
+  <!-- Text: Syndicate -->
+  <text x="130" y="48" font-family="'Share Tech Mono', 'Courier New', monospace"
+        font-size="32" font-weight="400" fill="#ff3d5a" filter="url(#glow)" letter-spacing="2">
+    Syndicate
+  </text>
+
+  <!-- Text: ChemDB -->
+  <text x="130" y="90" font-family="'Oxanium', 'Courier New', monospace"
+        font-size="40" font-weight="700" fill="#ff3d5a" filter="url(#glow-strong)" letter-spacing="4">
+    ChemDB
+  </text>
+
+  <!-- Decorative line -->
+  <line x1="130" y1="56" x2="490" y2="56" stroke="#ff3d5a" stroke-width="1" opacity="0.15"/>
+</svg>

@@ -139,7 +139,13 @@ header h1 {
   white-space: nowrap;
 }
 
-.header-icon { width: 30px; height: 30px; vertical-align: middle; margin-right: 8px; }
+.header-icon {
+  width: 30px; height: 30px; vertical-align: middle; margin-right: 8px;
+  filter: drop-shadow(0 0 3px rgba(57,255,133,0.5)) drop-shadow(0 0 7px rgba(57,255,133,0.2));
+}
+.antag-active .header-icon {
+  filter: drop-shadow(0 0 3px rgba(255,61,90,0.5)) drop-shadow(0 0 7px rgba(255,61,90,0.2));
+}
 
 .accent {
   color: var(--phosphor);

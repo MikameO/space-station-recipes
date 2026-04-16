@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 120" width="520" height="120">
+  <defs>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="2" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <filter id="glow-strong">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <linearGradient id="liquid" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#39ff85" stop-opacity="0.3"/>
+      <stop offset="100%" stop-color="#39ff85" stop-opacity="0.7"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Beaker icon (Erlenmeyer flask) — compact -->
+  <g transform="translate(4, 6) scale(0.75)" filter="url(#glow)">
+    <rect x="48" y="0" width="48" height="50" fill="none" stroke="#39ff85" stroke-width="3" rx="2"/>
+    <path d="M48,50 L20,110 Q12,130 30,140 L114,140 Q132,130 124,110 L96,50"
+          fill="none" stroke="#39ff85" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M36,100 Q30,120 38,132 L106,132 Q114,120 108,100 Z"
+          fill="url(#liquid)" opacity="0.6"/>
+    <circle cx="60" cy="108" r="4" fill="none" stroke="#39ff85" stroke-width="1.5" opacity="0.6"/>
+    <circle cx="80" cy="98" r="3" fill="none" stroke="#39ff85" stroke-width="1.5" opacity="0.4"/>
+    <circle cx="90" cy="114" r="5" fill="none" stroke="#39ff85" stroke-width="1.5" opacity="0.5"/>
+  </g>
+
+  <!-- Text: NanoTrasen -->
+  <text x="130" y="48" font-family="'Share Tech Mono', 'Courier New', monospace"
+        font-size="32" font-weight="400" fill="#39ff85" filter="url(#glow)" letter-spacing="2">
+    NanoTrasen
+  </text>
+
+  <!-- Text: ChemDB -->
+  <text x="130" y="90" font-family="'Oxanium', 'Courier New', monospace"
+        font-size="40" font-weight="700" fill="#39ff85" filter="url(#glow-strong)" letter-spacing="4">
+    ChemDB
+  </text>
+
+  <!-- Decorative line -->
+  <line x1="130" y1="56" x2="490" y2="56" stroke="#39ff85" stroke-width="1" opacity="0.15"/>
+</svg>
