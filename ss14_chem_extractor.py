@@ -1,3 +1,8 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# Copyright (C) 2025 MikameO
+# This file is part of Space Station Recipes.
+# See LICENSE for details.
+
 """
 SS14 Chemistry Database Extractor
 Fetches all reagent/reaction YAML prototypes from SS14 + RMC14 repos,

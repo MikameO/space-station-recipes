@@ -8,7 +8,7 @@
 
 Search reagents, plan reactions, explore craft trees, and calculate batch recipes across 8 community forks.
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-22c55e?style=flat-square)](LICENSE)
+[![License: GPL-3.0](https://img.shields.io/badge/License-GPL--3.0-22c55e?style=flat-square)](LICENSE)
 ![Reagents](https://img.shields.io/badge/Reagents-683-39ff85?style=flat-square)
 ![Reactions](https://img.shields.io/badge/Reactions-607-00e5ff?style=flat-square)
 ![Forks](https://img.shields.io/badge/Forks-8-ffb627?style=flat-square)
@@ -82,4 +82,4 @@ sprites/            Reagent sprite assets (pixel art)
 
 ## License
 
-[MIT](LICENSE)
+[GPL-3.0-only](LICENSE) — see [NOTICES](NOTICES) for third-party attributions.

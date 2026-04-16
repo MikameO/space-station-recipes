@@ -1,0 +1,46 @@
+Third-Party Notices for Space Station Recipes
+══════════════════════════════════════════════
+
+This project incorporates or derives from the following third-party works.
+Each retains its original license and copyright.
+
+
+1. Space Station 14 — Game Assets & Prototype Data
+───────────────────────────────────────────────────
+   Source:    https://github.com/space-wizards/space-station-14
+   License:   MIT
+   Copyright: Copyright (c) Space Station 14 Contributors
+
+   The sprite assets in sprites/ and the chemistry prototype data compiled
+   into data.json are sourced from Space Station 14 and the following
+   community forks:
+
+     - Vanilla SS14     space-wizards/space-station-14
+     - RMC14            RMC-14/RMC-14
+     - Goob Station     Goob-Station/Goob-Station
+     - Funky Station    funky-station/funky-station
+     - Delta-V          DeltaV-Station/Delta-v
+     - Starlight        starlight-station/starlight
+     - Frontier         new-frontiers-14/frontier-station-14
+     - Dead Space       Dead-Space-14/dead-space-14
+
+   All listed forks are MIT-licensed or MIT-compatible at the time of
+   data extraction. Per the MIT license, the original copyright notice
+   is preserved here.
+
+
+2. vis-network
+──────────────
+   Source:    https://github.com/visjs/vis-network
+   Version:  9.1.6
+   License:  MIT (Apache-2.0 / MIT dual license)
+   Copyright: Copyright (c) vis.js contributors
+   Usage:    Loaded via CDN at runtime (not distributed with this project)
+
+
+3. Google Fonts
+───────────────
+   Fonts:    Share Tech Mono, Chakra Petch, Oxanium
+   Source:   https://fonts.google.com/
+   License:  SIL Open Font License 1.1
+   Usage:    Loaded via Google Fonts CDN at runtime

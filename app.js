@@ -1,4 +1,11 @@
-/* SS14 Chemistry Database — Interactive Frontend */
+/*
+ * SPDX-License-Identifier: GPL-3.0-only
+ * Copyright (C) 2025 MikameO
+ * This file is part of Space Station Recipes.
+ * See LICENSE for details.
+ *
+ * SS14 Chemistry Database — Interactive Frontend
+ */
 
 let DATA = null;
 let searchIndex = [];

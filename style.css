@@ -1,7 +1,14 @@
-/* ══════════════════════════════════════════════════════════════
-   SS14 Chemistry Database — "NanoTrasen Lab Terminal" Theme
-   A space station chemist's workstation console interface
-   ══════════════════════════════════════════════════════════════ */
+/*
+ * SPDX-License-Identifier: GPL-3.0-only
+ * Copyright (C) 2025 MikameO
+ * This file is part of Space Station Recipes.
+ * See LICENSE for details.
+ *
+ * ══════════════════════════════════════════════════════════════
+ * SS14 Chemistry Database — "NanoTrasen Lab Terminal" Theme
+ * A space station chemist's workstation console interface
+ * ══════════════════════════════════════════════════════════════
+ */
 
 @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Chakra+Petch:wght@400;600;700&family=Oxanium:wght@400;600;700&display=swap');
 
@@ -132,7 +139,7 @@ header h1 {
   white-space: nowrap;
 }
 
-.header-icon { width: 22px; height: 22px; vertical-align: middle; margin-right: 6px; }
+.header-icon { width: 30px; height: 30px; vertical-align: middle; margin-right: 8px; }
 
 .accent {
   color: var(--phosphor);
