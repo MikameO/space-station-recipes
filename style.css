@@ -1890,7 +1890,7 @@ body.antag-active .disclaimer-bar {
   }
   .tab-bar { -webkit-overflow-scrolling: touch; scrollbar-width: none; }
   .tab-bar::-webkit-scrollbar { display: none; }
-  .tab-btn { font-size: 0.65rem; padding: 10px 12px; }
+  .tab-btn { font-size: 0.7rem; padding: 12px 16px; min-height: 44px; }
   .sidebar-content { display: none; }
   .sidebar-content.open { display: block; }
   .reagent-grid { grid-template-columns: 1fr; }

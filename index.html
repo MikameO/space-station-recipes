@@ -36,7 +36,7 @@
   </div>
   <div class="header-right">
     <input type="text" id="searchInput" class="search-input" placeholder="Search reagents, reactions, effects..." autocomplete="off" aria-label="Search reagents, reactions, effects">
-    <span class="result-count" id="resultCount"></span>
+    <span class="result-count" id="resultCount" aria-live="polite" aria-atomic="true"></span>
     <button class="antag-toggle" id="antagToggle" title="Toggle Antag Mode">
       <span class="antag-icon">&#9760;</span>
       <span class="antag-label">ANTAG</span>
@@ -109,17 +109,17 @@
 
   <main>
     <div class="tab-bar" role="tablist">
-      <button class="tab-btn active" data-tab="reagents" role="tab" aria-selected="true">Reagents</button>
-      <button class="tab-btn" data-tab="reactions" role="tab" aria-selected="false">Reactions</button>
-      <button class="tab-btn" data-tab="calculator" role="tab" aria-selected="false">Calculator</button>
-      <button class="tab-btn" data-tab="trees" role="tab" aria-selected="false">Craft Trees</button>
-      <button class="tab-btn" data-tab="graph" role="tab" aria-selected="false">Graph</button>
-      <button class="tab-btn" data-tab="stats" role="tab" aria-selected="false">Stats</button>
-      <button class="tab-btn tab-btn-antag" data-tab="antag" role="tab" aria-selected="false" style="display:none">&#9760; Antag Strategies</button>
+      <button class="tab-btn active" id="btn-reagents" data-tab="reagents" role="tab" aria-selected="true" aria-controls="tab-reagents">Reagents</button>
+      <button class="tab-btn" id="btn-reactions" data-tab="reactions" role="tab" aria-selected="false" aria-controls="tab-reactions">Reactions</button>
+      <button class="tab-btn" id="btn-calculator" data-tab="calculator" role="tab" aria-selected="false" aria-controls="tab-calculator">Calculator</button>
+      <button class="tab-btn" id="btn-trees" data-tab="trees" role="tab" aria-selected="false" aria-controls="tab-trees">Craft Trees</button>
+      <button class="tab-btn" id="btn-graph" data-tab="graph" role="tab" aria-selected="false" aria-controls="tab-graph">Graph</button>
+      <button class="tab-btn" id="btn-stats" data-tab="stats" role="tab" aria-selected="false" aria-controls="tab-stats">Stats</button>
+      <button class="tab-btn tab-btn-antag" id="btn-antag" data-tab="antag" role="tab" aria-selected="false" aria-controls="tab-antag" style="display:none">&#9760; Antag Strategies</button>
     </div>
 
     <!-- Reagents Tab -->
-    <div class="tab-panel active" id="tab-reagents">
+    <div class="tab-panel active" id="tab-reagents" role="tabpanel" aria-labelledby="btn-reagents">
       <div class="sort-bar">
         <label class="sort-label" for="sortSelect">Sort by</label>
         <select class="sort-select" id="sortSelect" aria-label="Sort reagents">
@@ -134,7 +134,7 @@
     </div>
 
     <!-- Reactions Tab -->
-    <div class="tab-panel" id="tab-reactions">
+    <div class="tab-panel" id="tab-reactions" role="tabpanel" aria-labelledby="btn-reactions">
       <table class="data-table" id="reactionsTable">
         <thead>
           <tr>
@@ -151,7 +151,7 @@
     </div>
 
     <!-- Calculator Tab -->
-    <div class="tab-panel" id="tab-calculator">
+    <div class="tab-panel" id="tab-calculator" role="tabpanel" aria-labelledby="btn-calculator">
       <div class="calc-controls">
         <div class="calc-input-group">
           <label>Target Reagent</label>
@@ -196,7 +196,7 @@
     </div>
 
     <!-- Craft Trees Tab -->
-    <div class="tab-panel" id="tab-trees">
+    <div class="tab-panel" id="tab-trees" role="tabpanel" aria-labelledby="btn-trees">
       <div class="tree-controls">
         <input type="text" id="treeTarget" class="search-input" placeholder="Type reagent name..." autocomplete="off" aria-label="Craft tree reagent search">
         <input type="number" id="treeAmount" class="tree-amount-input" value="1" min="1" max="9999" step="1" title="Target amount (units)">
@@ -206,7 +206,7 @@
     </div>
 
     <!-- Graph Tab -->
-    <div class="tab-panel" id="tab-graph">
+    <div class="tab-panel" id="tab-graph" role="tabpanel" aria-labelledby="btn-graph">
       <div class="graph-controls">
         <button class="btn-small" id="graphReset">Reset View</button>
         <button class="btn-small" id="graphPhysics">Toggle Physics</button>
@@ -216,12 +216,12 @@
     </div>
 
     <!-- Stats Tab -->
-    <div class="tab-panel" id="tab-stats">
+    <div class="tab-panel" id="tab-stats" role="tabpanel" aria-labelledby="btn-stats">
       <div id="statsTabContent"></div>
     </div>
 
     <!-- Antag Tab (visible only in Antag Mode) -->
-    <div class="tab-panel" id="tab-antag">
+    <div class="tab-panel" id="tab-antag" role="tabpanel" aria-labelledby="btn-antag">
       <div class="antag-tab-content">
         <div id="antagStrategies"></div>
         <div id="antagDelivery"></div>

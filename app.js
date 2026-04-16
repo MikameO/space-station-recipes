@@ -432,6 +432,9 @@ function renderReagents(query = '') {
     }
     grid.querySelectorAll('.reagent-card').forEach(card => {
       card.addEventListener('click', () => openDetail(card.dataset.id));
+      card.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openDetail(card.dataset.id); }
+      });
     });
   }
   renderBatch();
@@ -445,7 +448,7 @@ function reagentCardHTML(r) {
   const catColor = getCatColor(r.category);
 
   const accent = safeColor(r.color);
-  return `<div class="reagent-card" data-id="${r.id}" style="--card-accent:${accent}; border-top-color:${accent}">
+  return `<div class="reagent-card" data-id="${r.id}" tabindex="0" role="button" aria-label="${esc(capName(r.name || r.id))}" style="--card-accent:${accent}; border-top-color:${accent}">
     <div class="reagent-card-header">
       <span class="color-swatch" style="background:${accent}; box-shadow:0 0 6px ${accent}"></span>
       <span class="reagent-name">${esc(capName(r.name || r.id))}</span>
@@ -995,11 +998,13 @@ function renderGraph() {
   info.textContent = `${nodes.length} nodes, ${edges.length} edges`;
 
   if (nodes.length === 0) {
+    if (graphNetwork) { graphNetwork.destroy(); graphNetwork = null; }
     container.innerHTML = '<div style="padding:40px;text-align:center;color:var(--text-dim)">No reagents match filters. Adjust filters or clear search.</div>';
     return;
   }
 
   if (nodes.length > 400) {
+    if (graphNetwork) { graphNetwork.destroy(); graphNetwork = null; }
     container.innerHTML = `<div style="padding:40px;text-align:center;color:var(--text-dim)">
       ${nodes.length} nodes — select a category filter to reduce graph size for better performance.
       <br><button class="btn-primary" style="margin-top:12px" id="forceGraph">Show Anyway</button>
@@ -1033,6 +1038,7 @@ function initGraph(container, nodes, edges) {
     layout: { improvedLayout: true },
   };
 
+  if (graphNetwork) { graphNetwork.destroy(); graphNetwork = null; }
   graphNetwork = new vis.Network(container, data, options);
   graphPhysicsOn = true;
 
@@ -1125,6 +1131,11 @@ function capName(name) {
 function safeColor(c) {
   if (!c) return '#3d4a5e';
   return /^#[0-9A-Fa-f]{3,8}$/.test(c) ? c : '#3d4a5e';
+}
+
+function safeSel(str) {
+  if (!str) return '';
+  return CSS.escape(str);
 }
 
 // ─────────────────────────────────────────────
@@ -1650,56 +1661,61 @@ function decodeURLState() {
     activateAntagMode();
   }
 
-  // Tab
+  // Tab (whitelist)
   const tab = params.get('tab');
-  if (tab) {
-    const btn = document.querySelector(`.tab-btn[data-tab="${tab}"]`);
+  const validTabs = ['reagents','reactions','calculator','trees','graph','stats','antag'];
+  if (tab && validTabs.includes(tab)) {
+    const btn = document.querySelector(`.tab-btn[data-tab="${safeSel(tab)}"]`);
     if (btn) btn.click();
   }
 
-  // Source
+  // Source (whitelist: 'all' + fork keys)
   const src = params.get('src');
-  if (src) {
-    const radio = document.querySelector(`input[name="source"][value="${src}"]`);
+  const validSources = ['all', ...Object.keys(DATA.meta?.forks || {})];
+  if (src && validSources.includes(src)) {
+    const radio = document.querySelector(`input[name="source"][value="${safeSel(src)}"]`);
     if (radio) { radio.checked = true; activeSource = src; }
   }
 
-  // Base type
+  // Base type (whitelist)
   const bt = params.get('bt');
-  if (bt) {
-    const radio = document.querySelector(`input[name="basetype"][value="${bt}"]`);
+  const validBt = ['all','base','crafted'];
+  if (bt && validBt.includes(bt)) {
+    const radio = document.querySelector(`input[name="basetype"][value="${safeSel(bt)}"]`);
     if (radio) { radio.checked = true; activeBaseType = bt; }
   }
 
-  // Taste filter
+  // Taste filter (whitelist)
   const taste = params.get('taste');
-  if (taste) {
-    const radio = document.querySelector(`input[name="taste"][value="${taste}"]`);
+  const validTaste = ['all','has-taste','tasteless'];
+  if (taste && validTaste.includes(taste)) {
+    const radio = document.querySelector(`input[name="taste"][value="${safeSel(taste)}"]`);
     if (radio) { radio.checked = true; activeTaste = taste; }
   }
 
-  // Sort
+  // Sort (whitelist)
   const sortVal = params.get('sort');
-  if (sortVal) {
+  const validSort = ['name-asc','name-desc','category','used-in','antag-desc'];
+  if (sortVal && validSort.includes(sortVal)) {
     activeSort = sortVal;
     const sortSel = document.getElementById('sortSelect');
     if (sortSel) sortSel.value = sortVal;
   }
 
-  // Categories
+  // Categories (CSS.escape each value)
   const cats = params.get('cats');
   if (cats) {
     cats.split(',').forEach(cat => {
-      const cb = document.querySelector(`#categoryFilters input[value="${cat}"]`);
+      const cb = document.querySelector(`#categoryFilters input[value="${safeSel(cat)}"]`);
       if (cb) { cb.checked = true; activeCategories.add(cat); }
     });
   }
 
-  // Effect tags
+  // Effect tags (CSS.escape each value)
   const fx = params.get('fx');
   if (fx) {
     fx.split(',').forEach(tag => {
-      const btn = document.querySelector(`.effect-tag-btn[data-tag="${tag}"]`);
+      const btn = document.querySelector(`.effect-tag-btn[data-tag="${safeSel(tag)}"]`);
       if (btn) { btn.classList.add('active'); activeEffectTags.add(tag); }
     });
   }
