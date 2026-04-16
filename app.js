@@ -300,6 +300,11 @@ function buildSourceFilters() {
         }
       }
       renderCurrentTab();
+      rebuildTree(); // re-filter Trees tab if a tree is displayed
+      // Re-render open detail panel with new fork context
+      if (selectedReagentId && document.getElementById('detailPanel').classList.contains('open')) {
+        openDetail(selectedReagentId, false);
+      }
     });
   });
 
@@ -585,11 +590,14 @@ function openDetail(reagentId, pushHistory = true) {
     recipeHTML += `<div style="margin-top:6px;font-size:0.72rem;color:var(--accent-green)">Produces: ${products}</div>`;
   }
 
-  // Build mini craft tree
+  // Build mini craft tree with quantity input
   let treeHTML = '';
   if (!r.isBase) {
     const tree = buildCraftTree(reagentId, 1);
-    treeHTML = renderTreeHTML(tree);
+    treeHTML = `<input type="number" id="detailTreeAmount" class="tree-amount-input"
+      value="1" min="1" max="9999" step="1" oninput="rebuildDetailTree()"
+      title="Target amount (units)">
+    <div id="detailTreeOutput">${renderTreeHTML(tree)}</div>`;
   }
 
   // Find all reactions where this reagent is used as an ingredient
@@ -668,9 +676,45 @@ function goBackDetail() {
   openDetail(prevId, false); // false = don't push to history
 }
 
+function rebuildDetailTree() {
+  if (!selectedReagentId) return;
+  const r = DATA.reagents[selectedReagentId];
+  if (!r || r.isBase) return;
+  const input = document.getElementById('detailTreeAmount');
+  if (!input) return;
+  const amount = Math.max(1, parseFloat(input.value) || 1);
+  const tree = buildCraftTree(selectedReagentId, amount);
+  const output = document.getElementById('detailTreeOutput');
+  if (output) output.innerHTML = renderTreeHTML(tree);
+}
+
 // ─────────────────────────────────────────────
 // Craft Trees
 // ─────────────────────────────────────────────
+
+// Returns reactions producing reagentId, filtered by activeSource.
+// Fork-specific reactions are sorted first so rxns[0] picks the best match.
+function getFilteredReactions(reagentId) {
+  let rxns = Object.values(DATA.reactions).filter(rx => rx.products[reagentId]);
+  if (activeSource === 'all') return rxns;
+
+  if (activeSource === 'vanilla') {
+    return rxns.filter(rx => rx.source === 'vanilla');
+  }
+
+  const forkId = activeSource;
+  rxns = rxns.filter(rx => {
+    if (rx.source === 'vanilla') {
+      if (rx.forkStatus && rx.forkStatus[forkId] === 'blocked') return false;
+      if (forkId === 'rmc14' && !rx.forkStatus && rx.rmcStatus === 'blocked') return false;
+      return true;
+    }
+    return rx.source === forkId;
+  });
+  // Prefer fork-specific reactions over vanilla
+  rxns.sort((a, b) => (b.source === forkId ? 1 : 0) - (a.source === forkId ? 1 : 0));
+  return rxns;
+}
 
 function buildCraftTree(reagentId, amount, visited = new Set()) {
   const isBase = DATA.baseChemicals.includes(reagentId);
@@ -679,8 +723,8 @@ function buildCraftTree(reagentId, amount, visited = new Set()) {
     return { id: reagentId, amount, isBase: true, loop: visited.has(reagentId), children: [] };
   }
 
-  // Find reaction that produces this
-  const rxns = Object.values(DATA.reactions).filter(rx => rx.products[reagentId]);
+  // Find reaction that produces this, filtered by active fork
+  const rxns = getFilteredReactions(reagentId);
   if (rxns.length === 0) {
     return { id: reagentId, amount, isBase: true, children: [] };
   }
@@ -811,7 +855,7 @@ function calculateIngredients(targetId, targetAmount) {
       return;
     }
 
-    const rxns = Object.values(DATA.reactions).filter(rx => rx.products[reagentId]);
+    const rxns = getFilteredReactions(reagentId);
     if (rxns.length === 0) {
       baseNeeds[reagentId] = (baseNeeds[reagentId] || 0) + amount;
       return;

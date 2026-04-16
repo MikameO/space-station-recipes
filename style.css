@@ -889,6 +889,7 @@ main {
   font-size: 0.75rem; border-radius: 2px; text-align: center;
 }
 .tree-amount-input:focus { border-color: var(--phosphor); outline: none; }
+.detail-section .tree-amount-input { margin-bottom: 8px; }
 
 .tree-output { padding: 4px; }
 
@@ -1356,15 +1357,19 @@ body.antag-active .accent { color: var(--red-alert); }
 
 /* Antag toggle button */
 .antag-toggle {
-  display: flex; align-items: center; gap: 4px;
-  background: transparent; border: 1px solid var(--border-subtle);
-  color: var(--text-sub); font-family: 'Oxanium', sans-serif;
-  font-size: 0.65rem; letter-spacing: 0.08em; text-transform: uppercase;
-  padding: 5px 10px; border-radius: 2px; cursor: pointer;
+  display: flex; align-items: center; gap: 5px;
+  background: rgba(255,61,90,0.06); border: 1px solid rgba(255,61,90,0.25);
+  color: rgba(255,61,90,0.6); font-family: 'Oxanium', sans-serif;
+  font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase;
+  padding: 6px 12px; border-radius: 2px; cursor: pointer;
   transition: all 0.2s;
 }
-.antag-toggle:hover { border-color: var(--red-alert); color: var(--red-alert); }
-.antag-toggle .antag-icon { font-size: 1rem; line-height: 1; }
+.antag-toggle:hover { border-color: var(--red-alert); color: var(--red-alert); background: rgba(255,61,90,0.1); }
+.antag-toggle .antag-icon { font-size: 1.1rem; line-height: 1; animation: antag-idle-flicker 4s ease-in-out infinite; }
+@keyframes antag-idle-flicker {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
 body.antag-active .antag-toggle {
   border-color: var(--red-alert); color: var(--red-alert);
   background: var(--red-dim);
