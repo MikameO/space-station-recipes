@@ -1778,7 +1778,9 @@ body.antag-active .antag-toggle {
   gap: 8px;
   height: 32px;
   background: rgba(57,255,133,0.06);
-  border-bottom: 1px solid rgba(57,255,133,0.12);
+  border: 1px solid rgba(57,255,133,0.25);
+  border-radius: 2px;
+  margin: 4px 12px 0;
   font-family: 'Share Tech Mono', monospace;
   font-size: 0.72rem;
   color: var(--phosphor-dim);
@@ -1819,7 +1821,7 @@ body.antag-active .antag-toggle {
 .disclaimer-bar-toggle:hover .disclaimer-bar-chevron { opacity: 0.7; }
 body.antag-active .disclaimer-bar {
   background: rgba(255,61,90,0.06);
-  border-bottom-color: rgba(255,61,90,0.12);
+  border-color: rgba(255,61,90,0.25);
 }
 
 /* ── DISCLAIMER COLLAPSIBLE PANEL ── */
