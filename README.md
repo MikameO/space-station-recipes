@@ -80,6 +80,10 @@ ss14_chem_extractor.py   Scrapes SS14 GitHub repos → data.json
 sprites/            Reagent sprite assets (pixel art)
 ```
 
+## Privacy
+
+This site uses [Yandex.Metrika](https://metrika.yandex.com/) for anonymous usage analytics (page views, click maps, and session recordings via Webvisor). No personal data is collected or sold. Analytics help prioritize features based on how the database is actually used across forks.
+
 ## License
 
 [GPL-3.0-only](LICENSE) — see [NOTICES](NOTICES) for third-party attributions.
