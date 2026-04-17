@@ -351,7 +351,10 @@
     }
   }
 
-  function initTutorial() {
+  // Help button handler — attach as soon as the DOM is parsed.
+  // Intentionally independent of 'app:ready' so the button keeps working
+  // even if app.js fails to load data or throws during init.
+  function attachHelpBtn() {
     var helpBtn = document.getElementById('helpBtn');
     if (helpBtn) {
       helpBtn.addEventListener('click', function () {
@@ -359,19 +362,20 @@
         startTutorial();
       });
     }
+  }
 
+  // Auto-start on first visit — waits for the app to finish loading
+  // data so the tutorial never draws on top of the loading overlay.
+  function maybeAutoStart() {
     if (!safeLSGet()) {
-      // First visit — auto-start after a small delay so layout settles.
       setTimeout(startTutorial, 400);
     }
   }
 
-  // Wait for app to signal readiness (data loaded, panels rendered).
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', function () {
-      document.addEventListener('app:ready', initTutorial, { once: true });
-    });
+    document.addEventListener('DOMContentLoaded', attachHelpBtn);
   } else {
-    document.addEventListener('app:ready', initTutorial, { once: true });
+    attachHelpBtn();
   }
+  document.addEventListener('app:ready', maybeAutoStart, { once: true });
 })();

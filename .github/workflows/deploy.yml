@@ -26,7 +26,7 @@ jobs:
       - name: Collect static files
         run: |
           mkdir _site
-          cp index.html app.js style.css data.json favicon.ico _site/
+          cp index.html app.js tutorial.js style.css data.json favicon.ico _site/
           cp -r sprites _site/sprites
           [ -f og-image.png ] && cp og-image.png _site/ || true
 
