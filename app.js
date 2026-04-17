@@ -53,6 +53,7 @@ async function init() {
   buildSidebar();
   setupEffectFilters();
   setupTabs();
+  setupLogoHome();
   setupSearch();
   setupDetailPanel();
   setupCalculator();
@@ -71,6 +72,8 @@ async function init() {
   document.getElementById('loadingOverlay').classList.add('hidden');
   document.getElementById('headerMeta').textContent =
     `${Object.keys(DATA.reagents).length} reagents | ${Object.keys(DATA.reactions).length} reactions`;
+
+  document.dispatchEvent(new CustomEvent('app:ready'));
 }
 
 // ─────────────────────────────────────────────
@@ -339,6 +342,23 @@ function setupTabs() {
       activeTab = tab;
       renderCurrentTab();
     });
+  });
+}
+
+function setupLogoHome() {
+  const h1 = document.getElementById('logoHome');
+  if (!h1) return;
+  const goHome = () => {
+    const btn = document.getElementById('btn-reagents');
+    if (btn) btn.click();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+  h1.addEventListener('click', goHome);
+  h1.addEventListener('keydown', e => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      goHome();
+    }
   });
 }
 

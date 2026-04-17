@@ -92,7 +92,7 @@
 
 <header>
   <div class="header-left">
-    <h1>
+    <h1 id="logoHome" role="button" tabindex="0" aria-label="Go to Reagents home" title="Home">
       <span class="logo-normal"><svg class="header-icon" viewBox="0 0 144 148" fill="none" xmlns="http://www.w3.org/2000/svg"><defs><filter id="bg"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs><g filter="url(#bg)"><rect x="48" y="0" width="48" height="50" stroke="#39ff85" stroke-width="6" rx="2"/><path d="M48,50 L20,110 Q12,130 30,140 L114,140 Q132,130 124,110 L96,50" stroke="#39ff85" stroke-width="6" stroke-linejoin="round"/><path d="M36,100 Q30,120 38,132 L106,132 Q114,120 108,100 Z" fill="#39ff85" opacity="0.3"/><circle cx="60" cy="108" r="4" stroke="#39ff85" stroke-width="2.5" opacity="0.7"/><circle cx="85" cy="116" r="5" stroke="#39ff85" stroke-width="2.5" opacity="0.6"/></g></svg>NanoTrasen <span class="accent">ChemDB</span></span>
       <span class="logo-antag"><svg class="header-icon" viewBox="0 0 140 140" fill="none" xmlns="http://www.w3.org/2000/svg"><defs><filter id="rg"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs><g filter="url(#rg)"><ellipse cx="70" cy="55" rx="52" ry="55" stroke="#ff3d5a" stroke-width="6"/><path d="M30,78 Q30,115 46,120 L56,120 L56,105 L66,110 L76,105 L76,120 L86,120 Q102,115 102,78" stroke="#ff3d5a" stroke-width="6"/><ellipse cx="50" cy="46" rx="14" ry="16" fill="#ff3d5a" opacity="0.35" stroke="#ff3d5a" stroke-width="4"/><ellipse cx="90" cy="46" rx="14" ry="16" fill="#ff3d5a" opacity="0.35" stroke="#ff3d5a" stroke-width="4"/><path d="M63,66 L70,75 L77,66" stroke="#ff3d5a" stroke-width="4"/></g></svg>Syndicate <span class="accent">ChemDB</span></span>
     </h1>
@@ -105,6 +105,7 @@
       <span class="antag-icon">&#9760;</span>
       <span class="antag-label">ANTAG</span>
     </button>
+    <button class="help-btn" id="helpBtn" title="Show tutorial" aria-label="Show tutorial">?</button>
     <a class="feedback-btn" href="https://github.com/MikameO/space-station-recipes/issues" target="_blank" rel="noopener noreferrer" title="Feedback &amp; Bug Reports">
       <svg class="feedback-icon" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 3h14v10H7l-4 4V3z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><circle cx="7.5" cy="8" r="1" fill="currentColor"/><circle cx="10" cy="8" r="1" fill="currentColor"/><circle cx="12.5" cy="8" r="1" fill="currentColor"/></svg>
     </a>
@@ -318,5 +319,6 @@
 </div>
 
 <script src="app.js"></script>
+<script defer src="tutorial.js"></script>
 </body>
 </html>
