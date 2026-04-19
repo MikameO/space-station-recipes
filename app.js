@@ -570,17 +570,17 @@ function humanizeBody(body, opts = {}) {
   }
   if (m = body.match(/^Temp\s+(-?[\d.]+)/i)) {
     const delta = parseFloat(m[1]);
-    if (delta < 0) return { kind: 'speed', text: short ? `Cool ${Math.abs(delta)}K` : `Cools body by ${Math.abs(delta).toLocaleString()} K` };
-    return { kind: 'damage', text: short ? `Warm ${delta}K` : `Warms body by ${delta.toLocaleString()} K` };
+    if (delta < 0) return { kind: 'temperature', text: short ? `Cool ${Math.abs(delta)}K` : `Cools body by ${Math.abs(delta).toLocaleString()} K` };
+    return { kind: 'temperature', text: short ? `Warm ${delta}K` : `Warms body by ${delta.toLocaleString()} K` };
   }
-  if (/^Message\s*popup$/i.test(body) || /^Popup/i.test(body)) {
-    return { kind: 'status', text: short ? 'Popup msg' : 'Shows a popup message to the victim' };
+  if (/^Message\s*popup$/i.test(body) || /^Popup$/i.test(body)) {
+    return { kind: 'message', text: short ? 'Popup msg' : 'Shows a popup message to the victim' };
   }
   if (m = body.match(/^Popup\s*\(([^)]+)\):\s*(.+)$/i)) {
-    return { kind: 'status', text: short ? 'Popup msg' : `Popup (${m[1]}): ${m[2]}` };
+    return { kind: 'message', text: short ? 'Popup msg' : `Popup (${m[1]}): ${m[2]}` };
   }
   if (m = body.match(/^Popup\s*message:\s*(.+)$/i)) {
-    return { kind: 'status', text: short ? 'Popup msg' : `Popup: ${m[1]}` };
+    return { kind: 'message', text: short ? 'Popup msg' : `Popup: ${m[1]}` };
   }
   if (m = body.match(/^Status:?\s*(.+)$/i)) {
     const raw = m[1].replace(/ModifyStatusEffect|GenericStatusEffect/gi, '').trim();
@@ -675,45 +675,88 @@ function prettyPathLabel(path) {
   return map[path] || path;
 }
 
+// Fixed category order for predictable scanning across reagents.
+// Unknown kinds fall after the listed ones (sort index = Infinity).
+const EFFECT_KIND_ORDER = ['heal', 'damage', 'speed', 'temperature', 'status', 'message', 'other'];
+const EFFECT_KIND_LABELS = {
+  heal: 'Healing',
+  damage: 'Damage',
+  speed: 'Movement',
+  temperature: 'Temperature',
+  status: 'Status effects',
+  message: 'Messages',
+  other: 'Other',
+};
+function kindOrderIndex(kind) {
+  const i = EFFECT_KIND_ORDER.indexOf(kind);
+  return i === -1 ? EFFECT_KIND_ORDER.length : i;
+}
+
 function renderEffectsCompact(parsed) {
-  const chips = parsed.map(p => {
-    const h = humanizeBody(p.body, { short: true });
-    let text = h.text;
+  // Sort the same way as the verbose view so cards and detail stay consistent
+  const sorted = parsed
+    .map(p => ({ ...p, _h: humanizeBody(p.body, { short: true }) }))
+    .sort((a, b) => kindOrderIndex(a._h.kind) - kindOrderIndex(b._h.kind));
+  const chips = sorted.map(p => {
+    let text = p._h.text;
     if (p.prob != null && p.prob < 100) text += ` ${p.prob}%`;
     if (text.length > 38) text = text.slice(0, 35) + '\u2026';
-    return `<span class="effect-chip effect-${h.kind}">${esc(text)}</span>`;
+    return `<span class="effect-chip effect-${p._h.kind}">${esc(text)}</span>`;
   });
   return `<div class="effects-wrap">${chips.join('')}</div>`;
 }
 
 function renderEffectsVerbose(parsed) {
-  const groups = new Map();
+  // Level 1: group by metabolism path (preserves insertion order of paths)
+  const byPath = new Map();
   for (const p of parsed) {
     const key = p.path || '';
-    if (!groups.has(key)) groups.set(key, []);
-    groups.get(key).push(p);
+    if (!byPath.has(key)) byPath.set(key, []);
+    byPath.get(key).push(p);
   }
 
   const sections = [];
-  for (const [path, items] of groups) {
-    const rows = items.map(p => {
-      const h = humanizeBody(p.body);
-      const condText = p.conds.map(humanizeCondition).filter(Boolean).join(' \u00b7 ');
-      const meta = [];
-      if (condText) meta.push(condText);
-      if (p.prob != null && p.prob < 100) meta.push(`${p.prob}% chance per tick`);
-      const metaHTML = meta.length
-        ? `<div class="effect-row__meta">${esc(meta.join(' \u00b7 '))}</div>`
+  for (const [path, items] of byPath) {
+    // Humanize once so we know each row's kind for grouping + sorting
+    const humanized = items.map(p => ({ ...p, _h: humanizeBody(p.body) }));
+
+    // Level 2: bucket by kind in fixed EFFECT_KIND_ORDER
+    const byKind = new Map();
+    for (const row of humanized) {
+      const k = row._h.kind;
+      if (!byKind.has(k)) byKind.set(k, []);
+      byKind.get(k).push(row);
+    }
+    const sortedKinds = [...byKind.keys()].sort((a, b) => kindOrderIndex(a) - kindOrderIndex(b));
+
+    // Show category subheaders only when the path mixes multiple categories,
+    // so simple single-category reagents don't get visual overhead.
+    const showCategoryHeads = sortedKinds.length > 1;
+
+    const subsections = sortedKinds.map(kind => {
+      const rowsHTML = byKind.get(kind).map(row => {
+        const condText = row.conds.map(humanizeCondition).filter(Boolean).join(' \u00b7 ');
+        const meta = [];
+        if (condText) meta.push(condText);
+        if (row.prob != null && row.prob < 100) meta.push(`${row.prob}% chance per tick`);
+        const metaHTML = meta.length
+          ? `<div class="effect-row__meta">${esc(meta.join(' \u00b7 '))}</div>`
+          : '';
+        return `<div class="effect-row effect-row--${kind}">
+          <div class="effect-row__text">${esc(row._h.text)}</div>
+          ${metaHTML}
+        </div>`;
+      }).join('');
+      const catHead = showCategoryHeads
+        ? `<div class="effect-category__head effect-category__head--${kind}">${esc(EFFECT_KIND_LABELS[kind] || kind)}</div>`
         : '';
-      return `<div class="effect-row effect-row--${h.kind}">
-        <div class="effect-row__text">${esc(h.text)}</div>
-        ${metaHTML}
-      </div>`;
+      return `<div class="effect-category">${catHead}${rowsHTML}</div>`;
     }).join('');
-    const header = path
+
+    const pathHead = path
       ? `<div class="effect-group__head">${esc(prettyPathLabel(path))}</div>`
       : '';
-    sections.push(`<div class="effect-group">${header}${rows}</div>`);
+    sections.push(`<div class="effect-group">${pathHead}${subsections}</div>`);
   }
   return `<div class="effects-verbose">${sections.join('')}</div>`;
 }

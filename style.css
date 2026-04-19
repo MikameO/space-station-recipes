@@ -644,11 +644,13 @@ main {
   font-family: 'Oxanium', sans-serif; letter-spacing: 0.02em;
   white-space: nowrap;
 }
-.effect-heal { background: rgba(34,197,94,0.12); color: #4ade80; border-left: 2px solid #22c55e; }
-.effect-damage { background: rgba(239,68,68,0.12); color: #f87171; border-left: 2px solid #ef4444; }
-.effect-status { background: rgba(96,165,250,0.12); color: #93bbfd; border-left: 2px solid #60a5fa; }
-.effect-speed { background: rgba(250,204,21,0.12); color: #fde047; border-left: 2px solid #facc15; }
-.effect-other { background: rgba(148,163,184,0.10); color: #94a3b8; border-left: 2px solid #64748b; }
+.effect-heal        { background: rgba(34,197,94,0.12);  color: #4ade80; border-left: 2px solid #22c55e; }
+.effect-damage      { background: rgba(239,68,68,0.12);  color: #f87171; border-left: 2px solid #ef4444; }
+.effect-speed       { background: rgba(250,204,21,0.12); color: #fde047; border-left: 2px solid #facc15; }
+.effect-temperature { background: rgba(34,211,238,0.12); color: #67e8f9; border-left: 2px solid #22d3ee; }
+.effect-status      { background: rgba(96,165,250,0.12); color: #93bbfd; border-left: 2px solid #60a5fa; }
+.effect-message     { background: rgba(168,162,158,0.10); color: #d6d3d1; border-left: 2px solid #a8a29e; }
+.effect-other       { background: rgba(148,163,184,0.10); color: #94a3b8; border-left: 2px solid #64748b; }
 
 /* Verbose effects (used in the detail panel).
    Selectors include `.effects-verbose` to beat `.detail-section div` specificity. */
@@ -701,16 +703,47 @@ main {
 .effects-verbose .effect-group__head {
   color: var(--text-sub);
 }
-.effects-verbose .effect-row--heal   { border-left-color: #22c55e; background: rgba(34,197,94,0.07); }
-.effects-verbose .effect-row--heal   .effect-row__text { color: #a7f3c4; }
-.effects-verbose .effect-row--damage { border-left-color: #ef4444; background: rgba(239,68,68,0.07); }
-.effects-verbose .effect-row--damage .effect-row__text { color: #fca5a5; }
-.effects-verbose .effect-row--status { border-left-color: #60a5fa; background: rgba(96,165,250,0.07); }
-.effects-verbose .effect-row--status .effect-row__text { color: #bfd5fc; }
-.effects-verbose .effect-row--speed  { border-left-color: #facc15; background: rgba(250,204,21,0.07); }
-.effects-verbose .effect-row--speed  .effect-row__text { color: #fde68a; }
-.effects-verbose .effect-row--other  { border-left-color: #64748b; background: rgba(148,163,184,0.05); }
-.effects-verbose .effect-row--other  .effect-row__text { color: #cbd5e1; }
+.effects-verbose .effect-row--heal        { border-left-color: #22c55e; background: rgba(34,197,94,0.07); }
+.effects-verbose .effect-row--heal        .effect-row__text { color: #a7f3c4; }
+.effects-verbose .effect-row--damage      { border-left-color: #ef4444; background: rgba(239,68,68,0.07); }
+.effects-verbose .effect-row--damage      .effect-row__text { color: #fca5a5; }
+.effects-verbose .effect-row--speed       { border-left-color: #facc15; background: rgba(250,204,21,0.07); }
+.effects-verbose .effect-row--speed       .effect-row__text { color: #fde68a; }
+.effects-verbose .effect-row--temperature { border-left-color: #22d3ee; background: rgba(34,211,238,0.07); }
+.effects-verbose .effect-row--temperature .effect-row__text { color: #a5f3fc; }
+.effects-verbose .effect-row--status      { border-left-color: #60a5fa; background: rgba(96,165,250,0.07); }
+.effects-verbose .effect-row--status      .effect-row__text { color: #bfd5fc; }
+.effects-verbose .effect-row--message     { border-left-color: #a8a29e; background: rgba(168,162,158,0.06); }
+.effects-verbose .effect-row--message     .effect-row__text { color: #d6d3d1; }
+.effects-verbose .effect-row--other       { border-left-color: #64748b; background: rgba(148,163,184,0.05); }
+.effects-verbose .effect-row--other       .effect-row__text { color: #cbd5e1; }
+
+/* Category subheader inside a metabolism-path group */
+.effects-verbose .effect-category {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.effects-verbose .effect-category + .effect-category {
+  margin-top: 6px;
+}
+.effects-verbose .effect-category__head {
+  font-family: 'Oxanium', sans-serif;
+  font-size: 0.62rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  padding: 2px 0 3px 2px;
+  opacity: 0.85;
+  line-height: 1.3;
+}
+.effects-verbose .effect-category__head--heal        { color: #86efac; }
+.effects-verbose .effect-category__head--damage      { color: #fca5a5; }
+.effects-verbose .effect-category__head--speed       { color: #fde68a; }
+.effects-verbose .effect-category__head--temperature { color: #a5f3fc; }
+.effects-verbose .effect-category__head--status      { color: #bfd5fc; }
+.effects-verbose .effect-category__head--message     { color: #d6d3d1; }
+.effects-verbose .effect-category__head--other       { color: #94a3b8; }
 
 /* Effect filters in sidebar */
 .effect-filters { display: flex; flex-wrap: wrap; gap: 3px; }
