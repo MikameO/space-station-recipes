@@ -1517,47 +1517,79 @@ function activateAntagMode() {
   if (antagTabBtn) antagTabBtn.style.display = '';
 }
 
+// Tag-driven delivery suggestions — structured replacement for the old
+// text-mining heuristic (which produced false positives when tips contained
+// negations or multi-word context).
+const _TAG_TO_DELIVERY = {
+  'stealth-poison':    ['Drink', 'Food', 'Syringe'],
+  'debilitating':      ['Syringe', 'Hypospray'],
+  'lethal':            ['Syringe', 'Hypospray', 'Drink'],
+  'area-denial':       ['FoamGrenade', 'SmokeBomb'],
+  'explosive':         ['Beaker', 'LargeBeaker'],
+  'delivery-mechanism':['FoamGrenade', 'SmokeBomb'],
+  'utility':           ['Beaker', 'LargeBeaker'],
+};
+
+function _pickDeliverySuggestions(tags) {
+  const out = new Set();
+  (tags || []).forEach(t => (_TAG_TO_DELIVERY[t] || []).forEach(d => out.add(d)));
+  if (!out.size) { out.add('Syringe'); out.add('Drink'); }
+  return Array.from(out);
+}
+
 function getAntagIntelHTML(r) {
   const score = r.antagScore || 0;
-  if (!score) return '';
+  // Even without antagScore, still show verifiedMechanics if the reagent has any
+  // non-trivial YAML-extracted claims — they are the source-of-truth layer.
+  const verifiedMechanics = r.verifiedMechanics || [];
+  const hasVerified = verifiedMechanics.length > 0;
+  if (!score && !hasVerified) return '';
+
   const tags = r.antagTags || [];
   const tips = r.antagTips || '';
   const pct = Math.round(score * 10);
 
-  // Suggest delivery methods based on category/effects
+  // Tag-based delivery suggestions (no more text-mining tips).
   const deliveryData = DATA.deliveryMechanisms || {};
-  const suggestions = [];
-  if (tips.toLowerCase().includes('syringe') || tips.toLowerCase().includes('inject')) {
-    suggestions.push('Syringe', 'Hypospray');
-  }
-  if (tips.toLowerCase().includes('drink') || tips.toLowerCase().includes('food') || tips.toLowerCase().includes('ingest')) {
-    suggestions.push('Food', 'Drink');
-  }
-  if (tips.toLowerCase().includes('foam')) {
-    suggestions.push('FoamGrenade');
-  }
-  if (tips.toLowerCase().includes('smoke')) {
-    suggestions.push('SmokeBomb');
-  }
-  if (suggestions.length === 0) suggestions.push('Syringe', 'Drink');
-
+  const suggestions = _pickDeliverySuggestions(tags);
   const deliverySuggestHTML = suggestions.map(key => {
     const d = deliveryData[key];
     if (!d) return `<span class="badge badge-method">${esc(key)}</span>`;
     return `<span class="badge badge-method" title="${esc(d.desc)}">${esc(key)}${d.capacity ? ' (' + d.capacity + 'u)' : ''}</span>`;
   }).join(' ');
 
-  return `
-    <div class="antag-intel">
-      <h4>\u2620 Antag Intel <span class="game-label">(SS14 gameplay)</span></h4>
+  // Verified mechanics (from YAML) — authoritative, green ✓.
+  const verifiedHTML = hasVerified ? `
+      <div class="verified-mechanics">
+        <h5>\u2713 Verified in SS14 code</h5>
+        <ul class="verified-list">
+          ${verifiedMechanics.map(m => `<li>${esc(m)}</li>`).join('')}
+        </ul>
+      </div>` : '';
+
+  // Community knowledge (curator's antagTips) — not cross-checked against YAML.
+  // Visually distinct (dashed border, tooltip) so readers know to treat with skepticism.
+  const communityHTML = tips ? `
+      <div class="community-lore" title="Curator's playtime notes. Not automatically cross-checked against YAML — may include SS13 legacy or unverified community claims.">
+        <h5>\u24d8 Community knowledge (unverified)</h5>
+        <div class="antag-tips">${esc(tips)}</div>
+      </div>` : '';
+
+  const scoreHTML = score ? `
       <div class="antag-score-bar">
         <span class="score-label">${score}/10</span>
         <div class="score-track">
           <div class="score-fill" style="width:${pct}%"></div>
         </div>
-      </div>
+      </div>` : '';
+
+  return `
+    <div class="antag-intel">
+      <h4>\u2620 Antag Intel <span class="game-label">(SS14 gameplay)</span></h4>
+      ${scoreHTML}
       ${tags.length ? `<div class="antag-tags">${tags.map(t => `<span class="badge badge-antag-tag">${esc(t)}</span>`).join('')}</div>` : ''}
-      ${tips ? `<div class="antag-tips">${esc(tips)}</div>` : ''}
+      ${verifiedHTML}
+      ${communityHTML}
       <div class="antag-delivery-suggest">
         <h5>In-game Delivery</h5>
         ${deliverySuggestHTML}

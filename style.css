@@ -1614,6 +1614,49 @@ body.antag-active .antag-toggle {
   letter-spacing: 0.08em; margin-bottom: 6px;
 }
 
+/* Verified mechanics (from YAML) — authoritative "source of truth" section */
+.verified-mechanics {
+  margin-top: 10px; padding: 8px 10px;
+  border-left: 2px solid #4ade80;  /* green */
+  background: rgba(74, 222, 128, 0.05);
+  border-radius: 2px;
+}
+.verified-mechanics h5 {
+  color: #4ade80; font-size: 0.62rem; text-transform: uppercase;
+  letter-spacing: 0.08em; margin-bottom: 6px; font-weight: 700;
+}
+.verified-list {
+  list-style: none; padding: 0; margin: 0;
+  font-size: 0.7rem; color: var(--text-main); line-height: 1.5;
+}
+.verified-list li {
+  padding: 2px 0 2px 12px;
+  position: relative;
+  font-family: 'Share Tech Mono', monospace;
+}
+.verified-list li::before {
+  content: "\2192";  /* arrow */
+  position: absolute; left: 0;
+  color: #4ade80; opacity: 0.7;
+}
+
+/* Community knowledge — curated antag tips, not YAML-verified */
+.community-lore {
+  margin-top: 8px; padding: 8px 10px;
+  border-left: 2px dashed #fbbf24;  /* amber */
+  background: rgba(251, 191, 36, 0.04);
+  border-radius: 2px;
+  cursor: help;  /* signals "tooltip available" */
+}
+.community-lore h5 {
+  color: #fbbf24; font-size: 0.62rem; text-transform: uppercase;
+  letter-spacing: 0.08em; margin-bottom: 4px; font-weight: 700;
+}
+.community-lore .antag-tips {
+  margin-bottom: 0;  /* override default to not double-pad inside .community-lore */
+  opacity: 0.92;
+}
+
 /* Sprite icons */
 .sprite-icon {
   width: 32px; height: 32px;

@@ -776,6 +776,169 @@ def summarize_metabolisms(metabolisms: dict) -> tuple[str, str]:
     return "; ".join(all_effects), ", ".join(paths)
 
 
+# ─────────────────────────────────────────────
+# Phase 4b: Verified Mechanics (Increment C)
+# ─────────────────────────────────────────────
+# Parse reagent YAML fields that the current pipeline ignores (tileReactions,
+# reactiveEffects, boilingPoint, meltingPoint) into human-readable strings.
+# These are "code-verified" claims — distinct from curator's antagTips which
+# may include SS13 legacy lore. The frontend renders them in a separate
+# section with a ✓ badge so readers see what's authoritative vs community.
+
+_TILE_REACTION_DESCRIPTIONS = {
+    "FlammableTileReaction":  "Tile: Ignites spilled reagent (x{temperatureMultiplier} temperature)",
+    "ExtinguishTileReaction": "Tile: Extinguishes fires on wet tiles",
+    "CleanTileReaction":      "Tile: Cleans decals and puddles",
+    "PryTileReaction":        "Tile: **Pries floor tiles open** (only structural-damage tile reaction in vanilla SS14)",
+    "SpillTileReaction":      "Tile: Spills pooled reagent",
+    "SpaceLubeTileReaction":  "Tile: Slippery surface (trips walkers)",
+    "SpaceGlueTileReaction":  "Tile: Sticky surface (slows movement)",
+    "AnomalyPurge":           "Tile: Purges nearby anomalies",
+}
+
+_REACTIVE_EFFECT_DESCRIPTIONS = {
+    "Flammable":   "On touch: Ignites target",
+    "Ignite":      "On touch: Starts fire on target",
+    "Polymorph":   "On touch: Polymorphs target",
+    "Emote":       "On touch: Forces target emote",
+    "PopupMessage": "On touch: Shows warning message",
+    "CureZombieInfection": "On touch: Cures zombie infection",
+}
+
+
+def _summarize_tile_reaction(tr) -> str:
+    """Format a single tileReactions entry to a human-readable string."""
+    if not isinstance(tr, dict):
+        return ""
+    ttype = tr.get("_type", "")
+    template = _TILE_REACTION_DESCRIPTIONS.get(ttype)
+    if template is None:
+        return f"Tile: {ttype} (see YAML for details)"
+    try:
+        return template.format(**{k: tr.get(k, "?") for k in ("temperatureMultiplier",)})
+    except (KeyError, ValueError):
+        return template.replace("{temperatureMultiplier}", str(tr.get("temperatureMultiplier", "?")))
+
+
+def _summarize_reactive_effect(effect_name: str, effect_spec: dict) -> list[str]:
+    """Format reactiveEffects[name] into list of strings."""
+    out = []
+    if not isinstance(effect_spec, dict):
+        return out
+    effects = effect_spec.get("effects", [])
+    if not isinstance(effects, list):
+        return out
+    methods = effect_spec.get("methods", [])
+    method_hint = f" [{', '.join(methods)}]" if methods else ""
+    for eff in effects:
+        if not isinstance(eff, dict):
+            continue
+        etype = eff.get("_type", "")
+        template = _REACTIVE_EFFECT_DESCRIPTIONS.get(etype)
+        if template is None:
+            out.append(f"Reactive: {etype}{method_hint}")
+        else:
+            out.append(f"{template}{method_hint}")
+    return out
+
+
+def extract_verified_mechanics(reagent: dict) -> list[str]:
+    """Return list of human-readable mechanics extracted directly from YAML.
+
+    Covers tileReactions, reactiveEffects, metabolism effects, and phase-change
+    temperatures. Does NOT include curated ANTAG_DATA.tips — those live in the
+    community-lore section."""
+    if not isinstance(reagent, dict):
+        return []
+    out = []
+
+    # tileReactions
+    for tr in reagent.get("tileReactions", []) or []:
+        summary = _summarize_tile_reaction(tr)
+        if summary:
+            out.append(summary)
+
+    # reactiveEffects
+    re_map = reagent.get("reactiveEffects", {}) or {}
+    if isinstance(re_map, dict):
+        for re_name, re_val in re_map.items():
+            if re_name.startswith("_"):
+                continue
+            out.extend(_summarize_reactive_effect(re_name, re_val))
+
+    # metabolisms — reuse existing extract_effects_list + summarize_single_effect,
+    # but emit structured "[Path] Effect" strings (matches existing summarize_metabolisms
+    # format) as separate list items rather than one semicolon-joined blob.
+    metabolisms = reagent.get("metabolisms", {}) or {}
+    if isinstance(metabolisms, dict):
+        for path_name, path_value in metabolisms.items():
+            if path_name.startswith("_"):
+                continue
+            for eff in extract_effects_list(path_value):
+                summary = summarize_single_effect(eff)
+                if summary:
+                    out.append(f"[{path_name}] {summary}")
+
+    # Phase-change temperatures
+    bp = reagent.get("boilingPoint")
+    mp = reagent.get("meltingPoint")
+    if bp is not None or mp is not None:
+        parts = []
+        if mp is not None:
+            parts.append(f"melts at {mp}K")
+        if bp is not None:
+            parts.append(f"boils at {bp}K")
+        out.append(f"Phase change: {', '.join(parts)}")
+
+    return out
+
+
+def compute_strategy_verification_status(
+    strategy: dict,
+    reagents_verified: dict[str, list[str]],
+    delivery_mechanisms_keys: set,
+) -> dict:
+    """Classify a strategy as all-verified / partial / lore-only based on
+    whether its ingredients have verified mechanics and its method matches
+    a known delivery mechanism.
+
+    Returns: {"status": str, "loreWarnings": [...]}"""
+    warnings = []
+    ingredients = strategy.get("reagents", []) or []
+    verified_counts = 0
+
+    for ing in ingredients:
+        rid = ing.get("id")
+        if reagents_verified.get(rid):
+            verified_counts += 1
+        else:
+            warnings.append(f"{rid}: no YAML-verified mechanics (check ANTAG_DATA tips)")
+
+    # Method matching: strategy.method contains a delivery mechanism keyword?
+    method_text = (strategy.get("method", "") or "").lower()
+    method_matched = any(key.lower() in method_text for key in delivery_mechanisms_keys)
+    if not method_matched and delivery_mechanisms_keys:
+        warnings.append(f"Method '{strategy.get('method')}' does not match any known DELIVERY_MECHANISMS key")
+
+    # Heuristic lore-detection: strategy.desc mentions "melts walls" / "breach wall" / "SS13 legacy"
+    # — these describe things SS14 chemistry cannot do (left from A.1 debunking).
+    desc_lower = (strategy.get("desc", "") or "").lower()
+    if "melts wall" in desc_lower or "melt walls" in desc_lower:
+        warnings.append("Desc mentions 'melting walls' — SS14 chemistry has no wall-melting mechanic")
+
+    total = len(ingredients)
+    if total == 0:
+        status = "lore-only"
+    elif verified_counts == total and method_matched:
+        status = "all-verified"
+    elif verified_counts == 0:
+        status = "lore-only"
+    else:
+        status = "partial"
+
+    return {"status": status, "loreWarnings": warnings}
+
+
 def extract_effect_tags(metabolisms: dict) -> list[str]:
     """Extract searchable effect type tags from metabolisms for filtering."""
     if not metabolisms or not isinstance(metabolisms, dict):
@@ -1714,6 +1877,18 @@ def export_json(reagents: dict, reactions: dict, locale: dict,
             _rid, reaction_lookup, all_sources or {}
         )
 
+    # Phase 9a.6: Extract YAML-verified mechanics (Increment C).
+    # These are factual claims readable from the YAML (tileReactions, reactiveEffects,
+    # metabolism effects, phase-change temps). Separate from ANTAG_DATA.tips which
+    # may contain SS13 legacy / unverified community knowledge.
+    verified_mechanics_map = {}
+    for _rid, _reagent in reagents.items():
+        if _reagent.get("abstract"):
+            continue
+        mech = extract_verified_mechanics(_reagent)
+        if mech:
+            verified_mechanics_map[_rid] = mech
+
     # Build reagents
     cats_seen = set()
     for rid, reagent in sorted(reagents.items()):
@@ -1781,6 +1956,9 @@ def export_json(reagents: dict, reactions: dict, locale: dict,
             "recipe": recipe_obj,
             "obtainSources": (all_sources or {}).get(rid, []),
             "accessibility": accessibility_map.get(rid),
+            "verifiedMechanics": verified_mechanics_map.get(rid, []),
+            "boilingPoint": reagent.get("boilingPoint"),
+            "meltingPoint": reagent.get("meltingPoint"),
         }
         # Only include antag fields when non-default (saves ~30KB in JSON)
         if antag_score:
@@ -1873,18 +2051,28 @@ def export_json(reagents: dict, reactions: dict, locale: dict,
     data["categories"] = sorted(cats_seen)
     data["warnings"] = DANGEROUS_INTERACTIONS
 
-    # Antag mode data — each strategy gets computedDifficulty attached.
+    # Antag mode data — each strategy gets computedDifficulty + verificationStatus attached.
+    delivery_keys = set(DELIVERY_MECHANISMS.keys())
     strategies_out = []
     mismatches = []
+    lore_only_strategies = []
     for _strat in ANTAG_STRATEGIES:
         computed = compute_strategy_difficulty(_strat, accessibility_map, reaction_lookup)
-        strategies_out.append({**_strat, "computedDifficulty": computed})
+        verification = compute_strategy_verification_status(_strat, verified_mechanics_map, delivery_keys)
+        strategies_out.append({
+            **_strat,
+            "computedDifficulty": computed,
+            "verificationStatus": verification["status"],
+            "loreWarnings": verification["loreWarnings"],
+        })
         if computed["mismatch"]:
             mismatches.append(
                 f"  WARNING: strategy '{_strat['id']}' authored={computed['authoredTier']} "
                 f"computed={computed['tier']} (effortScore={computed['effortScore']}; "
                 f"{computed['mismatchReason']})"
             )
+        if verification["status"] == "lore-only":
+            lore_only_strategies.append(_strat["id"])
     data["antagStrategies"] = strategies_out
     data["deliveryMechanisms"] = DELIVERY_MECHANISMS
     data["syndicateItems"] = SYNDICATE_ITEMS
@@ -1896,6 +2084,12 @@ def export_json(reagents: dict, reactions: dict, locale: dict,
             print(line)
     else:
         print(f"\n  Computed difficulty: all {len(ANTAG_STRATEGIES)} strategies match authored tier")
+
+    # Verification status summary
+    verified_reagent_count = len(verified_mechanics_map)
+    print(f"\n  Verified mechanics: {verified_reagent_count}/{len(reagents)} reagents have YAML-extracted claims")
+    if lore_only_strategies:
+        print(f"  Lore-only strategies (no ingredient has verified mechanics): {lore_only_strategies}")
 
     with open(JSON_FILE, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=1)
