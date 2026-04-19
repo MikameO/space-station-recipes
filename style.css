@@ -589,6 +589,29 @@ main {
   cursor: help;
 }
 
+.badge-unobtainable {
+  background: rgba(255, 107, 107, 0.12);
+  border: 1px solid rgba(255, 107, 107, 0.5);
+  color: #ff6b6b;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  cursor: help;
+}
+
+.detail-unobtainable-warn {
+  margin: 8px 0 10px;
+  padding: 8px 10px;
+  background: rgba(255, 107, 107, 0.06);
+  border-left: 3px solid #ff6b6b;
+  font-size: 0.78rem;
+  color: var(--text-sub);
+  line-height: 1.45;
+}
+.detail-unobtainable-warn .badge-unobtainable {
+  margin-right: 6px;
+  vertical-align: middle;
+}
+
 .reagent-recipe {
   font-size: 0.7rem;
   color: var(--text-sub);

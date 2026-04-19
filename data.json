@@ -1,6 +1,6 @@
 {
  "meta": {
-  "generated": "2026-04-15T06:44:48",
+  "generated": "2026-04-19T11:16:34",
   "forks": {
    "vanilla": {
     "name": "Vanilla SS14",
@@ -13234,7 +13234,7 @@
     "lethal",
     "stealth-poison"
    ],
-   "antagTips": "Slow-acting heavy metal poison. Hard to detect, accumulates over time. Excellent for long-term covert poisoning via food/drink."
+   "antagTips": "(Unobtainable in vanilla SS14 — no reaction, no plant, no dispenser. Only appears as Licoxide ingredient in Goob/Frontier/Funky forks.) Slow-acting heavy metal poison. Hard to detect, accumulates over time."
   },
   "Lean": {
    "id": "Lean",
@@ -25127,12 +25127,11 @@
    "obtainSources": [
     "Chemistry reaction"
    ],
-   "antagScore": 7,
+   "antagScore": 4,
    "antagTags": [
-    "utility",
     "area-denial"
    ],
-   "antagTips": "Melts walls and doors when applied and ignited. Essential for breaching secured areas. Apply to wall, then use a lighter/welder."
+   "antagTips": "Tile: Ignites spilled reagent via FlammableTileReaction (x2 temperature). Metabolism (Bloodstream): Heat 2 + Poison 1. Does NOT melt walls in SS14 — the wall-breach use is SS13 legacy folklore, not present in any SS14 fork YAML."
   },
   "ThreeMileIsland": {
    "id": "ThreeMileIsland",
@@ -30992,10 +30991,10 @@
     "rmc14": "modified"
    },
    "forkNotes": {
-    "rmc14": "Added RMCSugar(1) reactant; Added RMCOxygen(1) reactant; Removed Oxygen reactant; Removed Sugar reactant"
+    "rmc14": "Added RMCOxygen(1) reactant; Added RMCSugar(1) reactant; Removed Oxygen reactant; Removed Sugar reactant"
    },
    "rmcStatus": "modified",
-   "rmcNote": "Added RMCSugar(1) reactant; Added RMCOxygen(1) reactant; Removed Oxygen reactant; Removed Sugar reactant"
+   "rmcNote": "Added RMCOxygen(1) reactant; Added RMCSugar(1) reactant; Removed Oxygen reactant; Removed Sugar reactant"
   },
   "ConcentratedCorgiJuice": {
    "id": "ConcentratedCorgiJuice",
@@ -32144,7 +32143,6 @@
    "forkStatus": {
     "rmc14": "blocked",
     "goob": "blocked",
-    "frontier": "blocked",
     "funky": "blocked"
    },
    "rmcStatus": "blocked",
@@ -32180,7 +32178,6 @@
    "forkStatus": {
     "rmc14": "blocked",
     "goob": "blocked",
-    "frontier": "blocked",
     "funky": "blocked"
    },
    "rmcStatus": "blocked",
@@ -32242,7 +32239,6 @@
    "forkStatus": {
     "rmc14": "blocked",
     "goob": "blocked",
-    "frontier": "blocked",
     "funky": "blocked"
    },
    "rmcStatus": "blocked",
@@ -32306,7 +32302,6 @@
    "forkStatus": {
     "rmc14": "blocked",
     "goob": "blocked",
-    "frontier": "blocked",
     "funky": "blocked"
    },
    "rmcStatus": "blocked",
@@ -32338,8 +32333,11 @@
    "forkStatus": {
     "rmc14": "blocked",
     "goob": "blocked",
-    "frontier": "blocked",
+    "frontier": "modified",
     "funky": "blocked"
+   },
+   "forkNotes": {
+    "frontier": "minTemp 373->383; Priority -1->None"
    },
    "rmcStatus": "blocked",
    "rmcNote": ""
@@ -32374,7 +32372,6 @@
    "forkStatus": {
     "rmc14": "blocked",
     "goob": "blocked",
-    "frontier": "blocked",
     "funky": "blocked"
    },
    "rmcStatus": "blocked",
@@ -56318,7 +56315,7 @@
    ],
    "type": "fire",
    "severity": "dangerous",
-   "desc": "Creates Thermite — melts walls/doors when applied and ignited"
+   "desc": "Creates Thermite — FlammableTileReaction (x2 temp) ignites spilled reagent. Deals Heat(2)+Poison(1) on metabolism. Does NOT melt walls in SS14 (that's SS13 folklore)."
   },
   {
    "reagents": [
@@ -56469,15 +56466,11 @@
   {
    "id": "slow-poison",
    "name": "Slow Poisoning",
-   "desc": "Lead or Histamine in food/drinks. Damage accumulates slowly — victim may not realize they're being poisoned for minutes.",
+   "desc": "Histamine overdose hidden in food/drink. Derived from Nettle plant (Botany cooperation). Allergic reaction deaths look natural — hard to trace. Lead would also work but is unobtainable in vanilla SS14.",
    "reagents": [
     {
      "id": "Histamine",
-     "amount": 15
-    },
-    {
-     "id": "Lead",
-     "amount": 15
+     "amount": 25
     }
    ],
    "method": "Food or drink contamination",
@@ -56525,17 +56518,17 @@
    "stealth": "low"
   },
   {
-   "id": "wall-breach",
-   "name": "Wall Breach",
-   "desc": "Apply Thermite to wall, ignite with lighter/welder. Melts through reinforced walls and blast doors. Essential for breaking into secure areas.",
+   "id": "floor-pry",
+   "name": "Floor Breach (CLF3)",
+   "desc": "Myth-buster: SS14 chemistry has NO wall-melting mechanic — the classic Thermite wall-breach is SS13 folklore. The only structural-damage tile reaction in SS14 chemistry is CLF3's PryTileReaction (pyrotechnic.yml:109). Spilling Chlorine Trifluoride pries floor tiles open — useful for breaching into subfloor pipes or lower decks. Extremely dangerous to the user.",
    "reagents": [
     {
-     "id": "Thermite",
-     "amount": 30
+     "id": "ChlorineTrifluoride",
+     "amount": 20
     }
    ],
-   "method": "Apply to wall + ignite",
-   "difficulty": "medium",
+   "method": "Splash or foam-deploy on target floor tile",
+   "difficulty": "hard",
    "stealth": "low"
   },
   {
@@ -56567,7 +56560,7 @@
   {
    "id": "clf3-armageddon",
    "name": "CLF3 Armageddon",
-   "desc": "Chlorine Trifluoride — the ultimate destruction chemical. Burns everything, melts walls, toxic fumes. Synthesize above 370K in a shatterproof container or it WILL explode in your hands.",
+   "desc": "Chlorine Trifluoride — the ultimate SS14 destruction chemical. Unique PryTileReaction pries floor tiles when spilled (pyrotechnic.yml:109). Bloodstream deals Heat(2)+Poison(1)+Caustic(0.5); Flammable on touch with scream/popup reactions. Does NOT melt walls. Synthesize above 370K in a shatterproof container or it WILL explode in your hands.",
    "reagents": [
     {
      "id": "ChlorineTrifluoride",

@@ -478,6 +478,7 @@ function reagentCardHTML(r) {
     <div class="reagent-badges">
       <span class="badge badge-cat" style="border-left-color:${catColor}">${esc(r.category)}</span>
       ${r.isBase ? `<span class="badge badge-base">${r.isDispenser ? 'DISPENSER' : 'BASE'}</span>` : ''}
+      ${(!r.recipe && (!r.obtainSources || r.obtainSources.length === 0) && !r.isDispenser) ? `<span class="badge badge-unobtainable" title="No recipe, no plant, no dispenser source \u2014 unobtainable in vanilla play">UNOBTAINABLE</span>` : ''}
       ${r.overdose ? `<span class="badge badge-od">OD ${r.overdose}u</span>` : ''}
       ${r.source !== 'vanilla' && DATA.meta?.forks?.[r.source] ? `<span class="badge badge-fork" style="border-color:${DATA.meta.forks[r.source].color}">${DATA.meta.forks[r.source].name}</span>` : ''}
       ${antagMode && r.antagScore ? `<span class="badge badge-antag">${'\u2620'} ${r.antagScore}/10</span>` : ''}
@@ -670,6 +671,7 @@ function openDetail(reagentId, pushHistory = true) {
       ${esc(capName(r.name || r.id))}
     </div>
     <div class="detail-id">${esc(r.id)} | ${esc(r.category)} | ${r.source !== 'vanilla' && DATA.meta?.forks?.[r.source] ? esc(DATA.meta.forks[r.source].name) : 'Vanilla'}</div>
+    ${(!r.recipe && (!r.obtainSources || r.obtainSources.length === 0) && !r.isDispenser) ? `<div class="detail-unobtainable-warn"><span class="badge badge-unobtainable">UNOBTAINABLE</span> No recipe, no plant, no dispenser source \u2014 not available in normal vanilla play. Check fork filter for alternative sources.</div>` : ''}
     ${r.desc ? `<div class="detail-desc">${esc(r.desc)}</div>` : ''}
 
     <div class="detail-section">

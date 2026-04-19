@@ -620,7 +620,7 @@ DANGEROUS_INTERACTIONS = [
     {"reagents": ["Oil", "WeldingFuel", "Ethanol"], "type": "fire", "severity": "lethal",
      "desc": "Creates Napalm — sticky fire, Heat(2)+Poison(1)+Caustic(0.5)/tick"},
     {"reagents": ["Iron", "Aluminium", "Oxygen", "Hydrogen"], "type": "fire", "severity": "dangerous",
-     "desc": "Creates Thermite — melts walls/doors when applied and ignited"},
+     "desc": "Creates Thermite — FlammableTileReaction (x2 temp) ignites spilled reagent. Deals Heat(2)+Poison(1) on metabolism. Does NOT melt walls in SS14 (that's SS13 folklore)."},
     {"reagents": ["Aluminium", "Potassium", "Sulfur"], "type": "flash", "severity": "dangerous",
      "desc": "Flash Powder — blinds everyone in area"},
     # === TOXIC COMBOS ===
@@ -673,7 +673,7 @@ ANTAG_DATA = {
     },
     "Lead": {
         "score": 6, "tags": ["lethal", "stealth-poison"],
-        "tips": "Slow-acting heavy metal poison. Hard to detect, accumulates over time. Excellent for long-term covert poisoning via food/drink.",
+        "tips": "(Unobtainable in vanilla SS14 \u2014 no reaction, no plant, no dispenser. Only appears as Licoxide ingredient in Goob/Frontier/Funky forks.) Slow-acting heavy metal poison. Hard to detect, accumulates over time.",
     },
     "CarpoToxin": {
         "score": 6, "tags": ["lethal"],
@@ -732,8 +732,8 @@ ANTAG_DATA = {
         "tips": "Sets targets on fire. Use in smoke grenades to ignite everyone in the area. Does not do direct damage — the fire does.",
     },
     "Thermite": {
-        "score": 7, "tags": ["utility", "area-denial"],
-        "tips": "Melts walls and doors when applied and ignited. Essential for breaching secured areas. Apply to wall, then use a lighter/welder.",
+        "score": 4, "tags": ["area-denial"],
+        "tips": "Tile: Ignites spilled reagent via FlammableTileReaction (x2 temperature). Metabolism (Bloodstream): Heat 2 + Poison 1. Does NOT melt walls in SS14 \u2014 the wall-breach use is SS13 legacy folklore, not present in any SS14 fork YAML.",
     },
     "Fluorosurfactant": {
         "score": 7, "tags": ["delivery-mechanism", "area-denial"],
@@ -867,8 +867,8 @@ ANTAG_STRATEGIES = [
     {
         "id": "slow-poison",
         "name": "Slow Poisoning",
-        "desc": "Lead or Histamine in food/drinks. Damage accumulates slowly — victim may not realize they're being poisoned for minutes.",
-        "reagents": [{"id": "Histamine", "amount": 15}, {"id": "Lead", "amount": 15}],
+        "desc": "Histamine overdose hidden in food/drink. Derived from Nettle plant (Botany cooperation). Allergic reaction deaths look natural — hard to trace. Lead would also work but is unobtainable in vanilla SS14.",
+        "reagents": [{"id": "Histamine", "amount": 25}],
         "method": "Food or drink contamination",
         "difficulty": "easy",
         "stealth": "high",
@@ -892,12 +892,12 @@ ANTAG_STRATEGIES = [
         "stealth": "low",
     },
     {
-        "id": "wall-breach",
-        "name": "Wall Breach",
-        "desc": "Apply Thermite to wall, ignite with lighter/welder. Melts through reinforced walls and blast doors. Essential for breaking into secure areas.",
-        "reagents": [{"id": "Thermite", "amount": 30}],
-        "method": "Apply to wall + ignite",
-        "difficulty": "medium",
+        "id": "floor-pry",
+        "name": "Floor Breach (CLF3)",
+        "desc": "Myth-buster: SS14 chemistry has NO wall-melting mechanic \u2014 the classic Thermite wall-breach is SS13 folklore. The only structural-damage tile reaction in SS14 chemistry is CLF3's PryTileReaction (pyrotechnic.yml:109). Spilling Chlorine Trifluoride pries floor tiles open \u2014 useful for breaching into subfloor pipes or lower decks. Extremely dangerous to the user.",
+        "reagents": [{"id": "ChlorineTrifluoride", "amount": 20}],
+        "method": "Splash or foam-deploy on target floor tile",
+        "difficulty": "hard",
         "stealth": "low",
     },
     {
@@ -912,7 +912,7 @@ ANTAG_STRATEGIES = [
     {
         "id": "clf3-armageddon",
         "name": "CLF3 Armageddon",
-        "desc": "Chlorine Trifluoride — the ultimate destruction chemical. Burns everything, melts walls, toxic fumes. Synthesize above 370K in a shatterproof container or it WILL explode in your hands.",
+        "desc": "Chlorine Trifluoride — the ultimate SS14 destruction chemical. Unique PryTileReaction pries floor tiles when spilled (pyrotechnic.yml:109). Bloodstream deals Heat(2)+Poison(1)+Caustic(0.5); Flammable on touch with scream/popup reactions. Does NOT melt walls. Synthesize above 370K in a shatterproof container or it WILL explode in your hands.",
         "reagents": [{"id": "ChlorineTrifluoride", "amount": 30}],
         "method": "Splash, foam, or suicide bomb",
         "difficulty": "hard",
