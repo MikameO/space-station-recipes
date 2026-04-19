@@ -1,7 +1,7 @@
 {
  "meta": {
-  "schemaVersion": "2.0.0",
-  "generated": "2026-04-19T12:55:11",
+  "schemaVersion": "3.0.0",
+  "generated": "2026-04-19T13:41:01",
   "forks": {
    "vanilla": {
     "name": "Vanilla SS14",
@@ -46,7 +46,25 @@
   },
   "vanillaReagentCount": 405,
   "rmcReagentCount": 94,
-  "reactionCount": 607
+  "reactionCount": 607,
+  "sourceAttribution": {
+   "total": 52,
+   "attributed": 6,
+   "maintainerKnowledgeOnly": 46,
+   "speculationOnly": 0,
+   "needsAttribution": [],
+   "coveragePercent": 11,
+   "avgAuthority": 2.92,
+   "warnings": [
+    "ANTAG_STRATEGIES:silent-kill: URL references a mutable branch (master/main); consider pinning to a commit SHA for link-rot resistance",
+    "ANTAG_STRATEGIES:mass-explosion: URL references a mutable branch (master/main); consider pinning to a commit SHA for link-rot resistance",
+    "ANTAG_STRATEGIES:slow-poison: URL references a mutable branch (master/main); consider pinning to a commit SHA for link-rot resistance",
+    "ANTAG_STRATEGIES:sedation-ambush: URL references a mutable branch (master/main); consider pinning to a commit SHA for link-rot resistance",
+    "ANTAG_STRATEGIES:floor-pry: URL references a mutable branch (master/main); consider pinning to a commit SHA for link-rot resistance",
+    "ANTAG_STRATEGIES:floor-pry: URL references a mutable branch (master/main); consider pinning to a commit SHA for link-rot resistance",
+    "ANTAG_STRATEGIES:clf3-armageddon: URL references a mutable branch (master/main); consider pinning to a commit SHA for link-rot resistance"
+   ]
+  }
  },
  "reagents": {
   "AbductorBlood": {
@@ -979,7 +997,10 @@
     "lethal",
     "stealth-poison"
    ],
-   "antagTips": "Deadly mushroom toxin. No recipe — must obtain from Destroying Angel mushrooms (botany). Very potent in small doses."
+   "antagTips": "Deadly mushroom toxin. No recipe — must obtain from Destroying Angel mushrooms (botany). Very potent in small doses.",
+   "antagTipsSources": [
+    "mk-general-antag-playtime"
+   ]
   },
   "Ambuzol": {
    "id": "Ambuzol",
@@ -6370,7 +6391,10 @@
    "antagTags": [
     "lethal"
    ],
-   "antagTips": "Space Carp venom. No recipe — obtain from butchered carp meat or Koibeans. Strong poison damage."
+   "antagTips": "Space Carp venom. No recipe — obtain from butchered carp meat or Koibeans. Strong poison damage.",
+   "antagTipsSources": [
+    "mk-general-antag-playtime"
+   ]
   },
   "Carpolin": {
    "id": "Carpolin",
@@ -6617,7 +6641,10 @@
    "antagTags": [
     "utility"
    ],
-   "antagTips": "Only from EMAG'd Shambler's Juice machine. Changeling-themed reagent with unique effects."
+   "antagTips": "Only from EMAG'd Shambler's Juice machine. Changeling-themed reagent with unique effects.",
+   "antagTipsSources": [
+    "mk-general-antag-playtime"
+   ]
   },
   "Charcoal": {
    "id": "Charcoal",
@@ -6800,7 +6827,10 @@
     "incapacitating",
     "stealth-poison"
    ],
-   "antagTips": "Puts target to sleep almost instantly. 15-20u is enough. Combine with a lethal toxin for guaranteed silent kill. The #1 antag chemical."
+   "antagTips": "Puts target to sleep almost instantly. 15-20u is enough. Combine with a lethal toxin for guaranteed silent kill. The #1 antag chemical.",
+   "antagTipsSources": [
+    "mk-general-antag-playtime"
+   ]
   },
   "Chlorine": {
    "id": "Chlorine",
@@ -6930,7 +6960,10 @@
     "area-denial",
     "explosive"
    ],
-   "antagTips": "The most dangerous chemical. Extreme fire+toxic damage, ignites on contact, melts almost anything. Synthesis requires >370K — WILL EXPLODE if container breaks. Handle with extreme care."
+   "antagTips": "The most dangerous chemical. Extreme fire+toxic damage, ignites on contact, melts almost anything. Synthesis requires >370K — WILL EXPLODE if container breaks. Handle with extreme care.",
+   "antagTipsSources": [
+    "mk-general-antag-playtime"
+   ]
   },
   "Chronexaline": {
    "id": "Chronexaline",
@@ -9087,7 +9120,10 @@
    "antagTags": [
     "utility"
    ],
-   "antagTips": "Space Meth — extreme speed boost but causes jitteriness and brain damage at high doses. High risk, high reward self-buff."
+   "antagTips": "Space Meth — extreme speed boost but causes jitteriness and brain damage at high doses. High risk, high reward self-buff.",
+   "antagTipsSources": [
+    "mk-general-antag-playtime"
+   ]
   },
   "Deunomia": {
    "id": "Deunomia",
@@ -10697,7 +10733,10 @@
    "antagTags": [
     "utility"
    ],
-   "antagTips": "Stimulant — gives speed boost and reduces stun time. Self-buff before combat. Component of meth."
+   "antagTips": "Stimulant — gives speed boost and reduces stun time. Self-buff before combat. Component of meth.",
+   "antagTipsSources": [
+    "mk-general-antag-playtime"
+   ]
   },
   "Epinephrine": {
    "id": "Epinephrine",
@@ -11764,7 +11803,10 @@
     "lethal",
     "area-denial"
    ],
-   "antagTips": "Highly corrosive acid. Similar to Polytrinic but slightly weaker. Good in foam grenades for corridor denial."
+   "antagTips": "Highly corrosive acid. Similar to Polytrinic but slightly weaker. Good in foam grenades for corridor denial.",
+   "antagTipsSources": [
+    "mk-general-antag-playtime"
+   ]
   },
   "Fluorosurfactant": {
    "id": "Fluorosurfactant",
@@ -11824,7 +11866,10 @@
     "delivery-mechanism",
     "area-denial"
    ],
-   "antagTips": "Creates foam when mixed with water. The foam carries ALL other chemicals in the beaker. Key ingredient for chemical foam grenades."
+   "antagTips": "Creates foam when mixed with water. The foam carries ALL other chemicals in the beaker. Key ingredient for chemical foam grenades.",
+   "antagTipsSources": [
+    "mk-general-antag-playtime"
+   ]
   },
   "FoamingAgent": {
    "id": "FoamingAgent",
@@ -11879,7 +11924,10 @@
    "antagTags": [
     "delivery-mechanism"
    ],
-   "antagTips": "Creates metal foam with iron/aluminium. Used in metal foam grenades to seal corridors or trap people."
+   "antagTips": "Creates metal foam with iron/aluminium. Used in metal foam grenades to seal corridors or trap people.",
+   "antagTipsSources": [
+    "mk-general-antag-playtime"
+   ]
   },
   "Formaldehyde": {
    "id": "Formaldehyde",
@@ -12093,7 +12141,10 @@
    "antagTags": [
     "area-denial"
    ],
-   "antagTips": "Creates extreme cold. Mixed with water causes flash-freeze. Can freeze pipes and create ice hazards."
+   "antagTips": "Creates extreme cold. Mixed with water causes flash-freeze. Can freeze pipes and create ice hazards.",
+   "antagTipsSources": [
+    "mk-general-antag-playtime"
+   ]
   },
   "Frezon": {
    "id": "Frezon",
@@ -12291,7 +12342,10 @@
     "debilitating",
     "stealth-poison"
    ],
-   "antagTips": "Causes severe nausea and vomiting. Target drops items and can't eat/drink. Good for disruption without killing."
+   "antagTips": "Causes severe nausea and vomiting. Target drops items and can't eat/drink. Good for disruption without killing.",
+   "antagTipsSources": [
+    "mk-general-antag-playtime"
+   ]
   },
   "Genecide": {
    "id": "Genecide",
@@ -13470,7 +13524,10 @@
     "lethal",
     "debilitating"
    ],
-   "antagTips": "Hallucinogen that also blocks respiratory signals, causing asphyxiation. More dangerous than MindbreakerToxin — can kill."
+   "antagTips": "Hallucinogen that also blocks respiratory signals, causing asphyxiation. More dangerous than MindbreakerToxin — can kill.",
+   "antagTipsSources": [
+    "mk-general-antag-playtime"
+   ]
   },
   "Helium": {
    "id": "Helium",
@@ -13560,7 +13617,10 @@
     "lethal",
     "stealth-poison"
    ],
-   "antagTips": "Causes internal bleeding. Slow but deadly — victim may not realize they're poisoned until too late. Pairs well with anticoagulants."
+   "antagTips": "Causes internal bleeding. Slow but deadly — victim may not realize they're poisoned until too late. Pairs well with anticoagulants.",
+   "antagTipsSources": [
+    "mk-general-antag-playtime"
+   ]
   },
   "Heparin": {
    "id": "Heparin",
@@ -13893,7 +13953,10 @@
     "lethal",
     "stealth-poison"
    ],
-   "antagTips": "Causes allergic reaction. Low doses: itching and rashes. High doses (overdose): lethal anaphylaxis. Hard to trace as a cause of death."
+   "antagTips": "Causes allergic reaction. Low doses: itching and rashes. High doses (overdose): lethal anaphylaxis. Hard to trace as a cause of death.",
+   "antagTipsSources": [
+    "mk-general-antag-playtime"
+   ]
   },
   "Holywater": {
    "id": "Holywater",
@@ -15190,7 +15253,10 @@
    "antagTags": [
     "debilitating"
    ],
-   "antagTips": "Causes brain damage and confusion. Target becomes disoriented and may wander randomly. Non-lethal disruption."
+   "antagTips": "Causes brain damage and confusion. Target becomes disoriented and may wander randomly. Non-lethal disruption.",
+   "antagTipsSources": [
+    "mk-general-antag-playtime"
+   ]
   },
   "ImperfectMutationToxin": {
    "id": "ImperfectMutationToxin",
@@ -17205,7 +17271,10 @@
     "lethal",
     "stealth-poison"
    ],
-   "antagTips": "(Unobtainable in vanilla SS14 — no reaction, no plant, no dispenser. Only appears as Licoxide ingredient in Goob/Frontier/Funky forks.) Slow-acting heavy metal poison. Hard to detect, accumulates over time."
+   "antagTips": "(Unobtainable in vanilla SS14 — no reaction, no plant, no dispenser. Only appears as Licoxide ingredient in Goob/Frontier/Funky forks.) Slow-acting heavy metal poison. Hard to detect, accumulates over time.",
+   "antagTipsSources": [
+    "mk-general-antag-playtime"
+   ]
   },
   "Lean": {
    "id": "Lean",
@@ -17789,7 +17858,10 @@
     "lethal",
     "stealth-poison"
    ],
-   "antagTips": "Rapidly blocks oxygen absorption. 20u in a syringe or drink is lethal. Tasteless in small doses — ideal for covert assassination."
+   "antagTips": "Rapidly blocks oxygen absorption. 20u in a syringe or drink is lethal. Tasteless in small doses — ideal for covert assassination.",
+   "antagTipsSources": [
+    "mk-general-antag-playtime"
+   ]
   },
   "Libital": {
    "id": "Libital",
@@ -17908,7 +17980,10 @@
     "lethal",
     "stealth-poison"
    ],
-   "antagTips": "Slow-acting toxic compound. Accumulates damage over time. Good for long-term covert poisoning operations."
+   "antagTips": "Slow-acting toxic compound. Accumulates damage over time. Good for long-term covert poisoning operations.",
+   "antagTipsSources": [
+    "mk-general-antag-playtime"
+   ]
   },
   "Lipolicide": {
    "id": "Lipolicide",
@@ -17973,7 +18048,10 @@
    "antagTags": [
     "debilitating"
    ],
-   "antagTips": "Breaks down fat tissue, causing hunger and weakness. Slow-acting. More of a nuisance than a threat."
+   "antagTips": "Breaks down fat tissue, causing hunger and weakness. Slow-acting. More of a nuisance than a threat.",
+   "antagTipsSources": [
+    "mk-general-antag-playtime"
+   ]
   },
   "Lipozine": {
    "id": "Lipozine",
@@ -18891,7 +18969,10 @@
    "antagTags": [
     "debilitating"
    ],
-   "antagTips": "Causes progressive paralysis. Target loses limb function gradually. Non-lethal but very disabling."
+   "antagTips": "Causes progressive paralysis. Target loses limb function gradually. Non-lethal but very disabling.",
+   "antagTipsSources": [
+    "mk-general-antag-playtime"
+   ]
   },
   "MelonLiquor": {
    "id": "MelonLiquor",
@@ -19476,7 +19557,10 @@
    "antagTags": [
     "debilitating"
    ],
-   "antagTips": "Potent hallucinogen. Target sees fake entities and events. Causes confusion and paranoia. Non-lethal psychological warfare."
+   "antagTips": "Potent hallucinogen. Target sees fake entities and events. Causes confusion and paranoia. Non-lethal psychological warfare.",
+   "antagTipsSources": [
+    "mk-general-antag-playtime"
+   ]
   },
   "Mitogen": {
    "id": "Mitogen",
@@ -19824,7 +19908,10 @@
    "antagTags": [
     "lethal"
    ],
-   "antagTips": "Toxic mold spores. Moderate damage over time. Can be grown in botany and ground."
+   "antagTips": "Toxic mold spores. Moderate damage over time. Can be grown in botany and ground.",
+   "antagTipsSources": [
+    "mk-general-antag-playtime"
+   ]
   },
   "MonkeyBusiness": {
    "id": "MonkeyBusiness",
@@ -20519,7 +20606,10 @@
     "incapacitating",
     "utility"
    ],
-   "antagTips": "Silences the victim — they cannot speak or call for help on radio. Combine with other toxins to prevent the target from alerting security."
+   "antagTips": "Silences the victim — they cannot speak or call for help on radio. Combine with other toxins to prevent the target from alerting security.",
+   "antagTipsSources": [
+    "mk-general-antag-playtime"
+   ]
   },
   "NFZombieBiteToxin": {
    "id": "NFZombieBiteToxin",
@@ -20665,7 +20755,10 @@
     "lethal",
     "area-denial"
    ],
-   "antagTips": "Sticky fire that persists. Combines heat, poison, and caustic damage. Use with foam for fire corridors. Recipe: Oil+WeldingFuel+Ethanol."
+   "antagTips": "Sticky fire that persists. Combines heat, poison, and caustic damage. Use with foam for fire corridors. Recipe: Oil+WeldingFuel+Ethanol.",
+   "antagTipsSources": [
+    "mk-general-antag-playtime"
+   ]
   },
   "Natusixadone": {
    "id": "Natusixadone",
@@ -21157,7 +21250,10 @@
     "incapacitating",
     "stealth-poison"
    ],
-   "antagTips": "Forces target to sleep and stay asleep. Longer duration than Chloral Hydrate. Good for kidnapping or extended incapacitation."
+   "antagTips": "Forces target to sleep and stay asleep. Longer duration than Chloral Hydrate. Good for kidnapping or extended incapacitation.",
+   "antagTipsSources": [
+    "mk-general-antag-playtime"
+   ]
   },
   "NorepinephricAcid": {
    "id": "NorepinephricAcid",
@@ -21280,7 +21376,10 @@
    "antagTags": [
     "utility"
    ],
-   "antagTips": "A mysterious reagent. Only obtainable from EMAG'd Solar's Best vending machine. Effects unknown — experimental."
+   "antagTips": "A mysterious reagent. Only obtainable from EMAG'd Solar's Best vending machine. Effects unknown — experimental.",
+   "antagTipsSources": [
+    "mk-general-antag-playtime"
+   ]
   },
   "NuclearCola": {
    "id": "NuclearCola",
@@ -22253,7 +22352,10 @@
     "incapacitating",
     "utility"
    ],
-   "antagTips": "Pacification drug — target cannot attack anyone. Inject into security officers to neutralize them non-lethally."
+   "antagTips": "Pacification drug — target cannot attack anyone. Inject into security officers to neutralize them non-lethally.",
+   "antagTipsSources": [
+    "mk-general-antag-playtime"
+   ]
   },
   "Pendetide": {
    "id": "Pendetide",
@@ -22797,7 +22899,10 @@
    "antagTags": [
     "area-denial"
    ],
-   "antagTips": "Sets targets on fire. Use in smoke grenades to ignite everyone in the area. Does not do direct damage — the fire does."
+   "antagTips": "Sets targets on fire. Use in smoke grenades to ignite everyone in the area. Does not do direct damage — the fire does.",
+   "antagTipsSources": [
+    "mk-general-antag-playtime"
+   ]
   },
   "Phosphorus": {
    "id": "Phosphorus",
@@ -23202,7 +23307,10 @@
    "antagTags": [
     "utility"
    ],
-   "antagTips": "Flammable gas. Can be released to cause fires. Component in many recipes. Available from dispensers."
+   "antagTips": "Flammable gas. Can be released to cause fires. Component in many recipes. Available from dispensers.",
+   "antagTipsSources": [
+    "mk-general-antag-playtime"
+   ]
   },
   "Pluoxium": {
    "id": "Pluoxium",
@@ -23441,7 +23549,10 @@
     "lethal",
     "area-denial"
    ],
-   "antagTips": "Extremely corrosive, severe burn damage. Combine with foam for area denial. Visible on contact — not stealthy."
+   "antagTips": "Extremely corrosive, severe burn damage. Combine with foam for area denial. Visible on contact — not stealthy.",
+   "antagTipsSources": [
+    "mk-general-antag-playtime"
+   ]
   },
   "Posca": {
    "id": "Posca",
@@ -23609,7 +23720,10 @@
    "antagTags": [
     "explosive"
    ],
-   "antagTips": "Explodes on contact with Water. Classic antag weapon: put both in a grenade or throw a beaker. 0.25 intensity per unit, max 100."
+   "antagTips": "Explodes on contact with Water. Classic antag weapon: put both in a grenade or throw a beaker. 0.25 intensity per unit, max 100.",
+   "antagTipsSources": [
+    "mk-general-antag-playtime"
+   ]
   },
   "PotassiumIodide": {
    "id": "PotassiumIodide",
@@ -28294,7 +28408,10 @@
     "lethal",
     "area-denial"
    ],
-   "antagTips": "Zombie virus reagent. Injecting into a corpse reanimates it as a hostile zombie. Maximum chaos potential."
+   "antagTips": "Zombie virus reagent. Injecting into a corpse reanimates it as a hostile zombie. Maximum chaos potential.",
+   "antagTipsSources": [
+    "mk-general-antag-playtime"
+   ]
   },
   "RootBeer": {
    "id": "RootBeer",
@@ -30493,7 +30610,10 @@
    "antagTags": [
     "debilitating"
    ],
-   "antagTips": "Causes hallucinations and stumbling. Low threat but good for distraction. Available from Ambrosia plants."
+   "antagTips": "Causes hallucinations and stumbling. Low threat but good for distraction. Available from Ambrosia plants.",
+   "antagTipsSources": [
+    "mk-general-antag-playtime"
+   ]
   },
   "SpaceGlue": {
    "id": "SpaceGlue",
@@ -31643,7 +31763,10 @@
    "antagTags": [
     "lethal"
    ],
-   "antagTips": "Moderate acid damage. Weaker than Polytrinic/Fluorosulfuric but easier to craft (just Hydrogen+Sulfur+Oxygen)."
+   "antagTips": "Moderate acid damage. Weaker than Polytrinic/Fluorosulfuric but easier to craft (just Hydrogen+Sulfur+Oxygen).",
+   "antagTipsSources": [
+    "mk-general-antag-playtime"
+   ]
   },
   "SwissLemonade": {
    "id": "SwissLemonade",
@@ -32238,7 +32361,10 @@
     "incapacitating",
     "lethal"
    ],
-   "antagTips": "Electrifying mixture that disrupts movement and causes shock damage. Target is slowed and stunned periodically. Also toxic."
+   "antagTips": "Electrifying mixture that disrupts movement and causes shock damage. Target is slowed and stunned periodically. Also toxic.",
+   "antagTipsSources": [
+    "mk-general-antag-playtime"
+   ]
   },
   "Tea": {
    "id": "Tea",
@@ -32376,7 +32502,10 @@
     "incapacitating",
     "area-denial"
    ],
-   "antagTips": "Causes eye irritation, blurred vision, and slowing. Excellent in smoke grenades for area denial and crowd control."
+   "antagTips": "Causes eye irritation, blurred vision, and slowing. Excellent in smoke grenades for area denial and crowd control.",
+   "antagTipsSources": [
+    "mk-general-antag-playtime"
+   ]
   },
   "Tehifin": {
    "id": "Tehifin",
@@ -32769,7 +32898,10 @@
    "antagTags": [
     "area-denial"
    ],
-   "antagTips": "Tile: Ignites spilled reagent via FlammableTileReaction (x2 temperature). Metabolism (Bloodstream): Heat 2 + Poison 1. Does NOT melt walls in SS14 — the wall-breach use is SS13 legacy folklore, not present in any SS14 fork YAML."
+   "antagTips": "Tile: Ignites spilled reagent via FlammableTileReaction (x2 temperature). Metabolism (Bloodstream): Heat 2 + Poison 1. Does NOT melt walls in SS14 — the wall-breach use is SS13 legacy folklore, not present in any SS14 fork YAML.",
+   "antagTipsSources": [
+    "mk-general-antag-playtime"
+   ]
   },
   "ThreeMileIsland": {
    "id": "ThreeMileIsland",
@@ -34015,7 +34147,10 @@
    "antagTags": [
     "area-denial"
    ],
-   "antagTips": "Irradiates everything nearby. Use in smoke for area radiation contamination. Also mutates plants in botany."
+   "antagTips": "Irradiates everything nearby. Use in smoke for area radiation contamination. Also mutates plants in botany.",
+   "antagTipsSources": [
+    "mk-general-antag-playtime"
+   ]
   },
   "UnstableMutationToxin": {
    "id": "UnstableMutationToxin",
@@ -34969,7 +35104,10 @@
    "antagTags": [
     "utility"
    ],
-   "antagTips": "Flammable base chemical. Component of Napalm. Also used in Acetone synthesis. Available from dispensers."
+   "antagTips": "Flammable base chemical. Component of Napalm. Also used in Acetone synthesis. Available from dispensers.",
+   "antagTipsSources": [
+    "mk-general-antag-playtime"
+   ]
   },
   "Whiskey": {
    "id": "Whiskey",
@@ -39310,10 +39448,10 @@
     "rmc14": "modified"
    },
    "forkNotes": {
-    "rmc14": "Added RMCSugar(1) reactant; Added RMCOxygen(1) reactant; Removed Oxygen reactant; Removed Sugar reactant"
+    "rmc14": "Added RMCOxygen(1) reactant; Added RMCSugar(1) reactant; Removed Sugar reactant; Removed Oxygen reactant"
    },
    "rmcStatus": "modified",
-   "rmcNote": "Added RMCSugar(1) reactant; Added RMCOxygen(1) reactant; Removed Oxygen reactant; Removed Sugar reactant"
+   "rmcNote": "Added RMCOxygen(1) reactant; Added RMCSugar(1) reactant; Removed Sugar reactant; Removed Oxygen reactant"
   },
   "ConcentratedCorgiJuice": {
    "id": "ConcentratedCorgiJuice",
@@ -45400,10 +45538,10 @@
     "rmc14": "modified"
    },
    "forkNotes": {
-    "rmc14": "Added RMCSugar(1) reactant; Added RMCBlackGoo(0.5) reactant; Removed Sugar reactant"
+    "rmc14": "Added RMCBlackGoo(0.5) reactant; Added RMCSugar(1) reactant; Removed Sugar reactant"
    },
    "rmcStatus": "modified",
-   "rmcNote": "Added RMCSugar(1) reactant; Added RMCBlackGoo(0.5) reactant; Removed Sugar reactant"
+   "rmcNote": "Added RMCBlackGoo(0.5) reactant; Added RMCSugar(1) reactant; Removed Sugar reactant"
   },
   "MeatCoagulating": {
    "id": "MeatCoagulating",
@@ -64513,6 +64651,93 @@
    "catalyst": false
   }
  ],
+ "sources": {
+  "code-pyro-thermite": {
+   "type": "code",
+   "url": "https://github.com/space-wizards/space-station-14/blob/master/Resources/Prototypes/Reagents/pyrotechnic.yml#L16-L37",
+   "title": "Thermite reagent (pyrotechnic.yml:17-37)",
+   "date": "2026-04-19",
+   "note": "Thermite's only tileReactions entry is FlammableTileReaction (x2 temperature multiplier). No wall-damage or pry effect exists — confirms Thermite does NOT breach walls in SS14.",
+   "authorityWeight": 10
+  },
+  "code-pyro-clf3-prytile": {
+   "type": "code",
+   "url": "https://github.com/space-wizards/space-station-14/blob/master/Resources/Prototypes/Reagents/pyrotechnic.yml#L100-L138",
+   "title": "ChlorineTrifluoride PryTileReaction (pyrotechnic.yml:109)",
+   "date": "2026-04-19",
+   "note": "ChlorineTrifluoride has PryTileReaction — the ONLY structural-damage tile reaction in vanilla SS14 chemistry. Backs the floor-pry strategy.",
+   "authorityWeight": 10
+  },
+  "code-reagents-lead": {
+   "type": "code",
+   "url": "https://github.com/space-wizards/space-station-14/blob/master/Resources/Prototypes/Reagents/toxins.yml",
+   "title": "Lead reagent in toxins.yml (no recipe, no plant, no dispenser)",
+   "date": "2026-04-19",
+   "note": "Searching the vanilla Reactions/ and Hydroponics/ folders for 'Lead' as a reaction product or seed chemical returns zero hits; Lead is defined as a reagent but not produced anywhere — confirming gobbygobbler's unobtainable claim for vanilla.",
+   "authorityWeight": 10
+  },
+  "code-goob-licoxide-lead": {
+   "type": "code",
+   "url": "https://github.com/Goob-Station/Goob-Station/blob/master/Resources/Prototypes/_Goobstation/Recipes/Reactions/toxins.yml",
+   "title": "Goob Station's Licoxide recipe (Lead added as reactant)",
+   "date": "2026-04-19",
+   "note": "Per config.py FORK_REGISTRY[goob].modified_reactions: 'Licoxide: Added Lead(1) as extra reactant'. Note: Lead is an *input* even in Goob, so it remains unobtainable as a product — the Goob modification makes Licoxide HARDER, not Lead EASIER.",
+   "authorityWeight": 10
+  },
+  "code-chemicals-chloral": {
+   "type": "code",
+   "url": "https://github.com/space-wizards/space-station-14/blob/master/Resources/Prototypes/Recipes/Reactions/chemicals.yml",
+   "title": "Chloral Hydrate recipe (chemicals.yml)",
+   "date": "2026-04-19",
+   "note": "Chloral: Chlorine + Ethanol + Water (all three from Chemical Dispenser). Backs silent-kill and sedation-ambush strategies.",
+   "authorityWeight": 10
+  },
+  "code-reagents-potassium-water": {
+   "type": "code",
+   "url": "https://github.com/space-wizards/space-station-14/blob/master/Resources/Prototypes/Recipes/Reactions/chemicals.yml",
+   "title": "Potassium-Water exothermic explosion reaction",
+   "date": "2026-04-19",
+   "note": "K+H2O reaction in chemicals.yml produces an explosion via ChemExplosion with intensity 0.25 per unit, capped at 100. Backs mass-explosion strategy.",
+   "authorityWeight": 10
+  },
+  "forum-gobby-killmix-2026": {
+   "type": "forum-post",
+   "url": "https://forum.spacestation14.com/",
+   "title": "gobbygobbler: kill-mix feedback calling out Lead unobtainable in antag strategies",
+   "author": "gobbygobbler",
+   "date": "2026-04-18",
+   "note": "Forum thread where gobbygobbler reports that 'easy' difficulty strategies use reagents that are 50% unobtainium or botany-coop. Confirmed true for slow-poison (Lead) in vanilla.",
+   "quote": "This 'easy' mix is 50% literal unobtainium and 50% chemical that is only accessible (in pure form) through cargo-botany cooperation.",
+   "authorityWeight": 4
+  },
+  "forum-testicular-thermite-walls-2026": {
+   "type": "forum-post",
+   "url": "https://forum.spacestation14.com/",
+   "title": "Testicular_Man: thermite breaching is SS13-only, not present on any SS14 fork",
+   "author": "Testicular_Man",
+   "date": "2026-04-18",
+   "note": "Forum post stating that thermite wall-breach mechanic does not exist in SS14 and never has. Corroborated by direct YAML inspection (see code-pyro-thermite).",
+   "quote": "Pretty sure that thermite breaching is a 13 only thing, i've not seen it on any fork and god knows it would be the breaching meta for antags and crew alike if it did.",
+   "authorityWeight": 4
+  },
+  "forum-steelclaw-thermite-forks-2026": {
+   "type": "forum-post",
+   "url": "https://forum.spacestation14.com/",
+   "title": "Steelclaw: asks which fork actually supports thermite wall-breach (expected: none)",
+   "author": "Steelclaw",
+   "date": "2026-04-18",
+   "note": "Forum post requesting per-fork clarification on thermite wall-breach — answer (confirmed by cross-fork YAML grep): no fork supports it. Motivated the per-fork filter UI in Increment D and the domain-whitelist design in Increment G.",
+   "quote": "I would request clarification on which forks that works on — it's not something I've ever heard of being a thing on Wizden.",
+   "authorityWeight": 4
+  },
+  "mk-general-antag-playtime": {
+   "type": "maintainer-knowledge",
+   "title": "Documented from maintainer's SS14 playtime",
+   "date": "2026-04-19",
+   "note": "Original curator compiled these notes from personal playtime across multiple SS14 forks. Source is undocumented — community verification via PR is encouraged.",
+   "authorityWeight": 2
+  }
+ },
  "warnings": [
   {
    "reagents": [
@@ -64693,6 +64918,10 @@
    "method": "Syringe or hypospray injection",
    "difficulty": "easy",
    "stealth": "high",
+   "sources": [
+    "code-chemicals-chloral",
+    "mk-general-antag-playtime"
+   ],
    "computedDifficulty": {
     "tier": "hard",
     "effortScore": 10,
@@ -64744,6 +64973,9 @@
    "method": "Foam grenade or beaker mix",
    "difficulty": "medium",
    "stealth": "low",
+   "sources": [
+    "mk-general-antag-playtime"
+   ],
    "computedDifficulty": {
     "tier": "medium",
     "effortScore": 8,
@@ -64797,6 +65029,9 @@
    "method": "Grenade (two-chamber)",
    "difficulty": "easy",
    "stealth": "low",
+   "sources": [
+    "code-reagents-potassium-water"
+   ],
    "computedDifficulty": {
     "tier": "trivial",
     "effortScore": 0,
@@ -64854,6 +65089,9 @@
    "method": "Mix in beaker — triggers automatically",
    "difficulty": "medium",
    "stealth": "medium",
+   "sources": [
+    "mk-general-antag-playtime"
+   ],
    "computedDifficulty": {
     "tier": "hard",
     "effortScore": 9,
@@ -64917,6 +65155,9 @@
    "method": "Foam grenade",
    "difficulty": "hard",
    "stealth": "low",
+   "sources": [
+    "mk-general-antag-playtime"
+   ],
    "computedDifficulty": {
     "tier": "medium",
     "effortScore": 7,
@@ -64968,6 +65209,11 @@
    "method": "Food or drink contamination",
    "difficulty": "easy",
    "stealth": "high",
+   "sources": [
+    "forum-gobby-killmix-2026",
+    "code-reagents-lead",
+    "mk-general-antag-playtime"
+   ],
    "computedDifficulty": {
     "tier": "easy",
     "effortScore": 4,
@@ -65009,6 +65255,10 @@
    "method": "Syringe injection, then restrain",
    "difficulty": "easy",
    "stealth": "medium",
+   "sources": [
+    "code-chemicals-chloral",
+    "mk-general-antag-playtime"
+   ],
    "computedDifficulty": {
     "tier": "medium",
     "effortScore": 8,
@@ -65060,6 +65310,9 @@
    "method": "Mix in thrown beaker",
    "difficulty": "easy",
    "stealth": "low",
+   "sources": [
+    "mk-general-antag-playtime"
+   ],
    "computedDifficulty": {
     "tier": "trivial",
     "effortScore": 0,
@@ -65109,6 +65362,12 @@
    "method": "Splash or foam-deploy on target floor tile",
    "difficulty": "hard",
    "stealth": "low",
+   "sources": [
+    "code-pyro-clf3-prytile",
+    "forum-testicular-thermite-walls-2026",
+    "forum-steelclaw-thermite-forks-2026",
+    "code-pyro-thermite"
+   ],
    "computedDifficulty": {
     "tier": "medium",
     "effortScore": 7,
@@ -65160,6 +65419,9 @@
    "method": "Smoke bomb (auto-triggers)",
    "difficulty": "medium",
    "stealth": "medium",
+   "sources": [
+    "mk-general-antag-playtime"
+   ],
    "computedDifficulty": {
     "tier": "easy",
     "effortScore": 2,
@@ -65217,6 +65479,10 @@
    "method": "Splash, foam, or suicide bomb",
    "difficulty": "hard",
    "stealth": "low",
+   "sources": [
+    "code-pyro-clf3-prytile",
+    "mk-general-antag-playtime"
+   ],
    "computedDifficulty": {
     "tier": "medium",
     "effortScore": 7,
@@ -65261,6 +65527,9 @@
    "method": "Syringe injection",
    "difficulty": "medium",
    "stealth": "high",
+   "sources": [
+    "mk-general-antag-playtime"
+   ],
    "computedDifficulty": {
     "tier": "expert",
     "effortScore": 18,

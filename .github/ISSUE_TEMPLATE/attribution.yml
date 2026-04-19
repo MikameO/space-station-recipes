@@ -1,0 +1,114 @@
+name: Suggest a source
+description: Contribute a code link, forum thread, wiki page, or video that backs up (or debunks) a curator's claim — turns a "maintainer knowledge" placeholder into a first-class catalog entry.
+title: "Source for <entry_id>"
+labels: ["attribution", "data-quality"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Every curated `antagTips` or strategy `desc` in NanoTrasen ChemDB should
+        cite its origin. When you click **Suggest a source** from an entry that
+        shows `⚠ needs attribution`, the `entry_id` field below is pre-filled from
+        the URL. Fill the rest and submit — maintainer will add it to
+        [`sources.py`](../sources.py) and link it in the relevant entry.
+
+        See [`docs/attribution-ladder`](../../docs) (or the README "Source
+        Attribution" section) for what counts as code / forum-post / wiki / etc.
+
+  - type: input
+    id: entry_id
+    attributes:
+      label: Entry ID the source applies to
+      description: Reagent ID or strategy ID (pre-filled if you used the in-app Suggest link).
+      placeholder: "ChlorineTrifluoride or floor-pry"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: field
+    attributes:
+      label: Which field does this source back?
+      options:
+        - antagTips (curator's reagent tips)
+        - desc (strategy description)
+        - difficulty (authored tier)
+        - loreWarning (debunks a claim)
+        - other
+    validations:
+      required: true
+
+  - type: dropdown
+    id: source_type
+    attributes:
+      label: Source type
+      description: Determines the authority weight (see README ladder).
+      options:
+        - "code — YAML deep-link (weight 10)"
+        - "maintainer-test — personally playtested (weight 9)"
+        - "forum-consensus — multiple aligned forum posts (weight 7)"
+        - "wiki — SS14 community wiki (weight 5)"
+        - "forum-post — single forum thread (weight 4)"
+        - "video — YouTube/Twitch VOD with timestamp (weight 4)"
+        - "speculation — needs verification (weight 1)"
+    validations:
+      required: true
+
+  - type: input
+    id: source_url
+    attributes:
+      label: Source URL
+      description: |
+        Whitelisted domains: github.com (space-wizards + fork owners),
+        forum.spacestation14.com, wiki.spacestation14.com, youtube.com / youtu.be,
+        twitch.tv, reddit.com/r/SpaceStation14, web.archive.org.
+        For code: deep-link to the specific line (e.g. `#L109`).
+        For videos: include `?t=` timestamp.
+      placeholder: "https://github.com/space-wizards/space-station-14/blob/<commit>/Resources/Prototypes/Reagents/pyrotechnic.yml#L109"
+    validations:
+      required: true
+
+  - type: input
+    id: source_author
+    attributes:
+      label: Author (for forum-post, video)
+      description: Forum handle or channel name. Leave blank for code / wiki / maintainer-test.
+      placeholder: "gobbygobbler"
+
+  - type: input
+    id: source_date
+    attributes:
+      label: Date (ISO-8601)
+      description: When the source was created / last verified.
+      placeholder: "2026-04-18"
+
+  - type: textarea
+    id: source_note
+    attributes:
+      label: What does this source prove?
+      description: One-sentence note — what specifically the link demonstrates. Shows up in tooltips.
+      placeholder: "Confirms CLF3 is the only SS14 reagent with PryTileReaction; backs the floor-pry strategy."
+    validations:
+      required: true
+
+  - type: textarea
+    id: source_quote
+    attributes:
+      label: Key quote (optional, ≤200 chars)
+      description: For forum posts — the sentence that matters. Fair-use snippet prevents context-stripping later.
+
+  - type: input
+    id: archive_url
+    attributes:
+      label: Wayback archive URL (optional but recommended for forum/video)
+      description: Hedge against link rot. Paste the web.archive.org snapshot URL.
+      placeholder: "https://web.archive.org/web/20260419000000/https://forum.spacestation14.com/t/..."
+
+  - type: checkboxes
+    id: acknowledgements
+    attributes:
+      label: Acknowledgements
+      options:
+        - label: "I've checked that this source is publicly accessible (not Discord, not a private DM)."
+          required: true
+        - label: "I understand maintainer may decline sources with low authority or unclear relevance."
+          required: true

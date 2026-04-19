@@ -1,0 +1,86 @@
+name: Link-rot check (SOURCES catalog)
+
+# Increment G.5 — weekly ping of every URL cited in sources.py. On ≥10%
+# broken, an auto-issue is filed with the broken list so the maintainer can
+# triage (usually by adding an `archive_url` Wayback snapshot or fixing the
+# URL itself). GitHub Actions free-tier cost: ~20 HTTP HEAD requests/week,
+# well under the 2000-minute monthly budget.
+
+on:
+  schedule:
+    # Mondays at 03:00 UTC — quiet period for most contributors.
+    - cron: "0 3 * * 1"
+  workflow_dispatch:  # allow manual runs from the Actions UI
+  push:
+    paths:
+      # Re-check immediately when the catalog changes (catches typos).
+      - "sources.py"
+      - "scripts/check_sources.py"
+      - ".github/workflows/check-links.yml"
+
+permissions:
+  contents: write   # for auto-commit of cache/link_health.json
+  issues: write     # for auto-filing broken-link issues
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Run link checker
+        id: check
+        run: |
+          set +e
+          python scripts/check_sources.py
+          echo "exit_code=$?" >> "$GITHUB_OUTPUT"
+          set -e
+
+      - name: Commit updated cache/link_health.json
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "chore: update cache/link_health.json"
+          file_pattern: cache/link_health.json
+
+      - name: Build issue body on failure
+        if: steps.check.outputs.exit_code != '0'
+        run: |
+          python -c "
+          import json, pathlib
+          h = json.loads(pathlib.Path('cache/link_health.json').read_text(encoding='utf-8'))
+          s = h['summary']
+          out = []
+          out.append('## Weekly link-rot check failed')
+          out.append('')
+          out.append(f\"**Broken:** {s['broken_count']}/{s['total_checked']} ({s['broken_percent']}%)\")
+          out.append(f\"**Last run:** {s['last_run']}\")
+          out.append('')
+          out.append('### Broken URLs')
+          out.append('')
+          for b in s['broken']:
+              out.append(f\"- **{b['id']}** — {b['error']}\")
+              out.append(f\"  - URL: {b['url']}\")
+          out.append('')
+          out.append('### Suggested fix')
+          out.append('')
+          out.append('For each broken entry in `sources.py`, either:')
+          out.append('- Update the URL to a working deep-link, OR')
+          out.append('- Add an `archive_url` field pointing at the Wayback Machine snapshot:')
+          out.append('  `https://web.archive.org/web/<timestamp>/<original-url>`')
+          out.append('')
+          out.append('_This issue was auto-filed by `.github/workflows/check-links.yml`._')
+          pathlib.Path('issue_body.md').write_text('\n'.join(out), encoding='utf-8')
+          "
+
+      - name: Create issue on failure
+        if: steps.check.outputs.exit_code != '0'
+        uses: peter-evans/create-issue-from-file@v5
+        with:
+          title: "Link-rot check: broken sources detected"
+          content-filepath: issue_body.md
+          labels: automated, link-rot, data-quality

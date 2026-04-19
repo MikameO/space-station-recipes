@@ -1525,6 +1525,73 @@ function activateAntagMode() {
   if (antagTabBtn) antagTabBtn.style.display = '';
 }
 
+// Increment G — render a source-attribution pill row.
+// `refs` is an array where each element is either a string ID (resolved via
+// DATA.sources[id]) or an inline {type,note,...} object.
+const _AUTHORITY_WEIGHTS_JS = {
+  'code': 10, 'maintainer-test': 9, 'forum-consensus': 7, 'wiki': 5,
+  'forum-post': 4, 'video': 4, 'maintainer-knowledge': 2, 'speculation': 1,
+};
+function _sourcePillClass(weight) {
+  if (weight >= 9) return 'source-code';
+  if (weight >= 5) return 'source-community';
+  if (weight >= 2) return 'source-claim';
+  return 'source-speculation';
+}
+function _sourceIcon(type) {
+  switch (type) {
+    case 'code': return '\u2329/\u232A';   // angle brackets
+    case 'maintainer-test': return '\u2713';
+    case 'forum-consensus':
+    case 'forum-post': return '\u{1F4AC}';  // speech bubble
+    case 'video': return '\u25B6';           // play triangle
+    case 'wiki': return '\u{1F4D6}';         // book
+    case 'maintainer-knowledge': return '\u266A';  // note (hand-written lore)
+    case 'speculation': return '?';
+    default: return '\u2022';
+  }
+}
+function renderSources(refs, ownerId) {
+  const catalog = DATA.sources || {};
+  const list = Array.isArray(refs) ? refs : [];
+
+  // Attribution-needed state
+  if (!list.length) {
+    const ownerParam = ownerId ? `&entry_id=${encodeURIComponent(ownerId)}` : '';
+    return `<div class="sources-row sources-empty">
+      <span class="badge badge-needs-attribution" title="No source cited for this entry — consider contributing a YAML/forum/video link via GitHub issue.">\u26A0 needs attribution</span>
+      <a class="attribution-link"
+         href="https://github.com/MikameO/space-station-recipes/issues/new?template=attribution.yml${ownerParam}"
+         target="_blank" rel="noopener noreferrer"
+         title="Open a pre-filled GitHub issue suggesting a source">Suggest a source</a>
+    </div>`;
+  }
+
+  const pills = list.map(ref => {
+    const src = typeof ref === 'string' ? catalog[ref] : ref;
+    if (!src) return '';
+    const weight = _AUTHORITY_WEIGHTS_JS[src.type] ?? 0;
+    const cls = _sourcePillClass(weight);
+    const icon = _sourceIcon(src.type);
+    const parts = [src.type];
+    if (src.author) parts.push(src.author);
+    if (src.date) parts.push(src.date);
+    const header = parts.join(' \u00B7 ');
+    const title = `${header}${src.note ? '\n' + src.note : ''}${src.quote ? '\n\n\u201C' + src.quote + '\u201D' : ''}`;
+    const label = src.title || src.type;
+    const clickable = src.url && src.type !== 'maintainer-knowledge';
+    return clickable
+      ? `<a href="${esc(src.url)}" target="_blank" rel="noopener noreferrer"
+            class="source-pill ${cls}" title="${esc(title)}">
+           <span class="source-icon">${icon}</span><span class="source-label">${esc(label)}</span>
+         </a>`
+      : `<span class="source-pill ${cls}" title="${esc(title)}">
+           <span class="source-icon">${icon}</span><span class="source-label">${esc(label)}</span>
+         </span>`;
+  }).join('');
+  return `<div class="sources-row">${pills}</div>`;
+}
+
 // Tag-driven delivery suggestions — structured replacement for the old
 // text-mining heuristic (which produced false positives when tips contained
 // negations or multi-word context).
@@ -1577,10 +1644,12 @@ function getAntagIntelHTML(r) {
 
   // Community knowledge (curator's antagTips) — not cross-checked against YAML.
   // Visually distinct (dashed border, tooltip) so readers know to treat with skepticism.
+  // Increment G: attribution pills show where the tip comes from (code/forum/mk).
   const communityHTML = tips ? `
       <div class="community-lore" title="Curator's playtime notes. Not automatically cross-checked against YAML — may include SS13 legacy or unverified community claims.">
         <h5>\u24d8 Community knowledge (unverified)</h5>
         <div class="antag-tips">${esc(tips)}</div>
+        ${renderSources(r.antagTipsSources, r.id)}
       </div>` : '';
 
   const scoreHTML = score ? `
@@ -1701,6 +1770,7 @@ function renderAntagStrategies() {
         ${vBadge}
       </div>
       <div class="strategy-reagents">${reagentChips}</div>
+      ${renderSources(strat.sources, strat.id)}
       <div class="strategy-actions">
         <button class="strategy-calc-btn" onclick="event.stopPropagation(); loadStrategyIntoBatch('${esc(strat.id)}')">Calculate in Batch Planner</button>
         <a class="strategy-report-btn"

@@ -94,9 +94,36 @@ sprites/            Reagent sprite assets (pixel art)
 
 SS13 legacy lore is **not accepted** unless independently confirmed in SS14 YAML. The classic "Thermite melts walls" claim (widely repeated from SS13) is the canonical example: in SS14, Thermite has only `FlammableTileReaction`, no wall-damage mechanic exists. Similar myths (chemistry-based EMP, pure poison auto-kill, etc.) are rejected without a github.com/space-wizards link or a verifiable forum/wiki source.
 
+**Source attribution (schema 3.0.0+)**
+
+Every curated claim in `data.json` — strategy `desc`, reagent `antagTips`, debunking `loreWarnings` — carries a `sources` list pointing at trackable evidence. The catalog lives in [`sources.py`](sources.py) and ships in `data.sources` for frontend consumption.
+
+Each source entry has a `type` from the authority ladder (higher = more authoritative):
+
+| Type | Weight | When to use |
+|---|:---:|---|
+| `code` | 10 | GitHub deep-link to YAML line (`…#L109`) — the source of truth |
+| `maintainer-test` | 9 | Personally playtested by maintainer |
+| `forum-consensus` | 7 | ≥3 aligned forum posts from distinct users |
+| `wiki` | 5 | SS14 community wiki |
+| `forum-post` | 4 | Single forum thread |
+| `video` | 4 | YouTube / Twitch VOD (include `?t=` timestamp) |
+| `maintainer-knowledge` | 2 | Honest placeholder: "I know this from playtime, undocumented" |
+| `speculation` | 1 | Explicit "needs verification" marker, renders red |
+
+Aggregation is **max**, not sum: a single `code` reference outweighs ten weak forum posts. Weight is centralized (derived from `type`, not per-entry editable) so a contributor cannot inflate their own post's authority by editing the catalog.
+
+Domain whitelist (`ALLOWED_DOMAINS` in `sources.py`): `forum.spacestation14.com`, `github.com` (owners auto-derived from `FORK_REGISTRY` + `space-wizards`), `wiki.spacestation14.com`, `youtube.com` / `youtu.be`, `twitch.tv`, `reddit.com/r/SpaceStation14`, `web.archive.org`. Discord explicitly excluded (non-public, non-permalink).
+
+A weekly [CI workflow](.github/workflows/check-links.yml) HEAD-pings every URL in the catalog and auto-files an issue if ≥10 % break — maintainer then adds an `archive_url` Wayback snapshot or fixes the link.
+
 **How to report an inaccuracy**
 
-On any strategy card in Antag mode there's a **⚠ Report inaccuracy** button that opens a pre-filled GitHub issue (template: [`strategy-inaccuracy.yml`](.github/ISSUE_TEMPLATE/strategy-inaccuracy.yml)). The template **requires** a verifiable source link (SS14 code, forum thread, wiki, or YouTube VOD with timestamp) — lazy reports without evidence get closed quickly, so citing makes your fix durable.
+On any strategy card in Antag mode there's a **⚠ Report inaccuracy** button that opens a pre-filled GitHub issue (template: [`strategy-inaccuracy.yml`](.github/ISSUE_TEMPLATE/strategy-inaccuracy.yml)). The template **requires** a verifiable source link — lazy reports without evidence get closed quickly, so citing makes your fix durable.
+
+**How to contribute a source**
+
+Reagents with `⚠ needs attribution` badges have a "Suggest a source" link that opens the [`attribution.yml`](.github/ISSUE_TEMPLATE/attribution.yml) template with the entry ID pre-filled. Fill in `source_type`, `source_url`, and a one-sentence `source_note`; maintainer adds the entry to `sources.py` and wires it into the relevant `sources` list.
 
 See [CHANGELOG.md](CHANGELOG.md) for schema evolution.
 

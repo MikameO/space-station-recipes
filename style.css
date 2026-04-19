@@ -1522,6 +1522,41 @@ body.antag-active .antag-toggle {
   padding: 0; margin-left: 4px;
 }
 
+/* Source attribution pills (Increment G) */
+.sources-row {
+  display: flex; flex-wrap: wrap; gap: 4px;
+  margin-top: 6px; padding-top: 6px;
+  border-top: 1px dotted rgba(255,255,255,0.06);
+}
+.source-pill {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 2px 7px; border-radius: 2px;
+  font-size: 0.62rem; font-family: 'Share Tech Mono', monospace;
+  text-decoration: none;
+  border: 1px solid; max-width: 260px;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.source-pill:hover { filter: brightness(1.3); }
+.source-pill .source-icon { opacity: 0.7; font-size: 0.75em; }
+.source-pill .source-label { overflow: hidden; text-overflow: ellipsis; }
+
+.source-pill.source-code       { color: #4ade80; border-color: rgba(74,222,128,0.4); background: rgba(74,222,128,0.08); }
+.source-pill.source-community  { color: #22d3ee; border-color: rgba(34,211,238,0.4); background: rgba(34,211,238,0.08); }
+.source-pill.source-claim      { color: #fbbf24; border-color: rgba(251,191,36,0.4); background: rgba(251,191,36,0.08); }
+.source-pill.source-speculation{ color: #ef4444; border-color: rgba(239,68,68,0.4);  background: rgba(239,68,68,0.08); }
+
+.sources-empty { align-items: center; }
+.badge-needs-attribution {
+  background: rgba(100,100,100,0.15); color: #aaa;
+  border: 1px dashed #666; padding: 2px 8px; border-radius: 2px;
+  font-size: 0.62rem; letter-spacing: 0.05em;
+}
+.attribution-link {
+  font-size: 0.65rem; color: #22d3ee;
+  text-decoration: underline dotted; text-underline-offset: 2px;
+}
+.attribution-link:hover { color: #67e8f9; }
+
 /* Strategy card action row (Increment E) */
 .strategy-actions {
   display: flex; gap: 8px; flex-wrap: wrap; align-items: center;

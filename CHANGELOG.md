@@ -3,6 +3,93 @@
 `data.json` schema version is in `meta.schemaVersion`. Consumers reading this file
 should pin on a compatible range (semver: breaking changes bump major).
 
+## 3.0.0 — 2026-04-19 (Increment G — Source Attribution)
+
+Introduces a **source attribution layer**: every curated claim in `data.json`
+(strategy `desc`/`method`, reagent `antagTips`) now carries a `sources` / `antagTipsSources`
+list pointing at trackable evidence — YAML deep-links, forum threads, wiki
+pages, videos, or explicit `maintainer-knowledge` placeholders.
+
+The conceptual shift (from 2.0.0) is why this is a major bump: consumers must
+no longer treat curator text as free-form opinion, but as a claim with a
+weighted authority trail. Forum user handles (gobbygobbler, Testicular_Man,
+Steelclaw) are now first-class catalog entries — `data.sources["forum-gobby-killmix-2026"]`
+ships literally in the JSON.
+
+### Breaking
+
+- `data.json.meta.schemaVersion` bumped to `"3.0.0"`.
+- New top-level `data.sources`: dict of catalog entries keyed by short IDs
+  (e.g. `code-pyro-clf3-prytile`, `forum-testicular-thermite-walls-2026`).
+  Each entry includes `type`, `url`, `title`, `author?`, `date`, `note`,
+  `quote?`, `archive_url?`, and a derived `authorityWeight` (0-10).
+- New field on each strategy: `sources: (string | object)[]` — list of
+  catalog refs or inline source objects.
+- New field on each reagent: `antagTipsSources: string[]` — defaults to
+  `["mk-general-antag-playtime"]` for reagents with curated `antagTips`
+  but no explicit source backfill yet.
+- New `data.meta.sourceAttribution` summary: `{total, attributed,
+  maintainerKnowledgeOnly, speculationOnly, coveragePercent, avgAuthority,
+  warnings}`.
+
+### New files
+
+- `sources.py` — catalog + `AUTHORITY_WEIGHTS` + `ALLOWED_DOMAINS` +
+  `validate_source_refs`. Separate from `config.py` so drive-by contributors
+  can PR attribution in isolation.
+- `scripts/check_sources.py` — weekly HEAD-request link checker, writes to
+  `cache/link_health.json`, exits 1 on ≥10% broken.
+- `.github/workflows/check-links.yml` — cron `Monday 03:00 UTC` runs the
+  checker, auto-commits the health file, auto-files an issue listing broken
+  URLs with suggested `archive_url` fix pattern.
+- `.github/ISSUE_TEMPLATE/attribution.yml` — community form for suggesting
+  sources. Required fields: `entry_id`, `field`, `source_type`, `source_url`,
+  `source_note` + two acknowledgement checkboxes.
+
+### New features
+
+- **Authority ladder** (`AUTHORITY_WEIGHTS`): 8 types from `speculation`(1)
+  through `code`(10). Centralized — a contributor cannot inflate weight by
+  editing entry-level data; weight is derived from `type`. Aggregation uses
+  `max()` not `sum()`, so one code reference outranks ten forum posts.
+- **Domain whitelist** in `sources.py::ALLOWED_DOMAINS`. GitHub owners are
+  auto-derived from `FORK_REGISTRY` + `space-wizards`. Unknown domains emit
+  a warning so whitelist expansion requires a visible PR.
+- **UI source pills** in `renderSources()`: green (code/maintainer-test),
+  cyan (forum-consensus/wiki), amber (forum-post/video/mk), red (speculation).
+  Clickable for entries with URL; `target="_blank" rel="noopener noreferrer"`
+  (OWASP standard).
+- **Attribution-needed state**: reagents with `antagTipsSources: []` render
+  a `⚠ needs attribution` badge with a "Suggest a source" link that opens
+  the pre-filled `attribution.yml` issue.
+- **Build-time validator** emits warnings for: branch-pinned GitHub URLs
+  (master/main rather than a commit SHA), unknown domains, invalid ISO
+  dates, missing required fields by source-type, overlong `quote` (>200),
+  non-web.archive.org `archive_url`, YouTube `/embed/` form, and Reddit URLs
+  outside the `/r/SpaceStation14` scope. Fatal: unresolved catalog IDs.
+
+### Backfill at release
+
+- 12/12 antag strategies have explicit `sources`:
+  - `slow-poison` → `forum-gobby-killmix-2026` + `code-reagents-lead`
+  - `floor-pry` → `code-pyro-clf3-prytile` + `forum-testicular-thermite-walls-2026` + `forum-steelclaw-thermite-forks-2026` + `code-pyro-thermite`
+  - `silent-kill` / `sedation-ambush` → `code-chemicals-chloral`
+  - `mass-explosion` → `code-reagents-potassium-water`
+  - `clf3-armageddon` → `code-pyro-clf3-prytile`
+  - Others → `mk-general-antag-playtime` (placeholder, community PR
+    welcome via attribution.yml).
+- 46 ANTAG_DATA reagent entries default to `["mk-general-antag-playtime"]`.
+  Coverage: 6/52 (11%) non-mk sources; avg authority 2.92.
+
+### Internal notes
+
+- `config.py` was NOT extended with a `sources` dict — the catalog lives in
+  `sources.py` to keep `config.py` focused on "what to render" vs "what
+  backs it up". Extractor does `from sources import SOURCES, ...`.
+- Field naming `antagTipsSources` (not `sources`) on reagent level
+  deliberately avoids collision with the existing `obtainSources` field
+  which means "where to get the chemical in-game".
+
 ## 2.0.0 — 2026-04-19 (Increments A–E)
 
 Quality improvement pack triggered by three [SS14 Discussion](https://forum.spacestation14.com/)

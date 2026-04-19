@@ -35,6 +35,10 @@ from config import (
     REAGENT_COLUMNS, REACTION_COLUMNS,
     ANTAG_DATA, ANTAG_STRATEGIES, DELIVERY_MECHANISMS, SYNDICATE_ITEMS,
 )
+from sources import (
+    SOURCES, AUTHORITY_WEIGHTS, ALLOWED_DOMAINS,
+    validate_source_refs, authority_weight, resolve_source,
+)
 
 # ─────────────────────────────────────────────
 # Fork source detection (generalized from hardcoded _RMC14 check)
@@ -1851,7 +1855,7 @@ def export_json(reagents: dict, reactions: dict, locale: dict,
 
     data = {
         "meta": {
-            "schemaVersion": "2.0.0",
+            "schemaVersion": "3.0.0",
             "generated": time.strftime("%Y-%m-%dT%H:%M:%S"),
             "forks": forks_meta,
             # Backward compat
@@ -1864,6 +1868,12 @@ def export_json(reagents: dict, reactions: dict, locale: dict,
         "baseChemicals": sorted(base_set),
         "categories": [],
         "edges": [],
+        # Increment G — attribution catalog. Each entry carries a derived
+        # `authorityWeight` (0-10) computed from `type` via AUTHORITY_WEIGHTS.
+        "sources": {
+            sid: {**entry, "authorityWeight": authority_weight(entry)}
+            for sid, entry in SOURCES.items()
+        },
     }
 
     # Phase 9a.5: Compute accessibility tier for every non-abstract reagent.
@@ -1935,6 +1945,12 @@ def export_json(reagents: dict, reactions: dict, locale: dict,
         antag_score = antag_info.get("score", 0) if antag_info else compute_antag_score(effect_tags)
         antag_tags = antag_info.get("tags", [])
         antag_tips = antag_info.get("tips", "")
+        # Increment G — attribution for curator tips. Defaults to
+        # maintainer-knowledge placeholder when the curated entry has no explicit
+        # "sources" field. This keeps coverage≥100% of curated entries without
+        # forcing maintainer to backfill in one go; the placeholder renders as an
+        # amber "⚠ needs verification" pill to motivate community PRs.
+        antag_tips_sources = list(antag_info.get("sources", ["mk-general-antag-playtime"])) if antag_info and antag_tips else []
 
         reagent_obj = {
             "id": rid,
@@ -1967,6 +1983,8 @@ def export_json(reagents: dict, reactions: dict, locale: dict,
             reagent_obj["antagTags"] = antag_tags
         if antag_tips:
             reagent_obj["antagTips"] = antag_tips
+        if antag_tips_sources:
+            reagent_obj["antagTipsSources"] = antag_tips_sources
 
         data["reagents"][rid] = reagent_obj
 
@@ -2052,6 +2070,7 @@ def export_json(reagents: dict, reactions: dict, locale: dict,
     data["warnings"] = DANGEROUS_INTERACTIONS
 
     # Antag mode data — each strategy gets computedDifficulty + verificationStatus attached.
+    # Increment G: `sources` passes through via {**_strat} — already authored on each entry.
     delivery_keys = set(DELIVERY_MECHANISMS.keys())
     strategies_out = []
     mismatches = []
@@ -2059,8 +2078,11 @@ def export_json(reagents: dict, reactions: dict, locale: dict,
     for _strat in ANTAG_STRATEGIES:
         computed = compute_strategy_difficulty(_strat, accessibility_map, reaction_lookup)
         verification = compute_strategy_verification_status(_strat, verified_mechanics_map, delivery_keys)
+        # Default sources to mk-placeholder if curator didn't specify any.
+        src_list = _strat.get("sources") or ["mk-general-antag-playtime"]
         strategies_out.append({
             **_strat,
+            "sources": src_list,
             "computedDifficulty": computed,
             "verificationStatus": verification["status"],
             "loreWarnings": verification["loreWarnings"],
@@ -2090,6 +2112,48 @@ def export_json(reagents: dict, reactions: dict, locale: dict,
     print(f"\n  Verified mechanics: {verified_reagent_count}/{len(reagents)} reagents have YAML-extracted claims")
     if lore_only_strategies:
         print(f"  Lore-only strategies (no ingredient has verified mechanics): {lore_only_strategies}")
+
+    # Increment G — source attribution validation.
+    # Collects (owner_label, sources_list) tuples from both ANTAG_STRATEGIES and
+    # the ANTAG_DATA entries attached to reagents (via antagTipsSources).
+    # Emits coverage report into meta.sourceAttribution and warnings to stdout.
+    attribution_inputs = []
+    for s in strategies_out:
+        attribution_inputs.append((f"ANTAG_STRATEGIES:{s['id']}", s.get("sources", [])))
+    for rid, robj in data["reagents"].items():
+        if robj.get("antagTipsSources"):
+            attribution_inputs.append((f"ANTAG_DATA:{rid}", robj["antagTipsSources"]))
+
+    allowed_gh_owners = {
+        conf["repo"].split("/")[0]
+        for conf in FORK_REGISTRY.values()
+        if conf.get("repo")
+    } | {"space-wizards"}
+
+    attribution_summary, attribution_fatal, attribution_warn = validate_source_refs(
+        attribution_inputs, allowed_gh_owners=allowed_gh_owners, catalog=SOURCES,
+    )
+    data["meta"]["sourceAttribution"] = {
+        **attribution_summary,
+        "warnings": attribution_warn,
+    }
+
+    print(f"\n  Source attribution coverage: "
+          f"{attribution_summary['attributed']}/{attribution_summary['total']} "
+          f"({attribution_summary['coveragePercent']}%) have non-mk sources; "
+          f"{attribution_summary['maintainerKnowledgeOnly']} mk-only; "
+          f"avg authority {attribution_summary['avgAuthority']}")
+    if attribution_warn:
+        print(f"  Attribution warnings ({len(attribution_warn)}):")
+        for w in attribution_warn[:10]:
+            print(f"    - {w}")
+        if len(attribution_warn) > 10:
+            print(f"    ... ({len(attribution_warn) - 10} more)")
+    if attribution_fatal:
+        raise RuntimeError(
+            "Source attribution fatal errors (unresolved catalog IDs):\n"
+            + "\n".join(f"  - {e}" for e in attribution_fatal)
+        )
 
     with open(JSON_FILE, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=1)

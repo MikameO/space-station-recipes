@@ -827,6 +827,7 @@ ANTAG_STRATEGIES = [
         "method": "Syringe or hypospray injection",
         "difficulty": "easy",
         "stealth": "high",
+        "sources": ["code-chemicals-chloral", "mk-general-antag-playtime"],
     },
     {
         "id": "area-denial-acid",
@@ -836,6 +837,7 @@ ANTAG_STRATEGIES = [
         "method": "Foam grenade or beaker mix",
         "difficulty": "medium",
         "stealth": "low",
+        "sources": ["mk-general-antag-playtime"],
     },
     {
         "id": "mass-explosion",
@@ -845,6 +847,7 @@ ANTAG_STRATEGIES = [
         "method": "Grenade (two-chamber)",
         "difficulty": "easy",
         "stealth": "low",
+        "sources": ["code-reagents-potassium-water"],
     },
     {
         "id": "smoke-toxin",
@@ -854,6 +857,7 @@ ANTAG_STRATEGIES = [
         "method": "Mix in beaker — triggers automatically",
         "difficulty": "medium",
         "stealth": "medium",
+        "sources": ["mk-general-antag-playtime"],
     },
     {
         "id": "fire-foam",
@@ -863,6 +867,7 @@ ANTAG_STRATEGIES = [
         "method": "Foam grenade",
         "difficulty": "hard",
         "stealth": "low",
+        "sources": ["mk-general-antag-playtime"],
     },
     {
         "id": "slow-poison",
@@ -872,6 +877,7 @@ ANTAG_STRATEGIES = [
         "method": "Food or drink contamination",
         "difficulty": "easy",
         "stealth": "high",
+        "sources": ["forum-gobby-killmix-2026", "code-reagents-lead", "mk-general-antag-playtime"],
     },
     {
         "id": "sedation-ambush",
@@ -881,6 +887,7 @@ ANTAG_STRATEGIES = [
         "method": "Syringe injection, then restrain",
         "difficulty": "easy",
         "stealth": "medium",
+        "sources": ["code-chemicals-chloral", "mk-general-antag-playtime"],
     },
     {
         "id": "flash-grab",
@@ -890,6 +897,7 @@ ANTAG_STRATEGIES = [
         "method": "Mix in thrown beaker",
         "difficulty": "easy",
         "stealth": "low",
+        "sources": ["mk-general-antag-playtime"],
     },
     {
         "id": "floor-pry",
@@ -899,6 +907,7 @@ ANTAG_STRATEGIES = [
         "method": "Splash or foam-deploy on target floor tile",
         "difficulty": "hard",
         "stealth": "low",
+        "sources": ["code-pyro-clf3-prytile", "forum-testicular-thermite-walls-2026", "forum-steelclaw-thermite-forks-2026", "code-pyro-thermite"],
     },
     {
         "id": "radiation-zone",
@@ -908,6 +917,7 @@ ANTAG_STRATEGIES = [
         "method": "Smoke bomb (auto-triggers)",
         "difficulty": "medium",
         "stealth": "medium",
+        "sources": ["mk-general-antag-playtime"],
     },
     {
         "id": "clf3-armageddon",
@@ -917,6 +927,7 @@ ANTAG_STRATEGIES = [
         "method": "Splash, foam, or suicide bomb",
         "difficulty": "hard",
         "stealth": "low",
+        "sources": ["code-pyro-clf3-prytile", "mk-general-antag-playtime"],
     },
     {
         "id": "silence-and-kill",
@@ -926,6 +937,7 @@ ANTAG_STRATEGIES = [
         "method": "Syringe injection",
         "difficulty": "medium",
         "stealth": "high",
+        "sources": ["mk-general-antag-playtime"],
     },
 ]
 
