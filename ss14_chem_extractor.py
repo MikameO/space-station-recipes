@@ -1418,6 +1418,246 @@ def compute_antag_score(effect_tags: list[str]) -> int:
 
 
 # ─────────────────────────────────────────────
+# Phase 9a.5: Accessibility & Computed Difficulty (Increment B)
+# ─────────────────────────────────────────────
+#
+# Accessibility classifies how hard it is to obtain each reagent in vanilla play.
+# Computed difficulty aggregates ingredient accessibility + reaction depth into a
+# tier for each antag strategy, enabling per-fork difficulty signals and catching
+# curator/reality mismatches (e.g. slow-poison authored "easy" but using
+# unobtainable Lead → computed "impossible").
+#
+# Currently global (not per-fork). Per-fork extension deferred: would require
+# rebuilding reaction_lookup and all_sources filtered by fork. For now the
+# strategy difficulty reflects whichever fork has the easiest access to each
+# reagent. Lead (unobtainable everywhere — no recipe produces it in any fork)
+# is already correctly classified globally.
+
+TIER_WEIGHTS = {
+    "dispenser":     0,
+    "self-chem":     1,
+    "cross-botany":  2,
+    "cross-service": 2,
+    "mob-drop":      3,
+    "antag-only":    4,
+    "unknown":       5,   # extractor blind spot — recipe exists but deep-chain has unresolved ingredient
+    "unobtainable":  999, # literal dead-end: no recipe AND no sources
+}
+
+_SERVICE_KEYWORDS  = ("NanoMed", "Booze", "Soda", "BoozeVend", "SodaVend", "Drobe")
+_MOB_KEYWORDS      = ("butcher", "blood draw", "Slime", "Zombie", "mob")
+_ANTAG_KEYWORDS    = ("EMAG", "Syndicate", "Chaplain")
+_DISPENSER_KEYWORDS = ("Dispenser", "Sink", "ChemVend")
+
+
+def compute_reagent_accessibility(
+    rid: str,
+    reaction_lookup: dict,
+    all_sources: dict[str, list[str]],
+    resolving: set | None = None,
+) -> dict:
+    """Classify obtainability tier for a reagent. Cycle-safe recursion via `resolving` set
+    (pattern from resolve_parents:463).
+
+    Returns: {"tier": str, "weight": int, "reason": str}
+    """
+    if resolving is None:
+        resolving = set()
+    if rid in resolving:
+        return {"tier": "self-chem", "weight": 1, "reason": "Cyclic reaction chain"}
+
+    sources = all_sources.get(rid, [])
+    is_dispenser = rid in BASE_DISPENSER_CHEMICALS
+
+    # Tier 0: dispenser
+    if is_dispenser or any(any(k in s for k in _DISPENSER_KEYWORDS) for s in sources):
+        return {"tier": "dispenser", "weight": 0, "reason": "Chemical Dispenser"}
+
+    # Tier 3: antag-only (strongest filter — antag sources override plant/service)
+    antag_srcs = [s for s in sources if any(k in s for k in _ANTAG_KEYWORDS)]
+    if antag_srcs:
+        return {"tier": "antag-only", "weight": 4, "reason": f"Antag-only: {antag_srcs[0]}"}
+
+    # Tier 2a: cross-botany (plant-derived)
+    plant_srcs = [s for s in sources if s.endswith("(plant)")]
+    if plant_srcs:
+        return {"tier": "cross-botany", "weight": 2, "reason": f"Requires Botany: {plant_srcs[0]}"}
+
+    # Tier 2b: mob-drop
+    mob_srcs = [s for s in sources if any(k in s.lower() for k in _MOB_KEYWORDS)]
+    if mob_srcs:
+        return {"tier": "mob-drop", "weight": 3, "reason": f"Mob-derived: {mob_srcs[0]}"}
+
+    # Tier 2c: cross-service (vending machines)
+    service_srcs = [s for s in sources if any(k in s for k in _SERVICE_KEYWORDS)]
+    if service_srcs:
+        return {"tier": "cross-service", "weight": 2, "reason": f"Service vending: {service_srcs[0]}"}
+
+    # Tier 1: self-chem — has recipe, all ingredients resolve to dispenser/self-chem
+    if rid in reaction_lookup:
+        rxn = reaction_lookup[rid][0]
+        reactants = rxn.get("reactants", {})
+        resolving_new = resolving | {rid}
+        ingredient_tiers = []
+        for ing_id in reactants:
+            ing_acc = compute_reagent_accessibility(ing_id, reaction_lookup, all_sources, resolving_new)
+            ingredient_tiers.append(ing_acc["tier"])
+
+        if not ingredient_tiers or all(t in ("dispenser", "self-chem") for t in ingredient_tiers):
+            return {"tier": "self-chem", "weight": 1, "reason": "Chemistry reaction from dispenser base"}
+
+        # If a deep-chain ingredient is literally unobtainable, don't catastrophically
+        # propagate — the extractor's source map is incomplete for plant-mutation reagents
+        # (Vestine via PlantMutateChemicals), mob drops, and cooking products.
+        # Mark as "unknown" to flag the uncertainty without nuking the strategy.
+        if "unobtainable" in ingredient_tiers:
+            return {
+                "tier": "unknown",
+                "weight": TIER_WEIGHTS["unknown"],
+                "reason": "Recipe exists but a deep-chain ingredient is unresolved by extractor (likely plant-mutation, mob-drop, or cooking product)",
+            }
+
+        # Inherit the worst non-unobtainable ingredient tier (needs that cross-dept ingredient to craft)
+        worst = max(
+            (t for t in ingredient_tiers if t != "unobtainable"),
+            key=lambda t: TIER_WEIGHTS.get(t, 0),
+            default="self-chem",
+        )
+        return {
+            "tier": worst,
+            "weight": TIER_WEIGHTS.get(worst, 1),
+            "reason": f"Recipe requires {worst} ingredient(s)",
+        }
+
+    # Tier 999: unobtainable — no recipe, no source, not in dispenser
+    return {"tier": "unobtainable", "weight": 999, "reason": "No recipe, no plant, no dispenser source"}
+
+
+def compute_reaction_depth(
+    rid: str, reaction_lookup: dict, resolving: set | None = None, cap: int = 5
+) -> int:
+    """Max depth of crafting chain, cycle-safe. Uses the same `resolving` set pattern
+    as resolve_parents:463. Capped to avoid runaway chains.
+
+    Short-circuits for dispenser chemicals — even if they happen to have a reaction
+    recipe, the player can bypass the chain by drawing from the dispenser."""
+    if rid in BASE_DISPENSER_CHEMICALS:
+        return 0
+    if resolving is None:
+        resolving = set()
+    if rid in resolving or rid not in reaction_lookup:
+        return 0
+    resolving = resolving | {rid}
+    rxn = reaction_lookup[rid][0]
+    reactants = rxn.get("reactants", {})
+    if not reactants:
+        return 0
+    child_depths = [compute_reaction_depth(ing, reaction_lookup, resolving, cap) for ing in reactants]
+    return min(1 + max(child_depths, default=0), cap)
+
+
+_DIFFICULTY_TIERS = [
+    ("trivial",    1),
+    ("easy",       4),
+    ("medium",     8),
+    ("hard",       15),
+    ("expert",     30),
+    ("impossible", float("inf")),
+]
+
+
+def _score_to_tier(score: int) -> str:
+    """Map numeric effort score to difficulty tier label."""
+    if score >= 100:
+        return "impossible"
+    for tier, ceiling in _DIFFICULTY_TIERS:
+        if score <= ceiling:
+            return tier
+    return "impossible"
+
+
+def compute_strategy_difficulty(
+    strategy: dict,
+    accessibility_map: dict[str, dict],
+    reaction_lookup: dict,
+) -> dict:
+    """Aggregate ingredient accessibility + reaction depth + penalties into a tier."""
+    ingredients = []
+    base_score = 0
+    has_cross_dept = False
+    has_temp_constraint = False
+    has_unobtainable = False
+    max_depth = 0
+
+    for ing in strategy.get("reagents", []):
+        rid = ing.get("id")
+        acc = accessibility_map.get(rid) or {
+            "tier": "unobtainable", "weight": 999,
+            "reason": f"reagent '{rid}' not found in extractor data",
+        }
+        base_score += acc["weight"]
+        if acc["tier"] in ("cross-botany", "cross-service", "mob-drop", "antag-only"):
+            has_cross_dept = True
+        if acc["tier"] == "unobtainable":
+            has_unobtainable = True
+
+        # Only analyze recipe depth / temp constraints for ingredients the player actually
+        # has to craft. Dispenser-accessible ingredients (even if they happen to also have
+        # a reaction recipe, like Aluminium's ProcenylLazideSludge chain) are taken directly.
+        if acc["tier"] != "dispenser":
+            depth = compute_reaction_depth(rid, reaction_lookup)
+            if depth > max_depth:
+                max_depth = depth
+
+            if rid in reaction_lookup:
+                rxn = reaction_lookup[rid][0]
+                if rxn.get("minTemp") is not None or rxn.get("maxTemp") is not None:
+                    has_temp_constraint = True
+
+        ingredients.append({
+            "id": rid,
+            "tier": acc["tier"],
+            "weight": acc["weight"],
+            "reason": acc.get("reason", ""),
+        })
+
+    cross_dept_penalty = 2 if has_cross_dept else 0
+    temp_penalty = 5 if has_temp_constraint else 0
+    unobtainable_penalty = 10 if has_unobtainable else 0
+
+    effort_score = base_score + max_depth + cross_dept_penalty + temp_penalty + unobtainable_penalty
+    tier = _score_to_tier(effort_score)
+
+    authored = strategy.get("difficulty", "unknown")
+    mismatch = (tier != authored)
+
+    reasons = []
+    if has_unobtainable:
+        reasons.append("unobtainable ingredient present")
+    if has_cross_dept:
+        reasons.append("cross-department ingredient(s)")
+    if has_temp_constraint:
+        reasons.append("temperature-constrained reaction")
+    if max_depth >= 3:
+        reasons.append(f"deep reaction chain (depth {max_depth})")
+
+    return {
+        "tier": tier,
+        "effortScore": effort_score,
+        "breakdown": {
+            "ingredients": ingredients,
+            "reactionDepth": max_depth,
+            "crossDepartmentPenalty": cross_dept_penalty,
+            "temperatureConstraintPenalty": temp_penalty,
+            "unobtainablePenalty": unobtainable_penalty,
+        },
+        "authoredTier": authored,
+        "mismatch": mismatch,
+        "mismatchReason": "; ".join(reasons) if mismatch else "",
+    }
+
+
+# ─────────────────────────────────────────────
 # Phase 9b: JSON Export
 # ─────────────────────────────────────────────
 
@@ -1448,6 +1688,7 @@ def export_json(reagents: dict, reactions: dict, locale: dict,
 
     data = {
         "meta": {
+            "schemaVersion": "2.0.0",
             "generated": time.strftime("%Y-%m-%dT%H:%M:%S"),
             "forks": forks_meta,
             # Backward compat
@@ -1461,6 +1702,17 @@ def export_json(reagents: dict, reactions: dict, locale: dict,
         "categories": [],
         "edges": [],
     }
+
+    # Phase 9a.5: Compute accessibility tier for every non-abstract reagent.
+    # Used below in the reagent loop (reagent_obj["accessibility"]) and by
+    # compute_strategy_difficulty for the antag strategies below.
+    accessibility_map = {}
+    for _rid, _reagent in reagents.items():
+        if _reagent.get("abstract"):
+            continue
+        accessibility_map[_rid] = compute_reagent_accessibility(
+            _rid, reaction_lookup, all_sources or {}
+        )
 
     # Build reagents
     cats_seen = set()
@@ -1528,6 +1780,7 @@ def export_json(reagents: dict, reactions: dict, locale: dict,
             "criticalOverdose": crit_overdose,
             "recipe": recipe_obj,
             "obtainSources": (all_sources or {}).get(rid, []),
+            "accessibility": accessibility_map.get(rid),
         }
         # Only include antag fields when non-default (saves ~30KB in JSON)
         if antag_score:
@@ -1620,10 +1873,29 @@ def export_json(reagents: dict, reactions: dict, locale: dict,
     data["categories"] = sorted(cats_seen)
     data["warnings"] = DANGEROUS_INTERACTIONS
 
-    # Antag mode data
-    data["antagStrategies"] = ANTAG_STRATEGIES
+    # Antag mode data — each strategy gets computedDifficulty attached.
+    strategies_out = []
+    mismatches = []
+    for _strat in ANTAG_STRATEGIES:
+        computed = compute_strategy_difficulty(_strat, accessibility_map, reaction_lookup)
+        strategies_out.append({**_strat, "computedDifficulty": computed})
+        if computed["mismatch"]:
+            mismatches.append(
+                f"  WARNING: strategy '{_strat['id']}' authored={computed['authoredTier']} "
+                f"computed={computed['tier']} (effortScore={computed['effortScore']}; "
+                f"{computed['mismatchReason']})"
+            )
+    data["antagStrategies"] = strategies_out
     data["deliveryMechanisms"] = DELIVERY_MECHANISMS
     data["syndicateItems"] = SYNDICATE_ITEMS
+
+    # Print mismatch summary (non-fatal — authored tier is preserved for UI tooltip).
+    if mismatches:
+        print(f"\n  Computed difficulty mismatches ({len(mismatches)}/{len(ANTAG_STRATEGIES)}):")
+        for line in mismatches:
+            print(line)
+    else:
+        print(f"\n  Computed difficulty: all {len(ANTAG_STRATEGIES)} strategies match authored tier")
 
     with open(JSON_FILE, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=1)
