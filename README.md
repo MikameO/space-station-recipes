@@ -80,6 +80,26 @@ ss14_chem_extractor.py   Scrapes SS14 GitHub repos → data.json
 sprites/            Reagent sprite assets (pixel art)
 ```
 
+## Data Provenance & Disclaimers
+
+**Where the data comes from**
+
+| Source | What it covers | Trust level |
+|---|---|---|
+| Upstream YAML (vanilla + fork `custom_dir`) | Reagent definitions, reaction recipes, `tileReactions`, `reactiveEffects`, metabolisms, phase-change temps | **Authoritative** — auto-regenerated from GitHub. The `verifiedMechanics` field on each reagent is extracted straight from these files. |
+| Curator fields in [`config.py`](config.py) (`ANTAG_DATA.tips`, `ANTAG_STRATEGIES.desc`/`method`/`difficulty`) | Antag playstyle tips, strategy combos, authored difficulty estimates | **Best-effort community knowledge.** These are a single curator's notes, written from playtime. They can drift from current code. The UI shows them in a dashed-amber **Community knowledge (unverified)** section, visually separate from the green **Verified in SS14 code** section. |
+| Computed fields (`accessibility`, `computedDifficulty`, `verificationStatus`) | Derived metrics — who can obtain this reagent, how much effort a strategy takes, whether every claim is YAML-backed | **Mechanically derived** from the two sources above. The build logs warnings when curator's authored difficulty diverges from computed; both tiers ship in `data.json` for transparency. |
+
+**What this project does NOT include**
+
+SS13 legacy lore is **not accepted** unless independently confirmed in SS14 YAML. The classic "Thermite melts walls" claim (widely repeated from SS13) is the canonical example: in SS14, Thermite has only `FlammableTileReaction`, no wall-damage mechanic exists. Similar myths (chemistry-based EMP, pure poison auto-kill, etc.) are rejected without a github.com/space-wizards link or a verifiable forum/wiki source.
+
+**How to report an inaccuracy**
+
+On any strategy card in Antag mode there's a **⚠ Report inaccuracy** button that opens a pre-filled GitHub issue (template: [`strategy-inaccuracy.yml`](.github/ISSUE_TEMPLATE/strategy-inaccuracy.yml)). The template **requires** a verifiable source link (SS14 code, forum thread, wiki, or YouTube VOD with timestamp) — lazy reports without evidence get closed quickly, so citing makes your fix durable.
+
+See [CHANGELOG.md](CHANGELOG.md) for schema evolution.
+
 ## Privacy
 
 This site uses [Yandex.Metrika](https://metrika.yandex.com/) for anonymous usage analytics (page views, click maps, and session recordings via Webvisor). No personal data is collected or sold. Analytics help prioritize features based on how the database is actually used across forks.

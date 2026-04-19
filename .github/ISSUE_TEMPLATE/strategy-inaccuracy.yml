@@ -1,0 +1,90 @@
+name: Strategy / reagent inaccuracy
+description: Report incorrect information in an antag strategy or reagent's tips — ideally with a link to SS14 YAML or a forum thread as evidence.
+title: "Strategy '<id>' inaccuracy"
+labels: ["data-quality", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for helping keep NanoTrasen ChemDB grounded in actual SS14 mechanics.
+        Curator-written tips can drift from upstream YAML, and SS13 folklore sometimes
+        leaks in. Citing a verifiable source (YAML line, forum post, video) turns your
+        report into a durable fix — a lazy "trust me bro" report often can't be acted on.
+
+        If you came from the **Report inaccuracy** button on a strategy card, the
+        `strategy_id` and `fork` fields below should already be pre-filled.
+
+  - type: input
+    id: strategy_id
+    attributes:
+      label: Strategy or reagent ID
+      description: The internal ID (e.g. `slow-poison`, `floor-pry`, `Thermite`). Pre-filled from the URL if you used the in-app Report button.
+      placeholder: slow-poison
+    validations:
+      required: true
+
+  - type: dropdown
+    id: field
+    attributes:
+      label: Which field is wrong?
+      options:
+        - antagTips (reagent tips)
+        - desc (strategy description)
+        - difficulty (computed or authored tier)
+        - method (delivery method)
+        - verifiedMechanics (extractor-derived)
+        - other
+    validations:
+      required: true
+
+  - type: input
+    id: fork
+    attributes:
+      label: Fork affected
+      description: Which fork this applies to. Pre-filled from the URL (`all` means all forks). Use `all` if you're not sure.
+      placeholder: "vanilla | goob | rmc14 | deltav | frontier | funky | starlight | deadspace | all"
+    validations:
+      required: true
+
+  - type: textarea
+    id: what_is_wrong
+    attributes:
+      label: What's wrong?
+      description: Describe the inaccuracy. Be concrete — "Thermite doesn't melt walls" is more actionable than "this is wrong".
+      placeholder: |
+        E.g. "Thermite is listed with `area-denial` utility for 'melting walls', but
+        in vanilla SS14 (pyrotechnic.yml) Thermite only has FlammableTileReaction —
+        no wall-melting mechanic exists."
+    validations:
+      required: true
+
+  - type: input
+    id: ss14_code_link
+    attributes:
+      label: SS14 code or forum link
+      description: |
+        A verifiable source. Accepted: deep-link to YAML on github.com/space-wizards
+        or a fork repo, forum.spacestation14.com thread, SS14 wiki, or YouTube VOD
+        with `?t=` timestamp. Makes lazy criticism cost more than lazy dismissal.
+      placeholder: https://github.com/space-wizards/space-station-14/blob/master/Resources/Prototypes/Reagents/pyrotechnic.yml#L17-L37
+    validations:
+      required: true
+
+  - type: textarea
+    id: suggested_fix
+    attributes:
+      label: Suggested fix (optional)
+      description: What should the entry say instead? If you already have an opinion, name it here — saves a round trip.
+      placeholder: |
+        Rewrite antagTips to: "Tile: Ignites spilled reagent via FlammableTileReaction
+        (x2 temp). Does NOT melt walls — that's SS13 legacy."
+
+  - type: checkboxes
+    id: acknowledgements
+    attributes:
+      label: Acknowledgements
+      options:
+        - label: "I've searched existing issues to make sure this isn't a duplicate."
+          required: true
+        - label: "The source link I provided is a public page (not Discord, not private DM)."
+          required: true

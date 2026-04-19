@@ -1701,7 +1701,15 @@ function renderAntagStrategies() {
         ${vBadge}
       </div>
       <div class="strategy-reagents">${reagentChips}</div>
-      <button class="strategy-calc-btn" onclick="event.stopPropagation(); loadStrategyIntoBatch('${esc(strat.id)}')">Calculate in Batch Planner</button>
+      <div class="strategy-actions">
+        <button class="strategy-calc-btn" onclick="event.stopPropagation(); loadStrategyIntoBatch('${esc(strat.id)}')">Calculate in Batch Planner</button>
+        <a class="strategy-report-btn"
+           title="Report an inaccuracy in this strategy (opens GitHub issue)"
+           onclick="event.stopPropagation();"
+           href="https://github.com/MikameO/space-station-recipes/issues/new?template=strategy-inaccuracy.yml&title=${encodeURIComponent('Strategy \'' + strat.id + '\' inaccuracy')}&strategy_id=${encodeURIComponent(strat.id)}&fork=${encodeURIComponent(activeSource)}"
+           target="_blank"
+           rel="noopener noreferrer">&#9888; Report inaccuracy</a>
+      </div>
     </div>`;
   }).join('');
 

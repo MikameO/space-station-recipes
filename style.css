@@ -1522,6 +1522,23 @@ body.antag-active .antag-toggle {
   padding: 0; margin-left: 4px;
 }
 
+/* Strategy card action row (Increment E) */
+.strategy-actions {
+  display: flex; gap: 8px; flex-wrap: wrap; align-items: center;
+  margin-top: 8px;
+}
+.strategy-report-btn {
+  font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.08em;
+  padding: 4px 8px; border-radius: 2px;
+  background: transparent; color: var(--text-sub);
+  border: 1px dashed rgba(251,191,36,0.35);
+  text-decoration: none; cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
+}
+.strategy-report-btn:hover {
+  color: #fbbf24; border-color: #fbbf24; background: rgba(251,191,36,0.06);
+}
+
 /* Per-tier difficulty badge variants */
 .badge-tier-trivial    { background: rgba(74,222,128,0.15);  color: #4ade80; border-color: rgba(74,222,128,0.4); }
 .badge-tier-easy       { background: rgba(34,211,238,0.15);  color: #22d3ee; border-color: rgba(34,211,238,0.4); }
