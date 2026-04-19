@@ -502,61 +502,220 @@ function reagentCardHTML(r) {
 // ─────────────────────────────────────────────
 // Human-readable Effects Renderer
 // ─────────────────────────────────────────────
+// Two layers:
+//   1. parseEffectPart  — splits "[Path] body (if cond) @N%" into structured data
+//   2. humanizeBody / humanizeCondition — turn raw tokens into plain English
+// Compact mode → single-line chips for reagent cards (space-constrained)
+// Verbose mode → grouped rows with wrapped text for the detail panel
 
 function renderEffectsHTML(effectsStr, compact = false) {
   if (!effectsStr) return '';
-  const parts = effectsStr.split('; ');
-  const chips = parts.map(part => {
-    // Strip [Path] prefix — e.g. "[Bloodstream] Heals Brute 1.5"
-    const pathMatch = part.match(/^\[([^\]]+)\]\s*/);
-    const body = pathMatch ? part.slice(pathMatch[0].length) : part;
+  const parsed = effectsStr.split('; ').flatMap(parseEffectPart);
+  return compact ? renderEffectsCompact(parsed) : renderEffectsVerbose(parsed);
+}
 
-    let cls = 'effect-other';
-    let icon = '';
-    let text = body;
+function parseEffectPart(part) {
+  const pathMatch = part.match(/^\[([^\]]+)\]\s*/);
+  const path = pathMatch ? pathMatch[1] : '';
+  let rest = pathMatch ? part.slice(pathMatch[0].length) : part;
 
-    if (/^Heals\s/i.test(body)) {
-      cls = 'effect-heal';
-      icon = '+';
-      // "Heals Brute 1.5 (even)" → "+1.5 Brute (even)"
-      const m = body.match(/^Heals\s+(\S+)\s+([\d.]+)(.*)$/);
-      if (m) text = `${icon}${m[2]} ${m[1]}${m[3]}`;
-      else text = body;
-    } else if (/^Deals\s/i.test(body)) {
-      cls = 'effect-damage';
-      icon = '-';
-      const m = body.match(/^Deals\s+(\S+)\s+([\d.]+)(.*)$/);
-      if (m) text = `${icon}${m[2]} ${m[1]}${m[3]}`;
-      else text = body;
-    } else if (/^Status:|StatusEffect|Emote:/i.test(body)) {
-      cls = 'effect-status';
-      // Clean up "Status: ModifyStatusEffect" → "Status: ..."
-      text = body.replace(/^Status:\s*/, '').replace('ModifyStatusEffect', 'Status Effect');
-    } else if (/^Speed\s/i.test(body)) {
-      cls = 'effect-speed';
-      const m = body.match(/walk=([\d.]+)\s*sprint=([\d.]+)/);
-      if (m) text = `Speed ${m[1]}/${m[2]}`;
-    } else if (/^Thirst|^Hunger/i.test(body)) {
-      cls = 'effect-other';
-    } else if (/^Message|popup/i.test(body)) {
-      cls = 'effect-status';
-      text = body.replace(/\s*@\d+%/, '');
-    } else if (/^Adds\s/i.test(body)) {
-      cls = 'effect-status';
-    } else if (/^Removes\s/i.test(body)) {
-      cls = 'effect-status';
-    } else if (/Flammable|Foam|Smoke|Explosion/i.test(body)) {
-      cls = 'effect-damage';
-    } else if (/^EvenHealthChange$|^HealthChange$/i.test(body)) {
-      cls = 'effect-other';
+  const probMatch = rest.match(/\s*@(\d+)%\s*$/);
+  const prob = probMatch ? parseInt(probMatch[1], 10) : null;
+  if (probMatch) rest = rest.slice(0, probMatch.index).trimEnd();
+
+  const condMatch = rest.match(/\s*\(if ([^)]+)\)\s*$/);
+  const conds = condMatch ? condMatch[1].split(/,\s*/).filter(Boolean) : [];
+  if (condMatch) rest = rest.slice(0, condMatch.index).trimEnd();
+
+  // Python extractor concatenates multi-direction HealthChange into one body
+  // (e.g. "Deals Cold 0.01 Heals Heat 3"). Split back into separate entries
+  // so each gets its own row, but share the same path / conds / prob.
+  const healthTokens = rest.match(/(?:Heals|Deals)\s+\S+\s+[\d.]+(?:\s*\(even\))?/gi);
+  if (healthTokens && healthTokens.length > 1) {
+    return healthTokens.map(body => ({ path, body: body.trim(), conds, prob }));
+  }
+
+  return [{ path, body: rest, conds, prob }];
+}
+
+function humanizeBody(body, opts = {}) {
+  const short = !!opts.short;
+  let m;
+
+  if (m = body.match(/^Heals\s+(\S+)\s+([\d.]+)(.*)$/i)) {
+    const even = /\beven\b/i.test(m[3]) ? ' (all limbs)' : '';
+    return { kind: 'heal', text: short ? `+${m[2]} ${m[1]}` : `Heals ${m[2]} ${m[1].toLowerCase()} damage${even}` };
+  }
+  if (m = body.match(/^Deals\s+(\S+)\s+([\d.]+)(.*)$/i)) {
+    const even = /\beven\b/i.test(m[3]) ? ' (all limbs)' : '';
+    return { kind: 'damage', text: short ? `-${m[2]} ${m[1]}` : `Deals ${m[2]} ${m[1].toLowerCase()} damage${even}` };
+  }
+  if (m = body.match(/^Speed\s+walk=([\d.]+)\s+sprint=([\d.]+)/i)) {
+    const walk = parseFloat(m[1]), sprint = parseFloat(m[2]);
+    if (walk === 0 && sprint === 0) {
+      return { kind: 'speed', text: short ? 'Paralyzed' : 'Fully paralyzes movement (cannot walk or run)' };
     }
+    if (walk === sprint) {
+      if (walk < 1) {
+        const pct = Math.round((1 - walk) * 100);
+        return { kind: 'speed', text: short ? `Slow ${pct}%` : `Slows movement by ${pct}% (walk & run \u00d7${walk})` };
+      }
+      if (walk > 1) {
+        const pct = Math.round((walk - 1) * 100);
+        return { kind: 'speed', text: short ? `Fast +${pct}%` : `Speeds up movement by ${pct}% (walk & run \u00d7${walk})` };
+      }
+      return { kind: 'speed', text: 'Normal speed' };
+    }
+    return { kind: 'speed', text: short ? `W\u00d7${walk} R\u00d7${sprint}` : `Walk \u00d7${walk}, run \u00d7${sprint}` };
+  }
+  if (m = body.match(/^Temp\s+(-?[\d.]+)/i)) {
+    const delta = parseFloat(m[1]);
+    if (delta < 0) return { kind: 'speed', text: short ? `Cool ${Math.abs(delta)}K` : `Cools body by ${Math.abs(delta).toLocaleString()} K` };
+    return { kind: 'damage', text: short ? `Warm ${delta}K` : `Warms body by ${delta.toLocaleString()} K` };
+  }
+  if (/^Message\s*popup$/i.test(body) || /^Popup/i.test(body)) {
+    return { kind: 'status', text: short ? 'Popup msg' : 'Shows a popup message to the victim' };
+  }
+  if (m = body.match(/^Popup\s*\(([^)]+)\):\s*(.+)$/i)) {
+    return { kind: 'status', text: short ? 'Popup msg' : `Popup (${m[1]}): ${m[2]}` };
+  }
+  if (m = body.match(/^Popup\s*message:\s*(.+)$/i)) {
+    return { kind: 'status', text: short ? 'Popup msg' : `Popup: ${m[1]}` };
+  }
+  if (m = body.match(/^Status:?\s*(.+)$/i)) {
+    const raw = m[1].replace(/ModifyStatusEffect|GenericStatusEffect/gi, '').trim();
+    if (!raw) {
+      return { kind: 'status', text: short ? 'Status fx' : 'Applies a status effect' };
+    }
+    return { kind: 'status', text: short ? raw : `Applies status: ${raw}` };
+  }
+  if (m = body.match(/^StatusEffect\s*(.*)$/i)) {
+    const label = m[1].trim();
+    return { kind: 'status', text: short ? (label || 'Status') : (label ? `Applies status: ${label}` : 'Applies a status effect') };
+  }
+  if (/^Jitter$/i.test(body)) return { kind: 'status', text: short ? 'Jitter' : 'Causes jittering' };
+  if (/^Stutter$/i.test(body)) return { kind: 'status', text: short ? 'Stutter' : 'Causes stuttering speech' };
+  if (/^Drunk$/i.test(body)) return { kind: 'status', text: short ? 'Drunk' : 'Causes drunkenness' };
+  if (/^Adrenaline$/i.test(body)) return { kind: 'status', text: short ? 'Adrenaline' : 'Triggers an adrenaline surge' };
+  if (/^Vomit$/i.test(body)) return { kind: 'damage', text: short ? 'Vomit' : 'Causes vomiting' };
+  if (/^Paralyze$/i.test(body)) return { kind: 'damage', text: short ? 'Paralyze' : 'Paralyzes the target' };
+  if (/^Electrocut/i.test(body)) return { kind: 'damage', text: short ? 'Shock' : 'Electrocutes the target' };
+  if (/^Flammable/i.test(body)) return { kind: 'damage', text: short ? 'Flammable' : 'Makes target flammable' };
+  if (/^Explosion/i.test(body)) return { kind: 'damage', text: short ? 'Boom' : 'Triggers an explosion' };
+  if (/^Foam/i.test(body)) return { kind: 'damage', text: short ? 'Foam' : 'Creates foam' };
+  if (/^Smoke/i.test(body)) return { kind: 'damage', text: short ? 'Smoke' : 'Creates smoke cloud' };
+  if (/^Resets\s*narcolepsy$/i.test(body)) return { kind: 'heal', text: short ? 'Cure narcolepsy' : 'Cures narcolepsy' };
+  if (/^Cures?\s*disease/i.test(body)) return { kind: 'heal', text: short ? 'Cure disease' : 'Cures diseases' };
+  if (/^Oxygenates?\s*blood/i.test(body)) return { kind: 'heal', text: short ? 'Oxygenate' : 'Oxygenates blood' };
+  if (m = body.match(/^Thirst\s*x([\d.]+)/i)) return { kind: 'other', text: short ? `Thirst \u00d7${m[1]}` : `Satiates thirst (\u00d7${m[1]})` };
+  if (m = body.match(/^Hunger\s*x([\d.]+)/i)) return { kind: 'other', text: short ? `Hunger \u00d7${m[1]}` : `Satiates hunger (\u00d7${m[1]})` };
+  if (m = body.match(/^Adds\s+([\d.]+)u?\s+(\S+)/i)) return { kind: 'status', text: short ? `+${m[1]}u ${m[2]}` : `Adds ${m[1]}u of ${m[2]}` };
+  if (m = body.match(/^Removes\s+([\d.]+)u?\s+(\S+)/i)) return { kind: 'status', text: short ? `-${m[1]}u ${m[2]}` : `Removes ${m[1]}u of ${m[2]}` };
+  if (m = body.match(/^Blood\s*level\s*(.+)$/i)) return { kind: 'status', text: short ? 'Blood lvl' : `Changes blood level: ${m[1]}` };
+  if (m = body.match(/^Bleed\s+(.+)$/i)) return { kind: 'damage', text: short ? `Bleed ${m[1]}` : `Modifies bleeding (${m[1]})` };
+  if (/^EvenHealthChange$|^HealthChange$/i.test(body)) return { kind: 'other', text: short ? 'Health change' : 'Generic health change' };
+  if (m = body.match(/^Emote:\s*(.+)$/i)) return { kind: 'status', text: short ? `Emote ${m[1]}` : `Forces emote: ${m[1]}` };
+  if (m = body.match(/^Creates?\s+gas:\s*(.+)$/i)) return { kind: 'damage', text: short ? `Gas ${m[1]}` : `Creates gas: ${m[1]}` };
+  if (m = body.match(/^Spawns:\s*(.+)$/i)) return { kind: 'other', text: short ? `Spawn ${m[1]}` : `Spawns entity: ${m[1]}` };
+  if (/^Plant\s*effect/i.test(body)) return { kind: 'other', text: short ? 'Plant fx' : 'Affects the plant' };
+  return { kind: 'other', text: body };
+}
 
-    // Compact mode: truncate long effects for cards
-    if (compact && text.length > 35) text = text.slice(0, 32) + '...';
+function humanizeCondition(cond) {
+  const c = cond.trim();
+  let m;
+  // Rich form from updated extractor: "self > 0u", "self in range 0..5u", "self present"
+  if (m = c.match(/^(\S+)\s+in range\s+([\d.]+)\.\.([\d.]+)u$/i)) {
+    return `${m[1] === 'self' ? 'reagent' : m[1]} in body: ${m[2]}\u2013${m[3]}u`;
+  }
+  if (m = c.match(/^(\S+)\s*>\s*([\d.]+)u$/i)) {
+    return `${m[1] === 'self' ? 'reagent' : m[1]} in body above ${m[2]}u`;
+  }
+  if (m = c.match(/^(\S+)\s*<\s*([\d.]+)u$/i)) {
+    return `${m[1] === 'self' ? 'reagent' : m[1]} in body below ${m[2]}u`;
+  }
+  if (m = c.match(/^(\S+)\s+present$/i)) {
+    return `${m[1] === 'self' ? 'reagent' : m[1]} is active in body`;
+  }
+  if (m = c.match(/^body\s*temp\s+([\d.]+)\.\.([\d.]+)K$/i)) {
+    return `body temperature ${m[1]}\u2013${m[2]} K`;
+  }
+  if (m = c.match(/^body\s*temp\s*>\s*([\d.]+)K$/i)) {
+    return `body temperature above ${m[1]} K`;
+  }
+  if (m = c.match(/^body\s*temp\s*<\s*([\d.]+)K$/i)) {
+    return `body temperature below ${m[1]} K`;
+  }
+  if (/^temperature-dependent$/i.test(c)) return 'depends on body temperature';
+  if (/^organ:/i.test(c)) return c.replace(/^organ:\s*/i, 'only in organ: ');
+  if (/^mob state:/i.test(c)) return c.replace(/^mob state:\s*/i, 'only when target is ');
+  if (/^has tag/i.test(c)) return c;
+  // Legacy fallbacks from unpatched data.json
+  if (/^ReagentCondition$|^ReagentThreshold$/i.test(c)) return 'while reagent is active in body';
+  if (/^temp\s*cond$/i.test(c) || /^Temperature$/i.test(c)) return 'under a body-temperature trigger';
+  if (m = c.match(/^>\s*([\d.]+)u?$/)) return `amount above ${m[1]}u`;
+  if (m = c.match(/^<\s*([\d.]+)u?$/)) return `amount below ${m[1]}u`;
+  return c;
+}
 
-    return `<span class="effect-chip ${cls}">${esc(text)}</span>`;
+function prettyPathLabel(path) {
+  const map = {
+    'Bloodstream': 'Bloodstream (when metabolized)',
+    'Touch': 'Skin contact',
+    'Ingestion': 'Stomach (when ingested)',
+    'Inhalation': 'Lungs (when inhaled)',
+    'Tile': 'Spilled tile',
+    'Reactive': 'Reactive surface',
+    'Injection': 'Injection site',
+    'Food': 'Food metabolism',
+    'Drink': 'Drink metabolism',
+    'Medicine': 'Medicine metabolism',
+    'Plant': 'Plant metabolism',
+  };
+  return map[path] || path;
+}
+
+function renderEffectsCompact(parsed) {
+  const chips = parsed.map(p => {
+    const h = humanizeBody(p.body, { short: true });
+    let text = h.text;
+    if (p.prob != null && p.prob < 100) text += ` ${p.prob}%`;
+    if (text.length > 38) text = text.slice(0, 35) + '\u2026';
+    return `<span class="effect-chip effect-${h.kind}">${esc(text)}</span>`;
   });
   return `<div class="effects-wrap">${chips.join('')}</div>`;
+}
+
+function renderEffectsVerbose(parsed) {
+  const groups = new Map();
+  for (const p of parsed) {
+    const key = p.path || '';
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key).push(p);
+  }
+
+  const sections = [];
+  for (const [path, items] of groups) {
+    const rows = items.map(p => {
+      const h = humanizeBody(p.body);
+      const condText = p.conds.map(humanizeCondition).filter(Boolean).join(' \u00b7 ');
+      const meta = [];
+      if (condText) meta.push(condText);
+      if (p.prob != null && p.prob < 100) meta.push(`${p.prob}% chance per tick`);
+      const metaHTML = meta.length
+        ? `<div class="effect-row__meta">${esc(meta.join(' \u00b7 '))}</div>`
+        : '';
+      return `<div class="effect-row effect-row--${h.kind}">
+        <div class="effect-row__text">${esc(h.text)}</div>
+        ${metaHTML}
+      </div>`;
+    }).join('');
+    const header = path
+      ? `<div class="effect-group__head">${esc(prettyPathLabel(path))}</div>`
+      : '';
+    sections.push(`<div class="effect-group">${header}${rows}</div>`);
+  }
+  return `<div class="effects-verbose">${sections.join('')}</div>`;
 }
 
 // ─────────────────────────────────────────────

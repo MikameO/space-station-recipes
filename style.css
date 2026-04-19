@@ -629,18 +629,18 @@ main {
 }
 
 .reagent-effects {
-  font-size: 0.65rem;
+  font-size: 0.68rem;
   color: var(--text-ghost);
-  max-height: 3.6em;
+  max-height: 4.2em;
   overflow: hidden;
-  line-height: 1.4;
+  line-height: 1.45;
 }
 
-/* Human-readable effect chips */
-.effects-wrap { display: flex; flex-wrap: wrap; gap: 2px; }
+/* Compact effect chips (used in reagent cards / list views) */
+.effects-wrap { display: flex; flex-wrap: wrap; gap: 3px; }
 .effect-chip {
   display: inline-flex; align-items: center; gap: 2px;
-  font-size: 0.58rem; padding: 1px 5px; border-radius: 2px;
+  font-size: 0.64rem; padding: 2px 6px; border-radius: 2px;
   font-family: 'Oxanium', sans-serif; letter-spacing: 0.02em;
   white-space: nowrap;
 }
@@ -649,6 +649,68 @@ main {
 .effect-status { background: rgba(96,165,250,0.12); color: #93bbfd; border-left: 2px solid #60a5fa; }
 .effect-speed { background: rgba(250,204,21,0.12); color: #fde047; border-left: 2px solid #facc15; }
 .effect-other { background: rgba(148,163,184,0.10); color: #94a3b8; border-left: 2px solid #64748b; }
+
+/* Verbose effects (used in the detail panel).
+   Selectors include `.effects-verbose` to beat `.detail-section div` specificity. */
+.effects-verbose {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.effects-verbose .effect-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.effects-verbose .effect-group__head {
+  font-family: 'Oxanium', sans-serif;
+  font-size: 0.62rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--text-ghost);
+  padding-left: 2px;
+  margin-bottom: 2px;
+  line-height: 1.3;
+}
+.effects-verbose .effect-row {
+  padding: 8px 11px;
+  background: rgba(255,255,255,0.025);
+  border-left: 3px solid #64748b;
+  border-radius: 0 4px 4px 0;
+  font-size: 0.82rem;
+  line-height: 1.5;
+  color: var(--text-main);
+}
+.effects-verbose .effect-row__text {
+  color: var(--text-main);
+  font-size: 0.82rem;
+  line-height: 1.5;
+  word-break: break-word;
+  white-space: normal;
+}
+.effects-verbose .effect-row__meta {
+  margin-top: 5px;
+  font-size: 0.72rem;
+  color: var(--text-sub);
+  font-style: italic;
+  letter-spacing: 0.02em;
+  line-height: 1.45;
+  opacity: 0.95;
+}
+.effects-verbose .effect-group__head {
+  color: var(--text-sub);
+}
+.effects-verbose .effect-row--heal   { border-left-color: #22c55e; background: rgba(34,197,94,0.07); }
+.effects-verbose .effect-row--heal   .effect-row__text { color: #a7f3c4; }
+.effects-verbose .effect-row--damage { border-left-color: #ef4444; background: rgba(239,68,68,0.07); }
+.effects-verbose .effect-row--damage .effect-row__text { color: #fca5a5; }
+.effects-verbose .effect-row--status { border-left-color: #60a5fa; background: rgba(96,165,250,0.07); }
+.effects-verbose .effect-row--status .effect-row__text { color: #bfd5fc; }
+.effects-verbose .effect-row--speed  { border-left-color: #facc15; background: rgba(250,204,21,0.07); }
+.effects-verbose .effect-row--speed  .effect-row__text { color: #fde68a; }
+.effects-verbose .effect-row--other  { border-left-color: #64748b; background: rgba(148,163,184,0.05); }
+.effects-verbose .effect-row--other  .effect-row__text { color: #cbd5e1; }
 
 /* Effect filters in sidebar */
 .effect-filters { display: flex; flex-wrap: wrap; gap: 3px; }

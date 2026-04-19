@@ -653,7 +653,21 @@ def summarize_single_effect(effect: dict) -> str:
         parts.append("Drunk")
 
     elif "PopupMessage" in etype:
-        parts.append("Message popup")
+        msg_type = str(effect.get("type", "")).strip()
+        msgs = effect.get("messages", [])
+        first_msg = ""
+        if isinstance(msgs, list) and msgs:
+            first_msg = str(msgs[0]).strip()
+        if first_msg:
+            label = first_msg.replace("-message", "").replace("_", " ").replace("-", " ").strip()
+            if msg_type:
+                parts.append(f"Popup ({msg_type.lower()}): {label}")
+            else:
+                parts.append(f"Popup message: {label}")
+        elif msg_type:
+            parts.append(f"Popup ({msg_type.lower()})")
+        else:
+            parts.append("Popup message")
 
     elif "AdjustReagent" in etype:
         reagent = effect.get("reagent", "?")
@@ -708,22 +722,55 @@ def summarize_single_effect(effect: dict) -> str:
         short = etype.replace("ReagentEffect", "").replace("Reaction", "")
         parts.append(f"Effect: {short}")
 
-    # Add conditions if present
+    # Add conditions if present. JS humanizeCondition in app.js understands these shapes:
+    #   "<name> in range <min>..<max>u" / "<name> > <min>u" / "<name> < <max>u" / "<name> present"
+    #   "body temp <min>..<max>K" / "body temp > <min>K" / "body temp < <max>K" / "temperature-dependent"
+    #   "organ: <name>" / "mob state: <state>" / "has tag <tag>" / "total damage ..."
     conditions = effect.get("conditions", [])
     if conditions:
         cond_parts = []
         for cond in conditions:
             if isinstance(cond, dict):
                 ct = cond.get("_type", cond.get("type", ""))
-                if "ReagentThreshold" in ct:
-                    min_v = cond.get("min", "")
-                    max_v = cond.get("max", "")
-                    if min_v:
-                        cond_parts.append(f">{min_v}u")
-                    if max_v:
-                        cond_parts.append(f"<{max_v}u")
+                min_v = cond.get("min", "")
+                max_v = cond.get("max", "")
+                if "ReagentThreshold" in ct or "ReagentCondition" in ct:
+                    ref = cond.get("reagent") or "self"
+                    if min_v != "" and max_v != "":
+                        cond_parts.append(f"{ref} in range {min_v}..{max_v}u")
+                    elif min_v != "":
+                        cond_parts.append(f"{ref} > {min_v}u")
+                    elif max_v != "":
+                        cond_parts.append(f"{ref} < {max_v}u")
+                    else:
+                        cond_parts.append(f"{ref} present")
                 elif "Temperature" in ct:
-                    cond_parts.append(f"temp cond")
+                    if min_v != "" and max_v != "":
+                        cond_parts.append(f"body temp {min_v}..{max_v}K")
+                    elif min_v != "":
+                        cond_parts.append(f"body temp > {min_v}K")
+                    elif max_v != "":
+                        cond_parts.append(f"body temp < {max_v}K")
+                    else:
+                        cond_parts.append("temperature-dependent")
+                elif "TotalDamage" in ct:
+                    if min_v != "" and max_v != "":
+                        cond_parts.append(f"total damage {min_v}..{max_v}")
+                    elif min_v != "":
+                        cond_parts.append(f"total damage > {min_v}")
+                    elif max_v != "":
+                        cond_parts.append(f"total damage < {max_v}")
+                    else:
+                        cond_parts.append("damage-dependent")
+                elif "HasTag" in ct:
+                    tag = cond.get("tag", "?")
+                    cond_parts.append(f"has tag {tag}")
+                elif "OrganType" in ct:
+                    organ = cond.get("type") or cond.get("organ") or "?"
+                    cond_parts.append(f"organ: {organ}")
+                elif "MobStateCondition" in ct or "MobState" in ct:
+                    state = cond.get("mobstate") or cond.get("state") or "?"
+                    cond_parts.append(f"mob state: {state}")
                 else:
                     cond_parts.append(ct.split(":")[-1] if ":" in ct else ct)
         if cond_parts:
