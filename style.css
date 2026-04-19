@@ -1478,6 +1478,63 @@ body.antag-active .antag-toggle {
   text-transform: uppercase; letter-spacing: 0.12em;
   margin-bottom: 4px;
 }
+/* Increment D — Antag strategy filter bar */
+.antag-filter-bar {
+  display: flex; flex-wrap: wrap; gap: 10px 14px;
+  padding: 10px 12px; margin-bottom: 14px;
+  background: rgba(255,61,90,0.04);
+  border: 1px solid rgba(255,61,90,0.15); border-radius: 2px;
+  align-items: flex-end;
+}
+.antag-filter-label {
+  display: flex; flex-direction: column; gap: 3px;
+  font-size: 0.6rem; text-transform: uppercase;
+  letter-spacing: 0.08em; color: var(--text-sub);
+}
+.antag-filter-label select {
+  background: var(--panel); color: var(--text-main);
+  border: 1px solid var(--border-subtle); border-radius: 2px;
+  padding: 4px 6px; font-family: 'Share Tech Mono', monospace;
+  font-size: 0.75rem; min-width: 120px; cursor: pointer;
+}
+.antag-filter-label select:focus { outline: 1px solid var(--red-alert); }
+.antag-filter-reset {
+  padding: 6px 10px; font-size: 0.65rem; text-transform: uppercase;
+  letter-spacing: 0.08em; cursor: pointer;
+  background: transparent; color: var(--text-sub);
+  border: 1px solid var(--border-subtle); border-radius: 2px;
+}
+.antag-filter-reset:hover { color: var(--red-alert); border-color: var(--red-alert); }
+
+.strategy-count {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.7rem; font-weight: 400; color: var(--text-sub);
+  margin-left: 8px;
+}
+.strategy-empty {
+  padding: 20px; text-align: center; font-size: 0.8rem;
+  color: var(--text-sub); border: 1px dashed var(--border-subtle);
+  border-radius: 2px; margin-bottom: 12px;
+}
+.link-button {
+  background: none; border: none; color: var(--red-alert);
+  text-decoration: underline; cursor: pointer; font: inherit;
+  padding: 0; margin-left: 4px;
+}
+
+/* Per-tier difficulty badge variants */
+.badge-tier-trivial    { background: rgba(74,222,128,0.15);  color: #4ade80; border-color: rgba(74,222,128,0.4); }
+.badge-tier-easy       { background: rgba(34,211,238,0.15);  color: #22d3ee; border-color: rgba(34,211,238,0.4); }
+.badge-tier-medium     { background: rgba(251,191,36,0.15);  color: #fbbf24; border-color: rgba(251,191,36,0.4); }
+.badge-tier-hard       { background: rgba(251,146,60,0.15);  color: #fb923c; border-color: rgba(251,146,60,0.4); }
+.badge-tier-expert     { background: rgba(239,68,68,0.15);   color: #ef4444; border-color: rgba(239,68,68,0.4); }
+.badge-tier-impossible { background: rgba(100,100,100,0.2);  color: #888;    border-color: #555; text-decoration: line-through; }
+
+/* Verification status badges */
+.badge-verified  { background: rgba(74,222,128,0.12); color: #4ade80; border: 1px solid rgba(74,222,128,0.35); }
+.badge-partial   { background: rgba(251,191,36,0.10); color: #fbbf24; border: 1px solid rgba(251,191,36,0.35); }
+.badge-lore-only { background: rgba(239,68,68,0.10);  color: #ef4444; border: 1px solid rgba(239,68,68,0.35); }
+
 .strategy-card {
   background: var(--panel); border: 1px solid var(--border-subtle);
   padding: 10px 12px; border-radius: 2px; cursor: pointer;

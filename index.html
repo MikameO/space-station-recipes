@@ -295,6 +295,56 @@
     <!-- Antag Tab (visible only in Antag Mode) -->
     <div class="tab-panel" id="tab-antag" role="tabpanel" aria-labelledby="btn-antag">
       <div class="antag-tab-content">
+        <!-- Increment D: strategy filter bar. Four selects + reset button.
+             Values persist via URL params af_d / af_s / af_v / af_m. -->
+        <div id="antagFilterBar" class="antag-filter-bar" role="toolbar" aria-label="Antag strategy filters">
+          <label class="antag-filter-label">
+            <span>Difficulty</span>
+            <select data-filter="difficulty" aria-label="Filter by computed difficulty">
+              <option value="all">all</option>
+              <option value="trivial">trivial</option>
+              <option value="easy">easy</option>
+              <option value="medium">medium</option>
+              <option value="hard">hard</option>
+              <option value="expert">expert</option>
+              <option value="impossible">impossible</option>
+            </select>
+          </label>
+          <label class="antag-filter-label">
+            <span>Stealth</span>
+            <select data-filter="stealth" aria-label="Filter by stealth level">
+              <option value="all">all</option>
+              <option value="low">low</option>
+              <option value="medium">medium</option>
+              <option value="high">high</option>
+            </select>
+          </label>
+          <label class="antag-filter-label">
+            <span>Verification</span>
+            <select data-filter="verification" aria-label="Filter by YAML-verification status">
+              <option value="all">all</option>
+              <option value="all-verified">&#10003; all-verified</option>
+              <option value="partial">&#9681; partial</option>
+              <option value="lore-only">&#9432; lore-only</option>
+            </select>
+          </label>
+          <label class="antag-filter-label">
+            <span>Method</span>
+            <select data-filter="method" aria-label="Filter by delivery method keyword">
+              <option value="all">all</option>
+              <option value="inject">inject</option>
+              <option value="ingest">ingest</option>
+              <option value="drink">drink</option>
+              <option value="food">food</option>
+              <option value="area">area</option>
+              <option value="grenade">grenade</option>
+              <option value="splash">splash</option>
+              <option value="foam">foam</option>
+              <option value="smoke">smoke</option>
+            </select>
+          </label>
+          <button type="button" id="antagFilterReset" class="antag-filter-reset">Reset filters</button>
+        </div>
         <div id="antagStrategies"></div>
         <div id="antagDelivery"></div>
       </div>

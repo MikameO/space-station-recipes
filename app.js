@@ -22,6 +22,13 @@ let antagMode = false;
 let activeSort = 'name-asc'; // 'name-asc' | 'name-desc' | 'category' | 'used-in' | 'antag-desc'
 let activeTaste = 'all'; // 'all' | 'has-taste' | 'tasteless'
 
+// Increment D — antag strategy filters (all default 'all').
+// Persisted in URL as af_d / af_s / af_v / af_m.
+let antagFilterDifficulty   = 'all'; // 'all'|'trivial'|'easy'|'medium'|'hard'|'expert'|'impossible'
+let antagFilterStealth      = 'all'; // 'all'|'low'|'medium'|'high'
+let antagFilterVerification = 'all'; // 'all'|'all-verified'|'partial'|'lore-only'
+let antagFilterMethod       = 'all'; // 'all'|'inject'|'ingest'|'area'|'grenade'|'splash'
+
 // ─────────────────────────────────────────────
 // Init
 // ─────────────────────────────────────────────
@@ -63,6 +70,7 @@ async function init() {
   setupShareButton();
   setupDisclaimer();
   setupAntagMode();
+  setupAntagFilters();
   setupSortSelect();
   decodeURLState();
 
@@ -1598,29 +1606,113 @@ function getAntagIntelHTML(r) {
   `;
 }
 
+// Increment D — filter antag strategies by user-selected criteria.
+// Reuses the pattern from filterReactions:137. The `activeSource` global
+// fork filter also applies here (Steelclaw's "which fork?" critique).
+function filterStrategies() {
+  const list = DATA.antagStrategies || [];
+  return list.filter(s => {
+    const computedTier = s.computedDifficulty?.tier || s.difficulty;
+
+    // Difficulty filter
+    if (antagFilterDifficulty !== 'all' && computedTier !== antagFilterDifficulty) return false;
+
+    // Stealth filter
+    if (antagFilterStealth !== 'all' && s.stealth !== antagFilterStealth) return false;
+
+    // Verification filter
+    if (antagFilterVerification !== 'all' && s.verificationStatus !== antagFilterVerification) return false;
+
+    // Method filter (keyword-based match against authored method string)
+    if (antagFilterMethod !== 'all') {
+      const m = (s.method || '').toLowerCase();
+      if (!m.includes(antagFilterMethod)) return false;
+    }
+
+    return true;
+  });
+}
+
+// Increment D — wire up filter-bar UI (index.html #antagFilterBar).
+// Called once during init() after DOM ready.
+function setupAntagFilters() {
+  const bar = document.getElementById('antagFilterBar');
+  if (!bar) return;
+  bar.addEventListener('change', (e) => {
+    const t = e.target;
+    if (!t || t.tagName !== 'SELECT') return;
+    const name = t.getAttribute('data-filter');
+    const val = t.value;
+    if (name === 'difficulty')   antagFilterDifficulty = val;
+    else if (name === 'stealth')      antagFilterStealth = val;
+    else if (name === 'verification') antagFilterVerification = val;
+    else if (name === 'method')       antagFilterMethod = val;
+    renderAntagStrategies();
+  });
+  const resetBtn = document.getElementById('antagFilterReset');
+  if (resetBtn) {
+    resetBtn.addEventListener('click', () => {
+      antagFilterDifficulty = 'all';
+      antagFilterStealth = 'all';
+      antagFilterVerification = 'all';
+      antagFilterMethod = 'all';
+      bar.querySelectorAll('select').forEach(sel => sel.value = 'all');
+      renderAntagStrategies();
+    });
+  }
+}
+
 function renderAntagStrategies() {
   const el = document.getElementById('antagStrategies');
   if (!el || !DATA.antagStrategies) return;
 
-  const cards = DATA.antagStrategies.map(strat => {
+  const filtered = filterStrategies();
+  const total = DATA.antagStrategies.length;
+
+  const cards = filtered.map(strat => {
     const reagentChips = strat.reagents.map(r =>
       `<span class="strategy-reagent-chip" onclick="event.stopPropagation(); openDetail('${esc(r.id)}')">${r.amount}u ${esc(r.id)}</span>`
     ).join('');
 
-    return `<div class="strategy-card">
+    // Primary difficulty = computed (per user decision). Authored goes into tooltip.
+    const cd = strat.computedDifficulty || {};
+    const primaryTier = cd.tier || strat.difficulty;
+    const authoredTier = cd.authoredTier || strat.difficulty;
+    const mismatch = cd.mismatch;
+    const tooltip = mismatch
+      ? `Computed: ${primaryTier} (effort ${cd.effortScore})\nCurator says: ${authoredTier}\n${cd.mismatchReason || ''}`
+      : `Computed difficulty (matches curator's authored tier: ${authoredTier})`;
+
+    // Verification badge
+    const vStatus = strat.verificationStatus || 'partial';
+    const vBadge = {
+      'all-verified': '<span class="badge badge-verified" title="Every ingredient has YAML-extracted mechanics; method matches a known delivery mechanism">\u2713 verified</span>',
+      'partial':      '<span class="badge badge-partial" title="Some ingredients have verified mechanics; other details come from curator\'s notes">\u25d1 partial</span>',
+      'lore-only':    '<span class="badge badge-lore-only" title="No ingredient has YAML-verified mechanics — relies entirely on curator\'s community knowledge">\u24d8 lore-only</span>',
+    }[vStatus] || '';
+
+    return `<div class="strategy-card" data-tier="${esc(primaryTier)}" data-status="${esc(vStatus)}">
       <div class="strategy-name">${esc(strat.name)}</div>
       <div class="strategy-desc">${esc(strat.desc)}</div>
       <div class="strategy-meta">
-        <span class="badge badge-stealth-${strat.stealth}">\u{1F441} ${esc(strat.stealth)}</span>
-        <span class="badge badge-difficulty">${esc(strat.difficulty)}</span>
+        <span class="badge badge-stealth-${esc(strat.stealth)}">\u{1F441} ${esc(strat.stealth)}</span>
+        <span class="badge badge-difficulty badge-tier-${esc(primaryTier)}" title="${esc(tooltip)}">${esc(primaryTier)}${mismatch ? ' <small>\u24d8</small>' : ''}</span>
         <span class="badge badge-method">${esc(strat.method)}</span>
+        ${vBadge}
       </div>
       <div class="strategy-reagents">${reagentChips}</div>
       <button class="strategy-calc-btn" onclick="event.stopPropagation(); loadStrategyIntoBatch('${esc(strat.id)}')">Calculate in Batch Planner</button>
     </div>`;
   }).join('');
 
-  el.innerHTML = `<h3>\u2620 Antag Strategies <span class="game-label">(SS14 gameplay)</span></h3>${cards}`;
+  const counterHTML = (filtered.length === total)
+    ? `<span class="strategy-count">${total} strategies</span>`
+    : `<span class="strategy-count">${filtered.length} of ${total} match filters</span>`;
+  const emptyHTML = filtered.length === 0
+    ? '<div class="strategy-empty">No strategies match the active filters. <button class="link-button" onclick="document.getElementById(\'antagFilterReset\').click()">Reset filters</button></div>'
+    : '';
+
+  el.innerHTML = `<h3>\u2620 Antag Strategies <span class="game-label">(SS14 gameplay)</span> ${counterHTML}</h3>${emptyHTML}${cards}`;
 }
 
 function renderDeliveryMechanisms() {
@@ -1717,6 +1809,11 @@ function encodeURLState() {
   if (activeSort !== 'name-asc') params.set('sort', activeSort);
   if (activeCategories.size) params.set('cats', [...activeCategories].join(','));
   if (activeEffectTags.size) params.set('fx', [...activeEffectTags].join(','));
+  // Increment D — antag strategy filters
+  if (antagFilterDifficulty   !== 'all') params.set('af_d', antagFilterDifficulty);
+  if (antagFilterStealth      !== 'all') params.set('af_s', antagFilterStealth);
+  if (antagFilterVerification !== 'all') params.set('af_v', antagFilterVerification);
+  if (antagFilterMethod       !== 'all') params.set('af_m', antagFilterMethod);
   const q = document.getElementById('searchInput')?.value;
   if (q) params.set('q', q);
   return params.toString() ? '#' + params.toString() : '';
@@ -1771,6 +1868,26 @@ function decodeURLState() {
     activeSort = sortVal;
     const sortSel = document.getElementById('sortSelect');
     if (sortSel) sortSel.value = sortVal;
+  }
+
+  // Increment D — antag strategy filters (whitelisted)
+  const validDiff = ['all','trivial','easy','medium','hard','expert','impossible'];
+  const validStealth = ['all','low','medium','high'];
+  const validVerification = ['all','all-verified','partial','lore-only'];
+  const validMethod = ['all','inject','ingest','area','grenade','splash','foam','smoke','food','drink'];
+  const afMap = {
+    'af_d': [validDiff,    'difficulty',   (v) => antagFilterDifficulty = v],
+    'af_s': [validStealth, 'stealth',      (v) => antagFilterStealth = v],
+    'af_v': [validVerification, 'verification', (v) => antagFilterVerification = v],
+    'af_m': [validMethod,  'method',       (v) => antagFilterMethod = v],
+  };
+  for (const [key, [validSet, dataAttr, setter]] of Object.entries(afMap)) {
+    const val = params.get(key);
+    if (val && validSet.includes(val)) {
+      setter(val);
+      const sel = document.querySelector(`#antagFilterBar select[data-filter="${safeSel(dataAttr)}"]`);
+      if (sel) sel.value = val;
+    }
   }
 
   // Categories (CSS.escape each value)
