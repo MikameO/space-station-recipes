@@ -142,6 +142,55 @@ function filterReagents(query) {
   });
 }
 
+// Bounded Levenshtein distance — returns max+1 once the running cost
+// exceeds max, so zero-result fallback stays O(n * k) with tiny k.
+function levenshtein(a, b, max) {
+  if (a === b) return 0;
+  const la = a.length, lb = b.length;
+  if (Math.abs(la - lb) > max) return max + 1;
+  if (la === 0) return lb;
+  if (lb === 0) return la;
+
+  let prev = new Array(lb + 1);
+  let curr = new Array(lb + 1);
+  for (let j = 0; j <= lb; j++) prev[j] = j;
+
+  for (let i = 1; i <= la; i++) {
+    curr[0] = i;
+    let rowMin = i;
+    for (let j = 1; j <= lb; j++) {
+      const cost = a.charCodeAt(i - 1) === b.charCodeAt(j - 1) ? 0 : 1;
+      curr[j] = Math.min(
+        curr[j - 1] + 1,
+        prev[j] + 1,
+        prev[j - 1] + cost
+      );
+      if (curr[j] < rowMin) rowMin = curr[j];
+    }
+    if (rowMin > max) return max + 1;
+    [prev, curr] = [curr, prev];
+  }
+  return prev[lb];
+}
+
+// Returns up to `limit` reagents whose *name* is within Levenshtein
+// distance 2 (or 3 for queries ≥ 6 chars) of the query. Ignores the
+// current source/category/taste filters — we want to rescue the user
+// from a typo, not honor filters that likely caused the zero-result.
+function findSimilarReagents(query, limit = 3) {
+  const q = query.toLowerCase().trim();
+  if (!q || q.length < 3) return [];
+  const max = q.length >= 6 ? 3 : 2;
+  const scored = [];
+  for (const entry of searchIndex) {
+    const name = (entry.reagent.name || entry.reagent.id).toLowerCase();
+    const d = levenshtein(q, name, max);
+    if (d <= max) scored.push({ entry, d });
+  }
+  scored.sort((a, b) => a.d - b.d);
+  return scored.slice(0, limit).map(s => s.entry);
+}
+
 function filterReactions(query) {
   const q = query.toLowerCase().trim();
   const tokens = q.split(/\s+/).filter(Boolean);
@@ -474,6 +523,11 @@ function renderReagents(query = '') {
   const grid = document.getElementById('reagentGrid');
   document.getElementById('resultCount').textContent = `${results.length} results`;
 
+  if (results.length === 0) {
+    renderEmptyReagentState(query, grid);
+    return;
+  }
+
   const BATCH = 80;
   let showCount = BATCH;
 
@@ -497,6 +551,56 @@ function renderReagents(query = '') {
     });
   }
   renderBatch();
+}
+
+function renderEmptyReagentState(query, grid) {
+  const q = query.trim();
+  const suggestions = q ? findSimilarReagents(q, 3) : [];
+  const escapeHtml = (s) => String(s).replace(/[&<>"']/g, c =>
+    ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+  let html = `<div class="empty-state" style="grid-column:1/-1">
+    <div class="empty-state-glyph">&#9888;</div>
+    <div class="empty-state-headline">No reagents match ${q ? `"${escapeHtml(q)}"` : 'the current filters'}</div>`;
+
+  if (suggestions.length) {
+    html += `<div class="empty-state-help">Did you mean:</div>
+      <div class="empty-state-chips">
+        ${suggestions.map(s =>
+          `<button class="empty-state-chip" data-name="${escapeHtml(s.reagent.name || s.reagent.id)}">${escapeHtml(s.reagent.name || s.reagent.id)}</button>`
+        ).join('')}
+      </div>`;
+  } else if (q) {
+    html += `<div class="empty-state-help">Try a different spelling, clear filters, or open the tutorial for a quick orientation.</div>`;
+  } else {
+    html += `<div class="empty-state-help">Try removing some filters from the sidebar.</div>`;
+  }
+
+  html += `<div class="empty-state-actions">
+      ${q ? `<button class="btn-small" id="emptyClearSearch">Clear search</button>` : ''}
+      <button class="btn-small" id="emptyOpenHelp">Open tutorial</button>
+    </div>
+  </div>`;
+
+  grid.innerHTML = html;
+
+  grid.querySelectorAll('.empty-state-chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      const input = document.getElementById('searchInput');
+      input.value = chip.dataset.name;
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+    });
+  });
+  const clearBtn = document.getElementById('emptyClearSearch');
+  if (clearBtn) clearBtn.addEventListener('click', () => {
+    const input = document.getElementById('searchInput');
+    input.value = '';
+    input.dispatchEvent(new Event('input', { bubbles: true }));
+  });
+  const helpBtn = document.getElementById('emptyOpenHelp');
+  if (helpBtn) helpBtn.addEventListener('click', () => {
+    document.getElementById('helpBtn').click();
+  });
 }
 
 function reagentCardHTML(r) {

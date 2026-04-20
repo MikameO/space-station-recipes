@@ -2507,6 +2507,65 @@ h1#logoHome:focus-visible { outline: 1px solid var(--phosphor); outline-offset: 
 }
 
 /* ══════════════════════════════════════════════════════════════
+ * EMPTY STATE — zero-result fallback for the reagent grid with
+ * Levenshtein-based "Did you mean" suggestion chips.
+ * ══════════════════════════════════════════════════════════════ */
+.empty-state {
+  text-align: center;
+  padding: 48px 24px 36px;
+  background: var(--panel);
+  border: 1px dashed var(--border-subtle);
+  border-radius: 4px;
+  margin-top: 12px;
+  display: flex; flex-direction: column; align-items: center; gap: 14px;
+}
+.empty-state-glyph {
+  font-size: 2.4rem;
+  color: var(--amber);
+  text-shadow: 0 0 12px rgba(255,182,39,0.35);
+  line-height: 1;
+}
+.empty-state-headline {
+  font-family: 'Oxanium', sans-serif;
+  font-size: 1.05rem; font-weight: 600;
+  color: var(--text-bright);
+  letter-spacing: 0.04em;
+}
+.empty-state-help {
+  font-size: 0.85rem; color: var(--text-sub);
+  max-width: 480px; line-height: 1.5;
+}
+.empty-state-chips {
+  display: flex; flex-wrap: wrap; gap: 8px; justify-content: center;
+}
+.empty-state-chip {
+  padding: 6px 14px;
+  background: var(--panel-raised);
+  border: 1px solid var(--phosphor-dim);
+  color: var(--phosphor);
+  font: 600 0.78rem 'Oxanium', sans-serif;
+  letter-spacing: 0.06em;
+  border-radius: 2px; cursor: pointer;
+  transition: background 0.15s, color 0.15s, box-shadow 0.15s;
+}
+.empty-state-chip:hover, .empty-state-chip:focus-visible {
+  background: var(--phosphor-glow);
+  color: var(--text-bright);
+  box-shadow: 0 0 12px var(--phosphor-glow);
+  outline: none;
+}
+.empty-state-actions {
+  display: flex; gap: 10px; justify-content: center; margin-top: 4px;
+}
+body.antag-active .empty-state-chip {
+  border-color: var(--red-alert); color: var(--red-alert);
+}
+body.antag-active .empty-state-chip:hover,
+body.antag-active .empty-state-chip:focus-visible {
+  background: var(--red-dim);
+}
+
+/* ══════════════════════════════════════════════════════════════
  * MOBILE OVERRIDES (must come after base .help-btn definition
  * because that rule lives below the main 768px media block).
  * ══════════════════════════════════════════════════════════════ */
