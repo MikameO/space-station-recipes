@@ -2404,3 +2404,35 @@ h1#logoHome:focus-visible { outline: 1px solid var(--phosphor); outline-offset: 
   .tut-btn { padding: 7px 10px; font-size: 0.72rem; }
 }
 
+/* ══════════════════════════════════════════════════════════════
+ * REDUCED MOTION — disable CRT scanlines, vignette, and looping
+ * animations for users with vestibular / photophobia sensitivity.
+ * One-shot transitions (tab-fade, stats-card-in, disclaimer-fade)
+ * survive — they convey "something happened" without flicker.
+ * ══════════════════════════════════════════════════════════════ */
+@media (prefers-reduced-motion: reduce) {
+  body::before,
+  body::after { display: none; }
+
+  .accent,
+  .antag-icon,
+  .tut-spotlight,
+  .loading-brand,
+  .loader-spinner,
+  .loading-bar-fill,
+  .loading-text,
+  .tab-btn-antag.pulse {
+    animation: none !important;
+  }
+
+  .tut-spotlight {
+    box-shadow: 0 0 0 4px var(--phosphor-glow), 0 0 18px var(--phosphor-glow);
+  }
+
+  .accent {
+    background: none;
+    -webkit-text-fill-color: var(--phosphor);
+    color: var(--phosphor);
+  }
+}
+
