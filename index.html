@@ -72,7 +72,7 @@
   "license": "https://github.com/MikameO/space-station-recipes/blob/main/LICENSE"
 }
 </script>
-<link rel="stylesheet" href="style.css?v=4">
+<link rel="stylesheet" href="style.css?v=5">
 <!-- Yandex.Metrika counter -->
 <script type="text/javascript">
     (function(m,e,t,r,i,k,a){
@@ -105,6 +105,7 @@
       <span class="antag-icon">&#9760;</span>
       <span class="antag-label">ANTAG</span>
     </button>
+    <button class="hint-chip hint-chip-left" data-hint="Reveals antagonist strategies tab: toxin synthesis routes, delivery methods, and difficulty ratings. Toggle off to return to the standard chemist view." aria-label="What is Antag mode?">?</button>
     <button class="help-btn" id="helpBtn" title="Show tutorial" aria-label="Show tutorial">?</button>
     <a class="feedback-btn" href="https://github.com/MikameO/space-station-recipes/issues" target="_blank" rel="noopener noreferrer" title="Feedback &amp; Bug Reports">
       <svg class="feedback-icon" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 3h14v10H7l-4 4V3z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><circle cx="7.5" cy="8" r="1" fill="currentColor"/><circle cx="10" cy="8" r="1" fill="currentColor"/><circle cx="12.5" cy="8" r="1" fill="currentColor"/></svg>
@@ -201,6 +202,7 @@
           <option value="used-in">Most Used</option>
           <option value="antag-desc">Antag Score ↓</option>
         </select>
+        <button class="hint-chip" data-hint="Most Used = sorted by how many reactions reference the reagent. Antag Score = potency heuristic across damage, stealth, and method." aria-label="Sort options explained">?</button>
       </div>
       <div class="reagent-grid" id="reagentGrid"></div>
     </div>
@@ -224,6 +226,7 @@
 
     <!-- Calculator Tab -->
     <div class="tab-panel" id="tab-calculator" role="tabpanel" aria-labelledby="btn-calculator">
+      <p class="calc-legend">Three planners stacked here: <strong>Recipe math</strong> below, <strong>Batch / Shift Planner</strong> for combined shopping lists, and <strong>What Can I Make?</strong> for reverse search by ingredient. Click any heading to collapse.</p>
       <div class="calc-controls">
         <div class="calc-input-group">
           <label>Target Reagent</label>
@@ -238,32 +241,44 @@
       </div>
       <div class="calc-results" id="calcResults"></div>
 
-      <div class="batch-section">
-        <h3 class="reverse-title">Batch / Shift Planner</h3>
-        <p class="reverse-desc">Add multiple targets to get one optimized shopping list</p>
-        <div class="batch-controls">
-          <div class="batch-row">
-            <input type="text" id="batchInput" class="search-input" placeholder="Type reagent..." autocomplete="off" aria-label="Add batch target reagent" style="width:220px">
-            <div class="calc-suggestions" id="batchSuggestions"></div>
-            <input type="number" id="batchAmount" class="search-input" value="30" min="1" max="9999" aria-label="Batch target amount" style="width:80px">
-            <button class="btn-small" id="batchAddBtn">+ Add</button>
+      <div class="batch-section" data-collapsible data-collapse-key="batch">
+        <h3 class="reverse-title">
+          <span class="reverse-title-text">Batch / Shift Planner</span>
+          <button class="hint-chip" data-hint="Add multiple targets to compute one combined ingredient list. Useful when planning a full shift instead of a single recipe." aria-label="Batch planner explained">?</button>
+          <span class="section-chevron">&#9660;</span>
+        </h3>
+        <div class="section-body">
+          <p class="reverse-desc">Add multiple targets to get one optimized shopping list</p>
+          <div class="batch-controls">
+            <div class="batch-row">
+              <input type="text" id="batchInput" class="search-input" placeholder="Type reagent..." autocomplete="off" aria-label="Add batch target reagent" style="width:220px">
+              <div class="calc-suggestions" id="batchSuggestions"></div>
+              <input type="number" id="batchAmount" class="search-input" value="30" min="1" max="9999" aria-label="Batch target amount" style="width:80px">
+              <button class="btn-small" id="batchAddBtn">+ Add</button>
+            </div>
           </div>
+          <div class="reverse-chips" id="batchChips"></div>
+          <button class="btn-primary" id="batchPlanBtn" style="margin-bottom:12px">Plan Batch</button>
+          <div id="batchWarnings"></div>
+          <div class="calc-results" id="batchResults"></div>
         </div>
-        <div class="reverse-chips" id="batchChips"></div>
-        <button class="btn-primary" id="batchPlanBtn" style="margin-bottom:12px">Plan Batch</button>
-        <div id="batchWarnings"></div>
-        <div class="calc-results" id="batchResults"></div>
       </div>
 
-      <div class="reverse-section">
-        <h3 class="reverse-title">What Can I Make?</h3>
-        <p class="reverse-desc">Select available ingredients to find craftable recipes</p>
-        <div class="reverse-controls">
-          <input type="text" id="reverseInput" class="search-input" placeholder="Type to add ingredient..." autocomplete="off" aria-label="Add ingredient for reverse lookup">
-          <div class="calc-suggestions" id="reverseSuggestions"></div>
+      <div class="reverse-section" data-collapsible data-collapse-key="reverse">
+        <h3 class="reverse-title">
+          <span class="reverse-title-text">What Can I Make?</span>
+          <button class="hint-chip" data-hint="Select available ingredients and the app suggests recipes you can craft right now. Reverse search instead of looking up reagents." aria-label="Reverse lookup explained">?</button>
+          <span class="section-chevron">&#9660;</span>
+        </h3>
+        <div class="section-body">
+          <p class="reverse-desc">Select available ingredients to find craftable recipes</p>
+          <div class="reverse-controls">
+            <input type="text" id="reverseInput" class="search-input" placeholder="Type to add ingredient..." autocomplete="off" aria-label="Add ingredient for reverse lookup">
+            <div class="calc-suggestions" id="reverseSuggestions"></div>
+          </div>
+          <div class="reverse-chips" id="reverseChips"></div>
+          <div class="reverse-results" id="reverseResults"></div>
         </div>
-        <div class="reverse-chips" id="reverseChips"></div>
-        <div class="reverse-results" id="reverseResults"></div>
       </div>
     </div>
 
@@ -368,7 +383,7 @@
   <div class="loading-bar"><div class="loading-bar-fill"></div></div>
 </div>
 
-<script src="app.js"></script>
+<script src="app.js?v=2"></script>
 <script defer src="tutorial.js"></script>
 </body>
 </html>

@@ -239,13 +239,22 @@ function buildSidebar() {
     });
   });
 
-  // Collapsible filter sections
-  document.querySelectorAll('.filter-section[data-collapsible]').forEach(section => {
+  // Collapsible sections — sidebar filters + Calculator subsections
+  // Sections with data-collapse-key persist state in sessionStorage.
+  document.querySelectorAll('[data-collapsible]').forEach(section => {
     const h3 = section.querySelector('h3');
+    if (!h3) return;
+    const key = section.dataset.collapseKey;
+    if (key && sessionStorage.getItem('collapse:' + key) === '1') {
+      section.classList.add('collapsed');
+    }
     h3.addEventListener('click', (e) => {
-      // Don't collapse when clicking Clear buttons
-      if (e.target.classList.contains('btn-small')) return;
+      // Don't collapse when clicking nested controls
+      if (e.target.closest('.btn-small, .hint-chip')) return;
       section.classList.toggle('collapsed');
+      if (key) {
+        sessionStorage.setItem('collapse:' + key, section.classList.contains('collapsed') ? '1' : '0');
+      }
     });
   });
 

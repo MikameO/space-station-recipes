@@ -272,6 +272,10 @@ header h1 {
 .filter-section.collapsed h3 { margin-bottom: 0; }
 .filter-section.collapsed { padding-bottom: 8px; margin-bottom: 10px; }
 
+/* Generic collapse — also applies to Calculator subsections */
+[data-collapsible].collapsed .section-chevron { transform: rotate(-90deg); }
+[data-collapsible].collapsed .section-body { display: none; }
+
 /* Radio & checkbox labels */
 .radio-label, .cat-label {
   display: flex;
@@ -772,8 +776,75 @@ main {
 
 /* Reverse lookup */
 .reverse-section { margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--border-subtle); }
-.reverse-title { font-family: 'Oxanium', sans-serif; font-size: 0.85rem; font-weight: 700; color: var(--phosphor); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px; }
-.reverse-desc { font-size: 0.68rem; color: var(--text-ghost); margin-bottom: 12px; }
+.reverse-title {
+  font-family: 'Oxanium', sans-serif; font-size: 0.85rem; font-weight: 700;
+  color: var(--phosphor); text-transform: uppercase; letter-spacing: 0.08em;
+  margin-bottom: 8px; display: flex; align-items: center; gap: 8px;
+  cursor: pointer; user-select: none;
+}
+.reverse-title-text { margin-right: auto; }
+[data-collapsible] .reverse-title:hover { color: #7dffb8; }
+.reverse-desc { font-size: 0.72rem; color: var(--text-sub); margin-bottom: 12px; }
+
+/* Calculator legend — orientation block above the three planners */
+.calc-legend {
+  font-size: 0.78rem; line-height: 1.55; color: var(--text-sub);
+  background: var(--panel); border-left: 3px solid var(--phosphor-dim);
+  padding: 10px 14px; margin-bottom: 14px; border-radius: 2px;
+}
+.calc-legend strong { color: var(--text-bright); font-weight: 600; }
+
+/* Hint chip — discoverability tooltip ((?) icon) */
+.hint-chip {
+  width: 18px; height: 18px; padding: 0; display: inline-flex;
+  align-items: center; justify-content: center;
+  background: transparent; border: 1px solid var(--phosphor-dim);
+  border-radius: 50%; color: var(--phosphor-dim);
+  font: 600 0.7rem 'Oxanium', sans-serif; cursor: help;
+  position: relative; flex-shrink: 0;
+  transition: color 0.15s, border-color 0.15s, background 0.15s;
+}
+.hint-chip:hover, .hint-chip:focus-visible {
+  color: var(--phosphor); border-color: var(--phosphor);
+  background: var(--phosphor-glow); outline: none;
+}
+.hint-chip:hover::after, .hint-chip:focus-visible::after {
+  content: attr(data-hint);
+  position: absolute; left: 50%; top: calc(100% + 8px);
+  transform: translateX(-50%);
+  width: max-content; max-width: 280px;
+  padding: 8px 12px;
+  background: var(--panel-raised); border: 1px solid var(--phosphor-dim);
+  color: var(--text-bright);
+  font: 400 0.72rem 'Chakra Petch', sans-serif;
+  letter-spacing: 0.02em; line-height: 1.45; text-align: left;
+  text-transform: none;
+  box-shadow: 0 0 14px rgba(57,255,133,0.18), 0 6px 16px rgba(0,0,0,0.45);
+  clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
+  z-index: 200; pointer-events: none;
+  white-space: normal;
+}
+.hint-chip:hover::before, .hint-chip:focus-visible::before {
+  content: ''; position: absolute; left: 50%; top: 100%;
+  width: 8px; height: 8px;
+  background: var(--phosphor-dim);
+  transform: translateX(-50%) rotate(45deg);
+  z-index: 201; pointer-events: none;
+}
+/* Right-anchored variant — for chips near right viewport edge (header) */
+.hint-chip-left:hover::after, .hint-chip-left:focus-visible::after {
+  left: auto; right: 0; transform: none;
+}
+.hint-chip-left:hover::before, .hint-chip-left:focus-visible::before {
+  left: auto; right: 6px; transform: rotate(45deg);
+}
+body.antag-active .hint-chip {
+  border-color: rgba(255,61,90,0.4); color: rgba(255,61,90,0.7);
+}
+body.antag-active .hint-chip:hover, body.antag-active .hint-chip:focus-visible {
+  color: var(--red-alert); border-color: var(--red-alert);
+  background: var(--red-dim);
+}
 .reverse-controls { position: relative; max-width: 400px; margin-bottom: 10px; }
 .reverse-chips { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 12px; }
 .reverse-chip {
