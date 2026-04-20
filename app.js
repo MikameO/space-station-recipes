@@ -266,9 +266,30 @@ function buildSidebar() {
   });
 
   // Sidebar toggle (mobile)
-  document.getElementById('sidebarToggle').addEventListener('click', () => {
+  const sidebarToggleBtn = document.getElementById('sidebarToggle');
+  sidebarToggleBtn.addEventListener('click', () => {
     document.getElementById('sidebarContent').classList.toggle('open');
   });
+
+  // Mobile-only: auto-collapse sidebar at <=480px on first paint so
+  // reagent grid claims the screen. Toggle button still visible.
+  if (matchMedia('(max-width: 480px)').matches) {
+    document.getElementById('sidebarContent').classList.remove('open');
+  }
+
+  // Active-filter count badge on the toggle button (reflects sidebar state).
+  function updateFilterCountBadge() {
+    let n = 0;
+    if (typeof activeSource !== 'undefined' && activeSource !== 'all') n++;
+    if (typeof activeBaseType !== 'undefined' && activeBaseType !== 'all') n++;
+    if (typeof activeTaste !== 'undefined' && activeTaste !== 'all') n++;
+    if (typeof activeCategories !== 'undefined') n += activeCategories.size;
+    if (typeof activeEffectTags !== 'undefined') n += activeEffectTags.size;
+    sidebarToggleBtn.textContent = n > 0 ? `Filters (${n})` : 'Filters';
+  }
+  updateFilterCountBadge();
+  // Catch every radio/checkbox change inside the sidebar to refresh the badge.
+  document.getElementById('sidebar').addEventListener('change', updateFilterCountBadge);
 }
 
 function updateStats() {

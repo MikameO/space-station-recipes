@@ -2252,7 +2252,11 @@ body.antag-active .disclaimer-bar {
     font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase;
     cursor: pointer; border-radius: 2px; margin-bottom: 8px;
   }
-  .tab-bar { -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+  .tab-bar {
+    -webkit-overflow-scrolling: touch; scrollbar-width: none;
+    -webkit-mask-image: linear-gradient(to right, #000 0, #000 calc(100% - 28px), transparent 100%);
+            mask-image: linear-gradient(to right, #000 0, #000 calc(100% - 28px), transparent 100%);
+  }
   .tab-bar::-webkit-scrollbar { display: none; }
   .tab-btn { font-size: 0.7rem; padding: 12px 16px; min-height: 44px; }
   .sidebar-content { display: none; }
@@ -2260,6 +2264,12 @@ body.antag-active .disclaimer-bar {
   .reagent-grid { grid-template-columns: 1fr; }
   .calc-results { grid-template-columns: 1fr; }
   .detail-panel { width: 100%; right: -100%; }
+  /* Touch targets that don't get overridden by later base rules */
+  .btn-small { min-height: 36px; padding: 6px 12px; }
+  .radio-label, .cat-label { padding: 8px 6px; }
+  .radio-label input, .cat-label input { width: 16px; height: 16px; }
+  .hint-chip { width: 24px; height: 24px; font-size: 0.85rem; }
+  .detail-close { width: 44px; height: 44px; font-size: 1.4rem; }
   .stats-bar-row { grid-template-columns: 100px 1fr 60px; gap: 6px; }
   .stats-bar-label { font-size: 0.7rem; }
   .stats-overview { grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 8px; }
@@ -2473,6 +2483,35 @@ h1#logoHome:focus-visible { outline: 1px solid var(--phosphor); outline-offset: 
   .tut-title { font-size: 0.95rem; }
   .tut-body { font-size: 0.85rem; }
   .tut-btn { padding: 7px 10px; font-size: 0.72rem; }
+}
+
+/* ══════════════════════════════════════════════════════════════
+ * 480px TIER — phones in portrait, ultra-narrow viewports
+ * Hides decorative meta, tightens header, gives reagent list
+ * more vertical room. Sidebar default-collapses (handled in JS).
+ * ══════════════════════════════════════════════════════════════ */
+@media (max-width: 480px) {
+  .header-meta { display: none; }
+  .disclaimer-bar-text { font-size: 0.62rem; }
+  .sidebar { max-height: 40vh; }
+  .tab-btn { padding: 10px 12px; font-size: 0.68rem; }
+  header { padding: 8px 10px; gap: 6px; }
+  .header-right { gap: 6px; }
+  .calc-legend { font-size: 0.72rem; padding: 8px 10px; }
+  .feedback-btn { display: none; }
+  .sidebar-toggle { font-size: 0.78rem; }
+  .reverse-title { font-size: 0.78rem; }
+  .hint-chip-left:hover::after, .hint-chip-left:focus-visible::after {
+    max-width: calc(100vw - 32px);
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════
+ * MOBILE OVERRIDES (must come after base .help-btn definition
+ * because that rule lives below the main 768px media block).
+ * ══════════════════════════════════════════════════════════════ */
+@media (max-width: 768px) {
+  .help-btn { width: 44px; height: 44px; font-size: 1.15rem; }
 }
 
 /* ══════════════════════════════════════════════════════════════
