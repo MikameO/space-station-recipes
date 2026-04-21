@@ -1641,10 +1641,15 @@ def compute_antag_score(effect_tags: list[str]) -> int:
 # curator/reality mismatches (e.g. slow-poison authored "easy" but using
 # unobtainable Lead → computed "impossible").
 #
-# Currently global (not per-fork). Per-fork extension deferred: would require
-# rebuilding reaction_lookup and all_sources filtered by fork. For now the
-# strategy difficulty reflects whichever fork has the easiest access to each
-# reagent. Lead (unobtainable everywhere — no recipe produces it in any fork)
+# Two layers coexist:
+#   - Global (legacy, top-level `computedDifficulty`): optimistic-max across all
+#     forks — the strategy's tier on the most permissive server. Kept for
+#     back-compat and for the 'all' filter.
+#   - Per-fork (`computedDifficulty.byFork[fork_id]`, Increment I): strict
+#     per-fork difficulty. A strategy using a reagent blocked in DeltaV surfaces
+#     as 'impossible' there while remaining 'easy' on vanilla. See
+#     build_per_fork_views() below.
+# Lead (unobtainable everywhere — no recipe produces it in any fork)
 # is already correctly classified globally.
 
 TIER_WEIGHTS = {
@@ -1869,6 +1874,94 @@ def compute_strategy_difficulty(
         "mismatch": mismatch,
         "mismatchReason": "; ".join(reasons) if mismatch else "",
     }
+
+
+def build_per_fork_views(
+    reactions: dict,
+    reagents: dict,
+    reagent_plants: dict,
+    base_set: set,
+) -> dict[str, dict]:
+    """Build filtered {reaction_lookup, all_sources, accessibility_map} per fork.
+
+    Each fork view drops reactions that are blocked in that fork and excludes
+    reagents that originated in a different fork (fork-exclusive content). This
+    mirrors the UI's fork-filter logic (app.js:119-127, 199-206) so the computed
+    difficulty matches what the player would actually see on that server.
+
+    Note: modified_reactions are not structurally applied here — the recipe shape
+    stays the same; only blocked recipes are dropped. Rationale: modifications
+    shift ingredient counts/types, which would require deeper mutation of the
+    reaction dict. Blocked is the first-order effect that dominates difficulty.
+    """
+    per_fork = {}
+
+    # Group reactions by source (fork ownership)
+    reactions_by_source = defaultdict(dict)
+    for rid, rxn in reactions.items():
+        src = rxn.get("source") or detect_fork_source(rxn.get("_source_file", ""))
+        reactions_by_source[src or "vanilla"][rid] = rxn
+
+    for fork_id, fconf in FORK_REGISTRY.items():
+        blocked = set(fconf.get("blocked_reactions", set()) or set())
+
+        # Fork view of reactions: vanilla (minus blocked) + fork-exclusive
+        fork_reactions = {}
+        for rid, rxn in reactions_by_source.get("vanilla", {}).items():
+            if rid not in blocked:
+                fork_reactions[rid] = rxn
+        # Add fork-native reactions (when fork_id != vanilla)
+        if fork_id != "vanilla":
+            for rid, rxn in reactions_by_source.get(fork_id, {}).items():
+                fork_reactions[rid] = rxn
+
+        fork_reaction_lookup = build_reaction_lookup(fork_reactions)
+
+        # Per-fork all_sources (plants are global, recipes are fork-filtered)
+        fork_all_sources = build_all_sources(reagent_plants, fork_reaction_lookup, base_set)
+
+        # Per-fork accessibility — only for non-abstract reagents visible in this fork
+        fork_accessibility_map = {}
+        for rid, reagent in reagents.items():
+            if reagent.get("abstract"):
+                continue
+            # Skip reagents that are exclusive to a different fork
+            reagent_source = reagent.get("source") or detect_fork_source(
+                reagent.get("_source_file", "")
+            )
+            if reagent_source and reagent_source != "vanilla" and reagent_source != fork_id:
+                continue
+            fork_accessibility_map[rid] = compute_reagent_accessibility(
+                rid, fork_reaction_lookup, fork_all_sources
+            )
+
+        per_fork[fork_id] = {
+            "reaction_lookup": fork_reaction_lookup,
+            "all_sources": fork_all_sources,
+            "accessibility_map": fork_accessibility_map,
+        }
+
+    return per_fork
+
+
+def compute_strategy_difficulty_by_fork(
+    strategy: dict,
+    per_fork_views: dict[str, dict],
+) -> dict[str, dict]:
+    """Run compute_strategy_difficulty once per fork. Returns {fork_id: result}.
+
+    Useful for UI that wants to show the effective difficulty on the server the
+    user is currently filtering by (see app.js activeSource). A strategy that
+    uses a reagent blocked on DeltaV will surface as `impossible` there while
+    staying `easy` on vanilla."""
+    result = {}
+    for fork_id, views in per_fork_views.items():
+        result[fork_id] = compute_strategy_difficulty(
+            strategy,
+            views["accessibility_map"],
+            views["reaction_lookup"],
+        )
+    return result
 
 
 # ─────────────────────────────────────────────
@@ -2118,12 +2211,25 @@ def export_json(reagents: dict, reactions: dict, locale: dict,
 
     # Antag mode data — each strategy gets computedDifficulty + verificationStatus attached.
     # Increment G: `sources` passes through via {**_strat} — already authored on each entry.
+    # Increment I: per-fork difficulty — UI reads computedDifficulty.byFork[activeSource]
+    # to reflect that a strategy can be easy on one server and impossible on another.
     delivery_keys = set(DELIVERY_MECHANISMS.keys())
+
+    # Per-fork views: one filtered context per fork in FORK_REGISTRY.
+    # Collapses ~120 lines of per-fork filtering (blocked recipes, fork-exclusive
+    # reagents) into a single precomputation so compute_strategy_difficulty stays pure.
+    per_fork_views = build_per_fork_views(reactions, reagents, reagent_plants, base_set)
+
     strategies_out = []
     mismatches = []
     lore_only_strategies = []
     for _strat in ANTAG_STRATEGIES:
         computed = compute_strategy_difficulty(_strat, accessibility_map, reaction_lookup)
+        by_fork = compute_strategy_difficulty_by_fork(_strat, per_fork_views)
+        computed["byFork"] = by_fork
+        # Inline summary: which forks flip the tier vs global?
+        tier_variants = {fid: r["tier"] for fid, r in by_fork.items()}
+        computed["tierVariesAcrossForks"] = len(set(tier_variants.values())) > 1
         verification = compute_strategy_verification_status(_strat, verified_mechanics_map, delivery_keys)
         # Default sources to mk-placeholder if curator didn't specify any.
         src_list = _strat.get("sources") or ["mk-general-antag-playtime"]

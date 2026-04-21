@@ -2011,13 +2011,36 @@ function getAntagIntelHTML(r) {
   `;
 }
 
+// Increment I — resolve the effective per-fork difficulty for a strategy.
+// Layering (first match wins):
+//   1. If a fork is selected AND the extractor emitted byFork for it → use it.
+//      This is the honest per-server answer (e.g. a strategy using a DeltaV-
+//      blocked reagent reads `impossible` only on DeltaV).
+//   2. Otherwise fall back to top-level computedDifficulty (optimistic-max
+//      across forks) — preserves behavior for the 'all' filter and for old
+//      data.json files generated before Increment I shipped.
+//   3. Final fallback: authored `difficulty` string (legacy entries).
+// The returned object is the same shape as computedDifficulty so existing
+// rendering code works unchanged.
+function resolveEffectiveDifficulty(strat) {
+  const cd = strat.computedDifficulty || {};
+  const byFork = cd.byFork;
+  if (byFork && activeSource && activeSource !== 'all' && byFork[activeSource]) {
+    return { ...byFork[activeSource], _forkScoped: activeSource };
+  }
+  if (cd.tier) return cd;
+  // Synthesize a minimal shape from authored difficulty only.
+  return { tier: strat.difficulty, authoredTier: strat.difficulty, mismatch: false, effortScore: null };
+}
+
 // Increment D — filter antag strategies by user-selected criteria.
 // Reuses the pattern from filterReactions:137. The `activeSource` global
 // fork filter also applies here (Steelclaw's "which fork?" critique).
 function filterStrategies() {
   const list = DATA.antagStrategies || [];
   return list.filter(s => {
-    const computedTier = s.computedDifficulty?.tier || s.difficulty;
+    const effective = resolveEffectiveDifficulty(s);
+    const computedTier = effective.tier || s.difficulty;
 
     // Difficulty filter
     if (antagFilterDifficulty !== 'all' && computedTier !== antagFilterDifficulty) return false;
@@ -2079,14 +2102,29 @@ function renderAntagStrategies() {
       `<span class="strategy-reagent-chip" onclick="event.stopPropagation(); openDetail('${esc(r.id)}')">${r.amount}u ${esc(r.id)}</span>`
     ).join('');
 
-    // Primary difficulty = computed (per user decision). Authored goes into tooltip.
+    // Primary difficulty = per-fork computed if activeSource is set, else global.
+    // Increment I: the tier visible on the badge tracks which server the user
+    // filtered to — matching the Steelclaw critique "which fork supports this?".
     const cd = strat.computedDifficulty || {};
-    const primaryTier = cd.tier || strat.difficulty;
-    const authoredTier = cd.authoredTier || strat.difficulty;
-    const mismatch = cd.mismatch;
+    const effective = resolveEffectiveDifficulty(strat);
+    const primaryTier = effective.tier || strat.difficulty;
+    const authoredTier = effective.authoredTier || cd.authoredTier || strat.difficulty;
+    const mismatch = effective.mismatch;
+    const forkScope = effective._forkScoped;
+    const forkMeta = forkScope && DATA.meta?.forks?.[forkScope];
+    const forkLabel = forkMeta?.name || forkScope || 'global (all forks)';
+    // Optional variance hint: if the same strategy reads differently across forks
+    // we tell the user so they know switching the fork radio will change the tier.
+    const varies = cd.tierVariesAcrossForks;
+    const varianceLine = (varies && !forkScope)
+      ? `\nTier varies across forks — pick a server radio to see the exact tier.`
+      : '';
+    const scopeLine = forkScope
+      ? `\nScope: ${forkLabel} (per-fork computed)`
+      : `\nScope: optimistic-max across all forks`;
     const tooltip = mismatch
-      ? `Computed: ${primaryTier} (effort ${cd.effortScore})\nCurator says: ${authoredTier}\n${cd.mismatchReason || ''}`
-      : `Computed difficulty (matches curator's authored tier: ${authoredTier})`;
+      ? `Computed: ${primaryTier} (effort ${effective.effortScore ?? '?'})\nCurator says: ${authoredTier}\n${effective.mismatchReason || ''}${scopeLine}${varianceLine}`
+      : `Computed difficulty (matches curator's authored tier: ${authoredTier})${scopeLine}${varianceLine}`;
 
     // Verification badge
     const vStatus = strat.verificationStatus || 'partial';
