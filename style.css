@@ -1675,6 +1675,42 @@ body.antag-active .antag-toggle {
 }
 .antag-filter-reset:hover { color: var(--red-alert); border-color: var(--red-alert); }
 
+/* Increment K — multi-select chip filters (difficulty, method).
+   Chip group wraps to next line on narrow viewports. Active state paints
+   the chip in its tier color to mirror the badge palette used on strategy
+   cards, giving the user a visual answer to "which chip maps to which
+   badge color?". Inactive chips stay muted but remain tappable. */
+.antag-filter-multi { min-width: 0; }
+.antag-filter-chips {
+  display: flex; flex-wrap: wrap; gap: 4px;
+  padding: 2px 0;
+}
+.diff-chip {
+  padding: 4px 9px; font-size: 0.72rem; font-family: 'Share Tech Mono', monospace;
+  text-transform: lowercase; letter-spacing: 0.04em;
+  background: var(--panel); color: var(--text-sub);
+  border: 1px solid var(--border-subtle); border-radius: 2px;
+  cursor: pointer; transition: background 120ms, color 120ms, border-color 120ms;
+  min-height: 28px;
+}
+.diff-chip:hover { color: var(--text-main); border-color: var(--text-sub); }
+.diff-chip:focus-visible { outline: 2px solid var(--red-alert); outline-offset: 1px; }
+.diff-chip.active { font-weight: 600; }
+
+/* Difficulty tier colors — mirror .badge-tier-* above for visual consistency. */
+.diff-chip-trivial.active    { background: rgba(74,222,128,0.18);  color: #4ade80; border-color: rgba(74,222,128,0.55); }
+.diff-chip-easy.active       { background: rgba(34,211,238,0.18);  color: #22d3ee; border-color: rgba(34,211,238,0.55); }
+.diff-chip-medium.active     { background: rgba(251,191,36,0.18);  color: #fbbf24; border-color: rgba(251,191,36,0.55); }
+.diff-chip-hard.active       { background: rgba(251,146,60,0.18);  color: #fb923c; border-color: rgba(251,146,60,0.55); }
+.diff-chip-expert.active     { background: rgba(239,68,68,0.18);   color: #ef4444; border-color: rgba(239,68,68,0.55); }
+.diff-chip-impossible.active { background: rgba(100,100,100,0.28); color: #aaa;    border-color: #777; text-decoration: line-through; }
+
+/* Method chips use the red-alert theme since they're not on a tier scale. */
+.method-chip.active {
+  background: var(--red-dim); color: var(--red-alert);
+  border-color: rgba(255,61,90,0.55);
+}
+
 .strategy-count {
   font-family: 'Share Tech Mono', monospace;
   font-size: 0.72rem; font-weight: 400; color: var(--text-sub);

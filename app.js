@@ -24,10 +24,13 @@ let activeTaste = 'all'; // 'all' | 'has-taste' | 'tasteless'
 
 // Increment D — antag strategy filters (all default 'all').
 // Persisted in URL as af_d / af_s / af_v / af_m.
-let antagFilterDifficulty   = 'all'; // 'all'|'trivial'|'easy'|'medium'|'hard'|'expert'|'impossible'
-let antagFilterStealth      = 'all'; // 'all'|'low'|'medium'|'high'
-let antagFilterVerification = 'all'; // 'all'|'all-verified'|'partial'|'lore-only'
-let antagFilterMethod       = 'all'; // 'all'|'inject'|'ingest'|'area'|'grenade'|'splash'
+// Increment K: difficulty & method are multi-select Sets. Empty Set = no
+// filter applied (= show all). Stealth & verification stay single-valued
+// because they only have 3-4 distinct options — chip-clutter with no payoff.
+let antagFilterDifficulties = new Set(); // subset of {trivial, easy, medium, hard, expert, impossible}
+let antagFilterStealth      = 'all';     // 'all'|'low'|'medium'|'high'
+let antagFilterVerification = 'all';     // 'all'|'all-verified'|'partial'|'lore-only'
+let antagFilterMethods      = new Set(); // subset of {inject, ingest, drink, food, area, grenade, splash, foam, smoke}
 
 // ─────────────────────────────────────────────
 // Init
@@ -2042,8 +2045,8 @@ function filterStrategies() {
     const effective = resolveEffectiveDifficulty(s);
     const computedTier = effective.tier || s.difficulty;
 
-    // Difficulty filter
-    if (antagFilterDifficulty !== 'all' && computedTier !== antagFilterDifficulty) return false;
+    // Difficulty filter — multi-select: pass if Set is empty OR contains tier.
+    if (antagFilterDifficulties.size > 0 && !antagFilterDifficulties.has(computedTier)) return false;
 
     // Stealth filter
     if (antagFilterStealth !== 'all' && s.stealth !== antagFilterStealth) return false;
@@ -2051,40 +2054,79 @@ function filterStrategies() {
     // Verification filter
     if (antagFilterVerification !== 'all' && s.verificationStatus !== antagFilterVerification) return false;
 
-    // Method filter (keyword-based match against authored method string)
-    if (antagFilterMethod !== 'all') {
+    // Method filter — multi-select, keyword-based. Pass if any selected
+    // keyword appears in the authored method string. Empty Set = no filter.
+    if (antagFilterMethods.size > 0) {
       const m = (s.method || '').toLowerCase();
-      if (!m.includes(antagFilterMethod)) return false;
+      let hit = false;
+      for (const kw of antagFilterMethods) {
+        if (m.includes(kw)) { hit = true; break; }
+      }
+      if (!hit) return false;
     }
 
     return true;
   });
 }
 
-// Increment D — wire up filter-bar UI (index.html #antagFilterBar).
+// Increment D / K — wire up filter-bar UI (index.html #antagFilterBar).
+// Two input types live in the same toolbar:
+//   - <select data-filter="..."> for single-valued filters (stealth, verification)
+//   - <div class="antag-filter-chips" data-filter="..."> with <button> chips
+//     for multi-valued filters (difficulty, method). Delegated click handler
+//     toggles `active` + aria-pressed and syncs the backing Set.
 // Called once during init() after DOM ready.
 function setupAntagFilters() {
   const bar = document.getElementById('antagFilterBar');
   if (!bar) return;
+
+  // Single-valued selects
   bar.addEventListener('change', (e) => {
     const t = e.target;
     if (!t || t.tagName !== 'SELECT') return;
     const name = t.getAttribute('data-filter');
     const val = t.value;
-    if (name === 'difficulty')   antagFilterDifficulty = val;
-    else if (name === 'stealth')      antagFilterStealth = val;
+    if (name === 'stealth')           antagFilterStealth = val;
     else if (name === 'verification') antagFilterVerification = val;
-    else if (name === 'method')       antagFilterMethod = val;
     renderAntagStrategies();
   });
+
+  // Multi-valued chip groups (delegated click)
+  bar.addEventListener('click', (e) => {
+    const chip = e.target.closest('.diff-chip');
+    if (!chip) return;
+    const group = chip.closest('.antag-filter-chips');
+    if (!group) return;
+    const filter = group.getAttribute('data-filter');
+    const val = chip.getAttribute('data-value');
+    const set = (filter === 'difficulty') ? antagFilterDifficulties
+              : (filter === 'method')     ? antagFilterMethods
+              : null;
+    if (!set) return;
+    if (set.has(val)) {
+      set.delete(val);
+      chip.classList.remove('active');
+      chip.setAttribute('aria-pressed', 'false');
+    } else {
+      set.add(val);
+      chip.classList.add('active');
+      chip.setAttribute('aria-pressed', 'true');
+    }
+    renderAntagStrategies();
+  });
+
   const resetBtn = document.getElementById('antagFilterReset');
   if (resetBtn) {
     resetBtn.addEventListener('click', () => {
-      antagFilterDifficulty = 'all';
+      antagFilterDifficulties.clear();
+      antagFilterMethods.clear();
       antagFilterStealth = 'all';
       antagFilterVerification = 'all';
-      antagFilterMethod = 'all';
       bar.querySelectorAll('select').forEach(sel => sel.value = 'all');
+      bar.querySelectorAll('.diff-chip.active').forEach(chip => {
+        chip.classList.remove('active');
+        chip.setAttribute('aria-pressed', 'false');
+      });
       renderAntagStrategies();
     });
   }
@@ -2261,11 +2303,14 @@ function encodeURLState() {
   if (activeSort !== 'name-asc') params.set('sort', activeSort);
   if (activeCategories.size) params.set('cats', [...activeCategories].join(','));
   if (activeEffectTags.size) params.set('fx', [...activeEffectTags].join(','));
-  // Increment D — antag strategy filters
-  if (antagFilterDifficulty   !== 'all') params.set('af_d', antagFilterDifficulty);
+  // Increment D / K — antag strategy filters. Multi-valued filters
+  // (difficulty, method) serialize as CSV so shareable URLs like
+  //   #antag=1&af_d=easy,medium&af_m=inject,drink
+  // round-trip without escape hell. Sort for URL stability across toggles.
+  if (antagFilterDifficulties.size) params.set('af_d', [...antagFilterDifficulties].sort().join(','));
   if (antagFilterStealth      !== 'all') params.set('af_s', antagFilterStealth);
   if (antagFilterVerification !== 'all') params.set('af_v', antagFilterVerification);
-  if (antagFilterMethod       !== 'all') params.set('af_m', antagFilterMethod);
+  if (antagFilterMethods.size) params.set('af_m', [...antagFilterMethods].sort().join(','));
   const q = document.getElementById('searchInput')?.value;
   if (q) params.set('q', q);
   return params.toString() ? '#' + params.toString() : '';
@@ -2322,18 +2367,38 @@ function decodeURLState() {
     if (sortSel) sortSel.value = sortVal;
   }
 
-  // Increment D — antag strategy filters (whitelisted)
-  const validDiff = ['all','trivial','easy','medium','hard','expert','impossible'];
+  // Increment D / K — antag strategy filters (whitelisted).
+  // Multi-valued: parse CSV into the backing Set, whitelist each token,
+  // and visually mark the corresponding chip active. Order of params
+  // doesn't matter — chips are toggled by data-value lookup.
+  const validDiffValues = new Set(['trivial','easy','medium','hard','expert','impossible']);
+  const validMethodValues = new Set(['inject','ingest','area','grenade','splash','foam','smoke','food','drink']);
   const validStealth = ['all','low','medium','high'];
   const validVerification = ['all','all-verified','partial','lore-only'];
-  const validMethod = ['all','inject','ingest','area','grenade','splash','foam','smoke','food','drink'];
-  const afMap = {
-    'af_d': [validDiff,    'difficulty',   (v) => antagFilterDifficulty = v],
+
+  const applyChipCsv = (csv, whitelist, backingSet, filterName) => {
+    if (!csv) return;
+    const wanted = csv.split(',').map(v => v.trim()).filter(v => whitelist.has(v));
+    for (const val of wanted) {
+      backingSet.add(val);
+      const chip = document.querySelector(
+        `#antagFilterBar .antag-filter-chips[data-filter="${safeSel(filterName)}"] .diff-chip[data-value="${safeSel(val)}"]`
+      );
+      if (chip) {
+        chip.classList.add('active');
+        chip.setAttribute('aria-pressed', 'true');
+      }
+    }
+  };
+  applyChipCsv(params.get('af_d'), validDiffValues,   antagFilterDifficulties, 'difficulty');
+  applyChipCsv(params.get('af_m'), validMethodValues, antagFilterMethods,      'method');
+
+  // Single-valued selects
+  const afSingleMap = {
     'af_s': [validStealth, 'stealth',      (v) => antagFilterStealth = v],
     'af_v': [validVerification, 'verification', (v) => antagFilterVerification = v],
-    'af_m': [validMethod,  'method',       (v) => antagFilterMethod = v],
   };
-  for (const [key, [validSet, dataAttr, setter]] of Object.entries(afMap)) {
+  for (const [key, [validSet, dataAttr, setter]] of Object.entries(afSingleMap)) {
     const val = params.get(key);
     if (val && validSet.includes(val)) {
       setter(val);

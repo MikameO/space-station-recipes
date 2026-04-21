@@ -310,21 +310,23 @@
     <!-- Antag Tab (visible only in Antag Mode) -->
     <div class="tab-panel" id="tab-antag" role="tabpanel" aria-labelledby="btn-antag">
       <div class="antag-tab-content">
-        <!-- Increment D: strategy filter bar. Four selects + reset button.
-             Values persist via URL params af_d / af_s / af_v / af_m. -->
+        <!-- Increment D: strategy filter bar. Two multi-select chip groups
+             (difficulty, method) + two single selects (stealth, verification)
+             + reset. Values persist via URL params af_d / af_s / af_v / af_m.
+             Multi filters serialize as CSV: af_d=easy,medium,hard. Empty
+             selection = "show all" (no filter applied). -->
         <div id="antagFilterBar" class="antag-filter-bar" role="toolbar" aria-label="Antag strategy filters">
-          <label class="antag-filter-label">
-            <span>Difficulty</span>
-            <select data-filter="difficulty" aria-label="Filter by computed difficulty">
-              <option value="all">all</option>
-              <option value="trivial">trivial</option>
-              <option value="easy">easy</option>
-              <option value="medium">medium</option>
-              <option value="hard">hard</option>
-              <option value="expert">expert</option>
-              <option value="impossible">impossible</option>
-            </select>
-          </label>
+          <div class="antag-filter-label antag-filter-multi" role="group" aria-labelledby="antagDifficultyLabel">
+            <span id="antagDifficultyLabel">Difficulty</span>
+            <div class="antag-filter-chips" data-filter="difficulty">
+              <button type="button" class="diff-chip diff-chip-trivial"    data-value="trivial"    aria-pressed="false">trivial</button>
+              <button type="button" class="diff-chip diff-chip-easy"       data-value="easy"       aria-pressed="false">easy</button>
+              <button type="button" class="diff-chip diff-chip-medium"     data-value="medium"     aria-pressed="false">medium</button>
+              <button type="button" class="diff-chip diff-chip-hard"       data-value="hard"       aria-pressed="false">hard</button>
+              <button type="button" class="diff-chip diff-chip-expert"     data-value="expert"     aria-pressed="false">expert</button>
+              <button type="button" class="diff-chip diff-chip-impossible" data-value="impossible" aria-pressed="false">impossible</button>
+            </div>
+          </div>
           <label class="antag-filter-label">
             <span>Stealth</span>
             <select data-filter="stealth" aria-label="Filter by stealth level">
@@ -343,21 +345,20 @@
               <option value="lore-only">&#9432; lore-only</option>
             </select>
           </label>
-          <label class="antag-filter-label">
-            <span>Method</span>
-            <select data-filter="method" aria-label="Filter by delivery method keyword">
-              <option value="all">all</option>
-              <option value="inject">inject</option>
-              <option value="ingest">ingest</option>
-              <option value="drink">drink</option>
-              <option value="food">food</option>
-              <option value="area">area</option>
-              <option value="grenade">grenade</option>
-              <option value="splash">splash</option>
-              <option value="foam">foam</option>
-              <option value="smoke">smoke</option>
-            </select>
-          </label>
+          <div class="antag-filter-label antag-filter-multi" role="group" aria-labelledby="antagMethodLabel">
+            <span id="antagMethodLabel">Method</span>
+            <div class="antag-filter-chips" data-filter="method">
+              <button type="button" class="diff-chip method-chip" data-value="inject"  aria-pressed="false">inject</button>
+              <button type="button" class="diff-chip method-chip" data-value="ingest"  aria-pressed="false">ingest</button>
+              <button type="button" class="diff-chip method-chip" data-value="drink"   aria-pressed="false">drink</button>
+              <button type="button" class="diff-chip method-chip" data-value="food"    aria-pressed="false">food</button>
+              <button type="button" class="diff-chip method-chip" data-value="area"    aria-pressed="false">area</button>
+              <button type="button" class="diff-chip method-chip" data-value="grenade" aria-pressed="false">grenade</button>
+              <button type="button" class="diff-chip method-chip" data-value="splash"  aria-pressed="false">splash</button>
+              <button type="button" class="diff-chip method-chip" data-value="foam"    aria-pressed="false">foam</button>
+              <button type="button" class="diff-chip method-chip" data-value="smoke"   aria-pressed="false">smoke</button>
+            </div>
+          </div>
           <button type="button" id="antagFilterReset" class="antag-filter-reset">Reset filters</button>
         </div>
         <div id="antagStrategies"></div>
