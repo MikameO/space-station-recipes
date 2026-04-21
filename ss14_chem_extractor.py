@@ -1971,9 +1971,13 @@ def compute_strategy_difficulty_by_fork(
 def export_json(reagents: dict, reactions: dict, locale: dict,
                 reaction_lookup: dict, base_set: set,
                 all_sources: dict | None = None,
-                fork_diffs: dict | None = None):
+                fork_diffs: dict | None = None,
+                reagent_plants: dict | None = None):
     """Export all data as a JSON file for the web frontend.
-    fork_diffs: {fork_id: (blocked_set, modified_dict)} from auto-diff."""
+    fork_diffs: {fork_id: (blocked_set, modified_dict)} from auto-diff.
+    reagent_plants: {reagent_id: [plant_label...]} from parse_seed_sources;
+        required for Increment I per-fork accessibility rebuild (plants are
+        fork-invariant, recipes are fork-filtered)."""
     # Compute per-fork reagent counts
     fork_reagent_counts = {}
     for r in reagents.values():
@@ -2218,18 +2222,22 @@ def export_json(reagents: dict, reactions: dict, locale: dict,
     # Per-fork views: one filtered context per fork in FORK_REGISTRY.
     # Collapses ~120 lines of per-fork filtering (blocked recipes, fork-exclusive
     # reagents) into a single precomputation so compute_strategy_difficulty stays pure.
-    per_fork_views = build_per_fork_views(reactions, reagents, reagent_plants, base_set)
+    # Falls back to empty dict if plants weren't threaded through (old call sites).
+    per_fork_views = build_per_fork_views(
+        reactions, reagents, reagent_plants or {}, base_set
+    ) if reagent_plants is not None else {}
 
     strategies_out = []
     mismatches = []
     lore_only_strategies = []
     for _strat in ANTAG_STRATEGIES:
         computed = compute_strategy_difficulty(_strat, accessibility_map, reaction_lookup)
-        by_fork = compute_strategy_difficulty_by_fork(_strat, per_fork_views)
-        computed["byFork"] = by_fork
-        # Inline summary: which forks flip the tier vs global?
-        tier_variants = {fid: r["tier"] for fid, r in by_fork.items()}
-        computed["tierVariesAcrossForks"] = len(set(tier_variants.values())) > 1
+        if per_fork_views:
+            by_fork = compute_strategy_difficulty_by_fork(_strat, per_fork_views)
+            computed["byFork"] = by_fork
+            # Inline summary: which forks flip the tier vs global?
+            tier_variants = {fid: r["tier"] for fid, r in by_fork.items()}
+            computed["tierVariesAcrossForks"] = len(set(tier_variants.values())) > 1
         verification = compute_strategy_verification_status(_strat, verified_mechanics_map, delivery_keys)
         # Default sources to mk-placeholder if curator didn't specify any.
         src_list = _strat.get("sources") or ["mk-general-antag-playtime"]
@@ -2476,7 +2484,10 @@ def main():
 
     # Phase 8: Generate JSON for web frontend
     print("\n=== Phase 8: Generating JSON for web frontend ===")
-    export_json(all_reagents, all_reactions, locale, reaction_lookup, base_set, all_sources, fork_diffs)
+    export_json(
+        all_reagents, all_reactions, locale, reaction_lookup, base_set,
+        all_sources, fork_diffs, reagent_plants=reagent_plants,
+    )
 
     print("\n=== Phase 9: Extracting sprites from SS14 repo ===")
     fetch_and_extract_sprites()

@@ -171,6 +171,85 @@ SOURCES = {
         "note": "K+H2O reaction in chemicals.yml produces an explosion via ChemExplosion with intensity 0.25 per unit, capped at 100. Backs mass-explosion strategy.",
     },
 
+    # ── Increment J: new antag strategies (2026-04-21) ─────
+    "code-toxins-romerol": {
+        "type": "code",
+        "url": "https://github.com/space-wizards/space-station-14/blob/master/Resources/Prototypes/Reagents/toxins.yml#L458-L475",
+        "title": "Romerol reagent (toxins.yml:458-475)",
+        "date": "2026-04-21",
+        "note": "Romerol triggers CauseZombieInfection at min 5u, worksOnTheDead: true, contrabandSeverity: Syndicate. No recipe in any of the 12 reaction YAMLs — uplink-only. Backs zombie-outbreak strategy.",
+    },
+    "code-toxins-hemorrhinol": {
+        "type": "code",
+        "url": "https://github.com/space-wizards/space-station-14/blob/master/Resources/Prototypes/Reagents/toxins.yml#L766-L783",
+        "title": "Hemorrhinol reagent (toxins.yml:766-783)",
+        "date": "2026-04-21",
+        "note": "Hemorrhinol applies StatusEffectHemorrhage (7 bleed ticks, 21s) plus ModifyBleed amount 0.5. Backs bleed-drip strategy.",
+    },
+    "code-medicine-hemorrhinol-recipe": {
+        "type": "code",
+        "url": "https://github.com/space-wizards/space-station-14/blob/master/Resources/Prototypes/Recipes/Reactions/medicine.yml#L677-L687",
+        "title": "Hemorrhinol recipe (medicine.yml:677-687)",
+        "date": "2026-04-21",
+        "note": "Heparin 2 + Razorium 2 + Plasma 1 → Hemorrhinol 2. Razorium itself is from CaninaseFelinaseReaction (fun.yml) — cross-dept via banana/lime juice.",
+    },
+    "code-narcotics-stimulants": {
+        "type": "code",
+        "url": "https://github.com/space-wizards/space-station-14/blob/master/Resources/Prototypes/Reagents/narcotics.yml#L125-L210",
+        "title": "Stimulants reagent (narcotics.yml:125-210)",
+        "date": "2026-04-21",
+        "note": "Stimulants grant walk/sprint 1.25x, strip Stunned/Knockdown/Sleep, AdjustReagent ChloralHydrate -10 (purges sedatives). Backs stim-super-soldier self-buff strategy.",
+    },
+    "code-chemicals-stimulants-recipe": {
+        "type": "code",
+        "url": "https://github.com/space-wizards/space-station-14/blob/master/Resources/Prototypes/Recipes/Reactions/chemicals.yml#L318-L330",
+        "title": "Stimulants recipe (chemicals.yml:318-330, minTemp 370)",
+        "date": "2026-04-21",
+        "note": "Ephedrine 1 + Vestine 1 + Oxygen 2 @ minTemp 370 → Stimulants 2. Vestine is contraband (plant-mutation path), temp requires heater setup.",
+    },
+    "code-toxins-tazinide": {
+        "type": "code",
+        "url": "https://github.com/space-wizards/space-station-14/blob/master/Resources/Prototypes/Reagents/toxins.yml#L668-L683",
+        "title": "Tazinide reagent (toxins.yml:668-683)",
+        "date": "2026-04-21",
+        "note": "Tazinide applies Electrocute effect at probability 0.5 per metabolism tick. Recipe in chemicals.yml: Licoxide + Vestine. Note: Licoxide's vanilla recipe is Lithium + Zinc (Goob adds Lead as extra reactant, making Licoxide harder there, not Lead easier).",
+    },
+    "code-chemicals-thermite-recipe": {
+        "type": "code",
+        "url": "https://github.com/space-wizards/space-station-14/blob/master/Resources/Prototypes/Recipes/Reactions/chemicals.yml#L252-L263",
+        "title": "Thermite recipe (chemicals.yml:252-263, impact Medium)",
+        "date": "2026-04-21",
+        "note": "Iron 1 + Aluminium 1 + Oxygen 1 → Thermite 3. All dispenser-available. Backs thermite-breach strategy — despite SS13 folklore, Thermite in SS14 does NOT melt walls (see code-pyro-thermite), but its FlammableTileReaction x2 temperature makes it useful for burning through doors over time.",
+    },
+    "code-narcotics-teargas": {
+        "type": "code",
+        "url": "https://github.com/space-wizards/space-station-14/blob/master/Resources/Prototypes/Reagents/narcotics.yml#L400-L458",
+        "title": "TearGas reagent (narcotics.yml:400-458)",
+        "date": "2026-04-21",
+        "note": "TearGas inflicts TemporaryBlindness (min 4u), Cough, and MovementSpeedModifier 0.65 over area. Marked allowedDepartments: [Security] — vanilla access requires Sec role or loot.",
+    },
+    "code-narcotics-happiness": {
+        "type": "code",
+        "url": "https://github.com/space-wizards/space-station-14/blob/master/Resources/Prototypes/Reagents/narcotics.yml#L461-L500",
+        "title": "Happiness reagent (narcotics.yml:461-500)",
+        "date": "2026-04-21",
+        "note": "Happiness forces Laugh/Whistle/Crying emotes + Pax-style pacifism popups. Recipe in medicine.yml:624-637 — Laughter 2 + Epinephrine 1 + Ethanol 1 (+ Plasma 5 catalyst) → Happiness 4.",
+    },
+    "code-toxins-honk": {
+        "type": "code",
+        "url": "https://github.com/space-wizards/space-station-14/blob/master/Resources/Prototypes/Reagents/toxins.yml#L573-L602",
+        "title": "Honk reagent (toxins.yml:573-602)",
+        "date": "2026-04-21",
+        "note": "Honk forces the Honk emote with force: true — target cannot suppress it. Combined with Happiness for coordinated clown-chaos radio/chat disruption.",
+    },
+    "code-fun-feline-canine": {
+        "type": "code",
+        "url": "https://github.com/space-wizards/space-station-14/blob/master/Resources/Prototypes/Recipes/Reactions/fun.yml",
+        "title": "CaninaseFelinaseReaction (fun.yml)",
+        "date": "2026-04-21",
+        "note": "Felinase + Caninase → Razorium 2 + Radioactive explosion (maxIntensity 5). Dual-purpose: area rad damage AND produces Razorium as a follow-up weapon for Hemorrhinol. Recipe chain for each enzyme is deeply nested (Haloperidol + Psicodine + CarpoToxin/Happiness + Enzyme).",
+    },
+
     # ── Forum posts (the three critics who started this pack) ─────
     "forum-gobby-killmix-2026": {
         "type": "forum-post",
