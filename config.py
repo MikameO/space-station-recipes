@@ -875,7 +875,7 @@ ANTAG_STRATEGIES = [
         "desc": "Histamine overdose hidden in food/drink. Derived from Nettle plant (Botany cooperation). Allergic reaction deaths look natural — hard to trace. Lead would also work but is unobtainable in vanilla SS14.",
         "reagents": [{"id": "Histamine", "amount": 25}],
         "method": "Food or drink contamination",
-        "difficulty": "easy",
+        "difficulty": "expert",
         "stealth": "high",
         "sources": ["forum-gobby-killmix-2026", "code-reagents-lead", "mk-general-antag-playtime"],
     },

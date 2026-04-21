@@ -65207,7 +65207,7 @@
     }
    ],
    "method": "Food or drink contamination",
-   "difficulty": "easy",
+   "difficulty": "expert",
    "stealth": "high",
    "sources": [
     "forum-gobby-killmix-2026",
@@ -65231,9 +65231,9 @@
      "temperatureConstraintPenalty": 0,
      "unobtainablePenalty": 0
     },
-    "authoredTier": "easy",
-    "mismatch": false,
-    "mismatchReason": ""
+    "authoredTier": "expert",
+    "mismatch": true,
+    "mismatchReason": "curator-authored 'expert' above computed 'easy' — the synthesis is cheap but the execution is top-tier (stealth dosing, timing, plausible-deniability)"
    },
    "verificationStatus": "all-verified",
    "loreWarnings": []
