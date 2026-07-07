@@ -1999,7 +1999,7 @@ def export_json(reagents: dict, reactions: dict, locale: dict,
 
     data = {
         "meta": {
-            "schemaVersion": "3.0.0",
+            "schemaVersion": "3.1.0",
             "generated": time.strftime("%Y-%m-%dT%H:%M:%S"),
             "forks": forks_meta,
             # Backward compat
@@ -2399,14 +2399,33 @@ def main():
 
     # Phase 4: Merge & resolve parents
     print("\n=== Phase 4: Resolving parent inheritance ===")
-    # Merge: vanilla first, then each fork layers on top (fork reagents override vanilla by ID)
+    # Merge: vanilla first, then each fork in registry order. First-wins on ID
+    # collisions — derivative forks (Trauma, Omu, ADT, ...) carry copied
+    # definitions of vanilla/base-fork reagents (e.g. ADT redefines Hydrogen,
+    # copies Goob's BZ/Healium); letting them overwrite would re-attribute the
+    # reagent's `source` to the copier and hide it from the owner fork's view.
     all_reagents = dict(parsed["vanilla"]["reagents"])
     all_reactions = dict(parsed["vanilla"]["reactions"])
+    collision_log = []
     for fork_id, pdata in parsed.items():
         if fork_id == "vanilla":
             continue
-        all_reagents.update(pdata["reagents"])
-        all_reactions.update(pdata["reactions"])
+        for rid, rdata in pdata["reagents"].items():
+            if rid in all_reagents:
+                owner = detect_fork_source(all_reagents[rid].get("_source_file", ""))
+                collision_log.append(f"reagent {rid}: {fork_id} copy skipped (owned by {owner})")
+            else:
+                all_reagents[rid] = rdata
+        for xid, xdata in pdata["reactions"].items():
+            if xid in all_reactions:
+                owner = detect_fork_source(all_reactions[xid].get("_source_file", ""))
+                collision_log.append(f"reaction {xid}: {fork_id} copy skipped (owned by {owner})")
+            else:
+                all_reactions[xid] = xdata
+    if collision_log:
+        print(f"  Cross-fork ID collisions (first-wins): {len(collision_log)}")
+        for line in collision_log:
+            print(f"    {line}")
 
     # Seed files — combine from all forks
     v_seed_files = fork_data.get("vanilla", {}).get("seed_files", {})

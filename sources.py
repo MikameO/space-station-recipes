@@ -105,6 +105,14 @@ _BASELINE_GH_OWNERS = frozenset({
     "CorvaxGoob",
     "Space-Wizards-Starlight",
     "dead-space-14",
+    # Popular-server forks (2026-07-07)
+    "Trauma-Station",
+    "ProjectOmu",
+    "carpmosia",
+    "Monolith-Station",
+    "ss14-harmony",
+    "space-syndicate",      # Corvax
+    "AdventureTimeSS14",    # ADT / Время Приключений
 })
 
 

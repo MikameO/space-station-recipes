@@ -3,6 +3,59 @@
 `data.json` schema version is in `meta.schemaVersion`. Consumers reading this file
 should pin on a compatible range (semver: breaking changes bump major).
 
+## 3.1.0 — 2026-07-07 (Increment K — Popular-Server Fork Expansion)
+
+Adds **7 new forks** selected from the SS14 hub server list by peak population,
+bringing coverage from 8 to 15 forks (893 reagents, 790 reactions total).
+Fork identity was confirmed via each server's `/info` endpoint (`build.fork_id`)
+where reachable, then mapped to public GitHub repos.
+
+### New forks
+
+| Fork | Servers covered | Repo | Base |
+|---|---|---|---|
+| `trauma` | TraumaStation | Trauma-Station/Trauma-Station | Goob |
+| `omu` | Omu Pelican/Magpie/Woodpecker | ProjectOmu/OmuStation | Goob |
+| `carpmosia` | Carpmosia | carpmosia/carpmosia (`dev`) | vanilla |
+| `monolith` | Monolith Babel | Monolith-Station/Monolith (`main`) | Frontier |
+| `harmony` | Harmony | ss14-harmony/ss14-harmony | vanilla |
+| `corvax` | Corvax Вега/Элизиум | space-syndicate/space-station-14 | vanilla |
+| `adt` | Время Приключений | AdventureTimeSS14/space_station_ADT | Corvax |
+
+Not addable — no public build repo: Misfits: Nuclear Wasteland (135 peak),
+Colonial Marines Universe 14 (71), Russian Marine Corps (34), STALKER (25),
+Byrd Station (28); Space Stories's public repo is dead since 2024-12. Deferred:
+Fish Station (needs a Sunrise base fork first), Dumont (own layer is ~2 files;
+its Trauma base is now covered).
+
+### Changed (data fix — reagent/reaction `source` attribution)
+
+- **Merge is now first-wins in FORK_REGISTRY order** (was: last-wins).
+  Derivative forks carry copied YAML of vanilla/base-fork content (ADT
+  redefines `Hydrogen`, copies Goob's `BZ`/`Healium`/`Nitrium`/`Pluoxium`;
+  Carpmosia copies Frontier's `Stelloxadone`/`Traumoxadone`). Under last-wins
+  the copier stole the `source` label, which (a) hid the reagent from the
+  owner fork's Source-filter view, (b) broke the vanilla view for staples
+  like `Hydrogen`. The extractor now logs every skipped cross-fork copy
+  (43 at release).
+- Attribution corrections vs 3.0.0 as a result: `Heparin` funky→vanilla,
+  `Multiver`/`Oxandrolone`/`Probital`/`SalicylicAcid`/`SilverSulfadiazine`/
+  `StypticPowder` funky→goob, `Daiquiri` (reaction) deltav→vanilla. Funky's
+  reagent count drops 36→29 accordingly; Goob rises 66→72.
+
+### Internal
+
+- `sources.py::_BASELINE_GH_OWNERS` extended with the 7 new repo owners.
+- Only each fork's **own** prototype layer is manifested (`_Trauma`, `_Omu`,
+  `_Carpmosia`, `_Mono`, `_Harmony`, `Corvax`, `ADT`) — copied layers
+  (`_Goobstation` inside Trauma/Omu, `_NF` inside Monolith, `Corvax` inside
+  ADT, `_EinsteinEngines` everywhere) are deliberately excluded to keep
+  `detect_fork_source` attribution unambiguous; lineage is tracked via
+  `parent_fork` instead (same pattern as Funky→Goob since 2.x).
+- New forks all reuse the standard auto-diff pipeline
+  (`vanilla_override_reaction_files`), e.g. soap reactions auto-blocked on
+  Omu/Monolith whose repos deleted `soap.yml`.
+
 ## 3.0.0 — 2026-04-19 (Increment G — Source Attribution)
 
 Introduces a **source attribution layer**: every curated claim in `data.json`
