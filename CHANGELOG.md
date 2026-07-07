@@ -3,6 +3,18 @@
 `data.json` schema version is in `meta.schemaVersion`. Consumers reading this file
 should pin on a compatible range (semver: breaking changes bump major).
 
+## 3.2.0 — 2026-07-07 (Increment K.2 — Sunrise + Fish Station)
+
+Adds the deferred pair from 3.1.0: **Sunrise** (space-sunrise/sunrise-station,
+`_Sunrise` layer, 38 reagents / 46 reactions) as the base fork, and
+**Fish Station / Рыбья станция** (space-sunrise/fish-station, `_Fish` layer,
+2 reagents incl. the polymorphing `UnknownPathogen`; its own reaction file is
+empty upstream) with `parent_fork: sunrise`. Registry order puts Sunrise before
+Fish so first-wins protects the base. The first-wins merge skipped 34 Sunrise
+copies of Corvax cocktails, Goob/ADT gases, Delta-V drinks — attribution of all
+15 pre-existing forks is byte-identical to 3.1.0. Totals: 17 forks,
+933 reagents, 836 reactions.
+
 ## 3.1.0 — 2026-07-07 (Increment K — Popular-Server Fork Expansion)
 
 Adds **7 new forks** selected from the SS14 hub server list by peak population,

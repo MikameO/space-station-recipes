@@ -113,6 +113,7 @@ _BASELINE_GH_OWNERS = frozenset({
     "ss14-harmony",
     "space-syndicate",      # Corvax
     "AdventureTimeSS14",    # ADT / Время Приключений
+    "space-sunrise",        # Sunrise + Fish Station
 })
 
 

@@ -707,6 +707,77 @@ FORK_REGISTRY = {
         "dispenser_chemicals": set(),
         "vanilla_override_reaction_files": VANILLA_REACTION_PATHS,
     },
+
+    # ── Sunrise (RU) ──
+    # Base build for Fish Station; must stay BEFORE "fish" in this registry so
+    # first-wins merge attributes shared content to the base fork.
+    "sunrise": {
+        "name": "Sunrise",
+        "repo": "space-sunrise/sunrise-station",
+        "branch": "master",
+        "raw_url": "https://raw.githubusercontent.com/space-sunrise/sunrise-station/master/{path}",
+        "custom_dir": "_Sunrise",
+        "color": "#d946ef",
+        "reagent_files": [
+            "Resources/Prototypes/_Sunrise/Reagents/Consumable/Drink/alcohol.yml",
+            "Resources/Prototypes/_Sunrise/Reagents/Consumable/Drink/drinks.yml",
+            "Resources/Prototypes/_Sunrise/Reagents/Consumable/Drink/soda.yml",
+            "Resources/Prototypes/_Sunrise/Reagents/Consumable/Food/condiments.yml",
+            "Resources/Prototypes/_Sunrise/Reagents/biological.yml",
+            "Resources/Prototypes/_Sunrise/Reagents/botany.yml",
+            "Resources/Prototypes/_Sunrise/Reagents/fun.yml",
+            "Resources/Prototypes/_Sunrise/Reagents/gases.yml",
+            "Resources/Prototypes/_Sunrise/Reagents/medicine.yml",
+            "Resources/Prototypes/_Sunrise/Reagents/narcotics.yml",
+            "Resources/Prototypes/_Sunrise/Reagents/pyrotechnic.yml",
+            "Resources/Prototypes/_Sunrise/Reagents/special.yml",
+            "Resources/Prototypes/_Sunrise/Reagents/toxins.yml",
+        ],
+        "reaction_files": [
+            "Resources/Prototypes/_Sunrise/Recipes/Reactions/chemicals.yml",
+            "Resources/Prototypes/_Sunrise/Recipes/Reactions/drinks.yml",
+            "Resources/Prototypes/_Sunrise/Recipes/Reactions/fun.yml",
+            "Resources/Prototypes/_Sunrise/Recipes/Reactions/gas.yml",
+            "Resources/Prototypes/_Sunrise/Recipes/Reactions/gases.yml",
+            "Resources/Prototypes/_Sunrise/Recipes/Reactions/medicine.yml",
+            "Resources/Prototypes/_Sunrise/Recipes/Reactions/special.yml",
+        ],
+        "locale_files": [],
+        "seed_files": [],
+        "botany_locale_files": [],
+        "blocked_reactions": set(),
+        "modified_reactions": {},
+        "dispenser_chemicals": set(),
+        "vanilla_override_reaction_files": VANILLA_REACTION_PATHS,
+    },
+
+    # ── Fish Station / Рыбья станция (RU, forks from Sunrise) ──
+    # Repo carries its own copy of the _Sunrise layer (not manifested — owned
+    # by sunrise above); only the fork's own _Fish layer ships here.
+    "fish": {
+        "name": "Fish Station (Рыбья)",
+        "repo": "space-sunrise/fish-station",
+        "branch": "master",
+        "raw_url": "https://raw.githubusercontent.com/space-sunrise/fish-station/master/{path}",
+        "custom_dir": "_Fish",
+        "color": "#0ea5e9",
+        "parent_fork": "sunrise",
+        "reagent_files": [
+            "Resources/Prototypes/_Fish/Reagents/Consumable/Drink/juice.yml",
+            "Resources/Prototypes/_Fish/Reagents/medicine.yml",
+            "Resources/Prototypes/_Fish/Reagents/unknown_pathogens.yml",
+        ],
+        "reaction_files": [
+            "Resources/Prototypes/_Fish/Recipes/Reactions/medicine.yml",
+        ],
+        "locale_files": [],
+        "seed_files": [],
+        "botany_locale_files": [],
+        "blocked_reactions": set(),
+        "modified_reactions": {},
+        "dispenser_chemicals": set(),
+        "vanilla_override_reaction_files": VANILLA_REACTION_PATHS,
+    },
 }
 
 # ── Backward-compatible aliases (used by extractor during transition) ──

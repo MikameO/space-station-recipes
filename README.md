@@ -6,12 +6,12 @@
 
 **Interactive chemistry reference for [Space Station 14](https://spacestation14.com/)**
 
-Search reagents, plan reactions, explore craft trees, and calculate batch recipes across 15 community forks.
+Search reagents, plan reactions, explore craft trees, and calculate batch recipes across 17 community forks.
 
 [![License: GPL-3.0](https://img.shields.io/badge/License-GPL--3.0-22c55e?style=flat-square)](LICENSE)
-![Reagents](https://img.shields.io/badge/Reagents-893-39ff85?style=flat-square)
-![Reactions](https://img.shields.io/badge/Reactions-790-00e5ff?style=flat-square)
-![Forks](https://img.shields.io/badge/Forks-15-ffb627?style=flat-square)
+![Reagents](https://img.shields.io/badge/Reagents-933-39ff85?style=flat-square)
+![Reactions](https://img.shields.io/badge/Reactions-836-00e5ff?style=flat-square)
+![Forks](https://img.shields.io/badge/Forks-17-ffb627?style=flat-square)
 
 </div>
 
@@ -22,7 +22,7 @@ Search reagents, plan reactions, explore craft trees, and calculate batch recipe
 | | Feature | Description |
 |---|---------|-------------|
 | **Search** | Full-text search | Search across names, effects, descriptions, and flavors |
-| **Multi-fork** | 15 SS14 forks | Vanilla, RMC14, Goob, Funky, Delta-V, Starlight, Frontier, Dead Space, Trauma, Omu, Carpmosia, Monolith, Harmony, Corvax, ADT |
+| **Multi-fork** | 17 SS14 forks | Vanilla, RMC14, Goob, Funky, Delta-V, Starlight, Frontier, Dead Space, Trauma, Omu, Carpmosia, Monolith, Harmony, Corvax, ADT, Sunrise, Fish |
 | **Calculator** | Recipe planner | Single recipe calc, batch shift planner, and reverse lookup |
 | **Trees** | Craft trees | Visual dependency chains for any reagent synthesis path |
 | **Graph** | Network viz | Interactive graph of all reagent relationships |
@@ -43,12 +43,14 @@ Search reagents, plan reactions, explore craft trees, and calculate batch recipe
 | **Funky Station** | 29 | 73 | Goob-based |
 | **Monolith** | 27 | 24 | Frontier-based |
 | **Starlight** | 21 | 9 | |
+| **Sunrise** | 38 | 46 | RU |
 | **Frontier** | 12 | 21 | |
 | **Carpmosia** | 12 | 15 | |
 | **Omu Station** | 11 | 11 | Goob-based |
 | **Dead Space** | 10 | 11 | |
 | **Corvax** | 9 | 8 | RU |
 | **Harmony** | 8 | 7 | |
+| **Fish Station (Рыбья)** | 2 | 0 | RU, Sunrise-based |
 
 ## Quick Start
 

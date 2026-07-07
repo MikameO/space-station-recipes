@@ -1999,7 +1999,7 @@ def export_json(reagents: dict, reactions: dict, locale: dict,
 
     data = {
         "meta": {
-            "schemaVersion": "3.1.0",
+            "schemaVersion": "3.2.0",
             "generated": time.strftime("%Y-%m-%dT%H:%M:%S"),
             "forks": forks_meta,
             # Backward compat

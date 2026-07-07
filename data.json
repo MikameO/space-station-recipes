@@ -1,7 +1,7 @@
 {
  "meta": {
-  "schemaVersion": "3.1.0",
-  "generated": "2026-07-07T07:44:51",
+  "schemaVersion": "3.2.0",
+  "generated": "2026-07-07T08:02:09",
   "forks": {
    "vanilla": {
     "name": "Vanilla SS14",
@@ -77,11 +77,21 @@
     "name": "ADT (Время Приключений)",
     "color": "#f43f5e",
     "reagentCount": 100
+   },
+   "sunrise": {
+    "name": "Sunrise",
+    "color": "#d946ef",
+    "reagentCount": 38
+   },
+   "fish": {
+    "name": "Fish Station (Рыбья)",
+    "color": "#0ea5e9",
+    "reagentCount": 2
    }
   },
   "vanillaReagentCount": 406,
   "rmcReagentCount": 94,
-  "reactionCount": 790,
+  "reactionCount": 836,
   "sourceAttribution": {
    "total": 60,
    "attributed": 14,
@@ -7297,6 +7307,63 @@
    "meltingPoint": 0.0,
    "antagScore": 2
   },
+  "Antidon": {
+   "id": "Antidon",
+   "name": "Antidon",
+   "group": "Medicine",
+   "category": "Sunrise Medicine",
+   "source": "sunrise",
+   "color": "#8A2BE2",
+   "desc": "",
+   "physicalDesc": "reagent-physical-desc-antidon",
+   "flavor": "medicine",
+   "isBase": false,
+   "isDispenser": false,
+   "effects": "[Medicine] Heals Poison 6 (if body temp < 213.0K)",
+   "effectTags": [
+    "heals:poison"
+   ],
+   "metabolismPaths": [
+    "Medicine"
+   ],
+   "overdose": null,
+   "criticalOverdose": null,
+   "recipe": {
+    "reactants": {
+     "Ultravasculine": {
+      "amount": 1,
+      "catalyst": false
+     },
+     "Cryoxadone": {
+      "amount": 1,
+      "catalyst": false
+     },
+     "Epinephrine": {
+      "amount": 1,
+      "catalyst": false
+     }
+    },
+    "products": {
+     "Antidon": 3
+    },
+    "minTemp": null,
+    "maxTemp": null,
+    "mixer": []
+   },
+   "obtainSources": [
+    "Chemistry reaction"
+   ],
+   "accessibility": {
+    "tier": "cross-botany",
+    "weight": 2,
+    "reason": "Recipe requires cross-botany ingredient(s)"
+   },
+   "verifiedMechanics": [
+    "[Medicine] Heals Poison 6 (if body temp < 213.0K)"
+   ],
+   "boilingPoint": null,
+   "meltingPoint": null
+  },
   "Antifreeze": {
    "id": "Antifreeze",
    "name": "antifreeze",
@@ -10356,6 +10423,67 @@
    "meltingPoint": null,
    "antagScore": 2
   },
+  "Brutedon": {
+   "id": "Brutedon",
+   "name": "Brutedon",
+   "group": "Medicine",
+   "category": "Sunrise Medicine",
+   "source": "sunrise",
+   "color": "#FFFF00",
+   "desc": "",
+   "physicalDesc": "reagent-physical-desc-brutedon",
+   "flavor": "medicine",
+   "isBase": false,
+   "isDispenser": false,
+   "effects": "[Medicine] Heals Brute 6 (if body temp < 213.0K)",
+   "effectTags": [
+    "heals:brute"
+   ],
+   "metabolismPaths": [
+    "Medicine"
+   ],
+   "overdose": null,
+   "criticalOverdose": null,
+   "recipe": {
+    "reactants": {
+     "Bicaridine": {
+      "amount": 1,
+      "catalyst": false
+     },
+     "Cryoxadone": {
+      "amount": 1,
+      "catalyst": false
+     },
+     "Epinephrine": {
+      "amount": 1,
+      "catalyst": false
+     },
+     "Plasma": {
+      "amount": 1,
+      "catalyst": true
+     }
+    },
+    "products": {
+     "Brutedon": 1
+    },
+    "minTemp": null,
+    "maxTemp": null,
+    "mixer": []
+   },
+   "obtainSources": [
+    "Chemistry reaction"
+   ],
+   "accessibility": {
+    "tier": "cross-botany",
+    "weight": 2,
+    "reason": "Recipe requires cross-botany ingredient(s)"
+   },
+   "verifiedMechanics": [
+    "[Medicine] Heals Brute 6 (if body temp < 213.0K)"
+   ],
+   "boilingPoint": null,
+   "meltingPoint": null
+  },
   "BudgetInsulsDrink": {
    "id": "BudgetInsulsDrink",
    "name": "budget insuls",
@@ -10478,6 +10606,65 @@
    ],
    "boilingPoint": 100.0,
    "meltingPoint": 32.0
+  },
+  "Butterbeer": {
+   "id": "Butterbeer",
+   "name": "Butterbeer",
+   "group": "Drinks",
+   "category": "Sunrise Drinks",
+   "source": "sunrise",
+   "color": "#FFF8DC",
+   "desc": "",
+   "physicalDesc": "creamy",
+   "flavor": "butterscotch",
+   "isBase": false,
+   "isDispenser": false,
+   "effects": "[Digestion] Thirst x2; [Drink] Thirst x3 (if MetabolizerTypeCondition); [Drink] Adds 0.03u Ethanol; [Drink] Popup (local): butterbeer effect taste",
+   "effectTags": [
+    "thirst"
+   ],
+   "metabolismPaths": [
+    "Digestion",
+    "Drink"
+   ],
+   "overdose": null,
+   "criticalOverdose": null,
+   "recipe": {
+    "reactants": {
+     "Beer": {
+      "amount": 1,
+      "catalyst": false
+     },
+     "Cream": {
+      "amount": 1,
+      "catalyst": false
+     }
+    },
+    "products": {
+     "Butterbeer": 2
+    },
+    "minTemp": null,
+    "maxTemp": null,
+    "mixer": []
+   },
+   "obtainSources": [
+    "Chemistry reaction"
+   ],
+   "accessibility": {
+    "tier": "self-chem",
+    "weight": 1,
+    "reason": "Chemistry reaction from dispenser base"
+   },
+   "verifiedMechanics": [
+    "Tile: Ignites spilled reagent (x1.35 temperature)",
+    "On touch: Ignites target [Touch]",
+    "[Digestion] Thirst x2",
+    "[Drink] Thirst x3 (if MetabolizerTypeCondition)",
+    "[Drink] Adds 0.03u Ethanol",
+    "[Drink] Popup (local): butterbeer effect taste"
+   ],
+   "boilingPoint": null,
+   "meltingPoint": null
   },
   "BuzzochloricBees": {
    "id": "BuzzochloricBees",
@@ -13005,6 +13192,64 @@
    "meltingPoint": null,
    "antagScore": 1
   },
+  "Celliminol": {
+   "id": "Celliminol",
+   "name": "Celliminol",
+   "group": "Medicine",
+   "category": "Sunrise Medicine",
+   "source": "sunrise",
+   "color": "#81eb81",
+   "desc": "",
+   "physicalDesc": "reagent-physical-desc-celliminol",
+   "flavor": "medicine",
+   "isBase": false,
+   "isDispenser": false,
+   "effects": "[Medicine] Heals Cellular 5 Heals Mangleness 1.25 (if body temp < 213.0K)",
+   "effectTags": [
+    "heals:cellular",
+    "heals:mangleness"
+   ],
+   "metabolismPaths": [
+    "Medicine"
+   ],
+   "overdose": null,
+   "criticalOverdose": null,
+   "recipe": {
+    "reactants": {
+     "Doxarubixadone": {
+      "amount": 5,
+      "catalyst": false
+     },
+     "Omnizine": {
+      "amount": 1,
+      "catalyst": false
+     },
+     "Blood": {
+      "amount": 10,
+      "catalyst": false
+     }
+    },
+    "products": {
+     "Celliminol": 5
+    },
+    "minTemp": 500,
+    "maxTemp": null,
+    "mixer": []
+   },
+   "obtainSources": [
+    "Chemistry reaction"
+   ],
+   "accessibility": {
+    "tier": "cross-botany",
+    "weight": 2,
+    "reason": "Recipe requires cross-botany ingredient(s)"
+   },
+   "verifiedMechanics": [
+    "[Medicine] Heals Cellular 5 Heals Mangleness 1.25 (if body temp < 213.0K)"
+   ],
+   "boilingPoint": null,
+   "meltingPoint": null
+  },
   "Cellulose": {
    "id": "Cellulose",
    "name": "cellulose fibers",
@@ -13252,6 +13497,49 @@
    "boilingPoint": null,
    "meltingPoint": null
   },
+  "ChamomileTincture": {
+   "id": "ChamomileTincture",
+   "name": "Chamomile Tincture",
+   "group": "Drinks",
+   "category": "Sunrise Drinks",
+   "source": "sunrise",
+   "color": "",
+   "desc": "",
+   "physicalDesc": "reagent-physical-desc-strong-smell",
+   "flavor": "chamomile_tincture",
+   "isBase": true,
+   "isDispenser": false,
+   "effects": "[Digestion] Thirst x3; [Drink] Thirst x4 (if MetabolizerTypeCondition); [Medicine] Heals Poison 2; [Medicine] Effect: CleanBloodstream",
+   "effectTags": [
+    "heals:poison",
+    "thirst"
+   ],
+   "metabolismPaths": [
+    "Digestion",
+    "Drink",
+    "Medicine"
+   ],
+   "overdose": null,
+   "criticalOverdose": null,
+   "recipe": null,
+   "obtainSources": [],
+   "accessibility": {
+    "tier": "unobtainable",
+    "weight": 999,
+    "reason": "No recipe, no plant, no dispenser source"
+   },
+   "verifiedMechanics": [
+    "Tile: Extinguishes fires on wet tiles",
+    "Tile: SpillIfPuddlePresentTileReaction (see YAML for details)",
+    "Reactive: Extinguish [Touch]",
+    "[Digestion] Thirst x3",
+    "[Drink] Thirst x4 (if MetabolizerTypeCondition)",
+    "[Medicine] Heals Poison 2",
+    "[Medicine] Effect: CleanBloodstream"
+   ],
+   "boilingPoint": null,
+   "meltingPoint": null
+  },
   "Champagne": {
    "id": "Champagne",
    "name": "champagne",
@@ -13335,6 +13623,68 @@
     "mk-general-antag-playtime"
    ]
   },
+  "ChangelingStingSunrise": {
+   "id": "ChangelingStingSunrise",
+   "name": "Changeling Sting Sunrise",
+   "group": "Drinks",
+   "category": "Sunrise Drinks",
+   "source": "sunrise",
+   "color": "#2E6671",
+   "desc": "You take a tiny sip and feel a burning sensation...",
+   "physicalDesc": "fizzy",
+   "flavor": "soda",
+   "isBase": true,
+   "isDispenser": false,
+   "effects": "[Digestion] Thirst x2; [Drink] Effect: Polymorph (if ChangelingStingSunrise > 25u) @2%; [Drink] Removes 1000u ChangelingStingSunrise (if ChangelingStingSunrise > 25u) @8%; [Drink] Effect: Polymorph (if ChangelingStingSunrise > 25u) @5%; [Drink] Removes 1000u ChangelingStingSunrise (if ChangelingStingSunrise > 25u) @16%; [Drink] Effect: Polymorph (if ChangelingStingSunrise > 25u) @8%; [Drink] Removes 1000u ChangelingStingSunrise (if ChangelingStingSunrise > 25u) @25%; [Drink] Effect: Polymorph (if ChangelingStingSunrise > 25u) @11%; [Drink] Removes 1000u ChangelingStingSunrise (if ChangelingStingSunrise > 25u) @33%; [Drink] Effect: Polymorph (if ChangelingStingSunrise > 25u) @13%; [Drink] Removes 1000u ChangelingStingSunrise (if ChangelingStingSunrise > 25u) @41%; [Drink] Effect: Polymorph (if ChangelingStingSunrise > 25u) @16%; [Drink] Removes 1000u ChangelingStingSunrise (if ChangelingStingSunrise > 25u) @50%; [Drink] Effect: Polymorph (if ChangelingStingSunrise > 25u) @19%; [Drink] Removes 1000u ChangelingStingSunrise (if ChangelingStingSunrise > 25u) @58%; [Drink] Effect: Polymorph (if ChangelingStingSunrise > 25u) @22%; [Drink] Removes 1000u ChangelingStingSunrise (if ChangelingStingSunrise > 25u) @66%; [Drink] Effect: Polymorph (if ChangelingStingSunrise > 25u) @25%; [Drink] Removes 1000u ChangelingStingSunrise (if ChangelingStingSunrise > 25u) @75%; [Drink] Effect: Polymorph (if ChangelingStingSunrise > 25u) @27%; [Drink] Removes 1000u ChangelingStingSunrise (if ChangelingStingSunrise > 25u) @83%; [Drink] Effect: Polymorph (if ChangelingStingSunrise > 25u) @30%; [Drink] Removes 1000u ChangelingStingSunrise (if ChangelingStingSunrise > 25u) @91%; [Drink] Effect: Polymorph (if ChangelingStingSunrise > 25u) @33%; [Drink] Removes 1000u ChangelingStingSunrise (if ChangelingStingSunrise > 25u)",
+   "effectTags": [
+    "thirst"
+   ],
+   "metabolismPaths": [
+    "Digestion",
+    "Drink"
+   ],
+   "overdose": null,
+   "criticalOverdose": null,
+   "recipe": null,
+   "obtainSources": [],
+   "accessibility": {
+    "tier": "unobtainable",
+    "weight": 999,
+    "reason": "No recipe, no plant, no dispenser source"
+   },
+   "verifiedMechanics": [
+    "Tile: Extinguishes fires on wet tiles",
+    "Tile: SpillIfPuddlePresentTileReaction (see YAML for details)",
+    "Reactive: Extinguish [Touch]",
+    "[Digestion] Thirst x2",
+    "[Drink] Effect: Polymorph (if ChangelingStingSunrise > 25u) @2%",
+    "[Drink] Removes 1000u ChangelingStingSunrise (if ChangelingStingSunrise > 25u) @8%",
+    "[Drink] Effect: Polymorph (if ChangelingStingSunrise > 25u) @5%",
+    "[Drink] Removes 1000u ChangelingStingSunrise (if ChangelingStingSunrise > 25u) @16%",
+    "[Drink] Effect: Polymorph (if ChangelingStingSunrise > 25u) @8%",
+    "[Drink] Removes 1000u ChangelingStingSunrise (if ChangelingStingSunrise > 25u) @25%",
+    "[Drink] Effect: Polymorph (if ChangelingStingSunrise > 25u) @11%",
+    "[Drink] Removes 1000u ChangelingStingSunrise (if ChangelingStingSunrise > 25u) @33%",
+    "[Drink] Effect: Polymorph (if ChangelingStingSunrise > 25u) @13%",
+    "[Drink] Removes 1000u ChangelingStingSunrise (if ChangelingStingSunrise > 25u) @41%",
+    "[Drink] Effect: Polymorph (if ChangelingStingSunrise > 25u) @16%",
+    "[Drink] Removes 1000u ChangelingStingSunrise (if ChangelingStingSunrise > 25u) @50%",
+    "[Drink] Effect: Polymorph (if ChangelingStingSunrise > 25u) @19%",
+    "[Drink] Removes 1000u ChangelingStingSunrise (if ChangelingStingSunrise > 25u) @58%",
+    "[Drink] Effect: Polymorph (if ChangelingStingSunrise > 25u) @22%",
+    "[Drink] Removes 1000u ChangelingStingSunrise (if ChangelingStingSunrise > 25u) @66%",
+    "[Drink] Effect: Polymorph (if ChangelingStingSunrise > 25u) @25%",
+    "[Drink] Removes 1000u ChangelingStingSunrise (if ChangelingStingSunrise > 25u) @75%",
+    "[Drink] Effect: Polymorph (if ChangelingStingSunrise > 25u) @27%",
+    "[Drink] Removes 1000u ChangelingStingSunrise (if ChangelingStingSunrise > 25u) @83%",
+    "[Drink] Effect: Polymorph (if ChangelingStingSunrise > 25u) @30%",
+    "[Drink] Removes 1000u ChangelingStingSunrise (if ChangelingStingSunrise > 25u) @91%",
+    "[Drink] Effect: Polymorph (if ChangelingStingSunrise > 25u) @33%",
+    "[Drink] Removes 1000u ChangelingStingSunrise (if ChangelingStingSunrise > 25u)"
+   ],
+   "boilingPoint": null,
+   "meltingPoint": null
+  },
   "Charcoal": {
    "id": "Charcoal",
    "name": "charcoal",
@@ -13389,6 +13739,46 @@
    ],
    "boilingPoint": 4200.0,
    "meltingPoint": 3550.0
+  },
+  "ChargedElectrovae": {
+   "id": "ChargedElectrovae",
+   "name": "Charged Electrovae",
+   "group": "",
+   "category": "Sunrise Other",
+   "source": "sunrise",
+   "color": "#ddff00",
+   "desc": "",
+   "physicalDesc": "gaseous",
+   "flavor": "metallic",
+   "isBase": true,
+   "isDispenser": false,
+   "effects": "[Poison] Deals Poison 1.0; [Gas] Deals Poison 0.15; [Gas] Effect: AdjustAlert",
+   "effectTags": [
+    "deals:poison"
+   ],
+   "metabolismPaths": [
+    "Poison",
+    "Gas"
+   ],
+   "overdose": null,
+   "criticalOverdose": null,
+   "recipe": null,
+   "obtainSources": [],
+   "accessibility": {
+    "tier": "unobtainable",
+    "weight": 999,
+    "reason": "No recipe, no plant, no dispenser source"
+   },
+   "verifiedMechanics": [
+    "On touch: Ignites target [Touch]",
+    "[Poison] Deals Poison 1.0",
+    "[Gas] Deals Poison 0.15",
+    "[Gas] Effect: AdjustAlert",
+    "Phase change: melts at -142.8K, boils at -114.3K"
+   ],
+   "boilingPoint": -114.3,
+   "meltingPoint": -142.8,
+   "antagScore": 2
   },
   "Chitoectesin": {
    "id": "Chitoectesin",
@@ -14457,6 +14847,49 @@
     "Reactive: Extinguish [Touch]",
     "[Digestion] Thirst x2",
     "[Digestion] Status: ModifyStatusEffect"
+   ],
+   "boilingPoint": null,
+   "meltingPoint": null
+  },
+  "ColaSunrise": {
+   "id": "ColaSunrise",
+   "name": "Cola Sunrise",
+   "group": "Drinks",
+   "category": "Sunrise Drinks",
+   "source": "sunrise",
+   "color": "#6c2828",
+   "desc": "A sweet, carbonated soft drink.",
+   "physicalDesc": "fizzy",
+   "flavor": "soda",
+   "isBase": true,
+   "isDispenser": false,
+   "effects": "[Digestion] Thirst x2; [Drink] Thirst x2 (if MetabolizerTypeCondition); [Drink] Status: ModifyStatusEffect; [Drink] Temp -2000; [Drink] Temp -6000 (if body temp > 310K)",
+   "effectTags": [
+    "temperature",
+    "thirst"
+   ],
+   "metabolismPaths": [
+    "Digestion",
+    "Drink"
+   ],
+   "overdose": null,
+   "criticalOverdose": null,
+   "recipe": null,
+   "obtainSources": [],
+   "accessibility": {
+    "tier": "unobtainable",
+    "weight": 999,
+    "reason": "No recipe, no plant, no dispenser source"
+   },
+   "verifiedMechanics": [
+    "Tile: Extinguishes fires on wet tiles",
+    "Tile: SpillIfPuddlePresentTileReaction (see YAML for details)",
+    "Reactive: Extinguish [Touch]",
+    "[Digestion] Thirst x2",
+    "[Drink] Thirst x2 (if MetabolizerTypeCondition)",
+    "[Drink] Status: ModifyStatusEffect",
+    "[Drink] Temp -2000",
+    "[Drink] Temp -6000 (if body temp > 310K)"
    ],
    "boilingPoint": null,
    "meltingPoint": null
@@ -15916,6 +16349,64 @@
    "boilingPoint": null,
    "meltingPoint": null
   },
+  "DarkAndStormy": {
+   "id": "DarkAndStormy",
+   "name": "dark & stormy",
+   "group": "Drinks",
+   "category": "Sunrise Drinks",
+   "source": "sunrise",
+   "color": "#d9b09e",
+   "desc": "You can almost hear the thunder.",
+   "physicalDesc": "bubbly",
+   "flavor": "alcohol",
+   "isBase": false,
+   "isDispenser": false,
+   "effects": "[Digestion] Thirst x2; [Drink] Thirst x2; [Drink] Adds 0.11u Ethanol",
+   "effectTags": [
+    "thirst"
+   ],
+   "metabolismPaths": [
+    "Digestion",
+    "Drink"
+   ],
+   "overdose": null,
+   "criticalOverdose": null,
+   "recipe": {
+    "reactants": {
+     "Rum": {
+      "amount": 1,
+      "catalyst": false
+     },
+     "Ale": {
+      "amount": 2,
+      "catalyst": false
+     }
+    },
+    "products": {
+     "DarkAndStormy": 3
+    },
+    "minTemp": null,
+    "maxTemp": null,
+    "mixer": []
+   },
+   "obtainSources": [
+    "Chemistry reaction"
+   ],
+   "accessibility": {
+    "tier": "self-chem",
+    "weight": 1,
+    "reason": "Chemistry reaction from dispenser base"
+   },
+   "verifiedMechanics": [
+    "Tile: Ignites spilled reagent (x1.35 temperature)",
+    "On touch: Ignites target [Touch]",
+    "[Digestion] Thirst x2",
+    "[Drink] Thirst x2",
+    "[Drink] Adds 0.11u Ethanol"
+   ],
+   "boilingPoint": null,
+   "meltingPoint": null
+  },
   "DarkBlood": {
    "id": "DarkBlood",
    "name": "Dark Blood",
@@ -16010,6 +16501,68 @@
     "Tile: Ignites spilled reagent (x1.35 temperature)",
     "On touch: Ignites target [Touch]",
     "[Digestion] Thirst x2"
+   ],
+   "boilingPoint": null,
+   "meltingPoint": null
+  },
+  "Darvinium": {
+   "id": "Darvinium",
+   "name": "Darvinium",
+   "group": "Special",
+   "category": "Sunrise Other",
+   "source": "sunrise",
+   "color": "#59b23a",
+   "desc": "",
+   "physicalDesc": "glowing",
+   "flavor": "",
+   "isBase": false,
+   "isDispenser": false,
+   "effects": "[Medicine] Effect: Polymorph (if MetabolizerTypeCondition, Darvinium > 5u); [Medicine] Effect: Polymorph (if MetabolizerTypeCondition, Darvinium > 5u); [Medicine] Effect: Polymorph (if MetabolizerTypeCondition, Darvinium > 5u); [Medicine] Effect: Polymorph (if MetabolizerTypeCondition, Darvinium > 5u); [Medicine] Effect: Polymorph (if MetabolizerTypeCondition, Darvinium > 5u); [Medicine] Effect: Polymorph (if MetabolizerTypeCondition, Darvinium > 5u); [Medicine] Effect: Polymorph (if MetabolizerTypeCondition, Darvinium > 5u); [Medicine] Effect: Polymorph (if MetabolizerTypeCondition, Darvinium > 5u)",
+   "effectTags": [],
+   "metabolismPaths": [
+    "Medicine"
+   ],
+   "overdose": null,
+   "criticalOverdose": null,
+   "recipe": {
+    "reactants": {
+     "Blood": {
+      "amount": 1,
+      "catalyst": false
+     },
+     "UnstableMutagen": {
+      "amount": 1,
+      "catalyst": false
+     },
+     "StableMutagen": {
+      "amount": 3,
+      "catalyst": false
+     }
+    },
+    "products": {
+     "Darvinium": 3
+    },
+    "minTemp": null,
+    "maxTemp": null,
+    "mixer": []
+   },
+   "obtainSources": [
+    "Chemistry reaction"
+   ],
+   "accessibility": {
+    "tier": "cross-botany",
+    "weight": 2,
+    "reason": "Recipe requires cross-botany ingredient(s)"
+   },
+   "verifiedMechanics": [
+    "[Medicine] Effect: Polymorph (if MetabolizerTypeCondition, Darvinium > 5u)",
+    "[Medicine] Effect: Polymorph (if MetabolizerTypeCondition, Darvinium > 5u)",
+    "[Medicine] Effect: Polymorph (if MetabolizerTypeCondition, Darvinium > 5u)",
+    "[Medicine] Effect: Polymorph (if MetabolizerTypeCondition, Darvinium > 5u)",
+    "[Medicine] Effect: Polymorph (if MetabolizerTypeCondition, Darvinium > 5u)",
+    "[Medicine] Effect: Polymorph (if MetabolizerTypeCondition, Darvinium > 5u)",
+    "[Medicine] Effect: Polymorph (if MetabolizerTypeCondition, Darvinium > 5u)",
+    "[Medicine] Effect: Polymorph (if MetabolizerTypeCondition, Darvinium > 5u)"
    ],
    "boilingPoint": null,
    "meltingPoint": null
@@ -17298,6 +17851,51 @@
    "boilingPoint": null,
    "meltingPoint": null
   },
+  "DrGibbSunrise": {
+   "id": "DrGibbSunrise",
+   "name": "Dr Gibb Sunrise",
+   "group": "Drinks",
+   "category": "Sunrise Drinks",
+   "source": "sunrise",
+   "color": "#102000",
+   "desc": "A delicious blend of 42 different flavours.",
+   "physicalDesc": "fizzy",
+   "flavor": "drgibb",
+   "isBase": true,
+   "isDispenser": false,
+   "effects": "[Digestion] Thirst x2; [Poison] Popup (local): dr gibbs presence (if DrGibbSunrise > 2u) @20%; [Poison] Deals Blunt 2000 (if DrGibbSunrise > 2u) @0%; [Poison] Temp -1500; [Poison] Temp -6000 (if body temp > 310K)",
+   "effectTags": [
+    "deals:blunt",
+    "temperature",
+    "thirst"
+   ],
+   "metabolismPaths": [
+    "Digestion",
+    "Poison"
+   ],
+   "overdose": 2,
+   "criticalOverdose": null,
+   "recipe": null,
+   "obtainSources": [],
+   "accessibility": {
+    "tier": "unobtainable",
+    "weight": 999,
+    "reason": "No recipe, no plant, no dispenser source"
+   },
+   "verifiedMechanics": [
+    "Tile: Extinguishes fires on wet tiles",
+    "Tile: SpillIfPuddlePresentTileReaction (see YAML for details)",
+    "Reactive: Extinguish [Touch]",
+    "[Digestion] Thirst x2",
+    "[Poison] Popup (local): dr gibbs presence (if DrGibbSunrise > 2u) @20%",
+    "[Poison] Deals Blunt 2000 (if DrGibbSunrise > 2u) @0%",
+    "[Poison] Temp -1500",
+    "[Poison] Temp -6000 (if body temp > 310K)"
+   ],
+   "boilingPoint": null,
+   "meltingPoint": null,
+   "antagScore": 2
+  },
   "DriestMartini": {
    "id": "DriestMartini",
    "name": "driest martini",
@@ -17830,6 +18428,45 @@
    "boilingPoint": null,
    "meltingPoint": null
   },
+  "Electrovae": {
+   "id": "Electrovae",
+   "name": "Electrovae",
+   "group": "",
+   "category": "Sunrise Other",
+   "source": "sunrise",
+   "color": "#0022FF",
+   "desc": "",
+   "physicalDesc": "gaseous",
+   "flavor": "bitter",
+   "isBase": true,
+   "isDispenser": false,
+   "effects": "[Poison] Deals Poison 0.5; [Gas] Deals Poison 0.1; [Gas] Effect: AdjustAlert",
+   "effectTags": [
+    "deals:poison"
+   ],
+   "metabolismPaths": [
+    "Poison",
+    "Gas"
+   ],
+   "overdose": null,
+   "criticalOverdose": null,
+   "recipe": null,
+   "obtainSources": [],
+   "accessibility": {
+    "tier": "unobtainable",
+    "weight": 999,
+    "reason": "No recipe, no plant, no dispenser source"
+   },
+   "verifiedMechanics": [
+    "[Poison] Deals Poison 0.5",
+    "[Gas] Deals Poison 0.1",
+    "[Gas] Effect: AdjustAlert",
+    "Phase change: melts at -149.9K, boils at -116.1K"
+   ],
+   "boilingPoint": -116.1,
+   "meltingPoint": -149.9,
+   "antagScore": 2
+  },
   "ElfDiethylamine": {
    "id": "ElfDiethylamine",
    "name": "Elf Diethylamine",
@@ -18020,6 +18657,53 @@
     "Reactive: Extinguish [Touch]",
     "[Digestion] Thirst x2",
     "[Digestion] Status: ModifyStatusEffect"
+   ],
+   "boilingPoint": null,
+   "meltingPoint": null
+  },
+  "EnergyDrinkSunrise": {
+   "id": "EnergyDrinkSunrise",
+   "name": "Energy Drink Sunrise",
+   "group": "Drinks",
+   "category": "Sunrise Drinks",
+   "source": "sunrise",
+   "color": "#ffffbf",
+   "desc": "A dose of energy! Nanotrasen is not responsible if you grow avian appendages.",
+   "physicalDesc": "fizzy",
+   "flavor": "energydrink",
+   "isBase": true,
+   "isDispenser": false,
+   "effects": "[Digestion] Thirst x2; [Drink] Thirst x2 (if MetabolizerTypeCondition); [Drink] Status: ModifyStatusEffect; [Drink] Status: ShockProtection (if EnergyDrinkSunrise > 5u); [Drink] Jitter (if EnergyDrinkSunrise > 10u); [Drink] Temp -1500; [Drink] Temp -6000 (if body temp > 310K); [Drink] Adds 0.1u Theobromine",
+   "effectTags": [
+    "jitter",
+    "temperature",
+    "thirst"
+   ],
+   "metabolismPaths": [
+    "Digestion",
+    "Drink"
+   ],
+   "overdose": 10,
+   "criticalOverdose": null,
+   "recipe": null,
+   "obtainSources": [],
+   "accessibility": {
+    "tier": "unobtainable",
+    "weight": 999,
+    "reason": "No recipe, no plant, no dispenser source"
+   },
+   "verifiedMechanics": [
+    "Tile: Extinguishes fires on wet tiles",
+    "Tile: SpillIfPuddlePresentTileReaction (see YAML for details)",
+    "Reactive: Extinguish [Touch]",
+    "[Digestion] Thirst x2",
+    "[Drink] Thirst x2 (if MetabolizerTypeCondition)",
+    "[Drink] Status: ModifyStatusEffect",
+    "[Drink] Status: ShockProtection (if EnergyDrinkSunrise > 5u)",
+    "[Drink] Jitter (if EnergyDrinkSunrise > 10u)",
+    "[Drink] Temp -1500",
+    "[Drink] Temp -6000 (if body temp > 310K)",
+    "[Drink] Adds 0.1u Theobromine"
    ],
    "boilingPoint": null,
    "meltingPoint": null
@@ -19308,6 +19992,85 @@
     "mk-general-antag-playtime"
    ]
   },
+  "FluorosulfuricAcidHumanoidXeno": {
+   "id": "FluorosulfuricAcidHumanoidXeno",
+   "name": "fluorosulfuric acid",
+   "group": "Toxins",
+   "category": "Sunrise Toxins",
+   "source": "sunrise",
+   "color": "#44944A",
+   "desc": "A highly corrosive chemical, capable of leaving quite a mark on your skin.",
+   "physicalDesc": "strong smelling",
+   "flavor": "acid",
+   "isBase": true,
+   "isDispenser": false,
+   "effects": "[Poison] Deals Caustic 7 (if TagCondition); [Poison] Popup (local): generic reagent effect burning insides (if TagCondition) @33%; [Poison] Emote: Scream (if TagCondition) @25%",
+   "effectTags": [
+    "deals:caustic",
+    "emote"
+   ],
+   "metabolismPaths": [
+    "Poison"
+   ],
+   "overdose": null,
+   "criticalOverdose": null,
+   "recipe": null,
+   "obtainSources": [],
+   "accessibility": {
+    "tier": "unobtainable",
+    "weight": 999,
+    "reason": "No recipe, no plant, no dispenser source"
+   },
+   "verifiedMechanics": [
+    "Reactive: HealthChange [Touch]",
+    "On touch: Forces target emote [Touch]",
+    "[Poison] Deals Caustic 7 (if TagCondition)",
+    "[Poison] Popup (local): generic reagent effect burning insides (if TagCondition) @33%",
+    "[Poison] Emote: Scream (if TagCondition) @25%",
+    "Phase change: melts at -19.4K, boils at 78.2K"
+   ],
+   "boilingPoint": 78.2,
+   "meltingPoint": -19.4,
+   "antagScore": 3
+  },
+  "FluorosulfuricAcidPredator": {
+   "id": "FluorosulfuricAcidPredator",
+   "name": "Fluorosulfuric Acid Predator",
+   "group": "Toxins",
+   "category": "Sunrise Toxins",
+   "source": "sunrise",
+   "color": "#008000",
+   "desc": "",
+   "physicalDesc": "strong smelling",
+   "flavor": "terrible",
+   "isBase": true,
+   "isDispenser": false,
+   "effects": "[Poison] Deals Caustic 3 (if TagCondition); [Poison] Popup (local): generic reagent effect burning insides (if TagCondition) @33%",
+   "effectTags": [
+    "deals:caustic"
+   ],
+   "metabolismPaths": [
+    "Poison"
+   ],
+   "overdose": null,
+   "criticalOverdose": null,
+   "recipe": null,
+   "obtainSources": [],
+   "accessibility": {
+    "tier": "unobtainable",
+    "weight": 999,
+    "reason": "No recipe, no plant, no dispenser source"
+   },
+   "verifiedMechanics": [
+    "Reactive: HealthChange [Touch]",
+    "On touch: Forces target emote [Touch]",
+    "[Poison] Deals Caustic 3 (if TagCondition)",
+    "[Poison] Popup (local): generic reagent effect burning insides (if TagCondition) @33%"
+   ],
+   "boilingPoint": null,
+   "meltingPoint": null,
+   "antagScore": 2
+  },
   "Fluorosurfactant": {
    "id": "Fluorosurfactant",
    "name": "fluorosurfactant",
@@ -19553,6 +20316,53 @@
    "boilingPoint": null,
    "meltingPoint": null,
    "antagScore": 2
+  },
+  "FourteenLokoSunrise": {
+   "id": "FourteenLokoSunrise",
+   "name": "Fourteen Loko Sunrise",
+   "group": "Drinks",
+   "category": "Sunrise Drinks",
+   "source": "sunrise",
+   "color": "#deb928",
+   "desc": "A highly processed liquid substance barely-passing intergalatic health standards for a soft drink.",
+   "physicalDesc": "fizzy",
+   "flavor": "fourteenlokosoda",
+   "isBase": true,
+   "isDispenser": false,
+   "effects": "[Digestion] Thirst x2; [Drink] Thirst x2 (if MetabolizerTypeCondition); [Drink] Adds 0.1u Theobromine; [Poison] Deals Poison 1 (if MetabolizerTypeCondition); [Narcotic] Speed walk=1.16 sprint=1.16",
+   "effectTags": [
+    "deals:poison",
+    "speed",
+    "thirst"
+   ],
+   "metabolismPaths": [
+    "Digestion",
+    "Drink",
+    "Poison",
+    "Narcotic"
+   ],
+   "overdose": null,
+   "criticalOverdose": null,
+   "recipe": null,
+   "obtainSources": [],
+   "accessibility": {
+    "tier": "unobtainable",
+    "weight": 999,
+    "reason": "No recipe, no plant, no dispenser source"
+   },
+   "verifiedMechanics": [
+    "Tile: Extinguishes fires on wet tiles",
+    "Tile: SpillIfPuddlePresentTileReaction (see YAML for details)",
+    "Reactive: Extinguish [Touch]",
+    "[Digestion] Thirst x2",
+    "[Drink] Thirst x2 (if MetabolizerTypeCondition)",
+    "[Drink] Adds 0.1u Theobromine",
+    "[Poison] Deals Poison 1 (if MetabolizerTypeCondition)",
+    "[Narcotic] Speed walk=1.16 sprint=1.16"
+   ],
+   "boilingPoint": null,
+   "meltingPoint": null,
+   "antagScore": 3
   },
   "Fresium": {
    "id": "Fresium",
@@ -20555,6 +21365,47 @@
    "boilingPoint": null,
    "meltingPoint": null
   },
+  "Grcoffee": {
+   "id": "Grcoffee",
+   "name": "Grcoffee",
+   "group": "Drinks",
+   "category": "Sunrise Drinks",
+   "source": "sunrise",
+   "color": "#664300",
+   "desc": "",
+   "physicalDesc": "aromatic",
+   "flavor": "coffee",
+   "isBase": true,
+   "isDispenser": false,
+   "effects": "[Digestion] Thirst x3; [Drink] Thirst x2 (if MetabolizerTypeCondition); [Drink] Status: Drowsiness; [Drink] Adds 0.05u Theobromine",
+   "effectTags": [
+    "thirst"
+   ],
+   "metabolismPaths": [
+    "Digestion",
+    "Drink"
+   ],
+   "overdose": null,
+   "criticalOverdose": null,
+   "recipe": null,
+   "obtainSources": [],
+   "accessibility": {
+    "tier": "unobtainable",
+    "weight": 999,
+    "reason": "No recipe, no plant, no dispenser source"
+   },
+   "verifiedMechanics": [
+    "Tile: Extinguishes fires on wet tiles",
+    "Tile: SpillIfPuddlePresentTileReaction (see YAML for details)",
+    "Reactive: Extinguish [Touch]",
+    "[Digestion] Thirst x3",
+    "[Drink] Thirst x2 (if MetabolizerTypeCondition)",
+    "[Drink] Status: Drowsiness",
+    "[Drink] Adds 0.05u Theobromine"
+   ],
+   "boilingPoint": null,
+   "meltingPoint": null
+  },
   "GreenGrass": {
    "id": "GreenGrass",
    "name": "Green Grass",
@@ -21114,6 +21965,67 @@
    "boilingPoint": null,
    "meltingPoint": null
   },
+  "H-32": {
+   "id": "H-32",
+   "name": "H-32",
+   "group": "Medicine",
+   "category": "Sunrise Medicine",
+   "source": "sunrise",
+   "color": "#cc1a79",
+   "desc": "",
+   "physicalDesc": "reagent-physical-desc-h-32",
+   "flavor": "medicine",
+   "isBase": false,
+   "isDispenser": false,
+   "effects": "[Medicine] Heals Radiation 4 (if body temp < 213.0K)",
+   "effectTags": [
+    "heals:radiation"
+   ],
+   "metabolismPaths": [
+    "Medicine"
+   ],
+   "overdose": null,
+   "criticalOverdose": null,
+   "recipe": {
+    "reactants": {
+     "Arithrazine": {
+      "amount": 1,
+      "catalyst": false
+     },
+     "Bicaridine": {
+      "amount": 1,
+      "catalyst": false
+     },
+     "Cryoxadone": {
+      "amount": 1,
+      "catalyst": false
+     },
+     "Plasma": {
+      "amount": 1,
+      "catalyst": true
+     }
+    },
+    "products": {
+     "H-32": 3
+    },
+    "minTemp": null,
+    "maxTemp": null,
+    "mixer": []
+   },
+   "obtainSources": [
+    "Chemistry reaction"
+   ],
+   "accessibility": {
+    "tier": "cross-botany",
+    "weight": 2,
+    "reason": "Recipe requires cross-botany ingredient(s)"
+   },
+   "verifiedMechanics": [
+    "[Medicine] Heals Radiation 4 (if body temp < 213.0K)"
+   ],
+   "boilingPoint": null,
+   "meltingPoint": null
+  },
   "Halon": {
    "id": "Halon",
    "name": "Halon",
@@ -21124,19 +22036,37 @@
    "desc": "",
    "physicalDesc": "gaseous",
    "flavor": "bitter",
-   "isBase": true,
+   "isBase": false,
    "isDispenser": false,
    "effects": "",
    "effectTags": [],
    "metabolismPaths": [],
    "overdose": null,
    "criticalOverdose": null,
-   "recipe": null,
-   "obtainSources": [],
+   "recipe": {
+    "reactants": {
+     "BZ": {
+      "amount": 2.1,
+      "catalyst": false
+     }
+    },
+    "products": {
+     "Halon": 4.2,
+     "Oxygen": 0.42
+    },
+    "minTemp": null,
+    "maxTemp": null,
+    "mixer": [
+     "Electrolysis"
+    ]
+   },
+   "obtainSources": [
+    "Chemistry reaction"
+   ],
    "accessibility": {
-    "tier": "unobtainable",
-    "weight": 999,
-    "reason": "No recipe, no plant, no dispenser source"
+    "tier": "unknown",
+    "weight": 5,
+    "reason": "Recipe exists but a deep-chain ingredient is unresolved by extractor (likely plant-mutation, mob-drop, or cooking product)"
    },
    "verifiedMechanics": [
     "Phase change: melts at -259.2K, boils at -253.0K"
@@ -21997,6 +22927,34 @@
     "[Digestion] Thirst x3",
     "[Digestion] Heals Blunt 0.2 Heals Poison 0.2 Heals Heat 0.2 Heals Shock 0.2 Heals Cold 0.2"
    ],
+   "boilingPoint": null,
+   "meltingPoint": null
+  },
+  "Honey": {
+   "id": "Honey",
+   "name": "Honey",
+   "group": "Foods",
+   "category": "Sunrise Other",
+   "source": "sunrise",
+   "color": "#ffdf6a",
+   "desc": "",
+   "physicalDesc": "thick",
+   "flavor": "sweet",
+   "isBase": true,
+   "isDispenser": false,
+   "effects": "",
+   "effectTags": [],
+   "metabolismPaths": [],
+   "overdose": null,
+   "criticalOverdose": null,
+   "recipe": null,
+   "obtainSources": [],
+   "accessibility": {
+    "tier": "unobtainable",
+    "weight": 999,
+    "reason": "No recipe, no plant, no dispenser source"
+   },
+   "verifiedMechanics": [],
    "boilingPoint": null,
    "meltingPoint": null
   },
@@ -23360,6 +24318,61 @@
    "boilingPoint": null,
    "meltingPoint": null
   },
+  "Inc": {
+   "id": "Inc",
+   "name": "Inc",
+   "group": "Special",
+   "category": "Sunrise Other",
+   "source": "sunrise",
+   "color": "#000000",
+   "desc": "",
+   "physicalDesc": "glowing",
+   "flavor": "",
+   "isBase": false,
+   "isDispenser": false,
+   "effects": "",
+   "effectTags": [],
+   "metabolismPaths": [],
+   "overdose": null,
+   "criticalOverdose": null,
+   "recipe": {
+    "reactants": {
+     "Oil": {
+      "amount": 5,
+      "catalyst": false
+     },
+     "Ethanol": {
+      "amount": 1,
+      "catalyst": false
+     },
+     "Ash": {
+      "amount": 1,
+      "catalyst": false
+     },
+     "Sulfur": {
+      "amount": 1,
+      "catalyst": false
+     }
+    },
+    "products": {
+     "Inc": 4
+    },
+    "minTemp": null,
+    "maxTemp": null,
+    "mixer": []
+   },
+   "obtainSources": [
+    "Chemistry reaction"
+   ],
+   "accessibility": {
+    "tier": "self-chem",
+    "weight": 1,
+    "reason": "Chemistry reaction from dispenser base"
+   },
+   "verifiedMechanics": [],
+   "boilingPoint": null,
+   "meltingPoint": null
+  },
   "InsectBlood": {
    "id": "InsectBlood",
    "name": "insect blood",
@@ -24659,6 +25672,43 @@
     "tier": "unknown",
     "weight": 5,
     "reason": "Recipe exists but a deep-chain ingredient is unresolved by extractor (likely plant-mutation, mob-drop, or cooking product)"
+   },
+   "verifiedMechanics": [
+    "Tile: Extinguishes fires on wet tiles",
+    "Tile: SpillIfPuddlePresentTileReaction (see YAML for details)",
+    "Reactive: Extinguish [Touch]",
+    "[Digestion] Thirst x3"
+   ],
+   "boilingPoint": null,
+   "meltingPoint": null
+  },
+  "JuiceMango": {
+   "id": "JuiceMango",
+   "name": "Juice Mango",
+   "group": "Drinks",
+   "category": "Fish Station (Рыбья) Drinks",
+   "source": "fish",
+   "color": "#f17e31",
+   "desc": "",
+   "physicalDesc": "crisp",
+   "flavor": "mango",
+   "isBase": true,
+   "isDispenser": false,
+   "effects": "[Digestion] Thirst x3",
+   "effectTags": [
+    "thirst"
+   ],
+   "metabolismPaths": [
+    "Digestion"
+   ],
+   "overdose": null,
+   "criticalOverdose": null,
+   "recipe": null,
+   "obtainSources": [],
+   "accessibility": {
+    "tier": "unobtainable",
+    "weight": 999,
+    "reason": "No recipe, no plant, no dispenser source"
    },
    "verifiedMechanics": [
     "Tile: Extinguishes fires on wet tiles",
@@ -29426,6 +30476,45 @@
    "boilingPoint": null,
    "meltingPoint": null
   },
+  "MotorOil": {
+   "id": "MotorOil",
+   "name": "Motor Oil",
+   "group": "Pyrotechnic",
+   "category": "Sunrise Pyrotechnic",
+   "source": "sunrise",
+   "color": "#b67823",
+   "desc": "",
+   "physicalDesc": "oily",
+   "flavor": "bitter",
+   "isBase": true,
+   "isDispenser": false,
+   "effects": "[Poison] Deals Poison 1; [Poison] Flammable",
+   "effectTags": [
+    "deals:poison",
+    "flammable"
+   ],
+   "metabolismPaths": [
+    "Poison"
+   ],
+   "overdose": null,
+   "criticalOverdose": null,
+   "recipe": null,
+   "obtainSources": [],
+   "accessibility": {
+    "tier": "unobtainable",
+    "weight": 999,
+    "reason": "No recipe, no plant, no dispenser source"
+   },
+   "verifiedMechanics": [
+    "Tile: Ignites spilled reagent (x? temperature)",
+    "On touch: Ignites target [Touch]",
+    "[Poison] Deals Poison 1",
+    "[Poison] Flammable"
+   ],
+   "boilingPoint": null,
+   "meltingPoint": null,
+   "antagScore": 4
+  },
   "MouseBites": {
    "id": "MouseBites",
    "name": "Mouse Bites",
@@ -29773,6 +30862,39 @@
    "antagTipsSources": [
     "mk-general-antag-playtime"
    ]
+  },
+  "MuteToxinAbductor": {
+   "id": "MuteToxinAbductor",
+   "name": "mute toxin",
+   "group": "Narcotics",
+   "category": "Sunrise Toxins",
+   "source": "sunrise",
+   "color": "#000000",
+   "desc": "A thick chemical that coats the vocal cords, making the user unable to speak during metabolization.",
+   "physicalDesc": "syrupy",
+   "flavor": "",
+   "isBase": true,
+   "isDispenser": false,
+   "effects": "[Narcotic] Status: Muted",
+   "effectTags": [],
+   "metabolismPaths": [
+    "Narcotic"
+   ],
+   "overdose": null,
+   "criticalOverdose": null,
+   "recipe": null,
+   "obtainSources": [],
+   "accessibility": {
+    "tier": "unobtainable",
+    "weight": 999,
+    "reason": "No recipe, no plant, no dispenser source"
+   },
+   "verifiedMechanics": [
+    "[Narcotic] Status: Muted",
+    "Phase change: melts at 36.0K, boils at 255.0K"
+   ],
+   "boilingPoint": 255.0,
+   "meltingPoint": 36.0
   },
   "NFZombieBiteToxin": {
    "id": "NFZombieBiteToxin",
@@ -30738,6 +31860,34 @@
    "meltingPoint": null,
    "antagScore": 3
   },
+  "NitroKill": {
+   "id": "NitroKill",
+   "name": "Nitro Kill",
+   "group": "Botanical",
+   "category": "Sunrise Other",
+   "source": "sunrise",
+   "color": "#cbff0e",
+   "desc": "",
+   "physicalDesc": "strong smelling",
+   "flavor": "bitter",
+   "isBase": true,
+   "isDispenser": false,
+   "effects": "",
+   "effectTags": [],
+   "metabolismPaths": [],
+   "overdose": null,
+   "criticalOverdose": null,
+   "recipe": null,
+   "obtainSources": [],
+   "accessibility": {
+    "tier": "unobtainable",
+    "weight": 999,
+    "reason": "No recipe, no plant, no dispenser source"
+   },
+   "verifiedMechanics": [],
+   "boilingPoint": null,
+   "meltingPoint": null
+  },
   "Nitrogen": {
    "id": "Nitrogen",
    "name": "nitrogen",
@@ -30906,6 +32056,43 @@
    "antagTipsSources": [
     "mk-general-antag-playtime"
    ]
+  },
+  "NocturineAbductor": {
+   "id": "NocturineAbductor",
+   "name": "Nocturine Abductor",
+   "group": "Narcotics",
+   "category": "Sunrise Toxins",
+   "source": "sunrise",
+   "color": "#128e80",
+   "desc": "A highly effective sedative and hypnotic, developed by the Syndicate for stealth operations. One-way ticket to honk-shoo town.",
+   "physicalDesc": "powdery",
+   "flavor": "",
+   "isBase": true,
+   "isDispenser": false,
+   "effects": "[Narcotic] Speed walk=0.65 sprint=0.65; [Narcotic] Status: ModifyStatusEffect (if NocturineAbductor > 8u)",
+   "effectTags": [
+    "speed"
+   ],
+   "metabolismPaths": [
+    "Narcotic"
+   ],
+   "overdose": null,
+   "criticalOverdose": null,
+   "recipe": null,
+   "obtainSources": [],
+   "accessibility": {
+    "tier": "unobtainable",
+    "weight": 999,
+    "reason": "No recipe, no plant, no dispenser source"
+   },
+   "verifiedMechanics": [
+    "[Narcotic] Speed walk=0.65 sprint=0.65",
+    "[Narcotic] Status: ModifyStatusEffect (if NocturineAbductor > 8u)",
+    "Phase change: melts at 128.0K, boils at 444.0K"
+   ],
+   "boilingPoint": 444.0,
+   "meltingPoint": 128.0,
+   "antagScore": 1
   },
   "NorepinephricAcid": {
    "id": "NorepinephricAcid",
@@ -31092,6 +32279,75 @@
    "boilingPoint": null,
    "meltingPoint": null,
    "antagScore": 2
+  },
+  "Nutricryokomp": {
+   "id": "Nutricryokomp",
+   "name": "Nutricryokomp",
+   "group": "Medicine",
+   "category": "Sunrise Medicine",
+   "source": "sunrise",
+   "color": "#cfc434ff",
+   "desc": "",
+   "physicalDesc": "reagent-physical-desc-nutricryokomp",
+   "flavor": "medicine",
+   "isBase": false,
+   "isDispenser": false,
+   "effects": "[Medicine] Blood level 1 (if body temp < 213.0K); [Medicine] Thirst x4 (if body temp < 213.0K); [Medicine] Hunger x1 (if body temp < 213.0K)",
+   "effectTags": [
+    "blood",
+    "hunger",
+    "thirst"
+   ],
+   "metabolismPaths": [
+    "Medicine"
+   ],
+   "overdose": null,
+   "criticalOverdose": null,
+   "recipe": {
+    "reactants": {
+     "Cryoxadone": {
+      "amount": 1,
+      "catalyst": false
+     },
+     "Iron": {
+      "amount": 1,
+      "catalyst": false
+     },
+     "Iodine": {
+      "amount": 1,
+      "catalyst": false
+     },
+     "Nutriment": {
+      "amount": 1,
+      "catalyst": false
+     },
+     "Saline": {
+      "amount": 1,
+      "catalyst": false
+     }
+    },
+    "products": {
+     "Nutricryokomp": 5
+    },
+    "minTemp": null,
+    "maxTemp": null,
+    "mixer": []
+   },
+   "obtainSources": [
+    "Chemistry reaction"
+   ],
+   "accessibility": {
+    "tier": "unknown",
+    "weight": 5,
+    "reason": "Recipe exists but a deep-chain ingredient is unresolved by extractor (likely plant-mutation, mob-drop, or cooking product)"
+   },
+   "verifiedMechanics": [
+    "[Medicine] Blood level 1 (if body temp < 213.0K)",
+    "[Medicine] Thirst x4 (if body temp < 213.0K)",
+    "[Medicine] Hunger x1 (if body temp < 213.0K)"
+   ],
+   "boilingPoint": null,
+   "meltingPoint": null
   },
   "Nutriment": {
    "id": "Nutriment",
@@ -34826,6 +36082,41 @@
    "boilingPoint": null,
    "meltingPoint": null
   },
+  "PulverizedLantern": {
+   "id": "PulverizedLantern",
+   "name": "Pulverized Lantern",
+   "group": "Botanical",
+   "category": "Sunrise Other",
+   "source": "sunrise",
+   "color": "#FFCA86",
+   "desc": "",
+   "physicalDesc": "reagent-physical-desc-pulverizedlantern",
+   "flavor": "medicine",
+   "isBase": true,
+   "isDispenser": false,
+   "effects": "[Poison] Deals Poison 1",
+   "effectTags": [
+    "deals:poison"
+   ],
+   "metabolismPaths": [
+    "Poison"
+   ],
+   "overdose": null,
+   "criticalOverdose": null,
+   "recipe": null,
+   "obtainSources": [],
+   "accessibility": {
+    "tier": "unobtainable",
+    "weight": 999,
+    "reason": "No recipe, no plant, no dispenser source"
+   },
+   "verifiedMechanics": [
+    "[Poison] Deals Poison 1"
+   ],
+   "boilingPoint": null,
+   "meltingPoint": null,
+   "antagScore": 2
+  },
   "PumpkinFlesh": {
    "id": "PumpkinFlesh",
    "name": "pumpkin flesh",
@@ -34952,6 +36243,55 @@
     "Tile: SpillIfPuddlePresentTileReaction (see YAML for details)",
     "Reactive: Extinguish [Touch]",
     "[Digestion] Thirst x2"
+   ],
+   "boilingPoint": null,
+   "meltingPoint": null
+  },
+  "PwrGameSunrise": {
+   "id": "PwrGameSunrise",
+   "name": "Pwr Game Sunrise",
+   "group": "Drinks",
+   "category": "Sunrise Drinks",
+   "source": "sunrise",
+   "color": "#9385bf",
+   "desc": "The only drink with the PWR that true gamers crave. When a gamer talks about gamerfuel, this is what they're literally referring to.",
+   "physicalDesc": "fizzy",
+   "flavor": "pwrgamesoda",
+   "isBase": true,
+   "isDispenser": false,
+   "effects": "[Digestion] Thirst x2; [Drink] Thirst x2 (if MetabolizerTypeCondition); [Drink] Status: ModifyStatusEffect; [Drink] Temp -2000; [Drink] Temp -6000 (if body temp > 310K); [Narcotic] Status: ModifyStatusEffect; [Narcotic] Status: ModifyStatusEffect; [Narcotic] Effect: ModifyKnockdown; [Narcotic] Status: ModifyStatusEffect; [Narcotic] Status: Adrenaline",
+   "effectTags": [
+    "temperature",
+    "thirst"
+   ],
+   "metabolismPaths": [
+    "Digestion",
+    "Drink",
+    "Narcotic"
+   ],
+   "overdose": null,
+   "criticalOverdose": null,
+   "recipe": null,
+   "obtainSources": [],
+   "accessibility": {
+    "tier": "unobtainable",
+    "weight": 999,
+    "reason": "No recipe, no plant, no dispenser source"
+   },
+   "verifiedMechanics": [
+    "Tile: Extinguishes fires on wet tiles",
+    "Tile: SpillIfPuddlePresentTileReaction (see YAML for details)",
+    "Reactive: Extinguish [Touch]",
+    "[Digestion] Thirst x2",
+    "[Drink] Thirst x2 (if MetabolizerTypeCondition)",
+    "[Drink] Status: ModifyStatusEffect",
+    "[Drink] Temp -2000",
+    "[Drink] Temp -6000 (if body temp > 310K)",
+    "[Narcotic] Status: ModifyStatusEffect",
+    "[Narcotic] Status: ModifyStatusEffect",
+    "[Narcotic] Effect: ModifyKnockdown",
+    "[Narcotic] Status: ModifyStatusEffect",
+    "[Narcotic] Status: Adrenaline"
    ],
    "boilingPoint": null,
    "meltingPoint": null
@@ -38800,6 +40140,114 @@
    "boilingPoint": null,
    "meltingPoint": null
   },
+  "RootBeerFloatSunrise": {
+   "id": "RootBeerFloatSunrise",
+   "name": "Root Beer Float Sunrise",
+   "group": "Drinks",
+   "category": "Sunrise Drinks",
+   "source": "sunrise",
+   "color": "#4f361f",
+   "desc": "Root beer, but now with ice cream on top. It truly is the magnum opus of Canadian summertime drinks.",
+   "physicalDesc": "fizzy and creamy",
+   "flavor": "rootbeerfloat",
+   "isBase": true,
+   "isDispenser": false,
+   "effects": "[Digestion] Thirst x2; [Drink] Thirst x2 (if MetabolizerTypeCondition); [Drink] Status: ModifyStatusEffect; [Drink] Temp -2000; [Drink] Temp -6000 (if body temp > 310K); [Poison] Heals Poison 1 Heals Blunt 2 Heals Slash 2 Heals Piercing 2 Heals Bloodloss 1 (if MetabolizerTypeCondition); [Poison] Deals Asphyxiation 1 Deals Poison 1 (if MetabolizerTypeCondition, RootBeerFloatSunrise > 50u)",
+   "effectTags": [
+    "deals:asphyxiation",
+    "deals:poison",
+    "heals:bloodloss",
+    "heals:blunt",
+    "heals:piercing",
+    "heals:poison",
+    "heals:slash",
+    "temperature",
+    "thirst"
+   ],
+   "metabolismPaths": [
+    "Digestion",
+    "Drink",
+    "Poison"
+   ],
+   "overdose": 50,
+   "criticalOverdose": null,
+   "recipe": null,
+   "obtainSources": [],
+   "accessibility": {
+    "tier": "unobtainable",
+    "weight": 999,
+    "reason": "No recipe, no plant, no dispenser source"
+   },
+   "verifiedMechanics": [
+    "Tile: Extinguishes fires on wet tiles",
+    "Tile: SpillIfPuddlePresentTileReaction (see YAML for details)",
+    "Reactive: Extinguish [Touch]",
+    "[Digestion] Thirst x2",
+    "[Drink] Thirst x2 (if MetabolizerTypeCondition)",
+    "[Drink] Status: ModifyStatusEffect",
+    "[Drink] Temp -2000",
+    "[Drink] Temp -6000 (if body temp > 310K)",
+    "[Poison] Heals Poison 1 Heals Blunt 2 Heals Slash 2 Heals Piercing 2 Heals Bloodloss 1 (if MetabolizerTypeCondition)",
+    "[Poison] Deals Asphyxiation 1 Deals Poison 1 (if MetabolizerTypeCondition, RootBeerFloatSunrise > 50u)"
+   ],
+   "boilingPoint": null,
+   "meltingPoint": null,
+   "antagScore": 5
+  },
+  "RootBeerSunrise": {
+   "id": "RootBeerSunrise",
+   "name": "Root Beer Sunrise",
+   "group": "Drinks",
+   "category": "Sunrise Drinks",
+   "source": "sunrise",
+   "color": "#381c07",
+   "desc": "A very sweet, carbonated drink reminiscent of sarsaparilla. Goes well with ice cream.",
+   "physicalDesc": "fizzy",
+   "flavor": "rootbeersoda",
+   "isBase": true,
+   "isDispenser": false,
+   "effects": "[Digestion] Thirst x2; [Drink] Thirst x2 (if MetabolizerTypeCondition); [Drink] Status: ModifyStatusEffect; [Drink] Temp -2000; [Drink] Temp -6000 (if body temp > 310K); [Poison] Heals Poison 1 Heals Blunt 2 Heals Slash 2 Heals Piercing 2 Heals Bloodloss 1 (if MetabolizerTypeCondition); [Poison] Deals Asphyxiation 1 Deals Poison 1 (if MetabolizerTypeCondition, RootBeerSunrise > 50u)",
+   "effectTags": [
+    "deals:asphyxiation",
+    "deals:poison",
+    "heals:bloodloss",
+    "heals:blunt",
+    "heals:piercing",
+    "heals:poison",
+    "heals:slash",
+    "temperature",
+    "thirst"
+   ],
+   "metabolismPaths": [
+    "Digestion",
+    "Drink",
+    "Poison"
+   ],
+   "overdose": 50,
+   "criticalOverdose": null,
+   "recipe": null,
+   "obtainSources": [],
+   "accessibility": {
+    "tier": "unobtainable",
+    "weight": 999,
+    "reason": "No recipe, no plant, no dispenser source"
+   },
+   "verifiedMechanics": [
+    "Tile: Extinguishes fires on wet tiles",
+    "Tile: SpillIfPuddlePresentTileReaction (see YAML for details)",
+    "Reactive: Extinguish [Touch]",
+    "[Digestion] Thirst x2",
+    "[Drink] Thirst x2 (if MetabolizerTypeCondition)",
+    "[Drink] Status: ModifyStatusEffect",
+    "[Drink] Temp -2000",
+    "[Drink] Temp -6000 (if body temp > 310K)",
+    "[Poison] Heals Poison 1 Heals Blunt 2 Heals Slash 2 Heals Piercing 2 Heals Bloodloss 1 (if MetabolizerTypeCondition)",
+    "[Poison] Deals Asphyxiation 1 Deals Poison 1 (if MetabolizerTypeCondition, RootBeerSunrise > 50u)"
+   ],
+   "boilingPoint": null,
+   "meltingPoint": null,
+   "antagScore": 5
+  },
   "Rororium": {
    "id": "Rororium",
    "name": "rororium",
@@ -39805,6 +41253,50 @@
    "boilingPoint": null,
    "meltingPoint": null
   },
+  "ShamblersJuiceSunrise": {
+   "id": "ShamblersJuiceSunrise",
+   "name": "Shamblers Juice Sunrise",
+   "group": "Drinks",
+   "category": "Sunrise Drinks",
+   "source": "sunrise",
+   "color": "#66538F",
+   "desc": "~Shake me up some of that Shambler's Juice!~",
+   "physicalDesc": "fizzy",
+   "flavor": "metallic",
+   "isBase": true,
+   "isDispenser": false,
+   "effects": "[Digestion] Thirst x2; [Drink] Status: ModifyStatusEffect (if ShamblersJuiceSunrise > 15u); [Drink] Effect: CureZombieInfection (if ShamblersJuiceSunrise > 15u) @35%; [Drink] Temp -2000; [Drink] Temp -6000 (if body temp > 310K)",
+   "effectTags": [
+    "cure",
+    "temperature",
+    "thirst"
+   ],
+   "metabolismPaths": [
+    "Digestion",
+    "Drink"
+   ],
+   "overdose": null,
+   "criticalOverdose": null,
+   "recipe": null,
+   "obtainSources": [],
+   "accessibility": {
+    "tier": "unobtainable",
+    "weight": 999,
+    "reason": "No recipe, no plant, no dispenser source"
+   },
+   "verifiedMechanics": [
+    "Tile: Extinguishes fires on wet tiles",
+    "Tile: SpillIfPuddlePresentTileReaction (see YAML for details)",
+    "Reactive: Extinguish [Touch]",
+    "[Digestion] Thirst x2",
+    "[Drink] Status: ModifyStatusEffect (if ShamblersJuiceSunrise > 15u)",
+    "[Drink] Effect: CureZombieInfection (if ShamblersJuiceSunrise > 15u) @35%",
+    "[Drink] Temp -2000",
+    "[Drink] Temp -6000 (if body temp > 310K)"
+   ],
+   "boilingPoint": null,
+   "meltingPoint": null
+  },
   "ShirleyTemple": {
    "id": "ShirleyTemple",
    "name": "Shirley Temple",
@@ -40459,6 +41951,34 @@
    "boilingPoint": null,
    "meltingPoint": null
   },
+  "Smetana": {
+   "id": "Smetana",
+   "name": "Smetana",
+   "group": "Foods",
+   "category": "Sunrise Other",
+   "source": "sunrise",
+   "color": "white",
+   "desc": "",
+   "physicalDesc": "creamy",
+   "flavor": "creamy",
+   "isBase": true,
+   "isDispenser": false,
+   "effects": "",
+   "effectTags": [],
+   "metabolismPaths": [],
+   "overdose": null,
+   "criticalOverdose": null,
+   "recipe": null,
+   "obtainSources": [],
+   "accessibility": {
+    "tier": "unobtainable",
+    "weight": 999,
+    "reason": "No recipe, no plant, no dispenser source"
+   },
+   "verifiedMechanics": [],
+   "boilingPoint": null,
+   "meltingPoint": null
+  },
   "SnowWhite": {
    "id": "SnowWhite",
    "name": "Snow White",
@@ -40975,6 +42495,51 @@
    "boilingPoint": null,
    "meltingPoint": null
   },
+  "SolDrySunrise": {
+   "id": "SolDrySunrise",
+   "name": "Sol Dry Sunrise",
+   "group": "Drinks",
+   "category": "Sunrise Drinks",
+   "source": "sunrise",
+   "color": "#ccb87e",
+   "desc": "Sweet ginger soda from outer space!",
+   "physicalDesc": "fizzy",
+   "flavor": "gingersoda",
+   "isBase": true,
+   "isDispenser": false,
+   "effects": "[Digestion] Thirst x2; [Drink] Temp -2000; [Drink] Temp -6000 (if body temp > 310K); [Medicine] Heals Poison 1; [Medicine] Effect: CleanBloodstream",
+   "effectTags": [
+    "heals:poison",
+    "temperature",
+    "thirst"
+   ],
+   "metabolismPaths": [
+    "Digestion",
+    "Drink",
+    "Medicine"
+   ],
+   "overdose": null,
+   "criticalOverdose": null,
+   "recipe": null,
+   "obtainSources": [],
+   "accessibility": {
+    "tier": "unobtainable",
+    "weight": 999,
+    "reason": "No recipe, no plant, no dispenser source"
+   },
+   "verifiedMechanics": [
+    "Tile: Extinguishes fires on wet tiles",
+    "Tile: SpillIfPuddlePresentTileReaction (see YAML for details)",
+    "Reactive: Extinguish [Touch]",
+    "[Digestion] Thirst x2",
+    "[Drink] Temp -2000",
+    "[Drink] Temp -6000 (if body temp > 310K)",
+    "[Medicine] Heals Poison 1",
+    "[Medicine] Effect: CleanBloodstream"
+   ],
+   "boilingPoint": null,
+   "meltingPoint": null
+  },
   "SoyLatte": {
    "id": "SoyLatte",
    "name": "soy latte",
@@ -41353,6 +42918,51 @@
    "boilingPoint": null,
    "meltingPoint": null
   },
+  "SpaceMountainWindSunrise": {
+   "id": "SpaceMountainWindSunrise",
+   "name": "Space Mountain Wind Sunrise",
+   "group": "Drinks",
+   "category": "Sunrise Drinks",
+   "source": "sunrise",
+   "color": "#a6fa5a",
+   "desc": "Blows right through you like a solar wind.",
+   "physicalDesc": "fizzy",
+   "flavor": "sodacitrus",
+   "isBase": true,
+   "isDispenser": false,
+   "effects": "[Digestion] Thirst x2; [Drink] Thirst x2 (if MetabolizerTypeCondition); [Drink] Status: ModifyStatusEffect; [Drink] Temp -2000; [Drink] Temp -6000 (if body temp > 310K); [Drink] Heals Asphyxiation 2 (if mob state: Critical)",
+   "effectTags": [
+    "heals:asphyxiation",
+    "temperature",
+    "thirst"
+   ],
+   "metabolismPaths": [
+    "Digestion",
+    "Drink"
+   ],
+   "overdose": null,
+   "criticalOverdose": null,
+   "recipe": null,
+   "obtainSources": [],
+   "accessibility": {
+    "tier": "unobtainable",
+    "weight": 999,
+    "reason": "No recipe, no plant, no dispenser source"
+   },
+   "verifiedMechanics": [
+    "Tile: Extinguishes fires on wet tiles",
+    "Tile: SpillIfPuddlePresentTileReaction (see YAML for details)",
+    "Reactive: Extinguish [Touch]",
+    "[Digestion] Thirst x2",
+    "[Drink] Thirst x2 (if MetabolizerTypeCondition)",
+    "[Drink] Status: ModifyStatusEffect",
+    "[Drink] Temp -2000",
+    "[Drink] Temp -6000 (if body temp > 310K)",
+    "[Drink] Heals Asphyxiation 2 (if mob state: Critical)"
+   ],
+   "boilingPoint": null,
+   "meltingPoint": null
+  },
   "SpaceUp": {
    "id": "SpaceUp",
    "name": "Space-Up",
@@ -41389,6 +42999,55 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null
+  },
+  "SpaceUpSunrise": {
+   "id": "SpaceUpSunrise",
+   "name": "Space Up Sunrise",
+   "group": "Drinks",
+   "category": "Sunrise Drinks",
+   "source": "sunrise",
+   "color": "#e3e3e37d",
+   "desc": "Tastes like a hull breach in your mouth.",
+   "physicalDesc": "fizzy",
+   "flavor": "spaceup",
+   "isBase": true,
+   "isDispenser": false,
+   "effects": "[Digestion] Thirst x2; [Drink] Thirst x2 (if MetabolizerTypeCondition); [Drink] Status: PressureImmunity (if SpaceUpSunrise > 10u) @50%; [Drink] Status: Stutter; [Drink] Jitter; [Drink] Emote: Scream @5%; [Drink] Popup (local): barozine effect muscle contract @10%; [Drink] Heals Blunt 1",
+   "effectTags": [
+    "emote",
+    "heals:blunt",
+    "jitter",
+    "thirst"
+   ],
+   "metabolismPaths": [
+    "Digestion",
+    "Drink"
+   ],
+   "overdose": null,
+   "criticalOverdose": null,
+   "recipe": null,
+   "obtainSources": [],
+   "accessibility": {
+    "tier": "unobtainable",
+    "weight": 999,
+    "reason": "No recipe, no plant, no dispenser source"
+   },
+   "verifiedMechanics": [
+    "Tile: Extinguishes fires on wet tiles",
+    "Tile: SpillIfPuddlePresentTileReaction (see YAML for details)",
+    "Reactive: Extinguish [Touch]",
+    "[Digestion] Thirst x2",
+    "[Drink] Thirst x2 (if MetabolizerTypeCondition)",
+    "[Drink] Status: PressureImmunity (if SpaceUpSunrise > 10u) @50%",
+    "[Drink] Status: Stutter",
+    "[Drink] Jitter",
+    "[Drink] Emote: Scream @5%",
+    "[Drink] Popup (local): barozine effect muscle contract @10%",
+    "[Drink] Heals Blunt 1"
+   ],
+   "boilingPoint": null,
+   "meltingPoint": null,
+   "antagScore": 1
   },
   "Spaceacilin": {
    "id": "Spaceacilin",
@@ -41599,6 +43258,70 @@
    "boilingPoint": null,
    "meltingPoint": null
   },
+  "StableMutagen": {
+   "id": "StableMutagen",
+   "name": "Stable Mutagen",
+   "group": "Toxins",
+   "category": "Sunrise Toxins",
+   "source": "sunrise",
+   "color": "#61b440",
+   "desc": "",
+   "physicalDesc": "translucent",
+   "flavor": "bitter",
+   "isBase": false,
+   "isDispenser": false,
+   "effects": "[Medicine] Deals Radiation 0.05 Deals Poison 0.05 Deals Caustic 0.05 Deals Mangleness 0.05; [Medicine] Popup (local): generic reagent effect burning insides @15%; [Medicine] Emote: Scream @20%",
+   "effectTags": [
+    "deals:caustic",
+    "deals:mangleness",
+    "deals:poison",
+    "deals:radiation",
+    "emote"
+   ],
+   "metabolismPaths": [
+    "Medicine"
+   ],
+   "overdose": null,
+   "criticalOverdose": null,
+   "recipe": {
+    "reactants": {
+     "Phalanximine": {
+      "amount": 1,
+      "catalyst": false
+     },
+     "Doxarubixadone": {
+      "amount": 1,
+      "catalyst": false
+     },
+     "UnstableMutagen": {
+      "amount": 1,
+      "catalyst": false
+     }
+    },
+    "products": {
+     "StableMutagen": 3
+    },
+    "minTemp": null,
+    "maxTemp": null,
+    "mixer": []
+   },
+   "obtainSources": [
+    "Chemistry reaction"
+   ],
+   "accessibility": {
+    "tier": "self-chem",
+    "weight": 1,
+    "reason": "Chemistry reaction from dispenser base"
+   },
+   "verifiedMechanics": [
+    "[Medicine] Deals Radiation 0.05 Deals Poison 0.05 Deals Caustic 0.05 Deals Mangleness 0.05",
+    "[Medicine] Popup (local): generic reagent effect burning insides @15%",
+    "[Medicine] Emote: Scream @20%"
+   ],
+   "boilingPoint": null,
+   "meltingPoint": null,
+   "antagScore": 5
+  },
   "Starkist": {
    "id": "Starkist",
    "name": "Starkist",
@@ -41651,6 +43374,51 @@
     "Tile: SpillIfPuddlePresentTileReaction (see YAML for details)",
     "Reactive: Extinguish [Touch]",
     "[Digestion] Thirst x2"
+   ],
+   "boilingPoint": null,
+   "meltingPoint": null
+  },
+  "StarkistSunrise": {
+   "id": "StarkistSunrise",
+   "name": "Starkist Sunrise",
+   "group": "Drinks",
+   "category": "Sunrise Drinks",
+   "source": "sunrise",
+   "color": "#9F3400",
+   "desc": "A sweet, orange flavored soft drink.",
+   "physicalDesc": "fizzy",
+   "flavor": "starkistsoda",
+   "isBase": true,
+   "isDispenser": false,
+   "effects": "[Digestion] Thirst x2; [Drink] Thirst x2 (if MetabolizerTypeCondition); [Drink] Status: ModifyStatusEffect; [Drink] Heals Cold 1; [Drink] Temp +2000; [Drink] Temp +6000 (if body temp < 310K)",
+   "effectTags": [
+    "heals:cold",
+    "temperature",
+    "thirst"
+   ],
+   "metabolismPaths": [
+    "Digestion",
+    "Drink"
+   ],
+   "overdose": null,
+   "criticalOverdose": null,
+   "recipe": null,
+   "obtainSources": [],
+   "accessibility": {
+    "tier": "unobtainable",
+    "weight": 999,
+    "reason": "No recipe, no plant, no dispenser source"
+   },
+   "verifiedMechanics": [
+    "Tile: Extinguishes fires on wet tiles",
+    "Tile: SpillIfPuddlePresentTileReaction (see YAML for details)",
+    "Reactive: Extinguish [Touch]",
+    "[Digestion] Thirst x2",
+    "[Drink] Thirst x2 (if MetabolizerTypeCondition)",
+    "[Drink] Status: ModifyStatusEffect",
+    "[Drink] Heals Cold 1",
+    "[Drink] Temp +2000",
+    "[Drink] Temp +6000 (if body temp < 310K)"
    ],
    "boilingPoint": null,
    "meltingPoint": null
@@ -45126,6 +46894,61 @@
    "meltingPoint": null,
    "antagScore": 2
   },
+  "UE": {
+   "id": "UE",
+   "name": "UE",
+   "group": "Special",
+   "category": "Sunrise Other",
+   "source": "sunrise",
+   "color": "#4B0082",
+   "desc": "",
+   "physicalDesc": "bubbling",
+   "flavor": "",
+   "isBase": false,
+   "isDispenser": false,
+   "effects": "[Poison] Deals Poison 1.5 Deals Radiation 2.5",
+   "effectTags": [
+    "deals:poison",
+    "deals:radiation"
+   ],
+   "metabolismPaths": [
+    "Poison"
+   ],
+   "overdose": null,
+   "criticalOverdose": null,
+   "recipe": {
+    "reactants": {
+     "Plasma": {
+      "amount": 1,
+      "catalyst": false
+     },
+     "Radium": {
+      "amount": 1,
+      "catalyst": false
+     }
+    },
+    "products": {
+     "UE": 2
+    },
+    "minTemp": 600,
+    "maxTemp": null,
+    "mixer": []
+   },
+   "obtainSources": [
+    "Chemistry reaction"
+   ],
+   "accessibility": {
+    "tier": "self-chem",
+    "weight": 1,
+    "reason": "Chemistry reaction from dispenser base"
+   },
+   "verifiedMechanics": [
+    "[Poison] Deals Poison 1.5 Deals Radiation 2.5"
+   ],
+   "boilingPoint": null,
+   "meltingPoint": null,
+   "antagScore": 4
+  },
   "Ultravasculine": {
    "id": "Ultravasculine",
    "name": "ultravasculine",
@@ -45400,6 +47223,149 @@
    "verifiedMechanics": [
     "[Bloodstream] Thirst x6",
     "[Bloodstream] Blood level 6"
+   ],
+   "boilingPoint": null,
+   "meltingPoint": null
+  },
+  "UniversalSolvent": {
+   "id": "UniversalSolvent",
+   "name": "Universal Solvent",
+   "group": "",
+   "category": "Sunrise Other",
+   "source": "sunrise",
+   "color": "#c8ff69",
+   "desc": "",
+   "physicalDesc": "strong smelling",
+   "flavor": "None",
+   "isBase": false,
+   "isDispenser": false,
+   "effects": "[Poison] Deals Caustic 6; [Poison] Popup (local): universalsolvent effect organs @33%; [Poison] Emote: Scream @30%",
+   "effectTags": [
+    "deals:caustic",
+    "emote"
+   ],
+   "metabolismPaths": [
+    "Poison"
+   ],
+   "overdose": null,
+   "criticalOverdose": null,
+   "recipe": {
+    "reactants": {
+     "FluorosulfuricAcid": {
+      "amount": 1,
+      "catalyst": false
+     },
+     "Bleach": {
+      "amount": 1,
+      "catalyst": false
+     },
+     "Vestine": {
+      "amount": 4,
+      "catalyst": false
+     }
+    },
+    "products": {
+     "UniversalSolvent": 6
+    },
+    "minTemp": null,
+    "maxTemp": null,
+    "mixer": []
+   },
+   "obtainSources": [
+    "Chemistry reaction"
+   ],
+   "accessibility": {
+    "tier": "unknown",
+    "weight": 5,
+    "reason": "Recipe exists but a deep-chain ingredient is unresolved by extractor (likely plant-mutation, mob-drop, or cooking product)"
+   },
+   "verifiedMechanics": [
+    "Tile: Cleans decals and puddles",
+    "Tile: CleanDecalsReaction (see YAML for details)",
+    "Reactive: HealthChange [Touch]",
+    "On touch: Shows warning message [Touch]",
+    "On touch: Forces target emote [Touch]",
+    "[Poison] Deals Caustic 6",
+    "[Poison] Popup (local): universalsolvent effect organs @33%",
+    "[Poison] Emote: Scream @30%",
+    "Phase change: melts at -11.0K, boils at 147.0K"
+   ],
+   "boilingPoint": 147.0,
+   "meltingPoint": -11.0,
+   "antagScore": 3
+  },
+  "UnknownPathogen": {
+   "id": "UnknownPathogen",
+   "name": "Unknown Pathogen",
+   "group": "Drinks",
+   "category": "Fish Station (Рыбья) Other",
+   "source": "fish",
+   "color": "#2E6671",
+   "desc": "",
+   "physicalDesc": "fizzy",
+   "flavor": "soda",
+   "isBase": true,
+   "isDispenser": false,
+   "effects": "[Digestion] Thirst x2; [Drink] Effect: Polymorph (if UnknownPathogen > 5u) @4%; [Drink] Removes 1000u UnknownPathogen (if UnknownPathogen > 5u) @4%; [Drink] Effect: Polymorph (if UnknownPathogen > 5u) @5%; [Drink] Removes 1000u UnknownPathogen (if UnknownPathogen > 5u) @5%; [Drink] Effect: Polymorph (if UnknownPathogen > 5u) @5%; [Drink] Removes 1000u UnknownPathogen (if UnknownPathogen > 5u) @5%; [Drink] Effect: Polymorph (if UnknownPathogen > 5u) @5%; [Drink] Removes 1000u UnknownPathogen (if UnknownPathogen > 5u) @5%; [Drink] Effect: Polymorph (if UnknownPathogen > 5u) @5%; [Drink] Removes 1000u UnknownPathogen (if UnknownPathogen > 5u) @5%; [Drink] Effect: Polymorph (if UnknownPathogen > 5u) @6%; [Drink] Removes 1000u UnknownPathogen (if UnknownPathogen > 5u) @6%; [Drink] Effect: Polymorph (if UnknownPathogen > 5u) @6%; [Drink] Removes 1000u UnknownPathogen (if UnknownPathogen > 5u) @6%; [Drink] Effect: Polymorph (if UnknownPathogen > 5u) @7%; [Drink] Removes 1000u UnknownPathogen (if UnknownPathogen > 5u) @7%; [Drink] Effect: Polymorph (if UnknownPathogen > 5u) @7%; [Drink] Removes 1000u UnknownPathogen (if UnknownPathogen > 5u) @7%; [Drink] Effect: Polymorph (if UnknownPathogen > 5u) @8%; [Drink] Removes 1000u UnknownPathogen (if UnknownPathogen > 5u) @8%; [Drink] Effect: Polymorph (if UnknownPathogen > 5u) @9%; [Drink] Removes 1000u UnknownPathogen (if UnknownPathogen > 5u) @9%; [Drink] Effect: Polymorph (if UnknownPathogen > 5u) @10%; [Drink] Removes 1000u UnknownPathogen (if UnknownPathogen > 5u) @10%; [Drink] Effect: Polymorph (if UnknownPathogen > 5u) @11%; [Drink] Removes 1000u UnknownPathogen (if UnknownPathogen > 5u) @11%; [Drink] Effect: Polymorph (if UnknownPathogen > 5u) @12%; [Drink] Removes 1000u UnknownPathogen (if UnknownPathogen > 5u) @12%; [Drink] Effect: Polymorph (if UnknownPathogen > 5u) @14%; [Drink] Removes 1000u UnknownPathogen (if UnknownPathogen > 5u) @14%; [Drink] Effect: Polymorph (if UnknownPathogen > 5u) @16%; [Drink] Removes 1000u UnknownPathogen (if UnknownPathogen > 5u) @16%; [Drink] Effect: Polymorph (if UnknownPathogen > 5u) @33%; [Drink] Removes 1000u UnknownPathogen (if UnknownPathogen > 5u) @33%; [Drink] Effect: Polymorph (if UnknownPathogen > 5u) @50%; [Drink] Removes 1000u UnknownPathogen (if UnknownPathogen > 5u) @50%; [Drink] Effect: Polymorph (if UnknownPathogen > 5u); [Drink] Removes 1000u UnknownPathogen (if UnknownPathogen > 5u)",
+   "effectTags": [
+    "thirst"
+   ],
+   "metabolismPaths": [
+    "Digestion",
+    "Drink"
+   ],
+   "overdose": null,
+   "criticalOverdose": null,
+   "recipe": null,
+   "obtainSources": [],
+   "accessibility": {
+    "tier": "unobtainable",
+    "weight": 999,
+    "reason": "No recipe, no plant, no dispenser source"
+   },
+   "verifiedMechanics": [
+    "Tile: Extinguishes fires on wet tiles",
+    "Tile: SpillIfPuddlePresentTileReaction (see YAML for details)",
+    "Reactive: Extinguish [Touch]",
+    "[Digestion] Thirst x2",
+    "[Drink] Effect: Polymorph (if UnknownPathogen > 5u) @4%",
+    "[Drink] Removes 1000u UnknownPathogen (if UnknownPathogen > 5u) @4%",
+    "[Drink] Effect: Polymorph (if UnknownPathogen > 5u) @5%",
+    "[Drink] Removes 1000u UnknownPathogen (if UnknownPathogen > 5u) @5%",
+    "[Drink] Effect: Polymorph (if UnknownPathogen > 5u) @5%",
+    "[Drink] Removes 1000u UnknownPathogen (if UnknownPathogen > 5u) @5%",
+    "[Drink] Effect: Polymorph (if UnknownPathogen > 5u) @5%",
+    "[Drink] Removes 1000u UnknownPathogen (if UnknownPathogen > 5u) @5%",
+    "[Drink] Effect: Polymorph (if UnknownPathogen > 5u) @5%",
+    "[Drink] Removes 1000u UnknownPathogen (if UnknownPathogen > 5u) @5%",
+    "[Drink] Effect: Polymorph (if UnknownPathogen > 5u) @6%",
+    "[Drink] Removes 1000u UnknownPathogen (if UnknownPathogen > 5u) @6%",
+    "[Drink] Effect: Polymorph (if UnknownPathogen > 5u) @6%",
+    "[Drink] Removes 1000u UnknownPathogen (if UnknownPathogen > 5u) @6%",
+    "[Drink] Effect: Polymorph (if UnknownPathogen > 5u) @7%",
+    "[Drink] Removes 1000u UnknownPathogen (if UnknownPathogen > 5u) @7%",
+    "[Drink] Effect: Polymorph (if UnknownPathogen > 5u) @7%",
+    "[Drink] Removes 1000u UnknownPathogen (if UnknownPathogen > 5u) @7%",
+    "[Drink] Effect: Polymorph (if UnknownPathogen > 5u) @8%",
+    "[Drink] Removes 1000u UnknownPathogen (if UnknownPathogen > 5u) @8%",
+    "[Drink] Effect: Polymorph (if UnknownPathogen > 5u) @9%",
+    "[Drink] Removes 1000u UnknownPathogen (if UnknownPathogen > 5u) @9%",
+    "[Drink] Effect: Polymorph (if UnknownPathogen > 5u) @10%",
+    "[Drink] Removes 1000u UnknownPathogen (if UnknownPathogen > 5u) @10%",
+    "[Drink] Effect: Polymorph (if UnknownPathogen > 5u) @11%",
+    "[Drink] Removes 1000u UnknownPathogen (if UnknownPathogen > 5u) @11%",
+    "[Drink] Effect: Polymorph (if UnknownPathogen > 5u) @12%",
+    "[Drink] Removes 1000u UnknownPathogen (if UnknownPathogen > 5u) @12%",
+    "[Drink] Effect: Polymorph (if UnknownPathogen > 5u) @14%",
+    "[Drink] Removes 1000u UnknownPathogen (if UnknownPathogen > 5u) @14%",
+    "[Drink] Effect: Polymorph (if UnknownPathogen > 5u) @16%",
+    "[Drink] Removes 1000u UnknownPathogen (if UnknownPathogen > 5u) @16%",
+    "[Drink] Effect: Polymorph (if UnknownPathogen > 5u) @33%",
+    "[Drink] Removes 1000u UnknownPathogen (if UnknownPathogen > 5u) @33%",
+    "[Drink] Effect: Polymorph (if UnknownPathogen > 5u) @50%",
+    "[Drink] Removes 1000u UnknownPathogen (if UnknownPathogen > 5u) @50%",
+    "[Drink] Effect: Polymorph (if UnknownPathogen > 5u)",
+    "[Drink] Removes 1000u UnknownPathogen (if UnknownPathogen > 5u)"
    ],
    "boilingPoint": null,
    "meltingPoint": null
@@ -49904,8 +51870,8 @@
    },
    "forkNotes": {
     "funky": "Added Sigynate(1) reactant; Removed Leporazine reactant; Cryoxadone amount 2->3; Aloxadone yield 4->5",
-    "monolith": "Added Sigynate(2) reactant; Removed Leporazine reactant; Aloe amount 1->2; Cryoxadone amount 2->1",
-    "adt": "Added Phenol(2) reactant; Added Pyrazine(2) reactant; Removed Aloe reactant; Removed Leporazine reactant; Cryoxadone amount 2->1; Added maxTemp: 200"
+    "monolith": "Added Sigynate(2) reactant; Removed Leporazine reactant; Cryoxadone amount 2->1; Aloe amount 1->2",
+    "adt": "Added Pyrazine(2) reactant; Added Phenol(2) reactant; Removed Aloe reactant; Removed Leporazine reactant; Cryoxadone amount 2->1; Added maxTemp: 200"
    },
    "rmcStatus": "blocked",
    "rmcNote": ""
@@ -50563,6 +52529,34 @@
    "rmcStatus": "available",
    "rmcNote": ""
   },
+  "Antidon": {
+   "id": "Antidon",
+   "source": "sunrise",
+   "reactants": {
+    "Ultravasculine": {
+     "amount": 1,
+     "catalyst": false
+    },
+    "Cryoxadone": {
+     "amount": 1,
+     "catalyst": false
+    },
+    "Epinephrine": {
+     "amount": 1,
+     "catalyst": false
+    }
+   },
+   "products": {
+    "Antidon": 3
+   },
+   "minTemp": null,
+   "maxTemp": null,
+   "mixer": [],
+   "effects": "",
+   "impact": null,
+   "rmcStatus": "available",
+   "rmcNote": ""
+  },
   "Antifreeze": {
    "id": "Antifreeze",
    "source": "vanilla",
@@ -51115,6 +53109,73 @@
     "trauma": "Added IrishCarBomb(1) reactant; Removed IrishSlammer reactant",
     "omu": "Added IrishCarBomb(1) reactant; Removed IrishSlammer reactant"
    },
+   "rmcStatus": "available",
+   "rmcNote": ""
+  },
+  "BZElectrolysis": {
+   "id": "BZElectrolysis",
+   "source": "sunrise",
+   "reactants": {
+    "BZ": {
+     "amount": 2.1,
+     "catalyst": false
+    }
+   },
+   "products": {
+    "Halon": 4.2,
+    "Oxygen": 0.42
+   },
+   "minTemp": null,
+   "maxTemp": null,
+   "mixer": [
+    "Electrolysis"
+   ],
+   "effects": "",
+   "impact": null,
+   "rmcStatus": "available",
+   "rmcNote": ""
+  },
+  "BZRelease": {
+   "id": "BZRelease",
+   "source": "sunrise",
+   "reactants": {
+    "BZ": {
+     "amount": 0.63,
+     "catalyst": false
+    },
+    "SulfuricAcid": {
+     "amount": 1,
+     "catalyst": false
+    }
+   },
+   "products": {},
+   "minTemp": 353,
+   "maxTemp": null,
+   "mixer": [],
+   "effects": "Creates gas: BZ",
+   "impact": null,
+   "rmcStatus": "available",
+   "rmcNote": ""
+  },
+  "BZUERelease": {
+   "id": "BZUERelease",
+   "source": "sunrise",
+   "reactants": {
+    "BZ": {
+     "amount": 0.63,
+     "catalyst": false
+    },
+    "UE": {
+     "amount": 0.1,
+     "catalyst": false
+    }
+   },
+   "products": {},
+   "minTemp": 353,
+   "maxTemp": null,
+   "mixer": [],
+   "effects": "Creates gas: BZ",
+   "impact": null,
    "rmcStatus": "available",
    "rmcNote": ""
   },
@@ -52112,6 +54173,10 @@
    ],
    "effects": "",
    "impact": "Low",
+   "forkStatus": {
+    "sunrise": "blocked",
+    "fish": "blocked"
+   },
    "rmcStatus": "available",
    "rmcNote": ""
   },
@@ -52601,6 +54666,38 @@
    "rmcStatus": "available",
    "rmcNote": ""
   },
+  "Brutedon": {
+   "id": "Brutedon",
+   "source": "sunrise",
+   "reactants": {
+    "Bicaridine": {
+     "amount": 1,
+     "catalyst": false
+    },
+    "Cryoxadone": {
+     "amount": 1,
+     "catalyst": false
+    },
+    "Epinephrine": {
+     "amount": 1,
+     "catalyst": false
+    },
+    "Plasma": {
+     "amount": 1,
+     "catalyst": true
+    }
+   },
+   "products": {
+    "Brutedon": 1
+   },
+   "minTemp": null,
+   "maxTemp": null,
+   "mixer": [],
+   "effects": "",
+   "impact": null,
+   "rmcStatus": "available",
+   "rmcNote": ""
+  },
   "BudgetInsulsDrink": {
    "id": "BudgetInsulsDrink",
    "source": "vanilla",
@@ -52654,6 +54751,30 @@
    "mixer": [
     "Shake"
    ],
+   "effects": "",
+   "impact": null,
+   "rmcStatus": "available",
+   "rmcNote": ""
+  },
+  "Butterbeer": {
+   "id": "Butterbeer",
+   "source": "sunrise",
+   "reactants": {
+    "Beer": {
+     "amount": 1,
+     "catalyst": false
+    },
+    "Cream": {
+     "amount": 1,
+     "catalyst": false
+    }
+   },
+   "products": {
+    "Butterbeer": 2
+   },
+   "minTemp": null,
+   "maxTemp": null,
+   "mixer": [],
    "effects": "",
    "impact": null,
    "rmcStatus": "available",
@@ -53450,6 +55571,28 @@
    "rmcStatus": "available",
    "rmcNote": ""
   },
+  "CarbonDioxideUERelease": {
+   "id": "CarbonDioxideUERelease",
+   "source": "sunrise",
+   "reactants": {
+    "CarbonDioxide": {
+     "amount": 0.63,
+     "catalyst": false
+    },
+    "UE": {
+     "amount": 0.1,
+     "catalyst": false
+    }
+   },
+   "products": {},
+   "minTemp": 195,
+   "maxTemp": null,
+   "mixer": [],
+   "effects": "Creates gas: CarbonDioxide",
+   "impact": null,
+   "rmcStatus": "available",
+   "rmcNote": ""
+  },
   "Carpetium": {
    "id": "Carpetium",
    "source": "vanilla",
@@ -53548,6 +55691,34 @@
    "mixer": [],
    "effects": "",
    "impact": null,
+   "rmcStatus": "available",
+   "rmcNote": ""
+  },
+  "Celliminol": {
+   "id": "Celliminol",
+   "source": "sunrise",
+   "reactants": {
+    "Doxarubixadone": {
+     "amount": 5,
+     "catalyst": false
+    },
+    "Omnizine": {
+     "amount": 1,
+     "catalyst": false
+    },
+    "Blood": {
+     "amount": 10,
+     "catalyst": false
+    }
+   },
+   "products": {
+    "Celliminol": 5
+   },
+   "minTemp": 500,
+   "maxTemp": null,
+   "mixer": [],
+   "effects": "",
+   "impact": "High",
    "rmcStatus": "available",
    "rmcNote": ""
   },
@@ -53701,6 +55872,72 @@
     "rmc14": "blocked"
    },
    "rmcStatus": "blocked",
+   "rmcNote": ""
+  },
+  "ChargedElectrovaeEmpExplosion": {
+   "id": "ChargedElectrovaeEmpExplosion",
+   "source": "sunrise",
+   "reactants": {
+    "ChargedElectrovae": {
+     "amount": 5,
+     "catalyst": false
+    },
+    "Oxygen": {
+     "amount": 1,
+     "catalyst": false
+    }
+   },
+   "products": {},
+   "minTemp": null,
+   "maxTemp": null,
+   "mixer": [],
+   "effects": "Effect: Emp",
+   "impact": "High",
+   "rmcStatus": "available",
+   "rmcNote": ""
+  },
+  "ChargedElectrovaeRelease": {
+   "id": "ChargedElectrovaeRelease",
+   "source": "sunrise",
+   "reactants": {
+    "ChargedElectrovae": {
+     "amount": 0.63,
+     "catalyst": false
+    },
+    "Water": {
+     "amount": 1,
+     "catalyst": false
+    }
+   },
+   "products": {},
+   "minTemp": 281,
+   "maxTemp": null,
+   "mixer": [],
+   "effects": "Creates gas: ChargedElectrovae",
+   "impact": null,
+   "rmcStatus": "available",
+   "rmcNote": ""
+  },
+  "ChargedElectrovaeUERelease": {
+   "id": "ChargedElectrovaeUERelease",
+   "source": "sunrise",
+   "reactants": {
+    "ChargedElectrovae": {
+     "amount": 0.63,
+     "catalyst": false
+    },
+    "UE": {
+     "amount": 0.1,
+     "catalyst": false
+    }
+   },
+   "products": {},
+   "minTemp": 281,
+   "maxTemp": null,
+   "mixer": [],
+   "effects": "Creates gas: ChargedElectrovae",
+   "impact": null,
+   "rmcStatus": "available",
    "rmcNote": ""
   },
   "CherryBlossom": {
@@ -54201,10 +56438,10 @@
     "rmc14": "modified"
    },
    "forkNotes": {
-    "rmc14": "Added RMCOxygen(1) reactant; Added RMCSugar(1) reactant; Removed Oxygen reactant; Removed Sugar reactant"
+    "rmc14": "Added RMCSugar(1) reactant; Added RMCOxygen(1) reactant; Removed Sugar reactant; Removed Oxygen reactant"
    },
    "rmcStatus": "modified",
-   "rmcNote": "Added RMCOxygen(1) reactant; Added RMCSugar(1) reactant; Removed Oxygen reactant; Removed Sugar reactant"
+   "rmcNote": "Added RMCSugar(1) reactant; Added RMCOxygen(1) reactant; Removed Sugar reactant; Removed Oxygen reactant"
   },
   "ConcentratedCorgiJuice": {
    "id": "ConcentratedCorgiJuice",
@@ -55102,10 +57339,10 @@
    },
    "forkNotes": {
     "rmc14": "Added RMCSugar(5) reactant; Removed Sugar reactant",
-    "trauma": "Added Butter(10) reactant; Sugar amount 5->10; Egg amount 12->6; Milk amount 5->10; Flour amount 15->20",
-    "carpmosia": "Added Butter(10) reactant; Sugar amount 5->10; Egg amount 12->6; Milk amount 5->10; Flour amount 15->20",
-    "harmony": "Added Butter(10) reactant; Sugar amount 5->10; Egg amount 12->6; Milk amount 5->10; Flour amount 15->20",
-    "corvax": "Added Butter(10) reactant; Sugar amount 5->10; Egg amount 12->6; Milk amount 5->10; Flour amount 15->20"
+    "trauma": "Added Butter(10) reactant; Egg amount 12->6; Sugar amount 5->10; Flour amount 15->20; Milk amount 5->10",
+    "carpmosia": "Added Butter(10) reactant; Egg amount 12->6; Sugar amount 5->10; Flour amount 15->20; Milk amount 5->10",
+    "harmony": "Added Butter(10) reactant; Egg amount 12->6; Sugar amount 5->10; Flour amount 15->20; Milk amount 5->10",
+    "corvax": "Added Butter(10) reactant; Egg amount 12->6; Sugar amount 5->10; Flour amount 15->20; Milk amount 5->10"
    },
    "rmcStatus": "modified",
    "rmcNote": "Added RMCSugar(5) reactant; Removed Sugar reactant"
@@ -55280,10 +57517,10 @@
     "corvax": "modified"
    },
    "forkNotes": {
-    "trauma": "Fiber amount 10->40; Water amount 10->15",
-    "carpmosia": "Fiber amount 10->40; Water amount 10->15",
-    "harmony": "Fiber amount 10->40; Water amount 10->15",
-    "corvax": "Fiber amount 10->40; Water amount 10->15"
+    "trauma": "Water amount 10->15; Fiber amount 10->40",
+    "carpmosia": "Water amount 10->15; Fiber amount 10->40",
+    "harmony": "Water amount 10->15; Fiber amount 10->40",
+    "corvax": "Water amount 10->15; Fiber amount 10->40"
    },
    "rmcStatus": "available",
    "rmcNote": ""
@@ -55392,10 +57629,10 @@
     "corvax": "modified"
    },
    "forkNotes": {
-    "trauma": "Added Sugar(5) reactant; Added Water(5) reactant; Added Butter(10) reactant; Removed Egg reactant; Removed TableSalt reactant; Flour amount 15->40",
-    "carpmosia": "Added Sugar(5) reactant; Added Water(5) reactant; Added Butter(10) reactant; Removed Egg reactant; Removed TableSalt reactant; Flour amount 15->40",
-    "harmony": "Added Sugar(5) reactant; Added Water(5) reactant; Added Butter(10) reactant; Removed Egg reactant; Removed TableSalt reactant; Flour amount 15->40",
-    "corvax": "Added Sugar(5) reactant; Added Water(5) reactant; Added Butter(10) reactant; Removed Egg reactant; Removed TableSalt reactant; Flour amount 15->40"
+    "trauma": "Added Butter(10) reactant; Added Water(5) reactant; Added Sugar(5) reactant; Removed Egg reactant; Removed TableSalt reactant; Flour amount 15->40",
+    "carpmosia": "Added Butter(10) reactant; Added Water(5) reactant; Added Sugar(5) reactant; Removed Egg reactant; Removed TableSalt reactant; Flour amount 15->40",
+    "harmony": "Added Butter(10) reactant; Added Water(5) reactant; Added Sugar(5) reactant; Removed Egg reactant; Removed TableSalt reactant; Flour amount 15->40",
+    "corvax": "Added Butter(10) reactant; Added Water(5) reactant; Added Sugar(5) reactant; Removed Egg reactant; Removed TableSalt reactant; Flour amount 15->40"
    },
    "rmcStatus": "available",
    "rmcNote": ""
@@ -55462,10 +57699,10 @@
     "corvax": "modified"
    },
    "forkNotes": {
-    "trauma": "Fat amount 10->15; Lye amount 20->25; TableSalt amount 5->10",
-    "carpmosia": "Fat amount 10->15; Lye amount 20->25; TableSalt amount 5->10",
-    "harmony": "Fat amount 10->15; Lye amount 20->25; TableSalt amount 5->10",
-    "corvax": "Fat amount 10->15; Lye amount 20->25; TableSalt amount 5->10"
+    "trauma": "Lye amount 20->25; TableSalt amount 5->10; Fat amount 10->15",
+    "carpmosia": "Lye amount 20->25; TableSalt amount 5->10; Fat amount 10->15",
+    "harmony": "Lye amount 20->25; TableSalt amount 5->10; Fat amount 10->15",
+    "corvax": "Lye amount 20->25; TableSalt amount 5->10; Fat amount 10->15"
    },
    "rmcStatus": "blocked",
    "rmcNote": ""
@@ -55508,10 +57745,10 @@
     "corvax": "modified"
    },
    "forkNotes": {
-    "trauma": "TableSalt amount 5->10; Lye amount 20->25; Oil amount 15->20",
-    "carpmosia": "TableSalt amount 5->10; Lye amount 20->25; Oil amount 15->20",
-    "harmony": "TableSalt amount 5->10; Lye amount 20->25; Oil amount 15->20",
-    "corvax": "TableSalt amount 5->10; Lye amount 20->25; Oil amount 15->20"
+    "trauma": "Lye amount 20->25; TableSalt amount 5->10; Oil amount 15->20",
+    "carpmosia": "Lye amount 20->25; TableSalt amount 5->10; Oil amount 15->20",
+    "harmony": "Lye amount 20->25; TableSalt amount 5->10; Oil amount 15->20",
+    "corvax": "Lye amount 20->25; TableSalt amount 5->10; Oil amount 15->20"
    },
    "rmcStatus": "blocked",
    "rmcNote": ""
@@ -55580,10 +57817,10 @@
     "corvax": "modified"
    },
    "forkNotes": {
-    "trauma": "TableSalt amount 5->10; Lye amount 20->25; Oil amount 15->20",
-    "carpmosia": "TableSalt amount 5->10; Lye amount 20->25; Oil amount 15->20",
-    "harmony": "TableSalt amount 5->10; Lye amount 20->25; Oil amount 15->20",
-    "corvax": "TableSalt amount 5->10; Lye amount 20->25; Oil amount 15->20"
+    "trauma": "Lye amount 20->25; TableSalt amount 5->10; Oil amount 15->20",
+    "carpmosia": "Lye amount 20->25; TableSalt amount 5->10; Oil amount 15->20",
+    "harmony": "Lye amount 20->25; TableSalt amount 5->10; Oil amount 15->20",
+    "corvax": "Lye amount 20->25; TableSalt amount 5->10; Oil amount 15->20"
    },
    "rmcStatus": "blocked",
    "rmcNote": ""
@@ -55688,10 +57925,10 @@
    },
    "forkNotes": {
     "frontier": "minTemp 373->383; Priority -1->None",
-    "trauma": "TableSalt amount 5->10; Lye amount 15->30; Oil amount 10->20",
-    "carpmosia": "TableSalt amount 5->10; Lye amount 15->30; Oil amount 10->20",
-    "harmony": "TableSalt amount 5->10; Lye amount 15->30; Oil amount 10->20",
-    "corvax": "TableSalt amount 5->10; Lye amount 15->30; Oil amount 10->20"
+    "trauma": "Lye amount 15->30; TableSalt amount 5->10; Oil amount 10->20",
+    "carpmosia": "Lye amount 15->30; TableSalt amount 5->10; Oil amount 10->20",
+    "harmony": "Lye amount 15->30; TableSalt amount 5->10; Oil amount 10->20",
+    "corvax": "Lye amount 15->30; TableSalt amount 5->10; Oil amount 10->20"
    },
    "rmcStatus": "blocked",
    "rmcNote": ""
@@ -55734,10 +57971,10 @@
     "corvax": "modified"
    },
    "forkNotes": {
-    "trauma": "TableSalt amount 5->10; Lye amount 20->25; Oil amount 15->20",
-    "carpmosia": "TableSalt amount 5->10; Lye amount 20->25; Oil amount 15->20",
-    "harmony": "TableSalt amount 5->10; Lye amount 20->25; Oil amount 15->20",
-    "corvax": "TableSalt amount 5->10; Lye amount 20->25; Oil amount 15->20"
+    "trauma": "Lye amount 20->25; TableSalt amount 5->10; Oil amount 15->20",
+    "carpmosia": "Lye amount 20->25; TableSalt amount 5->10; Oil amount 15->20",
+    "harmony": "Lye amount 20->25; TableSalt amount 5->10; Oil amount 15->20",
+    "corvax": "Lye amount 20->25; TableSalt amount 5->10; Oil amount 15->20"
    },
    "rmcStatus": "blocked",
    "rmcNote": ""
@@ -55880,6 +58117,32 @@
    "forkStatus": {
     "monolith": "blocked"
    },
+   "rmcStatus": "available",
+   "rmcNote": ""
+  },
+  "CrushedPhosphorus": {
+   "id": "CrushedPhosphorus",
+   "source": "sunrise",
+   "reactants": {
+    "Phosphorus": {
+     "amount": 4,
+     "catalyst": false
+    },
+    "Hydrogen": {
+     "amount": 2,
+     "catalyst": false
+    },
+    "Ethanol": {
+     "amount": 2,
+     "catalyst": false
+    }
+   },
+   "products": {},
+   "minTemp": 500,
+   "maxTemp": null,
+   "mixer": [],
+   "effects": "Spawns: CrushedPhosphorus1",
+   "impact": "Low",
    "rmcStatus": "available",
    "rmcNote": ""
   },
@@ -56080,7 +58343,7 @@
     "trauma": "modified"
    },
    "forkNotes": {
-    "trauma": "Added RumAndCoke(2) reactant; Added JuiceLime(1) reactant; Removed Cola reactant; Removed Rum reactant"
+    "trauma": "Added JuiceLime(1) reactant; Added RumAndCoke(2) reactant; Removed Rum reactant; Removed Cola reactant"
    },
    "rmcStatus": "available",
    "rmcNote": ""
@@ -56217,6 +58480,30 @@
    "rmcStatus": "modified",
    "rmcNote": "Added RMCSugar(1) reactant; Removed Sugar reactant"
   },
+  "DarkAndStormy": {
+   "id": "DarkAndStormy",
+   "source": "sunrise",
+   "reactants": {
+    "Rum": {
+     "amount": 1,
+     "catalyst": false
+    },
+    "Ale": {
+     "amount": 2,
+     "catalyst": false
+    }
+   },
+   "products": {
+    "DarkAndStormy": 3
+   },
+   "minTemp": null,
+   "maxTemp": null,
+   "mixer": [],
+   "effects": "",
+   "impact": null,
+   "rmcStatus": "available",
+   "rmcNote": ""
+  },
   "DarkandStormy": {
    "id": "DarkandStormy",
    "source": "vanilla",
@@ -56241,6 +58528,34 @@
    "forkStatus": {
     "monolith": "blocked"
    },
+   "rmcStatus": "available",
+   "rmcNote": ""
+  },
+  "Darvinium": {
+   "id": "Darvinium",
+   "source": "sunrise",
+   "reactants": {
+    "Blood": {
+     "amount": 1,
+     "catalyst": false
+    },
+    "UnstableMutagen": {
+     "amount": 1,
+     "catalyst": false
+    },
+    "StableMutagen": {
+     "amount": 3,
+     "catalyst": false
+    }
+   },
+   "products": {
+    "Darvinium": 3
+   },
+   "minTemp": null,
+   "maxTemp": null,
+   "mixer": [],
+   "effects": "",
+   "impact": null,
    "rmcStatus": "available",
    "rmcNote": ""
   },
@@ -57129,6 +59444,50 @@
    "rmcStatus": "available",
    "rmcNote": ""
   },
+  "ElectrovaeRelease": {
+   "id": "ElectrovaeRelease",
+   "source": "sunrise",
+   "reactants": {
+    "Electrovae": {
+     "amount": 0.63,
+     "catalyst": false
+    },
+    "Water": {
+     "amount": 1,
+     "catalyst": false
+    }
+   },
+   "products": {},
+   "minTemp": 288,
+   "maxTemp": null,
+   "mixer": [],
+   "effects": "Creates gas: Electrovae",
+   "impact": null,
+   "rmcStatus": "available",
+   "rmcNote": ""
+  },
+  "ElectrovaeUERelease": {
+   "id": "ElectrovaeUERelease",
+   "source": "sunrise",
+   "reactants": {
+    "Electrovae": {
+     "amount": 0.63,
+     "catalyst": false
+    },
+    "UE": {
+     "amount": 0.1,
+     "catalyst": false
+    }
+   },
+   "products": {},
+   "minTemp": 288,
+   "maxTemp": null,
+   "mixer": [],
+   "effects": "Creates gas: Electrovae",
+   "impact": null,
+   "rmcStatus": "available",
+   "rmcNote": ""
+  },
   "Empress75": {
    "id": "Empress75",
    "source": "vanilla",
@@ -57988,6 +60347,28 @@
    "rmcStatus": "available",
    "rmcNote": ""
   },
+  "FrezonUERelease": {
+   "id": "FrezonUERelease",
+   "source": "sunrise",
+   "reactants": {
+    "Frezon": {
+     "amount": 0.63,
+     "catalyst": false
+    },
+    "UE": {
+     "amount": 0.1,
+     "catalyst": false
+    }
+   },
+   "products": {},
+   "minTemp": 243,
+   "maxTemp": null,
+   "mixer": [],
+   "effects": "Creates gas: Frezon",
+   "impact": null,
+   "rmcStatus": "available",
+   "rmcNote": ""
+  },
   "FringeWeaver": {
    "id": "FringeWeaver",
    "source": "funky",
@@ -58540,6 +60921,60 @@
    "rmcStatus": "available",
    "rmcNote": ""
   },
+  "H-32": {
+   "id": "H-32",
+   "source": "sunrise",
+   "reactants": {
+    "Arithrazine": {
+     "amount": 1,
+     "catalyst": false
+    },
+    "Bicaridine": {
+     "amount": 1,
+     "catalyst": false
+    },
+    "Cryoxadone": {
+     "amount": 1,
+     "catalyst": false
+    },
+    "Plasma": {
+     "amount": 1,
+     "catalyst": true
+    }
+   },
+   "products": {
+    "H-32": 3
+   },
+   "minTemp": null,
+   "maxTemp": null,
+   "mixer": [],
+   "effects": "",
+   "impact": null,
+   "rmcStatus": "available",
+   "rmcNote": ""
+  },
+  "HalonUERelease": {
+   "id": "HalonUERelease",
+   "source": "sunrise",
+   "reactants": {
+    "Halon": {
+     "amount": 0.63,
+     "catalyst": false
+    },
+    "UE": {
+     "amount": 0.1,
+     "catalyst": false
+    }
+   },
+   "products": {},
+   "minTemp": 215,
+   "maxTemp": null,
+   "mixer": [],
+   "effects": "Creates gas: Halon",
+   "impact": null,
+   "rmcStatus": "available",
+   "rmcNote": ""
+  },
   "Haloperidol": {
    "id": "Haloperidol",
    "source": "vanilla",
@@ -58614,6 +61049,50 @@
    "rmcStatus": "blocked",
    "rmcNote": ""
   },
+  "HealiumRelease": {
+   "id": "HealiumRelease",
+   "source": "sunrise",
+   "reactants": {
+    "Healium": {
+     "amount": 0.63,
+     "catalyst": false
+    },
+    "Water": {
+     "amount": 1,
+     "catalyst": false
+    }
+   },
+   "products": {},
+   "minTemp": 233,
+   "maxTemp": null,
+   "mixer": [],
+   "effects": "Creates gas: Healium",
+   "impact": null,
+   "rmcStatus": "available",
+   "rmcNote": ""
+  },
+  "HealiumUERelease": {
+   "id": "HealiumUERelease",
+   "source": "sunrise",
+   "reactants": {
+    "Healium": {
+     "amount": 0.63,
+     "catalyst": false
+    },
+    "UE": {
+     "amount": 0.1,
+     "catalyst": false
+    }
+   },
+   "products": {},
+   "minTemp": 233,
+   "maxTemp": null,
+   "mixer": [],
+   "effects": "Creates gas: Healium",
+   "impact": null,
+   "rmcStatus": "available",
+   "rmcNote": ""
+  },
   "HealthViolation": {
    "id": "HealthViolation",
    "source": "deltav",
@@ -58680,6 +61159,28 @@
    "rmcStatus": "available",
    "rmcNote": ""
   },
+  "HeliumUERelease": {
+   "id": "HeliumUERelease",
+   "source": "sunrise",
+   "reactants": {
+    "Helium": {
+     "amount": 0.63,
+     "catalyst": false
+    },
+    "UE": {
+     "amount": 0.1,
+     "catalyst": false
+    }
+   },
+   "products": {},
+   "minTemp": 4,
+   "maxTemp": null,
+   "mixer": [],
+   "effects": "Creates gas: Helium",
+   "impact": null,
+   "rmcStatus": "available",
+   "rmcNote": ""
+  },
   "Hemorrhinol": {
    "id": "Hemorrhinol",
    "source": "vanilla",
@@ -58713,11 +61214,15 @@
     "frontier": "blocked",
     "funky": "blocked",
     "omu": "blocked",
-    "monolith": "blocked"
+    "monolith": "blocked",
+    "sunrise": "modified",
+    "fish": "modified"
    },
    "forkNotes": {
     "starlight": "Uses Warfarin instead of Heparin as reactant",
-    "deltav": "Added Warfarin(2) reactant; Removed Heparin reactant"
+    "deltav": "Added Warfarin(2) reactant; Removed Heparin reactant",
+    "sunrise": "Added Warfarin(2) reactant; Removed Heparin reactant",
+    "fish": "Added Warfarin(2) reactant; Removed Heparin reactant"
    },
    "rmcStatus": "blocked",
    "rmcNote": ""
@@ -58755,7 +61260,9 @@
     "frontier": "blocked",
     "funky": "blocked",
     "omu": "blocked",
-    "monolith": "blocked"
+    "monolith": "blocked",
+    "sunrise": "blocked",
+    "fish": "blocked"
    },
    "rmcStatus": "blocked",
    "rmcNote": ""
@@ -59010,6 +61517,28 @@
    "rmcStatus": "available",
    "rmcNote": ""
   },
+  "HydrogenUERelease": {
+   "id": "HydrogenUERelease",
+   "source": "sunrise",
+   "reactants": {
+    "Hydrogen": {
+     "amount": 0.63,
+     "catalyst": false
+    },
+    "UE": {
+     "amount": 0.1,
+     "catalyst": false
+    }
+   },
+   "products": {},
+   "minTemp": 20,
+   "maxTemp": null,
+   "mixer": [],
+   "effects": "Creates gas: Hydrogen",
+   "impact": null,
+   "rmcStatus": "available",
+   "rmcNote": ""
+  },
   "Hydroxide": {
    "id": "Hydroxide",
    "source": "vanilla",
@@ -59035,6 +61564,28 @@
     "rmc14": "blocked"
    },
    "rmcStatus": "blocked",
+   "rmcNote": ""
+  },
+  "HyperNobliumUERelease": {
+   "id": "HyperNobliumUERelease",
+   "source": "sunrise",
+   "reactants": {
+    "Hyper-Noblium": {
+     "amount": 0.63,
+     "catalyst": false
+    },
+    "UE": {
+     "amount": 0.1,
+     "catalyst": false
+    }
+   },
+   "products": {},
+   "minTemp": 165,
+   "maxTemp": null,
+   "mixer": [],
+   "effects": "Creates gas: HyperNoblium",
+   "impact": null,
+   "rmcStatus": "available",
    "rmcNote": ""
   },
   "Hypothium": {
@@ -59394,7 +61945,11 @@
    "effects": "",
    "impact": null,
    "forkStatus": {
-    "rmc14": "blocked"
+    "rmc14": "blocked",
+    "fish": "modified"
+   },
+   "forkNotes": {
+    "fish": "Added Zinc(1) reactant"
    },
    "rmcStatus": "blocked",
    "rmcNote": ""
@@ -59428,6 +61983,38 @@
     "rmc14": "blocked"
    },
    "rmcStatus": "blocked",
+   "rmcNote": ""
+  },
+  "Inc": {
+   "id": "Inc",
+   "source": "sunrise",
+   "reactants": {
+    "Oil": {
+     "amount": 5,
+     "catalyst": false
+    },
+    "Ethanol": {
+     "amount": 1,
+     "catalyst": false
+    },
+    "Ash": {
+     "amount": 1,
+     "catalyst": false
+    },
+    "Sulfur": {
+     "amount": 1,
+     "catalyst": false
+    }
+   },
+   "products": {
+    "Inc": 4
+   },
+   "minTemp": null,
+   "maxTemp": null,
+   "mixer": [],
+   "effects": "",
+   "impact": null,
+   "rmcStatus": "available",
    "rmcNote": ""
   },
   "InsectBloodBreakdown": {
@@ -60008,6 +62595,28 @@
     "funky": "Added Libital(1) reactant; Removed Bicaridine reactant"
    },
    "rmcStatus": "blocked",
+   "rmcNote": ""
+  },
+  "LanternFlash": {
+   "id": "LanternFlash",
+   "source": "sunrise",
+   "reactants": {
+    "PulverizedLantern": {
+     "amount": 0.5,
+     "catalyst": false
+    },
+    "Water": {
+     "amount": 0.5,
+     "catalyst": false
+    }
+   },
+   "products": {},
+   "minTemp": null,
+   "maxTemp": null,
+   "mixer": [],
+   "effects": "Effect: Flash",
+   "impact": "High",
+   "rmcStatus": "available",
    "rmcNote": ""
   },
   "Laughter": {
@@ -62173,7 +64782,9 @@
     "funky": "modified",
     "trauma": "modified",
     "omu": "modified",
-    "monolith": "modified"
+    "monolith": "modified",
+    "sunrise": "modified",
+    "fish": "modified"
    },
    "forkNotes": {
     "rmc14": "Added Uranium as extra reactant",
@@ -62184,7 +64795,9 @@
     "funky": "Added Uranium(1) reactant",
     "trauma": "MuteToxin yield 2->4",
     "omu": "Added Uranium(1) reactant; MuteToxin yield 2->4",
-    "monolith": "Added Uranium(1) reactant"
+    "monolith": "Added Uranium(1) reactant",
+    "sunrise": "Added Uranium(1) reactant",
+    "fish": "Added Uranium(1) reactant"
    },
    "rmcStatus": "modified",
    "rmcNote": "Added Uranium as extra reactant"
@@ -62785,6 +65398,72 @@
    "rmcStatus": "available",
    "rmcNote": ""
   },
+  "NitriumRelease": {
+   "id": "NitriumRelease",
+   "source": "sunrise",
+   "reactants": {
+    "Nitrium": {
+     "amount": 0.63,
+     "catalyst": false
+    },
+    "Water": {
+     "amount": 1,
+     "catalyst": false
+    }
+   },
+   "products": {},
+   "minTemp": 240,
+   "maxTemp": null,
+   "mixer": [],
+   "effects": "Creates gas: Nitrium",
+   "impact": null,
+   "rmcStatus": "available",
+   "rmcNote": ""
+  },
+  "NitriumUERelease": {
+   "id": "NitriumUERelease",
+   "source": "sunrise",
+   "reactants": {
+    "Nitrium": {
+     "amount": 0.63,
+     "catalyst": false
+    },
+    "UE": {
+     "amount": 0.1,
+     "catalyst": false
+    }
+   },
+   "products": {},
+   "minTemp": 240,
+   "maxTemp": null,
+   "mixer": [],
+   "effects": "Creates gas: Nitrium",
+   "impact": null,
+   "rmcStatus": "available",
+   "rmcNote": ""
+  },
+  "NitrogenUERelease": {
+   "id": "NitrogenUERelease",
+   "source": "sunrise",
+   "reactants": {
+    "Nitrogen": {
+     "amount": 0.63,
+     "catalyst": false
+    },
+    "UE": {
+     "amount": 0.1,
+     "catalyst": false
+    }
+   },
+   "products": {},
+   "minTemp": 77,
+   "maxTemp": null,
+   "mixer": [],
+   "effects": "Creates gas: Nitrogen",
+   "impact": null,
+   "rmcStatus": "available",
+   "rmcNote": ""
+  },
   "NitrousOxideBreakdown": {
    "id": "NitrousOxideBreakdown",
    "source": "vanilla",
@@ -62804,6 +65483,28 @@
     "Electrolysis"
    ],
    "effects": "",
+   "impact": null,
+   "rmcStatus": "available",
+   "rmcNote": ""
+  },
+  "NitrousOxideUERelease": {
+   "id": "NitrousOxideUERelease",
+   "source": "sunrise",
+   "reactants": {
+    "NitrousOxide": {
+     "amount": 0.63,
+     "catalyst": false
+    },
+    "UE": {
+     "amount": 0.1,
+     "catalyst": false
+    }
+   },
+   "products": {},
+   "minTemp": 185,
+   "maxTemp": null,
+   "mixer": [],
+   "effects": "Creates gas: NitrousOxide",
    "impact": null,
    "rmcStatus": "available",
    "rmcNote": ""
@@ -62920,6 +65621,42 @@
     "rmc14": "blocked"
    },
    "rmcStatus": "blocked",
+   "rmcNote": ""
+  },
+  "Nutricryokomp": {
+   "id": "Nutricryokomp",
+   "source": "sunrise",
+   "reactants": {
+    "Cryoxadone": {
+     "amount": 1,
+     "catalyst": false
+    },
+    "Iron": {
+     "amount": 1,
+     "catalyst": false
+    },
+    "Iodine": {
+     "amount": 1,
+     "catalyst": false
+    },
+    "Nutriment": {
+     "amount": 1,
+     "catalyst": false
+    },
+    "Saline": {
+     "amount": 1,
+     "catalyst": false
+    }
+   },
+   "products": {
+    "Nutricryokomp": 5
+   },
+   "minTemp": null,
+   "maxTemp": null,
+   "mixer": [],
+   "effects": "",
+   "impact": null,
+   "rmcStatus": "available",
    "rmcNote": ""
   },
   "NutrimentBreakdown": {
@@ -63214,13 +65951,17 @@
     "goob": "modified",
     "funky": "modified",
     "trauma": "modified",
-    "omu": "modified"
+    "omu": "modified",
+    "sunrise": "modified",
+    "fish": "modified"
    },
    "forkNotes": {
     "goob": "Removed Cognizine reactant, uses Phalanximine(2) instead; easier recipe",
     "funky": "Recipe changed: Cognizine as catalyst + Plasma(5) + Doxarubixadone",
     "trauma": "Added Phalanximine(2) reactant; Removed Cognizine reactant; Plasma amount 2->1",
-    "omu": "Added Phalanximine(2) reactant; Removed Cognizine reactant"
+    "omu": "Added Phalanximine(2) reactant; Removed Cognizine reactant",
+    "sunrise": "Added Necrosol(1) reactant; Added Mannitol(1) reactant; Removed Cognizine reactant; Opporozidone yield 3->2",
+    "fish": "Added Necrosol(1) reactant; Added Mannitol(1) reactant; Removed Cognizine reactant; Opporozidone yield 3->2"
    },
    "rmcStatus": "blocked",
    "rmcNote": ""
@@ -63368,6 +66109,28 @@
    "rmcStatus": "available",
    "rmcNote": ""
   },
+  "OxygenUERelease": {
+   "id": "OxygenUERelease",
+   "source": "sunrise",
+   "reactants": {
+    "Oxygen": {
+     "amount": 0.63,
+     "catalyst": false
+    },
+    "UE": {
+     "amount": 0.1,
+     "catalyst": false
+    }
+   },
+   "products": {},
+   "minTemp": 90,
+   "maxTemp": null,
+   "mixer": [],
+   "effects": "Creates gas: Oxygen",
+   "impact": null,
+   "rmcStatus": "available",
+   "rmcNote": ""
+  },
   "Painkiller": {
    "id": "Painkiller",
    "source": "vanilla",
@@ -63478,7 +66241,13 @@
    "effects": "",
    "impact": "Medium",
    "forkStatus": {
-    "rmc14": "blocked"
+    "rmc14": "blocked",
+    "sunrise": "modified",
+    "fish": "modified"
+   },
+   "forkNotes": {
+    "sunrise": "MindbreakerToxin amount 1->2; Pax yield 3->1",
+    "fish": "MindbreakerToxin amount 1->2; Pax yield 3->1"
    },
    "rmcStatus": "blocked",
    "rmcNote": ""
@@ -64054,6 +66823,50 @@
    "rmcStatus": "blocked",
    "rmcNote": ""
   },
+  "PlasmaRelease": {
+   "id": "PlasmaRelease",
+   "source": "sunrise",
+   "reactants": {
+    "Plasma": {
+     "amount": 0.63,
+     "catalyst": false
+    },
+    "Fluorine": {
+     "amount": 1,
+     "catalyst": false
+    }
+   },
+   "products": {},
+   "minTemp": 231,
+   "maxTemp": null,
+   "mixer": [],
+   "effects": "Creates gas: Plasma",
+   "impact": null,
+   "rmcStatus": "available",
+   "rmcNote": ""
+  },
+  "PlasmaUERelease": {
+   "id": "PlasmaUERelease",
+   "source": "sunrise",
+   "reactants": {
+    "Plasma": {
+     "amount": 0.63,
+     "catalyst": false
+    },
+    "UE": {
+     "amount": 0.1,
+     "catalyst": false
+    }
+   },
+   "products": {},
+   "minTemp": 231,
+   "maxTemp": null,
+   "mixer": [],
+   "effects": "Creates gas: Plasma",
+   "impact": null,
+   "rmcStatus": "available",
+   "rmcNote": ""
+  },
   "PlasticSheet": {
    "id": "PlasticSheet",
    "source": "vanilla",
@@ -64083,8 +66896,52 @@
    },
    "forkNotes": {
     "goob": "Reactant amounts doubled: Oil 5→10, Ash 3→6, SulfuricAcid 2→4",
-    "omu": "SulfuricAcid amount 2->4; Oil amount 5->10; Ash amount 3->6"
+    "omu": "Ash amount 3->6; Oil amount 5->10; SulfuricAcid amount 2->4"
    },
+   "rmcStatus": "available",
+   "rmcNote": ""
+  },
+  "PluoxiumRelease": {
+   "id": "PluoxiumRelease",
+   "source": "sunrise",
+   "reactants": {
+    "Pluoxium": {
+     "amount": 0.63,
+     "catalyst": false
+    },
+    "Water": {
+     "amount": 1,
+     "catalyst": false
+    }
+   },
+   "products": {},
+   "minTemp": 161,
+   "maxTemp": null,
+   "mixer": [],
+   "effects": "Creates gas: Pluoxium",
+   "impact": null,
+   "rmcStatus": "available",
+   "rmcNote": ""
+  },
+  "PluoxiumUERelease": {
+   "id": "PluoxiumUERelease",
+   "source": "sunrise",
+   "reactants": {
+    "Pluoxium": {
+     "amount": 0.63,
+     "catalyst": false
+    },
+    "UE": {
+     "amount": 0.1,
+     "catalyst": false
+    }
+   },
+   "products": {},
+   "minTemp": 161,
+   "maxTemp": null,
+   "mixer": [],
+   "effects": "Creates gas: Pluoxium",
+   "impact": null,
    "rmcStatus": "available",
    "rmcNote": ""
   },
@@ -64386,6 +67243,28 @@
    "mixer": [],
    "effects": "",
    "impact": "Low",
+   "rmcStatus": "available",
+   "rmcNote": ""
+  },
+  "ProtoNitrateUERelease": {
+   "id": "ProtoNitrateUERelease",
+   "source": "sunrise",
+   "reactants": {
+    "Proto-Nitrate": {
+     "amount": 0.63,
+     "catalyst": false
+    },
+    "UE": {
+     "amount": 0.1,
+     "catalyst": false
+    }
+   },
+   "products": {},
+   "minTemp": 323,
+   "maxTemp": null,
+   "mixer": [],
+   "effects": "Creates gas: ProtoNitrate",
+   "impact": null,
    "rmcStatus": "available",
    "rmcNote": ""
   },
@@ -67750,6 +70629,34 @@
    "rmcStatus": "available",
    "rmcNote": ""
   },
+  "StableMutagen": {
+   "id": "StableMutagen",
+   "source": "sunrise",
+   "reactants": {
+    "Phalanximine": {
+     "amount": 1,
+     "catalyst": false
+    },
+    "Doxarubixadone": {
+     "amount": 1,
+     "catalyst": false
+    },
+    "UnstableMutagen": {
+     "amount": 1,
+     "catalyst": false
+    }
+   },
+   "products": {
+    "StableMutagen": 3
+   },
+   "minTemp": null,
+   "maxTemp": null,
+   "mixer": [],
+   "effects": "",
+   "impact": null,
+   "rmcStatus": "available",
+   "rmcNote": ""
+  },
   "Starkist": {
    "id": "Starkist",
    "source": "vanilla",
@@ -68106,7 +71013,9 @@
     "frontier": "blocked",
     "funky": "blocked",
     "omu": "blocked",
-    "monolith": "blocked"
+    "monolith": "blocked",
+    "sunrise": "blocked",
+    "fish": "blocked"
    },
    "rmcStatus": "blocked",
    "rmcNote": ""
@@ -69241,6 +72150,50 @@
    "rmcStatus": "available",
    "rmcNote": ""
   },
+  "TritiumRelease": {
+   "id": "TritiumRelease",
+   "source": "sunrise",
+   "reactants": {
+    "Tritium": {
+     "amount": 0.63,
+     "catalyst": false
+    },
+    "Oxygen": {
+     "amount": 1,
+     "catalyst": false
+    }
+   },
+   "products": {},
+   "minTemp": 20,
+   "maxTemp": null,
+   "mixer": [],
+   "effects": "Creates gas: Tritium",
+   "impact": null,
+   "rmcStatus": "available",
+   "rmcNote": ""
+  },
+  "TritiumUERelease": {
+   "id": "TritiumUERelease",
+   "source": "sunrise",
+   "reactants": {
+    "Tritium": {
+     "amount": 0.63,
+     "catalyst": false
+    },
+    "UE": {
+     "amount": 0.1,
+     "catalyst": false
+    }
+   },
+   "products": {},
+   "minTemp": 20,
+   "maxTemp": null,
+   "mixer": [],
+   "effects": "Creates gas: Tritium",
+   "impact": null,
+   "rmcStatus": "available",
+   "rmcNote": ""
+  },
   "TropicalStorm": {
    "id": "TropicalStorm",
    "source": "funky",
@@ -69272,6 +72225,30 @@
    ],
    "effects": "",
    "impact": null,
+   "rmcStatus": "available",
+   "rmcNote": ""
+  },
+  "UE": {
+   "id": "UE",
+   "source": "sunrise",
+   "reactants": {
+    "Plasma": {
+     "amount": 1,
+     "catalyst": false
+    },
+    "Radium": {
+     "amount": 1,
+     "catalyst": false
+    }
+   },
+   "products": {
+    "UE": 2
+   },
+   "minTemp": 600,
+   "maxTemp": null,
+   "mixer": [],
+   "effects": "",
+   "impact": "High",
    "rmcStatus": "available",
    "rmcNote": ""
   },
@@ -69429,6 +72406,34 @@
    },
    "products": {
     "UniversalBlood": 4
+   },
+   "minTemp": null,
+   "maxTemp": null,
+   "mixer": [],
+   "effects": "",
+   "impact": null,
+   "rmcStatus": "available",
+   "rmcNote": ""
+  },
+  "UniversalSolvent": {
+   "id": "UniversalSolvent",
+   "source": "sunrise",
+   "reactants": {
+    "FluorosulfuricAcid": {
+     "amount": 1,
+     "catalyst": false
+    },
+    "Bleach": {
+     "amount": 1,
+     "catalyst": false
+    },
+    "Vestine": {
+     "amount": 4,
+     "catalyst": false
+    }
+   },
+   "products": {
+    "UniversalSolvent": 6
    },
    "minTemp": null,
    "maxTemp": null,
@@ -69896,6 +72901,50 @@
    "rmcStatus": "available",
    "rmcNote": ""
   },
+  "WaterVaporRelease": {
+   "id": "WaterVaporRelease",
+   "source": "sunrise",
+   "reactants": {
+    "Water": {
+     "amount": 0.63,
+     "catalyst": false
+    },
+    "SulfuricAcid": {
+     "amount": 1,
+     "catalyst": false
+    }
+   },
+   "products": {},
+   "minTemp": 353,
+   "maxTemp": null,
+   "mixer": [],
+   "effects": "Creates gas: WaterVapor",
+   "impact": null,
+   "rmcStatus": "available",
+   "rmcNote": ""
+  },
+  "WaterVaporUERelease": {
+   "id": "WaterVaporUERelease",
+   "source": "sunrise",
+   "reactants": {
+    "Water": {
+     "amount": 0.63,
+     "catalyst": false
+    },
+    "UE": {
+     "amount": 0.1,
+     "catalyst": false
+    }
+   },
+   "products": {},
+   "minTemp": 353,
+   "maxTemp": null,
+   "mixer": [],
+   "effects": "Creates gas: WaterVapor",
+   "impact": null,
+   "rmcStatus": "available",
+   "rmcNote": ""
+  },
   "WatermelonWakeup": {
    "id": "WatermelonWakeup",
    "source": "vanilla",
@@ -69944,7 +72993,9 @@
    "effects": "",
    "impact": "Low",
    "forkStatus": {
-    "rmc14": "blocked"
+    "rmc14": "blocked",
+    "sunrise": "blocked",
+    "fish": "blocked"
    },
    "rmcStatus": "blocked",
    "rmcNote": ""
@@ -70286,6 +73337,53 @@
    "rmcStatus": "available",
    "rmcNote": ""
   },
+  "ZaukerDecay": {
+   "id": "ZaukerDecay",
+   "source": "sunrise",
+   "reactants": {
+    "Zauker": {
+     "amount": 2.1,
+     "catalyst": false
+    },
+    "Oxygen": {
+     "amount": 0.01,
+     "catalyst": false
+    }
+   },
+   "products": {
+    "Oxygen": 0.64,
+    "Nitrogen": 1.47
+   },
+   "minTemp": null,
+   "maxTemp": null,
+   "mixer": [],
+   "effects": "",
+   "impact": null,
+   "rmcStatus": "available",
+   "rmcNote": ""
+  },
+  "ZaukerUERelease": {
+   "id": "ZaukerUERelease",
+   "source": "sunrise",
+   "reactants": {
+    "Zauker": {
+     "amount": 0.63,
+     "catalyst": false
+    },
+    "UE": {
+     "amount": 0.1,
+     "catalyst": false
+    }
+   },
+   "products": {},
+   "minTemp": 319,
+   "maxTemp": null,
+   "mixer": [],
+   "effects": "Creates gas: Zauker",
+   "impact": null,
+   "rmcStatus": "available",
+   "rmcNote": ""
+  },
   "ZombieBloodBreakdown": {
    "id": "ZombieBloodBreakdown",
    "source": "vanilla",
@@ -70476,14 +73574,18 @@
   "CatExtract",
   "Cellulose",
   "ChamomileTeaPowder",
+  "ChamomileTincture",
   "Champagne",
   "ChangelingSting",
+  "ChangelingStingSunrise",
+  "ChargedElectrovae",
   "Chlorine",
   "CocaSlurry",
   "CocoaPowder",
   "CoconutFlesh",
   "CoconutWater",
   "Cognac",
+  "ColaSunrise",
   "CoolantIPC",
   "Copper",
   "CopperBlood",
@@ -70494,13 +73596,16 @@
   "DecafBlackTeaPowder",
   "DecafCoffeePowder",
   "DrGibb",
+  "DrGibbSunrise",
   "DryRamen",
   "EdgeEssentia",
   "Egg",
+  "Electrovae",
   "ElfDiethylamine",
   "ElfSpaceCleaner",
   "ElfTranexamicAcid",
   "EnergyDrink",
+  "EnergyDrinkSunrise",
   "Enzyme",
   "EssenceEldritch",
   "Ethanol",
@@ -70508,6 +73613,9 @@
   "FineRockDust",
   "Flour",
   "Fluorine",
+  "FluorosulfuricAcidHumanoidXeno",
+  "FluorosulfuricAcidPredator",
+  "FourteenLokoSunrise",
   "Frezon",
   "FrostOil",
   "FruitTeaPowder",
@@ -70519,15 +73627,16 @@
   "GoblinBlood",
   "Gold",
   "GrapeSoda",
+  "Grcoffee",
   "GreenTeaPowder",
   "GreyMatter",
   "GroundBee",
   "GroundCrab",
-  "Halon",
   "Healium",
   "Helium",
   "Heroin",
   "Histamine",
+  "Honey",
   "HorseradishSauce",
   "Hydrogen",
   "Hyper-Noblium",
@@ -70540,6 +73649,7 @@
   "JuiceBluePumpkin",
   "JuiceBungo",
   "JuiceLemonade",
+  "JuiceMango",
   "JuiceThatMakesYouHew",
   "JuiceThatMakesYouScream",
   "JuiceThatMakesYouWeh",
@@ -70559,8 +73669,10 @@
   "MilkSpoiled",
   "Mitogen",
   "Mopwata",
+  "MotorOil",
   "MouseBites",
   "Musiver",
+  "MuteToxinAbductor",
   "NFZombieBiteToxin",
   "NTApprovedCoffee",
   "NTCahors",
@@ -70570,8 +73682,10 @@
   "NevcottaPowder",
   "Nicotine",
   "Nitrium",
+  "NitroKill",
   "Nitrogen",
   "NitrousOxide",
+  "NocturineAbductor",
   "Nostalgia",
   "Nothing",
   "Nutriment",
@@ -70606,8 +73720,10 @@
   "Primatine",
   "Proto-Nitrate",
   "PulpedBananaPeel",
+  "PulverizedLantern",
   "PumpkinFlesh",
   "PwrGame",
+  "PwrGameSunrise",
   "Quartzite",
   "RMCAluminum",
   "RMCAntiZed",
@@ -70666,6 +73782,8 @@
   "Respiron",
   "Rice",
   "RootBeer",
+  "RootBeerFloatSunrise",
+  "RootBeerSunrise",
   "Rororium",
   "Rum",
   "Sap",
@@ -70674,16 +73792,22 @@
   "SentientGreyMatter",
   "ShadekinBlood",
   "ShamblersJuice",
+  "ShamblersJuiceSunrise",
   "ShroomMix",
   "Silicon",
   "Silver",
   "Slime",
+  "Smetana",
   "SoapReagent",
   "Sodium",
   "SolDry",
+  "SolDrySunrise",
   "SpaceMountainWind",
+  "SpaceMountainWindSunrise",
   "SpaceUp",
+  "SpaceUpSunrise",
   "Stabilizine",
+  "StarkistSunrise",
   "Stasizium",
   "Stellibinin",
   "Sugar",
@@ -70705,6 +73829,7 @@
   "Tranquility",
   "Tritium",
   "UncookedAnimalProteins",
+  "UnknownPathogen",
   "UnstableMutationToxin",
   "Vermouth",
   "Vestine",
@@ -70747,6 +73872,8 @@
   "Drinks (Alcoholic)",
   "Drinks (Non-Alc)",
   "Elements",
+  "Fish Station (Рыбья) Drinks",
+  "Fish Station (Рыбья) Other",
   "Food & Condiments",
   "Frontier Medicine",
   "Frontier Narcotics",
@@ -70787,6 +73914,11 @@
   "Starlight Medicine",
   "Starlight Other",
   "Starlight Toxins",
+  "Sunrise Drinks",
+  "Sunrise Medicine",
+  "Sunrise Other",
+  "Sunrise Pyrotechnic",
+  "Sunrise Toxins",
   "Toxins",
   "Trauma Station Drinks",
   "Trauma Station Narcotics",
@@ -85879,6 +89011,314 @@
    "reaction": "ADTLiquidDarkMatter",
    "amount": 1,
    "catalyst": false
+  },
+  {
+   "from": "FluorosulfuricAcid",
+   "to": "UniversalSolvent",
+   "reaction": "UniversalSolvent",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "Bleach",
+   "to": "UniversalSolvent",
+   "reaction": "UniversalSolvent",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "Vestine",
+   "to": "UniversalSolvent",
+   "reaction": "UniversalSolvent",
+   "amount": 4,
+   "catalyst": false
+  },
+  {
+   "from": "Rum",
+   "to": "DarkAndStormy",
+   "reaction": "DarkAndStormy",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "Ale",
+   "to": "DarkAndStormy",
+   "reaction": "DarkAndStormy",
+   "amount": 2,
+   "catalyst": false
+  },
+  {
+   "from": "Beer",
+   "to": "Butterbeer",
+   "reaction": "Butterbeer",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "Cream",
+   "to": "Butterbeer",
+   "reaction": "Butterbeer",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "BZ",
+   "to": "Halon",
+   "reaction": "BZElectrolysis",
+   "amount": 2.1,
+   "catalyst": false
+  },
+  {
+   "from": "BZ",
+   "to": "Oxygen",
+   "reaction": "BZElectrolysis",
+   "amount": 2.1,
+   "catalyst": false
+  },
+  {
+   "from": "Zauker",
+   "to": "Oxygen",
+   "reaction": "ZaukerDecay",
+   "amount": 2.1,
+   "catalyst": false
+  },
+  {
+   "from": "Oxygen",
+   "to": "Oxygen",
+   "reaction": "ZaukerDecay",
+   "amount": 0.01,
+   "catalyst": false
+  },
+  {
+   "from": "Zauker",
+   "to": "Nitrogen",
+   "reaction": "ZaukerDecay",
+   "amount": 2.1,
+   "catalyst": false
+  },
+  {
+   "from": "Oxygen",
+   "to": "Nitrogen",
+   "reaction": "ZaukerDecay",
+   "amount": 0.01,
+   "catalyst": false
+  },
+  {
+   "from": "Doxarubixadone",
+   "to": "Celliminol",
+   "reaction": "Celliminol",
+   "amount": 5,
+   "catalyst": false
+  },
+  {
+   "from": "Omnizine",
+   "to": "Celliminol",
+   "reaction": "Celliminol",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "Blood",
+   "to": "Celliminol",
+   "reaction": "Celliminol",
+   "amount": 10,
+   "catalyst": false
+  },
+  {
+   "from": "Phalanximine",
+   "to": "StableMutagen",
+   "reaction": "StableMutagen",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "Doxarubixadone",
+   "to": "StableMutagen",
+   "reaction": "StableMutagen",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "UnstableMutagen",
+   "to": "StableMutagen",
+   "reaction": "StableMutagen",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "Blood",
+   "to": "Darvinium",
+   "reaction": "Darvinium",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "UnstableMutagen",
+   "to": "Darvinium",
+   "reaction": "Darvinium",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "StableMutagen",
+   "to": "Darvinium",
+   "reaction": "Darvinium",
+   "amount": 3,
+   "catalyst": false
+  },
+  {
+   "from": "Oil",
+   "to": "Inc",
+   "reaction": "Inc",
+   "amount": 5,
+   "catalyst": false
+  },
+  {
+   "from": "Ethanol",
+   "to": "Inc",
+   "reaction": "Inc",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "Ash",
+   "to": "Inc",
+   "reaction": "Inc",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "Sulfur",
+   "to": "Inc",
+   "reaction": "Inc",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "Arithrazine",
+   "to": "H-32",
+   "reaction": "H-32",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "Bicaridine",
+   "to": "H-32",
+   "reaction": "H-32",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "Cryoxadone",
+   "to": "H-32",
+   "reaction": "H-32",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "Plasma",
+   "to": "H-32",
+   "reaction": "H-32",
+   "amount": 1,
+   "catalyst": true
+  },
+  {
+   "from": "Ultravasculine",
+   "to": "Antidon",
+   "reaction": "Antidon",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "Cryoxadone",
+   "to": "Antidon",
+   "reaction": "Antidon",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "Epinephrine",
+   "to": "Antidon",
+   "reaction": "Antidon",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "Bicaridine",
+   "to": "Brutedon",
+   "reaction": "Brutedon",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "Cryoxadone",
+   "to": "Brutedon",
+   "reaction": "Brutedon",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "Epinephrine",
+   "to": "Brutedon",
+   "reaction": "Brutedon",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "Plasma",
+   "to": "Brutedon",
+   "reaction": "Brutedon",
+   "amount": 1,
+   "catalyst": true
+  },
+  {
+   "from": "Cryoxadone",
+   "to": "Nutricryokomp",
+   "reaction": "Nutricryokomp",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "Iron",
+   "to": "Nutricryokomp",
+   "reaction": "Nutricryokomp",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "Iodine",
+   "to": "Nutricryokomp",
+   "reaction": "Nutricryokomp",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "Nutriment",
+   "to": "Nutricryokomp",
+   "reaction": "Nutricryokomp",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "Saline",
+   "to": "Nutricryokomp",
+   "reaction": "Nutricryokomp",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "Plasma",
+   "to": "UE",
+   "reaction": "UE",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "Radium",
+   "to": "UE",
+   "reaction": "UE",
+   "amount": 1,
+   "catalyst": false
   }
  ],
  "sources": {
@@ -86671,6 +90111,60 @@
       "authoredTier": "easy",
       "mismatch": true,
       "mismatchReason": "deep reaction chain (depth 4)"
+     },
+     "sunrise": {
+      "tier": "hard",
+      "effortScore": 10,
+      "breakdown": {
+       "ingredients": [
+        {
+         "id": "ChloralHydrate",
+         "tier": "self-chem",
+         "weight": 1,
+         "reason": "Chemistry reaction from dispenser base"
+        },
+        {
+         "id": "Lexorin",
+         "tier": "unknown",
+         "weight": 5,
+         "reason": "Recipe exists but a deep-chain ingredient is unresolved by extractor (likely plant-mutation, mob-drop, or cooking product)"
+        }
+       ],
+       "reactionDepth": 4,
+       "crossDepartmentPenalty": 0,
+       "temperatureConstraintPenalty": 0,
+       "unobtainablePenalty": 0
+      },
+      "authoredTier": "easy",
+      "mismatch": true,
+      "mismatchReason": "deep reaction chain (depth 4)"
+     },
+     "fish": {
+      "tier": "hard",
+      "effortScore": 10,
+      "breakdown": {
+       "ingredients": [
+        {
+         "id": "ChloralHydrate",
+         "tier": "self-chem",
+         "weight": 1,
+         "reason": "Chemistry reaction from dispenser base"
+        },
+        {
+         "id": "Lexorin",
+         "tier": "unknown",
+         "weight": 5,
+         "reason": "Recipe exists but a deep-chain ingredient is unresolved by extractor (likely plant-mutation, mob-drop, or cooking product)"
+        }
+       ],
+       "reactionDepth": 4,
+       "crossDepartmentPenalty": 0,
+       "temperatureConstraintPenalty": 0,
+       "unobtainablePenalty": 0
+      },
+      "authoredTier": "easy",
+      "mismatch": true,
+      "mismatchReason": "deep reaction chain (depth 4)"
      }
     },
     "tierVariesAcrossForks": true
@@ -87229,6 +90723,72 @@
       "authoredTier": "medium",
       "mismatch": false,
       "mismatchReason": ""
+     },
+     "sunrise": {
+      "tier": "medium",
+      "effortScore": 8,
+      "breakdown": {
+       "ingredients": [
+        {
+         "id": "PolytrinicAcid",
+         "tier": "cross-botany",
+         "weight": 2,
+         "reason": "Recipe requires cross-botany ingredient(s)"
+        },
+        {
+         "id": "Fluorosurfactant",
+         "tier": "cross-botany",
+         "weight": 2,
+         "reason": "Recipe requires cross-botany ingredient(s)"
+        },
+        {
+         "id": "Water",
+         "tier": "dispenser",
+         "weight": 0,
+         "reason": "Chemical Dispenser"
+        }
+       ],
+       "reactionDepth": 2,
+       "crossDepartmentPenalty": 2,
+       "temperatureConstraintPenalty": 0,
+       "unobtainablePenalty": 0
+      },
+      "authoredTier": "medium",
+      "mismatch": false,
+      "mismatchReason": ""
+     },
+     "fish": {
+      "tier": "medium",
+      "effortScore": 8,
+      "breakdown": {
+       "ingredients": [
+        {
+         "id": "PolytrinicAcid",
+         "tier": "cross-botany",
+         "weight": 2,
+         "reason": "Recipe requires cross-botany ingredient(s)"
+        },
+        {
+         "id": "Fluorosurfactant",
+         "tier": "cross-botany",
+         "weight": 2,
+         "reason": "Recipe requires cross-botany ingredient(s)"
+        },
+        {
+         "id": "Water",
+         "tier": "dispenser",
+         "weight": 0,
+         "reason": "Chemical Dispenser"
+        }
+       ],
+       "reactionDepth": 2,
+       "crossDepartmentPenalty": 2,
+       "temperatureConstraintPenalty": 0,
+       "unobtainablePenalty": 0
+      },
+      "authoredTier": "medium",
+      "mismatch": false,
+      "mismatchReason": ""
      }
     },
     "tierVariesAcrossForks": false
@@ -87662,6 +91222,60 @@
       "mismatchReason": ""
      },
      "adt": {
+      "tier": "trivial",
+      "effortScore": 0,
+      "breakdown": {
+       "ingredients": [
+        {
+         "id": "Potassium",
+         "tier": "dispenser",
+         "weight": 0,
+         "reason": "Chemical Dispenser"
+        },
+        {
+         "id": "Water",
+         "tier": "dispenser",
+         "weight": 0,
+         "reason": "Chemical Dispenser"
+        }
+       ],
+       "reactionDepth": 0,
+       "crossDepartmentPenalty": 0,
+       "temperatureConstraintPenalty": 0,
+       "unobtainablePenalty": 0
+      },
+      "authoredTier": "easy",
+      "mismatch": true,
+      "mismatchReason": ""
+     },
+     "sunrise": {
+      "tier": "trivial",
+      "effortScore": 0,
+      "breakdown": {
+       "ingredients": [
+        {
+         "id": "Potassium",
+         "tier": "dispenser",
+         "weight": 0,
+         "reason": "Chemical Dispenser"
+        },
+        {
+         "id": "Water",
+         "tier": "dispenser",
+         "weight": 0,
+         "reason": "Chemical Dispenser"
+        }
+       ],
+       "reactionDepth": 0,
+       "crossDepartmentPenalty": 0,
+       "temperatureConstraintPenalty": 0,
+       "unobtainablePenalty": 0
+      },
+      "authoredTier": "easy",
+      "mismatch": true,
+      "mismatchReason": ""
+     },
+     "fish": {
       "tier": "trivial",
       "effortScore": 0,
       "breakdown": {
@@ -88347,6 +91961,84 @@
       "authoredTier": "medium",
       "mismatch": true,
       "mismatchReason": "deep reaction chain (depth 4)"
+     },
+     "sunrise": {
+      "tier": "hard",
+      "effortScore": 9,
+      "breakdown": {
+       "ingredients": [
+        {
+         "id": "Phosphorus",
+         "tier": "dispenser",
+         "weight": 0,
+         "reason": "Chemical Dispenser"
+        },
+        {
+         "id": "Potassium",
+         "tier": "dispenser",
+         "weight": 0,
+         "reason": "Chemical Dispenser"
+        },
+        {
+         "id": "Sugar",
+         "tier": "dispenser",
+         "weight": 0,
+         "reason": "Chemical Dispenser"
+        },
+        {
+         "id": "Lexorin",
+         "tier": "unknown",
+         "weight": 5,
+         "reason": "Recipe exists but a deep-chain ingredient is unresolved by extractor (likely plant-mutation, mob-drop, or cooking product)"
+        }
+       ],
+       "reactionDepth": 4,
+       "crossDepartmentPenalty": 0,
+       "temperatureConstraintPenalty": 0,
+       "unobtainablePenalty": 0
+      },
+      "authoredTier": "medium",
+      "mismatch": true,
+      "mismatchReason": "deep reaction chain (depth 4)"
+     },
+     "fish": {
+      "tier": "hard",
+      "effortScore": 9,
+      "breakdown": {
+       "ingredients": [
+        {
+         "id": "Phosphorus",
+         "tier": "dispenser",
+         "weight": 0,
+         "reason": "Chemical Dispenser"
+        },
+        {
+         "id": "Potassium",
+         "tier": "dispenser",
+         "weight": 0,
+         "reason": "Chemical Dispenser"
+        },
+        {
+         "id": "Sugar",
+         "tier": "dispenser",
+         "weight": 0,
+         "reason": "Chemical Dispenser"
+        },
+        {
+         "id": "Lexorin",
+         "tier": "unknown",
+         "weight": 5,
+         "reason": "Recipe exists but a deep-chain ingredient is unresolved by extractor (likely plant-mutation, mob-drop, or cooking product)"
+        }
+       ],
+       "reactionDepth": 4,
+       "crossDepartmentPenalty": 0,
+       "temperatureConstraintPenalty": 0,
+       "unobtainablePenalty": 0
+      },
+      "authoredTier": "medium",
+      "mismatch": true,
+      "mismatchReason": "deep reaction chain (depth 4)"
      }
     },
     "tierVariesAcrossForks": false
@@ -88905,6 +92597,72 @@
       "authoredTier": "hard",
       "mismatch": true,
       "mismatchReason": "cross-department ingredient(s)"
+     },
+     "sunrise": {
+      "tier": "medium",
+      "effortScore": 7,
+      "breakdown": {
+       "ingredients": [
+        {
+         "id": "Napalm",
+         "tier": "self-chem",
+         "weight": 1,
+         "reason": "Chemistry reaction from dispenser base"
+        },
+        {
+         "id": "Fluorosurfactant",
+         "tier": "cross-botany",
+         "weight": 2,
+         "reason": "Recipe requires cross-botany ingredient(s)"
+        },
+        {
+         "id": "Water",
+         "tier": "dispenser",
+         "weight": 0,
+         "reason": "Chemical Dispenser"
+        }
+       ],
+       "reactionDepth": 2,
+       "crossDepartmentPenalty": 2,
+       "temperatureConstraintPenalty": 0,
+       "unobtainablePenalty": 0
+      },
+      "authoredTier": "hard",
+      "mismatch": true,
+      "mismatchReason": "cross-department ingredient(s)"
+     },
+     "fish": {
+      "tier": "medium",
+      "effortScore": 7,
+      "breakdown": {
+       "ingredients": [
+        {
+         "id": "Napalm",
+         "tier": "self-chem",
+         "weight": 1,
+         "reason": "Chemistry reaction from dispenser base"
+        },
+        {
+         "id": "Fluorosurfactant",
+         "tier": "cross-botany",
+         "weight": 2,
+         "reason": "Recipe requires cross-botany ingredient(s)"
+        },
+        {
+         "id": "Water",
+         "tier": "dispenser",
+         "weight": 0,
+         "reason": "Chemical Dispenser"
+        }
+       ],
+       "reactionDepth": 2,
+       "crossDepartmentPenalty": 2,
+       "temperatureConstraintPenalty": 0,
+       "unobtainablePenalty": 0
+      },
+      "authoredTier": "hard",
+      "mismatch": true,
+      "mismatchReason": "cross-department ingredient(s)"
      }
     },
     "tierVariesAcrossForks": false
@@ -89248,6 +93006,48 @@
       "mismatchReason": "cross-department ingredient(s)"
      },
      "adt": {
+      "tier": "easy",
+      "effortScore": 4,
+      "breakdown": {
+       "ingredients": [
+        {
+         "id": "Histamine",
+         "tier": "cross-botany",
+         "weight": 2,
+         "reason": "Requires Botany: Nettle (plant)"
+        }
+       ],
+       "reactionDepth": 0,
+       "crossDepartmentPenalty": 2,
+       "temperatureConstraintPenalty": 0,
+       "unobtainablePenalty": 0
+      },
+      "authoredTier": "expert",
+      "mismatch": true,
+      "mismatchReason": "cross-department ingredient(s)"
+     },
+     "sunrise": {
+      "tier": "easy",
+      "effortScore": 4,
+      "breakdown": {
+       "ingredients": [
+        {
+         "id": "Histamine",
+         "tier": "cross-botany",
+         "weight": 2,
+         "reason": "Requires Botany: Nettle (plant)"
+        }
+       ],
+       "reactionDepth": 0,
+       "crossDepartmentPenalty": 2,
+       "temperatureConstraintPenalty": 0,
+       "unobtainablePenalty": 0
+      },
+      "authoredTier": "expert",
+      "mismatch": true,
+      "mismatchReason": "cross-department ingredient(s)"
+     },
+     "fish": {
       "tier": "easy",
       "effortScore": 4,
       "breakdown": {
@@ -89701,6 +93501,60 @@
       "mismatchReason": ""
      },
      "adt": {
+      "tier": "medium",
+      "effortScore": 8,
+      "breakdown": {
+       "ingredients": [
+        {
+         "id": "ChloralHydrate",
+         "tier": "self-chem",
+         "weight": 1,
+         "reason": "Chemistry reaction from dispenser base"
+        },
+        {
+         "id": "Nocturine",
+         "tier": "unknown",
+         "weight": 5,
+         "reason": "Recipe exists but a deep-chain ingredient is unresolved by extractor (likely plant-mutation, mob-drop, or cooking product)"
+        }
+       ],
+       "reactionDepth": 2,
+       "crossDepartmentPenalty": 0,
+       "temperatureConstraintPenalty": 0,
+       "unobtainablePenalty": 0
+      },
+      "authoredTier": "easy",
+      "mismatch": true,
+      "mismatchReason": ""
+     },
+     "sunrise": {
+      "tier": "medium",
+      "effortScore": 8,
+      "breakdown": {
+       "ingredients": [
+        {
+         "id": "ChloralHydrate",
+         "tier": "self-chem",
+         "weight": 1,
+         "reason": "Chemistry reaction from dispenser base"
+        },
+        {
+         "id": "Nocturine",
+         "tier": "unknown",
+         "weight": 5,
+         "reason": "Recipe exists but a deep-chain ingredient is unresolved by extractor (likely plant-mutation, mob-drop, or cooking product)"
+        }
+       ],
+       "reactionDepth": 2,
+       "crossDepartmentPenalty": 0,
+       "temperatureConstraintPenalty": 0,
+       "unobtainablePenalty": 0
+      },
+      "authoredTier": "easy",
+      "mismatch": true,
+      "mismatchReason": ""
+     },
+     "fish": {
       "tier": "medium",
       "effortScore": 8,
       "breakdown": {
@@ -90284,6 +94138,72 @@
       "authoredTier": "easy",
       "mismatch": true,
       "mismatchReason": ""
+     },
+     "sunrise": {
+      "tier": "trivial",
+      "effortScore": 0,
+      "breakdown": {
+       "ingredients": [
+        {
+         "id": "Aluminium",
+         "tier": "dispenser",
+         "weight": 0,
+         "reason": "Chemical Dispenser"
+        },
+        {
+         "id": "Potassium",
+         "tier": "dispenser",
+         "weight": 0,
+         "reason": "Chemical Dispenser"
+        },
+        {
+         "id": "Sulfur",
+         "tier": "dispenser",
+         "weight": 0,
+         "reason": "Chemical Dispenser"
+        }
+       ],
+       "reactionDepth": 0,
+       "crossDepartmentPenalty": 0,
+       "temperatureConstraintPenalty": 0,
+       "unobtainablePenalty": 0
+      },
+      "authoredTier": "easy",
+      "mismatch": true,
+      "mismatchReason": ""
+     },
+     "fish": {
+      "tier": "trivial",
+      "effortScore": 0,
+      "breakdown": {
+       "ingredients": [
+        {
+         "id": "Aluminium",
+         "tier": "dispenser",
+         "weight": 0,
+         "reason": "Chemical Dispenser"
+        },
+        {
+         "id": "Potassium",
+         "tier": "dispenser",
+         "weight": 0,
+         "reason": "Chemical Dispenser"
+        },
+        {
+         "id": "Sulfur",
+         "tier": "dispenser",
+         "weight": 0,
+         "reason": "Chemical Dispenser"
+        }
+       ],
+       "reactionDepth": 0,
+       "crossDepartmentPenalty": 0,
+       "temperatureConstraintPenalty": 0,
+       "unobtainablePenalty": 0
+      },
+      "authoredTier": "easy",
+      "mismatch": true,
+      "mismatchReason": ""
      }
     },
     "tierVariesAcrossForks": false
@@ -90626,6 +94546,48 @@
       "mismatchReason": "temperature-constrained reaction"
      },
      "adt": {
+      "tier": "medium",
+      "effortScore": 7,
+      "breakdown": {
+       "ingredients": [
+        {
+         "id": "ChlorineTrifluoride",
+         "tier": "self-chem",
+         "weight": 1,
+         "reason": "Chemistry reaction from dispenser base"
+        }
+       ],
+       "reactionDepth": 1,
+       "crossDepartmentPenalty": 0,
+       "temperatureConstraintPenalty": 5,
+       "unobtainablePenalty": 0
+      },
+      "authoredTier": "hard",
+      "mismatch": true,
+      "mismatchReason": "temperature-constrained reaction"
+     },
+     "sunrise": {
+      "tier": "medium",
+      "effortScore": 7,
+      "breakdown": {
+       "ingredients": [
+        {
+         "id": "ChlorineTrifluoride",
+         "tier": "self-chem",
+         "weight": 1,
+         "reason": "Chemistry reaction from dispenser base"
+        }
+       ],
+       "reactionDepth": 1,
+       "crossDepartmentPenalty": 0,
+       "temperatureConstraintPenalty": 5,
+       "unobtainablePenalty": 0
+      },
+      "authoredTier": "hard",
+      "mismatch": true,
+      "mismatchReason": "temperature-constrained reaction"
+     },
+     "fish": {
       "tier": "medium",
       "effortScore": 7,
       "breakdown": {
@@ -91305,6 +95267,84 @@
       "authoredTier": "medium",
       "mismatch": true,
       "mismatchReason": ""
+     },
+     "sunrise": {
+      "tier": "easy",
+      "effortScore": 2,
+      "breakdown": {
+       "ingredients": [
+        {
+         "id": "Phosphorus",
+         "tier": "dispenser",
+         "weight": 0,
+         "reason": "Chemical Dispenser"
+        },
+        {
+         "id": "Potassium",
+         "tier": "dispenser",
+         "weight": 0,
+         "reason": "Chemical Dispenser"
+        },
+        {
+         "id": "Sugar",
+         "tier": "dispenser",
+         "weight": 0,
+         "reason": "Chemical Dispenser"
+        },
+        {
+         "id": "UnstableMutagen",
+         "tier": "self-chem",
+         "weight": 1,
+         "reason": "Chemistry reaction from dispenser base"
+        }
+       ],
+       "reactionDepth": 1,
+       "crossDepartmentPenalty": 0,
+       "temperatureConstraintPenalty": 0,
+       "unobtainablePenalty": 0
+      },
+      "authoredTier": "medium",
+      "mismatch": true,
+      "mismatchReason": ""
+     },
+     "fish": {
+      "tier": "easy",
+      "effortScore": 2,
+      "breakdown": {
+       "ingredients": [
+        {
+         "id": "Phosphorus",
+         "tier": "dispenser",
+         "weight": 0,
+         "reason": "Chemical Dispenser"
+        },
+        {
+         "id": "Potassium",
+         "tier": "dispenser",
+         "weight": 0,
+         "reason": "Chemical Dispenser"
+        },
+        {
+         "id": "Sugar",
+         "tier": "dispenser",
+         "weight": 0,
+         "reason": "Chemical Dispenser"
+        },
+        {
+         "id": "UnstableMutagen",
+         "tier": "self-chem",
+         "weight": 1,
+         "reason": "Chemistry reaction from dispenser base"
+        }
+       ],
+       "reactionDepth": 1,
+       "crossDepartmentPenalty": 0,
+       "temperatureConstraintPenalty": 0,
+       "unobtainablePenalty": 0
+      },
+      "authoredTier": "medium",
+      "mismatch": true,
+      "mismatchReason": ""
      }
     },
     "tierVariesAcrossForks": false
@@ -91647,6 +95687,48 @@
       "mismatchReason": "temperature-constrained reaction"
      },
      "adt": {
+      "tier": "medium",
+      "effortScore": 7,
+      "breakdown": {
+       "ingredients": [
+        {
+         "id": "ChlorineTrifluoride",
+         "tier": "self-chem",
+         "weight": 1,
+         "reason": "Chemistry reaction from dispenser base"
+        }
+       ],
+       "reactionDepth": 1,
+       "crossDepartmentPenalty": 0,
+       "temperatureConstraintPenalty": 5,
+       "unobtainablePenalty": 0
+      },
+      "authoredTier": "hard",
+      "mismatch": true,
+      "mismatchReason": "temperature-constrained reaction"
+     },
+     "sunrise": {
+      "tier": "medium",
+      "effortScore": 7,
+      "breakdown": {
+       "ingredients": [
+        {
+         "id": "ChlorineTrifluoride",
+         "tier": "self-chem",
+         "weight": 1,
+         "reason": "Chemistry reaction from dispenser base"
+        }
+       ],
+       "reactionDepth": 1,
+       "crossDepartmentPenalty": 0,
+       "temperatureConstraintPenalty": 5,
+       "unobtainablePenalty": 0
+      },
+      "authoredTier": "hard",
+      "mismatch": true,
+      "mismatchReason": "temperature-constrained reaction"
+     },
+     "fish": {
       "tier": "medium",
       "effortScore": 7,
       "breakdown": {
@@ -92127,6 +96209,60 @@
       "authoredTier": "medium",
       "mismatch": true,
       "mismatchReason": "cross-department ingredient(s); temperature-constrained reaction; deep reaction chain (depth 4)"
+     },
+     "sunrise": {
+      "tier": "expert",
+      "effortScore": 18,
+      "breakdown": {
+       "ingredients": [
+        {
+         "id": "MuteToxin",
+         "tier": "cross-botany",
+         "weight": 2,
+         "reason": "Requires Botany: Mimana (plant)"
+        },
+        {
+         "id": "Lexorin",
+         "tier": "unknown",
+         "weight": 5,
+         "reason": "Recipe exists but a deep-chain ingredient is unresolved by extractor (likely plant-mutation, mob-drop, or cooking product)"
+        }
+       ],
+       "reactionDepth": 4,
+       "crossDepartmentPenalty": 2,
+       "temperatureConstraintPenalty": 5,
+       "unobtainablePenalty": 0
+      },
+      "authoredTier": "medium",
+      "mismatch": true,
+      "mismatchReason": "cross-department ingredient(s); temperature-constrained reaction; deep reaction chain (depth 4)"
+     },
+     "fish": {
+      "tier": "expert",
+      "effortScore": 18,
+      "breakdown": {
+       "ingredients": [
+        {
+         "id": "MuteToxin",
+         "tier": "cross-botany",
+         "weight": 2,
+         "reason": "Requires Botany: Mimana (plant)"
+        },
+        {
+         "id": "Lexorin",
+         "tier": "unknown",
+         "weight": 5,
+         "reason": "Recipe exists but a deep-chain ingredient is unresolved by extractor (likely plant-mutation, mob-drop, or cooking product)"
+        }
+       ],
+       "reactionDepth": 4,
+       "crossDepartmentPenalty": 2,
+       "temperatureConstraintPenalty": 5,
+       "unobtainablePenalty": 0
+      },
+      "authoredTier": "medium",
+      "mismatch": true,
+      "mismatchReason": "cross-department ingredient(s); temperature-constrained reaction; deep reaction chain (depth 4)"
      }
     },
     "tierVariesAcrossForks": false
@@ -92467,6 +96603,48 @@
       "mismatchReason": "unobtainable ingredient present"
      },
      "adt": {
+      "tier": "impossible",
+      "effortScore": 1009,
+      "breakdown": {
+       "ingredients": [
+        {
+         "id": "Romerol",
+         "tier": "unobtainable",
+         "weight": 999,
+         "reason": "No recipe, no plant, no dispenser source"
+        }
+       ],
+       "reactionDepth": 0,
+       "crossDepartmentPenalty": 0,
+       "temperatureConstraintPenalty": 0,
+       "unobtainablePenalty": 10
+      },
+      "authoredTier": "hard",
+      "mismatch": true,
+      "mismatchReason": "unobtainable ingredient present"
+     },
+     "sunrise": {
+      "tier": "impossible",
+      "effortScore": 1009,
+      "breakdown": {
+       "ingredients": [
+        {
+         "id": "Romerol",
+         "tier": "unobtainable",
+         "weight": 999,
+         "reason": "No recipe, no plant, no dispenser source"
+        }
+       ],
+       "reactionDepth": 0,
+       "crossDepartmentPenalty": 0,
+       "temperatureConstraintPenalty": 0,
+       "unobtainablePenalty": 10
+      },
+      "authoredTier": "hard",
+      "mismatch": true,
+      "mismatchReason": "unobtainable ingredient present"
+     },
+     "fish": {
       "tier": "impossible",
       "effortScore": 1009,
       "breakdown": {
@@ -92845,6 +97023,48 @@
       "authoredTier": "medium",
       "mismatch": true,
       "mismatchReason": "cross-department ingredient(s); deep reaction chain (depth 5)"
+     },
+     "sunrise": {
+      "tier": "hard",
+      "effortScore": 9,
+      "breakdown": {
+       "ingredients": [
+        {
+         "id": "Hemorrhinol",
+         "tier": "cross-botany",
+         "weight": 2,
+         "reason": "Recipe requires cross-botany ingredient(s)"
+        }
+       ],
+       "reactionDepth": 5,
+       "crossDepartmentPenalty": 2,
+       "temperatureConstraintPenalty": 0,
+       "unobtainablePenalty": 0
+      },
+      "authoredTier": "medium",
+      "mismatch": true,
+      "mismatchReason": "cross-department ingredient(s); deep reaction chain (depth 5)"
+     },
+     "fish": {
+      "tier": "hard",
+      "effortScore": 9,
+      "breakdown": {
+       "ingredients": [
+        {
+         "id": "Hemorrhinol",
+         "tier": "cross-botany",
+         "weight": 2,
+         "reason": "Recipe requires cross-botany ingredient(s)"
+        }
+       ],
+       "reactionDepth": 5,
+       "crossDepartmentPenalty": 2,
+       "temperatureConstraintPenalty": 0,
+       "unobtainablePenalty": 0
+      },
+      "authoredTier": "medium",
+      "mismatch": true,
+      "mismatchReason": "cross-department ingredient(s); deep reaction chain (depth 5)"
      }
     },
     "tierVariesAcrossForks": true
@@ -93184,6 +97404,48 @@
       "mismatchReason": ""
      },
      "adt": {
+      "tier": "medium",
+      "effortScore": 7,
+      "breakdown": {
+       "ingredients": [
+        {
+         "id": "Tazinide",
+         "tier": "unknown",
+         "weight": 5,
+         "reason": "Recipe exists but a deep-chain ingredient is unresolved by extractor (likely plant-mutation, mob-drop, or cooking product)"
+        }
+       ],
+       "reactionDepth": 2,
+       "crossDepartmentPenalty": 0,
+       "temperatureConstraintPenalty": 0,
+       "unobtainablePenalty": 0
+      },
+      "authoredTier": "expert",
+      "mismatch": true,
+      "mismatchReason": ""
+     },
+     "sunrise": {
+      "tier": "medium",
+      "effortScore": 7,
+      "breakdown": {
+       "ingredients": [
+        {
+         "id": "Tazinide",
+         "tier": "unknown",
+         "weight": 5,
+         "reason": "Recipe exists but a deep-chain ingredient is unresolved by extractor (likely plant-mutation, mob-drop, or cooking product)"
+        }
+       ],
+       "reactionDepth": 2,
+       "crossDepartmentPenalty": 0,
+       "temperatureConstraintPenalty": 0,
+       "unobtainablePenalty": 0
+      },
+      "authoredTier": "expert",
+      "mismatch": true,
+      "mismatchReason": ""
+     },
+     "fish": {
       "tier": "medium",
       "effortScore": 7,
       "breakdown": {
@@ -93731,6 +97993,72 @@
       "mismatchReason": "cross-department ingredient(s); temperature-constrained reaction; deep reaction chain (depth 4)"
      },
      "adt": {
+      "tier": "expert",
+      "effortScore": 19,
+      "breakdown": {
+       "ingredients": [
+        {
+         "id": "Stimulants",
+         "tier": "unknown",
+         "weight": 5,
+         "reason": "Recipe exists but a deep-chain ingredient is unresolved by extractor (likely plant-mutation, mob-drop, or cooking product)"
+        },
+        {
+         "id": "Dexalin",
+         "tier": "self-chem",
+         "weight": 1,
+         "reason": "Chemistry reaction from dispenser base"
+        },
+        {
+         "id": "Tricordrazine",
+         "tier": "cross-service",
+         "weight": 2,
+         "reason": "Service vending: NanoMed (pills)"
+        }
+       ],
+       "reactionDepth": 4,
+       "crossDepartmentPenalty": 2,
+       "temperatureConstraintPenalty": 5,
+       "unobtainablePenalty": 0
+      },
+      "authoredTier": "medium",
+      "mismatch": true,
+      "mismatchReason": "cross-department ingredient(s); temperature-constrained reaction; deep reaction chain (depth 4)"
+     },
+     "sunrise": {
+      "tier": "expert",
+      "effortScore": 19,
+      "breakdown": {
+       "ingredients": [
+        {
+         "id": "Stimulants",
+         "tier": "unknown",
+         "weight": 5,
+         "reason": "Recipe exists but a deep-chain ingredient is unresolved by extractor (likely plant-mutation, mob-drop, or cooking product)"
+        },
+        {
+         "id": "Dexalin",
+         "tier": "self-chem",
+         "weight": 1,
+         "reason": "Chemistry reaction from dispenser base"
+        },
+        {
+         "id": "Tricordrazine",
+         "tier": "cross-service",
+         "weight": 2,
+         "reason": "Service vending: NanoMed (pills)"
+        }
+       ],
+       "reactionDepth": 4,
+       "crossDepartmentPenalty": 2,
+       "temperatureConstraintPenalty": 5,
+       "unobtainablePenalty": 0
+      },
+      "authoredTier": "medium",
+      "mismatch": true,
+      "mismatchReason": "cross-department ingredient(s); temperature-constrained reaction; deep reaction chain (depth 4)"
+     },
+     "fish": {
       "tier": "expert",
       "effortScore": 19,
       "breakdown": {
@@ -94421,6 +98749,84 @@
       "authoredTier": "medium",
       "mismatch": true,
       "mismatchReason": "unobtainable ingredient present"
+     },
+     "sunrise": {
+      "tier": "impossible",
+      "effortScore": 1009,
+      "breakdown": {
+       "ingredients": [
+        {
+         "id": "Phosphorus",
+         "tier": "dispenser",
+         "weight": 0,
+         "reason": "Chemical Dispenser"
+        },
+        {
+         "id": "Potassium",
+         "tier": "dispenser",
+         "weight": 0,
+         "reason": "Chemical Dispenser"
+        },
+        {
+         "id": "Sugar",
+         "tier": "dispenser",
+         "weight": 0,
+         "reason": "Chemical Dispenser"
+        },
+        {
+         "id": "TearGas",
+         "tier": "unobtainable",
+         "weight": 999,
+         "reason": "No recipe, no plant, no dispenser source"
+        }
+       ],
+       "reactionDepth": 0,
+       "crossDepartmentPenalty": 0,
+       "temperatureConstraintPenalty": 0,
+       "unobtainablePenalty": 10
+      },
+      "authoredTier": "medium",
+      "mismatch": true,
+      "mismatchReason": "unobtainable ingredient present"
+     },
+     "fish": {
+      "tier": "impossible",
+      "effortScore": 1009,
+      "breakdown": {
+       "ingredients": [
+        {
+         "id": "Phosphorus",
+         "tier": "dispenser",
+         "weight": 0,
+         "reason": "Chemical Dispenser"
+        },
+        {
+         "id": "Potassium",
+         "tier": "dispenser",
+         "weight": 0,
+         "reason": "Chemical Dispenser"
+        },
+        {
+         "id": "Sugar",
+         "tier": "dispenser",
+         "weight": 0,
+         "reason": "Chemical Dispenser"
+        },
+        {
+         "id": "TearGas",
+         "tier": "unobtainable",
+         "weight": 999,
+         "reason": "No recipe, no plant, no dispenser source"
+        }
+       ],
+       "reactionDepth": 0,
+       "crossDepartmentPenalty": 0,
+       "temperatureConstraintPenalty": 0,
+       "unobtainablePenalty": 10
+      },
+      "authoredTier": "medium",
+      "mismatch": true,
+      "mismatchReason": "unobtainable ingredient present"
      }
     },
     "tierVariesAcrossForks": false
@@ -94855,6 +99261,60 @@
       "mismatchReason": "unobtainable ingredient present; cross-department ingredient(s); deep reaction chain (depth 4)"
      },
      "adt": {
+      "tier": "impossible",
+      "effortScore": 1017,
+      "breakdown": {
+       "ingredients": [
+        {
+         "id": "Happiness",
+         "tier": "cross-botany",
+         "weight": 2,
+         "reason": "Requires Botany: Rainbow Cannabis (plant)"
+        },
+        {
+         "id": "Honk",
+         "tier": "unobtainable",
+         "weight": 999,
+         "reason": "No recipe, no plant, no dispenser source"
+        }
+       ],
+       "reactionDepth": 4,
+       "crossDepartmentPenalty": 2,
+       "temperatureConstraintPenalty": 0,
+       "unobtainablePenalty": 10
+      },
+      "authoredTier": "easy",
+      "mismatch": true,
+      "mismatchReason": "unobtainable ingredient present; cross-department ingredient(s); deep reaction chain (depth 4)"
+     },
+     "sunrise": {
+      "tier": "impossible",
+      "effortScore": 1017,
+      "breakdown": {
+       "ingredients": [
+        {
+         "id": "Happiness",
+         "tier": "cross-botany",
+         "weight": 2,
+         "reason": "Requires Botany: Rainbow Cannabis (plant)"
+        },
+        {
+         "id": "Honk",
+         "tier": "unobtainable",
+         "weight": 999,
+         "reason": "No recipe, no plant, no dispenser source"
+        }
+       ],
+       "reactionDepth": 4,
+       "crossDepartmentPenalty": 2,
+       "temperatureConstraintPenalty": 0,
+       "unobtainablePenalty": 10
+      },
+      "authoredTier": "easy",
+      "mismatch": true,
+      "mismatchReason": "unobtainable ingredient present; cross-department ingredient(s); deep reaction chain (depth 4)"
+     },
+     "fish": {
       "tier": "impossible",
       "effortScore": 1017,
       "breakdown": {
@@ -95338,6 +99798,60 @@
       "authoredTier": "expert",
       "mismatch": true,
       "mismatchReason": "cross-department ingredient(s); deep reaction chain (depth 5)"
+     },
+     "sunrise": {
+      "tier": "hard",
+      "effortScore": 11,
+      "breakdown": {
+       "ingredients": [
+        {
+         "id": "Felinase",
+         "tier": "cross-botany",
+         "weight": 2,
+         "reason": "Recipe requires cross-botany ingredient(s)"
+        },
+        {
+         "id": "Caninase",
+         "tier": "cross-botany",
+         "weight": 2,
+         "reason": "Recipe requires cross-botany ingredient(s)"
+        }
+       ],
+       "reactionDepth": 5,
+       "crossDepartmentPenalty": 2,
+       "temperatureConstraintPenalty": 0,
+       "unobtainablePenalty": 0
+      },
+      "authoredTier": "expert",
+      "mismatch": true,
+      "mismatchReason": "cross-department ingredient(s); deep reaction chain (depth 5)"
+     },
+     "fish": {
+      "tier": "hard",
+      "effortScore": 11,
+      "breakdown": {
+       "ingredients": [
+        {
+         "id": "Felinase",
+         "tier": "cross-botany",
+         "weight": 2,
+         "reason": "Recipe requires cross-botany ingredient(s)"
+        },
+        {
+         "id": "Caninase",
+         "tier": "cross-botany",
+         "weight": 2,
+         "reason": "Recipe requires cross-botany ingredient(s)"
+        }
+       ],
+       "reactionDepth": 5,
+       "crossDepartmentPenalty": 2,
+       "temperatureConstraintPenalty": 0,
+       "unobtainablePenalty": 0
+      },
+      "authoredTier": "expert",
+      "mismatch": true,
+      "mismatchReason": "cross-department ingredient(s); deep reaction chain (depth 5)"
      }
     },
     "tierVariesAcrossForks": true
@@ -95681,6 +100195,48 @@
       "mismatchReason": ""
      },
      "adt": {
+      "tier": "easy",
+      "effortScore": 2,
+      "breakdown": {
+       "ingredients": [
+        {
+         "id": "Thermite",
+         "tier": "self-chem",
+         "weight": 1,
+         "reason": "Chemistry reaction from dispenser base"
+        }
+       ],
+       "reactionDepth": 1,
+       "crossDepartmentPenalty": 0,
+       "temperatureConstraintPenalty": 0,
+       "unobtainablePenalty": 0
+      },
+      "authoredTier": "easy",
+      "mismatch": false,
+      "mismatchReason": ""
+     },
+     "sunrise": {
+      "tier": "easy",
+      "effortScore": 2,
+      "breakdown": {
+       "ingredients": [
+        {
+         "id": "Thermite",
+         "tier": "self-chem",
+         "weight": 1,
+         "reason": "Chemistry reaction from dispenser base"
+        }
+       ],
+       "reactionDepth": 1,
+       "crossDepartmentPenalty": 0,
+       "temperatureConstraintPenalty": 0,
+       "unobtainablePenalty": 0
+      },
+      "authoredTier": "easy",
+      "mismatch": false,
+      "mismatchReason": ""
+     },
+     "fish": {
       "tier": "easy",
       "effortScore": 2,
       "breakdown": {
