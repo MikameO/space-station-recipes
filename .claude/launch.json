@@ -4,7 +4,11 @@
     {
       "name": "ss14-chem",
       "runtimeExecutable": "python",
-      "runtimeArgs": ["-m", "http.server", "8090"],
+      "runtimeArgs": [
+        "-c",
+        "import os, http.server; http.server.test(HandlerClass=http.server.SimpleHTTPRequestHandler, port=int(os.environ.get('PORT', '8090')))"
+      ],
+      "autoPort": true,
       "port": 8090
     }
   ]

@@ -13,6 +13,14 @@
   var CARD_GAP = 14;        // gap between spotlight and card
   var CARD_MAX_W = 380;
 
+  // Metrika goals (tutorial_start / tutorial_done / tutorial_skip).
+  // Own copy of the guard — this module stays independent of app.js.
+  function tTrack(goal, params) {
+    try {
+      if (typeof ym === 'function') ym(108585248, 'reachGoal', goal, params);
+    } catch (e) { /* analytics must never break the tutorial */ }
+  }
+
   var STEPS = [
     {
       id: 'search',
@@ -139,6 +147,7 @@
     rootEl.querySelector('#tut-next').addEventListener('click', nextStep);
     rootEl.querySelector('#tut-back').addEventListener('click', prevStep);
     rootEl.querySelector('#tut-skip').addEventListener('click', function () {
+      tTrack('tutorial_skip', { step: currentIdx + 1 });
       endTutorial(true);
     });
     // Backdrop clicks intentionally do nothing.
@@ -148,13 +157,14 @@
     return rootEl;
   }
 
-  function startTutorial() {
+  function startTutorial(auto) {
     buildOverlay();
     lastFocus = document.activeElement;
     currentIdx = 0;
     rootEl.classList.add('active');
     document.body.style.overflow = 'hidden';
     attachGlobalListeners();
+    tTrack('tutorial_start', { auto: auto ? 1 : 0 });
     goToStep(0, 'forward');
   }
 
@@ -174,7 +184,7 @@
 
   function goToStep(i, dir) {
     if (i < 0) { i = 0; dir = 'forward'; }
-    if (i >= STEPS.length) { endTutorial(true); return; }
+    if (i >= STEPS.length) { tTrack('tutorial_done'); endTutorial(true); return; }
 
     var step = STEPS[i];
     if (step.onBefore) {
@@ -323,6 +333,7 @@
   function onKey(e) {
     if (e.key === 'Escape') {
       e.preventDefault();
+      tTrack('tutorial_skip', { step: currentIdx + 1 });
       endTutorial(true);
     } else if (e.key === 'ArrowRight') {
       nextStep();
@@ -368,7 +379,7 @@
   // data so the tutorial never draws on top of the loading overlay.
   function maybeAutoStart() {
     if (!safeLSGet()) {
-      setTimeout(startTutorial, 400);
+      setTimeout(function () { startTutorial(true); }, 400);
     }
   }
 

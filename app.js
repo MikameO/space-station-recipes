@@ -33,6 +33,37 @@ let antagFilterVerification = 'all';     // 'all'|'all-verified'|'partial'|'lore
 let antagFilterMethods      = new Set(); // subset of {inject, ingest, drink, food, area, grenade, splash, foam, smoke}
 
 // ─────────────────────────────────────────────
+// Analytics — Yandex.Metrika goal events
+// ─────────────────────────────────────────────
+// Thin wrapper: no-ops when the counter is blocked (adblock) or absent
+// (file:// dev), and must never break the app. Goal ids below have to be
+// registered in Metrika as "JavaScript event" goals with the same id;
+// params surface in the visit-params report.
+//
+// Goal ids sent from this file:
+//   tab_reactions / tab_calculator / tab_trees / tab_graph /
+//   tab_botany / tab_stats / tab_antag       — tab opened
+//   reagent_open {reagent, tab}              — detail panel opened
+//   fork_select {fork}                       — source filter changed
+//   search_used {q, tab, results}            — settled query with results
+//   search_zero {q, tab}                     — settled query, 0 results
+//   calc_run {target, amount}                — single recipe calculated
+//   batch_plan {targets}                     — batch planner run
+//   reverse_used {ingredient}                — reverse lookup ingredient added
+//   tree_built {reagent}                     — craft tree built
+//   share_click {tab, antag}                 — share link copied
+//   antag_on                                 — antag mode enabled
+//   strategy_to_batch {strategy}             — strategy loaded into batch
+// tutorial.js additionally sends: tutorial_start / tutorial_done / tutorial_skip
+
+const YM_COUNTER_ID = 108585248;
+function track(goal, params) {
+  try {
+    if (typeof ym === 'function') ym(YM_COUNTER_ID, 'reachGoal', goal, params);
+  } catch (e) { /* analytics must never break the app */ }
+}
+
+// ─────────────────────────────────────────────
 // Init
 // ─────────────────────────────────────────────
 
@@ -413,6 +444,7 @@ function buildSourceFilters() {
   container.querySelectorAll('input[name="source"]').forEach(radio => {
     radio.addEventListener('change', () => {
       activeSource = radio.value;
+      if (radio.value !== 'all') track('fork_select', { fork: radio.value });
       // Show disclaimer for forks with blocked reactions
       const disc = document.getElementById('forkDisclaimer');
       if (disc) {
@@ -454,6 +486,7 @@ function setupTabs() {
       const tab = btn.dataset.tab;
       document.getElementById('tab-' + tab).classList.add('active');
       activeTab = tab;
+      if (tab !== 'reagents') track('tab_' + tab); // reagents is the default view
       renderCurrentTab();
     });
   });
@@ -588,9 +621,19 @@ function renderBotany(query = '') {
 
 function setupSearch() {
   let timer;
-  document.getElementById('searchInput').addEventListener('input', (e) => {
+  let trackTimer;
+  const input = document.getElementById('searchInput');
+  input.addEventListener('input', () => {
     clearTimeout(timer);
     timer = setTimeout(() => renderCurrentTab(), 150);
+    // Longer debounce for analytics — capture settled queries, not keystrokes
+    clearTimeout(trackTimer);
+    trackTimer = setTimeout(() => {
+      const q = input.value.trim();
+      if (q.length < 2) return;
+      const results = activeTab === 'reactions' ? filterReactions(q).length : filterReagents(q).length;
+      track(results === 0 ? 'search_zero' : 'search_used', { q: q.slice(0, 100), tab: activeTab, results });
+    }, 1400);
   });
 }
 
@@ -1058,6 +1101,8 @@ function openDetail(reagentId, pushHistory = true) {
   if (pushHistory && selectedReagentId && selectedReagentId !== reagentId) {
     detailHistory.push(selectedReagentId);
   }
+  // pushHistory=false means a programmatic re-render (back nav, fork switch) — don't double-count
+  if (pushHistory) track('reagent_open', { reagent: reagentId, tab: activeTab });
   selectedReagentId = reagentId;
 
   const panel = document.getElementById('detailPanel');
@@ -1310,6 +1355,7 @@ function setupCraftTrees() {
     input.value = DATA.reagents[id]?.name || id;
     suggestions.classList.remove('open');
     currentTreeReagentId = id;
+    track('tree_built', { reagent: id });
     rebuildTree();
   });
 
@@ -1335,6 +1381,7 @@ function setupCalculator() {
   document.getElementById('calcBtn').addEventListener('click', () => {
     if (!selectedCalcId) return;
     const amount = parseFloat(document.getElementById('calcAmount').value) || 30;
+    track('calc_run', { target: selectedCalcId, amount });
     const result = calculateIngredients(selectedCalcId, amount);
     document.getElementById('batchResults').innerHTML = '';
     document.getElementById('batchWarnings').innerHTML = '';
@@ -1761,6 +1808,7 @@ function setupReverseLookup() {
 
   setupAutocomplete(input, suggestions, (id) => {
     selectedIngredients.add(id);
+    track('reverse_used', { ingredient: id });
     input.value = '';
     suggestions.classList.remove('open');
     renderChips();
@@ -1866,6 +1914,7 @@ function setupBatchPlanner() {
 
   document.getElementById('batchPlanBtn').addEventListener('click', () => {
     if (batchTargets.length === 0) return;
+    track('batch_plan', { targets: batchTargets.length });
     document.getElementById('calcResults').innerHTML = '';
     const result = planBatch(batchTargets);
     renderBatchResults(result, resultsDiv, warningsDiv);
@@ -1944,6 +1993,7 @@ function setupAntagMode() {
   if (!btn) return;
   btn.addEventListener('click', () => {
     antagMode = !antagMode;
+    if (antagMode) track('antag_on');
     document.body.classList.toggle('antag-active', antagMode);
     // Auto-switch sort when toggling antag mode
     const sortSel = document.getElementById('sortSelect');
@@ -2380,6 +2430,7 @@ function renderDeliveryMechanisms() {
 function loadStrategyIntoBatch(strategyId) {
   const strat = (DATA.antagStrategies || []).find(s => s.id === strategyId);
   if (!strat) return;
+  track('strategy_to_batch', { strategy: strategyId });
 
   // Switch to calculator tab
   const calcTab = document.querySelector('.tab-btn[data-tab="calculator"]');
@@ -2555,6 +2606,7 @@ function decodeURLState() {
 
 function setupShareButton() {
   document.getElementById('shareBtn').addEventListener('click', () => {
+    track('share_click', { tab: activeTab, antag: antagMode ? 1 : 0 });
     const hash = encodeURLState();
     const url = location.origin + location.pathname + hash;
     navigator.clipboard.writeText(url).then(() => showToast('Link copied!')).catch(() => {
