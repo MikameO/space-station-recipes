@@ -44,6 +44,20 @@ hydration (inherited water/nutrition from the base drink prototype) is
 hidden by default behind a toggle so real fertilizers stand out. Reagent
 detail panels gain a "Plant Effects (Botany)" section.
 
+### Usage analytics — Metrika goal events
+
+`app.js` gains a `track()` wrapper (adblock-safe no-op) sending 21 JS-event
+goals to the existing Yandex.Metrika counter: tab opens, `reagent_open`,
+`fork_select`, settled search queries (`search_used` / `search_zero` with
+query + result count as visit params), calculator / batch / reverse /
+craft-tree runs, `antag_on`, `strategy_to_batch`, `share_click`;
+`tutorial.js` reports start / done / skip. Metrika silently drops
+`reachGoal` hits until a matching goal exists on the counter —
+`scripts/create_metrika_goals.py` creates all 21 through the Management API
+(idempotent, `--dry-run` supported). Cache-busts `app.js?v=5`,
+`tutorial.js?v=2`; README Privacy section updated to mention interaction
+events.
+
 ## 3.3.0 — 2026-07-11 (Increment L — Russian Marine Corps + pure categories)
 
 ### New fork: Russian Marine Corps (`rucm`)

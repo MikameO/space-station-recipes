@@ -140,7 +140,7 @@ See [CHANGELOG.md](CHANGELOG.md) for schema evolution.
 
 ## Privacy
 
-This site uses [Yandex.Metrika](https://metrika.yandex.com/) for anonymous usage analytics (page views, click maps, and session recordings via Webvisor). No personal data is collected or sold. Analytics help prioritize features based on how the database is actually used across forks.
+This site uses [Yandex.Metrika](https://metrika.yandex.com/) for anonymous usage analytics (page views, click maps, session recordings via Webvisor, and interaction events such as tab opens, search queries, and calculator runs — all limited to fictional in-game terms). No personal data is collected or sold. Analytics help prioritize features based on how the database is actually used across forks.
 
 ## License
 
