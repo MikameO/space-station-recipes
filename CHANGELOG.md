@@ -3,6 +3,70 @@
 `data.json` schema version is in `meta.schemaVersion`. Consumers reading this file
 should pin on a compatible range (semver: breaking changes bump major).
 
+## 3.4.2 — 2026-07-11 (Increment O — full curation list: fork seeds, Vaccine, vendor layers, locales)
+
+Follow-up to 3.4.1: the maintainer approved including everything the manifest
+audit surfaced ("Включай всё"). **1156 → 1213 reagents, 942 → 1003 reactions,
+plant sources 55 → 96.**
+
+### Fork botany (seed_files for 14 forks)
+
+`seed_files` was vanilla-only; now every fork with its own Hydroponics
+seeds ships them: Sunrise (14), Frontier (11), Dead Space (7), Monolith's
+pre-move Entities copy (6), Delta-V (4), Trauma (4), ADT (4), Impstation
+via Funky (3), Goob (2), Gardenstation via Omu (2), Fish (2), Carpmosia,
+Harmony, Starlight, Funkystation (1 each). Plant-source lookups (the
+Botany tab and "grow it" accessibility paths) now cover 96 reagents, up
+from 55. Note: the plant-source pool is global (not fork-filtered) — a
+Sunrise-only plant lists as a source for everyone; per-fork plant views
+are a known model limitation.
+
+### Fish Station: Vaccine system
+
+Fish-only extension of its _Sunrise layer (absent upstream): disease
+blood draws -> centrifuge separation -> NotReadyVaccine -> Vaccine /
+VaccinePlus (7 reagents + 11 reactions). Fish grows 2/0 -> 9/11.
+
+### Vendor layers included
+
+- **Delta-V**: full Nyanotrasen drink layer (12 reagents + 19 reactions:
+  Soju, Brainbomb, cheese-curdling chain, hot-oil pyro), _DEN cocktails
+  (17 + 16, Jaeger line), _Impstation uniques (Ethanotoxin, Echion,
+  BloodAllulalo), _Floof CreateFrosting (spawns an entity — no products).
+  Delta-V now 124/125, second only to vanilla.
+- **Funky**: _Impstation layer (SynthBlood chain via its _CD biological
+  copy, BatteryAcid/AngelsKiss/FeverDream) + NaniteSlurryBreakdown.
+- **Goob**: Einstein Engines reactions (Morphine synthesis!, Artiplates),
+  ShadowlingToxin, _Lavaland medicine (MinersSalve, Luxurium...),
+  _Shitmed NocturineWonderprod — whole Goob lineage sees them via
+  ancestry.
+- **Omu**: Gardenstation kelp/Thaven drinks + medicine (9 prototypes).
+- **Monolith**: its _NF-copy additions (OilVegetable + vegetable-oil
+  pyro reaction).
+- **Dead Space**: ADTVodkaAntivirus from its vendored ADT layer.
+- **RMC14**: drink names locale for the packaged/powdered lines.
+
+### Ownership-steal guards (files deliberately NOT manifested)
+
+Collision check before inclusion: a file is skipped when its ids are
+owned by a later-registered fork whose view would silently lose them —
+deadspace's _Corvax copies (10 corvax cocktails), deltav's _NF /
+_Impstation-medicine / _Floof-medicine copies (frontier ids), starlight's
+_Funkystation gases (6 adt/frontier gas ids), goob's _NF Comsumables
+copy (5 frontier ids). Documented inline in config.py.
+
+### Locales
+
+23 .ftl files wired for the new content (Funky cocktail names, Nyano/_DEN
+drinks, _CD meds, frozen treats, Gardenstation, Fish pathogens, seed
+names for 8 forks). Reagents without locale entries fall back to
+readable id-derived names.
+
+Leftover known issues: BeastBloodLing / MilkChoco (upstream Goob bugs, no
+prototypes exist); per-fork visibility of shared vendor layers follows
+first-wins ownership (frontier's Nyanotrasen copy invisible in frontier's
+own view — model limitation, candidate for a future shared-layer feature).
+
 ## 3.4.1 — 2026-07-11 (Increment N — manifest-drift audit, orphan fix, vanilla-copy harvest)
 
 ### Manifest-drift audit (`scripts/audit_fork_manifests.py`)

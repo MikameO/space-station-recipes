@@ -208,6 +208,8 @@ FORK_REGISTRY = {
             "Resources/Prototypes/_RMC14/Recipes/Reactions/toxins.yml",
         ],
         "locale_files": [
+            # Names for the packaged/powdered drink reagents (2026-07)
+            "Resources/Locale/en-US/_RMC14/reagents/meta/consumable/drink/drinks.ftl",
             "Resources/Locale/en-US/_RMC14/reagents/flavors.ftl",
             "Resources/Locale/en-US/_RMC14/reagents/ingredients.ftl",
             "Resources/Locale/en-US/_RMC14/reagents/other.ftl",
@@ -399,8 +401,18 @@ FORK_REGISTRY = {
             "Resources/Prototypes/_EinsteinEngines/Reagents/biological.yml",
             "Resources/Prototypes/_EinsteinEngines/Reagents/medicine.yml",
             "Resources/Prototypes/_EinsteinEngines/Reagents/narcotics.yml",
+            "Resources/Prototypes/_EinsteinEngines/Shadowling/Reagents/shadowling.yml",
+            # Lavaland/Shitmed vendor layers (goob owns them for the whole
+            # lineage — funky/trauma/omu see them via ancestry). NOTE:
+            # _NF/Comsumables is deliberately NOT here: its ids are owned by
+            # frontier (earlier real _NF layer) — manifesting the Goob copy
+            # would steal them and hide the drinks from Frontier's view.
+            "Resources/Prototypes/_Lavaland/Reagents/medicine.yml",
+            "Resources/Prototypes/_Shitmed/Reagents/narcotics.yml",
         ],
         "reaction_files": [
+            "Resources/Prototypes/_EinsteinEngines/Recipes/Reactions/chemicals.yml",
+            "Resources/Prototypes/_EinsteinEngines/Recipes/Reactions/medicine.yml",
             "Resources/Prototypes/_Goobstation/Recipes/Reactions/biological.yml",
             "Resources/Prototypes/_Goobstation/Recipes/Reactions/botany.yml",
             "Resources/Prototypes/_Goobstation/Recipes/Reactions/changeling.yml",
@@ -414,7 +426,7 @@ FORK_REGISTRY = {
             "Resources/Prototypes/_Goobstation/Recipes/Reactions/toxins.yml",
         ],
         "locale_files": [],
-        "seed_files": [],
+        "seed_files": ["Resources/Prototypes/_Goobstation/Hydroponics/seeds.yml"],
         "botany_locale_files": [],
         "blocked_reactions": set(),  # Goob doesn't block vanilla reactions — modifies in-place
         "modified_reactions": {
@@ -452,6 +464,9 @@ FORK_REGISTRY = {
             "Resources/Prototypes/_Starlight/Reagents/Consumable/Drink/alcohol.yml",
             "Resources/Prototypes/_Starlight/Reagents/Consumable/Drink/juice.yml",
             "Resources/Prototypes/_Starlight/Reagents/Consumable/Food/food.yml",
+            # _Funkystation/gases.yml is deliberately NOT manifested: its
+            # gas ids are owned by adt/frontier — the starlight copy would
+            # steal them (collision check 2026-07-11).
         ],
         "reaction_files": [
             "Resources/Prototypes/_Starlight/Recipes/Reactions/cleaning.yml",
@@ -461,8 +476,13 @@ FORK_REGISTRY = {
             "Resources/Prototypes/_Starlight/Recipes/Reactions/medicine.yml",
             "Resources/Prototypes/_Starlight/Recipes/Reactions/xenobiology.yml",
         ],
-        "locale_files": [],
-        "seed_files": [],
+        "locale_files": [
+            "Resources/Locale/en-US/_Starlight/reagents/meta/consumable/drink/alcohol.ftl",
+            "Resources/Locale/en-US/_Starlight/reagents/meta/consumable/drink/juice.ftl",
+            "Resources/Locale/en-US/_Starlight/reagents/meta/consumable/food/food.ftl",
+            "Resources/Locale/en-US/_Starlight/seeds/seeds.ftl",
+        ],
+        "seed_files": ["Resources/Prototypes/_Starlight/Hydroponics/seeds.yml"],
         "botany_locale_files": [],
         "blocked_reactions": {
             "Heparin",  # Replaced by Warfarin in Starlight's vanilla medicine.yml override
@@ -507,6 +527,17 @@ FORK_REGISTRY = {
             # Agonolexyne/Blissifylovene — orphan audit 2026-07-11)
             "Resources/Prototypes/Nyanotrasen/Reagents/psionic.yml",
             "Resources/Prototypes/Nyanotrasen/Reagents/Consumable/Food/condiments.yml",
+            # Full Nyanotrasen drink layer + _DEN and _Impstation vendor
+            # layers ("include everything" 2026-07-11). Files whose ids are
+            # owned by frontier (_NF copies, _Impstation medicine
+            # Caramexinin, _Floof medicine) are deliberately NOT here —
+            # manifesting them would steal ownership from frontier.
+            "Resources/Prototypes/Nyanotrasen/Reagents/Consumable/Drink/alcohol.yml",
+            "Resources/Prototypes/Nyanotrasen/Reagents/Consumable/Drink/drinks.yml",
+            "Resources/Prototypes/_DEN/Reagents/Consumable/Drink/alcohol.yml",
+            "Resources/Prototypes/_Impstation/Reagents/biological.yml",
+            "Resources/Prototypes/_Impstation/Reagents/toxins.yml",
+            "Resources/Prototypes/_Impstation/reagents/pyrotechnic.yml",
             "Resources/Prototypes/_CD/Reagents/medicine.yml",
         ],
         "reaction_files": [
@@ -517,11 +548,28 @@ FORK_REGISTRY = {
             "Resources/Prototypes/_DV/Recipes/Reactions/medicine.yml",
             "Resources/Prototypes/_DV/Recipes/Reactions/powdered_drinks.yml",
             "Resources/Prototypes/_DV/Recipes/Reactions/psionic.yml",
+            "Resources/Prototypes/Nyanotrasen/Recipes/Reactions/drink.yml",
+            "Resources/Prototypes/Nyanotrasen/Recipes/Reactions/food.yml",
+            "Resources/Prototypes/Nyanotrasen/Recipes/Reactions/pyrotechnic.yml",
+            "Resources/Prototypes/_DEN/Recipes/Reactions/drinks.yml",
+            # CreateFrosting spawns an entity (no products) — orphan-safe
+            "Resources/Prototypes/_Floof/Recipes/Reactions/food.yml",
             # Cosmatic Drift medicine pairs with _CD/Reagents/medicine.yml
             "Resources/Prototypes/_CD/Reactions/medicine.yml",
         ],
-        "locale_files": [],
-        "seed_files": [],
+        "locale_files": [
+            "Resources/Locale/en-US/nyanotrasen/reagents/meta/consumable/drink/alcohol.ftl",
+            "Resources/Locale/en-US/nyanotrasen/reagents/meta/consumable/drink/drink.ftl",
+            "Resources/Locale/en-US/_DEN/reagents/meta/consumable/drink/alcohol.ftl",
+            "Resources/Locale/en-US/_CD/reagents/RPmeds.ftl",
+            "Resources/Locale/en-US/_CD/reagents/meta/biological.ftl",
+            "Resources/Locale/en-US/_CD/reagents/meta/medicine.ftl",
+            "Resources/Locale/en-US/_DV/reagents/meta/consumable/drink/frozen_treats.ftl",
+            "Resources/Locale/en-US/_DV/reagents/meta/narcotic.ftl",
+            "Resources/Locale/en-US/_DV/reagents/meta/toxins.ftl",
+            "Resources/Locale/en-US/_DV/seeds.ftl",
+        ],
+        "seed_files": ["Resources/Prototypes/_DV/Hydroponics/seeds.yml"],
         "botany_locale_files": [],
         "blocked_reactions": set(),
         "modified_reactions": {},
@@ -547,6 +595,11 @@ FORK_REGISTRY = {
             "Resources/Prototypes/_DeadSpace/Reagents/narcotics.yml",
             "Resources/Prototypes/_DeadSpace/Reagents/toxins.yml",
             "Resources/Prototypes/_DeadSpace/Reagents/Consumable/drinks.yml",
+            # Dead Space's own addition inside its vendored ADT layer.
+            # The _Corvax layer copies are deliberately NOT manifested:
+            # their ids are owned by corvax (registered later) — the
+            # deadspace copy would steal them from Corvax's view.
+            "Resources/Prototypes/_ADT/Reagents/Consumable/Drink/vodka_antivirus.yml",
         ],
         "reaction_files": [
             "Resources/Prototypes/_DeadSpace/Recipes/Reactions/chemicals.yml",
@@ -554,7 +607,7 @@ FORK_REGISTRY = {
             "Resources/Prototypes/_DeadSpace/Recipes/Reactions/medicine.yml",
         ],
         "locale_files": [],
-        "seed_files": [],
+        "seed_files": ["Resources/Prototypes/_DeadSpace/Hydroponics/seeds.yml"],
         "botany_locale_files": [],
         "blocked_reactions": set(),
         "modified_reactions": {},
@@ -591,8 +644,16 @@ FORK_REGISTRY = {
             "Resources/Prototypes/_NF/Recipes/Reactions/food.yml",
             "Resources/Prototypes/_NF/Recipes/Reactions/medicine.yml",
         ],
-        "locale_files": [],
-        "seed_files": [],
+        "locale_files": [
+            "Resources/Locale/en-US/_NF/reagents/caffeine.ftl",
+            "Resources/Locale/en-US/_NF/reagents/drinks.ftl",
+            "Resources/Locale/en-US/_NF/reagents/meta/consumable/drink/drinks.ftl",
+            "Resources/Locale/en-US/_NF/reagents/meta/consumable/drink/juice.ftl",
+            "Resources/Locale/en-US/_NF/reagents/meta/consumable/food/food.ftl",
+            "Resources/Locale/en-US/_NF/reagents/meta/consumable/food/ingredients.ftl",
+            "Resources/Locale/en-US/_NF/seeds/seeds.ftl",
+        ],
+        "seed_files": ["Resources/Prototypes/_NF/Hydroponics/seeds.yml"],
         "botany_locale_files": [],
         "blocked_reactions": {
             "Lye",  # Missing from Frontier's vanilla chemicals.yml
@@ -628,18 +689,39 @@ FORK_REGISTRY = {
             # Funky's copy of the _DV layer defines Hemoxadone, referenced
             # by its patched vanilla medicine.yml (Ambuzol2 recipes)
             "Resources/Prototypes/_DV/Reagents/medicine.yml",
+            # Impstation vendor layer ("include everything" 2026-07-11).
+            # NB the "alchohol" typo is in the repo itself.
+            # _CD/biological defines SynthBlood, referenced by the
+            # Impstation drink reactions below.
+            "Resources/Prototypes/_CD/Reagents/biological.yml",
+            "Resources/Prototypes/_Impstation/Reagents/Consumable/Drink/alchohol.yml",
+            "Resources/Prototypes/_Impstation/Reagents/Consumable/Drink/drinks.yml",
+            "Resources/Prototypes/_Impstation/Reagents/biological.yml",
+            "Resources/Prototypes/_Impstation/Reagents/pyrotechnic.yml",
         ],
         "reaction_files": [
             "Resources/Prototypes/_Funkystation/Recipes/Reactions/alcohol.yml",
+            "Resources/Prototypes/_Funkystation/Recipes/Reactions/biological.yml",
             "Resources/Prototypes/_Funkystation/Recipes/Reactions/drinks.yml",
             "Resources/Prototypes/_Funkystation/Recipes/Reactions/exotic.yml",
             "Resources/Prototypes/_Funkystation/Recipes/Reactions/food.yml",
             "Resources/Prototypes/_Funkystation/Recipes/Reactions/medicine.yml",
             "Resources/Prototypes/_Funkystation/Recipes/Reactions/pyrotechnic.yml",
             "Resources/Prototypes/_Funkystation/Recipes/Reactions/toxins.yml",
+            "Resources/Prototypes/_Impstation/Recipes/Reactions/biological.yml",
+            "Resources/Prototypes/_Impstation/Recipes/Reactions/drinks.yml",
         ],
-        "locale_files": [],
-        "seed_files": [],
+        "locale_files": [
+            "Resources/Locale/en-US/_Funkystation/reagents/meta/consumable/drink/alcohol.ftl",
+            "Resources/Locale/en-US/_Funkystation/reagents/meta/consumable/drink/drinks.ftl",
+            "Resources/Locale/en-US/_Funkystation/reagents/meta/consumable/food/condiments.ftl",
+            "Resources/Locale/en-US/_Funkystation/reagents/meta/consumable/food/ingredients.ftl",
+            "Resources/Locale/en-US/_Funkystation/seeds/seeds.ftl",
+        ],
+        "seed_files": [
+            "Resources/Prototypes/_Funkystation/Hydroponics/seeds.yml",
+            "Resources/Prototypes/_Impstation/Hydroponics/seeds.yml",
+        ],
         "botany_locale_files": [],
         "blocked_reactions": {
             "Lye",           # Missing from Funky's vanilla chemicals.yml
@@ -698,8 +780,10 @@ FORK_REGISTRY = {
             "Resources/Prototypes/_Trauma/Recipes/Reactions/single_reagent.yml",
             "Resources/Prototypes/_Trauma/Recipes/Reactions/toxins.yml",
         ],
-        "locale_files": [],
-        "seed_files": [],
+        "locale_files": [
+            "Resources/Locale/en-US/_Trauma/botany/seeds.ftl",
+        ],
+        "seed_files": ["Resources/Prototypes/_Trauma/Hydroponics/seeds.yml"],
         "botany_locale_files": [],
         "blocked_reactions": set(),
         "modified_reactions": {},
@@ -733,14 +817,22 @@ FORK_REGISTRY = {
             # AtomicPrecision reagent lives inside an entity file (flavor +
             # glass entity + reagent in one YAML) — manifest audit 2026-07-11
             "Resources/Prototypes/_Omu/Entities/Objects/Consumable/Drinks/atomicPrecision.yml",
+            # Gardenstation vendor layer (kelp/Thaven drinks + medicine)
+            "Resources/Prototypes/_Gardenstation/Reagents/Consumable/Drink/alcohol.yml",
+            "Resources/Prototypes/_Gardenstation/Reagents/medicine.yml",
         ],
         "reaction_files": [
             "Resources/Prototypes/_Omu/Recipes/Reactions/drinks.yml",
             "Resources/Prototypes/_Omu/Recipes/Reactions/fun.yml",
             "Resources/Prototypes/_Omu/Recipes/Reactions/single_reagent.yml",
+            "Resources/Prototypes/_Gardenstation/Recipes/Reactions/drinks.yml",
         ],
-        "locale_files": [],
-        "seed_files": [],
+        "locale_files": [
+            "Resources/Locale/en-US/_Gardenstation/reagents/medicine.ftl",
+            "Resources/Locale/en-US/_Gardenstation/reagents/meta/Consumable/Drinks/alcohol.ftl",
+            "Resources/Locale/en-US/_Gardenstation/reagents/reagents.ftl",
+        ],
+        "seed_files": ["Resources/Prototypes/_Gardenstation/Hydroponics/seeds.yml"],
         "botany_locale_files": [],
         "blocked_reactions": set(),
         "modified_reactions": {},
@@ -769,7 +861,7 @@ FORK_REGISTRY = {
             "Resources/Prototypes/_Carpmosia/Recipes/Reactions/toxins.yml",
         ],
         "locale_files": [],
-        "seed_files": [],
+        "seed_files": ["Resources/Prototypes/_Carpmosia/Hydroponics/seeds.yml"],
         "botany_locale_files": [],
         "blocked_reactions": set(),
         "modified_reactions": {},
@@ -795,6 +887,10 @@ FORK_REGISTRY = {
             "Resources/Prototypes/_Mono/Reagents/medicine.yml",
             "Resources/Prototypes/_Mono/Reagents/narcotics.yml",
             "Resources/Prototypes/_Mono/Reagents/technological.yml",
+            # Monolith's _NF copy adds OilVegetable (used by its
+            # HotOilVegetableAndWater reaction); the three ids shared with
+            # Frontier's copy are skipped by first-wins.
+            "Resources/Prototypes/_NF/Reagents/Consumables/Food/ingredients.yml",
         ],
         "reaction_files": [
             "Resources/Prototypes/_Mono/Recipes/Reactions/drinks.yml",
@@ -802,9 +898,14 @@ FORK_REGISTRY = {
             "Resources/Prototypes/_Mono/Recipes/Reactions/medicine.yml",
             "Resources/Prototypes/_Mono/Recipes/Reactions/pyrotechnics.yml",
             "Resources/Prototypes/_Mono/Recipes/Reactions/technological.yml",
+            # Monolith-only addition to its _NF layer copy (audit 2026-07-11)
+            "Resources/Prototypes/_NF/Recipes/Reactions/pyrotechnic.yml",
         ],
-        "locale_files": [],
-        "seed_files": [],
+        "locale_files": [
+            "Resources/Locale/en-US/_NF/seeds/seeds.ftl",
+        ],
+        # Monolith keeps its _NF seeds at the pre-move Entities path
+        "seed_files": ["Resources/Prototypes/_NF/Entities/Objects/Specific/Hydroponics/seeds.yml"],
         "botany_locale_files": [],
         "blocked_reactions": set(),
         "modified_reactions": {},
@@ -833,7 +934,7 @@ FORK_REGISTRY = {
             "Resources/Prototypes/_Harmony/Recipes/Reactions/medicine.yml",
         ],
         "locale_files": [],
-        "seed_files": [],
+        "seed_files": ["Resources/Prototypes/_Harmony/Hydroponics/seeds.yml"],
         "botany_locale_files": [],
         "blocked_reactions": set(),
         "modified_reactions": {},
@@ -905,8 +1006,10 @@ FORK_REGISTRY = {
             # started using for new content (manifest audit 2026-07-11)
             "Resources/Prototypes/ADT/Reactions/plastic.yml",
         ],
-        "locale_files": [],
-        "seed_files": [],
+        "locale_files": [
+            "Resources/Locale/en-US/ADT/reagents/meta/toxins.ftl",
+        ],
+        "seed_files": ["Resources/Prototypes/ADT/Hydroponics/seeds.yml"],
         "botany_locale_files": [],
         "blocked_reactions": set(),
         "modified_reactions": {},
@@ -948,8 +1051,10 @@ FORK_REGISTRY = {
             "Resources/Prototypes/_Sunrise/Recipes/Reactions/medicine.yml",
             "Resources/Prototypes/_Sunrise/Recipes/Reactions/special.yml",
         ],
-        "locale_files": [],
-        "seed_files": [],
+        "locale_files": [
+            "Resources/Locale/en-US/_prototypes/_sunrise/entities/objects/specific/hydroponics/seeds.ftl",
+        ],
+        "seed_files": ["Resources/Prototypes/_Sunrise/Hydroponics/seeds.yml"],
         "botany_locale_files": [],
         "blocked_reactions": set(),
         "modified_reactions": {},
@@ -972,12 +1077,24 @@ FORK_REGISTRY = {
             "Resources/Prototypes/_Fish/Reagents/Consumable/Drink/juice.yml",
             "Resources/Prototypes/_Fish/Reagents/medicine.yml",
             "Resources/Prototypes/_Fish/Reagents/unknown_pathogens.yml",
+            # Vaccine system — Fish-only extension of the _Sunrise layer
+            # (absent from the sunrise repo itself; audit 2026-07-11):
+            # disease blood draws -> centrifuge -> vaccine crafting
+            "Resources/Prototypes/_Sunrise/Vaccine/Reagents/blood.yml",
+            "Resources/Prototypes/_Sunrise/Vaccine/Reagents/vaccine.yml",
         ],
         "reaction_files": [
             "Resources/Prototypes/_Fish/Recipes/Reactions/medicine.yml",
+            "Resources/Prototypes/_Sunrise/Vaccine/Reactions/BloodToVaccine.yml",
+            "Resources/Prototypes/_Sunrise/Vaccine/Reactions/Centrifuge.yml",
+            "Resources/Prototypes/_Sunrise/Vaccine/Reactions/VaccinatorInspect.yml",
+            "Resources/Prototypes/_Sunrise/Vaccine/Reactions/VaccineCreate.yml",
         ],
-        "locale_files": [],
-        "seed_files": [],
+        "locale_files": [
+            "Resources/Locale/en-US/_fish/Reagents/unknown_pathogens.ftl",
+            "Resources/Locale/en-US/_prototypes/_fish/entities/objects/specific/hydroponics/seeds.ftl",
+        ],
+        "seed_files": ["Resources/Prototypes/_Fish/Hydroponics/seeds.yml"],
         "botany_locale_files": [],
         "blocked_reactions": set(),
         "modified_reactions": {},
