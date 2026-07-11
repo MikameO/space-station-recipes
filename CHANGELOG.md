@@ -3,6 +3,62 @@
 `data.json` schema version is in `meta.schemaVersion`. Consumers reading this file
 should pin on a compatible range (semver: breaking changes bump major).
 
+## 3.3.0 — 2026-07-11 (Increment L — Russian Marine Corps + pure categories)
+
+### New fork: Russian Marine Corps (`rucm`)
+
+Listed as "not addable" in 3.1.0 — its build repo has since been located:
+**flex5hybrid/RussianCM** ("RMC-14 fork for RuCM"), `parent_fork: rmc14`.
+20 reagents / 14 reactions: 9 craftable CMU medicines (Paracetamol → Tramadol →
+Oxycodone painkiller chain; organ-repair line Hepatocytin/Pulmovine/Nephronate/
+Cardiocaine/Osteocalc; Biogenic Matrix for limb printing), 7 XenoAlch toxins
+(Sagunine, Cholinine, Noctine, Pyrinine, Vapinine, Crynine, Xenosterine —
+injected by the xeno Alchemist strain, obtainable marine-side only via blood
+draw), Black Sludge (+ CMUCreateSludgeGC: 4 CM meds 16u each → 64u), 3 napalm
+mixes (UT/B/E), AU14SpaceCleaner, Abomination Venom, Yautja blood, and the
+**Speed Demon** street drug (walk 1.3x / sprint 1.34x, OD 15u, purges Chloral
+Hydrate; **no synthesis recipe** — antag drug dealer bottle / WeyU experiments
+crate only, wired as `OTHER_REAGENT_SOURCES` → antag-only accessibility).
+New antag strategy `speed-demon-pills` with per-fork difficulty: medium on
+rucm, impossible everywhere else. Totals: 18 forks, 953 reagents, 850 reactions.
+
+### Parse-time fork stamping (`_fork`)
+
+RuCM adds new prototypes *inside its copies of parent `_RMC14` files*; the old
+path-substring attribution (`detect_fork_source`) would have credited them to
+rmc14. Prototypes are now stamped with the fetching fork at parse time and
+`proto_fork()` prefers the stamp; identical-ID copies are still skipped by
+first-wins merge, so attribution of all 17 pre-existing forks is unchanged
+(verified: per-fork reagent counts byte-identical to 3.2.0).
+
+### Parent-override auto-diff (`parent_override_reaction_files`)
+
+Same machinery as the vanilla auto-diff, pointed at the parent fork's custom
+layer: RuCM's copies of `_RMC14` reaction files are diffed against the rmc14
+build data. Result: 5 `modified` annotations (Mindbreaker Toxin, Space Drugs,
+Methylphenidate, Citalopram, Paroxetine — all craft **without** Black Goo on
+RuCM). `forkStatus`/`forkNotes` now also attach to fork-owned reactions, not
+just vanilla ones; the reactions table MOD badge renders them unchanged.
+
+### Pure categories (breaking-ish for deep links)
+
+`categorize_reagent` no longer emits per-fork "{ForkName} Medicine/Toxins/..."
+sheets — every reagent lands in one of 15 content-based categories (Medicine,
+Toxins, Narcotics, ...; was 79 with fork duplicates). Fork identity lives in
+the Source filter. Old share links encoding fork categories silently drop that
+filter. Excel: fork reagents merge into the standard category sheets; the
+per-fork "Recipes" sheets merge into All Reactions / Drink Recipes.
+
+### Fork lineage in the UI source filter
+
+`meta.forks[].parent` ships fork ancestry; selecting a derivative fork now
+shows its whole lineage (Funky → +Goob content, Fish → +Sunrise, RuCM →
++RMC14) instead of only fork-native + vanilla. Craft trees prefer the closest
+lineage recipe (self → parent → vanilla). `build_per_fork_views` applies the
+same chain plus auto-diff blocked sets, so per-fork strategy difficulty now
+accounts for inherited content (global tiers unchanged; per-fork tiers for
+derivative forks are more accurate).
+
 ## 3.2.0 — 2026-07-07 (Increment K.2 — Sunrise + Fish Station)
 
 Adds the deferred pair from 3.1.0: **Sunrise** (space-sunrise/sunrise-station,

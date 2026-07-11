@@ -55,6 +55,18 @@ def detect_fork_source(source_file: str) -> str:
             return fork_id
     return "vanilla"
 
+
+def proto_fork(proto: dict) -> str:
+    """Fork ownership of a parsed prototype.
+
+    Prefers the parse-time `_fork` stamp (which fork's manifest fetched the
+    file) over path-substring detection. The stamp matters for derivative
+    forks that add new content inside their copy of a parent layer — e.g.
+    RuCM's XenoAlch toxins live in a `_RMC14/` path but belong to rucm, not
+    rmc14. Identical-ID copies are already skipped by first-wins merge, so
+    the stamp only ever attributes genuinely new prototypes."""
+    return proto.get("_fork") or detect_fork_source(proto.get("_source_file", ""))
+
 SCRIPT_DIR = Path(__file__).parent
 CACHE_DIR = SCRIPT_DIR / "cache"
 OUTPUT_FILE = SCRIPT_DIR / "SS14_Chemistry_Database.xlsx"
@@ -496,10 +508,14 @@ def resolve_parents(reagents: dict) -> dict:
         for no_inherit in ("abstract", "parent", "type", "id"):
             merged.pop(no_inherit, None)
 
-        # Child overrides parent, but keep _source_file from child
+        # Child overrides parent, but keep _source_file/_fork from child
         source = entry.get("_source_file", "")
         result = deep_merge(merged, entry)
         result["_source_file"] = source
+        if entry.get("_fork"):
+            result["_fork"] = entry["_fork"]
+        else:
+            result.pop("_fork", None)
         resolved[rid] = result
         resolving.discard(rid)
         return result
@@ -1099,32 +1115,54 @@ def summarize_reaction_effects(reaction: dict) -> str:
 # Phase 7: Categorization
 # ─────────────────────────────────────────────
 
+# Filename-keyword ladder for fork content whose group field is absent.
+# Matched against the BASENAME only (a full-path match would trip on fork
+# directory names — "_Funkystation" contains "fun"). Order matters: more
+# specific keywords first.
+CATEGORY_KEYWORDS = [
+    ("alcohol", "Drinks (Alcoholic)"),
+    ("drink", "Drinks (Non-Alc)"),
+    ("juice", "Drinks (Non-Alc)"),
+    ("soda", "Drinks (Non-Alc)"),
+    ("condiment", "Food & Condiments"),
+    ("ingredient", "Food & Condiments"),
+    ("food", "Food & Condiments"),
+    ("medicine", "Medicine"),
+    ("organ_repair", "Medicine"),
+    ("painkiller", "Medicine"),
+    ("toxin", "Toxins"),
+    ("poison", "Toxins"),
+    ("narcotic", "Narcotics"),
+    ("drug", "Narcotics"),
+    ("element", "Elements"),
+    ("pyrotechnic", "Pyrotechnic"),
+    ("biological", "Biological"),
+    ("blood", "Biological"),
+    ("pathogen", "Biological"),
+    ("botany", "Botany"),
+    ("chemical", "Chemicals"),
+    ("gas", "Gases"),
+    ("clean", "Cleaning"),
+    ("material", "Materials"),
+    ("glass", "Materials"),
+    ("metal", "Materials"),
+    ("ore", "Materials"),
+    ("fun", "Fun"),
+]
+
+
 def categorize_reagent(reagent: dict) -> str:
-    """Determine which sheet category a reagent belongs to."""
+    """Determine which sheet category a reagent belongs to.
+
+    Categories are content-based and fork-agnostic (schema 3.3.0): a Sunrise
+    medicine and a vanilla medicine both land in "Medicine". Fork identity
+    lives in the separate `source` field / Source filter — before 3.3.0 each
+    fork spawned its own "{ForkName} Medicine/Toxins/..." category set, which
+    ballooned the sidebar filter to ~80 entries."""
     source = reagent.get("_source_file", "")
     group = reagent.get("group", "")
 
-    # Fork-specific reagents get "{ForkName} SubCategory" sheets
-    fork_id = detect_fork_source(source)
-    if fork_id != "vanilla":
-        fork_name = FORK_REGISTRY[fork_id]["name"]
-        src_lower = source.lower()
-        if "medicine" in src_lower or group == "Medicine":
-            return f"{fork_name} Medicine"
-        elif "toxin" in src_lower or group == "Toxins":
-            return f"{fork_name} Toxins"
-        elif "element" in src_lower or group == "Elements":
-            return f"{fork_name} Elements"
-        elif "drink" in src_lower:
-            return f"{fork_name} Drinks"
-        elif "narcotic" in src_lower or group == "Narcotics":
-            return f"{fork_name} Narcotics"
-        elif "pyrotechnic" in src_lower or group == "Pyrotechnic":
-            return f"{fork_name} Pyrotechnic"
-        else:
-            return f"{fork_name} Other"
-
-    # Vanilla categorization by source file path
+    # By source directory (vanilla + fork Consumable/Materials trees)
     if "Drink/alcohol" in source:
         return "Drinks (Alcoholic)"
     if "Drink/" in source:
@@ -1153,18 +1191,20 @@ def categorize_reagent(reagent: dict) -> str:
     if group in group_map:
         return group_map[group]
 
-    # By source filename
+    # By filename keywords (fork files: medicine.yml, drugs.yml, painkillers.yml, ...)
+    fname_lower = source.split("/")[-1].lower()
+    for keyword, cat in CATEGORY_KEYWORDS:
+        if keyword in fname_lower:
+            return cat
+
+    # By source filename via explicit sheet map
     fname = source.split("/")[-1].replace(".yml", "")
     return CATEGORY_SHEET_MAP.get(fname.capitalize(), "Other")
 
 
 def categorize_reaction(reaction: dict) -> str:
-    """Determine sheet for a reaction."""
+    """Determine sheet for a reaction. Fork-agnostic since schema 3.3.0."""
     source = reaction.get("_source_file", "")
-    fork_id = detect_fork_source(source)
-    if fork_id != "vanilla":
-        return f"{FORK_REGISTRY[fork_id]['name']} Recipes"
-
     fname = source.split("/")[-1].replace(".yml", "")
     mapping = {
         "drinks": "Drink Recipes",
@@ -1302,7 +1342,7 @@ def write_reagent_row(ws, row: int, reagent: dict, locale: dict,
 
     # Source
     source = reagent.get("_source_file", "")
-    source_label = FORK_REGISTRY.get(detect_fork_source(source), {}).get("name", "Vanilla")
+    source_label = FORK_REGISTRY.get(proto_fork(reagent), {}).get("name", "Vanilla")
     source_short = f"{source_label}: {source.split('/')[-1]}"
 
     # Notes
@@ -1376,7 +1416,7 @@ def write_reaction_row(ws, row: int, reaction: dict, reaction_lookup: dict, base
             craft_chain = "[TOO DEEP]"
 
     source = reaction.get("_source_file", "")
-    source_label = FORK_REGISTRY.get(detect_fork_source(source), {}).get("name", "Vanilla")
+    source_label = FORK_REGISTRY.get(proto_fork(reaction), {}).get("name", "Vanilla")
     source_short = f"{source_label}: {source.split('/')[-1]}"
 
     values = [
@@ -1665,7 +1705,7 @@ TIER_WEIGHTS = {
 
 _SERVICE_KEYWORDS  = ("NanoMed", "Booze", "Soda", "BoozeVend", "SodaVend", "Drobe")
 _MOB_KEYWORDS      = ("butcher", "blood draw", "Slime", "Zombie", "mob")
-_ANTAG_KEYWORDS    = ("EMAG", "Syndicate", "Chaplain")
+_ANTAG_KEYWORDS    = ("EMAG", "Syndicate", "Chaplain", "Antag")
 _DISPENSER_KEYWORDS = ("Dispenser", "Sink", "ChemVend")
 
 
@@ -1876,18 +1916,38 @@ def compute_strategy_difficulty(
     }
 
 
+def fork_ancestry(fork_id: str) -> list[str]:
+    """Fork lineage as [self, parent, grandparent, ...] (vanilla excluded).
+
+    A derivative fork ships its parent's custom content too — Funky runs
+    Goob chems, RuCM runs RMC14 chems — so fork views and the UI source
+    filter must treat ancestor-owned content as native."""
+    chain = []
+    current = fork_id
+    while current and current != "vanilla":
+        chain.append(current)
+        current = FORK_REGISTRY.get(current, {}).get("parent_fork")
+    return chain
+
+
 def build_per_fork_views(
     reactions: dict,
     reagents: dict,
     reagent_plants: dict,
     base_set: set,
+    fork_diffs: dict | None = None,
 ) -> dict[str, dict]:
     """Build filtered {reaction_lookup, all_sources, accessibility_map} per fork.
 
     Each fork view drops reactions that are blocked in that fork and excludes
-    reagents that originated in a different fork (fork-exclusive content). This
-    mirrors the UI's fork-filter logic (app.js:119-127, 199-206) so the computed
-    difficulty matches what the player would actually see on that server.
+    reagents that originated outside the fork's ancestry chain (fork-exclusive
+    content). This mirrors the UI's fork-filter logic (app.js filterReagents/
+    filterReactions) so the computed difficulty matches what the player would
+    actually see on that server.
+
+    fork_diffs: {fork_id: (blocked_set, modified_dict)} — when provided, the
+    auto-diff blocked set (vanilla category blocks, removed recipes, parent
+    overrides) is applied on top of the manual blocked_reactions config.
 
     Note: modified_reactions are not structurally applied here — the recipe shape
     stays the same; only blocked recipes are dropped. Rationale: modifications
@@ -1899,21 +1959,26 @@ def build_per_fork_views(
     # Group reactions by source (fork ownership)
     reactions_by_source = defaultdict(dict)
     for rid, rxn in reactions.items():
-        src = rxn.get("source") or detect_fork_source(rxn.get("_source_file", ""))
+        src = rxn.get("source") or proto_fork(rxn)
         reactions_by_source[src or "vanilla"][rid] = rxn
 
     for fork_id, fconf in FORK_REGISTRY.items():
         blocked = set(fconf.get("blocked_reactions", set()) or set())
+        if fork_diffs and fork_id in fork_diffs:
+            blocked |= fork_diffs[fork_id][0]
+        chain = fork_ancestry(fork_id)
 
-        # Fork view of reactions: vanilla (minus blocked) + fork-exclusive
+        # Fork view of reactions: vanilla (minus blocked) + ancestry chain
         fork_reactions = {}
         for rid, rxn in reactions_by_source.get("vanilla", {}).items():
             if rid not in blocked:
                 fork_reactions[rid] = rxn
-        # Add fork-native reactions (when fork_id != vanilla)
-        if fork_id != "vanilla":
-            for rid, rxn in reactions_by_source.get(fork_id, {}).items():
-                fork_reactions[rid] = rxn
+        # Add native + ancestor reactions, parents first so a (hypothetical)
+        # child redefinition would win the dict update
+        for src in reversed(chain):
+            for rid, rxn in reactions_by_source.get(src, {}).items():
+                if rid not in blocked:
+                    fork_reactions[rid] = rxn
 
         fork_reaction_lookup = build_reaction_lookup(fork_reactions)
 
@@ -1925,11 +1990,9 @@ def build_per_fork_views(
         for rid, reagent in reagents.items():
             if reagent.get("abstract"):
                 continue
-            # Skip reagents that are exclusive to a different fork
-            reagent_source = reagent.get("source") or detect_fork_source(
-                reagent.get("_source_file", "")
-            )
-            if reagent_source and reagent_source != "vanilla" and reagent_source != fork_id:
+            # Skip reagents that are exclusive to a fork outside this ancestry
+            reagent_source = reagent.get("source") or proto_fork(reagent)
+            if reagent_source and reagent_source != "vanilla" and reagent_source not in chain:
                 continue
             fork_accessibility_map[rid] = compute_reagent_accessibility(
                 rid, fork_reaction_lookup, fork_all_sources
@@ -1983,7 +2046,7 @@ def export_json(reagents: dict, reactions: dict, locale: dict,
     for r in reagents.values():
         if r.get("abstract"):
             continue
-        fid = detect_fork_source(r.get("_source_file", ""))
+        fid = proto_fork(r)
         fork_reagent_counts[fid] = fork_reagent_counts.get(fid, 0) + 1
 
     # Build fork metadata for frontend
@@ -1996,10 +2059,14 @@ def export_json(reagents: dict, reactions: dict, locale: dict,
                 "color": fconf["color"],
                 "reagentCount": count,
             }
+            # Ancestry for the UI source filter: selecting a derivative fork
+            # must also show its parents' content (Funky ships Goob chems).
+            if fconf.get("parent_fork"):
+                forks_meta[fid]["parent"] = fconf["parent_fork"]
 
     data = {
         "meta": {
-            "schemaVersion": "3.2.0",
+            "schemaVersion": "3.3.0",
             "generated": time.strftime("%Y-%m-%dT%H:%M:%S"),
             "forks": forks_meta,
             # Backward compat
@@ -2051,7 +2118,7 @@ def export_json(reagents: dict, reactions: dict, locale: dict,
 
         cat = categorize_reagent(reagent)
         cats_seen.add(cat)
-        source = detect_fork_source(reagent.get("_source_file", ""))
+        source = proto_fork(reagent)
         effects_str, metab_paths = summarize_metabolisms(reagent.get("metabolisms", {}))
 
         recipe_obj = None
@@ -2134,19 +2201,23 @@ def export_json(reagents: dict, reactions: dict, locale: dict,
 
     # Build reactions
     for rid, rxn in sorted(reactions.items()):
-        source = detect_fork_source(rxn.get("_source_file", ""))
+        source = proto_fork(rxn)
         reactants_obj = {}
         for react_id, info in rxn.get("reactants", {}).items():
             amount = info.get("amount", 1) if isinstance(info, dict) else 1
             catalyst = info.get("catalyst", False) if isinstance(info, dict) else False
             reactants_obj[react_id] = {"amount": amount, "catalyst": catalyst}
 
-        # Per-fork availability status for vanilla reactions (uses auto-diff results)
+        # Per-fork availability status (uses auto-diff results). Vanilla
+        # reactions carry status for every fork; parent-fork reactions carry
+        # status for derivative forks that override them (Phase 4c) — the
+        # diff sets only ever contain IDs the fork actually diverges on, so
+        # skipping self-annotation is the only guard needed.
         fork_status = {}
         fork_notes = {}
-        if source == "vanilla" and fork_diffs:
+        if fork_diffs:
             for fid in FORK_REGISTRY:
-                if fid == "vanilla":
+                if fid == "vanilla" or fid == source:
                     continue
                 blocked, modified = fork_diffs.get(fid, (set(), {}))
                 if rid in blocked:
@@ -2224,7 +2295,7 @@ def export_json(reagents: dict, reactions: dict, locale: dict,
     # reagents) into a single precomputation so compute_strategy_difficulty stays pure.
     # Falls back to empty dict if plants weren't threaded through (old call sites).
     per_fork_views = build_per_fork_views(
-        reactions, reagents, reagent_plants or {}, base_set
+        reactions, reagents, reagent_plants or {}, base_set, fork_diffs
     ) if reagent_plants is not None else {}
 
     strategies_out = []
@@ -2373,6 +2444,18 @@ def main():
             fork_vanilla_overrides[fork_id] = overrides
             print(f"  Fetched {len(overrides)} vanilla-path override files")
 
+    # Phase 1c: Fetch parent-path files from derivative forks for parent auto-diff
+    # (same idea as Phase 1b, but against the parent fork's custom layer — e.g.
+    # RuCM's copies of _RMC14 reaction files vs the rmc14 build data)
+    fork_parent_overrides = {}  # fork_id -> {path: content}
+    for fork_id, fconf in FORK_REGISTRY.items():
+        po_files = fconf.get("parent_override_reaction_files", [])
+        if po_files and fconf.get("parent_fork"):
+            print(f"\n[{fconf['name']}] Parent-path overrides...")
+            overrides = fetch_all_files(po_files, fconf["raw_url"], f"{fork_id}_parent_overrides")
+            fork_parent_overrides[fork_id] = overrides
+            print(f"  Fetched {len(overrides)} parent-path override files")
+
     # Botany locale (vanilla only for now)
     botany_locale_files = fetch_all_files(
         FORK_REGISTRY["vanilla"].get("botany_locale_files", []),
@@ -2387,6 +2470,11 @@ def main():
         reagents, reactions = parse_all_prototypes(fdata["reagent_files"], loader)
         r2, rxn2 = parse_all_prototypes(fdata["reaction_files"], loader)
         reactions.update(rxn2)
+        # Stamp ownership at parse time — path-based detection misattributes
+        # new content that derivative forks add inside parent-layer paths
+        # (see proto_fork).
+        for proto in (*reagents.values(), *reactions.values()):
+            proto["_fork"] = fork_id
         parsed[fork_id] = {"reagents": reagents, "reactions": reactions}
         print(f"  {FORK_REGISTRY[fork_id]['name']}: {len(reagents)} reagents, {len(reactions)} reactions")
 
@@ -2412,13 +2500,13 @@ def main():
             continue
         for rid, rdata in pdata["reagents"].items():
             if rid in all_reagents:
-                owner = detect_fork_source(all_reagents[rid].get("_source_file", ""))
+                owner = proto_fork(all_reagents[rid])
                 collision_log.append(f"reagent {rid}: {fork_id} copy skipped (owned by {owner})")
             else:
                 all_reagents[rid] = rdata
         for xid, xdata in pdata["reactions"].items():
             if xid in all_reactions:
-                owner = detect_fork_source(all_reactions[xid].get("_source_file", ""))
+                owner = proto_fork(all_reactions[xid])
                 collision_log.append(f"reaction {xid}: {fork_id} copy skipped (owned by {owner})")
             else:
                 all_reactions[xid] = xdata
@@ -2471,6 +2559,26 @@ def main():
             fconf.get("blocked_reactions", set()),
             fconf.get("modified_reactions", {}),
         )
+
+    # Phase 4c: Auto-diff derivative forks' parent-path copies against the
+    # parent fork's own reactions. Detects recipes the child changed inside
+    # the parent layer (e.g. RuCM crafts Mindbreaker without Black Goo and
+    # nerfed CLF3 yields vs upstream RMC14). Results merge into the same
+    # fork_diffs channel that vanilla auto-diff feeds, so forkStatus /
+    # forkNotes rendering needs no special casing downstream.
+    for fork_id, override_files in fork_parent_overrides.items():
+        if not override_files:
+            continue
+        parent_id = FORK_REGISTRY[fork_id].get("parent_fork")
+        parent_rxns = parsed.get(parent_id, {}).get("reactions", {})
+        if not parent_rxns:
+            continue
+        _, fork_parent_rxns = parse_all_prototypes(override_files, loader)
+        blocked_p, modified_p = diff_fork_reactions(parent_rxns, fork_parent_rxns, set(), {})
+        base_blocked, base_modified = fork_diffs.get(fork_id, (set(), {}))
+        fork_diffs[fork_id] = (base_blocked | blocked_p, {**modified_p, **base_modified})
+        print(f"  {FORK_REGISTRY[fork_id]['name']} vs parent {parent_id}: "
+              f"{len(blocked_p)} blocked, {len(modified_p)} modified")
 
     # Phase 5: Build dependency trees
     print("\n=== Phase 5: Building craft dependency trees ===")

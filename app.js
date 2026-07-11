@@ -112,22 +112,42 @@ function buildSearchIndex() {
   }
 }
 
+// Fork ancestry: forkId -> [self, parent, grandparent, ...]. A derivative
+// fork ships its parents' custom content too (Funky runs Goob chems, RuCM
+// runs RMC14 chems), so the source filter treats ancestor content as native.
+// Cached — meta.forks is static per page load.
+const forkChainCache = {};
+function forkChain(forkId) {
+  if (!forkChainCache[forkId]) {
+    const chain = [];
+    let cur = forkId;
+    while (cur && cur !== 'vanilla' && !chain.includes(cur)) {
+      chain.push(cur);
+      cur = DATA.meta?.forks?.[cur]?.parent;
+    }
+    forkChainCache[forkId] = chain;
+  }
+  return forkChainCache[forkId];
+}
+
 function filterReagents(query) {
   const q = query.toLowerCase().trim();
   const tokens = q.split(/\s+/).filter(Boolean);
 
   return searchIndex.filter(entry => {
     const r = entry.reagent;
-    // Source filter: fork mode shows fork-native + vanilla (minus blocked)
+    // Source filter: fork mode shows fork-lineage + vanilla (minus blocked)
     if (activeSource !== 'all' && activeSource !== 'vanilla') {
       const forkId = activeSource;
-      if (r.source === 'vanilla') {
+      if (r.source !== 'vanilla' && !forkChain(forkId).includes(r.source)) {
+        return false; // reagent from outside this fork's lineage — hide
+      }
+      // Vanilla/ancestor reagent: hide when its recipe is blocked on this fork
+      if (r.source !== forkId) {
         const rxn = r.recipe ? Object.values(DATA.reactions).find(rx => rx.products[r.id]) : null;
         if (rxn && rxn.forkStatus && rxn.forkStatus[forkId] === 'blocked') return false;
         // Backward compat: check rmcStatus for rmc14 if forkStatus missing
         if (forkId === 'rmc14' && rxn && !rxn.forkStatus && rxn.rmcStatus === 'blocked') return false;
-      } else if (r.source !== forkId) {
-        return false; // reagent from a different fork — hide
       }
     } else if (activeSource === 'vanilla') {
       if (r.source !== 'vanilla') return false;
@@ -199,14 +219,15 @@ function filterReactions(query) {
   const tokens = q.split(/\s+/).filter(Boolean);
 
   return Object.values(DATA.reactions).filter(rxn => {
-    // Source filter: fork mode hides blocked vanilla + other-fork reactions
+    // Source filter: fork mode hides blocked + out-of-lineage reactions
     if (activeSource !== 'all' && activeSource !== 'vanilla') {
       const forkId = activeSource;
-      if (rxn.source === 'vanilla') {
+      if (rxn.source !== 'vanilla' && !forkChain(forkId).includes(rxn.source)) {
+        return false; // reaction from outside this fork's lineage
+      }
+      if (rxn.source !== forkId) {
         if (rxn.forkStatus && rxn.forkStatus[forkId] === 'blocked') return false;
         if (forkId === 'rmc14' && !rxn.forkStatus && rxn.rmcStatus === 'blocked') return false;
-      } else if (rxn.source !== forkId) {
-        return false; // reaction from a different fork
       }
     } else if (activeSource === 'vanilla') {
       if (rxn.source !== 'vanilla') return false;
@@ -487,12 +508,6 @@ function getCatColor(cat) {
     'Fun': '#f472b6', 'Narcotics': '#fb923c', 'Materials': '#6b7280',
   };
   if (map[cat]) return map[cat];
-  // Dynamic: check if category starts with a fork name → use fork color
-  if (DATA?.meta?.forks) {
-    for (const [fid, meta] of Object.entries(DATA.meta.forks)) {
-      if (cat.startsWith(meta.name)) return meta.color;
-    }
-  }
   return '#64748b';
 }
 
@@ -1087,16 +1102,18 @@ function getFilteredReactions(reagentId) {
   }
 
   const forkId = activeSource;
+  const chain = forkChain(forkId);
   rxns = rxns.filter(rx => {
-    if (rx.source === 'vanilla') {
+    if (rx.source !== 'vanilla' && !chain.includes(rx.source)) return false;
+    if (rx.source !== forkId) {
       if (rx.forkStatus && rx.forkStatus[forkId] === 'blocked') return false;
       if (forkId === 'rmc14' && !rx.forkStatus && rx.rmcStatus === 'blocked') return false;
-      return true;
     }
-    return rx.source === forkId;
+    return true;
   });
-  // Prefer fork-specific reactions over vanilla
-  rxns.sort((a, b) => (b.source === forkId ? 1 : 0) - (a.source === forkId ? 1 : 0));
+  // Prefer the closest lineage match: self, then parent, ..., then vanilla
+  const rank = rx => rx.source === 'vanilla' ? chain.length : chain.indexOf(rx.source);
+  rxns.sort((a, b) => rank(a) - rank(b));
   return rxns;
 }
 

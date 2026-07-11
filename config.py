@@ -233,6 +233,66 @@ FORK_REGISTRY = {
         "vanilla_override_reaction_files": VANILLA_REACTION_PATHS,
     },
 
+    # ── Russian Marine Corps / RuCM (RU, forks from RMC-14) ──
+    # Must stay right AFTER "rmc14": the repo carries its own copies of the
+    # _RMC14 layer with local additions (XenoAlch toxins, CMU medicine
+    # reactions) mixed into parent files. First-wins merge skips the
+    # identical-ID copies, so only RuCM's new content survives — but only if
+    # rmc14 is registered first. RuCM-exclusive content lives in _CMU14/_AU14.
+    "rucm": {
+        "name": "Russian Marine Corps",
+        "repo": "flex5hybrid/RussianCM",
+        "branch": "master",
+        "raw_url": "https://raw.githubusercontent.com/flex5hybrid/RussianCM/master/{path}",
+        "custom_dir": "_CMU14",
+        "color": "#9f1239",
+        "parent_fork": "rmc14",
+        # Same vanilla-category replacement as parent RMC14 (CM chem system)
+        "blocked_categories": {"Medicine", "Narcotics", "Cleaning", "Fun", "Chemicals", "Botany"},
+        "reagent_files": [
+            # RuCM's copy of the parent-layer file — carries 7 new XenoAlch toxins
+            "Resources/Prototypes/_RMC14/Reagents/toxins.yml",
+            "Resources/Prototypes/_CMU14/Economy/Recipes/Reagents/drugs.yml",
+            "Resources/Prototypes/_CMU14/Economy/Recipes/Reagents/toxins.yml",
+            "Resources/Prototypes/_CMU14/Medical/reagents/organ_repair.yml",
+            "Resources/Prototypes/_CMU14/Medical/reagents/painkillers.yml",
+            "Resources/Prototypes/_CMU14/Threats/Abominations/reagents.yml",
+            "Resources/Prototypes/_CMU14/Threats/Yautja/Species/reagents.yml",
+        ],
+        "reaction_files": [
+            # RuCM's copy of the parent-layer file — carries 9 new CMU medicine reactions
+            "Resources/Prototypes/_RMC14/Recipes/Reactions/medicine.yml",
+            "Resources/Prototypes/_CMU14/Economy/Recipes/Reactions/other.yml",
+            "Resources/Prototypes/_CMU14/Economy/Recipes/Reactions/pyrotechnic.yml",
+        ],
+        "locale_files": [
+            "Resources/Locale/en-US/_AU14/drugs.ftl",
+            "Resources/Locale/en-US/_CMU14/medical/reagents.ftl",
+            "Resources/Locale/en-US/_CMU14/yautja/yautja.ftl",
+            # RuCM's copy of the parent locale — adds XenoAlch names (pure additions)
+            "Resources/Locale/en-US/_RMC14/medical/toxins.ftl",
+        ],
+        "seed_files": [],
+        "botany_locale_files": [],
+        "blocked_reactions": set(),
+        "modified_reactions": {},
+        "dispenser_chemicals": set(),  # CM dispenser chems already global via rmc14
+        "vanilla_override_reaction_files": VANILLA_REACTION_PATHS,
+        # RuCM's copies of parent RMC14 reaction files, auto-diffed against the
+        # rmc14 build data to annotate parent recipes the server changed
+        # (e.g. Mindbreaker without Black Goo, CLF3 yield nerf).
+        "parent_override_reaction_files": [
+            "Resources/Prototypes/_RMC14/Recipes/Reactions/chemicals.yml",
+            "Resources/Prototypes/_RMC14/Recipes/Reactions/elements.yml",
+            "Resources/Prototypes/_RMC14/Recipes/Reactions/ingredients.yml",
+            "Resources/Prototypes/_RMC14/Recipes/Reactions/medicine.yml",
+            "Resources/Prototypes/_RMC14/Recipes/Reactions/narcotics.yml",
+            "Resources/Prototypes/_RMC14/Recipes/Reactions/other.yml",
+            "Resources/Prototypes/_RMC14/Recipes/Reactions/pyrotechnic.yml",
+            "Resources/Prototypes/_RMC14/Recipes/Reactions/toxins.yml",
+        ],
+    },
+
     # ── Goob Station ──
     "goob": {
         "name": "Goob Station",
@@ -837,6 +897,24 @@ OTHER_REAGENT_SOURCES = {
     "Blood": ["Blood draw (syringe)", "Blood Tomato (plant)"],
     "Slime": ["Slime (butcher/grind)"],
     "CarpoToxin": ["Space Carp (butcher meat)", "Koibean (plant)"],
+    # RuCM (Russian Marine Corps) — non-craftable fork content.
+    # Speed Demon ships only as pills: antag drug dealer loadout
+    # (_CMU14/Roles/antags.yml) and the WeyU experiments crate.
+    "AU14DrugSpeedDemon": [
+        "Antag drug dealer bottle, 5x15u pills (RuCM)",
+        "Weyland-Yutani experiments crate (RuCM)",
+    ],
+    # XenoAlch toxins are injected by the xeno Alchemist strain; the only
+    # marine-side source is drawing blood from a poisoned victim.
+    "RMCXenoAlchBrute": ["Xeno Alchemist strain (blood draw from victim, RuCM)"],
+    "RMCXenoAlchBurn": ["Xeno Alchemist strain (blood draw from victim, RuCM)"],
+    "RMCXenoAlchPain": ["Xeno Alchemist strain (blood draw from victim, RuCM)"],
+    "RMCXenoAlchFire": ["Xeno Alchemist strain (blood draw from victim, RuCM)"],
+    "RMCXenoAlchBloodloss": ["Xeno Alchemist strain (blood draw from victim, RuCM)"],
+    "RMCXenoAlchFreeze": ["Xeno Alchemist strain (blood draw from victim, RuCM)"],
+    "RMCXenoAlchPurge": ["Xeno Alchemist strain (blood draw from victim, RuCM)"],
+    "AbominationVenom": ["Abomination mob venom / clotted syringe (RuCM)"],
+    "CMUYautjaBlood": ["Blood draw from Yautja (RuCM)"],
     # Other
     "Nicotine": ["Tobacco (plant)"],
     "THC": ["Cannabis (plant)"],
@@ -1108,6 +1186,11 @@ ANTAG_DATA = {
         "score": 5, "tags": ["utility"],
         "tips": "Space Meth — extreme speed boost but causes jitteriness and brain damage at high doses. High risk, high reward self-buff.",
     },
+    "AU14DrugSpeedDemon": {
+        "score": 5, "tags": ["utility"],
+        "tips": "RuCM street drug: +30% walk / +34% sprint speed and purges Chloral Hydrate 10u/tick while metabolizing. NOT craftable — comes only as 15u pills (antag drug dealer bottle, WeyU experiments crate). Overdose at 15u, poison damage stacks past 40u: one pill at a time.",
+        "sources": ["code-rucm-speed-demon", "code-rucm-speed-demon-sources"],
+    },
     "Nothing": {
         "score": 3, "tags": ["utility"],
         "tips": "A mysterious reagent. Only obtainable from EMAG'd Solar's Best vending machine. Effects unknown — experimental.",
@@ -1333,6 +1416,16 @@ ANTAG_STRATEGIES = [
         "difficulty": "easy",
         "stealth": "medium",
         "sources": ["code-pyro-thermite", "code-chemicals-thermite-recipe", "forum-testicular-thermite-walls-2026"],
+    },
+    {
+        "id": "speed-demon-pills",
+        "name": "Speed Demon Pills (RuCM)",
+        "desc": "Russian Marine Corps exclusive self-buff. The Speed Demon street drug gives +30% walk / +34% sprint speed while it metabolizes (0.4u/tick, ~37s per 15u pill) and strips Chloral Hydrate 10u/tick — a walking sedation counter. It CANNOT be synthesized: no reaction exists in the fork's chemistry. Known sources are the antag drug dealer's labeled bottle (5x15u pills) and the Weyland-Yutani experiments crate. Overdose at 15u and poison damage past 40u in the bloodstream — swallow one pill at a time, never stack.",
+        "reagents": [{"id": "AU14DrugSpeedDemon", "amount": 15}],
+        "method": "Pill (acquired, not crafted)",
+        "difficulty": "easy",
+        "stealth": "high",
+        "sources": ["code-rucm-speed-demon", "code-rucm-speed-demon-sources", "code-rucm-weyu-crate"],
     },
 ]
 

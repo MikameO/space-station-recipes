@@ -216,6 +216,27 @@ SOURCES = {
         "date": "2026-04-21",
         "note": "Ephedrine 1 + Vestine 1 + Oxygen 2 @ minTemp 370 → Stimulants 2. Vestine is contraband (plant-mutation path), temp requires heater setup.",
     },
+    "code-rucm-speed-demon": {
+        "type": "code",
+        "url": "https://github.com/flex5hybrid/RussianCM/blob/master/Resources/Prototypes/_CMU14/Economy/Recipes/Reagents/drugs.yml#L1-L36",
+        "title": "AU14DrugSpeedDemon reagent (RuCM drugs.yml:1-36)",
+        "date": "2026-07-11",
+        "note": "Speed Demon: MovespeedModifier walk 1.3 / sprint 1.34, Narcotic metabolism 0.4, overdose 15, Poison 2/tick past 40u and 4/tick past 80u, AdjustReagent ChloralHydrate -10. Searching the fork's Reactions/ folders for AU14DrugSpeedDemon as a product returns zero hits — the drug has NO synthesis recipe.",
+    },
+    "code-rucm-speed-demon-sources": {
+        "type": "code",
+        "url": "https://github.com/flex5hybrid/RussianCM/blob/master/Resources/Prototypes/_CMU14/Roles/antags.yml",
+        "title": "AU14DrugDealerDrugBottle in RuCM antag loadouts (antags.yml)",
+        "date": "2026-07-11",
+        "note": "The Speed Demon pill bottle (5x15u pills) ships in the antag drug dealer loadout — the primary in-game acquisition path.",
+    },
+    "code-rucm-weyu-crate": {
+        "type": "code",
+        "url": "https://github.com/flex5hybrid/RussianCM/blob/master/Resources/Prototypes/_CMU14/Economy/Catalog/Fills/Crates/weyu_experiments.yml",
+        "title": "Speed Demon bottle in WeyU experiments crate (weyu_experiments.yml)",
+        "date": "2026-07-11",
+        "note": "Secondary acquisition path: the Weyland-Yutani experiments crate includes the Speed Demon pill bottle among its contents.",
+    },
     "code-toxins-tazinide": {
         "type": "code",
         "url": "https://github.com/space-wizards/space-station-14/blob/master/Resources/Prototypes/Reagents/toxins.yml#L668-L683",
