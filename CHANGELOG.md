@@ -3,6 +3,47 @@
 `data.json` schema version is in `meta.schemaVersion`. Consumers reading this file
 should pin on a compatible range (semver: breaking changes bump major).
 
+## 3.4.0 — 2026-07-11 (Increment M — cache refresh, blocked reagents, Botany tab)
+
+### Fresh upstream snapshots (all 18 forks)
+
+Local caches were fully re-fetched (they only download missing files, so data
+had drifted). Totals: 965 reagents / 872 reactions (was 953/850). Notable
+drift picked up: vanilla 407/316, RMC14 96/65 (gains **RMCUltrazine**),
+Delta-V 45/53, Dead Space 12/14, Funky 30/73. Vanilla's seeds locale moved
+upstream — `botany_locale_files` now points at the split
+`Locale/en-US/botany/seeds.ftl` + `Locale/en-US/seeds/seeds.ftl` pair.
+With fresh parent data, RuCM's parent auto-diff now reports **5 blocked**
+(RMCInstantJuice× 5) and **9 modified** (Mindbreaker chain × 5 without Black
+Goo, CLF3 yield 3→1, both napalm yields 2→1, RMCSmoke +BlackGoo) — all
+rendered as MOD badges / hidden recipes in the RuCM source view.
+
+### Reagent-level blocking (`blocked_reagents`, Phase 4d)
+
+Reactions have had a blocked/modified channel since 3.0; reagents get one now
+because RuCM is the first fork that REMOVES a parent reagent rather than only
+adding. New `parent_override_reagent_files` manifest + auto-diff: a parent
+reagent is blocked for the child when it exists in a parent file the child
+also carries, is absent from the child's copy, and is not re-contributed by
+the child's own manifests (404-safe: only successfully fetched files are
+judged). Ships as `forkStatus: {fork: "blocked"}` on the reagent; the UI
+source filter hides it, per-fork views exclude it from accessibility and drop
+reactions whose every product is blocked. Manual channel:
+`FORK_REGISTRY[fork]["blocked_reagents"]`. First real case: **RMCUltrazine**
+(upstream RMC14 speed stimulant) hidden on Russian Marine Corps.
+
+### Botany tab (`plantEffects`)
+
+`plantMetabolism` was parsed but discarded; it now ships on each reagent as
+structured chips `{kind, label, text, group, tone}` — 18 effect kinds mapped
+to filter groups (care / yield / mutation / weedpest / harm / special) and a
+tone (good for the plant / bad / mutagenic), sign-aware: `Weeds -8` is a
+green weedkiller, `Weeds +2` is red. New **Botany** tab lists all 469
+plant-affecting chemicals with group filter chips; generic drink/food
+hydration (inherited water/nutrition from the base drink prototype) is
+hidden by default behind a toggle so real fertilizers stand out. Reagent
+detail panels gain a "Plant Effects (Botany)" section.
+
 ## 3.3.0 — 2026-07-11 (Increment L — Russian Marine Corps + pure categories)
 
 ### New fork: Russian Marine Corps (`rucm`)

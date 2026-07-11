@@ -844,6 +844,120 @@ def summarize_metabolisms(metabolisms: dict) -> tuple[str, str]:
 
 
 # ─────────────────────────────────────────────
+# Plant effects (Botany tab)
+# ─────────────────────────────────────────────
+# plantMetabolism is a top-level reagent field (not under metabolisms), so the
+# effect summarizer above never sees it. Each entry becomes a structured chip:
+# {kind, label, text, group, tone, amount?, probability?}.
+#   group — UI filter bucket: care / yield / mutation / weedpest / harm / special
+#   tone  — chip color: good (helps the plant), bad (hurts it), neutral (mutagenic)
+
+# kind -> (short label, default group). Group may be overridden by sign logic.
+_PLANT_EFFECT_META = {
+    "PlantAdjustNutrition":     ("Nutrition", "care"),
+    "PlantAdjustWater":         ("Water", "care"),
+    "PlantAdjustHealth":        ("Plant health", "care"),
+    "PlantAffectGrowth":        ("Growth", "care"),
+    "PlantCryoxadone":          ("De-ages plant", "care"),
+    "PlantAdjustPotency":       ("Potency", "yield"),
+    "RobustHarvest":            ("Potency (Robust Harvest)", "yield"),
+    "PlantDiethylamine":        ("Lifespan & yield", "yield"),
+    "PlantRestoreSeeds":        ("Restores seeds", "yield"),
+    "PlantAdjustMutationLevel": ("Mutation level", "mutation"),
+    "PlantAdjustMutationMod":   ("Mutation modifier", "mutation"),
+    "PlantMutateChemicals":     ("Mutates chemical contents", "mutation"),
+    "PlantAdjustWeeds":         ("Weeds", "weedpest"),
+    "PlantAdjustPests":         ("Pests", "weedpest"),
+    "PlantAdjustToxins":        ("Plant toxins", "harm"),
+    "PlantDestroySeeds":        ("Destroys seeds", "harm"),
+    "PlantPhalanximine":        ("Restores viability", "special"),
+    "PlantRemoveKudzu":         ("Removes kudzu", "special"),
+}
+
+# Kinds where a positive amount HELPS the plant (negative hurts).
+_PLANT_POSITIVE_GOOD = {
+    "PlantAdjustNutrition", "PlantAdjustWater", "PlantAdjustHealth",
+    "PlantAffectGrowth", "PlantAdjustPotency", "RobustHarvest",
+}
+# Kinds where a positive amount HURTS the plant (negative helps: weedkiller).
+_PLANT_POSITIVE_BAD = {"PlantAdjustToxins", "PlantAdjustWeeds", "PlantAdjustPests"}
+_PLANT_ALWAYS_GOOD = {
+    "PlantCryoxadone", "PlantDiethylamine", "PlantRestoreSeeds",
+    "PlantPhalanximine", "PlantRemoveKudzu",
+}
+_PLANT_ALWAYS_BAD = {"PlantDestroySeeds"}
+_PLANT_NEUTRAL = {"PlantAdjustMutationLevel", "PlantAdjustMutationMod", "PlantMutateChemicals"}
+
+
+def _fmt_amount(val) -> str:
+    """3.0 -> '+3', -0.5 -> '-0.5' (explicit sign for chip readability)."""
+    try:
+        num = float(val)
+    except (TypeError, ValueError):
+        return str(val)
+    text = f"{num:g}"
+    return f"+{text}" if num > 0 else text
+
+
+def summarize_plant_effects(reagent: dict) -> list[dict]:
+    """Structure a reagent's plantMetabolism list for the Botany tab."""
+    plant_meta = reagent.get("plantMetabolism")
+    if not isinstance(plant_meta, list):
+        return []
+
+    out = []
+    for eff in plant_meta:
+        if not isinstance(eff, dict):
+            continue
+        kind = eff.get("_type", "")
+        if not kind:
+            continue
+        label, group = _PLANT_EFFECT_META.get(kind, (pascal_to_words(kind), "special"))
+        amount = eff.get("amount")
+        prob = eff.get("probability")
+
+        # Tone: is this good or bad FOR THE PLANT?
+        sign = 0.0
+        try:
+            sign = float(amount) if amount is not None else 1.0
+        except (TypeError, ValueError):
+            sign = 1.0
+        if kind in _PLANT_NEUTRAL:
+            tone = "neutral"
+        elif kind in _PLANT_ALWAYS_GOOD:
+            tone = "good"
+        elif kind in _PLANT_ALWAYS_BAD:
+            tone = "bad"
+        elif kind in _PLANT_POSITIVE_GOOD:
+            tone = "good" if sign >= 0 else "bad"
+        elif kind in _PLANT_POSITIVE_BAD:
+            tone = "bad" if sign >= 0 else "good"
+        else:
+            tone = "neutral"
+        # Weed/pest KILLERS are the useful gardening direction — keep them in
+        # the weedpest filter bucket; weed/pest GROWERS belong with harmful.
+        if kind in ("PlantAdjustWeeds", "PlantAdjustPests") and sign > 0:
+            group = "harm"
+
+        text = label
+        if amount is not None:
+            text = f"{label} {_fmt_amount(amount)}"
+        if prob is not None:
+            try:
+                text += f" ({float(prob) * 100:g}%)"
+            except (TypeError, ValueError):
+                pass
+
+        entry = {"kind": kind, "label": label, "text": text, "group": group, "tone": tone}
+        if amount is not None:
+            entry["amount"] = amount
+        if prob is not None:
+            entry["probability"] = prob
+        out.append(entry)
+    return out
+
+
+# ─────────────────────────────────────────────
 # Phase 4b: Verified Mechanics (Increment C)
 # ─────────────────────────────────────────────
 # Parse reagent YAML fields that the current pipeline ignores (tileReactions,
@@ -1936,6 +2050,7 @@ def build_per_fork_views(
     reagent_plants: dict,
     base_set: set,
     fork_diffs: dict | None = None,
+    fork_reagent_blocks: dict | None = None,
 ) -> dict[str, dict]:
     """Build filtered {reaction_lookup, all_sources, accessibility_map} per fork.
 
@@ -1948,6 +2063,10 @@ def build_per_fork_views(
     fork_diffs: {fork_id: (blocked_set, modified_dict)} — when provided, the
     auto-diff blocked set (vanilla category blocks, removed recipes, parent
     overrides) is applied on top of the manual blocked_reactions config.
+
+    fork_reagent_blocks: {fork_id: set of reagent ids} — reagents removed by
+    the fork (Phase 4d); excluded from the fork's accessibility view, and
+    reactions whose every product is blocked are dropped too.
 
     Note: modified_reactions are not structurally applied here — the recipe shape
     stays the same; only blocked recipes are dropped. Rationale: modifications
@@ -1966,18 +2085,24 @@ def build_per_fork_views(
         blocked = set(fconf.get("blocked_reactions", set()) or set())
         if fork_diffs and fork_id in fork_diffs:
             blocked |= fork_diffs[fork_id][0]
+        blocked_reagents = (fork_reagent_blocks or {}).get(fork_id, set())
         chain = fork_ancestry(fork_id)
+
+        def reaction_alive(rxn) -> bool:
+            """A reaction is dead in this fork if every product is a blocked reagent."""
+            products = rxn.get("products", {})
+            return not products or any(p not in blocked_reagents for p in products)
 
         # Fork view of reactions: vanilla (minus blocked) + ancestry chain
         fork_reactions = {}
         for rid, rxn in reactions_by_source.get("vanilla", {}).items():
-            if rid not in blocked:
+            if rid not in blocked and reaction_alive(rxn):
                 fork_reactions[rid] = rxn
         # Add native + ancestor reactions, parents first so a (hypothetical)
         # child redefinition would win the dict update
         for src in reversed(chain):
             for rid, rxn in reactions_by_source.get(src, {}).items():
-                if rid not in blocked:
+                if rid not in blocked and reaction_alive(rxn):
                     fork_reactions[rid] = rxn
 
         fork_reaction_lookup = build_reaction_lookup(fork_reactions)
@@ -1989,6 +2114,8 @@ def build_per_fork_views(
         fork_accessibility_map = {}
         for rid, reagent in reagents.items():
             if reagent.get("abstract"):
+                continue
+            if rid in blocked_reagents:
                 continue
             # Skip reagents that are exclusive to a fork outside this ancestry
             reagent_source = reagent.get("source") or proto_fork(reagent)
@@ -2035,12 +2162,15 @@ def export_json(reagents: dict, reactions: dict, locale: dict,
                 reaction_lookup: dict, base_set: set,
                 all_sources: dict | None = None,
                 fork_diffs: dict | None = None,
-                reagent_plants: dict | None = None):
+                reagent_plants: dict | None = None,
+                fork_reagent_blocks: dict | None = None):
     """Export all data as a JSON file for the web frontend.
     fork_diffs: {fork_id: (blocked_set, modified_dict)} from auto-diff.
     reagent_plants: {reagent_id: [plant_label...]} from parse_seed_sources;
         required for Increment I per-fork accessibility rebuild (plants are
-        fork-invariant, recipes are fork-filtered)."""
+        fork-invariant, recipes are fork-filtered).
+    fork_reagent_blocks: {fork_id: set of reagent ids} — reagents a fork
+        removed from its copy of the parent layer (Phase 4d)."""
     # Compute per-fork reagent counts
     fork_reagent_counts = {}
     for r in reagents.values():
@@ -2066,7 +2196,7 @@ def export_json(reagents: dict, reactions: dict, locale: dict,
 
     data = {
         "meta": {
-            "schemaVersion": "3.3.0",
+            "schemaVersion": "3.4.0",
             "generated": time.strftime("%Y-%m-%dT%H:%M:%S"),
             "forks": forks_meta,
             # Backward compat
@@ -2197,6 +2327,19 @@ def export_json(reagents: dict, reactions: dict, locale: dict,
         if antag_tips_sources:
             reagent_obj["antagTipsSources"] = antag_tips_sources
 
+        # Per-fork blocked status (Phase 4d) — mirrors reaction forkStatus.
+        # Only attached when some fork actually removed this reagent.
+        if fork_reagent_blocks:
+            r_status = {fid: "blocked" for fid, bset in fork_reagent_blocks.items()
+                        if rid in bset}
+            if r_status:
+                reagent_obj["forkStatus"] = r_status
+
+        # Botany tab: structured plantMetabolism chips (only when present)
+        plant_effects = summarize_plant_effects(reagent)
+        if plant_effects:
+            reagent_obj["plantEffects"] = plant_effects
+
         data["reagents"][rid] = reagent_obj
 
     # Build reactions
@@ -2295,7 +2438,8 @@ def export_json(reagents: dict, reactions: dict, locale: dict,
     # reagents) into a single precomputation so compute_strategy_difficulty stays pure.
     # Falls back to empty dict if plants weren't threaded through (old call sites).
     per_fork_views = build_per_fork_views(
-        reactions, reagents, reagent_plants or {}, base_set, fork_diffs
+        reactions, reagents, reagent_plants or {}, base_set, fork_diffs,
+        fork_reagent_blocks,
     ) if reagent_plants is not None else {}
 
     strategies_out = []
@@ -2447,14 +2591,23 @@ def main():
     # Phase 1c: Fetch parent-path files from derivative forks for parent auto-diff
     # (same idea as Phase 1b, but against the parent fork's custom layer — e.g.
     # RuCM's copies of _RMC14 reaction files vs the rmc14 build data)
-    fork_parent_overrides = {}  # fork_id -> {path: content}
+    fork_parent_overrides = {}  # fork_id -> {path: content} (reaction files)
+    fork_parent_reagent_overrides = {}  # fork_id -> {path: content} (reagent files)
     for fork_id, fconf in FORK_REGISTRY.items():
+        if not fconf.get("parent_fork"):
+            continue
         po_files = fconf.get("parent_override_reaction_files", [])
-        if po_files and fconf.get("parent_fork"):
+        pr_files = fconf.get("parent_override_reagent_files", [])
+        if po_files or pr_files:
             print(f"\n[{fconf['name']}] Parent-path overrides...")
+        if po_files:
             overrides = fetch_all_files(po_files, fconf["raw_url"], f"{fork_id}_parent_overrides")
             fork_parent_overrides[fork_id] = overrides
-            print(f"  Fetched {len(overrides)} parent-path override files")
+            print(f"  Fetched {len(overrides)} parent-path reaction override files")
+        if pr_files:
+            overrides = fetch_all_files(pr_files, fconf["raw_url"], f"{fork_id}_parent_overrides")
+            fork_parent_reagent_overrides[fork_id] = overrides
+            print(f"  Fetched {len(overrides)} parent-path reagent override files")
 
     # Botany locale (vanilla only for now)
     botany_locale_files = fetch_all_files(
@@ -2580,6 +2733,36 @@ def main():
         print(f"  {FORK_REGISTRY[fork_id]['name']} vs parent {parent_id}: "
               f"{len(blocked_p)} blocked, {len(modified_p)} modified")
 
+    # Phase 4d: Reagent-level blocking. Reactions have had a blocked channel
+    # since 3.0; reagents get one now because RuCM is the first fork that
+    # REMOVES a parent reagent (RMCUltrazine) rather than only adding. A
+    # parent reagent is blocked for the child when it is (a) defined in a
+    # parent file the child also carries, (b) absent from the child's copy,
+    # and (c) not re-contributed by the child's own manifests elsewhere.
+    # Manual per-fork config channel: FORK_REGISTRY[fork]["blocked_reagents"].
+    fork_reagent_blocks = {}  # fork_id -> set of blocked reagent ids
+    for fork_id, fconf in FORK_REGISTRY.items():
+        if fork_id == "vanilla":
+            continue
+        blocked_r = set(fconf.get("blocked_reagents", set()) or set())
+        override_files = fork_parent_reagent_overrides.get(fork_id, {})
+        parent_id = fconf.get("parent_fork")
+        if override_files and parent_id:
+            parent_reagents = parsed.get(parent_id, {}).get("reagents", {})
+            child_copy_reagents, _ = parse_all_prototypes(override_files, loader)
+            own_reagents = parsed.get(fork_id, {}).get("reagents", {})
+            for rid, rdata in parent_reagents.items():
+                # Only judge reagents from files the child copy actually
+                # fetched — a 404'd file must not mass-block its reagents.
+                if rdata.get("_source_file", "") not in override_files:
+                    continue
+                if rid not in child_copy_reagents and rid not in own_reagents:
+                    blocked_r.add(rid)
+        if blocked_r:
+            fork_reagent_blocks[fork_id] = blocked_r
+            print(f"  {fconf['name']}: {len(blocked_r)} blocked reagent(s): "
+                  f"{', '.join(sorted(blocked_r))}")
+
     # Phase 5: Build dependency trees
     print("\n=== Phase 5: Building craft dependency trees ===")
     reaction_lookup = build_reaction_lookup(all_reactions)
@@ -2614,6 +2797,7 @@ def main():
     export_json(
         all_reagents, all_reactions, locale, reaction_lookup, base_set,
         all_sources, fork_diffs, reagent_plants=reagent_plants,
+        fork_reagent_blocks=fork_reagent_blocks,
     )
 
     print("\n=== Phase 9: Extracting sprites from SS14 repo ===")

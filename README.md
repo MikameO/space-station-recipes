@@ -9,8 +9,8 @@
 Search reagents, plan reactions, explore craft trees, and calculate batch recipes across 18 community forks.
 
 [![License: GPL-3.0](https://img.shields.io/badge/License-GPL--3.0-22c55e?style=flat-square)](LICENSE)
-![Reagents](https://img.shields.io/badge/Reagents-953-39ff85?style=flat-square)
-![Reactions](https://img.shields.io/badge/Reactions-850-00e5ff?style=flat-square)
+![Reagents](https://img.shields.io/badge/Reagents-965-39ff85?style=flat-square)
+![Reactions](https://img.shields.io/badge/Reactions-872-00e5ff?style=flat-square)
 ![Forks](https://img.shields.io/badge/Forks-18-ffb627?style=flat-square)
 
 </div>
@@ -26,6 +26,7 @@ Search reagents, plan reactions, explore craft trees, and calculate batch recipe
 | **Calculator** | Recipe planner | Single recipe calc, batch shift planner, and reverse lookup |
 | **Trees** | Craft trees | Visual dependency chains for any reagent synthesis path |
 | **Graph** | Network viz | Interactive graph of all reagent relationships |
+| **Botany** | Plant effects | Which chemicals feed, heal, mutate, or kill plants — fertilizers, weedkillers, mutagens |
 | **Stats** | Database stats | Fork comparison, complexity rankings, base chemical usage |
 | **Antag** | Antag Mode | Curated strategies with lethality scores and delivery methods |
 | **Share** | Deep links | URL encodes filters and selection for easy sharing |
@@ -34,21 +35,21 @@ Search reagents, plan reactions, explore craft trees, and calculate batch recipe
 
 | Fork | Reagents | Reactions | |
 |------|:--------:|:---------:|---|
-| **Vanilla SS14** | 406 | 313 | `upstream` |
-| **RMC14** | 94 | 60 | Colonial Marines |
+| **Vanilla SS14** | 407 | 316 | `upstream` |
+| **RMC14** | 96 | 65 | Colonial Marines |
 | **Russian Marine Corps** | 20 | 14 | RU, RMC14-based |
 | **Goob Station** | 72 | 78 | |
 | **ADT (Время Приключений)** | 100 | 76 | RU, Corvax-based |
 | **Trauma Station** | 43 | 42 | Goob-based |
-| **Delta-V** | 39 | 42 | |
-| **Funky Station** | 29 | 73 | Goob-based |
+| **Delta-V** | 45 | 53 | |
+| **Funky Station** | 30 | 73 | Goob-based |
 | **Monolith** | 27 | 24 | Frontier-based |
 | **Starlight** | 21 | 9 | |
 | **Sunrise** | 38 | 46 | RU |
 | **Frontier** | 12 | 21 | |
 | **Carpmosia** | 12 | 15 | |
 | **Omu Station** | 11 | 11 | Goob-based |
-| **Dead Space** | 10 | 11 | |
+| **Dead Space** | 12 | 14 | |
 | **Corvax** | 9 | 8 | RU |
 | **Harmony** | 8 | 7 | |
 | **Fish Station (Рыбья)** | 2 | 0 | RU, Sunrise-based |

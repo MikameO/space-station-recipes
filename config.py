@@ -119,7 +119,10 @@ FORK_REGISTRY = {
         ],
         "seed_files": ["Resources/Prototypes/Hydroponics/seeds.yml"],
         "botany_locale_files": [
-            "Resources/Locale/en-US/ss14-entities/objects/specific/hydroponics/seeds.ftl",
+            # Upstream split the old ss14-entities/.../hydroponics/seeds.ftl
+            # into two files (2026-07 reorganization)
+            "Resources/Locale/en-US/botany/seeds.ftl",
+            "Resources/Locale/en-US/seeds/seeds.ftl",
         ],
         "blocked_reactions": set(),
         "modified_reactions": {},
@@ -290,6 +293,25 @@ FORK_REGISTRY = {
             "Resources/Prototypes/_RMC14/Recipes/Reactions/other.yml",
             "Resources/Prototypes/_RMC14/Recipes/Reactions/pyrotechnic.yml",
             "Resources/Prototypes/_RMC14/Recipes/Reactions/toxins.yml",
+        ],
+        # Same idea for parent REAGENT files — detects reagents the server
+        # removed from its copy of the parent layer (e.g. RMCUltrazine).
+        # A parent reagent counts as blocked only if it is absent from the
+        # child's copy AND not re-contributed by the child's own manifests.
+        "parent_override_reagent_files": [
+            "Resources/Prototypes/_RMC14/Reagents/base_reagent.yml",
+            "Resources/Prototypes/_RMC14/Reagents/elements.yml",
+            "Resources/Prototypes/_RMC14/Reagents/medicine.yml",
+            "Resources/Prototypes/_RMC14/Reagents/narcotics.yml",
+            "Resources/Prototypes/_RMC14/Reagents/other.yml",
+            "Resources/Prototypes/_RMC14/Reagents/pyrotechnic.yml",
+            "Resources/Prototypes/_RMC14/Reagents/synth_blood.yml",
+            "Resources/Prototypes/_RMC14/Reagents/toxins.yml",
+            "Resources/Prototypes/_RMC14/Reagents/Consumable/ingredients.yml",
+            "Resources/Prototypes/_RMC14/Reagents/Consumable/Drink/alcohol.yml",
+            "Resources/Prototypes/_RMC14/Reagents/Consumable/Drink/juice.yml",
+            "Resources/Prototypes/_RMC14/Reagents/Consumable/Drink/other_drinks.yml",
+            "Resources/Prototypes/_RMC14/Reagents/Consumable/Drink/soda.yml",
         ],
     },
 

@@ -187,6 +187,7 @@
       <button class="tab-btn" id="btn-calculator" data-tab="calculator" role="tab" aria-selected="false" aria-controls="tab-calculator">Calculator</button>
       <button class="tab-btn" id="btn-trees" data-tab="trees" role="tab" aria-selected="false" aria-controls="tab-trees">Craft Trees</button>
       <button class="tab-btn" id="btn-graph" data-tab="graph" role="tab" aria-selected="false" aria-controls="tab-graph">Graph</button>
+      <button class="tab-btn" id="btn-botany" data-tab="botany" role="tab" aria-selected="false" aria-controls="tab-botany">Botany</button>
       <button class="tab-btn" id="btn-stats" data-tab="stats" role="tab" aria-selected="false" aria-controls="tab-stats">Stats</button>
       <button class="tab-btn tab-btn-antag" id="btn-antag" data-tab="antag" role="tab" aria-selected="false" aria-controls="tab-antag" style="display:none">&#9760; Antag Strategies</button>
     </div>
@@ -300,6 +301,25 @@
         <span class="graph-info" id="graphInfo"></span>
       </div>
       <div id="graphContainer" class="graph-container"></div>
+    </div>
+
+    <!-- Botany Tab -->
+    <div class="tab-panel" id="tab-botany" role="tabpanel" aria-labelledby="btn-botany">
+      <p class="calc-legend">Chemicals that affect plants when added to a hydroponics tray.
+        <span class="plant-chip plant-good">green helps the plant</span>
+        <span class="plant-chip plant-bad">red hurts it</span>
+        <span class="plant-chip plant-neutral">purple mutates</span>
+        — the global search and Source filter apply here too.</p>
+      <div class="botany-filter-chips" id="botanyFilterChips" role="group" aria-label="Filter by plant effect kind">
+        <button class="diff-chip" data-group="care" aria-pressed="false">Growth &amp; Care</button>
+        <button class="diff-chip" data-group="yield" aria-pressed="false">Potency &amp; Yield</button>
+        <button class="diff-chip" data-group="mutation" aria-pressed="false">Mutation</button>
+        <button class="diff-chip" data-group="weedpest" aria-pressed="false">Weed &amp; Pest Killers</button>
+        <button class="diff-chip" data-group="harm" aria-pressed="false">Harmful</button>
+        <button class="diff-chip" data-group="special" aria-pressed="false">Special</button>
+        <button class="diff-chip active" id="botanyGenericToggle" aria-pressed="true" title="Nearly every drink and food waters or feeds a plant a little (inherited from the base drink prototype). Hidden by default so real fertilizers and weedkillers stand out.">hide generic drink/food hydration</button>
+      </div>
+      <div class="reagent-grid" id="botanyGrid"></div>
     </div>
 
     <!-- Stats Tab -->

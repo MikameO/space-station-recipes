@@ -74,6 +74,7 @@ async function init() {
   setupDisclaimer();
   setupAntagMode();
   setupAntagFilters();
+  setupBotanyFilters();
   setupSortSelect();
   decodeURLState();
 
@@ -142,6 +143,8 @@ function filterReagents(query) {
       if (r.source !== 'vanilla' && !forkChain(forkId).includes(r.source)) {
         return false; // reagent from outside this fork's lineage — hide
       }
+      // Reagent removed by this fork (e.g. RuCM removed RMCUltrazine)
+      if (r.forkStatus && r.forkStatus[forkId] === 'blocked') return false;
       // Vanilla/ancestor reagent: hide when its recipe is blocked on this fork
       if (r.source !== forkId) {
         const rxn = r.recipe ? Object.values(DATA.reactions).find(rx => rx.products[r.id]) : null;
@@ -478,9 +481,105 @@ function renderCurrentTab() {
   if (activeTab === 'reagents') renderReagents(query);
   else if (activeTab === 'reactions') renderReactions(query);
   else if (activeTab === 'graph') renderGraph();
+  else if (activeTab === 'botany') renderBotany(query);
   else if (activeTab === 'stats') renderStatsTab();
   else if (activeTab === 'antag') { renderAntagStrategies(); renderDeliveryMechanisms(); }
   // calculator and trees tabs have their own autocomplete — no re-render needed on filter change
+}
+
+// ─────────────────────────────────────────────
+// Botany Tab — chemicals with plantMetabolism effects
+// ─────────────────────────────────────────────
+// Reuses filterReagents so search / source-lineage / category filters all
+// apply; then narrows to reagents carrying plantEffects and (optionally)
+// to the selected effect groups.
+
+let botanyFilterGroups = new Set();
+// Nearly every drink/food inherits a small PlantAdjustWater/Nutrition from
+// the base drink prototype — technically true (you CAN water a plant with
+// cola) but it buries real fertilizers. Hidden by default, toggleable.
+let botanyHideGeneric = true;
+const GENERIC_PLANT_KINDS = new Set(['PlantAdjustWater', 'PlantAdjustNutrition']);
+const GENERIC_PLANT_CATS = new Set(['Drinks (Alcoholic)', 'Drinks (Non-Alc)', 'Food & Condiments', 'Biological']);
+
+function isGenericHydration(r) {
+  return GENERIC_PLANT_CATS.has(r.category) &&
+    r.plantEffects.every(pe => GENERIC_PLANT_KINDS.has(pe.kind));
+}
+
+function setupBotanyFilters() {
+  const bar = document.getElementById('botanyFilterChips');
+  if (!bar) return;
+  bar.addEventListener('click', (e) => {
+    const chip = e.target.closest('.diff-chip');
+    if (!chip) return;
+    if (chip.id === 'botanyGenericToggle') {
+      botanyHideGeneric = !botanyHideGeneric;
+    } else {
+      const group = chip.dataset.group;
+      if (botanyFilterGroups.has(group)) botanyFilterGroups.delete(group);
+      else botanyFilterGroups.add(group);
+    }
+    chip.classList.toggle('active');
+    chip.setAttribute('aria-pressed', chip.classList.contains('active') ? 'true' : 'false');
+    renderBotany(document.getElementById('searchInput').value);
+  });
+}
+
+function plantEffectChipsHTML(effects) {
+  return effects.map(pe =>
+    `<span class="plant-chip plant-${pe.tone}" title="${esc(pe.label)}">${esc(pe.text)}</span>`
+  ).join('');
+}
+
+function botanyCardHTML(r) {
+  const accent = safeColor(r.color);
+  const obtain = r.isBase
+    ? (r.isDispenser ? 'Chemical Dispenser' : (r.obtainSources || []).join(' | '))
+    : (r.recipe ? Object.entries(r.recipe.reactants).map(([id, info]) => `${info.amount}x ${id}`).join(' + ') : '');
+  return `<div class="reagent-card" data-id="${r.id}" tabindex="0" role="button" aria-label="${esc(capName(r.name || r.id))}" style="--card-accent:${accent}; border-top-color:${accent}">
+    <div class="reagent-card-header">
+      <span class="color-swatch" style="background:${accent}; box-shadow:0 0 6px ${accent}"></span>
+      <span class="reagent-name">${esc(capName(r.name || r.id))}</span>
+      <span class="reagent-id">${esc(r.id)}</span>
+    </div>
+    <div class="reagent-badges">
+      ${r.isBase ? `<span class="badge badge-base">${r.isDispenser ? 'DISPENSER' : 'BASE'}</span>` : ''}
+      ${r.source !== 'vanilla' && DATA.meta?.forks?.[r.source] ? `<span class="badge badge-fork" style="border-color:${DATA.meta.forks[r.source].color}">${DATA.meta.forks[r.source].name}</span>` : ''}
+    </div>
+    <div class="plant-effects">${plantEffectChipsHTML(r.plantEffects)}</div>
+    ${obtain ? `<div class="reagent-recipe">${esc(obtain)}</div>` : ''}
+  </div>`;
+}
+
+function renderBotany(query = '') {
+  const grid = document.getElementById('botanyGrid');
+  let entries = filterReagents(query).filter(e => e.reagent.plantEffects && e.reagent.plantEffects.length);
+  if (botanyHideGeneric) {
+    entries = entries.filter(e => !isGenericHydration(e.reagent));
+  }
+  if (botanyFilterGroups.size > 0) {
+    entries = entries.filter(e => e.reagent.plantEffects.some(pe => botanyFilterGroups.has(pe.group)));
+  }
+  entries.sort((a, b) => (a.reagent.name || a.reagent.id).localeCompare(b.reagent.name || b.reagent.id));
+  document.getElementById('resultCount').textContent = `${entries.length} botany chemicals`;
+
+  if (entries.length === 0) {
+    grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1">
+      <div class="empty-state-glyph">&#127793;</div>
+      <div class="empty-state-headline">No plant-affecting chemicals match the current filters</div>
+      <div class="empty-state-help">Clear the search, effect chips, or sidebar filters.</div>
+    </div>`;
+    return;
+  }
+
+  grid.innerHTML = entries.map(e => botanyCardHTML(e.reagent)).join('');
+  grid.querySelectorAll('.reagent-card').forEach(card => {
+    card.addEventListener('click', () => openDetail(card.dataset.id));
+    card.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openDetail(card.dataset.id); }
+    });
+  });
 }
 
 // ─────────────────────────────────────────────
@@ -1045,6 +1144,7 @@ function openDetail(reagentId, pushHistory = true) {
     </div>
 
     ${r.effects ? `<div class="detail-section"><h4>Effects</h4>${renderEffectsHTML(r.effects)}</div>` : ''}
+    ${r.plantEffects && r.plantEffects.length ? `<div class="detail-section"><h4>Plant Effects (Botany)</h4><div class="plant-effects">${plantEffectChipsHTML(r.plantEffects)}</div></div>` : ''}
 
     ${r.overdose ? `<div class="detail-section"><h4>Overdose</h4><p class="overdose-warn">${r.overdose}u${r.criticalOverdose ? ' | Critical: ' + r.criticalOverdose + 'u' : ''}</p></div>` : ''}
 
