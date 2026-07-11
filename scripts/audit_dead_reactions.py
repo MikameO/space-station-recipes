@@ -106,10 +106,15 @@ def fork_reagent_ids(fork_id: str) -> set[str]:
     conf = FORK_REGISTRY[fork_id]
     is_replacement = bool(conf.get("blocked_categories"))
 
+    # Custom-layer manifests + vanilla-path copies: forks add definitions
+    # inside patched vanilla files too (Goob's Warfarin/Necrosol — harvested
+    # by extractor Phase 2b from the same *_vanilla_overrides cache).
     fork_ids = set(_collect(CACHE / fork_id, "reagent").keys())
+    fork_ids |= set(_collect(CACHE / f"{fork_id}_vanilla_overrides", "reagent").keys())
     parent = conf.get("parent_fork")
     while parent:
         fork_ids |= set(_collect(CACHE / parent, "reagent").keys())
+        fork_ids |= set(_collect(CACHE / f"{parent}_vanilla_overrides", "reagent").keys())
         parent = FORK_REGISTRY.get(parent, {}).get("parent_fork")
 
     if is_replacement:

@@ -9,8 +9,8 @@
 Search reagents, plan reactions, explore craft trees, and calculate batch recipes across 18 community forks.
 
 [![License: GPL-3.0](https://img.shields.io/badge/License-GPL--3.0-22c55e?style=flat-square)](LICENSE)
-![Reagents](https://img.shields.io/badge/Reagents-965-39ff85?style=flat-square)
-![Reactions](https://img.shields.io/badge/Reactions-872-00e5ff?style=flat-square)
+![Reagents](https://img.shields.io/badge/Reagents-1156-39ff85?style=flat-square)
+![Reactions](https://img.shields.io/badge/Reactions-942-00e5ff?style=flat-square)
 ![Forks](https://img.shields.io/badge/Forks-18-ffb627?style=flat-square)
 
 </div>
@@ -36,21 +36,21 @@ Search reagents, plan reactions, explore craft trees, and calculate batch recipe
 | Fork | Reagents | Reactions | |
 |------|:--------:|:---------:|---|
 | **Vanilla SS14** | 407 | 316 | `upstream` |
-| **RMC14** | 96 | 65 | Colonial Marines |
+| **RMC14** | 113 | 68 | Colonial Marines |
 | **Russian Marine Corps** | 20 | 14 | RU, RMC14-based |
-| **Goob Station** | 72 | 78 | |
-| **ADT (Время Приключений)** | 100 | 76 | RU, Corvax-based |
+| **Goob Station** | 94 | 82 | |
+| **ADT (Время Приключений)** | 100 | 77 | RU, Corvax-based |
 | **Trauma Station** | 43 | 42 | Goob-based |
-| **Delta-V** | 45 | 53 | |
-| **Funky Station** | 30 | 73 | Goob-based |
+| **Delta-V** | 93 | 89 | |
+| **Funky Station** | 97 | 95 | Goob-based |
 | **Monolith** | 27 | 24 | Frontier-based |
-| **Starlight** | 21 | 9 | |
-| **Sunrise** | 38 | 46 | RU |
-| **Frontier** | 12 | 21 | |
+| **Starlight** | 27 | 10 | |
+| **Sunrise** | 37 | 46 | RU |
+| **Frontier** | 31 | 21 | |
 | **Carpmosia** | 12 | 15 | |
-| **Omu Station** | 11 | 11 | Goob-based |
-| **Dead Space** | 12 | 14 | |
-| **Corvax** | 9 | 8 | RU |
+| **Omu Station** | 15 | 12 | Goob-based |
+| **Dead Space** | 22 | 16 | |
+| **Corvax** | 8 | 8 | RU |
 | **Harmony** | 8 | 7 | |
 | **Fish Station (Рыбья)** | 2 | 0 | RU, Sunrise-based |
 

@@ -29,6 +29,36 @@ VANILLA_REACTION_PATHS = [
     "Resources/Prototypes/Recipes/Reactions/soap.yml",
 ]
 
+# Vanilla reagent files — fetched from each fork's repo (vanilla-path copies)
+# so the extractor can harvest reagents the fork ADDED inside those copies
+# (Goob defines Warfarin/Necrosol/new cocktails in its patched vanilla files).
+# Assigned to every non-vanilla fork after FORK_REGISTRY (see setdefault loop).
+VANILLA_REAGENT_PATHS = [
+    "Resources/Prototypes/Reagents/biological.yml",
+    "Resources/Prototypes/Reagents/botany.yml",
+    "Resources/Prototypes/Reagents/chemicals.yml",
+    "Resources/Prototypes/Reagents/cleaning.yml",
+    "Resources/Prototypes/Reagents/elements.yml",
+    "Resources/Prototypes/Reagents/fun.yml",
+    "Resources/Prototypes/Reagents/gases.yml",
+    "Resources/Prototypes/Reagents/medicine.yml",
+    "Resources/Prototypes/Reagents/narcotics.yml",
+    "Resources/Prototypes/Reagents/pyrotechnic.yml",
+    "Resources/Prototypes/Reagents/toxins.yml",
+    "Resources/Prototypes/Reagents/Consumable/Drink/alcohol.yml",
+    "Resources/Prototypes/Reagents/Consumable/Drink/base_drink.yml",
+    "Resources/Prototypes/Reagents/Consumable/Drink/drinks.yml",
+    "Resources/Prototypes/Reagents/Consumable/Drink/juice.yml",
+    "Resources/Prototypes/Reagents/Consumable/Drink/soda.yml",
+    "Resources/Prototypes/Reagents/Consumable/Food/condiments.yml",
+    "Resources/Prototypes/Reagents/Consumable/Food/food.yml",
+    "Resources/Prototypes/Reagents/Consumable/Food/ingredients.yml",
+    "Resources/Prototypes/Reagents/Materials/glass.yml",
+    "Resources/Prototypes/Reagents/Materials/materials.yml",
+    "Resources/Prototypes/Reagents/Materials/metals.yml",
+    "Resources/Prototypes/Reagents/Materials/ores.yml",
+]
+
 FORK_REGISTRY = {
     # ── Vanilla SS14 (upstream) ──
     "vanilla": {
@@ -159,6 +189,13 @@ FORK_REGISTRY = {
             "Resources/Prototypes/_RMC14/Reagents/Consumable/Drink/juice.yml",
             "Resources/Prototypes/_RMC14/Reagents/Consumable/Drink/other_drinks.yml",
             "Resources/Prototypes/_RMC14/Reagents/Consumable/Drink/soda.yml",
+            # Drink files added upstream after the fork was registered
+            # (manifest audit 2026-07-11). powdered_mixes defines the
+            # RMCInstantJuice* reagents whose reactions already shipped —
+            # they rendered as ghost products before this.
+            "Resources/Prototypes/_RMC14/Reagents/Consumable/Drink/base.yml",
+            "Resources/Prototypes/_RMC14/Reagents/Consumable/Drink/packaged_drinks.yml",
+            "Resources/Prototypes/_RMC14/Reagents/Consumable/Drink/powdered_mixes.yml",
         ],
         "reaction_files": [
             "Resources/Prototypes/_RMC14/Recipes/Reactions/chemicals.yml",
@@ -312,6 +349,11 @@ FORK_REGISTRY = {
             "Resources/Prototypes/_RMC14/Reagents/Consumable/Drink/juice.yml",
             "Resources/Prototypes/_RMC14/Reagents/Consumable/Drink/other_drinks.yml",
             "Resources/Prototypes/_RMC14/Reagents/Consumable/Drink/soda.yml",
+            # Parent drink files added upstream 2026-07 (404-safe: RuCM
+            # carries base/packaged copies but not powdered_mixes)
+            "Resources/Prototypes/_RMC14/Reagents/Consumable/Drink/base.yml",
+            "Resources/Prototypes/_RMC14/Reagents/Consumable/Drink/packaged_drinks.yml",
+            "Resources/Prototypes/_RMC14/Reagents/Consumable/Drink/powdered_mixes.yml",
         ],
     },
 
@@ -334,6 +376,29 @@ FORK_REGISTRY = {
             "Resources/Prototypes/_Goobstation/Reagents/narcotics.yml",
             "Resources/Prototypes/_Goobstation/Reagents/pyrotechnics.yml",
             "Resources/Prototypes/_Goobstation/Reagents/toxins.yml",
+            # Materials layer (goob-specific material reagents). Note:
+            # Saxoite is NOT here — Goob upstreamed it into its vanilla-path
+            # fun.yml copy; the Phase 2b harvest picks it up (first-wins
+            # attributes it to rmc14, whose repo synced the brief upstream
+            # stint — see CHANGELOG 3.4.x).
+            "Resources/Prototypes/_Goobstation/Reagents/Materials/materials.yml",
+            # Antag/system reagent definitions. Included deliberately even
+            # though most are ability-granted rather than craftable: the
+            # changeling REACTIONS file above already references them, ADT
+            # manifests its Heretic reagents (precedent), and define-only
+            # entries render with honest unobtainable/antag accessibility.
+            "Resources/Prototypes/_Goobstation/Changeling/Reagents/biological.yml",
+            "Resources/Prototypes/_Goobstation/Heretic/Reagents/reagents.yml",
+            "Resources/Prototypes/_Goobstation/Wizard/reagents.yml",
+            "Resources/Prototypes/_Goobstation/Xenobiology/Reagents/reagents.yml",
+            # Goob vendors the Einstein Engines layer; its own recipes
+            # (Neurotoxin, Amasec2, BlackBloodBreakdown) reference reagents
+            # defined there (Morphine, BlackBlood — audit 2026-07-11).
+            # Registry order puts these ahead of Omu's copies of the same
+            # vendor layer, so the whole Goob lineage sees them.
+            "Resources/Prototypes/_EinsteinEngines/Reagents/biological.yml",
+            "Resources/Prototypes/_EinsteinEngines/Reagents/medicine.yml",
+            "Resources/Prototypes/_EinsteinEngines/Reagents/narcotics.yml",
         ],
         "reaction_files": [
             "Resources/Prototypes/_Goobstation/Recipes/Reactions/biological.yml",
@@ -382,6 +447,11 @@ FORK_REGISTRY = {
             "Resources/Prototypes/_Starlight/Reagents/fun.yml",
             "Resources/Prototypes/_Starlight/Reagents/medicine.yml",
             "Resources/Prototypes/_Starlight/Reagents/xenobiology.yml",
+            # Consumable layer (manifest audit 2026-07-11): alcohol defines
+            # DraganSpecial, whose drinks.yml reaction was already tracked
+            "Resources/Prototypes/_Starlight/Reagents/Consumable/Drink/alcohol.yml",
+            "Resources/Prototypes/_Starlight/Reagents/Consumable/Drink/juice.yml",
+            "Resources/Prototypes/_Starlight/Reagents/Consumable/Food/food.yml",
         ],
         "reaction_files": [
             "Resources/Prototypes/_Starlight/Recipes/Reactions/cleaning.yml",
@@ -418,19 +488,37 @@ FORK_REGISTRY = {
             "Resources/Prototypes/_DV/Reagents/biological.yml",
             "Resources/Prototypes/_DV/Reagents/fun.yml",
             "Resources/Prototypes/_DV/Reagents/medicine.yml",
+            # narcotics/psionic/toxins: manifest audit 2026-07-11 — the
+            # psionic reaction file was already tracked but its reagents
+            # (PureOil, Claridisol, LotophagoiOil) rendered as ghosts
+            "Resources/Prototypes/_DV/Reagents/narcotics.yml",
+            "Resources/Prototypes/_DV/Reagents/psionic.yml",
+            "Resources/Prototypes/_DV/Reagents/toxins.yml",
             "Resources/Prototypes/_DV/Reagents/Consumable/Drink/alcohol.yml",
             "Resources/Prototypes/_DV/Reagents/Consumable/Drink/drinks.yml",
+            # frozen_treats: new upstream file pair (ice cream line, 2026-07)
+            "Resources/Prototypes/_DV/Reagents/Consumable/Drink/frozen_treats.yml",
             "Resources/Prototypes/_DV/Reagents/Consumable/Drink/powdered_drinks.yml",
             "Resources/Prototypes/_DV/Reagents/Consumable/Drink/soda.yml",
             "Resources/Prototypes/_DV/Reagents/Materials/materials.yml",
+            # Delta-V vendors the Nyanotrasen and Cosmatic Drift (_CD)
+            # layers; tracked DeltaV recipe files reference reagents defined
+            # there (Bechamel/Pesto/TomatoSauce condiments, Ectoplasm,
+            # Agonolexyne/Blissifylovene — orphan audit 2026-07-11)
+            "Resources/Prototypes/Nyanotrasen/Reagents/psionic.yml",
+            "Resources/Prototypes/Nyanotrasen/Reagents/Consumable/Food/condiments.yml",
+            "Resources/Prototypes/_CD/Reagents/medicine.yml",
         ],
         "reaction_files": [
             "Resources/Prototypes/_DV/Recipes/Reactions/drinks.yml",
             "Resources/Prototypes/_DV/Recipes/Reactions/food.yml",
+            "Resources/Prototypes/_DV/Recipes/Reactions/frozen_treats.yml",
             "Resources/Prototypes/_DV/Recipes/Reactions/fun.yml",
             "Resources/Prototypes/_DV/Recipes/Reactions/medicine.yml",
             "Resources/Prototypes/_DV/Recipes/Reactions/powdered_drinks.yml",
             "Resources/Prototypes/_DV/Recipes/Reactions/psionic.yml",
+            # Cosmatic Drift medicine pairs with _CD/Reagents/medicine.yml
+            "Resources/Prototypes/_CD/Reactions/medicine.yml",
         ],
         "locale_files": [],
         "seed_files": [],
@@ -452,8 +540,13 @@ FORK_REGISTRY = {
         "reagent_files": [
             "Resources/Prototypes/_DeadSpace/Reagents/biological.yml",
             "Resources/Prototypes/_DeadSpace/Reagents/elements.yml",
+            # medicine defines Derytracine (Pendrotoxine chain, added
+            # upstream 2026-07-11); Consumable/drinks defines the 8 drink
+            # reagents whose reactions were already tracked (orphan audit)
+            "Resources/Prototypes/_DeadSpace/Reagents/medicine.yml",
             "Resources/Prototypes/_DeadSpace/Reagents/narcotics.yml",
             "Resources/Prototypes/_DeadSpace/Reagents/toxins.yml",
+            "Resources/Prototypes/_DeadSpace/Reagents/Consumable/drinks.yml",
         ],
         "reaction_files": [
             "Resources/Prototypes/_DeadSpace/Recipes/Reactions/chemicals.yml",
@@ -484,6 +577,13 @@ FORK_REGISTRY = {
             "Resources/Prototypes/_NF/Reagents/medicine.yml",
             "Resources/Prototypes/_NF/Reagents/narcotics.yml",
             "Resources/Prototypes/_NF/Reagents/toxins.yml",
+            # Consumables (note the spelling — Frontier's own layer uses
+            # "Consumables", unlike the "Comsumables" typo in the copy Goob
+            # descendants carry). Tracked _NF reaction files reference
+            # Nanocaf/Gravy/Everyspice etc. — orphan audit 2026-07-11.
+            "Resources/Prototypes/_NF/Reagents/Consumables/Drink/drinks.yml",
+            "Resources/Prototypes/_NF/Reagents/Consumables/Food/food.yml",
+            "Resources/Prototypes/_NF/Reagents/Consumables/Food/ingredients.yml",
         ],
         "reaction_files": [
             "Resources/Prototypes/_NF/Recipes/Reactions/chemicals.yml",
@@ -518,6 +618,16 @@ FORK_REGISTRY = {
             "Resources/Prototypes/_Funkystation/Reagents/fun.yml",
             "Resources/Prototypes/_Funkystation/Reagents/medicine.yml",
             "Resources/Prototypes/_Funkystation/Reagents/toxins.yml",
+            # Consumable reagents backing the tracked alcohol/drinks/food
+            # reaction files — 34 cocktail products (Admiralty, BlueBlazer,
+            # ...) rendered as ghosts before (orphan audit 2026-07-11)
+            "Resources/Prototypes/_Funkystation/Reagents/Consumable/Drink/alcohol.yml",
+            "Resources/Prototypes/_Funkystation/Reagents/Consumable/Drink/drinks.yml",
+            "Resources/Prototypes/_Funkystation/Reagents/Consumable/Food/condiments.yml",
+            "Resources/Prototypes/_Funkystation/Reagents/Consumable/Food/ingredients.yml",
+            # Funky's copy of the _DV layer defines Hemoxadone, referenced
+            # by its patched vanilla medicine.yml (Ambuzol2 recipes)
+            "Resources/Prototypes/_DV/Reagents/medicine.yml",
         ],
         "reaction_files": [
             "Resources/Prototypes/_Funkystation/Recipes/Reactions/alcohol.yml",
@@ -612,6 +722,17 @@ FORK_REGISTRY = {
             "Resources/Prototypes/_Omu/Reagents/Consumable/Drink/drinks.yml",
             "Resources/Prototypes/_Omu/Reagents/chemicals.yml",
             "Resources/Prototypes/_Omu/Reagents/fun.yml",
+            # Omu vendors Frontier (_NF) and Einstein Engines layers inside
+            # its repo; its own recipes reference reagents defined there
+            # (GoldenCat/PineappleBlast drinks, Morphine, BlackBlood —
+            # audit findings 2026-07-11). _fork stamping attributes them to
+            # omu unless an earlier-registered fork defines the same ID.
+            "Resources/Prototypes/_NF/Reagents/Comsumables/Drink/drinks.yml",
+            "Resources/Prototypes/_EinsteinEngines/Reagents/narcotics.yml",
+            "Resources/Prototypes/_EinsteinEngines/Reagents/biological.yml",
+            # AtomicPrecision reagent lives inside an entity file (flavor +
+            # glass entity + reagent in one YAML) — manifest audit 2026-07-11
+            "Resources/Prototypes/_Omu/Entities/Objects/Consumable/Drinks/atomicPrecision.yml",
         ],
         "reaction_files": [
             "Resources/Prototypes/_Omu/Recipes/Reactions/drinks.yml",
@@ -780,6 +901,9 @@ FORK_REGISTRY = {
             "Resources/Prototypes/ADT/Recipes/Reactions/medicine.yml",
             "Resources/Prototypes/ADT/Recipes/Reactions/pyrotechnic.yml",
             "Resources/Prototypes/ADT/Recipes/Reactions/toxins.yml",
+            # ADT/Reactions/ (no Recipes/ segment) — separate dir the fork
+            # started using for new content (manifest audit 2026-07-11)
+            "Resources/Prototypes/ADT/Reactions/plastic.yml",
         ],
         "locale_files": [],
         "seed_files": [],
@@ -861,6 +985,13 @@ FORK_REGISTRY = {
         "vanilla_override_reaction_files": VANILLA_REACTION_PATHS,
     },
 }
+
+# Every non-vanilla fork gets vanilla-path reagent copies fetched for the
+# Phase 2b harvest (fork-added content inside patched vanilla files). Explicit
+# per-fork override still possible by setting the key in the entry above.
+for _fork_id, _fconf in FORK_REGISTRY.items():
+    if _fork_id != "vanilla":
+        _fconf.setdefault("vanilla_override_reagent_files", VANILLA_REAGENT_PATHS)
 
 # ── Backward-compatible aliases (used by extractor during transition) ──
 VANILLA_RAW = FORK_REGISTRY["vanilla"]["raw_url"]

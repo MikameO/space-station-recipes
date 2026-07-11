@@ -2196,7 +2196,7 @@ def export_json(reagents: dict, reactions: dict, locale: dict,
 
     data = {
         "meta": {
-            "schemaVersion": "3.4.0",
+            "schemaVersion": "3.4.1",
             "generated": time.strftime("%Y-%m-%dT%H:%M:%S"),
             "forks": forks_meta,
             # Backward compat
@@ -2576,17 +2576,24 @@ def main():
             "seed_files": seed_files,
         }
 
-    # Phase 1b: Fetch vanilla-path files from each fork for auto-diff
-    fork_vanilla_overrides = {}  # fork_id -> {path: content}
+    # Phase 1b: Fetch vanilla-path files from each fork for auto-diff + harvest
+    fork_vanilla_overrides = {}  # fork_id -> {path: content} (reaction files)
+    fork_vanilla_reagent_overrides = {}  # fork_id -> {path: content} (reagent files)
     for fork_id, fconf in FORK_REGISTRY.items():
         if fork_id == "vanilla":
             continue
         override_files = fconf.get("vanilla_override_reaction_files", [])
-        if override_files:
+        reagent_override_files = fconf.get("vanilla_override_reagent_files", [])
+        if override_files or reagent_override_files:
             print(f"\n[{fconf['name']}] Vanilla-path overrides...")
+        if override_files:
             overrides = fetch_all_files(override_files, fconf["raw_url"], f"{fork_id}_vanilla_overrides")
             fork_vanilla_overrides[fork_id] = overrides
-            print(f"  Fetched {len(overrides)} vanilla-path override files")
+            print(f"  Fetched {len(overrides)} vanilla-path reaction override files")
+        if reagent_override_files:
+            overrides = fetch_all_files(reagent_override_files, fconf["raw_url"], f"{fork_id}_vanilla_overrides")
+            fork_vanilla_reagent_overrides[fork_id] = overrides
+            print(f"  Fetched {len(overrides)} vanilla-path reagent override files")
 
     # Phase 1c: Fetch parent-path files from derivative forks for parent auto-diff
     # (same idea as Phase 1b, but against the parent fork's custom layer — e.g.
@@ -2631,6 +2638,49 @@ def main():
         parsed[fork_id] = {"reagents": reagents, "reactions": reactions}
         print(f"  {FORK_REGISTRY[fork_id]['name']}: {len(reagents)} reagents, {len(reactions)} reactions")
 
+    # Phase 2b: Harvest fork-added content from vanilla-path copies.
+    # Forks patch vanilla files in place — Goob defines Warfarin/Necrosol in
+    # its copy of Reagents/medicine.yml and new cocktail reactions in
+    # Recipes/Reactions/drinks.yml. Those copies are fetched for auto-diff
+    # (Phase 1b/4b) but their NEW prototypes were discarded, leaving fork
+    # reactions dangling on missing reagents (audit_dead_reactions findings,
+    # 2026-07-11). A prototype joins the fork's parse when its ID exists
+    # neither in vanilla nor in the fork's custom layers; the _fork stamp
+    # keeps attribution honest and first-wins merge (registry order) credits
+    # shared lineage additions to the base fork (Goob before Funky/Omu/...).
+    # Harvested content is kept SEPARATE from the fork's custom parse and
+    # merged in a second pass (Phase 4): explicitly-manifested definitions
+    # from ANY fork beat vanilla-copy harvests from any other. Otherwise a
+    # short-lived upstream experiment that 13 forks synced (Saxoite lived in
+    # wizards' fun.yml briefly, then was reverted) gets attributed to
+    # whichever fork sits earliest in the registry (rmc14) instead of the
+    # fork that actually manifests it as custom content (Goob).
+    print("\n=== Phase 2b: Harvesting fork additions from vanilla-path copies ===")
+    vanilla_reagent_ids = set(parsed["vanilla"]["reagents"])
+    vanilla_reaction_ids = set(parsed["vanilla"]["reactions"])
+    for fork_id in parsed:
+        if fork_id == "vanilla":
+            continue
+        harvested_r = {}
+        harvested_x = {}
+        o_reagents, _ = parse_all_prototypes(
+            fork_vanilla_reagent_overrides.get(fork_id, {}), loader)
+        for rid, rdata in o_reagents.items():
+            if rid not in vanilla_reagent_ids and rid not in parsed[fork_id]["reagents"]:
+                rdata["_fork"] = fork_id
+                harvested_r[rid] = rdata
+        _, o_reactions = parse_all_prototypes(
+            fork_vanilla_overrides.get(fork_id, {}), loader)
+        for xid, xdata in o_reactions.items():
+            if xid not in vanilla_reaction_ids and xid not in parsed[fork_id]["reactions"]:
+                xdata["_fork"] = fork_id
+                harvested_x[xid] = xdata
+        parsed[fork_id]["harvested_reagents"] = harvested_r
+        parsed[fork_id]["harvested_reactions"] = harvested_x
+        if harvested_r or harvested_x:
+            print(f"  {FORK_REGISTRY[fork_id]['name']}: +{len(harvested_r)} reagents, "
+                  f"+{len(harvested_x)} reactions harvested from vanilla-path copies")
+
     # Phase 3: Localization
     print("\n=== Phase 3: Loading localization ===")
     locale = {}
@@ -2648,21 +2698,29 @@ def main():
     all_reagents = dict(parsed["vanilla"]["reagents"])
     all_reactions = dict(parsed["vanilla"]["reactions"])
     collision_log = []
-    for fork_id, pdata in parsed.items():
-        if fork_id == "vanilla":
-            continue
-        for rid, rdata in pdata["reagents"].items():
-            if rid in all_reagents:
-                owner = proto_fork(all_reagents[rid])
-                collision_log.append(f"reagent {rid}: {fork_id} copy skipped (owned by {owner})")
-            else:
-                all_reagents[rid] = rdata
-        for xid, xdata in pdata["reactions"].items():
-            if xid in all_reactions:
-                owner = proto_fork(all_reactions[xid])
-                collision_log.append(f"reaction {xid}: {fork_id} copy skipped (owned by {owner})")
-            else:
-                all_reactions[xid] = xdata
+
+    def merge_pass(key_reagents: str, key_reactions: str, label: str):
+        for fork_id, pdata in parsed.items():
+            if fork_id == "vanilla":
+                continue
+            for rid, rdata in pdata.get(key_reagents, {}).items():
+                if rid in all_reagents:
+                    owner = proto_fork(all_reagents[rid])
+                    collision_log.append(f"reagent {rid}: {fork_id} {label} copy skipped (owned by {owner})")
+                else:
+                    all_reagents[rid] = rdata
+            for xid, xdata in pdata.get(key_reactions, {}).items():
+                if xid in all_reactions:
+                    owner = proto_fork(all_reactions[xid])
+                    collision_log.append(f"reaction {xid}: {fork_id} {label} copy skipped (owned by {owner})")
+                else:
+                    all_reactions[xid] = xdata
+
+    # Pass 1: custom-layer manifests (registry order) — explicit fork content.
+    # Pass 2: vanilla-copy harvests (registry order) — implicit content; any
+    # fork's explicit manifest outranks any fork's harvested copy.
+    merge_pass("reagents", "reactions", "custom")
+    merge_pass("harvested_reagents", "harvested_reactions", "harvested")
     if collision_log:
         print(f"  Cross-fork ID collisions (first-wins): {len(collision_log)}")
         for line in collision_log:
@@ -2726,6 +2784,14 @@ def main():
         parent_rxns = parsed.get(parent_id, {}).get("reactions", {})
         if not parent_rxns:
             continue
+        # Judge only reactions from files the child copy actually covers —
+        # the parent's parse also holds Phase 2b harvested reactions from
+        # vanilla-path copies, which live outside the parent layer and must
+        # not read as "blocked" here (same guard as Phase 4d for reagents).
+        parent_rxns = {
+            rid: rxn for rid, rxn in parent_rxns.items()
+            if rxn.get("_source_file", "") in override_files
+        }
         _, fork_parent_rxns = parse_all_prototypes(override_files, loader)
         blocked_p, modified_p = diff_fork_reactions(parent_rxns, fork_parent_rxns, set(), {})
         base_blocked, base_modified = fork_diffs.get(fork_id, (set(), {}))
@@ -2750,7 +2816,12 @@ def main():
         if override_files and parent_id:
             parent_reagents = parsed.get(parent_id, {}).get("reagents", {})
             child_copy_reagents, _ = parse_all_prototypes(override_files, loader)
-            own_reagents = parsed.get(fork_id, {}).get("reagents", {})
+            # "Re-contributed elsewhere" includes both the child's custom
+            # manifests and its vanilla-copy harvest (Phase 2b)
+            own_reagents = {
+                **parsed.get(fork_id, {}).get("reagents", {}),
+                **parsed.get(fork_id, {}).get("harvested_reagents", {}),
+            }
             for rid, rdata in parent_reagents.items():
                 # Only judge reagents from files the child copy actually
                 # fetched — a 404'd file must not mass-block its reagents.

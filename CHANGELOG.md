@@ -3,6 +3,63 @@
 `data.json` schema version is in `meta.schemaVersion`. Consumers reading this file
 should pin on a compatible range (semver: breaking changes bump major).
 
+## 3.4.1 — 2026-07-11 (Increment N — manifest-drift audit, orphan fix, vanilla-copy harvest)
+
+### Manifest-drift audit (`scripts/audit_fork_manifests.py`)
+
+The extractor's file manifests are static and its cache is immortal, so drift
+accumulates silently: forks add new YAML files the manifests never heard of,
+and renamed files 404 without failing the build. The new audit tool compares
+every fork's live GitHub tree (2 `git/trees` requests per fork) against
+`FORK_REGISTRY`, verifies tracked files via git blob-SHA against the local
+cache (no re-download), and content-probes untracked reagent/reaction YAMLs.
+First run found: **146 untracked files with chem prototypes**, 5 missing
+manifest paths (`soap.yml` × 5 forks — correctly auto-blocked), and a
+same-day Dead Space update. Report: `cache/fork_manifest_audit.json`.
+
+### Orphan fix — 26 files added to 10 fork manifests
+
+93 reactions referenced reagent ids that didn't exist in the database
+(tracked reaction files whose reagent-definition files weren't tracked):
+36 Funky cocktails, 15 Frontier drinks, 14 Delta-V entries, 10 RMC14
+instant juices, 8 Dead Space drinks... Added the defining files to
+`reagent_files` across rmc14, rucm (parent overrides), deltav, deadspace,
+frontier, funky, starlight, omu (AtomicPrecision lives inside an entity
+file), adt, and goob (`_EinsteinEngines` vendor layer). **Orphans: 93 → 2**;
+both leftovers are upstream Goob bugs (BeastBloodLing / MilkChoco reactions
+have no reagent prototype anywhere in the Goob repo).
+
+### Same-day upstream pickups
+
+- **Dead Space** (commit 15:53Z, after the 3.4.0 snapshot): new toxin
+  **Pendrotoxine** (Blunt 5/tick, slip hazard, forced screams) + chain
+  Puncturase + Dermaline → **Derytracine**; Celestin + Derytracine →
+  Pendrotoxine. Derytracine lives in `_DeadSpace/Reagents/medicine.yml` —
+  a file the manifest didn't track until now.
+- **Delta-V frozen treats**: new upstream file pair — 28 ice-cream/slush
+  reagents + 27 reactions (IceCreamTower, SlushCola, sherbet line, ...).
+- **RMC14 drink files** (base/packaged/powdered): 15 reagents incl. the
+  RMCInstantJuice* powders whose reactions already shipped in 3.4.0.
+
+### Vanilla-copy harvest (extractor Phase 2b)
+
+Forks patch vanilla files in place — Goob defines Warfarin/Necrosol inside
+its copy of `Reagents/medicine.yml`, Funky adds 12 Ambuzol recipes to its
+vanilla `medicine.yml`, RMC14 moved soap crafting into its `fun.yml` copy.
+Those copies were already fetched for the auto-diff; Phase 2b now also
+harvests fork-added prototypes from them. Merge is two-pass: explicit
+custom-layer manifests (registry order) always outrank harvested copies.
+Parent-diff guards keep harvested content from reading as "blocked".
+
+### Ownership moves (first-wins, registry order)
+
+Alexander (corvax → funky), Honey (sunrise → frontier),
+AdvancedMutationToxin (starlight → goob), Morphine/BlackBlood (omu → goob),
+Saxoite (goob → rmc14). Same ids, earlier-registered fork now defines them.
+
+Totals: **965 → 1156 reagents, 872 → 942 reactions** (schema unchanged —
+patch bump).
+
 ## 3.4.0 — 2026-07-11 (Increment M — cache refresh, blocked reagents, Botany tab)
 
 ### Fresh upstream snapshots (all 18 forks)
