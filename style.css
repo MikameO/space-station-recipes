@@ -550,6 +550,45 @@ main {
 }
 .preset-tier-meta .preset-tier-label { color: var(--amber-warn, #ffb627); opacity: 0.9; }
 
+/* A3: What Heals? medical mode */
+.heal-type-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 12px 0 16px;
+}
+.heal-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: var(--hull-plate);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-sub);
+  font-family: 'Oxanium', sans-serif;
+  font-size: 12px;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+.heal-chip:hover { border-color: var(--phosphor); color: var(--phosphor); }
+.heal-chip.active {
+  border-color: var(--phosphor);
+  color: var(--phosphor);
+  text-shadow: 0 0 8px var(--phosphor-glow);
+}
+.heal-chip-count {
+  font-size: 10px;
+  opacity: 0.6;
+  border: 1px solid currentColor;
+  padding: 0 4px;
+  border-radius: 2px;
+}
+.heal-table .heal-row { cursor: pointer; }
+.heal-table .heal-row:hover td { color: var(--phosphor); }
+.heal-num { font-weight: 600; }
+.heal-cond { color: var(--amber-warn, #ffb627); font-weight: 700; }
+.badge-access { border-left-color: var(--text-ghost); text-transform: none; }
+
 .tab-panel {
   display: none;
   flex: 1;

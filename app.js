@@ -537,6 +537,7 @@ function renderCurrentTab() {
   const query = document.getElementById('searchInput').value;
   if (activeTab === 'reagents') renderReagents(query);
   else if (activeTab === 'reactions') renderReactions(query);
+  else if (activeTab === 'medbay') renderMedbay();
   else if (activeTab === 'graph') renderGraph();
   else if (activeTab === 'botany') renderBotany(query);
   else if (activeTab === 'stats') renderStatsTab();
@@ -1292,6 +1293,128 @@ function rebuildDetailTree() {
   const tree = buildCraftTree(selectedReagentId, amount);
   const output = document.getElementById('detailTreeOutput');
   if (output) output.innerHTML = renderTreeHTML(tree);
+}
+
+// ─────────────────────────────────────────────
+// What Heals? — medical mode (A3)
+// Damage-type chips are built from live heals:* effectTags, so fork-added
+// damage types appear without code changes.
+// ─────────────────────────────────────────────
+
+let activeHealType = null;
+
+// Same source-visibility rules as filterReagents, minus sidebar filters —
+// the medbay mode stands alone.
+function reagentInActiveFork(r) {
+  if (activeSource === 'vanilla') return r.source === 'vanilla';
+  if (activeSource === 'all') return true;
+  const forkId = activeSource;
+  if (r.source !== 'vanilla' && !forkChain(forkId).includes(r.source)) return false;
+  if (r.forkStatus && r.forkStatus[forkId] === 'blocked') return false;
+  if (r.source !== forkId) {
+    const rxn = r.recipe ? Object.values(DATA.reactions).find(rx => rx.products[r.id]) : null;
+    if (rxn && rxn.forkStatus && rxn.forkStatus[forkId] === 'blocked') return false;
+    if (forkId === 'rmc14' && rxn && !rxn.forkStatus && rxn.rmcStatus === 'blocked') return false;
+  }
+  return true;
+}
+
+// Parse "Heals <Type> <N>" out of the effects clause list for one heal tag.
+// Prefers unconditional clauses; a conditional-only match is flagged for the UI.
+function healPerUnit(r, healLabel) {
+  const clauses = (r.effects || '').split(';');
+  const re = new RegExp('Heals\\s+' + healLabel + '\\s+([\\d.]+)', 'i');
+  let best = null;
+  for (const cl of clauses) {
+    const m = cl.match(re);
+    if (!m) continue;
+    const conditional = /\(if\s/.test(cl);
+    const val = parseFloat(m[1]);
+    if (!best || (best.conditional && !conditional) ||
+        (conditional === best.conditional && val > best.val)) {
+      best = { val, conditional };
+    }
+  }
+  return best;
+}
+
+function renderMedbay() {
+  const chipsEl = document.getElementById('healTypeChips');
+  if (!chipsEl) return;
+
+  // Available heal types under the active fork filter
+  const counts = {};
+  for (const r of Object.values(DATA.reagents)) {
+    if (!reagentInActiveFork(r)) continue;
+    for (const t of r.effectTags || []) {
+      if (t.startsWith('heals:')) {
+        const type = t.slice(6);
+        counts[type] = (counts[type] || 0) + 1;
+      }
+    }
+  }
+  const types = Object.keys(counts).sort((a, b) => counts[b] - counts[a]);
+  if (activeHealType && !counts[activeHealType]) activeHealType = null;
+  if (!activeHealType && types.length) activeHealType = types[0];
+
+  chipsEl.innerHTML = types.map(t =>
+    `<button class="heal-chip ${t === activeHealType ? 'active' : ''}" data-type="${esc(t)}">
+      ${esc(capName(t))} <span class="heal-chip-count">${counts[t]}</span>
+    </button>`).join('');
+  chipsEl.querySelectorAll('.heal-chip').forEach(btn => {
+    btn.addEventListener('click', () => {
+      activeHealType = btn.dataset.type;
+      track('whatheals_type', { type: activeHealType });
+      renderMedbay();
+    });
+  });
+
+  renderHealResults();
+}
+
+function renderHealResults() {
+  const el = document.getElementById('healResults');
+  if (!el) return;
+  if (!activeHealType) {
+    el.innerHTML = '<div class="empty-state"><div class="empty-state-headline">No healing data under the current fork filter.</div></div>';
+    return;
+  }
+
+  const rows = [];
+  for (const r of Object.values(DATA.reagents)) {
+    if (!reagentInActiveFork(r)) continue;
+    if (!(r.effectTags || []).includes('heals:' + activeHealType)) continue;
+    rows.push({ r, heal: healPerUnit(r, activeHealType) });
+  }
+  rows.sort((a, b) => {
+    const av = a.heal ? a.heal.val : -1;
+    const bv = b.heal ? b.heal.val : -1;
+    return bv - av ||
+      ((a.r.accessibility?.weight ?? 9) - (b.r.accessibility?.weight ?? 9)) ||
+      (a.r.name || a.r.id).localeCompare(b.r.name || b.r.id);
+  });
+
+  el.innerHTML = `<table class="data-table heal-table">
+    <thead><tr><th>Medicine</th><th>Heal / u</th><th>Overdose</th><th>Access</th><th>Source</th></tr></thead>
+    <tbody>${rows.map(({ r, heal }) => {
+      const healCell = heal
+        ? `${heal.val}${heal.conditional ? ' <span class="heal-cond" title="Conditional healing — open details">*</span>' : ''}`
+        : '—';
+      const acc = r.accessibility;
+      const accBadge = acc
+        ? `<span class="badge badge-access" title="${esc(acc.reason || '')}">${esc(acc.tier)}</span>` : '—';
+      const forkBadge = r.source !== 'vanilla' && DATA.meta?.forks?.[r.source]
+        ? `<span class="badge badge-fork" style="border-color:${DATA.meta.forks[r.source].color}">${esc(DATA.meta.forks[r.source].name)}</span>`
+        : 'vanilla';
+      return `<tr class="heal-row" onclick="openDetail('${esc(r.id)}')" tabindex="0">
+        <td><span class="color-swatch" style="background:${safeColor(r.color)}"></span> ${esc(capName(r.name || r.id))}</td>
+        <td class="heal-num">${healCell}</td>
+        <td>${r.overdose ? r.overdose + 'u' : '—'}</td>
+        <td>${accBadge}</td>
+        <td>${forkBadge}</td>
+      </tr>`;
+    }).join('')}</tbody>
+  </table>`;
 }
 
 // ─────────────────────────────────────────────
@@ -2728,7 +2851,7 @@ function decodeURLState() {
 
   // Tab (whitelist)
   const tab = params.get('tab');
-  const validTabs = ['reagents','reactions','calculator','trees','graph','stats','antag'];
+  const validTabs = ['reagents','reactions','calculator','medbay','trees','graph','stats','antag'];
   if (tab && validTabs.includes(tab)) {
     const btn = document.querySelector(`.tab-btn[data-tab="${safeSel(tab)}"]`);
     if (btn) btn.click();

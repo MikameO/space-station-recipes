@@ -72,7 +72,7 @@
   "license": "https://github.com/MikameO/space-station-recipes/blob/main/LICENSE"
 }
 </script>
-<link rel="stylesheet" href="style.css?v=13">
+<link rel="stylesheet" href="style.css?v=14">
 <!-- Yandex.Metrika counter -->
 <script type="text/javascript">
     (function(m,e,t,r,i,k,a){
@@ -185,6 +185,7 @@
     <div class="tab-bar" role="tablist">
       <button class="tab-btn active" id="btn-reagents" data-tab="reagents" role="tab" aria-selected="true" aria-controls="tab-reagents">Reagents</button>
       <button class="tab-btn" id="btn-calculator" data-tab="calculator" role="tab" aria-selected="false" aria-controls="tab-calculator">Calculator</button>
+      <button class="tab-btn" id="btn-medbay" data-tab="medbay" role="tab" aria-selected="false" aria-controls="tab-medbay">What Heals?</button>
       <button class="tab-btn" id="btn-trees" data-tab="trees" role="tab" aria-selected="false" aria-controls="tab-trees">Craft Trees</button>
       <button class="tab-btn" id="btn-botany" data-tab="botany" role="tab" aria-selected="false" aria-controls="tab-botany">Botany</button>
       <!-- A1: low-usage tabs live in Advanced; final removal pends the Metrika checkpoint (ROADMAP A1) -->
@@ -294,6 +295,13 @@
     </div>
 
     <!-- Craft Trees Tab -->
+    <!-- What Heals Tab (A3): damage type → medicines ranked by heal-per-unit -->
+    <div class="tab-panel" id="tab-medbay" role="tabpanel" aria-labelledby="btn-medbay">
+      <p class="reverse-desc">Pick a damage type — medicines ranked by healing per unit. Respects the fork filter; <span class="heal-cond">*</span> marks conditional healing (open details).</p>
+      <div class="heal-type-chips" id="healTypeChips"></div>
+      <div id="healResults"></div>
+    </div>
+
     <div class="tab-panel" id="tab-trees" role="tabpanel" aria-labelledby="btn-trees">
       <div class="tree-controls">
         <input type="text" id="treeTarget" class="search-input" placeholder="Type reagent name..." autocomplete="off" aria-label="Craft tree reagent search">
@@ -417,7 +425,7 @@
   <div class="loading-bar"><div class="loading-bar-fill"></div></div>
 </div>
 
-<script src="app.js?v=10"></script>
+<script src="app.js?v=11"></script>
 <script defer src="tutorial.js?v=2"></script>
 </body>
 </html>
