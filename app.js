@@ -676,6 +676,39 @@ function getCatColor(cat) {
   return '#64748b';
 }
 
+// A5: recipe complexity = number of distinct reactions in the fork-aware craft closure.
+// base/dispenser = 0; catalysts add no steps (mirrors buildCraftTree); no recipe → Infinity (sorts last).
+// v1 is a pure step counter — "hard to obtain" weighting deliberately deferred.
+const recipeStepsCache = new Map();
+function recipeSteps(reagentId) {
+  const key = activeSource + ':' + reagentId;
+  if (recipeStepsCache.has(key)) return recipeStepsCache.get(key);
+  let steps;
+  if (DATA.baseChemicals.includes(reagentId)) {
+    steps = 0;
+  } else if (getFilteredReactions(reagentId).length === 0) {
+    steps = Infinity;
+  } else {
+    const reactions = new Set();
+    (function walk(id, visiting) {
+      if (DATA.baseChemicals.includes(id) || visiting.has(id)) return;
+      const rxns = getFilteredReactions(id);
+      if (!rxns.length) return;
+      const rxn = rxns[0];
+      if (reactions.has(rxn.id)) return;
+      reactions.add(rxn.id);
+      const next = new Set(visiting);
+      next.add(id);
+      for (const [rid, info] of Object.entries(rxn.reactants)) {
+        if (!info.catalyst) walk(rid, next);
+      }
+    })(reagentId, new Set());
+    steps = reactions.size;
+  }
+  recipeStepsCache.set(key, steps);
+  return steps;
+}
+
 function sortResults(results) {
   const getName = e => (e.reagent.name || e.reagent.id).toLowerCase();
   switch (activeSort) {
@@ -685,6 +718,10 @@ function sortResults(results) {
       a.reagent.category.localeCompare(b.reagent.category) || getName(a).localeCompare(getName(b)));
     case 'used-in':   return results.sort((a, b) =>
       (usedInLookup[b.reagent.id] || 0) - (usedInLookup[a.reagent.id] || 0) || getName(a).localeCompare(getName(b)));
+    case 'steps-asc': { // A5
+      const sv = e => { const s = recipeSteps(e.reagent.id); return Number.isFinite(s) ? s : 1e9; };
+      return results.sort((a, b) => sv(a) - sv(b) || getName(a).localeCompare(getName(b)));
+    }
     case 'antag-desc': return results.sort((a, b) =>
       (b.reagent.antagScore || 0) - (a.reagent.antagScore || 0) || getName(a).localeCompare(getName(b)));
     default: return results;
@@ -805,6 +842,7 @@ function reagentCardHTML(r) {
       ${r.isBase ? `<span class="badge badge-base">${r.isDispenser ? 'DISPENSER' : 'BASE'}</span>` : ''}
       ${(!r.recipe && (!r.obtainSources || r.obtainSources.length === 0) && !r.isDispenser) ? `<span class="badge badge-unobtainable" title="No recipe, no plant, no dispenser source \u2014 unobtainable in vanilla play">UNOBTAINABLE</span>` : ''}
       ${r.overdose ? `<span class="badge badge-od">OD ${r.overdose}u</span>` : ''}
+      ${activeSort === 'steps-asc' && Number.isFinite(recipeSteps(r.id)) ? `<span class="badge badge-steps">&#9879; ${recipeSteps(r.id)} step${recipeSteps(r.id) === 1 ? '' : 's'}</span>` : ''}
       ${r.source !== 'vanilla' && DATA.meta?.forks?.[r.source] ? `<span class="badge badge-fork" style="border-color:${DATA.meta.forks[r.source].color}">${DATA.meta.forks[r.source].name}</span>` : ''}
       ${antagMode && r.antagScore ? `<span class="badge badge-antag">${'\u2620'} ${r.antagScore}/10</span>` : ''}
       ${antagMode && r.antagTags ? r.antagTags.map(t => `<span class="badge badge-antag-tag">${esc(t)}</span>`).join('') : ''}

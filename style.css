@@ -510,6 +510,12 @@ main {
   align-self: center;
 }
 
+/* A5: recipe-complexity chip (shown while sorting by Fewest Steps) */
+.badge-steps {
+  border-left-color: var(--phosphor);
+  color: var(--phosphor);
+}
+
 .tab-panel {
   display: none;
   flex: 1;
