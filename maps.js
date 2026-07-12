@@ -23,6 +23,7 @@
       if (!r.ok) throw new Error('HTTP ' + r.status);
       S.index = await r.json();
       status.textContent = '';
+      if (!S._navSetup) { S._navSetup = true; setupCanvasNav(); }
       buildMapSelect();
     } catch (e) {
       status.innerHTML = 'Failed to load maps index. <button id="mapsRetry">Retry</button>';
@@ -108,6 +109,33 @@
   function buildSearchIndex() {}   // replaced in Task 12
   function renderLocations() {}    // replaced in Task 13
   window.addEventListener('resize', () => { if (S.img && document.getElementById('tab-maps').classList.contains('active')) zoomFit(); });
+
+  function zoomAt(cx, cy, factor) {
+    const ns = Math.min(Math.max(S.scale * factor, 0.2), 40);
+    S.ox = cx - (cx - S.ox) * (ns / S.scale);
+    S.oy = cy - (cy - S.oy) * (ns / S.scale);
+    S.scale = ns; draw();
+  }
+  function setupCanvasNav() {
+    const c = document.getElementById('mapsCanvas');
+    const dpr = () => window.devicePixelRatio || 1;
+    c.addEventListener('wheel', e => {
+      e.preventDefault();
+      const r = c.getBoundingClientRect();
+      zoomAt((e.clientX - r.left) * dpr(), (e.clientY - r.top) * dpr(), e.deltaY < 0 ? 1.25 : 0.8);
+    }, { passive: false });
+    let drag = null;
+    c.addEventListener('pointerdown', e => { drag = { x: e.clientX, y: e.clientY }; c.setPointerCapture(e.pointerId); });
+    c.addEventListener('pointermove', e => {
+      if (!drag) return;
+      S.ox += (e.clientX - drag.x) * dpr(); S.oy += (e.clientY - drag.y) * dpr();
+      drag = { x: e.clientX, y: e.clientY }; draw();
+    });
+    c.addEventListener('pointerup', () => { drag = null; });
+    document.getElementById('mapsZoomIn').onclick = () => zoomAt(c.width / 2, c.height / 2, 1.4);
+    document.getElementById('mapsZoomOut').onclick = () => zoomAt(c.width / 2, c.height / 2, 0.7);
+    document.getElementById('mapsZoomFit').onclick = zoomFit;
+  }
 
   document.getElementById('btn-maps').addEventListener('click', init);
 })();
