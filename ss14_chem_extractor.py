@@ -1286,6 +1286,27 @@ def categorize_reagent(reagent: dict) -> str:
 # Phase 8b: Plant/Seed Source Extraction
 # ─────────────────────────────────────────────
 
+def _plant_display_name(raw_name: str, locale: dict | None) -> str:
+    """Resolve a seed's display name: locale first, cleaned key otherwise."""
+    if locale and raw_name in locale:
+        return locale[raw_name]
+    # Clean up seed name: seeds-ambrosiavulgaris-name -> Ambrosia Vulgaris
+    clean = raw_name.replace("seeds-", "").replace("-name", "").replace("-", " ")
+    clean = re.sub(r'([a-z])([A-Z])', r'\1 \2', clean)
+    # Fix known compound words that are all lowercase
+    fixes = {
+        "ambrosiavulgaris": "Ambrosia Vulgaris", "ambrosiadeus": "Ambrosia Deus",
+        "flyamanita": "Fly Amanita", "deathnettle": "Death Nettle",
+        "galaxythistle": "Galaxy Thistle", "spacemans trumpet": "Spaceman's Trumpet",
+        "onionred": "Red Onion", "bluetomato": "Blue Tomato",
+        "bloodtomato": "Blood Tomato", "holymelon": "Holy Melon",
+        "goldenapple": "Golden Apple", "bluepumpkin": "Blue Pumpkin",
+        "rainbow cannabis": "Rainbow Cannabis",
+        "walkingmushroom": "Walking Mushroom",
+    }
+    return fixes.get(clean.lower().strip(), clean.title())
+
+
 def parse_seed_sources(seed_files: dict[str, str], loader,
                        locale: dict | None = None) -> dict[str, list[str]]:
     """Parse seed YAML files to build reagent -> [plant names] mapping."""
@@ -1296,26 +1317,7 @@ def parse_seed_sources(seed_files: dict[str, str], loader,
         for entry in entries:
             if entry.get("type") != "seed":
                 continue
-            raw_name = entry.get("name", entry.get("id", "unknown"))
-            # Resolve locale name
-            if locale and raw_name in locale:
-                seed_name = locale[raw_name]
-            else:
-                # Clean up seed name: seeds-ambrosiavulgaris-name -> Ambrosia Vulgaris
-                clean = raw_name.replace("seeds-", "").replace("-name", "").replace("-", " ")
-                clean = re.sub(r'([a-z])([A-Z])', r'\1 \2', clean)
-                # Fix known compound words that are all lowercase
-                fixes = {
-                    "ambrosiavulgaris": "Ambrosia Vulgaris", "ambrosiadeus": "Ambrosia Deus",
-                    "flyamanita": "Fly Amanita", "deathnettle": "Death Nettle",
-                    "galaxythistle": "Galaxy Thistle", "spacemans trumpet": "Spaceman's Trumpet",
-                    "onionred": "Red Onion", "bluetomato": "Blue Tomato",
-                    "bloodtomato": "Blood Tomato", "holymelon": "Holy Melon",
-                    "goldenapple": "Golden Apple", "bluepumpkin": "Blue Pumpkin",
-                    "rainbow cannabis": "Rainbow Cannabis",
-                    "walkingmushroom": "Walking Mushroom",
-                }
-                seed_name = fixes.get(clean.lower().strip(), clean.title())
+            seed_name = _plant_display_name(entry.get("name", entry.get("id", "unknown")), locale)
             chemicals = entry.get("chemicals", {})
             if not isinstance(chemicals, dict):
                 continue
@@ -1327,6 +1329,60 @@ def parse_seed_sources(seed_files: dict[str, str], loader,
                     reagent_plants[reagent_id].append(plant_label)
 
     return dict(reagent_plants)
+
+
+def parse_plants(fork_data: dict, loader, locale: dict | None = None) -> dict:
+    """Parse seed prototypes into plant entities (D1, schema 3.6.0).
+
+    First fork to define a seed id wins — same merge rule as reagents
+    (fork_data iterates in FORK_REGISTRY order, vanilla first). Mutation
+    refs pointing at seeds no fork defines are dropped with a warning.
+    Returns {seed_id: {id, name, source, products, mutations, chemicals,
+    growth, rsi}}."""
+    plants = {}
+    for fork_id, fdata in fork_data.items():
+        for path, content in fdata.get("seed_files", {}).items():
+            entries = parse_yaml_content(content, path, loader)
+            for entry in entries:
+                if entry.get("type") != "seed":
+                    continue
+                sid = entry.get("id")
+                if not sid or sid in plants:
+                    continue
+                chems = {}
+                chemicals = entry.get("chemicals", {})
+                if isinstance(chemicals, dict):
+                    for rid, spec in chemicals.items():
+                        if isinstance(spec, dict):
+                            chems[rid] = {
+                                "min": spec.get("Min", 0),
+                                "max": spec.get("Max", 0),
+                                "potencyDivisor": spec.get("PotencyDivisor"),
+                            }
+                growth = {k: entry[k] for k in (
+                    "lifespan", "maturation", "production", "yield", "potency",
+                    "idealLight", "idealHeat", "nutrientConsumption", "waterConsumption",
+                ) if entry.get(k) is not None}
+                plants[sid] = {
+                    "id": sid,
+                    "name": _plant_display_name(entry.get("name", sid), locale),
+                    "source": fork_id,
+                    "products": entry.get("productPrototypes") or [],
+                    "mutations": entry.get("mutationPrototypes") or [],
+                    "chemicals": chems,
+                    "growth": growth,
+                    "rsi": entry.get("plantRsi", ""),
+                }
+    # Validate mutation targets against the merged plant set
+    dropped = []
+    for p in plants.values():
+        valid = [m for m in p["mutations"] if m in plants]
+        if len(valid) != len(p["mutations"]):
+            dropped.extend(m for m in p["mutations"] if m not in plants)
+        p["mutations"] = valid
+    if dropped:
+        print(f"  WARNING: dropped {len(dropped)} mutation refs to unknown seeds: {sorted(set(dropped))[:8]}")
+    return plants
 
 
 def build_all_sources(reagent_plants: dict, reaction_lookup: dict,
@@ -1750,7 +1806,8 @@ def export_json(reagents: dict, reactions: dict, locale: dict,
                 all_sources: dict | None = None,
                 fork_diffs: dict | None = None,
                 reagent_plants: dict | None = None,
-                fork_reagent_blocks: dict | None = None):
+                fork_reagent_blocks: dict | None = None,
+                plants: dict | None = None):
     """Export all data as a JSON file for the web frontend.
     fork_diffs: {fork_id: (blocked_set, modified_dict)} from auto-diff.
     reagent_plants: {reagent_id: [plant_label...]} from parse_seed_sources;
@@ -1783,13 +1840,16 @@ def export_json(reagents: dict, reactions: dict, locale: dict,
 
     data = {
         "meta": {
+            # 3.6.0: plants{} — seed prototypes as first-class entities
+            # (mutation graph, potency-scaled chemicals, growth params).
             # 3.5.0: legacy rmcStatus/rmcNote per-reaction fields and
             # vanillaReagentCount/rmcReagentCount meta removed — forkStatus/
             # forkNotes are the only fork-view fields since the multi-fork era.
-            "schemaVersion": "3.5.0",
+            "schemaVersion": "3.6.0",
             "generated": time.strftime("%Y-%m-%dT%H:%M:%S"),
             "forks": forks_meta,
             "reactionCount": len(reactions),
+            "plantCount": len(plants or {}),
         },
         "reagents": {},
         "reactions": {},
@@ -2079,6 +2139,9 @@ def export_json(reagents: dict, reactions: dict, locale: dict,
         presets_out.append({**_preset, "reagents": valid_reagents})
     data["shiftPresets"] = presets_out
     print(f"\n  Shift presets: {len(presets_out)}/{len(SHIFT_PRESETS)} exported")
+
+    # Plant entities (D1) — mutation graph + potency-scaled chemicals
+    data["plants"] = plants or {}
 
     # Print mismatch summary (non-fatal — authored tier is preserved for UI tooltip).
     if mismatches:
@@ -2463,10 +2526,14 @@ def main():
 
     # Phase 8: Generate JSON for web frontend
     print("\n=== Phase 8: Generating JSON for web frontend ===")
+    plants = parse_plants(fork_data, loader, all_seed_locale)
+    mut_count = sum(1 for p in plants.values() if p["mutations"])
+    print(f"  Plants: {len(plants)} entities ({mut_count} with mutation targets)")
+
     export_json(
         all_reagents, all_reactions, locale, reaction_lookup, base_set,
         all_sources, fork_diffs, reagent_plants=reagent_plants,
-        fork_reagent_blocks=fork_reagent_blocks,
+        fork_reagent_blocks=fork_reagent_blocks, plants=plants,
     )
 
     print("\n=== Phase 9: Extracting sprites from SS14 repo ===")

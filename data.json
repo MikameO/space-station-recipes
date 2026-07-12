@@ -1,7 +1,7 @@
 {
  "meta": {
-  "schemaVersion": "3.5.0",
-  "generated": "2026-07-12T17:21:13",
+  "schemaVersion": "3.6.0",
+  "generated": "2026-07-12T19:32:55",
   "forks": {
    "vanilla": {
     "name": "Vanilla SS14",
@@ -102,6 +102,7 @@
    }
   },
   "reactionCount": 1003,
+  "plantCount": 128,
   "sourceAttribution": {
    "total": 66,
    "attributed": 16,
@@ -133704,5 +133705,4130 @@
     "mk-shift-presets"
    ]
   }
- ]
+ ],
+ "plants": {
+  "wheat": {
+   "id": "wheat",
+   "name": "wheat",
+   "source": "vanilla",
+   "products": [
+    "WheatBushel"
+   ],
+   "mutations": [
+    "meatwheat"
+   ],
+   "chemicals": {
+    "Nutriment": {
+     "min": 1,
+     "max": 20,
+     "potencyDivisor": 20
+    },
+    "Flour": {
+     "min": 5,
+     "max": 20,
+     "potencyDivisor": 20
+    }
+   },
+   "growth": {
+    "lifespan": 25,
+    "maturation": 6,
+    "production": 3,
+    "yield": 3,
+    "potency": 5,
+    "idealLight": 8,
+    "nutrientConsumption": 0.4
+   },
+   "rsi": "Objects/Specific/Hydroponics/wheat.rsi"
+  },
+  "meatwheat": {
+   "id": "meatwheat",
+   "name": "meatwheat",
+   "source": "vanilla",
+   "products": [
+    "MeatwheatBushel"
+   ],
+   "mutations": [],
+   "chemicals": {
+    "Nutriment": {
+     "min": 1,
+     "max": 20,
+     "potencyDivisor": 20
+    },
+    "UncookedAnimalProteins": {
+     "min": 5,
+     "max": 20,
+     "potencyDivisor": 20
+    }
+   },
+   "growth": {
+    "lifespan": 25,
+    "maturation": 6,
+    "production": 3,
+    "yield": 3,
+    "potency": 5,
+    "idealLight": 8,
+    "nutrientConsumption": 0.4
+   },
+   "rsi": "Objects/Specific/Hydroponics/meatwheat.rsi"
+  },
+  "oat": {
+   "id": "oat",
+   "name": "oat",
+   "source": "vanilla",
+   "products": [
+    "OatBushel"
+   ],
+   "mutations": [],
+   "chemicals": {
+    "Nutriment": {
+     "min": 1,
+     "max": 20,
+     "potencyDivisor": 20
+    },
+    "Oats": {
+     "min": 5,
+     "max": 20,
+     "potencyDivisor": 20
+    }
+   },
+   "growth": {
+    "lifespan": 25,
+    "maturation": 6,
+    "production": 3,
+    "yield": 3,
+    "potency": 5,
+    "idealLight": 8,
+    "nutrientConsumption": 0.4
+   },
+   "rsi": "Objects/Specific/Hydroponics/oat.rsi"
+  },
+  "banana": {
+   "id": "banana",
+   "name": "banana",
+   "source": "vanilla",
+   "products": [
+    "FoodBanana"
+   ],
+   "mutations": [
+    "mimana"
+   ],
+   "chemicals": {
+    "Vitamin": {
+     "min": 1,
+     "max": 4,
+     "potencyDivisor": 25
+    },
+    "Nutriment": {
+     "min": 1,
+     "max": 2,
+     "potencyDivisor": 50
+    }
+   },
+   "growth": {
+    "lifespan": 50,
+    "maturation": 6,
+    "production": 6,
+    "yield": 2,
+    "idealLight": 9,
+    "idealHeat": 298,
+    "waterConsumption": 0.6
+   },
+   "rsi": "Objects/Specific/Hydroponics/banana.rsi"
+  },
+  "mimana": {
+   "id": "mimana",
+   "name": "mimana",
+   "source": "vanilla",
+   "products": [
+    "FoodMimana"
+   ],
+   "mutations": [],
+   "chemicals": {
+    "MuteToxin": {
+     "min": 1,
+     "max": 5,
+     "potencyDivisor": 20
+    },
+    "Nutriment": {
+     "min": 1,
+     "max": 2,
+     "potencyDivisor": 50
+    }
+   },
+   "growth": {
+    "lifespan": 50,
+    "maturation": 6,
+    "production": 6,
+    "yield": 2,
+    "idealLight": 9,
+    "idealHeat": 298,
+    "waterConsumption": 0.6
+   },
+   "rsi": "Objects/Specific/Hydroponics/mimana.rsi"
+  },
+  "carrots": {
+   "id": "carrots",
+   "name": "carrot",
+   "source": "vanilla",
+   "products": [
+    "FoodCarrot"
+   ],
+   "mutations": [],
+   "chemicals": {
+    "JuiceCarrot": {
+     "min": 1,
+     "max": 5,
+     "potencyDivisor": 20
+    },
+    "Oculine": {
+     "min": 2,
+     "max": 6,
+     "potencyDivisor": 20
+    },
+    "Vitamin": {
+     "min": 1,
+     "max": 4,
+     "potencyDivisor": 25
+    }
+   },
+   "growth": {
+    "lifespan": 25,
+    "maturation": 10,
+    "production": 3,
+    "yield": 3,
+    "potency": 10,
+    "waterConsumption": 0.6
+   },
+   "rsi": "Objects/Specific/Hydroponics/carrot.rsi"
+  },
+  "laughinPea": {
+   "id": "laughinPea",
+   "name": "laughin' peas",
+   "source": "vanilla",
+   "products": [
+    "FoodLaughinPeaPod"
+   ],
+   "mutations": [
+    "worldPea"
+   ],
+   "chemicals": {
+    "Nutriment": {
+     "min": 1,
+     "max": 3,
+     "potencyDivisor": 7
+    },
+    "Sugar": {
+     "min": 1,
+     "max": 10,
+     "potencyDivisor": 5
+    },
+    "Laughter": {
+     "min": 1,
+     "max": 10,
+     "potencyDivisor": 5
+    }
+   },
+   "growth": {
+    "lifespan": 25,
+    "maturation": 7,
+    "production": 5,
+    "yield": 3,
+    "potency": 20,
+    "idealLight": 8,
+    "nutrientConsumption": 0.6,
+    "waterConsumption": 0.6
+   },
+   "rsi": "Objects/Specific/Hydroponics/laughin_pea.rsi"
+  },
+  "lemon": {
+   "id": "lemon",
+   "name": "lemon",
+   "source": "vanilla",
+   "products": [
+    "FoodLemon"
+   ],
+   "mutations": [
+    "lemoon",
+    "lime",
+    "orange"
+   ],
+   "chemicals": {
+    "Nutriment": {
+     "min": 1,
+     "max": 5,
+     "potencyDivisor": 20
+    },
+    "Vitamin": {
+     "min": 1,
+     "max": 4,
+     "potencyDivisor": 25
+    }
+   },
+   "growth": {
+    "lifespan": 55,
+    "maturation": 6,
+    "production": 6,
+    "yield": 3,
+    "potency": 10,
+    "idealLight": 8
+   },
+   "rsi": "Objects/Specific/Hydroponics/lemon.rsi"
+  },
+  "lemoon": {
+   "id": "lemoon",
+   "name": "lemoon",
+   "source": "vanilla",
+   "products": [
+    "FoodLemoon"
+   ],
+   "mutations": [],
+   "chemicals": {
+    "Vitamin": {
+     "min": 1,
+     "max": 4,
+     "potencyDivisor": 25
+    },
+    "Milk": {
+     "min": 8,
+     "max": 20,
+     "potencyDivisor": 5
+    }
+   },
+   "growth": {
+    "lifespan": 90,
+    "maturation": 8,
+    "production": 6,
+    "yield": 4,
+    "potency": 1,
+    "idealLight": 8
+   },
+   "rsi": "Objects/Specific/Hydroponics/lemoon.rsi"
+  },
+  "lime": {
+   "id": "lime",
+   "name": "lime",
+   "source": "vanilla",
+   "products": [
+    "FoodLime"
+   ],
+   "mutations": [
+    "orange",
+    "lemon"
+   ],
+   "chemicals": {
+    "Nutriment": {
+     "min": 1,
+     "max": 5,
+     "potencyDivisor": 20
+    },
+    "Vitamin": {
+     "min": 1,
+     "max": 4,
+     "potencyDivisor": 25
+    }
+   },
+   "growth": {
+    "lifespan": 55,
+    "maturation": 6,
+    "production": 6,
+    "yield": 3,
+    "potency": 10,
+    "idealLight": 8
+   },
+   "rsi": "Objects/Specific/Hydroponics/lime.rsi"
+  },
+  "orange": {
+   "id": "orange",
+   "name": "orange",
+   "source": "vanilla",
+   "products": [
+    "FoodOrange"
+   ],
+   "mutations": [
+    "extradimensionalOrange",
+    "lemon",
+    "lime"
+   ],
+   "chemicals": {
+    "Nutriment": {
+     "min": 1,
+     "max": 5,
+     "potencyDivisor": 20
+    },
+    "Vitamin": {
+     "min": 1,
+     "max": 4,
+     "potencyDivisor": 25
+    }
+   },
+   "growth": {
+    "lifespan": 55,
+    "maturation": 6,
+    "production": 6,
+    "yield": 3,
+    "potency": 10,
+    "idealLight": 8
+   },
+   "rsi": "Objects/Specific/Hydroponics/orange.rsi"
+  },
+  "extradimensionalOrange": {
+   "id": "extradimensionalOrange",
+   "name": "extradimensional orange",
+   "source": "vanilla",
+   "products": [
+    "FoodExtradimensionalOrange"
+   ],
+   "mutations": [],
+   "chemicals": {
+    "Haloperidol": {
+     "min": 1,
+     "max": 5,
+     "potencyDivisor": 20
+    },
+    "Nutriment": {
+     "min": 1,
+     "max": 5,
+     "potencyDivisor": 20
+    },
+    "Vitamin": {
+     "min": 1,
+     "max": 4,
+     "potencyDivisor": 25
+    }
+   },
+   "growth": {
+    "lifespan": 55,
+    "maturation": 6,
+    "production": 6,
+    "yield": 3,
+    "potency": 10,
+    "idealLight": 8
+   },
+   "rsi": "Objects/Specific/Hydroponics/extradimensional_orange.rsi"
+  },
+  "pineapple": {
+   "id": "pineapple",
+   "name": "pineapple",
+   "source": "vanilla",
+   "products": [
+    "FoodPineapple"
+   ],
+   "mutations": [],
+   "chemicals": {
+    "Nutriment": {
+     "min": 1,
+     "max": 20,
+     "potencyDivisor": 20
+    },
+    "Water": {
+     "min": 1,
+     "max": 4,
+     "potencyDivisor": 25
+    },
+    "Vitamin": {
+     "min": 1,
+     "max": 2,
+     "potencyDivisor": 50
+    }
+   },
+   "growth": {
+    "lifespan": 55,
+    "maturation": 6,
+    "production": 6,
+    "yield": 3,
+    "potency": 10,
+    "idealLight": 8
+   },
+   "rsi": "Objects/Specific/Hydroponics/pineapple.rsi"
+  },
+  "potato": {
+   "id": "potato",
+   "name": "potato",
+   "source": "vanilla",
+   "products": [
+    "FoodPotato"
+   ],
+   "mutations": [],
+   "chemicals": {
+    "Nutriment": {
+     "min": 1,
+     "max": 10,
+     "potencyDivisor": 10
+    },
+    "Vitamin": {
+     "min": 1,
+     "max": 4,
+     "potencyDivisor": 25
+    }
+   },
+   "growth": {
+    "lifespan": 30,
+    "maturation": 10,
+    "production": 3,
+    "yield": 3,
+    "potency": 10,
+    "waterConsumption": 0.6
+   },
+   "rsi": "Objects/Specific/Hydroponics/potato.rsi"
+  },
+  "sugarcane": {
+   "id": "sugarcane",
+   "name": "sugarcane",
+   "source": "vanilla",
+   "products": [
+    "Sugarcane"
+   ],
+   "mutations": [
+    "papercane"
+   ],
+   "chemicals": {
+    "Sugar": {
+     "min": 4,
+     "max": 5,
+     "potencyDivisor": 5
+    }
+   },
+   "growth": {
+    "lifespan": 60,
+    "maturation": 6,
+    "production": 6,
+    "yield": 3,
+    "potency": 10,
+    "idealHeat": 298
+   },
+   "rsi": "Objects/Specific/Hydroponics/sugarcane.rsi"
+  },
+  "teaPlant": {
+   "id": "teaPlant",
+   "name": "tea plant",
+   "source": "vanilla",
+   "products": [
+    "LeavesTea"
+   ],
+   "mutations": [],
+   "chemicals": {
+    "Vitamin": {
+     "min": 1,
+     "max": 5,
+     "potencyDivisor": 20
+    }
+   },
+   "growth": {
+    "lifespan": 75,
+    "maturation": 5,
+    "production": 3,
+    "yield": 2,
+    "potency": 20,
+    "idealLight": 9,
+    "idealHeat": 298,
+    "waterConsumption": 0.6
+   },
+   "rsi": "Objects/Specific/Hydroponics/tea_plant.rsi"
+  },
+  "papercane": {
+   "id": "papercane",
+   "name": "papercane",
+   "source": "vanilla",
+   "products": [
+    "Papercane"
+   ],
+   "mutations": [],
+   "chemicals": {},
+   "growth": {
+    "lifespan": 60,
+    "maturation": 6,
+    "production": 6,
+    "yield": 3,
+    "potency": 10,
+    "idealHeat": 298
+   },
+   "rsi": "Objects/Specific/Hydroponics/papercane.rsi"
+  },
+  "towercap": {
+   "id": "towercap",
+   "name": "tower cap",
+   "source": "vanilla",
+   "products": [
+    "Log"
+   ],
+   "mutations": [
+    "steelcap"
+   ],
+   "chemicals": {},
+   "growth": {
+    "lifespan": 80,
+    "maturation": 15,
+    "production": 3,
+    "yield": 5,
+    "potency": 1,
+    "idealHeat": 288,
+    "nutrientConsumption": 0.5,
+    "waterConsumption": 0.6
+   },
+   "rsi": "Objects/Specific/Hydroponics/towercap.rsi"
+  },
+  "steelcap": {
+   "id": "steelcap",
+   "name": "steel cap",
+   "source": "vanilla",
+   "products": [
+    "SteelLog"
+   ],
+   "mutations": [],
+   "chemicals": {},
+   "growth": {
+    "lifespan": 80,
+    "maturation": 15,
+    "production": 3,
+    "yield": 3,
+    "potency": 1,
+    "idealHeat": 288,
+    "nutrientConsumption": 0.8,
+    "waterConsumption": 0.6
+   },
+   "rsi": "Objects/Specific/Hydroponics/steelcap.rsi"
+  },
+  "tomato": {
+   "id": "tomato",
+   "name": "tomato",
+   "source": "vanilla",
+   "products": [
+    "FoodTomato"
+   ],
+   "mutations": [
+    "blueTomato",
+    "bloodTomato"
+   ],
+   "chemicals": {
+    "Nutriment": {
+     "min": 1,
+     "max": 7,
+     "potencyDivisor": 14
+    },
+    "Vitamin": {
+     "min": 1,
+     "max": 3,
+     "potencyDivisor": 33
+    },
+    "Water": {
+     "min": 1,
+     "max": 4,
+     "potencyDivisor": 25
+    }
+   },
+   "growth": {
+    "lifespan": 25,
+    "maturation": 8,
+    "production": 6,
+    "yield": 2,
+    "potency": 10,
+    "idealLight": 8,
+    "idealHeat": 298,
+    "nutrientConsumption": 0.4,
+    "waterConsumption": 0.6
+   },
+   "rsi": "Objects/Specific/Hydroponics/tomato.rsi"
+  },
+  "blueTomato": {
+   "id": "blueTomato",
+   "name": "blue tomato",
+   "source": "vanilla",
+   "products": [
+    "FoodBlueTomato"
+   ],
+   "mutations": [],
+   "chemicals": {
+    "Nutriment": {
+     "min": 1,
+     "max": 5,
+     "potencyDivisor": 20
+    },
+    "SpaceLube": {
+     "min": 5,
+     "max": 15,
+     "potencyDivisor": 10
+    },
+    "Vitamin": {
+     "min": 1,
+     "max": 4,
+     "potencyDivisor": 25
+    }
+   },
+   "growth": {
+    "lifespan": 25,
+    "maturation": 8,
+    "production": 6,
+    "yield": 2,
+    "potency": 10,
+    "idealLight": 8,
+    "idealHeat": 298,
+    "nutrientConsumption": 0.7,
+    "waterConsumption": 0.6
+   },
+   "rsi": "Objects/Specific/Hydroponics/blue_tomato.rsi"
+  },
+  "bloodTomato": {
+   "id": "bloodTomato",
+   "name": "blood tomato",
+   "source": "vanilla",
+   "products": [
+    "FoodBloodTomato"
+   ],
+   "mutations": [
+    "killerTomato"
+   ],
+   "chemicals": {
+    "Blood": {
+     "min": 1,
+     "max": 10,
+     "potencyDivisor": 10
+    },
+    "Vitamin": {
+     "min": 1,
+     "max": 4,
+     "potencyDivisor": 25
+    }
+   },
+   "growth": {
+    "lifespan": 60,
+    "maturation": 8,
+    "production": 6,
+    "yield": 2,
+    "potency": 10,
+    "idealLight": 8,
+    "idealHeat": 298,
+    "nutrientConsumption": 0.7,
+    "waterConsumption": 0.6
+   },
+   "rsi": "Objects/Specific/Hydroponics/blood_tomato.rsi"
+  },
+  "killerTomato": {
+   "id": "killerTomato",
+   "name": "tomato killer",
+   "source": "vanilla",
+   "products": [
+    "MobTomatoKiller"
+   ],
+   "mutations": [],
+   "chemicals": {
+    "Blood": {
+     "min": 1,
+     "max": 10,
+     "potencyDivisor": 10
+    },
+    "JuiceTomato": {
+     "min": 1,
+     "max": 4,
+     "potencyDivisor": 25
+    }
+   },
+   "growth": {
+    "lifespan": 25,
+    "maturation": 15,
+    "production": 6,
+    "yield": 2,
+    "potency": 10,
+    "idealLight": 8,
+    "idealHeat": 298,
+    "nutrientConsumption": 0.7,
+    "waterConsumption": 0.6
+   },
+   "rsi": "Objects/Specific/Hydroponics/tomatokiller.rsi"
+  },
+  "eggplant": {
+   "id": "eggplant",
+   "name": "eggplant",
+   "source": "vanilla",
+   "products": [
+    "FoodEggplant"
+   ],
+   "mutations": [
+    "eggy"
+   ],
+   "chemicals": {
+    "Nutriment": {
+     "min": 1,
+     "max": 10,
+     "potencyDivisor": 10
+    },
+    "Vitamin": {
+     "min": 1,
+     "max": 4,
+     "potencyDivisor": 25
+    }
+   },
+   "growth": {
+    "lifespan": 25,
+    "maturation": 6,
+    "production": 6,
+    "yield": 2,
+    "potency": 20,
+    "idealLight": 9,
+    "idealHeat": 298
+   },
+   "rsi": "Objects/Specific/Hydroponics/eggplant.rsi"
+  },
+  "cabbage": {
+   "id": "cabbage",
+   "name": "cabbage",
+   "source": "vanilla",
+   "products": [
+    "FoodCabbage"
+   ],
+   "mutations": [],
+   "chemicals": {
+    "Nutriment": {
+     "min": 1,
+     "max": 10,
+     "potencyDivisor": 10
+    },
+    "Vitamin": {
+     "min": 1,
+     "max": 4,
+     "potencyDivisor": 25
+    }
+   },
+   "growth": {
+    "lifespan": 50,
+    "maturation": 7,
+    "production": 5,
+    "yield": 3,
+    "potency": 10
+   },
+   "rsi": "Objects/Specific/Hydroponics/cabbage.rsi"
+  },
+  "garlic": {
+   "id": "garlic",
+   "name": "garlic head",
+   "source": "vanilla",
+   "products": [
+    "FoodGarlic"
+   ],
+   "mutations": [],
+   "chemicals": {
+    "Nutriment": {
+     "min": 1,
+     "max": 10,
+     "potencyDivisor": 10
+    },
+    "Vitamin": {
+     "min": 1,
+     "max": 4,
+     "potencyDivisor": 25
+    },
+    "Allicin": {
+     "min": 1,
+     "max": 8,
+     "potencyDivisor": 25
+    }
+   },
+   "growth": {
+    "lifespan": 25,
+    "maturation": 8,
+    "production": 5,
+    "yield": 3,
+    "potency": 25
+   },
+   "rsi": "Objects/Specific/Hydroponics/garlic.rsi"
+  },
+  "apple": {
+   "id": "apple",
+   "name": "apple",
+   "source": "vanilla",
+   "products": [
+    "FoodApple"
+   ],
+   "mutations": [
+    "goldenApple"
+   ],
+   "chemicals": {
+    "Nutriment": {
+     "min": 1,
+     "max": 10,
+     "potencyDivisor": 10
+    },
+    "Vitamin": {
+     "min": 1,
+     "max": 4,
+     "potencyDivisor": 25
+    }
+   },
+   "growth": {
+    "lifespan": 55,
+    "maturation": 6,
+    "production": 6,
+    "yield": 3,
+    "potency": 10,
+    "idealLight": 6
+   },
+   "rsi": "Objects/Specific/Hydroponics/apple.rsi"
+  },
+  "goldenApple": {
+   "id": "goldenApple",
+   "name": "golden apple",
+   "source": "vanilla",
+   "products": [
+    "FoodGoldenApple"
+   ],
+   "mutations": [],
+   "chemicals": {
+    "Nutriment": {
+     "min": 1,
+     "max": 10,
+     "potencyDivisor": 10
+    },
+    "Vitamin": {
+     "min": 1,
+     "max": 4,
+     "potencyDivisor": 25
+    },
+    "DoctorsDelight": {
+     "min": 3,
+     "max": 13,
+     "potencyDivisor": 10
+    }
+   },
+   "growth": {
+    "lifespan": 55,
+    "maturation": 6,
+    "production": 6,
+    "yield": 3,
+    "potency": 10,
+    "idealLight": 6,
+    "nutrientConsumption": 0.75,
+    "waterConsumption": 0.75
+   },
+   "rsi": "Objects/Specific/Hydroponics/golden_apple.rsi"
+  },
+  "corn": {
+   "id": "corn",
+   "name": "corn",
+   "source": "vanilla",
+   "products": [
+    "FoodCorn"
+   ],
+   "mutations": [],
+   "chemicals": {
+    "Nutriment": {
+     "min": 1,
+     "max": 10,
+     "potencyDivisor": 20
+    },
+    "Cornmeal": {
+     "min": 5,
+     "max": 15,
+     "potencyDivisor": 10
+    }
+   },
+   "growth": {
+    "lifespan": 25,
+    "maturation": 8,
+    "production": 6,
+    "yield": 2,
+    "potency": 20,
+    "idealLight": 8,
+    "idealHeat": 298,
+    "waterConsumption": 0.6
+   },
+   "rsi": "Objects/Specific/Hydroponics/corn.rsi"
+  },
+  "onion": {
+   "id": "onion",
+   "name": "onion",
+   "source": "vanilla",
+   "products": [
+    "FoodOnion"
+   ],
+   "mutations": [
+    "onionred",
+    "bloonion"
+   ],
+   "chemicals": {
+    "Nutriment": {
+     "min": 1,
+     "max": 10,
+     "potencyDivisor": 10
+    },
+    "Vitamin": {
+     "min": 1,
+     "max": 4,
+     "potencyDivisor": 25
+    },
+    "Allicin": {
+     "min": 1,
+     "max": 4,
+     "potencyDivisor": 25
+    }
+   },
+   "growth": {
+    "lifespan": 25,
+    "maturation": 8,
+    "production": 6,
+    "yield": 2,
+    "potency": 20,
+    "idealLight": 8,
+    "idealHeat": 298,
+    "waterConsumption": 0.6
+   },
+   "rsi": "Objects/Specific/Hydroponics/onion.rsi"
+  },
+  "onionred": {
+   "id": "onionred",
+   "name": "red onion",
+   "source": "vanilla",
+   "products": [
+    "FoodOnionRed"
+   ],
+   "mutations": [],
+   "chemicals": {
+    "Nutriment": {
+     "min": 1,
+     "max": 10,
+     "potencyDivisor": 10
+    },
+    "Vitamin": {
+     "min": 1,
+     "max": 4,
+     "potencyDivisor": 25
+    },
+    "Allicin": {
+     "min": 1,
+     "max": 4,
+     "potencyDivisor": 25
+    }
+   },
+   "growth": {
+    "lifespan": 25,
+    "maturation": 8,
+    "production": 6,
+    "yield": 2,
+    "potency": 20,
+    "idealLight": 8,
+    "idealHeat": 298,
+    "waterConsumption": 0.6
+   },
+   "rsi": "Objects/Specific/Hydroponics/onion_red.rsi"
+  },
+  "chanterelle": {
+   "id": "chanterelle",
+   "name": "chanterelle",
+   "source": "vanilla",
+   "products": [
+    "FoodMushroom"
+   ],
+   "mutations": [],
+   "chemicals": {
+    "Nutriment": {
+     "min": 1,
+     "max": 25,
+     "potencyDivisor": 25
+    }
+   },
+   "growth": {
+    "lifespan": 35,
+    "maturation": 10,
+    "production": 7,
+    "yield": 5,
+    "potency": 1,
+    "idealHeat": 288,
+    "nutrientConsumption": 0.5,
+    "waterConsumption": 0.6
+   },
+   "rsi": "Objects/Specific/Hydroponics/chanterelle.rsi"
+  },
+  "eggy": {
+   "id": "eggy",
+   "name": "egg-plant",
+   "source": "vanilla",
+   "products": [
+    "FoodEgg"
+   ],
+   "mutations": [],
+   "chemicals": {
+    "Egg": {
+     "min": 4,
+     "max": 12,
+     "potencyDivisor": 10
+    }
+   },
+   "growth": {
+    "lifespan": 75,
+    "maturation": 6,
+    "production": 12,
+    "yield": 2,
+    "potency": 20,
+    "idealLight": 9,
+    "idealHeat": 298,
+    "nutrientConsumption": 0.5
+   },
+   "rsi": "Objects/Specific/Hydroponics/eggy.rsi"
+  },
+  "cannabis": {
+   "id": "cannabis",
+   "name": "cannabis",
+   "source": "vanilla",
+   "products": [
+    "LeavesCannabis"
+   ],
+   "mutations": [
+    "rainbowCannabis"
+   ],
+   "chemicals": {
+    "THC": {
+     "min": 1,
+     "max": 10,
+     "potencyDivisor": 10
+    }
+   },
+   "growth": {
+    "lifespan": 75,
+    "maturation": 8,
+    "production": 12,
+    "yield": 2,
+    "potency": 20,
+    "idealLight": 9,
+    "idealHeat": 298,
+    "waterConsumption": 0.4
+   },
+   "rsi": "Objects/Specific/Hydroponics/cannabis.rsi"
+  },
+  "rainbowCannabis": {
+   "id": "rainbowCannabis",
+   "name": "rainbow cannabis",
+   "source": "vanilla",
+   "products": [
+    "LeavesCannabisRainbow"
+   ],
+   "mutations": [],
+   "chemicals": {
+    "SpaceDrugs": {
+     "min": 1,
+     "max": 15,
+     "potencyDivisor": 10
+    },
+    "Lipolicide": {
+     "min": 1,
+     "max": 15,
+     "potencyDivisor": 10
+    },
+    "MindbreakerToxin": {
+     "min": 1,
+     "max": 5,
+     "potencyDivisor": 20
+    },
+    "Happiness": {
+     "min": 1,
+     "max": 5,
+     "potencyDivisor": null
+    },
+    "Psicodine": {
+     "min": 0,
+     "max": 5,
+     "potencyDivisor": 33
+    }
+   },
+   "growth": {
+    "lifespan": 75,
+    "maturation": 8,
+    "production": 12,
+    "yield": 2,
+    "potency": 20,
+    "idealLight": 9,
+    "idealHeat": 298,
+    "waterConsumption": 0.4
+   },
+   "rsi": "Objects/Specific/Hydroponics/rainbow_cannabis.rsi"
+  },
+  "tobacco": {
+   "id": "tobacco",
+   "name": "tobacco",
+   "source": "vanilla",
+   "products": [
+    "LeavesTobacco"
+   ],
+   "mutations": [],
+   "chemicals": {
+    "Nicotine": {
+     "min": 1,
+     "max": 10,
+     "potencyDivisor": 10
+    }
+   },
+   "growth": {
+    "lifespan": 75,
+    "maturation": 5,
+    "production": 5,
+    "yield": 2,
+    "potency": 20,
+    "idealLight": 9,
+    "idealHeat": 298,
+    "waterConsumption": 0.4
+   },
+   "rsi": "Objects/Specific/Hydroponics/tobacco.rsi"
+  },
+  "nettle": {
+   "id": "nettle",
+   "name": "nettle",
+   "source": "vanilla",
+   "products": [
+    "Nettle"
+   ],
+   "mutations": [
+    "deathNettle"
+   ],
+   "chemicals": {
+    "Histamine": {
+     "min": 1,
+     "max": 25,
+     "potencyDivisor": 4
+    }
+   },
+   "growth": {
+    "lifespan": 25,
+    "maturation": 8,
+    "production": 6,
+    "yield": 2,
+    "potency": 20,
+    "idealLight": 8,
+    "idealHeat": 298,
+    "waterConsumption": 0.6
+   },
+   "rsi": "Objects/Specific/Hydroponics/nettle.rsi"
+  },
+  "deathNettle": {
+   "id": "deathNettle",
+   "name": "death nettle",
+   "source": "vanilla",
+   "products": [
+    "DeathNettle"
+   ],
+   "mutations": [],
+   "chemicals": {
+    "SulfuricAcid": {
+     "min": 1,
+     "max": 15,
+     "potencyDivisor": 6
+    },
+    "FluorosulfuricAcid": {
+     "min": 1,
+     "max": 15,
+     "potencyDivisor": 6
+    }
+   },
+   "growth": {
+    "lifespan": 25,
+    "maturation": 8,
+    "production": 6,
+    "yield": 2,
+    "potency": 20,
+    "idealLight": 8,
+    "idealHeat": 298,
+    "nutrientConsumption": 0.8,
+    "waterConsumption": 0.7
+   },
+   "rsi": "Objects/Specific/Hydroponics/death_nettle.rsi"
+  },
+  "chili": {
+   "id": "chili",
+   "name": "chili",
+   "source": "vanilla",
+   "products": [
+    "FoodChiliPepper"
+   ],
+   "mutations": [
+    "chilly"
+   ],
+   "chemicals": {
+    "CapsaicinOil": {
+     "min": 1,
+     "max": 10,
+     "potencyDivisor": 10
+    },
+    "Nutriment": {
+     "min": 1,
+     "max": 4,
+     "potencyDivisor": 25
+    },
+    "Vitamin": {
+     "min": 1,
+     "max": 4,
+     "potencyDivisor": 25
+    }
+   },
+   "growth": {
+    "lifespan": 25,
+    "maturation": 6,
+    "production": 6,
+    "yield": 2,
+    "potency": 20,
+    "idealLight": 9,
+    "idealHeat": 298
+   },
+   "rsi": "Objects/Specific/Hydroponics/chili.rsi"
+  },
+  "chilly": {
+   "id": "chilly",
+   "name": "chilly",
+   "source": "vanilla",
+   "products": [
+    "FoodChillyPepper"
+   ],
+   "mutations": [],
+   "chemicals": {
+    "FrostOil": {
+     "min": 1,
+     "max": 10,
+     "potencyDivisor": 10
+    },
+    "Nutriment": {
+     "min": 1,
+     "max": 4,
+     "potencyDivisor": 25
+    },
+    "Vitamin": {
+     "min": 1,
+     "max": 4,
+     "potencyDivisor": 25
+    }
+   },
+   "growth": {
+    "lifespan": 25,
+    "maturation": 6,
+    "production": 6,
+    "yield": 2,
+    "potency": 20,
+    "idealLight": 9,
+    "idealHeat": 298
+   },
+   "rsi": "Objects/Specific/Hydroponics/chilly.rsi"
+  },
+  "poppy": {
+   "id": "poppy",
+   "name": "poppy",
+   "source": "vanilla",
+   "products": [
+    "FoodPoppy"
+   ],
+   "mutations": [
+    "lily"
+   ],
+   "chemicals": {
+    "Nutriment": {
+     "min": 1,
+     "max": 2,
+     "potencyDivisor": 50
+    },
+    "Bicaridine": {
+     "min": 1,
+     "max": 20,
+     "potencyDivisor": 5
+    }
+   },
+   "growth": {
+    "lifespan": 25,
+    "maturation": 10,
+    "production": 3,
+    "yield": 3,
+    "potency": 10,
+    "waterConsumption": 0.6
+   },
+   "rsi": "Objects/Specific/Hydroponics/poppy.rsi"
+  },
+  "aloe": {
+   "id": "aloe",
+   "name": "aloe",
+   "source": "vanilla",
+   "products": [
+    "FoodAloe"
+   ],
+   "mutations": [],
+   "chemicals": {
+    "Aloe": {
+     "min": 1,
+     "max": 10,
+     "potencyDivisor": 10
+    },
+    "Dermaline": {
+     "min": 1,
+     "max": 10,
+     "potencyDivisor": 10
+    }
+   },
+   "growth": {
+    "lifespan": 25,
+    "maturation": 10,
+    "production": 3,
+    "yield": 3,
+    "potency": 10,
+    "waterConsumption": 0.6
+   },
+   "rsi": "Objects/Specific/Hydroponics/aloe.rsi"
+  },
+  "lily": {
+   "id": "lily",
+   "name": "lily",
+   "source": "vanilla",
+   "products": [
+    "FoodLily"
+   ],
+   "mutations": [
+    "spacemansTrumpet"
+   ],
+   "chemicals": {
+    "Nutriment": {
+     "min": 1,
+     "max": 2,
+     "potencyDivisor": 50
+    },
+    "Bicaridine": {
+     "min": 1,
+     "max": 20,
+     "potencyDivisor": 5
+    }
+   },
+   "growth": {
+    "lifespan": 25,
+    "maturation": 10,
+    "production": 3,
+    "yield": 3,
+    "potency": 10,
+    "waterConsumption": 0.6
+   },
+   "rsi": "Objects/Specific/Hydroponics/lily.rsi"
+  },
+  "lingzhi": {
+   "id": "lingzhi",
+   "name": "lingzhi",
+   "source": "vanilla",
+   "products": [
+    "FoodLingzhi"
+   ],
+   "mutations": [],
+   "chemicals": {
+    "Ultravasculine": {
+     "min": 1,
+     "max": 20,
+     "potencyDivisor": 5
+    },
+    "Epinephrine": {
+     "min": 1,
+     "max": 20,
+     "potencyDivisor": 5
+    }
+   },
+   "growth": {
+    "lifespan": 25,
+    "maturation": 10,
+    "production": 3,
+    "yield": 3,
+    "potency": 10,
+    "waterConsumption": 0.6
+   },
+   "rsi": "Objects/Specific/Hydroponics/lingzhi.rsi"
+  },
+  "ambrosiaVulgaris": {
+   "id": "ambrosiaVulgaris",
+   "name": "ambrosia vulgaris",
+   "source": "vanilla",
+   "products": [
+    "FoodAmbrosiaVulgaris"
+   ],
+   "mutations": [
+    "ambrosiaDeus"
+   ],
+   "chemicals": {
+    "Nutriment": {
+     "min": 1,
+     "max": 2,
+     "potencyDivisor": 10
+    },
+    "Bicaridine": {
+     "min": 1,
+     "max": 5,
+     "potencyDivisor": 20
+    },
+    "Kelotane": {
+     "min": 1,
+     "max": 5,
+     "potencyDivisor": 20
+    },
+    "Vitamin": {
+     "min": 1,
+     "max": 2,
+     "potencyDivisor": 50
+    }
+   },
+   "growth": {
+    "lifespan": 25,
+    "maturation": 10,
+    "production": 3,
+    "yield": 3,
+    "potency": 10,
+    "waterConsumption": 0.6
+   },
+   "rsi": "Objects/Specific/Hydroponics/ambrosia_vulgaris.rsi"
+  },
+  "ambrosiaDeus": {
+   "id": "ambrosiaDeus",
+   "name": "ambrosia deus",
+   "source": "vanilla",
+   "products": [
+    "FoodAmbrosiaDeus"
+   ],
+   "mutations": [],
+   "chemicals": {
+    "Nutriment": {
+     "min": 1,
+     "max": 2,
+     "potencyDivisor": 10
+    },
+    "Omnizine": {
+     "min": 1,
+     "max": 3,
+     "potencyDivisor": 35
+    },
+    "SpaceDrugs": {
+     "min": 1,
+     "max": 5,
+     "potencyDivisor": 20
+    }
+   },
+   "growth": {
+    "lifespan": 25,
+    "maturation": 10,
+    "production": 3,
+    "yield": 3,
+    "potency": 10,
+    "waterConsumption": 0.6
+   },
+   "rsi": "Objects/Specific/Hydroponics/ambrosia_deus.rsi"
+  },
+  "galaxythistle": {
+   "id": "galaxythistle",
+   "name": "galaxythistle",
+   "source": "vanilla",
+   "products": [
+    "FoodGalaxythistle"
+   ],
+   "mutations": [
+    "glasstle"
+   ],
+   "chemicals": {
+    "Stellibinin": {
+     "min": 1,
+     "max": 25,
+     "potencyDivisor": 4
+    }
+   },
+   "growth": {
+    "lifespan": 25,
+    "maturation": 10,
+    "production": 3,
+    "yield": 3,
+    "potency": 10,
+    "waterConsumption": 0.6
+   },
+   "rsi": "Objects/Specific/Hydroponics/galaxythistle.rsi"
+  },
+  "glasstle": {
+   "id": "glasstle",
+   "name": "glasstle",
+   "source": "vanilla",
+   "products": [
+    "FoodGlasstle"
+   ],
+   "mutations": [],
+   "chemicals": {
+    "Razorium": {
+     "min": 1,
+     "max": 25,
+     "potencyDivisor": 4
+    },
+    "Desoxyephedrine": {
+     "min": 1,
+     "max": 10,
+     "potencyDivisor": 10
+    }
+   },
+   "growth": {
+    "lifespan": 25,
+    "maturation": 10,
+    "production": 3,
+    "yield": 3,
+    "potency": 10,
+    "waterConsumption": 0.5
+   },
+   "rsi": "Objects/Specific/Hydroponics/glasstle.rsi"
+  },
+  "flyAmanita": {
+   "id": "flyAmanita",
+   "name": "fly amanita",
+   "source": "vanilla",
+   "products": [
+    "FoodFlyAmanita"
+   ],
+   "mutations": [],
+   "chemicals": {
+    "Amatoxin": {
+     "min": 1,
+     "max": 10,
+     "potencyDivisor": 12
+    },
+    "Nutriment": {
+     "min": 1,
+     "max": 5,
+     "potencyDivisor": 20
+    }
+   },
+   "growth": {
+    "lifespan": 25,
+    "maturation": 12,
+    "production": 3,
+    "yield": 3,
+    "potency": 10,
+    "nutrientConsumption": 0.5,
+    "waterConsumption": 0.6
+   },
+   "rsi": "Objects/Specific/Hydroponics/fly_amanita.rsi"
+  },
+  "gatfruit": {
+   "id": "gatfruit",
+   "name": "gatfruit",
+   "source": "vanilla",
+   "products": [
+    "FoodGatfruit"
+   ],
+   "mutations": [
+    "fakeCapfruit",
+    "realCapfruit"
+   ],
+   "chemicals": {
+    "Nutriment": {
+     "min": 1,
+     "max": 5,
+     "potencyDivisor": 20
+    },
+    "Sulfur": {
+     "min": 1,
+     "max": 5,
+     "potencyDivisor": 20
+    }
+   },
+   "growth": {
+    "lifespan": 65,
+    "maturation": 25,
+    "production": 25,
+    "yield": 1,
+    "potency": 10,
+    "idealLight": 6
+   },
+   "rsi": "Objects/Specific/Hydroponics/gatfruit.rsi"
+  },
+  "fakeCapfruit": {
+   "id": "fakeCapfruit",
+   "name": "capfruit",
+   "source": "vanilla",
+   "products": [
+    "FoodFakeCapfruit"
+   ],
+   "mutations": [],
+   "chemicals": {
+    "Nutriment": {
+     "min": 1,
+     "max": 5,
+     "potencyDivisor": 20
+    },
+    "Sulfur": {
+     "min": 1,
+     "max": 5,
+     "potencyDivisor": 20
+    }
+   },
+   "growth": {
+    "lifespan": 65,
+    "maturation": 25,
+    "production": 25,
+    "yield": 1,
+    "potency": 10,
+    "idealLight": 6
+   },
+   "rsi": "Objects/Specific/Hydroponics/capfruit.rsi"
+  },
+  "realCapfruit": {
+   "id": "realCapfruit",
+   "name": "capfruit",
+   "source": "vanilla",
+   "products": [
+    "FoodRealCapfruit"
+   ],
+   "mutations": [],
+   "chemicals": {
+    "Nutriment": {
+     "min": 1,
+     "max": 5,
+     "potencyDivisor": 20
+    },
+    "Sulfur": {
+     "min": 1,
+     "max": 5,
+     "potencyDivisor": 20
+    }
+   },
+   "growth": {
+    "lifespan": 65,
+    "maturation": 25,
+    "production": 25,
+    "yield": 1,
+    "potency": 10,
+    "idealLight": 6
+   },
+   "rsi": "Objects/Specific/Hydroponics/capfruit.rsi"
+  },
+  "rice": {
+   "id": "rice",
+   "name": "rice",
+   "source": "vanilla",
+   "products": [
+    "RiceBushel"
+   ],
+   "mutations": [],
+   "chemicals": {
+    "Nutriment": {
+     "min": 1,
+     "max": 20,
+     "potencyDivisor": 20
+    },
+    "Rice": {
+     "min": 5,
+     "max": 20,
+     "potencyDivisor": 20
+    }
+   },
+   "growth": {
+    "lifespan": 25,
+    "maturation": 6,
+    "production": 3,
+    "yield": 3,
+    "potency": 5,
+    "idealLight": 5,
+    "nutrientConsumption": 0.4,
+    "waterConsumption": 0.6
+   },
+   "rsi": "Objects/Specific/Hydroponics/rice.rsi"
+  },
+  "soybeans": {
+   "id": "soybeans",
+   "name": "soybeans",
+   "source": "vanilla",
+   "products": [
+    "FoodSoybeans"
+   ],
+   "mutations": [
+    "koibean"
+   ],
+   "chemicals": {
+    "Nutriment": {
+     "min": 1,
+     "max": 2,
+     "potencyDivisor": 50
+    }
+   },
+   "growth": {
+    "lifespan": 25,
+    "maturation": 6,
+    "production": 6,
+    "yield": 3,
+    "potency": 5,
+    "idealLight": 7,
+    "nutrientConsumption": 0.4
+   },
+   "rsi": "Objects/Specific/Hydroponics/soybeans.rsi"
+  },
+  "spacemansTrumpet": {
+   "id": "spacemansTrumpet",
+   "name": "spaceman's trumpet",
+   "source": "vanilla",
+   "products": [
+    "FoodSpacemansTrumpet"
+   ],
+   "mutations": [],
+   "chemicals": {
+    "Nutriment": {
+     "min": 1,
+     "max": 5,
+     "potencyDivisor": 50
+    },
+    "PolypyryliumOligomers": {
+     "min": 1,
+     "max": 15,
+     "potencyDivisor": 5
+    }
+   },
+   "growth": {
+    "lifespan": 20,
+    "maturation": 14,
+    "production": 3,
+    "yield": 2,
+    "potency": 10,
+    "waterConsumption": 0.6
+   },
+   "rsi": "Objects/Specific/Hydroponics/spacemans_trumpet.rsi"
+  },
+  "koibean": {
+   "id": "koibean",
+   "name": "koibeans",
+   "source": "vanilla",
+   "products": [
+    "FoodKoibean"
+   ],
+   "mutations": [],
+   "chemicals": {
+    "Nutriment": {
+     "min": 1,
+     "max": 5,
+     "potencyDivisor": 20
+    },
+    "CarpoToxin": {
+     "min": 1,
+     "max": 4,
+     "potencyDivisor": 30
+    }
+   },
+   "growth": {
+    "lifespan": 25,
+    "maturation": 6,
+    "production": 6,
+    "yield": 3,
+    "potency": 5,
+    "idealLight": 7,
+    "nutrientConsumption": 0.4
+   },
+   "rsi": "Objects/Specific/Hydroponics/koibean.rsi"
+  },
+  "grape": {
+   "id": "grape",
+   "name": "grape",
+   "source": "vanilla",
+   "products": [
+    "FoodGrape"
+   ],
+   "mutations": [],
+   "chemicals": {
+    "Nutriment": {
+     "min": 1,
+     "max": 5,
+     "potencyDivisor": 20
+    },
+    "Vitamin": {
+     "min": 1,
+     "max": 4,
+     "potencyDivisor": 25
+    }
+   },
+   "growth": {
+    "lifespan": 50,
+    "maturation": 6,
+    "production": 5,
+    "yield": 3,
+    "potency": 10
+   },
+   "rsi": "Objects/Specific/Hydroponics/grape.rsi"
+  },
+  "watermelon": {
+   "id": "watermelon",
+   "name": "watermelon",
+   "source": "vanilla",
+   "products": [
+    "FoodWatermelon"
+   ],
+   "mutations": [
+    "holymelon"
+   ],
+   "chemicals": {
+    "Nutriment": {
+     "min": 1,
+     "max": 10,
+     "potencyDivisor": 10
+    },
+    "Water": {
+     "min": 1,
+     "max": 10,
+     "potencyDivisor": 10
+    },
+    "Vitamin": {
+     "min": 1,
+     "max": 5,
+     "potencyDivisor": 20
+    }
+   },
+   "growth": {
+    "lifespan": 55,
+    "maturation": 12,
+    "production": 3,
+    "yield": 1,
+    "potency": 1,
+    "idealLight": 8
+   },
+   "rsi": "Objects/Specific/Hydroponics/watermelon.rsi"
+  },
+  "holymelon": {
+   "id": "holymelon",
+   "name": "holymelon",
+   "source": "vanilla",
+   "products": [
+    "FoodHolymelon"
+   ],
+   "mutations": [],
+   "chemicals": {
+    "Nutriment": {
+     "min": 1,
+     "max": 10,
+     "potencyDivisor": 10
+    },
+    "Holywater": {
+     "min": 1,
+     "max": 10,
+     "potencyDivisor": 10
+    },
+    "Vitamin": {
+     "min": 1,
+     "max": 5,
+     "potencyDivisor": 20
+    }
+   },
+   "growth": {
+    "lifespan": 55,
+    "maturation": 12,
+    "production": 3,
+    "yield": 1,
+    "potency": 1,
+    "idealLight": 8
+   },
+   "rsi": "Objects/Specific/Hydroponics/holymelon.rsi"
+  },
+  "cocoa": {
+   "id": "cocoa",
+   "name": "cocoa",
+   "source": "vanilla",
+   "products": [
+    "FoodCocoaPod"
+   ],
+   "mutations": [],
+   "chemicals": {
+    "Vitamin": {
+     "min": 1,
+     "max": 4,
+     "potencyDivisor": 25
+    },
+    "Nutriment": {
+     "min": 1,
+     "max": 2,
+     "potencyDivisor": 50
+    }
+   },
+   "growth": {
+    "lifespan": 50,
+    "maturation": 6,
+    "production": 6,
+    "yield": 6,
+    "idealLight": 7,
+    "idealHeat": 298,
+    "nutrientConsumption": 0.8,
+    "waterConsumption": 1
+   },
+   "rsi": "Objects/Specific/Hydroponics/cocoa.rsi"
+  },
+  "berries": {
+   "id": "berries",
+   "name": "berries",
+   "source": "vanilla",
+   "products": [
+    "FoodBerries"
+   ],
+   "mutations": [],
+   "chemicals": {
+    "Nutriment": {
+     "min": 2,
+     "max": 5,
+     "potencyDivisor": 30
+    },
+    "Vitamin": {
+     "min": 1,
+     "max": 4,
+     "potencyDivisor": 40
+    }
+   },
+   "growth": {
+    "lifespan": 50,
+    "maturation": 6,
+    "production": 6,
+    "yield": 4,
+    "idealLight": 7,
+    "nutrientConsumption": 0.6
+   },
+   "rsi": "Objects/Specific/Hydroponics/berries.rsi"
+  },
+  "bungo": {
+   "id": "bungo",
+   "name": "bungo",
+   "source": "vanilla",
+   "products": [
+    "FoodBungo"
+   ],
+   "mutations": [],
+   "chemicals": {
+    "Nutriment": {
+     "min": 5,
+     "max": 10,
+     "potencyDivisor": 20
+    },
+    "Enzyme": {
+     "min": 5,
+     "max": 10,
+     "potencyDivisor": 20
+    }
+   },
+   "growth": {
+    "lifespan": 50,
+    "maturation": 8,
+    "production": 6,
+    "yield": 3,
+    "potency": 10,
+    "idealLight": 8,
+    "idealHeat": 298,
+    "waterConsumption": 0.6
+   },
+   "rsi": "Objects/Specific/Hydroponics/bungo.rsi"
+  },
+  "pea": {
+   "id": "pea",
+   "name": "peas",
+   "source": "vanilla",
+   "products": [
+    "FoodPeaPod"
+   ],
+   "mutations": [
+    "laughinPea"
+   ],
+   "chemicals": {
+    "Nutriment": {
+     "min": 1,
+     "max": 3,
+     "potencyDivisor": 33
+    },
+    "Vitamin": {
+     "min": 1,
+     "max": 2,
+     "potencyDivisor": 50
+    }
+   },
+   "growth": {
+    "lifespan": 25,
+    "maturation": 8,
+    "production": 6,
+    "yield": 3,
+    "potency": 25,
+    "idealLight": 8,
+    "nutrientConsumption": 0.5,
+    "waterConsumption": 0.5
+   },
+   "rsi": "Objects/Specific/Hydroponics/pea.rsi"
+  },
+  "worldPea": {
+   "id": "worldPea",
+   "name": "world peas",
+   "source": "vanilla",
+   "products": [
+    "FoodWorldPeas"
+   ],
+   "mutations": [],
+   "chemicals": {
+    "Happiness": {
+     "min": 1,
+     "max": 3,
+     "potencyDivisor": 25
+    },
+    "Nutriment": {
+     "min": 1,
+     "max": 3,
+     "potencyDivisor": 20
+    },
+    "Pax": {
+     "min": 1,
+     "max": 2,
+     "potencyDivisor": 50
+    }
+   },
+   "growth": {
+    "lifespan": 25,
+    "maturation": 20,
+    "production": 6,
+    "yield": 3,
+    "potency": 25,
+    "idealLight": 8,
+    "nutrientConsumption": 0.5,
+    "waterConsumption": 0.5
+   },
+   "rsi": "Objects/Specific/Hydroponics/world_pea.rsi"
+  },
+  "pumpkin": {
+   "id": "pumpkin",
+   "name": "pumpkin",
+   "source": "vanilla",
+   "products": [
+    "FoodPumpkin"
+   ],
+   "mutations": [
+    "bluePumpkin"
+   ],
+   "chemicals": {
+    "PumpkinFlesh": {
+     "min": 1,
+     "max": 20,
+     "potencyDivisor": 5
+    },
+    "Vitamin": {
+     "min": 1,
+     "max": 5,
+     "potencyDivisor": 20
+    }
+   },
+   "growth": {
+    "lifespan": 55,
+    "maturation": 10,
+    "production": 4,
+    "yield": 2,
+    "potency": 10,
+    "idealHeat": 288
+   },
+   "rsi": "Objects/Specific/Hydroponics/pumpkin.rsi"
+  },
+  "bluePumpkin": {
+   "id": "bluePumpkin",
+   "name": "blue pumpkin",
+   "source": "vanilla",
+   "products": [
+    "FoodBluePumpkin"
+   ],
+   "mutations": [],
+   "chemicals": {
+    "Ammonia": {
+     "min": 1,
+     "max": 15,
+     "potencyDivisor": 3
+    },
+    "Chlorine": {
+     "min": 1,
+     "max": 5,
+     "potencyDivisor": 5
+    },
+    "Vitamin": {
+     "min": 1,
+     "max": 10,
+     "potencyDivisor": 3
+    }
+   },
+   "growth": {
+    "lifespan": 55,
+    "maturation": 10,
+    "production": 4,
+    "yield": 2,
+    "potency": 10,
+    "idealHeat": 288
+   },
+   "rsi": "Objects/Specific/Hydroponics/blue_pumpkin.rsi"
+  },
+  "cotton": {
+   "id": "cotton",
+   "name": "cotton",
+   "source": "vanilla",
+   "products": [
+    "CottonBol"
+   ],
+   "mutations": [
+    "pyrotton"
+   ],
+   "chemicals": {
+    "Fiber": {
+     "min": 5,
+     "max": 10,
+     "potencyDivisor": 20
+    }
+   },
+   "growth": {
+    "lifespan": 25,
+    "maturation": 8,
+    "production": 3,
+    "yield": 3,
+    "potency": 5,
+    "idealLight": 8,
+    "waterConsumption": 0.6
+   },
+   "rsi": "Objects/Specific/Hydroponics/cotton.rsi"
+  },
+  "pyrotton": {
+   "id": "pyrotton",
+   "name": "pyrotton",
+   "source": "vanilla",
+   "products": [
+    "PyrottonBol"
+   ],
+   "mutations": [],
+   "chemicals": {
+    "Fiber": {
+     "min": 5,
+     "max": 10,
+     "potencyDivisor": 20
+    },
+    "Phlogiston": {
+     "min": 4,
+     "max": 8,
+     "potencyDivisor": 30
+    }
+   },
+   "growth": {
+    "lifespan": 25,
+    "maturation": 8,
+    "production": 3,
+    "yield": 2,
+    "potency": 5,
+    "idealLight": 8,
+    "waterConsumption": 0.8
+   },
+   "rsi": "Objects/Specific/Hydroponics/pyrotton.rsi"
+  },
+  "cherry": {
+   "id": "cherry",
+   "name": "cherry",
+   "source": "vanilla",
+   "products": [
+    "FoodCherry"
+   ],
+   "mutations": [],
+   "chemicals": {
+    "Nutriment": {
+     "min": 1,
+     "max": 3,
+     "potencyDivisor": 30
+    },
+    "Vitamin": {
+     "min": 1,
+     "max": 3,
+     "potencyDivisor": 40
+    }
+   },
+   "growth": {
+    "lifespan": 55,
+    "maturation": 6,
+    "production": 6,
+    "yield": 5,
+    "potency": 10,
+    "idealLight": 6
+   },
+   "rsi": "Objects/Specific/Hydroponics/cherry.rsi"
+  },
+  "anomalyBerry": {
+   "id": "anomalyBerry",
+   "name": "anomaly berry",
+   "source": "vanilla",
+   "products": [
+    "FoodAnomalyBerry"
+   ],
+   "mutations": [],
+   "chemicals": {
+    "Artifexium": {
+     "min": 1,
+     "max": 1,
+     "potencyDivisor": 4
+    },
+    "Nutriment": {
+     "min": 1,
+     "max": 2,
+     "potencyDivisor": 30
+    },
+    "Vitamin": {
+     "min": 1,
+     "max": 2,
+     "potencyDivisor": 40
+    }
+   },
+   "growth": {
+    "lifespan": 25,
+    "maturation": 12,
+    "production": 3,
+    "yield": 3,
+    "potency": 10,
+    "nutrientConsumption": 0.5,
+    "waterConsumption": 0.6
+   },
+   "rsi": "Objects/Specific/Hydroponics/anomaly_berry.rsi"
+  },
+  "bloonion": {
+   "id": "bloonion",
+   "name": "bloonion",
+   "source": "vanilla",
+   "products": [
+    "FoodBloonion"
+   ],
+   "mutations": [],
+   "chemicals": {
+    "Potassium": {
+     "min": 1,
+     "max": 5,
+     "potencyDivisor": 20
+    },
+    "Phosphorus": {
+     "min": 1,
+     "max": 5,
+     "potencyDivisor": 20
+    },
+    "Sugar": {
+     "min": 1,
+     "max": 5,
+     "potencyDivisor": 20
+    },
+    "Allicin": {
+     "min": 1,
+     "max": 10,
+     "potencyDivisor": 10
+    }
+   },
+   "growth": {
+    "lifespan": 25,
+    "maturation": 15,
+    "production": 3,
+    "yield": 3,
+    "potency": 10,
+    "nutrientConsumption": 0.5,
+    "waterConsumption": 0.6
+   },
+   "rsi": "Objects/Specific/Hydroponics/bloonion.rsi"
+  },
+  "strangeBerries": {
+   "id": "strangeBerries",
+   "name": "Strange Berries",
+   "source": "goob",
+   "products": [
+    "FoodStrangeBerries"
+   ],
+   "mutations": [],
+   "chemicals": {
+    "Artifexium": {
+     "min": 2,
+     "max": 5,
+     "potencyDivisor": 30
+    },
+    "Vitamin": {
+     "min": 1,
+     "max": 4,
+     "potencyDivisor": 40
+    }
+   },
+   "growth": {
+    "lifespan": 50,
+    "maturation": 6,
+    "production": 6,
+    "yield": 4,
+    "idealLight": 7,
+    "nutrientConsumption": 0.6
+   },
+   "rsi": "_Goobstation/Objects/Specific/Hydroponics/strange_berries.rsi"
+  },
+  "bluespaceTomato": {
+   "id": "bluespaceTomato",
+   "name": "Bluespace Tomato",
+   "source": "goob",
+   "products": [
+    "FoodBluespaceTomato"
+   ],
+   "mutations": [],
+   "chemicals": {
+    "Nutriment": {
+     "min": 1,
+     "max": 3,
+     "potencyDivisor": 20
+    },
+    "Singulo": {
+     "min": 1,
+     "max": 10,
+     "potencyDivisor": 10
+    }
+   },
+   "growth": {
+    "lifespan": 25,
+    "maturation": 8,
+    "production": 6,
+    "yield": 2,
+    "potency": 10,
+    "idealLight": 8,
+    "idealHeat": 298,
+    "nutrientConsumption": 0.6,
+    "waterConsumption": 0.5
+   },
+   "rsi": "_Goobstation/Objects/Specific/Hydroponics/bluespace_tomato.rsi"
+  },
+  "organTree": {
+   "id": "organTree",
+   "name": "organ tree",
+   "source": "starlight",
+   "products": [
+    "FoodOrganTree"
+   ],
+   "mutations": [],
+   "chemicals": {
+    "Nutriment": {
+     "min": 1,
+     "max": 2,
+     "potencyDivisor": 40
+    },
+    "Vitamin": {
+     "min": 1,
+     "max": 2,
+     "potencyDivisor": 40
+    }
+   },
+   "growth": {
+    "lifespan": 10,
+    "maturation": 12,
+    "production": 15,
+    "yield": 1,
+    "potency": 10,
+    "nutrientConsumption": 0.8,
+    "waterConsumption": 0.6
+   },
+   "rsi": "_Starlight/Objects/Specific/Hydroponics/organtree.rsi"
+  },
+  "CrystalThistle": {
+   "id": "CrystalThistle",
+   "name": "crystalthistle",
+   "source": "deltav",
+   "products": [
+    "FoodCrystalThistle"
+   ],
+   "mutations": [],
+   "chemicals": {
+    "Ethyloxyephedrine": {
+     "min": 1,
+     "max": 25,
+     "potencyDivisor": 4
+    },
+    "Quartzite": {
+     "min": 1,
+     "max": 25,
+     "potencyDivisor": 4
+    }
+   },
+   "growth": {
+    "lifespan": 25,
+    "maturation": 10,
+    "production": 3,
+    "yield": 3,
+    "potency": 10,
+    "waterConsumption": 0.6
+   },
+   "rsi": "_DV/Objects/Specific/Hydroponics/Crystal_Thistle.rsi"
+  },
+  "GhostPepper": {
+   "id": "GhostPepper",
+   "name": "ghost pepper",
+   "source": "deltav",
+   "products": [
+    "FoodGhostPepper"
+   ],
+   "mutations": [
+    "CosmicRevenant"
+   ],
+   "chemicals": {
+    "CapsaicinOil": {
+     "min": 2,
+     "max": 20,
+     "potencyDivisor": 10
+    },
+    "Nutriment": {
+     "min": 2,
+     "max": 8,
+     "potencyDivisor": 25
+    },
+    "Vitamin": {
+     "min": 2,
+     "max": 8,
+     "potencyDivisor": 25
+    },
+    "Thermite": {
+     "min": 5,
+     "max": 20,
+     "potencyDivisor": 10
+    }
+   },
+   "growth": {
+    "lifespan": 25,
+    "maturation": 6,
+    "production": 6,
+    "yield": 2,
+    "potency": 20,
+    "idealLight": 9,
+    "idealHeat": 298
+   },
+   "rsi": "_DV/Objects/Specific/Hydroponics/Ghost_Pepper.rsi"
+  },
+  "CosmicRevenant": {
+   "id": "CosmicRevenant",
+   "name": "cosmic revenant",
+   "source": "deltav",
+   "products": [
+    "FoodCosmicRevenant"
+   ],
+   "mutations": [],
+   "chemicals": {
+    "CapsaicinOil": {
+     "min": 3,
+     "max": 30,
+     "potencyDivisor": 10
+    },
+    "Nutriment": {
+     "min": 4,
+     "max": 10,
+     "potencyDivisor": 25
+    },
+    "Vitamin": {
+     "min": 4,
+     "max": 10,
+     "potencyDivisor": 25
+    },
+    "Ectoplasm": {
+     "min": 1,
+     "max": 5,
+     "potencyDivisor": 10
+    }
+   },
+   "growth": {
+    "lifespan": 25,
+    "maturation": 6,
+    "production": 6,
+    "yield": 2,
+    "potency": 20,
+    "idealLight": 9,
+    "idealHeat": 298
+   },
+   "rsi": "_DV/Objects/Specific/Hydroponics/Cosmic_Revenant.rsi"
+  },
+  "AmbrosiaNobilis": {
+   "id": "AmbrosiaNobilis",
+   "name": "ambrosia nobilis",
+   "source": "deltav",
+   "products": [
+    "FoodAmbrosiaNobilis"
+   ],
+   "mutations": [
+    "ambrosiaDeus"
+   ],
+   "chemicals": {
+    "Nutriment": {
+     "min": 1,
+     "max": 2,
+     "potencyDivisor": 10
+    },
+    "SpaceDrugs": {
+     "min": 1,
+     "max": 5,
+     "potencyDivisor": 20
+    },
+    "Tricordrazine": {
+     "min": 1,
+     "max": 4,
+     "potencyDivisor": 25
+    },
+    "Negacordrazine": {
+     "min": 0,
+     "max": 2,
+     "potencyDivisor": 50
+    }
+   },
+   "growth": {
+    "lifespan": 25,
+    "maturation": 10,
+    "production": 3,
+    "yield": 3,
+    "potency": 10,
+    "waterConsumption": 0.6
+   },
+   "rsi": "Objects/Specific/Hydroponics/ambrosia_deus.rsi"
+  },
+  "sakura": {
+   "id": "sakura",
+   "name": "Sakura",
+   "source": "deadspace",
+   "products": [
+    "FoodSakuraFlower"
+   ],
+   "mutations": [],
+   "chemicals": {
+    "Nutriment": {
+     "min": 1,
+     "max": 4,
+     "potencyDivisor": 20
+    },
+    "Vitamin": {
+     "min": 1,
+     "max": 4,
+     "potencyDivisor": 25
+    },
+    "SakuraJuice": {
+     "min": 1,
+     "max": 5,
+     "potencyDivisor": 5
+    }
+   },
+   "growth": {
+    "lifespan": 55,
+    "maturation": 6,
+    "production": 3,
+    "yield": 3,
+    "potency": 10,
+    "idealLight": 8,
+    "waterConsumption": 0.6
+   },
+   "rsi": "_DeadSpace/Objects/Specific/Hydroponics/sakura_plant.rsi"
+  },
+  "tritiumCannabis": {
+   "id": "tritiumCannabis",
+   "name": "Тритиевая Конопля",
+   "source": "deadspace",
+   "products": [
+    "LeavesCannabisTritium"
+   ],
+   "mutations": [],
+   "chemicals": {
+    "THC": {
+     "min": 1,
+     "max": 10,
+     "potencyDivisor": 10
+    },
+    "SpaceDrugs": {
+     "min": 1,
+     "max": 5,
+     "potencyDivisor": 20
+    }
+   },
+   "growth": {
+    "lifespan": 75,
+    "maturation": 8,
+    "production": 12,
+    "yield": 2,
+    "potency": 20,
+    "idealLight": 9,
+    "idealHeat": 298,
+    "waterConsumption": 0.4
+   },
+   "rsi": "Objects/Specific/Hydroponics/cannabis.rsi"
+  },
+  "CactusPlant": {
+   "id": "CactusPlant",
+   "name": "Кактус",
+   "source": "deadspace",
+   "products": [
+    "FoodCactus"
+   ],
+   "mutations": [
+    "CactusCoralPlant",
+    "CactusBombPlant",
+    "CactusBubblePlant"
+   ],
+   "chemicals": {
+    "Nutriment": {
+     "min": 1,
+     "max": 5,
+     "potencyDivisor": 20
+    },
+    "CactusJuice": {
+     "min": 3,
+     "max": 5,
+     "potencyDivisor": 5
+    },
+    "SpikeAcid": {
+     "min": 1,
+     "max": 1,
+     "potencyDivisor": 1
+    }
+   },
+   "growth": {
+    "lifespan": 125,
+    "maturation": 12,
+    "production": 3,
+    "yield": 3,
+    "potency": 10,
+    "idealLight": 8,
+    "waterConsumption": 0.1
+   },
+   "rsi": "_DeadSpace/Objects/Specific/Hydroponics/cactus.rsi"
+  },
+  "CactusCoralPlant": {
+   "id": "CactusCoralPlant",
+   "name": "Коралловый Кактус",
+   "source": "deadspace",
+   "products": [
+    "FoodCactusCoral"
+   ],
+   "mutations": [],
+   "chemicals": {
+    "Nutriment": {
+     "min": 1,
+     "max": 3,
+     "potencyDivisor": 20
+    },
+    "CactusJuice": {
+     "min": 1,
+     "max": 3,
+     "potencyDivisor": 5
+    },
+    "SpikeAcid": {
+     "min": 1,
+     "max": 2,
+     "potencyDivisor": 1
+    }
+   },
+   "growth": {
+    "lifespan": 34,
+    "maturation": 10,
+    "production": 6,
+    "yield": 1,
+    "potency": 10,
+    "idealLight": 8,
+    "waterConsumption": 1.25
+   },
+   "rsi": "_DeadSpace/Objects/Specific/Hydroponics/cactus_coral.rsi"
+  },
+  "CactusBombPlant": {
+   "id": "CactusBombPlant",
+   "name": "Взрывной Кактус",
+   "source": "deadspace",
+   "products": [
+    "FoodCactusBomb"
+   ],
+   "mutations": [],
+   "chemicals": {
+    "Nutriment": {
+     "min": 1,
+     "max": 3,
+     "potencyDivisor": 20
+    },
+    "CactusJuice": {
+     "min": 1,
+     "max": 3,
+     "potencyDivisor": 5
+    },
+    "SpikeAcid": {
+     "min": 1,
+     "max": 2,
+     "potencyDivisor": 1
+    }
+   },
+   "growth": {
+    "lifespan": 34,
+    "maturation": 10,
+    "production": 6,
+    "yield": 1,
+    "potency": 10,
+    "idealLight": 8,
+    "waterConsumption": 1.25
+   },
+   "rsi": "_DeadSpace/Objects/Specific/Hydroponics/cactus_bomb.rsi"
+  },
+  "CactusBubblePlant": {
+   "id": "CactusBubblePlant",
+   "name": "Пузырчатый Кактоплюх",
+   "source": "deadspace",
+   "products": [
+    "FoodCactusBubble"
+   ],
+   "mutations": [],
+   "chemicals": {
+    "Nutriment": {
+     "min": 1,
+     "max": 3,
+     "potencyDivisor": 20
+    },
+    "Panacemycin": {
+     "min": 1,
+     "max": 3,
+     "potencyDivisor": 5
+    },
+    "Septomycin": {
+     "min": 1,
+     "max": 2,
+     "potencyDivisor": 1
+    }
+   },
+   "growth": {
+    "lifespan": 34,
+    "maturation": 10,
+    "production": 6,
+    "yield": 3,
+    "potency": 10,
+    "idealLight": 8,
+    "waterConsumption": 1.25
+   },
+   "rsi": "_DeadSpace/Objects/Specific/Hydroponics/cactus_bubble.rsi"
+  },
+  "MangoPlant": {
+   "id": "MangoPlant",
+   "name": "Манго",
+   "source": "deadspace",
+   "products": [
+    "FoodMango"
+   ],
+   "mutations": [],
+   "chemicals": {
+    "Nutriment": {
+     "min": 1,
+     "max": 5,
+     "potencyDivisor": 20
+    }
+   },
+   "growth": {
+    "lifespan": 55,
+    "maturation": 12,
+    "production": 3,
+    "yield": 3,
+    "potency": 10,
+    "idealLight": 8,
+    "waterConsumption": 1.5
+   },
+   "rsi": "_DeadSpace/Objects/Specific/Hydroponics/mango.rsi"
+  },
+  "spesos": {
+   "id": "spesos",
+   "name": "speso",
+   "source": "frontier",
+   "products": [
+    "GoldLeaf"
+   ],
+   "mutations": [],
+   "chemicals": {},
+   "growth": {
+    "lifespan": 45,
+    "maturation": 15,
+    "production": 8,
+    "yield": 1,
+    "potency": 10,
+    "idealLight": 6
+   },
+   "rsi": "_NF/Objects/Specific/Hydroponics/spesostree.rsi"
+  },
+  "pear": {
+   "id": "pear",
+   "name": "pear",
+   "source": "frontier",
+   "products": [
+    "FoodPear"
+   ],
+   "mutations": [],
+   "chemicals": {
+    "Nutriment": {
+     "min": 1,
+     "max": 10,
+     "potencyDivisor": 10
+    },
+    "Vitamin": {
+     "min": 1,
+     "max": 4,
+     "potencyDivisor": 25
+    }
+   },
+   "growth": {
+    "lifespan": 55,
+    "maturation": 6,
+    "production": 6,
+    "yield": 3,
+    "potency": 10,
+    "idealLight": 6
+   },
+   "rsi": "_NF/Objects/Specific/Hydroponics/pear.rsi"
+  },
+  "coffee": {
+   "id": "coffee",
+   "name": "coffee",
+   "source": "frontier",
+   "products": [
+    "FoodCoffee"
+   ],
+   "mutations": [],
+   "chemicals": {
+    "Nutriment": {
+     "min": 2,
+     "max": 8,
+     "potencyDivisor": 16
+    },
+    "Theobromine": {
+     "min": 1,
+     "max": 4,
+     "potencyDivisor": 25
+    }
+   },
+   "growth": {
+    "lifespan": 25,
+    "maturation": 9,
+    "production": 1,
+    "yield": 2,
+    "potency": 5,
+    "idealLight": 8,
+    "waterConsumption": 0.6
+   },
+   "rsi": "_NF/Objects/Specific/Hydroponics/coffee.rsi"
+  },
+  "avocado": {
+   "id": "avocado",
+   "name": "avocado",
+   "source": "frontier",
+   "products": [
+    "FoodAvocado"
+   ],
+   "mutations": [],
+   "chemicals": {
+    "Nutriment": {
+     "min": 1,
+     "max": 10,
+     "potencyDivisor": 10
+    },
+    "Vitamin": {
+     "min": 1,
+     "max": 4,
+     "potencyDivisor": 25
+    }
+   },
+   "growth": {
+    "lifespan": 55,
+    "maturation": 6,
+    "production": 6,
+    "yield": 3,
+    "potency": 10,
+    "idealLight": 6,
+    "waterConsumption": 0.6
+   },
+   "rsi": "_NF/Objects/Specific/Hydroponics/avocado.rsi"
+  },
+  "cucumber": {
+   "id": "cucumber",
+   "name": "cucumber",
+   "source": "frontier",
+   "products": [
+    "FoodCucumber"
+   ],
+   "mutations": [],
+   "chemicals": {
+    "Nutriment": {
+     "min": 1,
+     "max": 10,
+     "potencyDivisor": 10
+    },
+    "Vitamin": {
+     "min": 1,
+     "max": 4,
+     "potencyDivisor": 25
+    }
+   },
+   "growth": {
+    "lifespan": 50,
+    "maturation": 7,
+    "production": 5,
+    "yield": 4,
+    "potency": 10
+   },
+   "rsi": "_NF/Objects/Specific/Hydroponics/cucumber.rsi"
+  },
+  "bees": {
+   "id": "bees",
+   "name": "bees",
+   "source": "frontier",
+   "products": [
+    "FoodHoneyComb"
+   ],
+   "mutations": [],
+   "chemicals": {
+    "Nutriment": {
+     "min": 1,
+     "max": 10,
+     "potencyDivisor": 10
+    },
+    "Vitamin": {
+     "min": 1,
+     "max": 4,
+     "potencyDivisor": 25
+    }
+   },
+   "growth": {
+    "lifespan": 60,
+    "maturation": 7,
+    "production": 5,
+    "yield": 4,
+    "potency": 10
+   },
+   "rsi": "_NF/Objects/Specific/Hydroponics/bees.rsi"
+  },
+  "everyspice": {
+   "id": "everyspice",
+   "name": "everyspice",
+   "source": "frontier",
+   "products": [
+    "FoodEveryspice"
+   ],
+   "mutations": [],
+   "chemicals": {
+    "Everyspice": {
+     "min": 1,
+     "max": 10,
+     "potencyDivisor": 10
+    }
+   },
+   "growth": {
+    "lifespan": 25,
+    "maturation": 6,
+    "production": 6,
+    "yield": 2,
+    "potency": 20,
+    "idealLight": 9,
+    "idealHeat": 303
+   },
+   "rsi": "_NF/Objects/Specific/Hydroponics/everyspice.rsi"
+  },
+  "monkanana": {
+   "id": "monkanana",
+   "name": "monkanana",
+   "source": "frontier",
+   "products": [
+    "FoodMonkanana"
+   ],
+   "mutations": [],
+   "chemicals": {
+    "Primatine": {
+     "min": 5,
+     "max": 16,
+     "potencyDivisor": 5
+    },
+    "Nutriment": {
+     "min": 3,
+     "max": 6,
+     "potencyDivisor": 10
+    },
+    "Vitamin": {
+     "min": 0,
+     "max": 2,
+     "potencyDivisor": 25
+    }
+   },
+   "growth": {
+    "lifespan": 50,
+    "maturation": 12,
+    "production": 6,
+    "yield": 3,
+    "potency": 25,
+    "idealLight": 9,
+    "idealHeat": 298,
+    "waterConsumption": 0.6
+   },
+   "rsi": "_NF/Objects/Specific/Hydroponics/monkanana.rsi"
+  },
+  "nfglowshroom": {
+   "id": "nfglowshroom",
+   "name": "glowshroom",
+   "source": "frontier",
+   "products": [
+    "NFFoodGlowshroom"
+   ],
+   "mutations": [],
+   "chemicals": {
+    "Radium": {
+     "min": 4,
+     "max": 12,
+     "potencyDivisor": 20
+    }
+   },
+   "growth": {
+    "lifespan": 60,
+    "maturation": 12,
+    "production": 3,
+    "yield": 2,
+    "potency": 30,
+    "idealLight": 2,
+    "waterConsumption": 0.8
+   },
+   "rsi": "_NF/Objects/Misc/glowshroom.rsi"
+  },
+  "pomegranate": {
+   "id": "pomegranate",
+   "name": "pomegranate",
+   "source": "frontier",
+   "products": [
+    "FoodPomegranate"
+   ],
+   "mutations": [
+    "granatapfel"
+   ],
+   "chemicals": {
+    "Nutriment": {
+     "min": 1,
+     "max": 10,
+     "potencyDivisor": 10
+    },
+    "Vitamin": {
+     "min": 1,
+     "max": 4,
+     "potencyDivisor": 25
+    }
+   },
+   "growth": {
+    "lifespan": 55,
+    "maturation": 6,
+    "production": 6,
+    "yield": 4,
+    "potency": 10,
+    "idealLight": 6
+   },
+   "rsi": "_NF/Objects/Specific/Hydroponics/pomegranate.rsi"
+  },
+  "granatapfel": {
+   "id": "granatapfel",
+   "name": "granatapfel",
+   "source": "frontier",
+   "products": [
+    "FoodGranatapfel"
+   ],
+   "mutations": [],
+   "chemicals": {
+    "Sulfur": {
+     "min": 1,
+     "max": 20,
+     "potencyDivisor": 5
+    },
+    "Hydrogen": {
+     "min": 1,
+     "max": 20,
+     "potencyDivisor": 5
+    },
+    "Ethanol": {
+     "min": 1,
+     "max": 20,
+     "potencyDivisor": 5
+    }
+   },
+   "growth": {
+    "lifespan": 55,
+    "maturation": 6,
+    "production": 6,
+    "yield": 4,
+    "potency": 10,
+    "idealLight": 6
+   },
+   "rsi": "_NF/Objects/Specific/Hydroponics/granatapfel.rsi"
+  },
+  "catberry": {
+   "id": "catberry",
+   "name": "catberry",
+   "source": "funky",
+   "products": [
+    "FoodCatberry"
+   ],
+   "mutations": [],
+   "chemicals": {
+    "Nutriment": {
+     "min": 2,
+     "max": 5,
+     "potencyDivisor": 30
+    },
+    "Vitamin": {
+     "min": 1,
+     "max": 4,
+     "potencyDivisor": 40
+    },
+    "CatExtract": {
+     "min": 2,
+     "max": 3,
+     "potencyDivisor": 50
+    }
+   },
+   "growth": {
+    "lifespan": 35,
+    "maturation": 6,
+    "production": 6,
+    "yield": 3,
+    "idealLight": 7,
+    "nutrientConsumption": 0.6
+   },
+   "rsi": "_Funkystation/Objects/Specific/Hydroponics/catberry.rsi"
+  },
+  "hops": {
+   "id": "hops",
+   "name": "Hops",
+   "source": "funky",
+   "products": [
+    "FoodHops"
+   ],
+   "mutations": [
+    "employedhops"
+   ],
+   "chemicals": {
+    "Beer": {
+     "min": 1,
+     "max": 20,
+     "potencyDivisor": 25
+    }
+   },
+   "growth": {
+    "lifespan": 25,
+    "maturation": 6,
+    "production": 3,
+    "yield": 3,
+    "potency": 5,
+    "idealLight": 8,
+    "nutrientConsumption": 0.4
+   },
+   "rsi": "_Impstation/Objects/Specific/Hydroponics/hops.rsi"
+  },
+  "employedhops": {
+   "id": "employedhops",
+   "name": "Employedhops",
+   "source": "funky",
+   "products": [
+    "HopTart"
+   ],
+   "mutations": [
+    "agentgrain"
+   ],
+   "chemicals": {},
+   "growth": {
+    "lifespan": 65,
+    "maturation": 25,
+    "production": 25,
+    "yield": 1,
+    "potency": 5,
+    "idealLight": 8,
+    "nutrientConsumption": 0.4
+   },
+   "rsi": "_Impstation/Objects/Specific/Hydroponics/employedhops.rsi"
+  },
+  "agentgrain": {
+   "id": "agentgrain",
+   "name": "Agentgrain",
+   "source": "funky",
+   "products": [
+    "AgentIDCard"
+   ],
+   "mutations": [],
+   "chemicals": {},
+   "growth": {
+    "lifespan": 65,
+    "maturation": 25,
+    "production": 25,
+    "yield": 1,
+    "potency": 5,
+    "idealLight": 8,
+    "nutrientConsumption": 0.4
+   },
+   "rsi": "_Impstation/Objects/Specific/Hydroponics/agentgrain.rsi"
+  },
+  "Lemonade": {
+   "id": "Lemonade",
+   "name": "lemonade",
+   "source": "trauma",
+   "products": [
+    "FoodLemonade"
+   ],
+   "mutations": [
+    "lime"
+   ],
+   "chemicals": {
+    "WeldingFuel": {
+     "min": 1,
+     "max": 5,
+     "potencyDivisor": 20
+    },
+    "Napalm": {
+     "min": 1,
+     "max": 4,
+     "potencyDivisor": 25
+    },
+    "ChlorineTrifluoride": {
+     "min": 2,
+     "max": 3,
+     "potencyDivisor": 100
+    }
+   },
+   "growth": {
+    "lifespan": 55,
+    "maturation": 6,
+    "production": 6,
+    "yield": 3,
+    "potency": 10,
+    "idealLight": 8
+   },
+   "rsi": "_Trauma/Objects/Specific/Hydroponics/lemonade.rsi"
+  },
+  "CocaPlant": {
+   "id": "CocaPlant",
+   "name": "coca leaf",
+   "source": "trauma",
+   "products": [
+    "LeavesCoca"
+   ],
+   "mutations": [],
+   "chemicals": {
+    "CocaSlurry": {
+     "min": 1,
+     "max": 10,
+     "potencyDivisor": 10
+    }
+   },
+   "growth": {
+    "lifespan": 75,
+    "maturation": 5,
+    "production": 5,
+    "yield": 2,
+    "potency": 10,
+    "idealLight": 9,
+    "idealHeat": 300,
+    "waterConsumption": 0.4
+   },
+   "rsi": "_Trauma/Objects/Specific/Hydroponics/coca_plant.rsi"
+  },
+  "CoconutPlant": {
+   "id": "CoconutPlant",
+   "name": "coconut",
+   "source": "trauma",
+   "products": [
+    "FoodCoconut"
+   ],
+   "mutations": [],
+   "chemicals": {
+    "CoconutFlesh": {
+     "min": 1,
+     "max": 20,
+     "potencyDivisor": 2
+    },
+    "Vitamin": {
+     "min": 1,
+     "max": 10,
+     "potencyDivisor": 2
+    },
+    "CoconutWater": {
+     "min": 1,
+     "max": 10,
+     "potencyDivisor": 2
+    }
+   },
+   "growth": {
+    "lifespan": 80,
+    "maturation": 12,
+    "production": 1,
+    "yield": 8,
+    "potency": 25,
+    "idealLight": 8,
+    "nutrientConsumption": 1,
+    "waterConsumption": 1
+   },
+   "rsi": "_Trauma/Objects/Specific/Hydroponics/coconut.rsi"
+  },
+  "CherryBomb": {
+   "id": "CherryBomb",
+   "name": "cherry bomb",
+   "source": "trauma",
+   "products": [
+    "FoodCherryBomb"
+   ],
+   "mutations": [],
+   "chemicals": {
+    "Nutriment": {
+     "min": 1,
+     "max": 3,
+     "potencyDivisor": 30
+    },
+    "Vitamin": {
+     "min": 1,
+     "max": 3,
+     "potencyDivisor": 40
+    }
+   },
+   "growth": {
+    "lifespan": 55,
+    "maturation": 3,
+    "production": 3,
+    "yield": 6,
+    "potency": 10,
+    "idealLight": 6
+   },
+   "rsi": "_Goobstation/Objects/Specific/Hydroponics/cherry.rsi"
+  },
+  "KelpPod": {
+   "id": "KelpPod",
+   "name": "Eeckekyiish Kelp Pods",
+   "source": "omu",
+   "products": [
+    "FoodKelpPod"
+   ],
+   "mutations": [
+    "KelpWinePod"
+   ],
+   "chemicals": {
+    "KelpPodSlime": {
+     "min": 10,
+     "max": 30,
+     "potencyDivisor": 20
+    },
+    "Slime": {
+     "min": 5,
+     "max": 20,
+     "potencyDivisor": 50
+    }
+   },
+   "growth": {
+    "lifespan": 75,
+    "maturation": 8,
+    "production": 12,
+    "yield": 2,
+    "potency": 20,
+    "idealLight": 9,
+    "idealHeat": 298,
+    "waterConsumption": 0.4
+   },
+   "rsi": "_Gardenstation/Objects/Specific/Hydroponics/kelppod.rsi"
+  },
+  "KelpWinePod": {
+   "id": "KelpWinePod",
+   "name": "Eeckekyiish Cask Kelp Pods",
+   "source": "omu",
+   "products": [
+    "FoodKelpWinePod"
+   ],
+   "mutations": [],
+   "chemicals": {
+    "KelpPodSlime": {
+     "min": 5,
+     "max": 15,
+     "potencyDivisor": 20
+    },
+    "KelpPodWine": {
+     "min": 10,
+     "max": 30,
+     "potencyDivisor": 20
+    }
+   },
+   "growth": {
+    "lifespan": 75,
+    "maturation": 8,
+    "production": 12,
+    "yield": 2,
+    "potency": 20,
+    "idealLight": 9,
+    "idealHeat": 298,
+    "waterConsumption": 0.4
+   },
+   "rsi": "_Gardenstation/Objects/Specific/Hydroponics/kelppod.rsi"
+  },
+  "crudcoa": {
+   "id": "crudcoa",
+   "name": "Crudcoa",
+   "source": "carpmosia",
+   "products": [
+    "FoodCrudcoaPod"
+   ],
+   "mutations": [],
+   "chemicals": {
+    "Oil": {
+     "min": 5,
+     "max": 10,
+     "potencyDivisor": 20
+    },
+    "Phosphorus": {
+     "min": 5,
+     "max": 10,
+     "potencyDivisor": 20
+    }
+   },
+   "growth": {
+    "lifespan": 50,
+    "maturation": 6,
+    "production": 6,
+    "yield": 6,
+    "potency": 1,
+    "idealLight": 7,
+    "idealHeat": 298,
+    "nutrientConsumption": 0.8,
+    "waterConsumption": 1
+   },
+   "rsi": "_Carpmosia/Objects/Specific/Hydroponics/crudcoa.rsi"
+  },
+  "peanut": {
+   "id": "peanut",
+   "name": "Peanut",
+   "source": "harmony",
+   "products": [
+    "FoodPeanut"
+   ],
+   "mutations": [],
+   "chemicals": {
+    "Nutriment": {
+     "min": 1,
+     "max": 5,
+     "potencyDivisor": 20
+    },
+    "PeanutButter": {
+     "min": 2,
+     "max": 6,
+     "potencyDivisor": 20
+    }
+   },
+   "growth": {
+    "lifespan": 25,
+    "maturation": 10,
+    "production": 3,
+    "yield": 4,
+    "potency": 10,
+    "waterConsumption": 0.6
+   },
+   "rsi": "_Harmony/Objects/Specific/Hydroponics/peanut.rsi"
+  },
+  "ADTPapaverSomniferum": {
+   "id": "ADTPapaverSomniferum",
+   "name": "Papaver Somniferum",
+   "source": "adt",
+   "products": [
+    "ADTFoodPapaverSomniferum"
+   ],
+   "mutations": [],
+   "chemicals": {
+    "Nutriment": {
+     "min": 1,
+     "max": 2,
+     "potencyDivisor": 50
+    },
+    "Toxin": {
+     "min": 1,
+     "max": 4,
+     "potencyDivisor": 5
+    },
+    "ADTOpium": {
+     "min": 1,
+     "max": 10,
+     "potencyDivisor": 5
+    }
+   },
+   "growth": {
+    "lifespan": 25,
+    "maturation": 10,
+    "production": 3,
+    "yield": 3,
+    "potency": 10,
+    "waterConsumption": 0.6
+   },
+   "rsi": "ADT/Objects/Specific/Hydroponics/papaver_somniferum.rsi"
+  },
+  "ADTCannabisWhite": {
+   "id": "ADTCannabisWhite",
+   "name": "Cannabiswhite",
+   "source": "adt",
+   "products": [
+    "ADTLeavesCannabisWhite"
+   ],
+   "mutations": [],
+   "chemicals": {
+    "THC": {
+     "min": 5,
+     "max": 15,
+     "potencyDivisor": 15
+    },
+    "Omnizine": {
+     "min": 3,
+     "max": 8,
+     "potencyDivisor": 15
+    }
+   },
+   "growth": {
+    "lifespan": 75,
+    "maturation": 8,
+    "production": 15,
+    "yield": 2,
+    "potency": 30,
+    "idealLight": 9,
+    "idealHeat": 298,
+    "waterConsumption": 0.4
+   },
+   "rsi": "ADT/Objects/Specific/Hydroponics/cannabiswhite.rsi"
+  },
+  "ADTCoffeeTree": {
+   "id": "ADTCoffeeTree",
+   "name": "Coffeetree",
+   "source": "adt",
+   "products": [
+    "ADTCoffeeBeans"
+   ],
+   "mutations": [],
+   "chemicals": {
+    "Theobromine": {
+     "min": 5,
+     "max": 15,
+     "potencyDivisor": 15
+    },
+    "Nutriment": {
+     "min": 3,
+     "max": 8,
+     "potencyDivisor": 15
+    }
+   },
+   "growth": {
+    "lifespan": 75,
+    "maturation": 8,
+    "production": 15,
+    "yield": 3,
+    "potency": 15,
+    "idealLight": 9,
+    "idealHeat": 298,
+    "waterConsumption": 0.4
+   },
+   "rsi": "ADT/Objects/Specific/Hydroponics/coffeebeans.rsi"
+  },
+  "ADTStrawberry": {
+   "id": "ADTStrawberry",
+   "name": "Strawberry",
+   "source": "adt",
+   "products": [
+    "ADTFoodStrawberry"
+   ],
+   "mutations": [],
+   "chemicals": {
+    "Nutriment": {
+     "min": 1,
+     "max": 5,
+     "potencyDivisor": 20
+    },
+    "Vitamin": {
+     "min": 1,
+     "max": 4,
+     "potencyDivisor": 25
+    }
+   },
+   "growth": {
+    "lifespan": 55,
+    "maturation": 6,
+    "production": 6,
+    "yield": 3,
+    "potency": 10,
+    "idealLight": 8
+   },
+   "rsi": "ADT/Objects/Specific/Hydroponics/strawberry.rsi"
+  },
+  "ExplosiveBanana": {
+   "id": "ExplosiveBanana",
+   "name": "Explosive Banana",
+   "source": "sunrise",
+   "products": [
+    "ExplosiveBanana"
+   ],
+   "mutations": [],
+   "chemicals": {
+    "Potassium": {
+     "min": 1,
+     "max": 15,
+     "potencyDivisor": 4
+    },
+    "Nutriment": {
+     "min": 1,
+     "max": 2,
+     "potencyDivisor": 30
+    },
+    "Water": {
+     "min": 1,
+     "max": 15,
+     "potencyDivisor": 4
+    }
+   },
+   "growth": {
+    "lifespan": 25,
+    "maturation": 12,
+    "production": 2,
+    "yield": 2,
+    "potency": 10,
+    "nutrientConsumption": 0.5,
+    "waterConsumption": 0.6
+   },
+   "rsi": "_Sunrise/Objects/Specific/Hydroponics/explosive_banana.rsi"
+  },
+  "CoffeeArabica": {
+   "id": "CoffeeArabica",
+   "name": "Coffee Arabica",
+   "source": "sunrise",
+   "products": [
+    "FoodCoffeeArabica"
+   ],
+   "mutations": [
+    "CoffeeRobust"
+   ],
+   "chemicals": {
+    "Grcoffee": {
+     "min": 1,
+     "max": 20,
+     "potencyDivisor": 4
+    },
+    "Nutriment": {
+     "min": 1,
+     "max": 2,
+     "potencyDivisor": 4
+    }
+   },
+   "growth": {
+    "lifespan": 25,
+    "maturation": 6,
+    "production": 4,
+    "yield": 3,
+    "potency": 10,
+    "idealLight": 7,
+    "idealHeat": 298,
+    "nutrientConsumption": 0.3,
+    "waterConsumption": 0.4
+   },
+   "rsi": "_Sunrise/Objects/Specific/Hydroponics/coffee_arabica.rsi"
+  },
+  "CoffeeRobust": {
+   "id": "CoffeeRobust",
+   "name": "Coffee Robust",
+   "source": "sunrise",
+   "products": [
+    "FoodCoffeeRobust"
+   ],
+   "mutations": [],
+   "chemicals": {
+    "Grcoffee": {
+     "min": 1,
+     "max": 10,
+     "potencyDivisor": 2
+    },
+    "Nutriment": {
+     "min": 1,
+     "max": 2,
+     "potencyDivisor": 2
+    },
+    "Ephedrine": {
+     "min": 1,
+     "max": 10,
+     "potencyDivisor": 25
+    }
+   },
+   "growth": {
+    "lifespan": 25,
+    "maturation": 6,
+    "production": 4,
+    "yield": 3,
+    "potency": 10,
+    "idealLight": 7,
+    "idealHeat": 298,
+    "nutrientConsumption": 0.3,
+    "waterConsumption": 0.4
+   },
+   "rsi": "_Sunrise/Objects/Specific/Hydroponics/coffee_robust.rsi"
+  },
+  "Geranium": {
+   "id": "Geranium",
+   "name": "Geranium",
+   "source": "sunrise",
+   "products": [
+    "FoodGeranium"
+   ],
+   "mutations": [],
+   "chemicals": {
+    "Nutriment": {
+     "min": 1,
+     "max": 2,
+     "potencyDivisor": 50
+    },
+    "Lacerinol": {
+     "min": 1,
+     "max": 20,
+     "potencyDivisor": 5
+    }
+   },
+   "growth": {
+    "lifespan": 25,
+    "maturation": 10,
+    "production": 3,
+    "yield": 3,
+    "potency": 10,
+    "waterConsumption": 0.6
+   },
+   "rsi": "_Sunrise/Objects/Specific/Hydroponics/geranium.rsi"
+  },
+  "plaststeelcap": {
+   "id": "plaststeelcap",
+   "name": "Plaststeelcap",
+   "source": "sunrise",
+   "products": [
+    "PlastSteelLog"
+   ],
+   "mutations": [],
+   "chemicals": {},
+   "growth": {
+    "lifespan": 80,
+    "maturation": 15,
+    "production": 3,
+    "yield": 3,
+    "potency": 1,
+    "idealHeat": 288,
+    "nutrientConsumption": 0.8,
+    "waterConsumption": 0.6
+   },
+   "rsi": "_Sunrise/Objects/Specific/Hydroponics/plaststeelcap.rsi"
+  },
+  "glasscap": {
+   "id": "glasscap",
+   "name": "Glasscap",
+   "source": "sunrise",
+   "products": [
+    "GlassLog"
+   ],
+   "mutations": [],
+   "chemicals": {},
+   "growth": {
+    "lifespan": 80,
+    "maturation": 15,
+    "production": 3,
+    "yield": 5,
+    "potency": 1,
+    "idealHeat": 288,
+    "nutrientConsumption": 0.5,
+    "waterConsumption": 0.6
+   },
+   "rsi": "_Sunrise/Objects/Specific/Hydroponics/glasscap.rsi"
+  },
+  "CannabisVita": {
+   "id": "CannabisVita",
+   "name": "Cannabis Vita",
+   "source": "sunrise",
+   "products": [
+    "CannabisVitaLeaves"
+   ],
+   "mutations": [],
+   "chemicals": {
+    "Omnizine": {
+     "min": 1,
+     "max": 6,
+     "potencyDivisor": 35
+    },
+    "THC": {
+     "min": 1,
+     "max": 10,
+     "potencyDivisor": 10
+    }
+   },
+   "growth": {
+    "lifespan": 40,
+    "maturation": 8,
+    "production": 5,
+    "yield": 2,
+    "potency": 20,
+    "idealLight": 11,
+    "idealHeat": 298
+   },
+   "rsi": "_Sunrise/Objects/Specific/Hydroponics/cannabis_vita.rsi"
+  },
+  "Barrelmelon": {
+   "id": "Barrelmelon",
+   "name": "Barrelmelon",
+   "source": "sunrise",
+   "products": [
+    "FoodBarrelmelon"
+   ],
+   "mutations": [],
+   "chemicals": {
+    "Nutriment": {
+     "min": 1,
+     "max": 10,
+     "potencyDivisor": 10
+    },
+    "Moonshine": {
+     "min": 1,
+     "max": 15,
+     "potencyDivisor": 20
+    }
+   },
+   "growth": {
+    "lifespan": 55,
+    "maturation": 12,
+    "production": 3,
+    "yield": 1,
+    "potency": 1,
+    "idealLight": 8
+   },
+   "rsi": "_Sunrise/Objects/Specific/Hydroponics/barrelmelon.rsi"
+  },
+  "Lanternfruit": {
+   "id": "Lanternfruit",
+   "name": "Lanternfruit",
+   "source": "sunrise",
+   "products": [
+    "FoodLanternfruit"
+   ],
+   "mutations": [],
+   "chemicals": {
+    "PulverizedLantern": {
+     "min": 1,
+     "max": 5,
+     "potencyDivisor": 5
+    },
+    "Sulfur": {
+     "min": 1,
+     "max": 10,
+     "potencyDivisor": 10
+    },
+    "Licoxide": {
+     "min": 1,
+     "max": 5,
+     "potencyDivisor": 5
+    }
+   },
+   "growth": {
+    "lifespan": 60,
+    "maturation": 8,
+    "production": 3,
+    "yield": 1,
+    "potency": 20,
+    "idealLight": 7,
+    "idealHeat": 298
+   },
+   "rsi": "_Sunrise/Objects/Specific/Hydroponics/lanternfruit.rsi"
+  },
+  "Redrose": {
+   "id": "Redrose",
+   "name": "Redrose",
+   "source": "sunrise",
+   "products": [
+    "FoodRedrose"
+   ],
+   "mutations": [],
+   "chemicals": {
+    "Nutriment": {
+     "min": 1,
+     "max": 2,
+     "potencyDivisor": 10
+    },
+    "Vitamin": {
+     "min": 1,
+     "max": 2,
+     "potencyDivisor": 10
+    }
+   },
+   "growth": {
+    "lifespan": 60,
+    "maturation": 8,
+    "production": 3,
+    "yield": 2,
+    "potency": 11,
+    "idealLight": 7,
+    "idealHeat": 298
+   },
+   "rsi": "_Sunrise/Objects/Specific/Hydroponics/redrose.rsi"
+  },
+  "Snapcorn": {
+   "id": "Snapcorn",
+   "name": "Snapcorn",
+   "source": "sunrise",
+   "products": [
+    "FoodSnapcorn"
+   ],
+   "mutations": [],
+   "chemicals": {
+    "Nutriment": {
+     "min": 1,
+     "max": 35,
+     "potencyDivisor": 3
+    },
+    "Water": {
+     "min": 5,
+     "max": 10,
+     "potencyDivisor": 5
+    }
+   },
+   "growth": {
+    "lifespan": 25,
+    "maturation": 8,
+    "production": 4,
+    "yield": 2,
+    "potency": 20,
+    "idealLight": 8,
+    "idealHeat": 298,
+    "waterConsumption": 0.6
+   },
+   "rsi": "_Sunrise/Objects/Specific/Hydroponics/snapcorn.rsi"
+  },
+  "Whiterose": {
+   "id": "Whiterose",
+   "name": "Whiterose",
+   "source": "sunrise",
+   "products": [
+    "FoodWhiterose"
+   ],
+   "mutations": [
+    "Geranium"
+   ],
+   "chemicals": {
+    "Nutriment": {
+     "min": 1,
+     "max": 2,
+     "potencyDivisor": 10
+    },
+    "Vitamin": {
+     "min": 1,
+     "max": 2,
+     "potencyDivisor": 10
+    }
+   },
+   "growth": {
+    "lifespan": 60,
+    "maturation": 8,
+    "production": 3,
+    "yield": 2,
+    "potency": 20,
+    "idealLight": 7,
+    "idealHeat": 298
+   },
+   "rsi": "_Sunrise/Objects/Specific/Hydroponics/whiterose.rsi"
+  },
+  "Sunflower": {
+   "id": "Sunflower",
+   "name": "Sunflower",
+   "source": "sunrise",
+   "products": [
+    "FoodSunflower"
+   ],
+   "mutations": [],
+   "chemicals": {
+    "Nutriment": {
+     "min": 1,
+     "max": 2,
+     "potencyDivisor": 10
+    },
+    "Vitamin": {
+     "min": 1,
+     "max": 2,
+     "potencyDivisor": 5
+    },
+    "Oil": {
+     "min": 1,
+     "max": 10,
+     "potencyDivisor": 10
+    }
+   },
+   "growth": {
+    "lifespan": 40,
+    "maturation": 8,
+    "production": 4,
+    "yield": 1,
+    "potency": 10,
+    "idealLight": 7,
+    "idealHeat": 298
+   },
+   "rsi": "_Sunrise/Objects/Specific/Hydroponics/sunflower.rsi"
+  },
+  "WhiteLily": {
+   "id": "WhiteLily",
+   "name": "White Lily",
+   "source": "sunrise",
+   "products": [
+    "FoodWhiteLily"
+   ],
+   "mutations": [],
+   "chemicals": {
+    "Nutriment": {
+     "min": 1,
+     "max": 2,
+     "potencyDivisor": 10
+    },
+    "Vitamin": {
+     "min": 1,
+     "max": 2,
+     "potencyDivisor": 10
+    }
+   },
+   "growth": {
+    "lifespan": 25,
+    "maturation": 6,
+    "production": 4,
+    "yield": 3,
+    "potency": 10,
+    "idealLight": 7,
+    "idealHeat": 298,
+    "nutrientConsumption": 0.3,
+    "waterConsumption": 0.4
+   },
+   "rsi": "_Sunrise/Objects/Specific/Hydroponics/white_lily.rsi"
+  },
+  "Mango": {
+   "id": "Mango",
+   "name": "Mango",
+   "source": "fish",
+   "products": [
+    "FoodMango"
+   ],
+   "mutations": [
+    "OxygenMango"
+   ],
+   "chemicals": {
+    "Nutriment": {
+     "min": 3,
+     "max": 13,
+     "potencyDivisor": 15
+    },
+    "Vitamin": {
+     "min": 2,
+     "max": 6,
+     "potencyDivisor": 25
+    }
+   },
+   "growth": {
+    "lifespan": 50,
+    "maturation": 6,
+    "production": 6,
+    "yield": 3,
+    "potency": 10,
+    "idealLight": 6
+   },
+   "rsi": "_Fish/Objects/Specific/Hydroponics/mango.rsi"
+  },
+  "OxygenMango": {
+   "id": "OxygenMango",
+   "name": "Mango",
+   "source": "fish",
+   "products": [
+    "FoodOxygenMango"
+   ],
+   "mutations": [],
+   "chemicals": {
+    "Nutriment": {
+     "min": 1,
+     "max": 8,
+     "potencyDivisor": 15
+    },
+    "Vitamin": {
+     "min": 1,
+     "max": 4,
+     "potencyDivisor": 15
+    },
+    "Dexalin": {
+     "min": 4,
+     "max": 10,
+     "potencyDivisor": 15
+    },
+    "Saline": {
+     "min": 4,
+     "max": 10,
+     "potencyDivisor": 15
+    }
+   },
+   "growth": {
+    "lifespan": 50,
+    "maturation": 6,
+    "production": 6,
+    "yield": 3,
+    "potency": 10,
+    "idealLight": 6
+   },
+   "rsi": "_Fish/Objects/Specific/Hydroponics/oxygen_mango.rsi"
+  }
+ }
 }
