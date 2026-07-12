@@ -248,6 +248,24 @@ class Registry:
             return "mach"
         return "skip"
 
+    @staticmethod
+    def _amount(a):
+        """Coerce amount to int — real data uses !type:NumberSelector dicts
+        (Range/Constant/Binomial). Range 'lo, hi' → hi (an 'up to N' hint)."""
+        if isinstance(a, dict):
+            if "value" in a:
+                a = a["value"]
+            elif "range" in a:
+                a = str(a["range"]).split(",")[-1]
+            elif "trials" in a:
+                a = a["trials"]
+            else:
+                return 1
+        try:
+            return max(1, int(float(a)))
+        except (TypeError, ValueError):
+            return 1
+
     def _flatten_table(self, node, p=1.0, depth=0):
         """Yield (proto_id, prob, amount) from an entity-table selector tree.
         ponytail: GroupSelector = weight-proportional split, rolls ignored —
@@ -273,7 +291,7 @@ class Registry:
                 yield from self._flatten_table(c, p, depth + 1)
             return
         if node.get("id"):  # leaf entity entry
-            yield node["id"], p, int(node.get("amount", 1) or 1)
+            yield node["id"], p, self._amount(node.get("amount", 1))
 
     def storage_fill(self, pid):
         """[{id, prob?, amount?}] — legacy StorageFill or modern EntityTableContainerFill."""
@@ -339,9 +357,11 @@ def build_registry(fork_key: str, fork_cfg: dict, tree: list[str]) -> Registry:
                     reg.protos[eid] = {"id": eid, "name": entry.get("name"),
                                        "parents": parents, "components": comps}
                 elif t == "vendingMachineInventory" and eid:
-                    reg.vend_inventories[eid] = {
-                        "normal": entry.get("startingInventory") or {},
-                        "contraband": entry.get("contrabandInventory") or {}}
+                    inv = entry.get("startingInventory")
+                    cinv = entry.get("contrabandInventory")
+                    reg.vend_inventories[eid] = {   # dict-guard: a list here would crash the fork loop
+                        "normal": inv if isinstance(inv, dict) else {},
+                        "contraband": cinv if isinstance(cinv, dict) else {}}
                 elif t == "entityTable" and eid:
                     reg.entity_tables[eid] = entry.get("table") or {}
                 elif t == "tile" and eid and entry.get("sprite"):
@@ -351,7 +371,7 @@ def build_registry(fork_key: str, fork_cfg: dict, tree: list[str]) -> Registry:
     for path in ftl_paths:
         content = fetch_file(fork_cfg["raw_url"].format(path=path), CACHE_DIR / fork_key / path)
         for line in content.splitlines():
-            m = re.match(r"^([a-zA-Z0-9-]+)\s*=\s*(.+)$", line.strip())
+            m = re.match(r"^([a-zA-Z0-9-]+)\s*=\s*(.+)$", line.lstrip("﻿").strip())
             if m:
                 reg.ftl[m.group(1)] = m.group(2).strip()
     return reg
@@ -387,6 +407,7 @@ def selfcheck():
     assert reg.kind("ClosetToolFilled") == "container"
     assert reg.kind("CrateTrashCartFilled") == "container"
     assert reg.kind("Crowbar") == "item", "container branch must not steal plain items"
+    assert reg.storage_fill("BookshelfFilled"), "dict-amount (NumberSelector) container must not crash"
     # prob propagation: LockerWeldingSuppliesFilled fills purely via GroupSelector weight
     # splits (FillWelderSupplies 1/1/0.25/0.05, FillWelderSuppliesMask 1/0.25/0.25/0.25 —
     # verified in Catalog/Fills/Lockers/engineer.yml), so every flattened entry has prob<1.
