@@ -70,7 +70,14 @@
       document.getElementById('mapsSearch').disabled = false;
       buildSearchIndex();          // Task 12
       zoomFit();
-      renderLocations(null);       // Task 13
+      // deep-link item restore (Task 14): if ?item= names a real proto on this map, select it
+      const wantItem = new URLSearchParams(location.hash.slice(1)).get('item');
+      if (wantItem && S.mapData.items[wantItem]) {
+        document.getElementById('mapsSearch').value = wantItem;
+        pick(wantItem);            // draws markers + location list (Task 13)
+      } else {
+        renderLocations(null);     // Task 13
+      }
       if (typeof track === 'function') track('maps_map_select');
     } catch (e) {
       status.innerHTML = 'Failed to load map. <button id="mapsRetryMap">Retry</button>';
