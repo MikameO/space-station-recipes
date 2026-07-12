@@ -3,6 +3,24 @@
 `data.json` schema version is in `meta.schemaVersion`. Consumers reading this file
 should pin on a compatible range (semver: breaking changes bump major).
 
+## 3.4.3 — 2026-07-12 (Increment C1 — serialize reaction priority)
+
+Reactions now carry the engine's cascade **`priority`** when the upstream
+YAML defines it — omitted otherwise (engine default is 0; values can be
+negative: Smoke/Foam are -10 so real recipes win the reagents first).
+37 of 1003 reactions have one: vanilla 13 (PotassiumExplosion/Flash/
+Fresium 20, Hydroxide/CreateSoapRegular -1, Smoke/Foam/metal foams -10),
+RMC14 10, Trauma 4, Goob 3, RuCM 3, Starlight 2, Sunrise 1, Omu 1.
+Prerequisite for the beaker simulator (C2).
+
+Data refresh drift vs 3.4.2: none — same 1213 reagents / 1003 reactions,
+identical ids and per-fork counts; the only textual churn is clause
+reordering inside 14 `forkNotes` strings (unsorted set iteration in
+`compare_reaction`). M1 warning sweep: clean — no upstream rename signals
+(Solution→entity, EdibleComponent, EntityEffects conditions,
+ExudeGasses/ConsumeGasses); 404s are the usual fork-lacks-vanilla-file
+manifest probes (soap.yml on rmc14/rucm/funky/omu/monolith).
+
 ## 3.4.2 — 2026-07-11 (Increment O — full curation list: fork seeds, Vaccine, vendor layers, locales)
 
 Follow-up to 3.4.1: the maintainer approved including everything the manifest

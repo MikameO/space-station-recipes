@@ -1,7 +1,7 @@
 {
  "meta": {
-  "schemaVersion": "3.4.2",
-  "generated": "2026-07-11T21:22:16",
+  "schemaVersion": "3.4.3",
+  "generated": "2026-07-12T15:21:54",
   "forks": {
    "vanilla": {
     "name": "Vanilla SS14",
@@ -77637,6 +77637,7 @@
    "mixer": [],
    "effects": "Explosion",
    "impact": "High",
+   "priority": 20,
    "rmcStatus": "available",
    "rmcNote": ""
   },
@@ -78060,8 +78061,8 @@
    },
    "forkNotes": {
     "funky": "Added Sigynate(1) reactant; Removed Leporazine reactant; Cryoxadone amount 2->3; Aloxadone yield 4->5",
-    "monolith": "Added Sigynate(2) reactant; Removed Leporazine reactant; Aloe amount 1->2; Cryoxadone amount 2->1",
-    "adt": "Added Pyrazine(2) reactant; Added Phenol(2) reactant; Removed Leporazine reactant; Removed Aloe reactant; Cryoxadone amount 2->1; Added maxTemp: 200"
+    "monolith": "Added Sigynate(2) reactant; Removed Leporazine reactant; Cryoxadone amount 2->1; Aloe amount 1->2",
+    "adt": "Added Phenol(2) reactant; Added Pyrazine(2) reactant; Removed Aloe reactant; Removed Leporazine reactant; Cryoxadone amount 2->1; Added maxTemp: 200"
    },
    "rmcStatus": "blocked",
    "rmcNote": ""
@@ -78117,6 +78118,7 @@
    "mixer": [],
    "effects": "Effect: AreaEffect",
    "impact": "High",
+   "priority": -10,
    "forkStatus": {
     "rmc14": "modified",
     "rucm": "modified",
@@ -78329,7 +78331,7 @@
    "forkNotes": {
     "deadspace": "Added Diphenhydramine(1) reactant; Removed Dylovene reactant; Ambuzol yield 4->1",
     "funky": "Recipe changed: uses Multiver instead of Dylovene",
-    "adt": "Added Diphenhydramine(1) reactant; Added Opporozidone(1) reactant; Added Phalanximine(1) reactant; Removed Ammonia reactant; Removed Dylovene reactant; ZombieBlood amount 2->1; Ambuzol yield 4->5"
+    "adt": "Added Phalanximine(1) reactant; Added Diphenhydramine(1) reactant; Added Opporozidone(1) reactant; Removed Ammonia reactant; Removed Dylovene reactant; ZombieBlood amount 2->1; Ambuzol yield 4->5"
    },
    "rmcStatus": "blocked",
    "rmcNote": ""
@@ -80875,6 +80877,7 @@
    "mixer": [],
    "effects": "Explosion",
    "impact": "High",
+   "priority": 20,
    "rmcStatus": "available",
    "rmcNote": ""
   },
@@ -81213,6 +81216,7 @@
    "mixer": [],
    "effects": "Effect: AreaEffect",
    "impact": "High",
+   "priority": 10,
    "rmcStatus": "available",
    "rmcNote": ""
   },
@@ -82158,6 +82162,7 @@
    "mixer": [],
    "effects": "",
    "impact": null,
+   "priority": 10,
    "rmcStatus": "available",
    "rmcNote": ""
   },
@@ -82450,6 +82455,7 @@
    "mixer": [],
    "effects": "",
    "impact": null,
+   "priority": 20,
    "rmcStatus": "available",
    "rmcNote": ""
   },
@@ -82478,6 +82484,7 @@
    "mixer": [],
    "effects": "",
    "impact": null,
+   "priority": 20,
    "rmcStatus": "available",
    "rmcNote": ""
   },
@@ -82506,6 +82513,7 @@
    "mixer": [],
    "effects": "",
    "impact": null,
+   "priority": 20,
    "rmcStatus": "available",
    "rmcNote": ""
   },
@@ -82970,6 +82978,7 @@
    "mixer": [],
    "effects": "Explosion",
    "impact": "High",
+   "priority": 20,
    "forkStatus": {
     "rmc14": "blocked",
     "rucm": "blocked",
@@ -83701,6 +83710,7 @@
    "mixer": [],
    "effects": "Explosion; Popup (pvs): clf3 explosion",
    "impact": null,
+   "priority": 20,
    "rmcStatus": "available",
    "rmcNote": ""
   },
@@ -84147,11 +84157,11 @@
     "rucm": "modified"
    },
    "forkNotes": {
-    "rmc14": "Added RMCOxygen(1) reactant; Added RMCSugar(1) reactant; Removed Sugar reactant; Removed Oxygen reactant",
-    "rucm": "Added RMCOxygen(1) reactant; Added RMCSugar(1) reactant; Removed Sugar reactant; Removed Oxygen reactant"
+    "rmc14": "Added RMCSugar(1) reactant; Added RMCOxygen(1) reactant; Removed Oxygen reactant; Removed Sugar reactant",
+    "rucm": "Added RMCSugar(1) reactant; Added RMCOxygen(1) reactant; Removed Oxygen reactant; Removed Sugar reactant"
    },
    "rmcStatus": "modified",
-   "rmcNote": "Added RMCOxygen(1) reactant; Added RMCSugar(1) reactant; Removed Sugar reactant; Removed Oxygen reactant"
+   "rmcNote": "Added RMCSugar(1) reactant; Added RMCOxygen(1) reactant; Removed Oxygen reactant; Removed Sugar reactant"
   },
   "ConcentratedCorgiJuice": {
    "id": "ConcentratedCorgiJuice",
@@ -85121,22 +85131,22 @@
     "fish": "modified"
    },
    "forkNotes": {
-    "rmc14": "Added RMCSugar(5) reactant; Removed Sugar reactant; Removed Butter reactant; Flour amount 20->15; Milk amount 10->5; Egg amount 6->12",
-    "rucm": "Added RMCSugar(5) reactant; Removed Sugar reactant; Removed Butter reactant; Flour amount 20->15; Milk amount 10->5; Egg amount 6->12",
-    "goob": "Removed Butter reactant; Egg amount 6->12; Flour amount 20->15; Milk amount 10->5; Sugar amount 10->5",
-    "starlight": "Removed Butter reactant; Egg amount 6->12; Flour amount 20->15; Milk amount 10->5; Sugar amount 10->5",
-    "deltav": "Removed Butter reactant; Egg amount 6->12; Flour amount 20->15; Milk amount 10->5; Sugar amount 10->5",
-    "deadspace": "Removed Butter reactant; Egg amount 6->12; Flour amount 20->15; Milk amount 10->5; Sugar amount 10->5",
-    "frontier": "Removed Butter reactant; Egg amount 6->12; Flour amount 20->15; Milk amount 10->5; Sugar amount 10->5",
-    "funky": "Removed Butter reactant; Egg amount 6->12; Flour amount 20->15; Milk amount 10->5; Sugar amount 10->5",
-    "omu": "Removed Butter reactant; Egg amount 6->12; Flour amount 20->15; Milk amount 10->5; Sugar amount 10->5",
-    "monolith": "Removed Butter reactant; Egg amount 6->12; Flour amount 20->15; Milk amount 10->5; Sugar amount 10->5",
-    "adt": "Removed Butter reactant; Egg amount 6->12; Flour amount 20->15; Milk amount 10->5; Sugar amount 10->5",
-    "sunrise": "Removed Butter reactant; Egg amount 6->12; Flour amount 20->15; Milk amount 10->5; Sugar amount 10->5",
-    "fish": "Removed Butter reactant; Egg amount 6->12; Flour amount 20->15; Milk amount 10->5; Sugar amount 10->5"
+    "rmc14": "Added RMCSugar(5) reactant; Removed Butter reactant; Removed Sugar reactant; Milk amount 10->5; Egg amount 6->12; Flour amount 20->15",
+    "rucm": "Added RMCSugar(5) reactant; Removed Butter reactant; Removed Sugar reactant; Milk amount 10->5; Egg amount 6->12; Flour amount 20->15",
+    "goob": "Removed Butter reactant; Milk amount 10->5; Egg amount 6->12; Flour amount 20->15; Sugar amount 10->5",
+    "starlight": "Removed Butter reactant; Milk amount 10->5; Egg amount 6->12; Flour amount 20->15; Sugar amount 10->5",
+    "deltav": "Removed Butter reactant; Milk amount 10->5; Egg amount 6->12; Flour amount 20->15; Sugar amount 10->5",
+    "deadspace": "Removed Butter reactant; Milk amount 10->5; Egg amount 6->12; Flour amount 20->15; Sugar amount 10->5",
+    "frontier": "Removed Butter reactant; Milk amount 10->5; Egg amount 6->12; Flour amount 20->15; Sugar amount 10->5",
+    "funky": "Removed Butter reactant; Milk amount 10->5; Egg amount 6->12; Flour amount 20->15; Sugar amount 10->5",
+    "omu": "Removed Butter reactant; Milk amount 10->5; Egg amount 6->12; Flour amount 20->15; Sugar amount 10->5",
+    "monolith": "Removed Butter reactant; Milk amount 10->5; Egg amount 6->12; Flour amount 20->15; Sugar amount 10->5",
+    "adt": "Removed Butter reactant; Milk amount 10->5; Egg amount 6->12; Flour amount 20->15; Sugar amount 10->5",
+    "sunrise": "Removed Butter reactant; Milk amount 10->5; Egg amount 6->12; Flour amount 20->15; Sugar amount 10->5",
+    "fish": "Removed Butter reactant; Milk amount 10->5; Egg amount 6->12; Flour amount 20->15; Sugar amount 10->5"
    },
    "rmcStatus": "modified",
-   "rmcNote": "Added RMCSugar(5) reactant; Removed Sugar reactant; Removed Butter reactant; Flour amount 20->15; Milk amount 10->5; Egg amount 6->12"
+   "rmcNote": "Added RMCSugar(5) reactant; Removed Butter reactant; Removed Sugar reactant; Milk amount 10->5; Egg amount 6->12; Flour amount 20->15"
   },
   "CreateChocolate": {
    "id": "CreateChocolate",
@@ -85359,22 +85369,22 @@
     "fish": "modified"
    },
    "forkNotes": {
-    "rmc14": "Water amount 15->10; Fiber amount 40->10",
-    "rucm": "Water amount 15->10; Fiber amount 40->10",
-    "goob": "Water amount 15->10; Fiber amount 40->10",
-    "starlight": "Water amount 15->10; Fiber amount 40->10",
-    "deltav": "Water amount 15->10; Fiber amount 40->10",
-    "deadspace": "Water amount 15->10; Fiber amount 40->10",
-    "frontier": "Water amount 15->10; Fiber amount 40->10",
-    "funky": "Water amount 15->10; Fiber amount 40->10",
-    "omu": "Water amount 15->10; Fiber amount 40->10",
-    "monolith": "Water amount 15->10; Fiber amount 40->10",
-    "adt": "Water amount 15->10; Fiber amount 40->10",
-    "sunrise": "Water amount 15->10; Fiber amount 40->10",
-    "fish": "Water amount 15->10; Fiber amount 40->10"
+    "rmc14": "Fiber amount 40->10; Water amount 15->10",
+    "rucm": "Fiber amount 40->10; Water amount 15->10",
+    "goob": "Fiber amount 40->10; Water amount 15->10",
+    "starlight": "Fiber amount 40->10; Water amount 15->10",
+    "deltav": "Fiber amount 40->10; Water amount 15->10",
+    "deadspace": "Fiber amount 40->10; Water amount 15->10",
+    "frontier": "Fiber amount 40->10; Water amount 15->10",
+    "funky": "Fiber amount 40->10; Water amount 15->10",
+    "omu": "Fiber amount 40->10; Water amount 15->10",
+    "monolith": "Fiber amount 40->10; Water amount 15->10",
+    "adt": "Fiber amount 40->10; Water amount 15->10",
+    "sunrise": "Fiber amount 40->10; Water amount 15->10",
+    "fish": "Fiber amount 40->10; Water amount 15->10"
    },
    "rmcStatus": "modified",
-   "rmcNote": "Water amount 15->10; Fiber amount 40->10"
+   "rmcNote": "Fiber amount 40->10; Water amount 15->10"
   },
   "CreateFriedEgg": {
    "id": "CreateFriedEgg",
@@ -85515,22 +85525,22 @@
     "fish": "modified"
    },
    "forkNotes": {
-    "rmc14": "Added TableSalt(5) reactant; Added Egg(12) reactant; Removed Water reactant; Removed Sugar reactant; Removed Butter reactant; Flour amount 40->15",
-    "rucm": "Added TableSalt(5) reactant; Added Egg(12) reactant; Removed Water reactant; Removed Sugar reactant; Removed Butter reactant; Flour amount 40->15",
-    "goob": "Added TableSalt(5) reactant; Added Egg(12) reactant; Removed Water reactant; Removed Sugar reactant; Removed Butter reactant; Flour amount 40->15",
-    "starlight": "Added TableSalt(5) reactant; Added Egg(12) reactant; Removed Water reactant; Removed Sugar reactant; Removed Butter reactant; Flour amount 40->15",
-    "deltav": "Added TableSalt(5) reactant; Added Egg(12) reactant; Removed Water reactant; Removed Sugar reactant; Removed Butter reactant; Flour amount 40->15",
-    "deadspace": "Added TableSalt(5) reactant; Added Egg(12) reactant; Removed Water reactant; Removed Sugar reactant; Removed Butter reactant; Flour amount 40->15",
-    "frontier": "Added TableSalt(5) reactant; Added Egg(12) reactant; Removed Water reactant; Removed Sugar reactant; Removed Butter reactant; Flour amount 40->15",
-    "funky": "Added TableSalt(5) reactant; Added Egg(12) reactant; Removed Water reactant; Removed Sugar reactant; Removed Butter reactant; Flour amount 40->15",
-    "omu": "Added TableSalt(5) reactant; Added Egg(12) reactant; Removed Water reactant; Removed Sugar reactant; Removed Butter reactant; Flour amount 40->15",
-    "monolith": "Added TableSalt(5) reactant; Added Egg(12) reactant; Removed Water reactant; Removed Sugar reactant; Removed Butter reactant; Flour amount 40->15",
-    "adt": "Added TableSalt(5) reactant; Added Egg(12) reactant; Removed Water reactant; Removed Sugar reactant; Removed Butter reactant; Flour amount 40->15",
-    "sunrise": "Added TableSalt(5) reactant; Added Egg(12) reactant; Removed Water reactant; Removed Sugar reactant; Removed Butter reactant; Flour amount 40->15",
-    "fish": "Added TableSalt(5) reactant; Added Egg(12) reactant; Removed Water reactant; Removed Sugar reactant; Removed Butter reactant; Flour amount 40->15"
+    "rmc14": "Added Egg(12) reactant; Added TableSalt(5) reactant; Removed Butter reactant; Removed Water reactant; Removed Sugar reactant; Flour amount 40->15",
+    "rucm": "Added Egg(12) reactant; Added TableSalt(5) reactant; Removed Butter reactant; Removed Water reactant; Removed Sugar reactant; Flour amount 40->15",
+    "goob": "Added Egg(12) reactant; Added TableSalt(5) reactant; Removed Butter reactant; Removed Water reactant; Removed Sugar reactant; Flour amount 40->15",
+    "starlight": "Added Egg(12) reactant; Added TableSalt(5) reactant; Removed Butter reactant; Removed Water reactant; Removed Sugar reactant; Flour amount 40->15",
+    "deltav": "Added Egg(12) reactant; Added TableSalt(5) reactant; Removed Butter reactant; Removed Water reactant; Removed Sugar reactant; Flour amount 40->15",
+    "deadspace": "Added Egg(12) reactant; Added TableSalt(5) reactant; Removed Butter reactant; Removed Water reactant; Removed Sugar reactant; Flour amount 40->15",
+    "frontier": "Added Egg(12) reactant; Added TableSalt(5) reactant; Removed Butter reactant; Removed Water reactant; Removed Sugar reactant; Flour amount 40->15",
+    "funky": "Added Egg(12) reactant; Added TableSalt(5) reactant; Removed Butter reactant; Removed Water reactant; Removed Sugar reactant; Flour amount 40->15",
+    "omu": "Added Egg(12) reactant; Added TableSalt(5) reactant; Removed Butter reactant; Removed Water reactant; Removed Sugar reactant; Flour amount 40->15",
+    "monolith": "Added Egg(12) reactant; Added TableSalt(5) reactant; Removed Butter reactant; Removed Water reactant; Removed Sugar reactant; Flour amount 40->15",
+    "adt": "Added Egg(12) reactant; Added TableSalt(5) reactant; Removed Butter reactant; Removed Water reactant; Removed Sugar reactant; Flour amount 40->15",
+    "sunrise": "Added Egg(12) reactant; Added TableSalt(5) reactant; Removed Butter reactant; Removed Water reactant; Removed Sugar reactant; Flour amount 40->15",
+    "fish": "Added Egg(12) reactant; Added TableSalt(5) reactant; Removed Butter reactant; Removed Water reactant; Removed Sugar reactant; Flour amount 40->15"
    },
    "rmcStatus": "modified",
-   "rmcNote": "Added TableSalt(5) reactant; Added Egg(12) reactant; Removed Water reactant; Removed Sugar reactant; Removed Butter reactant; Flour amount 40->15"
+   "rmcNote": "Added Egg(12) reactant; Added TableSalt(5) reactant; Removed Butter reactant; Removed Water reactant; Removed Sugar reactant; Flour amount 40->15"
   },
   "CreatePrecogCrystal": {
    "id": "CreatePrecogCrystal",
@@ -85755,14 +85765,14 @@
     "fish": "modified"
    },
    "forkNotes": {
-    "goob": "TableSalt amount 10->5; Lye amount 25->20; Fat amount 15->10",
-    "starlight": "TableSalt amount 10->5; Lye amount 25->20; Fat amount 15->10",
-    "deltav": "TableSalt amount 10->5; Lye amount 25->20; Fat amount 15->10",
-    "deadspace": "TableSalt amount 10->5; Lye amount 25->20; Fat amount 15->10",
-    "frontier": "TableSalt amount 10->5; Lye amount 25->20; Fat amount 15->10",
-    "adt": "TableSalt amount 10->5; Lye amount 25->20; Fat amount 15->10",
-    "sunrise": "TableSalt amount 10->5; Lye amount 25->20; Fat amount 15->10",
-    "fish": "TableSalt amount 10->5; Lye amount 25->20; Fat amount 15->10"
+    "goob": "Lye amount 25->20; TableSalt amount 10->5; Fat amount 15->10",
+    "starlight": "Lye amount 25->20; TableSalt amount 10->5; Fat amount 15->10",
+    "deltav": "Lye amount 25->20; TableSalt amount 10->5; Fat amount 15->10",
+    "deadspace": "Lye amount 25->20; TableSalt amount 10->5; Fat amount 15->10",
+    "frontier": "Lye amount 25->20; TableSalt amount 10->5; Fat amount 15->10",
+    "adt": "Lye amount 25->20; TableSalt amount 10->5; Fat amount 15->10",
+    "sunrise": "Lye amount 25->20; TableSalt amount 10->5; Fat amount 15->10",
+    "fish": "Lye amount 25->20; TableSalt amount 10->5; Fat amount 15->10"
    },
    "rmcStatus": "blocked",
    "rmcNote": ""
@@ -85810,14 +85820,14 @@
     "fish": "modified"
    },
    "forkNotes": {
-    "goob": "Oil amount 20->15; TableSalt amount 10->5; Lye amount 25->20",
-    "starlight": "Oil amount 20->15; TableSalt amount 10->5; Lye amount 25->20",
-    "deltav": "Oil amount 20->15; TableSalt amount 10->5; Lye amount 25->20",
-    "deadspace": "Oil amount 20->15; TableSalt amount 10->5; Lye amount 25->20",
-    "frontier": "Oil amount 20->15; TableSalt amount 10->5; Lye amount 25->20",
-    "adt": "Oil amount 20->15; TableSalt amount 10->5; Lye amount 25->20",
-    "sunrise": "Oil amount 20->15; TableSalt amount 10->5; Lye amount 25->20",
-    "fish": "Oil amount 20->15; TableSalt amount 10->5; Lye amount 25->20"
+    "goob": "TableSalt amount 10->5; Oil amount 20->15; Lye amount 25->20",
+    "starlight": "TableSalt amount 10->5; Oil amount 20->15; Lye amount 25->20",
+    "deltav": "TableSalt amount 10->5; Oil amount 20->15; Lye amount 25->20",
+    "deadspace": "TableSalt amount 10->5; Oil amount 20->15; Lye amount 25->20",
+    "frontier": "TableSalt amount 10->5; Oil amount 20->15; Lye amount 25->20",
+    "adt": "TableSalt amount 10->5; Oil amount 20->15; Lye amount 25->20",
+    "sunrise": "TableSalt amount 10->5; Oil amount 20->15; Lye amount 25->20",
+    "fish": "TableSalt amount 10->5; Oil amount 20->15; Lye amount 25->20"
    },
    "rmcStatus": "blocked",
    "rmcNote": ""
@@ -85917,14 +85927,14 @@
     "fish": "modified"
    },
    "forkNotes": {
-    "goob": "Oil amount 20->15; TableSalt amount 10->5; Lye amount 25->20",
-    "starlight": "Oil amount 20->15; TableSalt amount 10->5; Lye amount 25->20",
-    "deltav": "Oil amount 20->15; TableSalt amount 10->5; Lye amount 25->20",
-    "deadspace": "Oil amount 20->15; TableSalt amount 10->5; Lye amount 25->20",
-    "frontier": "Oil amount 20->15; TableSalt amount 10->5; Lye amount 25->20",
-    "adt": "Oil amount 20->15; TableSalt amount 10->5; Lye amount 25->20",
-    "sunrise": "Oil amount 20->15; TableSalt amount 10->5; Lye amount 25->20",
-    "fish": "Oil amount 20->15; TableSalt amount 10->5; Lye amount 25->20"
+    "goob": "TableSalt amount 10->5; Oil amount 20->15; Lye amount 25->20",
+    "starlight": "TableSalt amount 10->5; Oil amount 20->15; Lye amount 25->20",
+    "deltav": "TableSalt amount 10->5; Oil amount 20->15; Lye amount 25->20",
+    "deadspace": "TableSalt amount 10->5; Oil amount 20->15; Lye amount 25->20",
+    "frontier": "TableSalt amount 10->5; Oil amount 20->15; Lye amount 25->20",
+    "adt": "TableSalt amount 10->5; Oil amount 20->15; Lye amount 25->20",
+    "sunrise": "TableSalt amount 10->5; Oil amount 20->15; Lye amount 25->20",
+    "fish": "TableSalt amount 10->5; Oil amount 20->15; Lye amount 25->20"
    },
    "rmcStatus": "blocked",
    "rmcNote": ""
@@ -86017,6 +86027,7 @@
    "mixer": [],
    "effects": "Spawns: Soap",
    "impact": "Low",
+   "priority": -1,
    "forkStatus": {
     "rmc14": "blocked",
     "rucm": "blocked",
@@ -86033,14 +86044,14 @@
     "fish": "modified"
    },
    "forkNotes": {
-    "goob": "Oil amount 20->10; TableSalt amount 10->5; Lye amount 30->15",
-    "starlight": "Oil amount 20->10; TableSalt amount 10->5; Lye amount 30->15",
-    "deltav": "Oil amount 20->10; TableSalt amount 10->5; Lye amount 30->15",
-    "deadspace": "Oil amount 20->10; TableSalt amount 10->5; Lye amount 30->15",
-    "frontier": "Oil amount 20->10; TableSalt amount 10->5; Lye amount 30->15; minTemp 373->383; Priority -1->None",
-    "adt": "Oil amount 20->10; TableSalt amount 10->5; Lye amount 30->15",
-    "sunrise": "Oil amount 20->10; TableSalt amount 10->5; Lye amount 30->15",
-    "fish": "Oil amount 20->10; TableSalt amount 10->5; Lye amount 30->15"
+    "goob": "TableSalt amount 10->5; Oil amount 20->10; Lye amount 30->15",
+    "starlight": "TableSalt amount 10->5; Oil amount 20->10; Lye amount 30->15",
+    "deltav": "TableSalt amount 10->5; Oil amount 20->10; Lye amount 30->15",
+    "deadspace": "TableSalt amount 10->5; Oil amount 20->10; Lye amount 30->15",
+    "frontier": "TableSalt amount 10->5; Oil amount 20->10; Lye amount 30->15; minTemp 373->383; Priority -1->None",
+    "adt": "TableSalt amount 10->5; Oil amount 20->10; Lye amount 30->15",
+    "sunrise": "TableSalt amount 10->5; Oil amount 20->10; Lye amount 30->15",
+    "fish": "TableSalt amount 10->5; Oil amount 20->10; Lye amount 30->15"
    },
    "rmcStatus": "blocked",
    "rmcNote": ""
@@ -86088,14 +86099,14 @@
     "fish": "modified"
    },
    "forkNotes": {
-    "goob": "Oil amount 20->15; TableSalt amount 10->5; Lye amount 25->20",
-    "starlight": "Oil amount 20->15; TableSalt amount 10->5; Lye amount 25->20",
-    "deltav": "Oil amount 20->15; TableSalt amount 10->5; Lye amount 25->20",
-    "deadspace": "Oil amount 20->15; TableSalt amount 10->5; Lye amount 25->20",
-    "frontier": "Oil amount 20->15; TableSalt amount 10->5; Lye amount 25->20",
-    "adt": "Oil amount 20->15; TableSalt amount 10->5; Lye amount 25->20",
-    "sunrise": "Oil amount 20->15; TableSalt amount 10->5; Lye amount 25->20",
-    "fish": "Oil amount 20->15; TableSalt amount 10->5; Lye amount 25->20"
+    "goob": "TableSalt amount 10->5; Oil amount 20->15; Lye amount 25->20",
+    "starlight": "TableSalt amount 10->5; Oil amount 20->15; Lye amount 25->20",
+    "deltav": "TableSalt amount 10->5; Oil amount 20->15; Lye amount 25->20",
+    "deadspace": "TableSalt amount 10->5; Oil amount 20->15; Lye amount 25->20",
+    "frontier": "TableSalt amount 10->5; Oil amount 20->15; Lye amount 25->20",
+    "adt": "TableSalt amount 10->5; Oil amount 20->15; Lye amount 25->20",
+    "sunrise": "TableSalt amount 10->5; Oil amount 20->15; Lye amount 25->20",
+    "fish": "TableSalt amount 10->5; Oil amount 20->15; Lye amount 25->20"
    },
    "rmcStatus": "blocked",
    "rmcNote": ""
@@ -86434,7 +86445,7 @@
     "adt": "modified"
    },
    "forkNotes": {
-    "adt": "Added DexalinPlus(2) reactant; Added Tricordrazine(1) reactant; Removed Dexalin reactant; Removed Oxygen reactant; Water amount 1->2; Cryoxadone yield 3->5; Added maxTemp: 175"
+    "adt": "Added Tricordrazine(1) reactant; Added DexalinPlus(2) reactant; Removed Oxygen reactant; Removed Dexalin reactant; Water amount 1->2; Cryoxadone yield 3->5; Added maxTemp: 175"
    },
    "rmcStatus": "blocked",
    "rmcNote": ""
@@ -86530,7 +86541,7 @@
     "trauma": "modified"
    },
    "forkNotes": {
-    "trauma": "Added RumAndCoke(2) reactant; Added JuiceLime(1) reactant; Removed Cola reactant; Removed Rum reactant"
+    "trauma": "Added RumAndCoke(2) reactant; Added JuiceLime(1) reactant; Removed Rum reactant; Removed Cola reactant"
    },
    "rmcStatus": "available",
    "rmcNote": ""
@@ -86678,6 +86689,7 @@
    "mixer": [],
    "effects": "Explosion",
    "impact": "High",
+   "priority": 20,
    "rmcStatus": "available",
    "rmcNote": ""
   },
@@ -88618,6 +88630,7 @@
    "mixer": [],
    "effects": "Effect: Flash",
    "impact": "High",
+   "priority": 20,
    "forkStatus": {
     "rucm": "blocked"
    },
@@ -88727,6 +88740,7 @@
    "mixer": [],
    "effects": "Effect: AreaEffect",
    "impact": "High",
+   "priority": -10,
    "forkStatus": {
     "rmc14": "modified",
     "rucm": "modified",
@@ -88890,6 +88904,7 @@
    "mixer": [],
    "effects": "Creates gas: Nitrogen",
    "impact": null,
+   "priority": 20,
    "rmcStatus": "available",
    "rmcNote": ""
   },
@@ -90355,6 +90370,7 @@
    "mixer": [],
    "effects": "",
    "impact": null,
+   "priority": -1,
    "forkStatus": {
     "rmc14": "blocked",
     "rucm": "blocked"
@@ -91715,6 +91731,7 @@
    "mixer": [],
    "effects": "Effect: AreaEffect",
    "impact": "High",
+   "priority": -10,
    "forkStatus": {
     "rmc14": "modified",
     "rucm": "modified",
@@ -92175,6 +92192,7 @@
    "mixer": [],
    "effects": "Effect: Flash",
    "impact": "High",
+   "priority": 20,
    "rmcStatus": "available",
    "rmcNote": ""
   },
@@ -93328,12 +93346,12 @@
     "frontier": "modified"
    },
    "forkNotes": {
-    "rmc14": "Added RMCBlackGoo(0.5) reactant; Added RMCSugar(1) reactant; Removed Sugar reactant",
-    "rucm": "Added RMCBlackGoo(0.5) reactant; Added RMCSugar(1) reactant; Removed Sugar reactant",
+    "rmc14": "Added RMCSugar(1) reactant; Added RMCBlackGoo(0.5) reactant; Removed Sugar reactant",
+    "rucm": "Added RMCSugar(1) reactant; Added RMCBlackGoo(0.5) reactant; Removed Sugar reactant",
     "frontier": "Added Honey(1) reactant; Removed Sugar reactant"
    },
    "rmcStatus": "modified",
-   "rmcNote": "Added RMCBlackGoo(0.5) reactant; Added RMCSugar(1) reactant; Removed Sugar reactant"
+   "rmcNote": "Added RMCSugar(1) reactant; Added RMCBlackGoo(0.5) reactant; Removed Sugar reactant"
   },
   "MeatCoagulating": {
    "id": "MeatCoagulating",
@@ -93636,6 +93654,7 @@
    "mixer": [],
    "effects": "Explosion",
    "impact": "High",
+   "priority": 20,
    "rmcStatus": "available",
    "rmcNote": ""
   },
@@ -95582,6 +95601,7 @@
    "mixer": [],
    "effects": "",
    "impact": null,
+   "priority": 5,
    "rmcStatus": "available",
    "rmcNote": ""
   },
@@ -95602,6 +95622,7 @@
    "mixer": [],
    "effects": "Explosion",
    "impact": "High",
+   "priority": 20,
    "rmcStatus": "available",
    "rmcNote": ""
   },
@@ -95915,6 +95936,7 @@
    "mixer": [],
    "effects": "Effect: AreaEffect",
    "impact": "High",
+   "priority": 10,
    "rmcStatus": "available",
    "rmcNote": ""
   },
@@ -97074,6 +97096,7 @@
    "mixer": [],
    "effects": "Explosion",
    "impact": "High",
+   "priority": 20,
    "rmcStatus": "available",
    "rmcNote": ""
   },
@@ -97603,6 +97626,7 @@
    "mixer": [],
    "effects": "Effect: AreaEffect",
    "impact": "High",
+   "priority": 10,
    "rmcStatus": "available",
    "rmcNote": ""
   },
@@ -97665,6 +97689,7 @@
    "mixer": [],
    "effects": "",
    "impact": null,
+   "priority": 10,
    "forkStatus": {
     "rucm": "modified"
    },
@@ -97693,6 +97718,7 @@
    "mixer": [],
    "effects": "Explosion",
    "impact": "High",
+   "priority": 5,
    "rmcStatus": "available",
    "rmcNote": ""
   },
@@ -98008,6 +98034,7 @@
    "mixer": [],
    "effects": "Effect: AreaEffect",
    "impact": "High",
+   "priority": 10,
    "rmcStatus": "available",
    "rmcNote": ""
   },
@@ -98220,6 +98247,7 @@
    "mixer": [],
    "effects": "",
    "impact": null,
+   "priority": 10,
    "rmcStatus": "available",
    "rmcNote": ""
   },
@@ -98246,6 +98274,7 @@
    "mixer": [],
    "effects": "Explosion",
    "impact": "High",
+   "priority": 5,
    "rmcStatus": "available",
    "rmcNote": ""
   },
@@ -98366,6 +98395,7 @@
    "mixer": [],
    "effects": "Explosion",
    "impact": "High",
+   "priority": 20,
    "rmcStatus": "available",
    "rmcNote": ""
   },
@@ -98392,6 +98422,7 @@
    "mixer": [],
    "effects": "Effect: AreaEffect",
    "impact": "High",
+   "priority": 10,
    "forkStatus": {
     "rucm": "modified"
    },
@@ -98464,6 +98495,7 @@
    "mixer": [],
    "effects": "",
    "impact": null,
+   "priority": 5,
    "rmcStatus": "available",
    "rmcNote": ""
   },
@@ -100532,6 +100564,7 @@
    "mixer": [],
    "effects": "Effect: AreaEffect",
    "impact": "High",
+   "priority": -10,
    "forkStatus": {
     "rmc14": "modified",
     "rucm": "modified",
@@ -100734,6 +100767,7 @@
    "mixer": [],
    "effects": "Explosion",
    "impact": "High",
+   "priority": 20,
    "rmcStatus": "available",
    "rmcNote": ""
   },
@@ -103487,6 +103521,7 @@
    "mixer": [],
    "effects": "Effect: Emp",
    "impact": "High",
+   "priority": 20,
    "rmcStatus": "available",
    "rmcNote": ""
   },
@@ -103701,6 +103736,7 @@
    "mixer": [],
    "effects": "Creates gas: WaterVapor",
    "impact": "Low",
+   "priority": -1,
    "rmcStatus": "available",
    "rmcNote": ""
   },
@@ -104107,6 +104143,7 @@
    "mixer": [],
    "effects": "Explosion",
    "impact": "High",
+   "priority": 20,
    "rmcStatus": "available",
    "rmcNote": ""
   },
