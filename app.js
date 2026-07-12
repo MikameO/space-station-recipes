@@ -181,8 +181,6 @@ function filterReagents(query) {
       if (r.source !== forkId) {
         const rxn = r.recipe ? Object.values(DATA.reactions).find(rx => rx.products[r.id]) : null;
         if (rxn && rxn.forkStatus && rxn.forkStatus[forkId] === 'blocked') return false;
-        // Backward compat: check rmcStatus for rmc14 if forkStatus missing
-        if (forkId === 'rmc14' && rxn && !rxn.forkStatus && rxn.rmcStatus === 'blocked') return false;
       }
     } else if (activeSource === 'vanilla') {
       if (r.source !== 'vanilla') return false;
@@ -262,7 +260,6 @@ function filterReactions(query) {
       }
       if (rxn.source !== forkId) {
         if (rxn.forkStatus && rxn.forkStatus[forkId] === 'blocked') return false;
-        if (forkId === 'rmc14' && !rxn.forkStatus && rxn.rmcStatus === 'blocked') return false;
       }
     } else if (activeSource === 'vanilla') {
       if (rxn.source !== 'vanilla') return false;
@@ -1314,7 +1311,6 @@ function reagentInActiveFork(r) {
   if (r.source !== forkId) {
     const rxn = r.recipe ? Object.values(DATA.reactions).find(rx => rx.products[r.id]) : null;
     if (rxn && rxn.forkStatus && rxn.forkStatus[forkId] === 'blocked') return false;
-    if (forkId === 'rmc14' && rxn && !rxn.forkStatus && rxn.rmcStatus === 'blocked') return false;
   }
   return true;
 }
@@ -1437,7 +1433,6 @@ function getFilteredReactions(reagentId) {
     if (rx.source !== 'vanilla' && !chain.includes(rx.source)) return false;
     if (rx.source !== forkId) {
       if (rx.forkStatus && rx.forkStatus[forkId] === 'blocked') return false;
-      if (forkId === 'rmc14' && !rx.forkStatus && rx.rmcStatus === 'blocked') return false;
     }
     return true;
   });

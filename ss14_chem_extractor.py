@@ -1783,12 +1783,12 @@ def export_json(reagents: dict, reactions: dict, locale: dict,
 
     data = {
         "meta": {
-            "schemaVersion": "3.4.3",
+            # 3.5.0: legacy rmcStatus/rmcNote per-reaction fields and
+            # vanillaReagentCount/rmcReagentCount meta removed — forkStatus/
+            # forkNotes are the only fork-view fields since the multi-fork era.
+            "schemaVersion": "3.5.0",
             "generated": time.strftime("%Y-%m-%dT%H:%M:%S"),
             "forks": forks_meta,
-            # Backward compat
-            "vanillaReagentCount": fork_reagent_counts.get("vanilla", 0),
-            "rmcReagentCount": fork_reagent_counts.get("rmc14", 0),
             "reactionCount": len(reactions),
         },
         "reagents": {},
@@ -1991,13 +1991,6 @@ def export_json(reagents: dict, reactions: dict, locale: dict,
             reaction_obj["forkStatus"] = fork_status
         if fork_notes:
             reaction_obj["forkNotes"] = fork_notes
-        # Backward compat: rmcStatus / rmcNote
-        rmc_status = fork_status.get("rmc14", "available")
-        reaction_obj["rmcStatus"] = rmc_status
-        if rmc_status == "modified":
-            reaction_obj["rmcNote"] = fork_notes.get("rmc14", "")
-        else:
-            reaction_obj["rmcNote"] = ""
 
         data["reactions"][rid] = reaction_obj
 
