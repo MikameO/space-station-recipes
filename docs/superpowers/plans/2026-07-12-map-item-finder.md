@@ -1578,6 +1578,8 @@ Enable the two blocklist lines in `discover_maps` (drop the ponytail stub).
 - [ ] **Step 2:** Run `python ss14_map_extractor.py --all-forks` (long: trees + protos per fork; cached afterwards).
 Review output per fork: `fork X: N/M maps baked`. Forks with 0 gameMaps (pure content forks that reuse upstream maps) are expected SKIPs — count them in the commit message. Any *parse* failure (format drift) → inspect, either fix decode or blocklist the map with a comment.
 
+Interrupted-run note: `fetch_repo_tree` caches `_tree.json` with a non-atomic write — if `--all-forks` is killed mid-write, that one fork's cache can be truncated and future runs read it as `SKIP fork X: no tree` (looks like a legit content-fork skip). If a fork you expect to have maps skips, `rm cache_maps/<fork>/_tree.json` and re-run before trusting the skip. (Not worth a temp-file+rename for a recoverable dev-tool cache.)
+
 Format-drift guard (add to `decode_chunk` before the unpack loop — cheap insurance against a silent 6-byte-stride misparse): `if len(raw) % 7: print(f"  WARNING: chunk stride {len(raw)}B not /7 — skipping (format drift?)"); return {}`. Empirically low-risk: probed live on E1 — dead-space (an older/smaller fork) serializes `meta.format: 7`, chunk = 1792 B = 256×7, identical to vanilla; all current forks track the same engine tile format. The guard exists so a future engine bump degrades to a warning+skipped map, never a corrupt-but-committed PNG.
 
 - [ ] **Step 3:** Browser check 2 RU forks (per audience): pick a Corvax and an ADT map, search a common item (`лом` won't hit — search `crowbar`; RU search is a spec non-goal), verify markers + beacon labels render (fork beacons may use their own ftl — beacon fallback `.title()` covers missing keys).
