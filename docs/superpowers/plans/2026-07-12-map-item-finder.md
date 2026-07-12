@@ -1067,7 +1067,7 @@ def write_index(per_fork: dict):
     print(f"wrote maps/index.json ({sum(len(m) for m in per_fork.values())} maps)")
 ```
 
-In `main()`: `--fork X [--map ID]` → `process_fork` (filter to one map when `--map` given, still `write_index({fork: done})` merging with existing index.json if present — read it, replace that fork's entry, write back). `--all-forks` → loop `for key in FORK_REGISTRY`. (Display-name key confirmed = `name` in config.py; `write_index` above already uses it. `SCHEMA_VERSION = 1` already defined at module top.)
+In `main()`: `--fork X [--map ID]` → `process_fork` (filter to one map when `--map` given), then merge into index.json if present — read it, and **upsert by map id**: a single `--map` refresh merges the baked map into the fork's existing list (must NOT drop the fork's other maps, nor wipe the fork if the id typos to an empty result); a full `--fork X` rebuild (no `--map`) replaces the fork's list wholesale (every map was just rebuilt). `--all-forks` → loop `for key in FORK_REGISTRY`. (Display-name key confirmed = `name` in config.py; `write_index` above already uses it. `SCHEMA_VERSION = 1` already defined at module top.)
 
 - [ ] **Step 4: Run selfcheck until green; run the real thing**
 

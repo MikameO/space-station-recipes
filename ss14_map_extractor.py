@@ -747,7 +747,15 @@ def main():
     if index_path.exists():
         existing = json.loads(index_path.read_text(encoding="utf-8"))
         per_fork = {f["key"]: f["maps"] for f in existing.get("forks", [])}
-    per_fork[args.fork] = done
+    if args.map:
+        # single-map refresh: upsert by id, don't drop the fork's other maps
+        # (a full-fork `--fork X` run rebuilds every map, so wholesale-replace is fine there)
+        merged = {m["id"]: m for m in per_fork.get(args.fork, [])}
+        for m in done:
+            merged[m["id"]] = m
+        per_fork[args.fork] = list(merged.values())
+    else:
+        per_fork[args.fork] = done
     write_index(per_fork)
 
 if __name__ == "__main__":
