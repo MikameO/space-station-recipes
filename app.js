@@ -72,15 +72,10 @@ async function init() {
     const resp = await fetch('data.json?v=' + Date.now());
     DATA = await resp.json();
   } catch (e) {
-    // Fallback for file:// — try embedded
-    if (typeof EMBEDDED_DATA !== 'undefined') {
-      DATA = EMBEDDED_DATA;
-    } else {
-      document.getElementById('loadingOverlay').innerHTML =
-        '<div style="color:#ef4444;padding:20px;text-align:center;">' +
-        'Failed to load data.json<br><small>If using file://, try a local server: python -m http.server</small></div>';
-      return;
-    }
+    document.getElementById('loadingOverlay').innerHTML =
+      '<div style="color:#ef4444;padding:20px;text-align:center;">' +
+      'Failed to load data.json<br><small>If using file://, try a local server: python -m http.server</small></div>';
+    return;
   }
 
   // Validate data structure
@@ -148,19 +143,22 @@ function buildSearchIndex() {
 // Fork ancestry: forkId -> [self, parent, grandparent, ...]. A derivative
 // fork ships its parents' custom content too (Funky runs Goob chems, RuCM
 // runs RMC14 chems), so the source filter treats ancestor content as native.
-// Cached — meta.forks is static per page load.
-const forkChainCache = {};
 function forkChain(forkId) {
-  if (!forkChainCache[forkId]) {
-    const chain = [];
-    let cur = forkId;
-    while (cur && cur !== 'vanilla' && !chain.includes(cur)) {
-      chain.push(cur);
-      cur = DATA.meta?.forks?.[cur]?.parent;
-    }
-    forkChainCache[forkId] = chain;
+  const chain = [];
+  let cur = forkId;
+  while (cur && cur !== 'vanilla' && !chain.includes(cur)) {
+    chain.push(cur);
+    cur = DATA.meta?.forks?.[cur]?.parent;
   }
-  return forkChainCache[forkId];
+  return chain;
+}
+
+// Shared fork-lineage visibility: is this entity (reagent or reaction)
+// native-or-inherited under forkId and not blocked by it?
+function forkVisible(entity, forkId) {
+  if (entity.source !== 'vanilla' && !forkChain(forkId).includes(entity.source)) return false;
+  if (entity.forkStatus && entity.forkStatus[forkId] === 'blocked') return false;
+  return true;
 }
 
 function filterReagents(query) {
@@ -169,22 +167,9 @@ function filterReagents(query) {
 
   return searchIndex.filter(entry => {
     const r = entry.reagent;
-    // Source filter: fork mode shows fork-lineage + vanilla (minus blocked)
-    if (activeSource !== 'all' && activeSource !== 'vanilla') {
-      const forkId = activeSource;
-      if (r.source !== 'vanilla' && !forkChain(forkId).includes(r.source)) {
-        return false; // reagent from outside this fork's lineage — hide
-      }
-      // Reagent removed by this fork (e.g. RuCM removed RMCUltrazine)
-      if (r.forkStatus && r.forkStatus[forkId] === 'blocked') return false;
-      // Vanilla/ancestor reagent: hide when its recipe is blocked on this fork
-      if (r.source !== forkId) {
-        const rxn = r.recipe ? Object.values(DATA.reactions).find(rx => rx.products[r.id]) : null;
-        if (rxn && rxn.forkStatus && rxn.forkStatus[forkId] === 'blocked') return false;
-      }
-    } else if (activeSource === 'vanilla') {
-      if (r.source !== 'vanilla') return false;
-    }
+    // Source filter: fork mode shows fork-lineage + vanilla (minus blocked).
+    // Shared with the medbay mode — see reagentInActiveFork/forkVisible.
+    if (!reagentInActiveFork(r)) return false;
     if (activeBaseType === 'base' && !r.isBase) return false;
     if (activeBaseType === 'crafted' && r.isBase) return false;
     if (activeTaste === 'tasteless' && r.flavor) return false;
@@ -254,13 +239,7 @@ function filterReactions(query) {
   return Object.values(DATA.reactions).filter(rxn => {
     // Source filter: fork mode hides blocked + out-of-lineage reactions
     if (activeSource !== 'all' && activeSource !== 'vanilla') {
-      const forkId = activeSource;
-      if (rxn.source !== 'vanilla' && !forkChain(forkId).includes(rxn.source)) {
-        return false; // reaction from outside this fork's lineage
-      }
-      if (rxn.source !== forkId) {
-        if (rxn.forkStatus && rxn.forkStatus[forkId] === 'blocked') return false;
-      }
+      if (!forkVisible(rxn, activeSource)) return false;
     } else if (activeSource === 'vanilla') {
       if (rxn.source !== 'vanilla') return false;
     }
@@ -1306,8 +1285,8 @@ function reagentInActiveFork(r) {
   if (activeSource === 'vanilla') return r.source === 'vanilla';
   if (activeSource === 'all') return true;
   const forkId = activeSource;
-  if (r.source !== 'vanilla' && !forkChain(forkId).includes(r.source)) return false;
-  if (r.forkStatus && r.forkStatus[forkId] === 'blocked') return false;
+  if (!forkVisible(r, forkId)) return false;
+  // Vanilla/ancestor reagent: hide when its recipe is blocked on this fork
   if (r.source !== forkId) {
     const rxn = r.recipe ? Object.values(DATA.reactions).find(rx => rx.products[r.id]) : null;
     if (rxn && rxn.forkStatus && rxn.forkStatus[forkId] === 'blocked') return false;
@@ -1429,13 +1408,7 @@ function getFilteredReactions(reagentId) {
 
   const forkId = activeSource;
   const chain = forkChain(forkId);
-  rxns = rxns.filter(rx => {
-    if (rx.source !== 'vanilla' && !chain.includes(rx.source)) return false;
-    if (rx.source !== forkId) {
-      if (rx.forkStatus && rx.forkStatus[forkId] === 'blocked') return false;
-    }
-    return true;
-  });
+  rxns = rxns.filter(rx => forkVisible(rx, forkId));
   // Prefer the closest lineage match: self, then parent, ..., then vanilla
   const rank = rx => rx.source === 'vanilla' ? chain.length : chain.indexOf(rx.source);
   rxns.sort((a, b) => rank(a) - rank(b));
@@ -1937,11 +1910,6 @@ function capName(name) {
 function safeColor(c) {
   if (!c) return '#3d4a5e';
   return /^#[0-9A-Fa-f]{3,8}$/.test(c) ? c : '#3d4a5e';
-}
-
-function safeSel(str) {
-  if (!str) return '';
-  return CSS.escape(str);
 }
 
 // ─────────────────────────────────────────────
@@ -2848,7 +2816,7 @@ function decodeURLState() {
   const tab = params.get('tab');
   const validTabs = ['reagents','reactions','calculator','medbay','trees','graph','stats','antag'];
   if (tab && validTabs.includes(tab)) {
-    const btn = document.querySelector(`.tab-btn[data-tab="${safeSel(tab)}"]`);
+    const btn = document.querySelector(`.tab-btn[data-tab="${CSS.escape(tab)}"]`);
     if (btn) btn.click();
   }
 
@@ -2856,7 +2824,7 @@ function decodeURLState() {
   const src = params.get('src');
   const validSources = ['all', ...Object.keys(DATA.meta?.forks || {})];
   if (src && validSources.includes(src)) {
-    const radio = document.querySelector(`input[name="source"][value="${safeSel(src)}"]`);
+    const radio = document.querySelector(`input[name="source"][value="${CSS.escape(src)}"]`);
     if (radio) { radio.checked = true; activeSource = src; }
   }
 
@@ -2864,7 +2832,7 @@ function decodeURLState() {
   const bt = params.get('bt');
   const validBt = ['all','base','crafted'];
   if (bt && validBt.includes(bt)) {
-    const radio = document.querySelector(`input[name="basetype"][value="${safeSel(bt)}"]`);
+    const radio = document.querySelector(`input[name="basetype"][value="${CSS.escape(bt)}"]`);
     if (radio) { radio.checked = true; activeBaseType = bt; }
   }
 
@@ -2872,7 +2840,7 @@ function decodeURLState() {
   const taste = params.get('taste');
   const validTaste = ['all','has-taste','tasteless'];
   if (taste && validTaste.includes(taste)) {
-    const radio = document.querySelector(`input[name="taste"][value="${safeSel(taste)}"]`);
+    const radio = document.querySelector(`input[name="taste"][value="${CSS.escape(taste)}"]`);
     if (radio) { radio.checked = true; activeTaste = taste; }
   }
 
@@ -2900,7 +2868,7 @@ function decodeURLState() {
     for (const val of wanted) {
       backingSet.add(val);
       const chip = document.querySelector(
-        `#antagFilterBar .antag-filter-chips[data-filter="${safeSel(filterName)}"] .diff-chip[data-value="${safeSel(val)}"]`
+        `#antagFilterBar .antag-filter-chips[data-filter="${CSS.escape(filterName)}"] .diff-chip[data-value="${CSS.escape(val)}"]`
       );
       if (chip) {
         chip.classList.add('active');
@@ -2920,7 +2888,7 @@ function decodeURLState() {
     const val = params.get(key);
     if (val && validSet.includes(val)) {
       setter(val);
-      const sel = document.querySelector(`#antagFilterBar select[data-filter="${safeSel(dataAttr)}"]`);
+      const sel = document.querySelector(`#antagFilterBar select[data-filter="${CSS.escape(dataAttr)}"]`);
       if (sel) sel.value = val;
     }
   }
@@ -2929,7 +2897,7 @@ function decodeURLState() {
   const cats = params.get('cats');
   if (cats) {
     cats.split(',').forEach(cat => {
-      const cb = document.querySelector(`#categoryFilters input[value="${safeSel(cat)}"]`);
+      const cb = document.querySelector(`#categoryFilters input[value="${CSS.escape(cat)}"]`);
       if (cb) { cb.checked = true; activeCategories.add(cat); }
     });
   }
@@ -2938,7 +2906,7 @@ function decodeURLState() {
   const fx = params.get('fx');
   if (fx) {
     fx.split(',').forEach(tag => {
-      const btn = document.querySelector(`.effect-tag-btn[data-tag="${safeSel(tag)}"]`);
+      const btn = document.querySelector(`.effect-tag-btn[data-tag="${CSS.escape(tag)}"]`);
       if (btn) { btn.classList.add('active'); activeEffectTags.add(tag); }
     });
   }
@@ -2959,13 +2927,9 @@ function setupShareButton() {
     track('share_click', { tab: activeTab, antag: antagMode ? 1 : 0 });
     const hash = encodeURLState();
     const url = location.origin + location.pathname + hash;
-    navigator.clipboard.writeText(url).then(() => showToast('Link copied!')).catch(() => {
-      // Fallback
-      const ta = document.createElement('textarea');
-      ta.value = url; document.body.appendChild(ta); ta.select();
-      document.execCommand('copy'); document.body.removeChild(ta);
-      showToast('Link copied!');
-    });
+    navigator.clipboard.writeText(url)
+      .then(() => showToast('Link copied!'))
+      .catch(() => showToast('Copy failed — grab the URL from the address bar'));
   });
 }
 

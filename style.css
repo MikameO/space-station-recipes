@@ -45,7 +45,6 @@
   /* Structural */
   --border-subtle: #1a2540;
   --border-active: #2c5282;
-  --corner-cut: 6px;
   --glow-spread: 12px;
 }
 
@@ -91,15 +90,6 @@ body::after {
 }
 
 /* ── ANGULAR CLIP UTILITY ── */
-.clip-corner {
-  clip-path: polygon(
-    var(--corner-cut) 0%, 100% 0%,
-    100% calc(100% - var(--corner-cut)),
-    calc(100% - var(--corner-cut)) 100%,
-    0% 100%, 0% var(--corner-cut)
-  );
-}
-
 /* ══════════════════════════════════════════
    HEADER — Station masthead
    ══════════════════════════════════════════ */
@@ -322,7 +312,7 @@ header h1 {
 }
 .radio-label input:checked::after { border-radius: 50%; }
 
-.rmc-disclaimer, .fork-disclaimer {
+.fork-disclaimer {
   font-size: 0.6rem;
   color: var(--amber);
   background: var(--amber-dim);
@@ -708,12 +698,6 @@ main {
   color: var(--phosphor);
 }
 
-.badge-rmc {
-  background: var(--cyan-dim);
-  border-left: 2px solid var(--cyan);
-  color: var(--cyan);
-}
-
 .badge-modified {
   background: var(--amber-dim);
   border-left: 2px solid var(--amber);
@@ -802,7 +786,7 @@ main {
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.14em;
-  color: var(--text-ghost);
+  color: var(--text-sub);
   padding-left: 2px;
   margin-bottom: 2px;
   line-height: 1.3;
@@ -831,9 +815,6 @@ main {
   letter-spacing: 0.02em;
   line-height: 1.45;
   opacity: 0.95;
-}
-.effects-verbose .effect-group__head {
-  color: var(--text-sub);
 }
 .effects-verbose .effect-row--heal        { border-left-color: #22c55e; background: rgba(34,197,94,0.07); }
 .effects-verbose .effect-row--heal        .effect-row__text { color: #a7f3c4; }
@@ -878,7 +859,6 @@ main {
 .effects-verbose .effect-category__head--other       { color: #94a3b8; }
 
 /* Effect filters in sidebar */
-.effect-filters { display: block; }
 .effect-tag-btn {
   padding: 2px 7px;
   background: transparent;
@@ -1790,18 +1770,6 @@ body.antag-active .antag-toggle {
 }
 
 /* Strategy cards bar */
-.antag-strategies-bar {
-  display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 10px; margin-bottom: 16px; padding: 12px;
-  border: 1px solid rgba(255,61,90,0.15); border-radius: 2px;
-  background: rgba(255,61,90,0.03);
-}
-.antag-strategies-bar h3 {
-  grid-column: 1 / -1; color: var(--red-alert);
-  font-family: 'Oxanium', sans-serif; font-size: 0.75rem;
-  text-transform: uppercase; letter-spacing: 0.12em;
-  margin-bottom: 4px;
-}
 /* Increment D — Antag strategy filter bar */
 .antag-filter-bar {
   display: flex; flex-wrap: wrap; gap: 10px 14px;
@@ -2021,16 +1989,6 @@ body.antag-active .antag-toggle {
 .strategy-calc-btn:hover { background: rgba(255,61,90,0.2); }
 
 /* Delivery mechanisms section */
-.antag-delivery-section {
-  margin-bottom: 16px; padding: 12px;
-  border: 1px solid rgba(255,61,90,0.1); border-radius: 2px;
-  background: rgba(255,61,90,0.02);
-}
-.antag-delivery-section h3 {
-  color: var(--red-alert); font-family: 'Oxanium', sans-serif;
-  font-size: 0.75rem; text-transform: uppercase;
-  letter-spacing: 0.12em; margin-bottom: 10px;
-}
 .delivery-grid {
   display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   gap: 8px;
@@ -2157,11 +2115,6 @@ body.antag-active .antag-toggle {
   image-rendering: pixelated; image-rendering: crisp-edges;
   vertical-align: middle;
 }
-.sprite-icon-lg {
-  width: 48px; height: 48px;
-  image-rendering: pixelated; image-rendering: crisp-edges;
-}
-
 /* ══════════════════════════════════════════
    RESPONSIVE
    ══════════════════════════════════════════ */
@@ -2803,7 +2756,7 @@ body.antag-active .empty-state-chip:focus-visible {
   .antag-icon,
   .tut-spotlight,
   .loading-brand,
-  .loader-spinner,
+  .loading-spinner,
   .loading-bar-fill,
   .loading-text,
   .tab-btn-antag.pulse {
