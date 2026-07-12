@@ -682,6 +682,29 @@ body.companion header,
 body.companion .sidebar {
   display: none;
 }
+
+/* C3: companion top bar (search + collapse) and slim collapsed state */
+.companion-bar { display: none; }
+body.companion .companion-bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  padding: 5px 8px;
+  background: var(--hull-plate);
+  border-bottom: 1px solid var(--border-subtle);
+}
+body.companion .companion-bar .search-input {
+  flex: 1;
+  min-width: 0;
+  font-size: 13px;
+}
+body.companion.companion-collapsed .tab-bar,
+body.companion.companion-collapsed main {
+  display: none;
+}
 body.companion main {
   margin: 0;
   max-width: none;

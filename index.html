@@ -72,7 +72,7 @@
   "license": "https://github.com/MikameO/space-station-recipes/blob/main/LICENSE"
 }
 </script>
-<link rel="stylesheet" href="style.css?v=18">
+<link rel="stylesheet" href="style.css?v=19">
 <!-- Yandex.Metrika counter -->
 <script type="text/javascript">
     (function(m,e,t,r,i,k,a){
@@ -89,6 +89,12 @@
 <!-- vis-network is lazy-loaded by app.js on first Graph tab open (A1) -->
 </head>
 <body>
+
+<!-- C3: companion-mode top bar — search + collapse (hidden outside ?mode=companion) -->
+<div id="companionBar" class="companion-bar">
+  <input type="text" id="companionSearch" class="search-input" placeholder="Search reagents, effects..." autocomplete="off" aria-label="Companion search">
+  <button class="btn-small" id="companionCollapse" title="Collapse to a slim bar">&#9601;</button>
+</div>
 
 <header>
   <div class="header-left">
@@ -463,7 +469,7 @@
   <div class="loading-bar"><div class="loading-bar-fill"></div></div>
 </div>
 
-<script src="app.js?v=17"></script>
+<script src="app.js?v=18"></script>
 <script defer src="tutorial.js?v=2"></script>
 </body>
 </html>

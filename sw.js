@@ -3,12 +3,12 @@
 // network-first with cache fallback — fresh while online, functional offline.
 // data.json is requested with a ?v=Date.now() cache-buster, so fallback
 // matching ignores the query string to hit the cached copy.
-const CACHE = 'chemdb-v3';
+const CACHE = 'chemdb-v4';
 const PRECACHE = [
   './',
   './index.html',
-  './style.css?v=18',
-  './app.js?v=17',
+  './style.css?v=19',
+  './app.js?v=18',
   './tutorial.js?v=2',
   './manifest.json',
   './libs/vis-network.min.js',
@@ -33,6 +33,26 @@ self.addEventListener('activate', e => {
 self.addEventListener('fetch', e => {
   const url = new URL(e.request.url);
   if (e.request.method !== 'GET' || url.origin !== location.origin) return;
+
+  // data.json (3MB): stale-while-revalidate — serve the cached copy
+  // instantly, refresh in the background. First visit falls through to
+  // the network. This is what makes reopening (and the PiP companion
+  // window) near-instant.
+  if (url.pathname.endsWith('/data.json')) {
+    e.respondWith(
+      caches.match(e.request, { ignoreSearch: true }).then(cached => {
+        const fresh = fetch(e.request).then(resp => {
+          if (resp.ok) {
+            const clone = resp.clone();
+            caches.open(CACHE).then(c => c.put(url.pathname, clone));
+          }
+          return resp;
+        }).catch(() => cached);
+        return cached || fresh;
+      })
+    );
+    return;
+  }
 
   e.respondWith(
     fetch(e.request)

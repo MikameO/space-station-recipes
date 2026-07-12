@@ -77,7 +77,11 @@ async function init() {
     document.body.classList.add('companion');
   }
   try {
-    const resp = await fetch('data.json?v=' + Date.now());
+    // No cache-buster: SW serves cached data.json instantly (stale-while-
+    // revalidate) and refreshes it in the background; Pages ETag covers the
+    // no-SW case. The old ?v=Date.now() forced a full 3MB download on every
+    // open — twice with the PiP companion window.
+    const resp = await fetch('data.json');
     DATA = await resp.json();
   } catch (e) {
     document.getElementById('loadingOverlay').innerHTML =
@@ -109,6 +113,7 @@ async function init() {
   setupBeakerSim(); // C2
   setupShareButton();
   setupPipButton(); // B3
+  setupCompanionBar(); // C3
   setupDisclaimer();
   setupAntagMode();
   setupAntagFilters();
@@ -3157,6 +3162,37 @@ function setupShareButton() {
     navigator.clipboard.writeText(url)
       .then(() => showToast('Link copied!'))
       .catch(() => showToast('Copy failed — grab the URL from the address bar'));
+  });
+}
+
+// C3: companion top bar — search proxy + collapse-to-slim-bar so the
+// floating window stops covering the game between lookups.
+function setupCompanionBar() {
+  if (!document.body.classList.contains('companion')) return;
+  const search = document.getElementById('companionSearch');
+  const mainSearch = document.getElementById('searchInput');
+  search.addEventListener('input', () => {
+    mainSearch.value = search.value;
+    mainSearch.dispatchEvent(new Event('input', { bubbles: true }));
+  });
+  const btn = document.getElementById('companionCollapse');
+  btn.addEventListener('click', () => {
+    const collapsed = document.body.classList.toggle('companion-collapsed');
+    btn.innerHTML = collapsed ? '&#9635;' : '&#9601;';
+    btn.title = collapsed ? 'Expand' : 'Collapse to a slim bar';
+    track('companion_collapse', { collapsed: collapsed ? 1 : 0 });
+    // Physically shrink the floating window where the platform allows it
+    // (PiP/popup windows honor resizeTo on a user gesture); if it refuses,
+    // the CSS collapse still reduces the content to the slim bar.
+    try {
+      const w = window.top;
+      if (collapsed) {
+        window.__companionSize = [w.outerWidth, w.outerHeight];
+        w.resizeTo(Math.max(280, w.outerWidth), 64);
+      } else if (window.__companionSize) {
+        w.resizeTo(window.__companionSize[0], Math.max(420, window.__companionSize[1]));
+      }
+    } catch (e) { /* cross-origin top or platform refusal — CSS path is enough */ }
   });
 }
 
