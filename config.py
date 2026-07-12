@@ -1497,6 +1497,49 @@ SHIFT_PRESETS = [
 ]
 
 # ─────────────────────────────────────────────
+# Species physiology (ROADMAP D2)
+# Curated layer (amber tier): breathing + quirks per playable species.
+# The per-reagent organ conditions ("if organ: Moth") are YAML-extracted
+# separately (green tier) — this dict only covers what body prototypes
+# would tell us if they were in the extraction manifest.
+# ─────────────────────────────────────────────
+SPECIES_DATA = {
+    "Human": {
+        "name": "Human", "breathes": "oxygen", "toxicGas": None,
+        "note": "Baseline physiology — all standard medicine applies.",
+    },
+    "Dwarf": {
+        "name": "Dwarf", "breathes": "oxygen", "toxicGas": None,
+        "note": "Human-like; notably resistant to alcohol.",
+    },
+    "Slime": {
+        "name": "Slime person", "breathes": "oxygen", "toxicGas": None,
+        "note": "Slime metabolism — several reagents behave differently (see per-reagent organ notes).",
+    },
+    "Vox": {
+        "name": "Vox", "breathes": "nitrogen", "toxicGas": "oxygen",
+        "note": "Breathes NITROGEN; oxygen is toxic to them — avoid oxygen-based breathing meds; internals with N2 required off-station.",
+    },
+    "Diona": {
+        "name": "Diona", "breathes": "oxygen", "toxicGas": None,
+        "note": "Plant-based multi-organ physiology; regenerates in light, several meds metabolize oddly.",
+    },
+    "Moth": {
+        "name": "Moth person", "breathes": "oxygen", "toxicGas": None,
+        "note": "Insectoid — pesticides (e.g. Bug Spray) poison them; can eat cloth.",
+    },
+    "Arachnid": {
+        "name": "Arachnid", "breathes": "oxygen", "toxicGas": None,
+        "note": "Insectoid physiology; web-related interactions.",
+    },
+    "Reptilian": {
+        "name": "Reptilian", "breathes": "oxygen", "toxicGas": None,
+        "note": "Cold-sensitive; temperature meds matter more.",
+    },
+}
+SPECIES_GUIDE_SOURCES = ["mk-species-guide"]
+
+# ─────────────────────────────────────────────
 # Botany swab / mutation guide (ROADMAP D1)
 # The HOW of cross-pollination lives in C# code, so this layer is curated
 # (amber "community knowledge" tier), while the mutation graph itself is

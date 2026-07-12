@@ -297,6 +297,12 @@ SOURCES = {
         "date": "2026-07-12",
         "note": "Reagent picks and amounts for the one-click shift-start presets (Batch Planner). Compiled from personal playtime; every reagent id is validated against extracted vanilla recipes at build time. Community tuning via PR is encouraged.",
     },
+    "mk-species-guide": {
+        "type": "maintainer-knowledge",
+        "title": "Species physiology notes from maintainer's playtime",
+        "date": "2026-07-12",
+        "note": "Breathing gases and physiology quirks per playable species. Species/body prototypes are not part of the extraction manifest (yet) — unlike per-reagent organ conditions, which ARE extracted from reagent YAML. Corrections via PR encouraged.",
+    },
     "mk-botany-guide": {
         "type": "maintainer-knowledge",
         "title": "Cross-pollination / swab guide from maintainer's playtime",

@@ -1,7 +1,7 @@
 {
  "meta": {
-  "schemaVersion": "3.6.0",
-  "generated": "2026-07-12T19:36:55",
+  "schemaVersion": "3.6.1",
+  "generated": "2026-07-12T20:52:50",
   "forks": {
    "vanilla": {
     "name": "Vanilla SS14",
@@ -104,13 +104,13 @@
   "reactionCount": 1003,
   "plantCount": 128,
   "sourceAttribution": {
-   "total": 67,
+   "total": 68,
    "attributed": 16,
-   "maintainerKnowledgeOnly": 51,
+   "maintainerKnowledgeOnly": 52,
    "speculationOnly": 0,
    "needsAttribution": [],
    "coveragePercent": 23,
-   "avgAuthority": 3.91,
+   "avgAuthority": 3.88,
    "warnings": [
     "ANTAG_STRATEGIES:silent-kill: URL references a mutable branch (master/main); consider pinning to a commit SHA for link-rot resistance",
     "ANTAG_STRATEGIES:mass-explosion: URL references a mutable branch (master/main); consider pinning to a commit SHA for link-rot resistance",
@@ -15743,7 +15743,12 @@
      "tone": "good",
      "amount": 0.7
     }
-   ]
+   ],
+   "speciesEffects": {
+    "Moth": [
+     "[Poison] Deals Poison 1 (if organ: Moth)"
+    ]
+   }
   },
   "Bungotoxin": {
    "id": "Bungotoxin",
@@ -20658,7 +20663,13 @@
     "[Food] Adds 0.5u Vitamin (if organ: Rat)"
    ],
    "boilingPoint": null,
-   "meltingPoint": null
+   "meltingPoint": null,
+   "speciesEffects": {
+    "Rat": [
+     "[Food] Adds 0.5u Protein (if organ: Rat)",
+     "[Food] Adds 0.5u Vitamin (if organ: Rat)"
+    ]
+   }
   },
   "CherryBlossom": {
    "id": "CherryBlossom",
@@ -22954,7 +22965,15 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
-   "antagScore": 3
+   "antagScore": 3,
+   "speciesEffects": {
+    "Vox": [
+     "[Food] Popup (local): generic reagent effect sick (if organ: Vox) @50%",
+     "[Food] Vomit (if organ: Vox) @10%",
+     "[Food] Deals Poison 1 (if organ: Vox)",
+     "[Food] Thirst x1 (if organ: Vox)"
+    ]
+   }
   },
   "Copium": {
    "id": "Copium",
@@ -24526,7 +24545,12 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
-   "antagScore": 2
+   "antagScore": 2,
+   "speciesEffects": {
+    "Arachnid": [
+     "[Poison] Deals Poison 2 (if organ: Arachnid)"
+    ]
+   }
   },
   "Cyclonite": {
    "id": "Cyclonite",
@@ -29645,7 +29669,12 @@
      "tone": "good",
      "amount": -1
     }
-   ]
+   ],
+   "speciesEffects": {
+    "Thaven": [
+     "[Narcotic] Status: SeeingRainbows (if organ: Thaven)"
+    ]
+   }
   },
   "Fiber": {
    "id": "Fiber",
@@ -29744,7 +29773,15 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
-   "antagScore": 1
+   "antagScore": 1,
+   "speciesEffects": {
+    "Dwarf": [
+     "[Narcotic] Emote: Cough (if organ: Dwarf) @5%",
+     "[Narcotic] Emote: Gasp (if organ: Dwarf) @2%",
+     "[Narcotic] Popup (local): rock dust effect nf pleasant memories 01 (if organ: Dwarf) @5%",
+     "[Narcotic] Popup (local): rock dust effect nf tense memories 01 (if organ: Dwarf) @1%"
+    ]
+   }
   },
   "Firebolt": {
    "id": "Firebolt",
@@ -31578,7 +31615,13 @@
    ],
    "boilingPoint": 444.0,
    "meltingPoint": 128.0,
-   "antagScore": 5
+   "antagScore": 5,
+   "speciesEffects": {
+    "Yowie": [
+     "[Poison] Effect: MovespeedModifier (if organ: Yowie)",
+     "[Poison] Status: Drowsiness (if organ: Yowie)"
+    ]
+   }
   },
   "Gildlager": {
    "id": "Gildlager",
@@ -32067,7 +32110,15 @@
      "tone": "good",
      "amount": 0.5
     }
-   ]
+   ],
+   "speciesEffects": {
+    "Goblin": [
+     "[Drink] Thirst x-0.5 (if organ: Goblin)",
+     "[Drink] Vomit (if organ: Goblin) @2%",
+     "[Drink] Status: Stutter (if organ: Goblin) @2%",
+     "[Drink] Thirst x1 (if organ: Goblin)"
+    ]
+   }
   },
   "Gold": {
    "id": "Gold",
@@ -33843,7 +33894,12 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
-   "antagScore": 2
+   "antagScore": 2,
+   "speciesEffects": {
+    "Arachnid": [
+     "[Poison] Deals Poison 2 (if organ: Arachnid)"
+    ]
+   }
   },
   "Heparin": {
    "id": "Heparin",
@@ -40408,7 +40464,14 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
-   "antagScore": 5
+   "antagScore": 5,
+   "speciesEffects": {
+    "Thaven": [
+     "[Narcotic] Heals Blunt 0.3 Heals Asphyxiation 1 Heals Bloodloss 0.8 Heals Poison 0.5 Heals Cold 0.3 (if organ: Thaven)",
+     "[Narcotic] Effect: SuppressPain (if organ: Thaven)",
+     "[Narcotic] Status: ModifyStatusEffect (if organ: Thaven)"
+    ]
+   }
   },
   "KelpPodWine": {
    "id": "KelpPodWine",
@@ -59854,7 +59917,18 @@
     "[Gas] Effect: ModifyLungGas (if organ: Slime)"
    ],
    "boilingPoint": null,
-   "meltingPoint": null
+   "meltingPoint": null,
+   "speciesEffects": {
+    "Sheleg": [
+     "[Gas] Effect: ModifyLungGas (if organ: Sheleg)"
+    ],
+    "Vox": [
+     "[Gas] Effect: ModifyLungGas (if organ: Vox)"
+    ],
+    "Slime": [
+     "[Gas] Effect: ModifyLungGas (if organ: Slime)"
+    ]
+   }
   },
   "Revivopine": {
    "id": "Revivopine",
@@ -61858,7 +61932,12 @@
      "tone": "good",
      "amount": 0.5
     }
-   ]
+   ],
+   "speciesEffects": {
+    "Bloodsucker": [
+     "[Poison] Deals Poison 2 (if organ: Bloodsucker)"
+    ]
+   }
   },
   "Sap": {
    "id": "Sap",
@@ -62782,7 +62861,12 @@
      "tone": "good",
      "amount": -2
     }
-   ]
+   ],
+   "speciesEffects": {
+    "Thaven": [
+     "[Narcotic] Status: SeeingRainbows (if organ: Thaven)"
+    ]
+   }
   },
   "ShirleyTemple": {
    "id": "ShirleyTemple",
@@ -62989,7 +63073,19 @@
      "tone": "bad",
      "amount": -1
     }
-   ]
+   ],
+   "speciesEffects": {
+    "Goblin": [
+     "[Narcotic] Status: SeeingRainbows (if organ: Goblin)",
+     "[Narcotic] Emote: Laugh (if organ: Goblin) @8%",
+     "[Narcotic] Emote: GoblinMutter (if organ: Goblin) @5%",
+     "[Narcotic] Emote: Hiss (if organ: Goblin) @2%",
+     "[Narcotic] Popup (local): shroom mix effect nf procrastination visions 01 (if organ: Goblin) @5%",
+     "[Narcotic] Vomit (if organ: Goblin) @2%",
+     "[Narcotic] Thirst x-1 (if organ: Goblin)",
+     "[Narcotic] Hunger x-1 (if organ: Goblin)"
+    ]
+   }
   },
   "Sidecar": {
    "id": "Sidecar",
@@ -67845,7 +67941,12 @@
     "[Drink] Thirst x1.5 (if organ: Human)"
    ],
    "boilingPoint": null,
-   "meltingPoint": null
+   "meltingPoint": null,
+   "speciesEffects": {
+    "Human": [
+     "[Drink] Thirst x1.5 (if organ: Human)"
+    ]
+   }
   },
   "Synthcells": {
    "id": "Synthcells",
@@ -121745,6 +121846,13 @@
    "note": "Reagent picks and amounts for the one-click shift-start presets (Batch Planner). Compiled from personal playtime; every reagent id is validated against extracted vanilla recipes at build time. Community tuning via PR is encouraged.",
    "authorityWeight": 2
   },
+  "mk-species-guide": {
+   "type": "maintainer-knowledge",
+   "title": "Species physiology notes from maintainer's playtime",
+   "date": "2026-07-12",
+   "note": "Breathing gases and physiology quirks per playable species. Species/body prototypes are not part of the extraction manifest (yet) — unlike per-reagent organ conditions, which ARE extracted from reagent YAML. Corrections via PR encouraged.",
+   "authorityWeight": 2
+  },
   "mk-botany-guide": {
    "type": "maintainer-knowledge",
    "title": "Cross-pollination / swab guide from maintainer's playtime",
@@ -137857,6 +137965,61 @@
     "h": "Practical loop",
     "body": "1) Mutagen small doses until the species you want appears. 2) Stabilize: harvest, replant the mutated seeds. 3) Swab-breed your best specimens to stack potency/yield onto the new species. 4) Robust Harvest boosts potency; seedless traits need the clippers workaround."
    }
+  ]
+ },
+ "species": {
+  "physiology": {
+   "Human": {
+    "name": "Human",
+    "breathes": "oxygen",
+    "toxicGas": null,
+    "note": "Baseline physiology — all standard medicine applies."
+   },
+   "Dwarf": {
+    "name": "Dwarf",
+    "breathes": "oxygen",
+    "toxicGas": null,
+    "note": "Human-like; notably resistant to alcohol."
+   },
+   "Slime": {
+    "name": "Slime person",
+    "breathes": "oxygen",
+    "toxicGas": null,
+    "note": "Slime metabolism — several reagents behave differently (see per-reagent organ notes)."
+   },
+   "Vox": {
+    "name": "Vox",
+    "breathes": "nitrogen",
+    "toxicGas": "oxygen",
+    "note": "Breathes NITROGEN; oxygen is toxic to them — avoid oxygen-based breathing meds; internals with N2 required off-station."
+   },
+   "Diona": {
+    "name": "Diona",
+    "breathes": "oxygen",
+    "toxicGas": null,
+    "note": "Plant-based multi-organ physiology; regenerates in light, several meds metabolize oddly."
+   },
+   "Moth": {
+    "name": "Moth person",
+    "breathes": "oxygen",
+    "toxicGas": null,
+    "note": "Insectoid — pesticides (e.g. Bug Spray) poison them; can eat cloth."
+   },
+   "Arachnid": {
+    "name": "Arachnid",
+    "breathes": "oxygen",
+    "toxicGas": null,
+    "note": "Insectoid physiology; web-related interactions."
+   },
+   "Reptilian": {
+    "name": "Reptilian",
+    "breathes": "oxygen",
+    "toxicGas": null,
+    "note": "Cold-sensitive; temperature meds matter more."
+   }
+  },
+  "sources": [
+   "mk-species-guide"
   ]
  }
 }

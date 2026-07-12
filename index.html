@@ -72,7 +72,7 @@
   "license": "https://github.com/MikameO/space-station-recipes/blob/main/LICENSE"
 }
 </script>
-<link rel="stylesheet" href="style.css?v=23">
+<link rel="stylesheet" href="style.css?v=24">
 <!-- Yandex.Metrika counter -->
 <script type="text/javascript">
     (function(m,e,t,r,i,k,a){
@@ -344,6 +344,9 @@
     <div class="tab-panel" id="tab-medbay" role="tabpanel" aria-labelledby="btn-medbay">
       <p class="reverse-desc">Pick a damage type — medicines ranked by healing per unit. Respects the fork filter; <span class="heal-cond">*</span> marks conditional healing (open details).</p>
       <div class="heal-type-chips" id="healTypeChips"></div>
+      <!-- D2: species context — curated physiology + YAML-extracted organ effects -->
+      <div class="heal-type-chips species-chips" id="speciesChips" role="group" aria-label="Species context"></div>
+      <div id="speciesInfo"></div>
       <div id="healResults"></div>
     </div>
 
@@ -483,7 +486,7 @@
   <div class="loading-bar"><div class="loading-bar-fill"></div></div>
 </div>
 
-<script src="app.js?v=22"></script>
+<script src="app.js?v=23"></script>
 <script defer src="tutorial.js?v=2"></script>
 </body>
 </html>

@@ -577,6 +577,14 @@ main {
   padding: 0 4px;
   border-radius: 2px;
 }
+/* D2: species context in What Heals? */
+.species-chips { margin-top: 0; }
+.species-card { margin: 0 0 12px; }
+.species-line { color: var(--text-sub); font-size: 0.74rem; margin: 0; line-height: 1.5; }
+.species-tox { color: var(--red-alert); }
+.badge.species-bad { border-left-color: var(--red-alert); color: var(--red-alert); }
+.badge.species-note { border-left-color: var(--cyan, #06b6d4); color: var(--cyan, #06b6d4); }
+
 .heal-table .heal-row { cursor: pointer; }
 .heal-table .heal-row:hover td { color: var(--phosphor); }
 .heal-num { font-weight: 600; }

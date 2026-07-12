@@ -1588,6 +1588,7 @@ function renderBeakerLog(final, log, truncated) {
 // ─────────────────────────────────────────────
 
 let activeHealType = null;
+let activeSpecies = null; // D2: null = all species
 
 // Same source-visibility rules as filterReagents, minus sidebar filters —
 // the medbay mode stands alone.
@@ -1661,7 +1662,49 @@ function renderMedbay() {
     });
   });
 
+  renderSpeciesChips();
+  renderSpeciesInfo();
   renderHealResults();
+}
+
+// D2: species context. Physiology facts are curated (amber tier); the
+// per-medicine ☠/ℹ badges come from YAML-extracted organ conditions.
+function renderSpeciesChips() {
+  const host = document.getElementById('speciesChips');
+  if (!host) return;
+  const phys = DATA.species?.physiology || {};
+  // Union: curated species + any species found in extracted organ
+  // conditions (fork races like Goblin/Thaven appear automatically).
+  const found = new Set(Object.keys(phys));
+  for (const r of Object.values(DATA.reagents)) {
+    for (const s of Object.keys(r.speciesEffects || {})) found.add(s);
+  }
+  const items = [['', 'All species'],
+    ...[...found].sort((a, b) => a.localeCompare(b)).map(k => [k, phys[k]?.name || k])];
+  host.innerHTML = items.map(([id, label]) =>
+    `<button class="heal-chip species-chip ${(activeSpecies || '') === id ? 'active' : ''}" data-species="${esc(id)}">${esc(capName(label))}</button>`).join('');
+  host.querySelectorAll('.species-chip').forEach(btn => {
+    btn.addEventListener('click', () => {
+      activeSpecies = btn.dataset.species || null;
+      track('whatheals_species', { species: activeSpecies || 'all' });
+      renderMedbay();
+    });
+  });
+}
+
+function renderSpeciesInfo() {
+  const host = document.getElementById('speciesInfo');
+  if (!host) return;
+  const p = activeSpecies ? DATA.species?.physiology?.[activeSpecies] : null;
+  if (!p) { host.innerHTML = ''; return; }
+  const tox = p.toxicGas
+    ? ` — <b class="species-tox">&#9760; ${esc(p.toxicGas)} is TOXIC to them</b>` : '';
+  host.innerHTML = `<div class="guide-card species-card">
+    <div class="guide-head">${esc(p.name)} physiology
+      <span class="badge badge-community" title="Physiology facts are curated from playtime (species prototypes are not extracted yet). The per-medicine ☠/ℹ notes in the table ARE extracted from reagent YAML.">Community knowledge</span>
+    </div>
+    <p class="species-line">Breathes <b>${esc(p.breathes)}</b>${tox}. ${esc(p.note)}</p>
+  </div>`;
 }
 
 function renderHealResults() {
@@ -1698,8 +1741,14 @@ function renderHealResults() {
       const forkBadge = r.source !== 'vanilla' && DATA.meta?.forks?.[r.source]
         ? `<span class="badge badge-fork" style="border-color:${DATA.meta.forks[r.source].color}">${esc(DATA.meta.forks[r.source].name)}</span>`
         : 'vanilla';
+      let speciesBadge = '';
+      if (activeSpecies && r.speciesEffects && r.speciesEffects[activeSpecies]) {
+        const clauses = r.speciesEffects[activeSpecies];
+        const harmful = clauses.some(c => /Deals|Vomit|Toxin/i.test(c));
+        speciesBadge = ` <span class="badge ${harmful ? 'species-bad' : 'species-note'}" title="${esc(clauses.join(' | '))}">${harmful ? '&#9760;' : '&#8505;'} ${esc(activeSpecies)}</span>`;
+      }
       return `<tr class="heal-row" onclick="openDetail('${esc(r.id)}')" tabindex="0">
-        <td><span class="color-swatch" style="background:${safeColor(r.color)}"></span> ${esc(capName(r.name || r.id))}</td>
+        <td><span class="color-swatch" style="background:${safeColor(r.color)}"></span> ${esc(capName(r.name || r.id))}${speciesBadge}</td>
         <td class="heal-num">${healCell}</td>
         <td>${r.overdose ? r.overdose + 'u' : '—'}</td>
         <td>${accBadge}</td>

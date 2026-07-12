@@ -25,7 +25,7 @@ from config import (
     OTHER_REAGENT_SOURCES, DANGEROUS_INTERACTIONS,
     BASE_DISPENSER_CHEMICALS, CATEGORY_SHEET_MAP,
     ANTAG_DATA, ANTAG_STRATEGIES, DELIVERY_MECHANISMS, SYNDICATE_ITEMS,
-    SHIFT_PRESETS, BOTANY_GUIDE,
+    SHIFT_PRESETS, BOTANY_GUIDE, SPECIES_DATA, SPECIES_GUIDE_SOURCES,
 )
 from sources import (
     SOURCES, AUTHORITY_WEIGHTS, ALLOWED_DOMAINS,
@@ -1840,12 +1840,14 @@ def export_json(reagents: dict, reactions: dict, locale: dict,
 
     data = {
         "meta": {
+            # 3.6.1: species{} (curated physiology) + per-reagent
+            # speciesEffects lifted from organ-conditional effect clauses.
             # 3.6.0: plants{} — seed prototypes as first-class entities
             # (mutation graph, potency-scaled chemicals, growth params).
             # 3.5.0: legacy rmcStatus/rmcNote per-reaction fields and
             # vanillaReagentCount/rmcReagentCount meta removed — forkStatus/
             # forkNotes are the only fork-view fields since the multi-fork era.
-            "schemaVersion": "3.6.0",
+            "schemaVersion": "3.6.1",
             "generated": time.strftime("%Y-%m-%dT%H:%M:%S"),
             "forks": forks_meta,
             "reactionCount": len(reactions),
@@ -2144,6 +2146,27 @@ def export_json(reagents: dict, reactions: dict, locale: dict,
     data["plants"] = plants or {}
     data["botanyGuide"] = BOTANY_GUIDE
 
+    # Species layer (D2): curated physiology + auto-extracted per-reagent
+    # organ conditions. The "(if organ: X)" clauses already live in the
+    # humanized effects strings — lift them into a structured field so the
+    # UI doesn't regex display text.
+    data["species"] = {"physiology": SPECIES_DATA, "sources": SPECIES_GUIDE_SOURCES}
+    organ_re = re.compile(r"\(if organ: (\w+)\)")
+    species_reagent_count = 0
+    for rid, robj in data["reagents"].items():
+        fx = robj.get("effects") or ""
+        if "organ:" not in fx:
+            continue
+        by_species = {}
+        for clause in fx.split(";"):
+            m = organ_re.search(clause)
+            if m:
+                by_species.setdefault(m.group(1), []).append(clause.strip())
+        if by_species:
+            robj["speciesEffects"] = by_species
+            species_reagent_count += 1
+    print(f"  Species: {len(SPECIES_DATA)} curated, {species_reagent_count} reagents with organ-conditional effects")
+
     # Print mismatch summary (non-fatal — authored tier is preserved for UI tooltip).
     if mismatches:
         print(f"\n  Computed difficulty mismatches ({len(mismatches)}/{len(ANTAG_STRATEGIES)}):")
@@ -2168,6 +2191,7 @@ def export_json(reagents: dict, reactions: dict, locale: dict,
     for p in presets_out:
         attribution_inputs.append((f"SHIFT_PRESETS:{p['id']}", p.get("sources", [])))
     attribution_inputs.append(("BOTANY_GUIDE", BOTANY_GUIDE.get("sources", [])))
+    attribution_inputs.append(("SPECIES_DATA", SPECIES_GUIDE_SOURCES))
     for rid, robj in data["reagents"].items():
         if robj.get("antagTipsSources"):
             attribution_inputs.append((f"ANTAG_DATA:{rid}", robj["antagTipsSources"]))
