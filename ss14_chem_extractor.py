@@ -2238,7 +2238,7 @@ def export_json(reagents: dict, reactions: dict, locale: dict,
 
     data = {
         "meta": {
-            "schemaVersion": "3.4.2",
+            "schemaVersion": "3.4.3",
             "generated": time.strftime("%Y-%m-%dT%H:%M:%S"),
             "forks": forks_meta,
             # Backward compat
@@ -2435,6 +2435,12 @@ def export_json(reagents: dict, reactions: dict, locale: dict,
             "effects": summarize_reaction_effects(rxn),
             "impact": rxn.get("impact"),
         }
+        # Increment C1 — cascade priority for the beaker simulator: the engine
+        # picks the highest-priority reaction when several compete (Smoke/Foam
+        # are -10 so real recipes win the reagents). Only present when the
+        # YAML defines it; absent means engine default 0. Can be negative.
+        if rxn.get("priority") is not None:
+            reaction_obj["priority"] = rxn["priority"]
         # Only add fork fields if there's something to report
         if fork_status:
             reaction_obj["forkStatus"] = fork_status
