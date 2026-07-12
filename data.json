@@ -266,7 +266,8 @@
     "[Bloodstream] Status: TemporaryBlindness"
    ],
    "boilingPoint": null,
-   "meltingPoint": null
+   "meltingPoint": null,
+   "antagScore": 2
   },
   "ADTAnelgesin": {
    "id": "ADTAnelgesin",
@@ -1453,7 +1454,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
-   "antagScore": 1,
+   "antagScore": 2,
    "plantEffects": [
     {
      "kind": "PlantAdjustWater",
@@ -2937,7 +2938,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
-   "antagScore": 2,
+   "antagScore": 4,
    "plantEffects": [
     {
      "kind": "PlantAdjustToxins",
@@ -3298,7 +3299,8 @@
     "[Bloodstream] Popup (local): medicine effect shock (if total damage > 0.5) @5%"
    ],
    "boilingPoint": null,
-   "meltingPoint": null
+   "meltingPoint": null,
+   "antagScore": 2
   },
   "ADTMorphine": {
    "id": "ADTMorphine",
@@ -4810,7 +4812,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
-   "antagScore": 1
+   "antagScore": 4
   },
   "ADTVodkaAntivirus": {
    "id": "ADTVodkaAntivirus",
@@ -9953,7 +9955,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
-   "antagScore": 4
+   "antagScore": 5
   },
   "Arcryox": {
    "id": "Arcryox",
@@ -10767,7 +10769,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
-   "antagScore": 2,
+   "antagScore": 3,
    "plantEffects": [
     {
      "kind": "PlantAdjustNutrition",
@@ -13676,7 +13678,8 @@
     "Phase change: melts at 36.0K, boils at 255.0K"
    ],
    "boilingPoint": 255.0,
-   "meltingPoint": 36.0
+   "meltingPoint": 36.0,
+   "antagScore": 2
   },
   "BlindingStew": {
    "id": "BlindingStew",
@@ -13712,7 +13715,8 @@
     "[Poison] Status: TemporaryBlindness (if BlindingStew > 20u)"
    ],
    "boilingPoint": null,
-   "meltingPoint": null
+   "meltingPoint": null,
+   "antagScore": 2
   },
   "Blissifylovene": {
    "id": "Blissifylovene",
@@ -16832,7 +16836,8 @@
     "[Medicine] Status: Unconscious (if self > 100u) @5%"
    ],
    "boilingPoint": null,
-   "meltingPoint": null
+   "meltingPoint": null,
+   "antagScore": 3
   },
   "CMKelotane": {
    "id": "CMKelotane",
@@ -25146,6 +25151,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "antagScore": 3,
    "plantEffects": [
     {
      "kind": "PlantAdjustNutrition",
@@ -27827,7 +27833,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
-   "antagScore": 2,
+   "antagScore": 3,
    "plantEffects": [
     {
      "kind": "PlantAdjustWater",
@@ -28791,7 +28797,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
-   "antagScore": 4
+   "antagScore": 5
   },
   "Ethanol": {
    "id": "Ethanol",
@@ -28923,7 +28929,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
-   "antagScore": 2
+   "antagScore": 5
   },
   "Ethenone": {
    "id": "Ethenone",
@@ -29598,6 +29604,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "antagScore": 1,
    "plantEffects": [
     {
      "kind": "PlantAdjustNutrition",
@@ -30580,7 +30587,8 @@
     "[Narcotic] Popup (local): foreverweed effect longtime @1%"
    ],
    "boilingPoint": null,
-   "meltingPoint": null
+   "meltingPoint": null,
+   "antagScore": 1
   },
   "Formaldehyde": {
    "id": "Formaldehyde",
@@ -31571,7 +31579,7 @@
    ],
    "boilingPoint": 444.0,
    "meltingPoint": 128.0,
-   "antagScore": 1
+   "antagScore": 5
   },
   "Gildlager": {
    "id": "Gildlager",
@@ -32504,6 +32512,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "antagScore": 1,
    "plantEffects": [
     {
      "kind": "PlantAdjustWater",
@@ -33550,7 +33559,8 @@
     "[Gas] Oxygenates blood (if MetabolizerTypeCondition)"
    ],
    "boilingPoint": null,
-   "meltingPoint": null
+   "meltingPoint": null,
+   "antagScore": 3
   },
   "HealthViolation": {
    "id": "HealthViolation",
@@ -42754,6 +42764,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "antagScore": 1,
    "plantEffects": [
     {
      "kind": "PlantAdjustToxins",
@@ -45075,6 +45086,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "antagScore": 2,
    "plantEffects": [
     {
      "kind": "PlantAdjustNutrition",
@@ -46051,7 +46063,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
-   "antagScore": 4
+   "antagScore": 5
   },
   "MoscowMule": {
    "id": "MoscowMule",
@@ -46404,6 +46416,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "antagScore": 1,
    "plantEffects": [
     {
      "kind": "PlantAdjustWater",
@@ -46797,7 +46810,8 @@
     "Phase change: melts at 36.0K, boils at 255.0K"
    ],
    "boilingPoint": 255.0,
-   "meltingPoint": 36.0
+   "meltingPoint": 36.0,
+   "antagScore": 2
   },
   "NFZombieBiteToxin": {
    "id": "NFZombieBiteToxin",
@@ -47126,6 +47140,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "antagScore": 1,
    "plantEffects": [
     {
      "kind": "PlantAdjustWater",
@@ -47196,6 +47211,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "antagScore": 1,
    "plantEffects": [
     {
      "kind": "PlantAdjustWater",
@@ -47266,6 +47282,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "antagScore": 1,
    "plantEffects": [
     {
      "kind": "PlantAdjustWater",
@@ -47429,6 +47446,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "antagScore": 1,
    "plantEffects": [
     {
      "kind": "PlantAdjustWater",
@@ -48724,7 +48742,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
-   "antagScore": 2
+   "antagScore": 5
   },
   "NitrousOxide": {
    "id": "NitrousOxide",
@@ -53698,7 +53716,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
-   "antagScore": 1
+   "antagScore": 4
   },
   "ProcenylLazide": {
    "id": "ProcenylLazide",
@@ -55277,7 +55295,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
-   "antagScore": 4
+   "antagScore": 5
   },
   "RMCChlorine": {
    "id": "RMCChlorine",
@@ -55510,7 +55528,8 @@
     "[Poison] Status: Drowsiness"
    ],
    "boilingPoint": null,
-   "meltingPoint": null
+   "meltingPoint": null,
+   "antagScore": 1
   },
   "RMCEthanol": {
    "id": "RMCEthanol",
@@ -56960,7 +56979,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
-   "antagScore": 1,
+   "antagScore": 4,
    "plantEffects": [
     {
      "kind": "PlantAdjustToxins",
@@ -58015,7 +58034,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
-   "antagScore": 1
+   "antagScore": 4
   },
   "RMCR189": {
    "id": "RMCR189",
@@ -58393,7 +58412,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
-   "antagScore": 1
+   "antagScore": 4
   },
   "RMCSpecialBlendWhiskey": {
    "id": "RMCSpecialBlendWhiskey",
@@ -62007,7 +62026,7 @@
    ],
    "boilingPoint": 255.0,
    "meltingPoint": 36.0,
-   "antagScore": 4
+   "antagScore": 5
   },
   "Saxoite": {
    "id": "Saxoite",
@@ -62738,6 +62757,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "antagScore": 1,
    "plantEffects": [
     {
      "kind": "PlantAdjustToxins",
@@ -62952,7 +62972,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
-   "antagScore": 2,
+   "antagScore": 3,
    "plantEffects": [
     {
      "kind": "PlantAdjustNutrition",
@@ -63299,6 +63319,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "antagScore": 2,
    "plantEffects": [
     {
      "kind": "PlantAdjustNutrition",
@@ -65139,7 +65160,8 @@
     "Phase change: melts at 380.0K, boils at 250.0K"
    ],
    "boilingPoint": 250.0,
-   "meltingPoint": 380.0
+   "meltingPoint": 380.0,
+   "antagScore": 2
   },
   "SpaceLube": {
    "id": "SpaceLube",
@@ -65764,7 +65786,8 @@
     "[Narcotic] Status: Adrenaline"
    ],
    "boilingPoint": null,
-   "meltingPoint": null
+   "meltingPoint": null,
+   "antagScore": 5
   },
   "Stabilizine": {
    "id": "Stabilizine",
@@ -66179,7 +66202,8 @@
     "[Medicine] Status: ForcedSleep (if self > 11u)"
    ],
    "boilingPoint": null,
-   "meltingPoint": null
+   "meltingPoint": null,
+   "antagScore": 3
   },
   "Stasizium": {
    "id": "Stasizium",
@@ -70706,7 +70730,8 @@
     "[Poison] Effect: Polymorph (if Tranquility > 25u)"
    ],
    "boilingPoint": null,
-   "meltingPoint": null
+   "meltingPoint": null,
+   "antagScore": 4
   },
   "Tranquinase": {
    "id": "Tranquinase",
@@ -75399,7 +75424,8 @@
     "[Narcotic] Effect: SuppressPain"
    ],
    "boilingPoint": null,
-   "meltingPoint": null
+   "meltingPoint": null,
+   "antagScore": 2
   },
   "uraniumhexafluoride": {
    "id": "uraniumhexafluoride",

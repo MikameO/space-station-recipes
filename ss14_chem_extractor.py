@@ -1805,6 +1805,9 @@ _ANTAG_TAG_WEIGHTS = {
     "flammable": 2, "paralyze": 3, "explosion": 3, "stun": 2,
     "bleed": 2, "emote": 1, "speed": 1, "drunk": 0, "jitter": 0,
     "sleep": 3, "blind": 2, "mute": 2, "vomit": 1,
+    # Status-effect CC debuffs (added alongside the status-tag filters)
+    "unconscious": 3, "knockdown": 2, "pacified": 2, "hallucinating": 1,
+    "drowsy": 1, "dementia": 1, "dna-scramble": 1,
 }
 
 def compute_antag_score(effect_tags: list[str]) -> int:
