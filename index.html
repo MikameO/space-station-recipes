@@ -72,7 +72,7 @@
   "license": "https://github.com/MikameO/space-station-recipes/blob/main/LICENSE"
 }
 </script>
-<link rel="stylesheet" href="style.css?v=17">
+<link rel="stylesheet" href="style.css?v=18">
 <!-- Yandex.Metrika counter -->
 <script type="text/javascript">
     (function(m,e,t,r,i,k,a){
@@ -279,6 +279,30 @@
         </div>
       </div>
 
+      <!-- C2: Beaker Simulator — what will ACTUALLY happen when you mix -->
+      <div class="batch-section" data-collapsible data-collapse-key="beaker">
+        <h3 class="reverse-title">
+          <span class="reverse-title-text">Beaker Simulator</span>
+          <button class="hint-chip" data-hint="Simulates the actual reaction cascade: priority order, temperature windows, catalysts. 'What Can I Make?' answers what's craftable — this answers what physically happens, including the smoke you didn't want." aria-label="Beaker simulator explained">?</button>
+          <span class="section-chevron">&#9660;</span>
+        </h3>
+        <div class="section-body">
+          <p class="reverse-desc">Enter beaker contents — watch the cascade, see the final mix</p>
+          <div class="batch-controls">
+            <div class="batch-row">
+              <input type="text" id="beakerInput" class="search-input" placeholder="Type reagent..." autocomplete="off" aria-label="Add beaker reagent" style="width:220px">
+              <div class="calc-suggestions" id="beakerSuggestions"></div>
+              <input type="number" id="beakerAmount" class="search-input" value="30" min="0.5" max="9999" step="0.5" aria-label="Beaker reagent amount" style="width:80px">
+              <button class="btn-small" id="beakerAddBtn">+ Add</button>
+              <label class="beaker-temp-label">Temp <input type="number" id="beakerTemp" class="search-input" value="293" min="0" max="10000" aria-label="Beaker temperature in Kelvin" style="width:80px"> K</label>
+            </div>
+          </div>
+          <div class="reverse-chips" id="beakerChips"></div>
+          <button class="btn-primary" id="beakerSimBtn" style="margin-bottom:12px">Simulate Mix</button>
+          <div id="beakerLog"></div>
+        </div>
+      </div>
+
       <div class="reverse-section" data-collapsible data-collapse-key="reverse">
         <h3 class="reverse-title">
           <span class="reverse-title-text">What Can I Make?</span>
@@ -439,7 +463,7 @@
   <div class="loading-bar"><div class="loading-bar-fill"></div></div>
 </div>
 
-<script src="app.js?v=16"></script>
+<script src="app.js?v=17"></script>
 <script defer src="tutorial.js?v=2"></script>
 </body>
 </html>

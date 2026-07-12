@@ -633,6 +633,49 @@ main {
 .diff-mod-id { font-family: 'Share Tech Mono', monospace; color: var(--text-sub); white-space: nowrap; }
 .diff-mod-note { color: var(--text-ghost); }
 
+/* C2: beaker simulator */
+.beaker-temp-label {
+  font-family: 'Oxanium', sans-serif;
+  font-size: 12px;
+  color: var(--text-sub);
+  white-space: nowrap;
+}
+.beaker-log-title {
+  font-family: 'Oxanium', sans-serif;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--phosphor);
+  margin: 8px 0 6px;
+}
+.beaker-step {
+  display: flex;
+  gap: 8px;
+  padding: 5px 8px;
+  font-size: 12px;
+  border-left: 2px solid var(--border-subtle);
+  margin-bottom: 3px;
+  background: rgba(255,255,255,0.02);
+}
+.beaker-step-n {
+  font-family: 'Share Tech Mono', monospace;
+  color: var(--text-ghost);
+  min-width: 16px;
+}
+.beaker-danger {
+  border-left-color: var(--red-alert);
+  background: rgba(255,61,90,0.05);
+}
+.beaker-warn { color: var(--red-alert); font-weight: 600; }
+.beaker-note { color: var(--text-ghost); font-style: italic; }
+.beaker-pri {
+  font-size: 10px;
+  color: var(--text-ghost);
+  border: 1px solid var(--border-subtle);
+  padding: 0 3px;
+  border-radius: 2px;
+}
+
 /* B2: companion mode (?mode=companion) — compact layout for a second
    screen or the pin-over-game PiP window: no chrome, content edge-to-edge */
 body.companion header,

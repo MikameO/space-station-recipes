@@ -106,6 +106,7 @@ async function init() {
   setupBatchPlanner();
   renderPresetBar(); // A2: shift-start preset chips
   setupForkDiff(); // B1
+  setupBeakerSim(); // C2
   setupShareButton();
   setupPipButton(); // B3
   setupDisclaimer();
@@ -1359,6 +1360,135 @@ function renderForkDiff() {
     + section('Reactions you gain', 'diff-added', addedX, rxRow)
     + section('Reactions you lose', 'diff-removed', removedX, rxRow)
     + section('Recipes that differ', 'diff-modified', modX, modRow);
+}
+
+// ─────────────────────────────────────────────
+// Beaker Simulator (C2) — replays SS14's reaction pass over a mixture.
+// Per engine rules: the highest-priority eligible reaction fires first
+// (priority serialized since schema 3.4.3; e.g. Smoke/Foam are -10 so real
+// recipes win their reagents), consumes at the largest integer multiple,
+// then the pass repeats until nothing can react. Mixer-gated reactions
+// (Stir/Shake) never auto-fire in a plain beaker.
+// ─────────────────────────────────────────────
+
+function simulateBeaker(contents, tempK) {
+  const state = {};
+  for (const [id, amt] of Object.entries(contents)) state[id] = amt;
+  const log = [];
+  const MAX_STEPS = 30;
+
+  for (let step = 1; step <= MAX_STEPS; step++) {
+    let best = null;
+    for (const rx of Object.values(DATA.reactions)) {
+      if (!reactionInFork(rx, activeSource === 'all' ? 'all' : activeSource)) continue;
+      if (rx.mixer && rx.mixer.length) continue; // needs Stir/Shake — not a beaker pour
+      if (rx.minTemp && tempK < rx.minTemp) continue;
+      if (rx.maxTemp && tempK > rx.maxTemp) continue;
+      let mult = Infinity;
+      let ok = true;
+      for (const [rid, info] of Object.entries(rx.reactants)) {
+        const have = state[rid] || 0;
+        if (have < info.amount) { ok = false; break; }
+        if (!info.catalyst) mult = Math.min(mult, Math.floor(have / info.amount));
+      }
+      if (!ok || !isFinite(mult) || mult < 1) continue;
+      const pri = rx.priority ?? 0;
+      if (!best || pri > best.pri) best = { rx, mult, pri };
+    }
+    if (!best) break;
+
+    const { rx, mult } = best;
+    const consumed = [];
+    for (const [rid, info] of Object.entries(rx.reactants)) {
+      if (info.catalyst) { consumed.push(`${info.amount}u ${rid} (cat, kept)`); continue; }
+      state[rid] = +(state[rid] - info.amount * mult).toFixed(2);
+      consumed.push(`${info.amount * mult}u ${rid}`);
+      if (state[rid] <= 0.001) delete state[rid];
+    }
+    const produced = [];
+    for (const [pid, amt] of Object.entries(rx.products || {})) {
+      state[pid] = +((state[pid] || 0) + amt * mult).toFixed(2);
+      produced.push(`${+(amt * mult).toFixed(2)}u ${pid}`);
+    }
+    log.push({ step, id: rx.id, consumed, produced, effects: rx.effects || '', impact: rx.impact || '', priority: rx.priority });
+  }
+  return { final: state, log, truncated: log.length >= MAX_STEPS };
+}
+
+const beakerContents = {}; // reagentId -> units
+
+function renderBeakerChips() {
+  const el = document.getElementById('beakerChips');
+  el.innerHTML = Object.entries(beakerContents).map(([id, amt]) =>
+    `<span class="reverse-chip">
+      <span class="color-swatch" style="background:${safeColor(DATA.reagents[id]?.color)};width:8px;height:8px"></span>
+      ${esc(capName(DATA.reagents[id]?.name || id))} ${amt}u
+      <span class="reverse-chip-remove" data-id="${esc(id)}">&times;</span>
+    </span>`).join('');
+  el.querySelectorAll('.reverse-chip-remove').forEach(btn => {
+    btn.addEventListener('click', () => {
+      delete beakerContents[btn.dataset.id];
+      renderBeakerChips();
+    });
+  });
+}
+
+function setupBeakerSim() {
+  const input = document.getElementById('beakerInput');
+  const suggestions = document.getElementById('beakerSuggestions');
+  if (!input) return;
+  let pendingId = null;
+  setupAutocomplete(input, suggestions, (id) => {
+    pendingId = id;
+    input.value = capName(DATA.reagents[id]?.name || id);
+    suggestions.classList.remove('open');
+  });
+  document.getElementById('beakerAddBtn').addEventListener('click', () => {
+    if (!pendingId) return;
+    const amt = Math.max(0.5, parseFloat(document.getElementById('beakerAmount').value) || 30);
+    beakerContents[pendingId] = (beakerContents[pendingId] || 0) + amt;
+    pendingId = null;
+    input.value = '';
+    renderBeakerChips();
+  });
+  document.getElementById('beakerSimBtn').addEventListener('click', () => {
+    if (!Object.keys(beakerContents).length) return;
+    const tempK = parseFloat(document.getElementById('beakerTemp').value) || 293;
+    track('beaker_sim', { n: Object.keys(beakerContents).length, tempK });
+    const { final, log, truncated } = simulateBeaker(beakerContents, tempK);
+    renderBeakerLog(final, log, truncated);
+  });
+}
+
+function renderBeakerLog(final, log, truncated) {
+  const el = document.getElementById('beakerLog');
+  const dangerRe = /explosion|explode|ignite|flash|emp|smoke|foam|flammable/i;
+  const stepsHTML = log.length
+    ? log.map(s => {
+        const danger = dangerRe.test(s.effects) || dangerRe.test(s.impact) || dangerRe.test(s.id);
+        return `<div class="beaker-step ${danger ? 'beaker-danger' : ''}">
+          <span class="beaker-step-n">${s.step}</span>
+          <span class="beaker-step-body">
+            <b>${esc(s.id)}</b>${s.priority != null ? ` <span class="beaker-pri" title="reaction priority">p${s.priority}</span>` : ''}:
+            ${esc(s.consumed.join(' + '))} &#8594; ${s.produced.length ? esc(s.produced.join(' + ')) : '<i>no products</i>'}
+            ${danger ? ' <span class="beaker-warn">&#9888; ' + esc(s.impact || 'hazardous effect') + '</span>' : ''}
+            ${!danger && s.impact ? ` <span class="beaker-note">${esc(s.impact)}</span>` : ''}
+          </span>
+        </div>`;
+      }).join('')
+    : '<div class="beaker-step"><i>Nothing reacts at this temperature.</i></div>';
+  const finalHTML = Object.keys(final).length
+    ? Object.entries(final).map(([id, amt]) =>
+        `<span class="reverse-chip">
+          <span class="color-swatch" style="background:${safeColor(DATA.reagents[id]?.color)};width:8px;height:8px"></span>
+          ${esc(capName(DATA.reagents[id]?.name || id))} ${amt}u
+        </span>`).join('')
+    : '<i>Empty beaker — everything was consumed.</i>';
+  el.innerHTML = `
+    <div class="beaker-log-title">Reaction cascade${truncated ? ' (stopped at 30 steps)' : ''}</div>
+    ${stepsHTML}
+    <div class="beaker-log-title" style="margin-top:10px">Final beaker</div>
+    <div class="reverse-chips">${finalHTML}</div>`;
 }
 
 // ─────────────────────────────────────────────
