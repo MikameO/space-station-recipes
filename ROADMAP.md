@@ -120,13 +120,13 @@
 3. Спот-чеки: Vox+кислород, Slime-специфика, Diona мульти-орган.
 **DoD:** 3 вида сверены с YAML; скриншот; M1-чек.
 
-### D3. Источники-предметы: заливки бутылок/банок/таблеток + вендоматы `[~]` (2026-07-12, запрос пользователя; worktree substance-obtainability-items) — HAE 8h = D3a 4h + D3b 2h + D3c 2h (data)
+### D3. Источники-предметы: заливки бутылок/банок/таблеток + вендоматы `[x]` (2026-07-12, запрос пользователя; commits b6906dc D3a / 332958f D3b / 7c8051e D3c; schema 3.5.0) — HAE 8h = D3a 4h + D3b 2h + D3c 2h (data)
 **Спрос:** пользователь: Absinthe/Speed Demon помечены UNOBTAINABLE, хотя доступны как предметы (бутылка в Booze-O-Mat, таблетки дилера). Масштаб: 332 unobtainable, из них 152 — напитки/еда. Дизайн: [docs/design/2026-07-12-item-fill-sources.md](docs/design/2026-07-12-item-fill-sources.md) (утверждён: подход B, полный scope v1).
 **Шаги:**
 1. **D3a** — машинерия: новые манифест-ключи в `config.py` (item_fill/vending_inventory/vending_machine/dispenser files, ванильный сет), фаза экстрактора «Item-fill sources» (парс двух схем растворов #43192, наследование entity, EntityTable-паки диспенсеров), слияние в `build_all_sources`, keyword-дополнения классификатора (`Vending:`, `Atmospherics`), честные ручные метки (газы→Атмос, крови видов, грайнд-исключения).
 2. **D3b** — соки/грайнд: produce-манифесты Hydroponics, `Extractable.juiceSolution` через seed.productPrototypes → метки `Juicing: X (plant)`.
 3. **D3c** — форк-манифесты: goob/deltav/sunrise/corvax/adt + ancestry-фильтрация каналов в per-fork views.
-**DoD:** Absinthe → Booze-O-Mat (120u), тир cross-service, бейдж исчез (скриншот); Vodka остаётся dispenser (регрессия); JuiceBungo (D3b); форк-эксклюзив (D3c); regen ×2 идентичен; счётчики unobtainable до/после в CHANGELOG; schemaVersion 3.5.0.
+**DoD (выполнено):** Absinthe → Booze-O-Mat 120u, тир cross-service, бейдж исчез (e2e: структурная проверка detail-панели, скриншот-рендерер завис — известная особенность превью); Vodka осталась dispenser; JuiceBungo/JuiceBluePumpkin/MilkOat → Juicing (D3b); Angobitters (deltav) — форк-канал с ancestry-фильтром (D3c); regen ×2 идентичен (без timestamp); **unobtainable 332 → 297 (ванила 63 → 29)** в CHANGELOG 3.5.0. Бонус-находки: Lead → antag-only (SyndieJuice, синд-доступ), contraband-бакеты = хакинг провода (не EMAG), Gold → бутылка Gildlager. Follow-ups в дизайн-доке (StorageFill-паки, патченные копии вендоров, лут-спавнеры).
 
 ---
 
