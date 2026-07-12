@@ -39,11 +39,12 @@ fetch-кэш.
 кэшируется. Из дерева берём `Resources/Maps/**` и `Resources/Prototypes/**`
 (+ кастомные директории форков из `FORK_REGISTRY`).
 
-**Фильтр станций:** исключаются поддиректории (`Dungeon/`, `Ruins/`,
-`Shuttles/`, `Misc/`, `Salvage/`, `Test/`), карты с `meta.category != Map` и
-карты, чей крупнейший грид меньше порога по числу сущностей (порог
-подбирается эмпирически на инкременте E3); спорные случаи — ручной
-allow/block-список в `config.py`.
+**Фильтр станций:** источник истины — `gameMap`-прототипы
+(`Resources/Prototypes/Maps/*.yml`: id, mapName, mapPath) и пулы
+`gameMapPool` (флаг «в ротации»). Данжи/руины/шаттлы в gameMap не объявлены
+и отпадают сами; редкий мусор (Debug-карты) — ручной `MAP_BLOCKLIST` в
+`config.py`. Уточнение по разведке 2026-07-12: это строже и проще
+первоначальной эвристики по поддиректориям.
 
 **Реестр прототипов** (один раз на форк, с учётом наследования `parent`):
 
@@ -55,7 +56,9 @@ allow/block-список в `config.py`.
 - `StorageFill.contents` шкафов/ящиков (записи с `prob < 1` сохраняют
   вероятность);
 - инвентари вендоматов (`VendingMachineInventoryPrototype`);
-- маяки: прототипы `DefaultStationBeacon*` — имя локации из прототипа
+- маяки: прототипы `DefaultStationBeacon*` — `NavMapBeacon.defaultText`
+  содержит Fluent-ключ, резолвится словарём из
+  `Locale/en-US/navmap-beacons/station-beacons.ftl`
   (+ переопределение `NavMapBeacon.text` на карте, если задано).
 
 **Парс карты (format 7).** Из YAML: `tilemap` (id → имя тайла), base64-чанки
