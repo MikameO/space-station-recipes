@@ -218,6 +218,7 @@
    "isDispenser": false,
    "effects": "[Bloodstream] Heals Shock 4.2 Heals Caustic 3.1 (if body temp < 203.0K); [Bloodstream] Status: TemporaryBlindness",
    "effectTags": [
+    "blind",
     "heals:caustic",
     "heals:shock"
    ],
@@ -918,8 +919,10 @@
     "deals:asphyxiation",
     "deals:bloodloss",
     "deals:poison",
+    "hallucinating",
     "jitter",
-    "speed"
+    "speed",
+    "stutter"
    ],
    "metabolismPaths": [
     "Bloodstream"
@@ -1343,6 +1346,7 @@
    "effects": "[Digestion] Thirst x3; [Digestion] Status: StaminaModifier; [Digestion] Speed walk=1.03 sprint=1.05; [Digestion] Temp +2500 (if body temp < 310K)",
    "effectTags": [
     "speed",
+    "stamina",
     "temperature",
     "thirst"
    ],
@@ -1421,6 +1425,7 @@
    "isDispenser": false,
    "effects": "[Digestion] Thirst x2; [Digestion] Status: Drowsiness; [Digestion] Adds 0.05u Theobromine; [Digestion] Vomit (if ADTCoffeePowder > 10u) @4%; [Digestion] Popup (local): generic reagent effect disgusting (if ADTCoffeePowder > 5u) @30%",
    "effectTags": [
+    "drowsy",
     "thirst",
     "vomit"
    ],
@@ -1584,6 +1589,7 @@
     "heals:cold",
     "heals:piercing",
     "heals:slash",
+    "stutter",
     "temperature"
    ],
    "metabolismPaths": [
@@ -1674,6 +1680,7 @@
    "effectTags": [
     "deals:piercing",
     "deals:slash",
+    "drunk",
     "heals:poison"
    ],
    "metabolismPaths": [
@@ -2450,6 +2457,7 @@
    "isDispenser": false,
    "effects": "[Digestion] Thirst x3; [Digestion] Temp -2500 (if body temp > 290K); [Digestion] Heals Poison 0.5 Heals Radiation 0.5; [Digestion] Popup (local): medicine effect hungover @4%; [Digestion] Status: Drunk",
    "effectTags": [
+    "drunk",
     "heals:poison",
     "heals:radiation",
     "temperature",
@@ -2884,6 +2892,7 @@
    "isDispenser": false,
    "effects": "[Bloodstream] Deals Poison 3.5; [Bloodstream] Status: TemporaryBlindness (if ADTMethanol > 7u); [Bloodstream] Popup (local): norepinephricacid effect eye disconnect (if ADTMethanol > 7u)",
    "effectTags": [
+    "blind",
     "deals:poison"
    ],
    "metabolismPaths": [
@@ -3041,7 +3050,8 @@
     "deals:caustic",
     "heals:blunt",
     "heals:piercing",
-    "heals:slash"
+    "heals:slash",
+    "stutter"
    ],
    "metabolismPaths": [
     "Bloodstream"
@@ -3104,7 +3114,8 @@
    "isDispenser": false,
    "effects": "[Bloodstream] Heals Cold 4.4 (if body temp < 203.0K); [Bloodstream] Status: Stutter",
    "effectTags": [
-    "heals:cold"
+    "heals:cold",
+    "stutter"
    ],
    "metabolismPaths": [
     "Bloodstream"
@@ -3240,7 +3251,8 @@
    "isDispenser": false,
    "effects": "[Bloodstream] Heals Shock 0.25; [Bloodstream] Heals Shock 1 (if Dermaline > 0.5u); [Bloodstream] Status: KnockedDown; [Bloodstream] Removes 0.5u Licoxide; [Bloodstream] Removes 0.5u Tazinide; [Bloodstream] Popup (local): medicine effect shock (if total damage > 0.5) @5%",
    "effectTags": [
-    "heals:shock"
+    "heals:shock",
+    "knockdown"
    ],
    "metabolismPaths": [
     "Bloodstream"
@@ -3302,11 +3314,15 @@
    "isDispenser": false,
    "effects": "[Bloodstream] Status: Adrenaline; [Bloodstream] Heals Brute 1 (even); [Bloodstream] Popup (local): medicine effect pain (if total damage > 0.5) @5%; [Bloodstream] Status: Stun; [Bloodstream] Status: KnockedDown; [Bloodstream] Vomit (if ADTMorphine > 30.05u) @30%; [Bloodstream] Deals Asphyxiation 5 (if MetabolizerTypeCondition, ADTMorphine > 30.05u); [Bloodstream] Deals Poison 2.5 Deals Bloodloss 1.5 (if MetabolizerTypeCondition, ADTMorphine > 30.05u); [Bloodstream] Jitter (if ADTMorphine > 30.05u); [Bloodstream] Status: SeeingRainbows; [Bloodstream] Effect: Hallucinations; [Bloodstream] Popup (local): goodfeeling artifact drastic 3 @5%",
    "effectTags": [
+    "adrenaline",
     "deals:asphyxiation",
     "deals:bloodloss",
     "deals:poison",
+    "hallucinating",
     "heals:brute",
     "jitter",
+    "knockdown",
+    "stun",
     "vomit"
    ],
    "metabolismPaths": [
@@ -3497,8 +3513,10 @@
    "isDispenser": false,
    "effects": "[Bloodstream] Status: Adrenaline; [Bloodstream] Popup (local): medicine effect pain (if total damage > 0.5) @5%; [Bloodstream] Status: SeeingRainbows; [Bloodstream] Popup (local): narcotic effect rainbows @5%; [Bloodstream] Popup (pvs): narcotic effect visible miosis @5%; [Bloodstream] Deals Asphyxiation 2 (if MetabolizerTypeCondition, ADTOpium > 10.05u); [Bloodstream] Deals Poison 2 (if MetabolizerTypeCondition, ADTOpium > 10.05u)",
    "effectTags": [
+    "adrenaline",
     "deals:asphyxiation",
-    "deals:poison"
+    "deals:poison",
+    "hallucinating"
    ],
    "metabolismPaths": [
     "Bloodstream"
@@ -4133,6 +4151,7 @@
    "isDispenser": false,
    "effects": "[Bloodstream] Popup (local): medicine effect headache @5%; [Bloodstream] Status: Adrenaline; [Bloodstream] Heals Blunt 1 (if Bicaridine > 0.5u)",
    "effectTags": [
+    "adrenaline",
     "heals:blunt"
    ],
    "metabolismPaths": [
@@ -4769,6 +4788,7 @@
    "isDispenser": false,
    "effects": "[Bloodstream] Speed walk=0.65 sprint=0.65; [Bloodstream] Status: ForcedSleep (if ADTUltraChloralHydrate > 3u); [Bloodstream] Popup (local): narcotic effect sleepy @6%",
    "effectTags": [
+    "sleep",
     "speed"
    ],
    "metabolismPaths": [
@@ -6900,7 +6920,8 @@
    "effects": "[Bloodstream] Status: PainNumbness; [Bloodstream] Status: ModifyStatusEffect; [Bloodstream] Effect: SuppressAddiction; [Bloodstream] Popup (local): reagent effect painkiller strong1 @35%; [Bloodstream] Adds 0.04u Agonolexyne (if Ethanol > 1u); [Bloodstream] Effect: Addicting (if Agonolexyne > 0.25u) @80%; [Bloodstream] Drunk (if Agonolexyne > 5u); [Bloodstream] Deals Asphyxiation 1 (if Agonolexyne > 5.5u); [Bloodstream] Popup (local): reagent effect painkiller fade (if Agonolexyne < 0.1u) @50%",
    "effectTags": [
     "deals:asphyxiation",
-    "drunk"
+    "drunk",
+    "numbness"
    ],
    "metabolismPaths": [
     "Bloodstream"
@@ -8928,12 +8949,16 @@
    "isDispenser": false,
    "effects": "[Narcotic] Status: Dementia; [Narcotic] Status: Stutter; [Narcotic] Effect: TakeStaminaDamage (if MetabolizerTypeCondition); [Narcotic] Popup (local): amnestizine effect forget (if Amnestizine > 1u) @35%; [Narcotic] Status: Pacified; [Narcotic] Speed walk=0.4 sprint=0.4 (if MetabolizerTypeCondition, Amnestizine > 4u); [Narcotic] Status: TemporaryBlindness (if MetabolizerTypeCondition, Amnestizine > 10u); [Narcotic] Jitter (if Amnestizine > 15u); [Narcotic] Deals Poison 0.25 Deals Asphyxiation 0.25 (if MetabolizerTypeCondition, Amnestizine > 15u); [Narcotic] Deals Cellular 1 Deals Asphyxiation 1 (if MetabolizerTypeCondition, Amnestizine > 30u); [Narcotic] Flammable; [Narcotic] Effect: ModifyParalysis (if MetabolizerTypeCondition) @5%",
    "effectTags": [
+    "blind",
     "deals:asphyxiation",
     "deals:cellular",
     "deals:poison",
+    "dementia",
     "flammable",
     "jitter",
-    "speed"
+    "pacified",
+    "speed",
+    "stutter"
    ],
    "metabolismPaths": [
     "Narcotic"
@@ -9424,6 +9449,8 @@
    "isDispenser": false,
    "effects": "[Bloodstream] Status: Anesthesia; [Bloodstream] Status: PainNumbness; [Bloodstream] Speed walk=0.5 sprint=0.5",
    "effectTags": [
+    "anesthesia",
+    "numbness",
     "speed"
    ],
    "metabolismPaths": [
@@ -9865,13 +9892,16 @@
    "isDispenser": false,
    "effects": "[Narcotic] Speed walk=1.3 sprint=1.3; [Narcotic] Status: ModifyStatusEffect; [Narcotic] Status: KnockedDown; [Narcotic] Status: Drowsiness; [Narcotic] Status: Adrenaline; [Narcotic] Effect: TakeStaminaDamage; [Narcotic] Effect: RemoveComponentEffect; [Medicine] Resets narcolepsy; [Medicine] Heals Brute 1 Heals Heat 0.5 Heals Shock 0.5 Heals Cold 0.5 Heals Radiation 0.5 Heals Poison 0.5 Deals Asphyxiation 0.5",
    "effectTags": [
+    "adrenaline",
     "deals:asphyxiation",
+    "drowsy",
     "heals:brute",
     "heals:cold",
     "heals:heat",
     "heals:poison",
     "heals:radiation",
     "heals:shock",
+    "knockdown",
     "speed"
    ],
    "metabolismPaths": [
@@ -10580,6 +10610,7 @@
    "effects": "[Digestion] Thirst x2; [Drink] Status: ScrambleDnaEffect (if self > 25u); [Drink] Deals Genetic 0.25; [Drink] Adds 1u Ethanol",
    "effectTags": [
     "deals:genetic",
+    "dna-scramble",
     "thirst"
    ],
    "metabolismPaths": [
@@ -10849,7 +10880,8 @@
     "heals:burn",
     "heals:toxin",
     "jitter",
-    "speed"
+    "speed",
+    "stutter"
    ],
    "metabolismPaths": [
     "Medicine"
@@ -11146,9 +11178,11 @@
     "deals:asphyxiation",
     "deals:poison",
     "emote",
+    "hallucinating",
     "heals:airloss",
     "heals:cellular",
     "heals:poison",
+    "sleep",
     "speed"
    ],
    "metabolismPaths": [
@@ -11935,6 +11969,8 @@
     "deals:poison",
     "emote",
     "jitter",
+    "pressure-immune",
+    "stutter",
     "vomit"
    ],
    "metabolismPaths": [
@@ -12008,6 +12044,8 @@
     "deals:poison",
     "emote",
     "jitter",
+    "pressure-immune",
+    "stutter",
     "vomit"
    ],
    "metabolismPaths": [
@@ -13618,7 +13656,9 @@
    "isBase": true,
    "isDispenser": false,
    "effects": "[Narcotic] Status: TemporaryBlindness (if MetabolizerTypeCondition)",
-   "effectTags": [],
+   "effectTags": [
+    "blind"
+   ],
    "metabolismPaths": [
     "Narcotic"
    ],
@@ -13651,7 +13691,9 @@
    "isBase": true,
    "isDispenser": false,
    "effects": "[Poison] Popup (local): blindingstew effect eye pain @8%; [Poison] Popup (local): blindingstew effect darkness (if BlindingStew > 20u) @3%; [Poison] Status: TemporaryBlindness (if BlindingStew > 20u)",
-   "effectTags": [],
+   "effectTags": [
+    "blind"
+   ],
    "metabolismPaths": [
     "Poison"
    ],
@@ -14527,7 +14569,8 @@
    "isDispenser": false,
    "effects": "[Medicine] Status: Drunk; [Medicine] Deals Poison 1.5; [Medicine] Removes 0.5u BoneGel (if MetabolizerTypeCondition)",
    "effectTags": [
-    "deals:poison"
+    "deals:poison",
+    "drunk"
    ],
    "metabolismPaths": [
     "Medicine"
@@ -16510,6 +16553,7 @@
    "isDispenser": false,
    "effects": "[Bloodstream] Removes 5u Histamine (if Histamine > 45u); [Bloodstream] Heals Asphyxiation 3 Heals Poison 0.5 (if mob state: Critical, Epinephrine < 20u); [Bloodstream] Heals Brute 0.5 (even) Heals Burn 0.5 (even) (if mob state: Critical, Epinephrine < 20u); [Bloodstream] Deals Asphyxiation 1 Deals Poison 1 (if Epinephrine > 20u); [Bloodstream] Removes 2u HeartbreakerToxin; [Bloodstream] Removes 1u Epinephrine (if HeartbreakerToxin > 1u); [Bloodstream] Adds 4u Histamine (if HeartbreakerToxin > 1u) @10%; [Bloodstream] Status: ModifyStatusEffect; [Bloodstream] Effect: ModifyKnockdown; [Bloodstream] Status: Adrenaline; [Medicine] Effect: Electrogenetic; [Medicine] Deals Toxin 0.38 (if self > 10.5u); [Medicine] Deals Asphyxiation 1.5 (if self > 20u)",
    "effectTags": [
+    "adrenaline",
     "deals:asphyxiation",
     "deals:poison",
     "deals:toxin",
@@ -19767,7 +19811,8 @@
     "deals:asphyxiation",
     "deals:poison",
     "jitter",
-    "speed"
+    "speed",
+    "stutter"
    ],
    "metabolismPaths": [
     "Poison",
@@ -21595,6 +21640,7 @@
    "isDispenser": false,
    "effects": "[Bloodstream] Deals Poison 0.1; [Bloodstream] Deals Poison 1 Deals Asphyxiation 1.5 (if Cocaine > 11u); [Bloodstream] Deals Poison 0.75 Deals Asphyxiation 1.25 (if CrackCocaine < 0.01u); [Bloodstream] Speed walk=1.1 sprint=1.1; [Bloodstream] Status: ModifyStatusEffect; [Bloodstream] Status: Adrenaline; [Bloodstream] Status: ModifyStatusEffect; [Bloodstream] Effect: ModifyKnockdown; [Bloodstream] Status: ModifyStatusEffect (if Haloperidol < 0.01u); [Bloodstream] Status: Adrenaline; [Bloodstream] Effect: RemoveComponents; [Bloodstream] Resets narcolepsy (if Cocaine > 20u)",
    "effectTags": [
+    "adrenaline",
     "deals:asphyxiation",
     "deals:poison",
     "speed"
@@ -22302,6 +22348,7 @@
    "isDispenser": false,
    "effects": "[Digestion] Status: RatvarianLanguage; [Digestion] Thirst x2",
    "effectTags": [
+    "ratvarian",
     "thirst"
    ],
    "metabolismPaths": [
@@ -22754,6 +22801,7 @@
     "heals:burn",
     "heals:toxin",
     "hunger",
+    "ratvarian",
     "thirst"
    ],
    "metabolismPaths": [
@@ -23514,12 +23562,14 @@
    "isDispenser": false,
    "effects": "[Bloodstream] Deals Poison 1; [Bloodstream] Deals Poison 0.75 Deals Asphyxiation 1.25 (if CrackCocaine > 4u); [Bloodstream] Deals Poison 0.75 Deals Asphyxiation 1.25 (if Cocaine < 0.01u); [Bloodstream] Speed walk=1.25 sprint=1.25; [Bloodstream] Status: ModifyStatusEffect; [Bloodstream] Status: Adrenaline; [Bloodstream] Jitter; [Bloodstream] Status: Stutter; [Bloodstream] Jitter; [Bloodstream] Status: ModifyStatusEffect; [Bloodstream] Effect: ModifyKnockdown; [Bloodstream] Status: ModifyStatusEffect (if Haloperidol < 0.01u); [Bloodstream] Status: Adrenaline; [Bloodstream] Effect: RemoveComponents; [Bloodstream] Resets narcolepsy (if CrackCocaine > 1u); [Bloodstream] Drunk; [Bloodstream] Emote: Scream @5%; [Bloodstream] Effect: ModifyParalysis @10%; [Bloodstream] Emote: Jump @5%; [Bloodstream] Emote: Flip @5%",
    "effectTags": [
+    "adrenaline",
     "deals:asphyxiation",
     "deals:poison",
     "drunk",
     "emote",
     "jitter",
-    "speed"
+    "speed",
+    "stutter"
    ],
    "metabolismPaths": [
     "Bloodstream"
@@ -25039,6 +25089,9 @@
    "isDispenser": false,
    "effects": "[Digestion] Thirst x2; [Digestion] Adds 0.2u Ethanol; [Digestion] Status: KnockedDown; [Digestion] Status: Drowsiness; [Digestion] Status: Stutter",
    "effectTags": [
+    "drowsy",
+    "knockdown",
+    "stutter",
     "thirst"
    ],
    "metabolismPaths": [
@@ -25615,11 +25668,13 @@
    "isDispenser": false,
    "effects": "[Bloodstream] Deals Poison 0.55 Deals Blunt 1.1; [Bloodstream] Deals Poison 3 Deals Asphyxiation 2 (if Desoxyephedrine > 16u); [Bloodstream] Speed walk=1.2 sprint=1.2; [Bloodstream] Status: ModifyStatusEffect; [Bloodstream] Status: Adrenaline; [Bloodstream] Jitter; [Bloodstream] Status: Stutter; [Bloodstream] Status: ModifyStatusEffect; [Bloodstream] Status: ModifyStatusEffect (if Haloperidol < 0.01u); [Bloodstream] Resets narcolepsy (if Desoxyephedrine > 5u)",
    "effectTags": [
+    "adrenaline",
     "deals:asphyxiation",
     "deals:blunt",
     "deals:poison",
     "jitter",
-    "speed"
+    "speed",
+    "stutter"
    ],
    "metabolismPaths": [
     "Bloodstream"
@@ -26177,7 +26232,8 @@
    "isDispenser": false,
    "effects": "[Bloodstream] Removes 3.0u Histamine; [Bloodstream] Status: Jitter; [Bloodstream] Status: ModifyStatusEffect; [Bloodstream] Heals Poison 3",
    "effectTags": [
-    "heals:poison"
+    "heals:poison",
+    "jitter"
    ],
    "metabolismPaths": [
     "Bloodstream"
@@ -26982,10 +27038,14 @@
     "deals:poison",
     "drunk",
     "emote",
+    "hallucinating",
     "heals:brute",
     "heals:burn",
     "jitter",
+    "knockdown",
     "speed",
+    "stun",
+    "stutter",
     "thirst",
     "vomit"
    ],
@@ -27729,6 +27789,7 @@
    "effectTags": [
     "blood",
     "deals:poison",
+    "hallucinating",
     "heals:airloss",
     "heals:brute",
     "heals:burn",
@@ -28200,6 +28261,7 @@
    "effects": "[Digestion] Thirst x2; [Drink] Thirst x2 (if MetabolizerTypeCondition); [Drink] Status: ModifyStatusEffect; [Drink] Status: ShockProtection (if EnergyDrinkSunrise > 5u); [Drink] Jitter (if EnergyDrinkSunrise > 10u); [Drink] Temp -1500; [Drink] Temp -6000 (if body temp > 310K); [Drink] Adds 0.1u Theobromine",
    "effectTags": [
     "jitter",
+    "shock-immune",
     "temperature",
     "thirst"
    ],
@@ -28384,6 +28446,7 @@
    "isDispenser": false,
    "effects": "[Bloodstream] Removes 5u Histamine (if Histamine > 45u); [Bloodstream] Heals Asphyxiation 3 Heals Poison 0.5 (if mob state: Critical, Epinephrine < 20u); [Bloodstream] Heals Brute 0.5 (even) Heals Burn 0.5 (even) (if mob state: Critical, Epinephrine < 20u); [Bloodstream] Deals Asphyxiation 1 Deals Poison 1 (if Epinephrine > 20u); [Bloodstream] Removes 2u HeartbreakerToxin; [Bloodstream] Removes 1u Epinephrine (if HeartbreakerToxin > 1u); [Bloodstream] Adds 4u Histamine (if HeartbreakerToxin > 1u) @10%; [Bloodstream] Status: ModifyStatusEffect; [Bloodstream] Effect: ModifyKnockdown; [Bloodstream] Status: Adrenaline",
    "effectTags": [
+    "adrenaline",
     "deals:asphyxiation",
     "deals:poison",
     "heals:asphyxiation",
@@ -28694,6 +28757,7 @@
    "effectTags": [
     "deals:poison",
     "deals:radiation",
+    "hallucinating",
     "heals:asphyxiation",
     "heals:bloodloss",
     "heals:blunt",
@@ -28832,7 +28896,10 @@
    "isDispenser": false,
    "effects": "[Bloodstream] Deals Poison 1; [Bloodstream] Effect: ModifyBleed; [Bloodstream] Adds 0.1u Ethanol; [Bloodstream] Status: Adrenaline; [Bloodstream] Status: Stun; [Bloodstream] Status: KnockedDown",
    "effectTags": [
-    "deals:poison"
+    "adrenaline",
+    "deals:poison",
+    "knockdown",
+    "stun"
    ],
    "metabolismPaths": [
     "Bloodstream"
@@ -28924,7 +28991,8 @@
    "isDispenser": false,
    "effects": "[Bloodstream] Jitter; [Bloodstream] Status: Stutter; [Bloodstream] Status: ModifyStatusEffect; [Bloodstream] Resets narcolepsy (if Ethyloxyephedrine > 10u); [Bloodstream] Popup (local): ethyloxyephedrine effect feeling awake @10%",
    "effectTags": [
-    "jitter"
+    "jitter",
+    "stutter"
    ],
    "metabolismPaths": [
     "Bloodstream"
@@ -29244,13 +29312,15 @@
     "deals:slash",
     "drunk",
     "emote",
+    "hallucinating",
     "heals:brute",
     "heals:cold",
     "heals:heat",
     "heals:radiation",
     "heals:shock",
     "jitter",
-    "speed"
+    "speed",
+    "stutter"
    ],
    "metabolismPaths": [
     "Poison",
@@ -29474,6 +29544,7 @@
    "isDispenser": false,
    "effects": "[Digestion] Thirst x3; [Drink] Thirst x2; [Drink] Adds 0.3u Ethanol; [Narcotic] Thirst x2; [Narcotic] Status: SeeingRainbows (if organ: Thaven)",
    "effectTags": [
+    "hallucinating",
     "thirst"
    ],
    "metabolismPaths": [
@@ -30488,7 +30559,9 @@
    "isBase": true,
    "isDispenser": false,
    "effects": "[Narcotic] Adds 1u ForeverWeed (if ForeverWeed < 5u); [Narcotic] Status: SeeingRainbows; [Narcotic] Popup (local): foreverweed effect longtime @1%",
-   "effectTags": [],
+   "effectTags": [
+    "hallucinating"
+   ],
    "metabolismPaths": [
     "Narcotic"
    ],
@@ -31473,7 +31546,9 @@
    "isDispenser": false,
    "effects": "[Poison] Emote: Yawn @10%; [Poison] Effect: MovespeedModifier (if organ: Yowie); [Poison] Status: Drowsiness (if organ: Yowie); [Poison] Status: ForcedSleep (if organ: Yowie, Gestalzitine > 30u)",
    "effectTags": [
-    "emote"
+    "drowsy",
+    "emote",
+    "sleep"
    ],
    "metabolismPaths": [
     "Poison"
@@ -31946,6 +32021,7 @@
     "deals:poison",
     "heals:brute",
     "heals:burn",
+    "stutter",
     "thirst",
     "vomit"
    ],
@@ -32398,6 +32474,7 @@
    "isDispenser": false,
    "effects": "[Digestion] Thirst x3; [Drink] Thirst x2 (if MetabolizerTypeCondition); [Drink] Status: Drowsiness; [Drink] Adds 0.05u Theobromine",
    "effectTags": [
+    "drowsy",
     "thirst"
    ],
    "metabolismPaths": [
@@ -33291,7 +33368,8 @@
    "isDispenser": false,
    "effects": "[Bloodstream] Emote: Yawn @10%; [Bloodstream] Status: ModifyStatusEffect; [Bloodstream] Status: Jitter; [Bloodstream] Status: ModifyStatusEffect; [Bloodstream] Removes 3.0u Desoxyephedrine; [Bloodstream] Removes 3.0u Ephedrine; [Bloodstream] Removes 3.0u Stimulants; [Bloodstream] Removes 3.0u THC; [Bloodstream] Removes 3.0u SpaceDrugs; [Bloodstream] Removes 3.0u Bananadine; [Bloodstream] Removes 3.0u SpaceGlue; [Bloodstream] Removes 3.0u MindbreakerToxin",
    "effectTags": [
-    "emote"
+    "emote",
+    "jitter"
    ],
    "metabolismPaths": [
     "Bloodstream"
@@ -33441,7 +33519,8 @@
     "heals:airloss",
     "heals:brute",
     "heals:burn",
-    "heals:toxin"
+    "heals:toxin",
+    "sleep"
    ],
    "metabolismPaths": [
     "Narcotic",
@@ -33980,10 +34059,12 @@
    "isDispenser": false,
    "effects": "[Medicine] Effect: SuppressPain; [Medicine] Status: Adrenaline; [Medicine] Deals Poison 2 Deals Cold 0.25 Deals Asphyxiation 0.75 (if Heroin > 10.5u, MetabolizerTypeCondition); [Medicine] Status: SeeingRainbows (if Heroin > 10.5u); [Medicine] Drunk (if Heroin > 10.5u); [Medicine] Effect: AdjustConsciousness",
    "effectTags": [
+    "adrenaline",
     "deals:asphyxiation",
     "deals:cold",
     "deals:poison",
-    "drunk"
+    "drunk",
+    "hallucinating"
    ],
    "metabolismPaths": [
     "Medicine"
@@ -40966,6 +41047,7 @@
    "effectTags": [
     "deals:caustic",
     "jitter",
+    "stutter",
     "thirst",
     "vomit"
    ],
@@ -42648,6 +42730,7 @@
    "isDispenser": false,
    "effects": "[Food] Hunger x-1; [Food] Thirst x-1; [Narcotic] Status: SeeingRainbows",
    "effectTags": [
+    "hallucinating",
     "hunger",
     "thirst"
    ],
@@ -44091,7 +44174,9 @@
    "isBase": false,
    "isDispenser": false,
    "effects": "[Medicine] Status: ClawsGrowthSuppression",
-   "effectTags": [],
+   "effectTags": [
+    "claw-suppression"
+   ],
    "metabolismPaths": [
     "Medicine"
    ],
@@ -44948,6 +45033,7 @@
    "isDispenser": false,
    "effects": "[Digestion] Status: Muted; [Digestion] Thirst x2",
    "effectTags": [
+    "mute",
     "thirst"
    ],
    "metabolismPaths": [
@@ -45912,6 +45998,7 @@
    "effects": "[Narcotic] Heals Brute 1 Heals Heat 0.5 Heals Shock 0.5 Heals Cold 0.5 Heals Radiation 0.5 (if MetabolizerTypeCondition); [Narcotic] Emote: Yawn @3%; [Narcotic] Status: Drowsiness; [Narcotic] Effect: SuppressPain; [Narcotic] Deals Asphyxiation 2 (if MetabolizerTypeCondition, Morphine > 16u); [Narcotic] Effect: AdjustConsciousness (if Morphine > 16u)",
    "effectTags": [
     "deals:asphyxiation",
+    "drowsy",
     "emote",
     "heals:brute",
     "heals:cold",
@@ -46283,6 +46370,7 @@
    "effects": "[Digestion] Thirst x3; [Medicine] Blood level 3 (if HasComponentCondition); [Medicine] Heals Burn 5 Heals Toxin 5 Heals Airloss 5 Heals Brute 5 Heals Genetic 5 (if HasComponentCondition); [Medicine] Effect: ModifyBleed (if HasComponentCondition); [Medicine] Effect: CleanBloodstream (if HasComponentCondition); [Medicine] Status: SeeingRainbows (if HasComponentCondition)",
    "effectTags": [
     "blood",
+    "hallucinating",
     "heals:airloss",
     "heals:brute",
     "heals:burn",
@@ -46625,7 +46713,9 @@
    "isBase": false,
    "isDispenser": false,
    "effects": "[Bloodstream] Status: Muted",
-   "effectTags": [],
+   "effectTags": [
+    "mute"
+   ],
    "metabolismPaths": [
     "Bloodstream"
    ],
@@ -46687,7 +46777,9 @@
    "isBase": true,
    "isDispenser": false,
    "effects": "[Narcotic] Status: Muted",
-   "effectTags": [],
+   "effectTags": [
+    "mute"
+   ],
    "metabolismPaths": [
     "Narcotic"
    ],
@@ -46783,6 +46875,7 @@
     "deals:asphyxiation",
     "deals:poison",
     "jitter",
+    "stutter",
     "thirst"
    ],
    "metabolismPaths": [
@@ -46988,6 +47081,7 @@
    "isDispenser": false,
    "effects": "[Digestion] Thirst x3; [Drink] Thirst x2; [Drink] Status: Drowsiness",
    "effectTags": [
+    "drowsy",
     "thirst"
    ],
    "metabolismPaths": [
@@ -47057,6 +47151,7 @@
    "isDispenser": false,
    "effects": "[Digestion] Thirst x3; [Drink] Thirst x2; [Drink] Status: Drowsiness",
    "effectTags": [
+    "drowsy",
     "thirst"
    ],
    "metabolismPaths": [
@@ -47126,6 +47221,7 @@
    "isDispenser": false,
    "effects": "[Digestion] Thirst x3; [Drink] Thirst x2; [Drink] Status: Drowsiness",
    "effectTags": [
+    "drowsy",
     "thirst"
    ],
    "metabolismPaths": [
@@ -47307,6 +47403,7 @@
    "isDispenser": false,
    "effects": "[Digestion] Thirst x3; [Drink] Thirst x2; [Drink] Status: Drowsiness",
    "effectTags": [
+    "drowsy",
     "thirst"
    ],
    "metabolismPaths": [
@@ -48222,6 +48319,7 @@
    "effectTags": [
     "deals:asphyxiation",
     "deals:poison",
+    "hallucinating",
     "vomit"
    ],
    "metabolismPaths": [
@@ -48436,7 +48534,8 @@
    "effects": "[Narcotic] Effect: NitriumMovespeedModifier (if Nitrium in range 1..8u); [Narcotic] Effect: NitriumMovespeedModifier (if Nitrium in range 8..12u); [Narcotic] Effect: NitriumMovespeedModifier (if Nitrium > 12u); [Narcotic] Effect: AddReagentToBlood (if Nitrium > 6u); [Narcotic] Status: Stutter (if Nitrium > 8u); [Narcotic] Deals Asphyxiation 15 (if Nitrium > 10u); [Narcotic] Oxygenates blood (if MetabolizerTypeCondition); [Gas] Effect: NitriumMovespeedModifier (if Nitrium in range 1..8u); [Gas] Effect: NitriumMovespeedModifier (if Nitrium in range 8..12u); [Gas] Effect: NitriumMovespeedModifier (if Nitrium > 12u); [Gas] Effect: AddReagentToBlood (if MetabolizerTypeCondition, Nitrium > 6u); [Gas] Status: Stutter (if Nitrium > 8u); [Gas] Deals Asphyxiation 15 (if MetabolizerTypeCondition, Nitrium > 10u); [Gas] Oxygenates blood (if MetabolizerTypeCondition)",
    "effectTags": [
     "deals:asphyxiation",
-    "heals:airloss"
+    "heals:airloss",
+    "stutter"
    ],
    "metabolismPaths": [
     "Narcotic",
@@ -48593,7 +48692,10 @@
    "effects": "[Gas] Jitter; [Narcotic] Jitter; [Narcotic] Status: ModifyStatusEffect; [Narcotic] Status: KnockedDown; [Narcotic] Status: Drowsiness; [Narcotic] Status: ForcedSleep; [Narcotic] Deals Poison 0.1; [Narcotic] Effect: RemoveComponentEffect; [Medicine] Resets narcolepsy (if NitrosylPlasmide > 1u)",
    "effectTags": [
     "deals:poison",
-    "jitter"
+    "drowsy",
+    "jitter",
+    "knockdown",
+    "sleep"
    ],
    "metabolismPaths": [
     "Gas",
@@ -50175,6 +50277,7 @@
    "isDispenser": false,
    "effects": "[Medicine] Effect: SuppressPain; [Medicine] Status: Adrenaline; [Medicine] Deals Poison 1.2 (if Oxycodone > 10.5u, MetabolizerTypeCondition); [Medicine] Effect: AdjustConsciousness",
    "effectTags": [
+    "adrenaline",
     "deals:poison"
    ],
    "metabolismPaths": [
@@ -50535,7 +50638,9 @@
    "isBase": false,
    "isDispenser": false,
    "effects": "[Bloodstream] Status: Pacified",
-   "effectTags": [],
+   "effectTags": [
+    "pacified"
+   ],
    "metabolismPaths": [
     "Bloodstream"
    ],
@@ -50707,7 +50812,8 @@
    "effects": "[Poison] Removes 5u ?; [Poison] Deals Radiation 2 (if TypedDamageThresholdCondition, MetabolizerTypeCondition); [Poison] Status: Stutter; [Poison] Jitter",
    "effectTags": [
     "deals:radiation",
-    "jitter"
+    "jitter",
+    "stutter"
    ],
    "metabolismPaths": [
     "Poison"
@@ -50826,7 +50932,8 @@
    "effects": "[Medicine] Effect: CleanBloodstream; [Medicine] Heals Poison 2 Heals Radiation 2; [Medicine] Status: RadiationProtection",
    "effectTags": [
     "heals:poison",
-    "heals:radiation"
+    "heals:radiation",
+    "rad-protection"
    ],
    "metabolismPaths": [
     "Medicine"
@@ -53499,7 +53606,8 @@
    "isDispenser": false,
    "effects": "[Drink] Emote: MonkeyScreeches @18%; [Drink] Effect: Polymorph (if NFIsHumanoid, self > 50u); [Drink] Removes 20u Primatine (if self > 50u); [Drink] Status: Stutter",
    "effectTags": [
-    "emote"
+    "emote",
+    "stutter"
    ],
    "metabolismPaths": [
     "Drink"
@@ -53540,7 +53648,9 @@
    "effects": "[Medicine] Heals Brute 1.5; [Medicine] Effect: TakeStaminaDamage (if Probital > 20u, MetabolizerTypeCondition); [Medicine] Speed walk=0.8 sprint=0.8 (if StaminaDamageThreshold, Probital > 20u, MetabolizerTypeCondition); [Medicine] Status: Stutter (if StaminaDamageThreshold, Probital > 20u); [Medicine] Status: ForcedSleep (if StaminaDamageThreshold, Probital > 20u, MetabolizerTypeCondition); [Medicine] Effect: TakeStaminaDamage (if StaminaDamageThreshold, Probital > 20u, MetabolizerTypeCondition); [Medicine] Adds 0.125u Mitogen",
    "effectTags": [
     "heals:brute",
-    "speed"
+    "sleep",
+    "speed",
+    "stutter"
    ],
    "metabolismPaths": [
     "Medicine"
@@ -53724,7 +53834,9 @@
    "isBase": false,
    "isDispenser": false,
    "effects": "[Poison] Status: Vulgarity",
-   "effectTags": [],
+   "effectTags": [
+    "vulgar"
+   ],
    "metabolismPaths": [
     "Poison"
    ],
@@ -53971,7 +54083,8 @@
    "isDispenser": false,
    "effects": "[Bloodstream] Deals Poison 2 (if Psicodine > 30u); [Bloodstream] Status: ModifyStatusEffect (if Psicodine > 30u); [Bloodstream] Status: Jitter; [Bloodstream] Status: ModifyStatusEffect; [Bloodstream] Popup (local): psicodine effect fearless @20%",
    "effectTags": [
-    "deals:poison"
+    "deals:poison",
+    "jitter"
    ],
    "metabolismPaths": [
     "Bloodstream"
@@ -54406,6 +54519,7 @@
    "isDispenser": false,
    "effects": "[Digestion] Thirst x2; [Drink] Thirst x2 (if MetabolizerTypeCondition); [Drink] Status: ModifyStatusEffect; [Drink] Temp -2000; [Drink] Temp -6000 (if body temp > 310K); [Narcotic] Status: ModifyStatusEffect; [Narcotic] Status: ModifyStatusEffect; [Narcotic] Effect: ModifyKnockdown; [Narcotic] Status: ModifyStatusEffect; [Narcotic] Status: Adrenaline",
    "effectTags": [
+    "adrenaline",
     "temperature",
     "thirst"
    ],
@@ -55376,7 +55490,9 @@
    "isBase": true,
    "isDispenser": false,
    "effects": "[Poison] Effect: Hypoxemic; [Poison] Status: Drowsiness",
-   "effectTags": [],
+   "effectTags": [
+    "drowsy"
+   ],
    "metabolismPaths": [
     "Poison"
    ],
@@ -56561,7 +56677,9 @@
    "isBase": true,
    "isDispenser": true,
    "effects": "[Poison] Status: Stutter",
-   "effectTags": [],
+   "effectTags": [
+    "stutter"
+   ],
    "metabolismPaths": [
     "Poison"
    ],
@@ -58556,6 +58674,7 @@
    "isDispenser": false,
    "effects": "[Bloodstream] Speed walk=1.25 sprint=1.25; [Bloodstream] Status: ModifyStatusEffect; [Bloodstream] Status: ModifyStatusEffect; [Bloodstream] Effect: ModifyKnockdown; [Bloodstream] Status: ModifyStatusEffect; [Bloodstream] Status: Adrenaline; [Bloodstream] Jitter; [Bloodstream] Deals Poison 3 (if Stimulants > 45u); [Bloodstream] Status: ModifyStatusEffect (if Haloperidol < 0.01u); [Bloodstream] Removes 10u ChloralHydrate (if ChloralHydrate > 1u); [Bloodstream] Effect: ModifyBleed; [Bloodstream] Heals Burn 0.5 (even) Heals Brute 0.5 (even) (if mob state: Critical); [Bloodstream] Heals Asphyxiation 2 (if mob state: Critical); [Bloodstream] Resets narcolepsy; [Bloodstream] Hunger x1; [Bloodstream] Thirst x1; [Narcotic] Effect: MovespeedModifier; [Narcotic] Status: StaminaModifier",
    "effectTags": [
+    "adrenaline",
     "deals:poison",
     "heals:asphyxiation",
     "heals:brute",
@@ -58563,6 +58682,7 @@
     "hunger",
     "jitter",
     "speed",
+    "stamina",
     "thirst"
    ],
    "metabolismPaths": [
@@ -60734,6 +60854,7 @@
    "isDispenser": false,
    "effects": "[Bloodstream] Heals Brute 4 (even); [Bloodstream] Status: Adrenaline",
    "effectTags": [
+    "adrenaline",
     "heals:brute"
    ],
    "metabolismPaths": [
@@ -61852,10 +61973,12 @@
    "isDispenser": false,
    "effects": "[Poison] Deals Poison 2; [Poison] Speed walk=0.7 sprint=0.7; [Poison] Status: Stutter; [Poison] Jitter; [Poison] Effect: ModifyParalysis (if Sarin > 5u) @50%; [Poison] Popup (local): generic reagent effect burning eyes @8%; [Poison] Popup (local): norepinephricacid effect eye disconnect (if Sarin > 5u) @3%; [Poison] Emote: Scream @8%; [Poison] Status: TemporaryBlindness (if Sarin > 2.5u)",
    "effectTags": [
+    "blind",
     "deals:poison",
     "emote",
     "jitter",
-    "speed"
+    "speed",
+    "stutter"
    ],
    "metabolismPaths": [
     "Poison"
@@ -62591,6 +62714,7 @@
    "isDispenser": false,
    "effects": "[Food] Hunger x1; [Food] Thirst x1; [Narcotic] Status: SeeingRainbows (if organ: Thaven)",
    "effectTags": [
+    "hallucinating",
     "hunger",
     "thirst"
    ],
@@ -62795,6 +62919,7 @@
    "effects": "[Narcotic] Status: SeeingRainbows (if organ: Goblin); [Narcotic] Emote: Laugh (if organ: Goblin) @8%; [Narcotic] Emote: GoblinMutter (if organ: Goblin) @5%; [Narcotic] Emote: Hiss (if organ: Goblin) @2%; [Narcotic] Popup (local): shroom mix effect nf procrastination visions 01 (if organ: Goblin) @5%; [Narcotic] Emote: Scream @1%; [Narcotic] Emote: Gasp @3%; [Narcotic] Jitter (if self > 1u, organ: Goblin); [Narcotic] Vomit (if organ: Goblin) @2%; [Narcotic] Thirst x-1 (if organ: Goblin); [Narcotic] Hunger x-1 (if organ: Goblin)",
    "effectTags": [
     "emote",
+    "hallucinating",
     "hunger",
     "jitter",
     "thirst",
@@ -63128,6 +63253,7 @@
    "isDispenser": false,
    "effects": "[Digestion] Status: Muted; [Digestion] Thirst x2",
    "effectTags": [
+    "mute",
     "thirst"
    ],
    "metabolismPaths": [
@@ -64968,7 +65094,9 @@
    "isBase": false,
    "isDispenser": false,
    "effects": "[Bloodstream] Status: ModifyStatusEffect; [Digestion] Status: Muted",
-   "effectTags": [],
+   "effectTags": [
+    "mute"
+   ],
    "metabolismPaths": [
     "Bloodstream",
     "Digestion"
@@ -65282,6 +65410,8 @@
     "emote",
     "heals:blunt",
     "jitter",
+    "pressure-immune",
+    "stutter",
     "thirst"
    ],
    "metabolismPaths": [
@@ -65581,7 +65711,12 @@
    "isBase": false,
    "isDispenser": false,
    "effects": "[Narcotic] Effect: MovespeedModifier; [Narcotic] Status: Stun; [Narcotic] Status: KnockedDown; [Narcotic] Status: Drowsiness (if Haloperidol < 0.01u); [Narcotic] Status: Adrenaline",
-   "effectTags": [],
+   "effectTags": [
+    "adrenaline",
+    "drowsy",
+    "knockdown",
+    "stun"
+   ],
    "metabolismPaths": [
     "Narcotic"
    ],
@@ -65997,7 +66132,8 @@
     "heals:airloss",
     "heals:brute",
     "heals:burn",
-    "heals:toxin"
+    "heals:toxin",
+    "sleep"
    ],
    "metabolismPaths": [
     "Medicine"
@@ -66292,6 +66428,7 @@
    "isDispenser": false,
    "effects": "[Bloodstream] Speed walk=1.25 sprint=1.25; [Bloodstream] Status: ModifyStatusEffect; [Bloodstream] Status: ModifyStatusEffect; [Bloodstream] Effect: ModifyKnockdown; [Bloodstream] Status: ModifyStatusEffect; [Bloodstream] Status: Adrenaline; [Bloodstream] Jitter; [Bloodstream] Deals Poison 3 (if Stimulants > 45u); [Bloodstream] Status: ModifyStatusEffect (if Haloperidol < 0.01u); [Bloodstream] Removes 10u ChloralHydrate (if ChloralHydrate > 1u); [Bloodstream] Effect: ModifyBleed; [Bloodstream] Heals Burn 0.5 (even) Heals Brute 0.5 (even) (if mob state: Critical); [Bloodstream] Heals Asphyxiation 2 (if mob state: Critical); [Bloodstream] Resets narcolepsy; [Bloodstream] Hunger x1; [Bloodstream] Thirst x1",
    "effectTags": [
+    "adrenaline",
     "deals:poison",
     "heals:asphyxiation",
     "heals:brute",
@@ -69743,7 +69880,9 @@
    "isBase": false,
    "isDispenser": false,
    "effects": "[Drink] Status: Centered",
-   "effectTags": [],
+   "effectTags": [
+    "centered"
+   ],
    "metabolismPaths": [
     "Drink"
    ],
@@ -70424,6 +70563,7 @@
    "isDispenser": false,
    "effects": "[Medicine] Effect: SuppressPain; [Medicine] Status: Adrenaline; [Medicine] Deals Poison 0.8 (if Tramadol > 15.5u, MetabolizerTypeCondition); [Medicine] Effect: AdjustConsciousness",
    "effectTags": [
+    "adrenaline",
     "deals:poison"
    ],
    "metabolismPaths": [
@@ -70543,7 +70683,10 @@
    "isBase": true,
    "isDispenser": false,
    "effects": "[Poison] Popup (local): reagent popup tranquility @20%; [Poison] Status: Muted (if Tranquility > 5u); [Poison] Status: Pacified (if Tranquility > 10u); [Poison] Effect: Polymorph (if Tranquility > 25u)",
-   "effectTags": [],
+   "effectTags": [
+    "mute",
+    "pacified"
+   ],
    "metabolismPaths": [
     "Poison"
    ],
@@ -70785,6 +70928,7 @@
     "deals:blunt",
     "deals:poison",
     "jitter",
+    "stutter",
     "vomit"
    ],
    "metabolismPaths": [
@@ -75223,11 +75367,13 @@
    "isDispenser": false,
    "effects": "[Medicine] Heals Burn 3 Heals Brute 3 Heals Toxin 3 Heals Airloss 3 Heals Genetic 3; [Medicine] Status: ModifyStatusEffect; [Narcotic] Status: KnockedDown; [Narcotic] Status: ModifyStatusEffect; [Narcotic] Status: ModifyStatusEffect; [Narcotic] Status: Adrenaline; [Narcotic] Effect: TakeStaminaDamage; [Narcotic] Effect: SuppressPain",
    "effectTags": [
+    "adrenaline",
     "heals:airloss",
     "heals:brute",
     "heals:burn",
     "heals:genetic",
-    "heals:toxin"
+    "heals:toxin",
+    "knockdown"
    ],
    "metabolismPaths": [
     "Medicine",

@@ -1120,6 +1120,36 @@ def compute_strategy_verification_status(
     return {"status": status, "loreWarnings": warnings}
 
 
+# Canonical filter-chip labels for metabolism status effects. Status effects
+# render as "Status: <key>" in the effects string; keys not listed here fall
+# through to key.lower() (already clean: stun, stutter, adrenaline, drunk,
+# jitter, unconscious, pacified, dementia, anesthesia, centered). The combat
+# labels deliberately match _ANTAG_TAG_WEIGHTS (sleep/mute/blind/stun) so the
+# antag score picks them up. Generic keys (ModifyStatusEffect/GenericStatusEffect)
+# carry no specific status and are skipped in extract_effect_tags.
+STATUS_TAG_LABELS = {
+    # Combat / crowd-control
+    "forcedsleep": "sleep",
+    "temporaryblindness": "blind",
+    "muted": "mute",
+    "knockeddown": "knockdown",
+    # Disorientation / impairment
+    "seeingrainbows": "hallucinating",
+    "drowsiness": "drowsy",
+    "painnumbness": "numbness",
+    "staminamodifier": "stamina",
+    # Protections / buffs
+    "pressureimmunity": "pressure-immune",
+    "shockprotection": "shock-immune",
+    "radiationprotection": "rad-protection",
+    "scramblednaeffect": "dna-scramble",
+    "clawsgrowthsuppression": "claw-suppression",
+    # Flavour / niche
+    "ratvarianlanguage": "ratvarian",
+    "vulgarity": "vulgar",
+}
+
+
 def extract_effect_tags(metabolisms: dict) -> list[str]:
     """Extract searchable effect type tags from metabolisms for filtering."""
     if not metabolisms or not isinstance(metabolisms, dict):
@@ -1174,12 +1204,13 @@ def extract_effect_tags(metabolisms: dict) -> list[str]:
                 tags.add("temperature")
             elif "ModifyStatusEffect" in etype or "GenericStatusEffect" in etype:
                 # Status effects render as "Status: <key>" in the human-readable
-                # effects string (see summarize_single_effect). Expose Unconscious
-                # as a filterable tag so sedative/knockout chems surface in the
-                # Effects sidebar; other status keys stay untagged for now.
-                key = str(eff.get("key", eff.get("statusEffectId", ""))).lower()
-                if key == "unconscious":
-                    tags.add("unconscious")
+                # effects string (see summarize_single_effect). Tag by the
+                # specific status key so knockout/blind/mute/etc. become filter
+                # chips. Effects with no explicit key are generic no-ops (they
+                # show as "Status: ModifyStatusEffect") — skip them.
+                key = str(eff.get("key") or eff.get("statusEffectId") or "").lower()
+                if key:
+                    tags.add(STATUS_TAG_LABELS.get(key, key))
     return sorted(tags)
 
 
