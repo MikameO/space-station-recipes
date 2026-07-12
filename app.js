@@ -97,6 +97,7 @@ async function init() {
   setupReverseLookup();
   setupBatchPlanner();
   renderPresetBar(); // A2: shift-start preset chips
+  setupForkDiff(); // B1
   setupShareButton();
   setupDisclaimer();
   setupAntagMode();
@@ -514,6 +515,7 @@ function renderCurrentTab() {
   if (activeTab === 'reagents') renderReagents(query);
   else if (activeTab === 'reactions') renderReactions(query);
   else if (activeTab === 'medbay') renderMedbay();
+  else if (activeTab === 'forkdiff') renderForkDiff();
   else if (activeTab === 'graph') renderGraph();
   else if (activeTab === 'botany') renderBotany(query);
   else if (activeTab === 'stats') renderStatsTab();
@@ -1272,6 +1274,85 @@ function rebuildDetailTree() {
 }
 
 // ─────────────────────────────────────────────
+// Fork Diff — "moved servers, what changed?" (B1)
+// Membership diffs come from the same fork-visibility rules as the filters;
+// recipe-change notes are the build-time comparator's forkNotes strings.
+// ─────────────────────────────────────────────
+
+function setupForkDiff() {
+  const fromSel = document.getElementById('forkDiffFrom');
+  const toSel = document.getElementById('forkDiffTo');
+  if (!fromSel || !toSel) return;
+  // meta.forks already lists vanilla first — no need to prepend it
+  const opts = Object.entries(DATA.meta?.forks || {}).map(([id, f]) => [id, f.name || id]);
+  for (const [id, name] of opts) {
+    fromSel.add(new Option(name, id));
+    toSel.add(new Option(name, id));
+  }
+  const firstFork = opts.find(([id]) => id !== 'vanilla');
+  fromSel.value = 'vanilla';
+  toSel.value = firstFork ? firstFork[0] : 'vanilla';
+  fromSel.addEventListener('change', renderForkDiff);
+  toSel.addEventListener('change', renderForkDiff);
+}
+
+function renderForkDiff() {
+  const el = document.getElementById('forkDiffResults');
+  const from = document.getElementById('forkDiffFrom')?.value;
+  const to = document.getElementById('forkDiffTo')?.value;
+  if (!el || !from || !to) return;
+  if (from === to) {
+    el.innerHTML = '<div class="empty-state"><div class="empty-state-headline">Pick two different forks to compare.</div></div>';
+    return;
+  }
+  track('forkdiff_view', { from, to });
+
+  const addedR = [], removedR = [];
+  for (const r of Object.values(DATA.reagents)) {
+    const inF = reagentInFork(r, from), inT = reagentInFork(r, to);
+    if (!inF && inT) addedR.push(r);
+    else if (inF && !inT) removedR.push(r);
+  }
+  const addedX = [], removedX = [], modX = [];
+  for (const rx of Object.values(DATA.reactions)) {
+    const inF = reactionInFork(rx, from), inT = reactionInFork(rx, to);
+    if (!inF && inT) addedX.push(rx);
+    else if (inF && !inT) removedX.push(rx);
+    else if (inF && inT) {
+      const noteF = rx.forkNotes?.[from] || '';
+      const noteT = rx.forkNotes?.[to] || '';
+      if (noteF !== noteT) modX.push({ rx, noteF, noteT });
+    }
+  }
+  const byName = arr => arr.sort((a, b) => (a.name || a.id).localeCompare(b.name || b.id));
+  byName(addedR); byName(removedR);
+  const byId = arr => arr.sort((a, b) => (a.rx ? a.rx.id : a.id).localeCompare(b.rx ? b.rx.id : b.id));
+  byId(addedX); byId(removedX); byId(modX);
+
+  const chip = r => `<button class="diff-chip" onclick="openDetail('${esc(r.id)}')">${esc(capName(r.name || r.id))}</button>`;
+  const rxRow = rx => `<span class="diff-chip diff-chip-static">${esc(rx.id)}</span>`;
+  const section = (title, cls, items, renderer) => items.length
+    ? `<div class="diff-section">
+        <h3 class="diff-h ${cls}">${title} <span class="diff-count">${items.length}</span></h3>
+        <div class="diff-body">${items.map(renderer).join('')}</div>
+      </div>`
+    : '';
+  const modRow = m => `<div class="diff-mod">
+      <span class="diff-mod-id">${esc(m.rx.id)}</span>
+      <span class="diff-mod-note">${esc(m.noteF || 'vanilla recipe')} &#8594; ${esc(m.noteT || 'vanilla recipe')}</span>
+    </div>`;
+
+  const total = addedR.length + removedR.length + addedX.length + removedX.length + modX.length;
+  el.innerHTML = total === 0
+    ? '<div class="empty-state"><div class="empty-state-headline">No differences — these forks share the same chemistry.</div></div>'
+    : section('Reagents you gain', 'diff-added', addedR, chip)
+    + section('Reagents you lose', 'diff-removed', removedR, chip)
+    + section('Reactions you gain', 'diff-added', addedX, rxRow)
+    + section('Reactions you lose', 'diff-removed', removedX, rxRow)
+    + section('Recipes that differ', 'diff-modified', modX, modRow);
+}
+
+// ─────────────────────────────────────────────
 // What Heals? — medical mode (A3)
 // Damage-type chips are built from live heals:* effectTags, so fork-added
 // damage types appear without code changes.
@@ -1281,10 +1362,9 @@ let activeHealType = null;
 
 // Same source-visibility rules as filterReagents, minus sidebar filters —
 // the medbay mode stands alone.
-function reagentInActiveFork(r) {
-  if (activeSource === 'vanilla') return r.source === 'vanilla';
-  if (activeSource === 'all') return true;
-  const forkId = activeSource;
+function reagentInFork(r, forkId) {
+  if (forkId === 'vanilla') return r.source === 'vanilla';
+  if (forkId === 'all') return true;
   if (!forkVisible(r, forkId)) return false;
   // Vanilla/ancestor reagent: hide when its recipe is blocked on this fork
   if (r.source !== forkId) {
@@ -1292,6 +1372,14 @@ function reagentInActiveFork(r) {
     if (rxn && rxn.forkStatus && rxn.forkStatus[forkId] === 'blocked') return false;
   }
   return true;
+}
+
+function reagentInActiveFork(r) { return reagentInFork(r, activeSource); }
+
+function reactionInFork(rx, forkId) {
+  if (forkId === 'vanilla') return rx.source === 'vanilla';
+  if (forkId === 'all') return true;
+  return forkVisible(rx, forkId);
 }
 
 // Parse "Heals <Type> <N>" out of the effects clause list for one heal tag.
@@ -2814,7 +2902,7 @@ function decodeURLState() {
 
   // Tab (whitelist)
   const tab = params.get('tab');
-  const validTabs = ['reagents','reactions','calculator','medbay','trees','graph','stats','antag'];
+  const validTabs = ['reagents','reactions','calculator','medbay','forkdiff','trees','graph','stats','antag'];
   if (tab && validTabs.includes(tab)) {
     const btn = document.querySelector(`.tab-btn[data-tab="${CSS.escape(tab)}"]`);
     if (btn) btn.click();

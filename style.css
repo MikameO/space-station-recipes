@@ -579,6 +579,60 @@ main {
 .heal-cond { color: var(--amber-warn, #ffb627); font-weight: 700; }
 .badge-access { border-left-color: var(--text-ghost); text-transform: none; }
 
+/* B1: Fork Diff */
+.forkdiff-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 12px 0 16px;
+  font-family: 'Oxanium', sans-serif;
+  font-size: 12px;
+  color: var(--text-sub);
+}
+.forkdiff-arrow { color: var(--phosphor); font-size: 16px; }
+.diff-section { margin-bottom: 18px; }
+.diff-h {
+  font-family: 'Oxanium', sans-serif;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  margin-bottom: 8px;
+}
+.diff-h.diff-added { color: var(--phosphor); }
+.diff-h.diff-removed { color: var(--red-alert); }
+.diff-h.diff-modified { color: var(--amber-warn, #ffb627); }
+.diff-count {
+  font-size: 10px;
+  border: 1px solid currentColor;
+  padding: 0 5px;
+  border-radius: 2px;
+  vertical-align: middle;
+}
+.diff-body { display: flex; flex-wrap: wrap; gap: 6px; }
+.diff-chip {
+  padding: 3px 9px;
+  background: var(--hull-plate);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-sub);
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 11px;
+  cursor: pointer;
+}
+.diff-chip:hover { border-color: var(--phosphor); color: var(--phosphor); }
+.diff-chip-static { cursor: default; }
+.diff-chip-static:hover { border-color: var(--border-subtle); color: var(--text-sub); }
+.diff-mod {
+  width: 100%;
+  display: flex;
+  gap: 10px;
+  padding: 5px 8px;
+  background: rgba(255,182,39,0.04);
+  border-left: 2px solid var(--amber-warn, #ffb627);
+  font-size: 11px;
+}
+.diff-mod-id { font-family: 'Share Tech Mono', monospace; color: var(--text-sub); white-space: nowrap; }
+.diff-mod-note { color: var(--text-ghost); }
+
 .tab-panel {
   display: none;
   flex: 1;

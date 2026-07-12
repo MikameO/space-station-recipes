@@ -72,7 +72,7 @@
   "license": "https://github.com/MikameO/space-station-recipes/blob/main/LICENSE"
 }
 </script>
-<link rel="stylesheet" href="style.css?v=15">
+<link rel="stylesheet" href="style.css?v=16">
 <!-- Yandex.Metrika counter -->
 <script type="text/javascript">
     (function(m,e,t,r,i,k,a){
@@ -195,6 +195,7 @@
           <button class="tab-btn" id="btn-reactions" data-tab="reactions" role="tab" aria-selected="false" aria-controls="tab-reactions">Reactions</button>
           <button class="tab-btn" id="btn-graph" data-tab="graph" role="tab" aria-selected="false" aria-controls="tab-graph">Graph</button>
           <button class="tab-btn" id="btn-stats" data-tab="stats" role="tab" aria-selected="false" aria-controls="tab-stats">Stats</button>
+          <button class="tab-btn" id="btn-forkdiff" data-tab="forkdiff" role="tab" aria-selected="false" aria-controls="tab-forkdiff">Fork Diff</button>
         </div>
       </div>
       <button class="tab-btn tab-btn-antag" id="btn-antag" data-tab="antag" role="tab" aria-selected="false" aria-controls="tab-antag" style="display:none">&#9760; Antag Strategies</button>
@@ -295,6 +296,17 @@
     </div>
 
     <!-- Craft Trees Tab -->
+    <!-- Fork Diff Tab (B1): moved servers — what changed? -->
+    <div class="tab-panel" id="tab-forkdiff" role="tabpanel" aria-labelledby="btn-forkdiff">
+      <p class="reverse-desc">Moving between servers? Pick two forks — see what's added, removed or rebalanced. Notes come from the build-time comparator (verified against fork YAML).</p>
+      <div class="forkdiff-controls">
+        <label>From <select id="forkDiffFrom" class="sort-select"></select></label>
+        <span class="forkdiff-arrow">&#8594;</span>
+        <label>To <select id="forkDiffTo" class="sort-select"></select></label>
+      </div>
+      <div id="forkDiffResults"></div>
+    </div>
+
     <!-- What Heals Tab (A3): damage type → medicines ranked by heal-per-unit -->
     <div class="tab-panel" id="tab-medbay" role="tabpanel" aria-labelledby="btn-medbay">
       <p class="reverse-desc">Pick a damage type — medicines ranked by healing per unit. Respects the fork filter; <span class="heal-cond">*</span> marks conditional healing (open details).</p>
@@ -425,7 +437,7 @@
   <div class="loading-bar"><div class="loading-bar-fill"></div></div>
 </div>
 
-<script src="app.js?v=13"></script>
+<script src="app.js?v=14"></script>
 <script defer src="tutorial.js?v=2"></script>
 </body>
 </html>
