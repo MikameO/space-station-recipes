@@ -161,7 +161,10 @@ header h1 {
   letter-spacing: 0.06em;
 }
 
-.header-right { display: flex; align-items: center; gap: 10px; flex: 1; max-width: 480px; }
+.header-right { display: flex; align-items: center; gap: 10px; flex: 1; max-width: 560px; }
+/* C3.1: the search box must survive the button row growing (📌 pushed it
+   to zero width — buttons don't shrink, the input was the only thing that could) */
+.header-right .search-input { min-width: 130px; }
 
 /* ── SEARCH ── */
 .search-input {

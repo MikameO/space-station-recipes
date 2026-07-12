@@ -3,11 +3,11 @@
 // network-first with cache fallback — fresh while online, functional offline.
 // data.json is requested with a ?v=Date.now() cache-buster, so fallback
 // matching ignores the query string to hit the cached copy.
-const CACHE = 'chemdb-v4';
+const CACHE = 'chemdb-v5';
 const PRECACHE = [
   './',
   './index.html',
-  './style.css?v=19',
+  './style.css?v=20',
   './app.js?v=18',
   './tutorial.js?v=2',
   './manifest.json',
