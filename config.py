@@ -65,48 +65,11 @@ FORK_REGISTRY = {
         "name": "Vanilla SS14",
         "repo": "space-wizards/space-station-14",
         "branch": "master",
-        "raw_url": "https://raw.githubusercontent.com/space-wizards/space-station-14/master/{path}",
         "custom_dir": None,
         "color": "#22c55e",
-        "reagent_files": [
-            "Resources/Prototypes/Reagents/biological.yml",
-            "Resources/Prototypes/Reagents/botany.yml",
-            "Resources/Prototypes/Reagents/chemicals.yml",
-            "Resources/Prototypes/Reagents/cleaning.yml",
-            "Resources/Prototypes/Reagents/elements.yml",
-            "Resources/Prototypes/Reagents/fun.yml",
-            "Resources/Prototypes/Reagents/gases.yml",
-            "Resources/Prototypes/Reagents/medicine.yml",
-            "Resources/Prototypes/Reagents/narcotics.yml",
-            "Resources/Prototypes/Reagents/pyrotechnic.yml",
-            "Resources/Prototypes/Reagents/toxins.yml",
-            "Resources/Prototypes/Reagents/Consumable/Drink/alcohol.yml",
-            "Resources/Prototypes/Reagents/Consumable/Drink/base_drink.yml",
-            "Resources/Prototypes/Reagents/Consumable/Drink/drinks.yml",
-            "Resources/Prototypes/Reagents/Consumable/Drink/juice.yml",
-            "Resources/Prototypes/Reagents/Consumable/Drink/soda.yml",
-            "Resources/Prototypes/Reagents/Consumable/Food/condiments.yml",
-            "Resources/Prototypes/Reagents/Consumable/Food/food.yml",
-            "Resources/Prototypes/Reagents/Consumable/Food/ingredients.yml",
-            "Resources/Prototypes/Reagents/Materials/glass.yml",
-            "Resources/Prototypes/Reagents/Materials/materials.yml",
-            "Resources/Prototypes/Reagents/Materials/metals.yml",
-            "Resources/Prototypes/Reagents/Materials/ores.yml",
-        ],
-        "reaction_files": [
-            "Resources/Prototypes/Recipes/Reactions/biological.yml",
-            "Resources/Prototypes/Recipes/Reactions/botany.yml",
-            "Resources/Prototypes/Recipes/Reactions/chemicals.yml",
-            "Resources/Prototypes/Recipes/Reactions/cleaning.yml",
-            "Resources/Prototypes/Recipes/Reactions/drinks.yml",
-            "Resources/Prototypes/Recipes/Reactions/food.yml",
-            "Resources/Prototypes/Recipes/Reactions/fun.yml",
-            "Resources/Prototypes/Recipes/Reactions/gas.yml",
-            "Resources/Prototypes/Recipes/Reactions/medicine.yml",
-            "Resources/Prototypes/Recipes/Reactions/pyrotechnic.yml",
-            "Resources/Prototypes/Recipes/Reactions/single_reagent.yml",
-            "Resources/Prototypes/Recipes/Reactions/soap.yml",
-        ],
+        # T2c: these are the canonical lists (see constants above)
+        "reagent_files": VANILLA_REAGENT_PATHS,
+        "reaction_files": VANILLA_REACTION_PATHS,
         "locale_files": [
             "Resources/Locale/en-US/reagents/meta/biological.ftl",
             "Resources/Locale/en-US/reagents/meta/botany.ftl",
@@ -154,8 +117,6 @@ FORK_REGISTRY = {
             "Resources/Locale/en-US/botany/seeds.ftl",
             "Resources/Locale/en-US/seeds/seeds.ftl",
         ],
-        "blocked_reactions": set(),
-        "modified_reactions": {},
         "dispenser_chemicals": {
             "Aluminium", "Carbon", "Chlorine", "Copper", "Ethanol", "Fluorine",
             "Hydrogen", "Iodine", "Iron", "Lithium", "Mercury", "Nitrogen",
@@ -222,7 +183,6 @@ FORK_REGISTRY = {
         "name": "RMC14",
         "repo": "RMC-14/RMC-14",
         "branch": "master",
-        "raw_url": "https://raw.githubusercontent.com/RMC-14/RMC-14/master/{path}",
         "custom_dir": "_RMC14",
         "color": "#06b6d4",
         # RMC14 completely replaces these vanilla categories with its own CM system
@@ -277,8 +237,6 @@ FORK_REGISTRY = {
             "Resources/Locale/en-US/_RMC14/medical/toxins.ftl",
             "Resources/Locale/en-US/_RMC14/medical/synth.ftl",
         ],
-        "seed_files": [],
-        "botany_locale_files": [],
         "blocked_reactions": {
             # Commented out in medicine.yml
             "Synaptizine", "Cognizine", "Saline",
@@ -338,7 +296,6 @@ FORK_REGISTRY = {
         "name": "Russian Marine Corps",
         "repo": "flex5hybrid/RussianCM",
         "branch": "master",
-        "raw_url": "https://raw.githubusercontent.com/flex5hybrid/RussianCM/master/{path}",
         "custom_dir": "_CMU14",
         "color": "#9f1239",
         "parent_fork": "rmc14",
@@ -367,10 +324,6 @@ FORK_REGISTRY = {
             # RuCM's copy of the parent locale — adds XenoAlch names (pure additions)
             "Resources/Locale/en-US/_RMC14/medical/toxins.ftl",
         ],
-        "seed_files": [],
-        "botany_locale_files": [],
-        "blocked_reactions": set(),
-        "modified_reactions": {},
         "dispenser_chemicals": set(),  # CM dispenser chems already global via rmc14
         "vanilla_override_reaction_files": VANILLA_REACTION_PATHS,
         # RuCM's copies of parent RMC14 reaction files, auto-diffed against the
@@ -417,7 +370,6 @@ FORK_REGISTRY = {
         "name": "Goob Station",
         "repo": "Goob-Station/Goob-Station",
         "branch": "master",
-        "raw_url": "https://raw.githubusercontent.com/Goob-Station/Goob-Station/master/{path}",
         "custom_dir": "_Goobstation",
         "color": "#f472b6",
         "reagent_files": [
@@ -480,7 +432,6 @@ FORK_REGISTRY = {
         ],
         "locale_files": [],
         "seed_files": ["Resources/Prototypes/_Goobstation/Hydroponics/seeds.yml"],
-        "botany_locale_files": [],
         "blocked_reactions": set(),  # Goob doesn't block vanilla reactions — modifies in-place
         "modified_reactions": {
             "Stimulants": "Product yield increased from 2 to 3",
@@ -493,7 +444,6 @@ FORK_REGISTRY = {
             "Licoxide": "Added Lead(1) as extra reactant; added maxTemp: 265",
             "PlasticSheet": "Reactant amounts doubled: Oil 5→10, Ash 3→6, SulfuricAcid 2→4",
         },
-        "dispenser_chemicals": set(),
         "vanilla_override_reaction_files": VANILLA_REACTION_PATHS,
         # D3c: fork item-fill channels (custom layer only; patched vanilla-path
         # vendor copies are a follow-up — see design doc)
@@ -518,7 +468,6 @@ FORK_REGISTRY = {
         "name": "Starlight",
         "repo": "fskx/starlight-ss14",
         "branch": "Starlight",
-        "raw_url": "https://raw.githubusercontent.com/fskx/starlight-ss14/Starlight/{path}",
         "custom_dir": "_Starlight",
         "color": "#facc15",
         "reagent_files": [
@@ -552,7 +501,6 @@ FORK_REGISTRY = {
             "Resources/Locale/en-US/_Starlight/seeds/seeds.ftl",
         ],
         "seed_files": ["Resources/Prototypes/_Starlight/Hydroponics/seeds.yml"],
-        "botany_locale_files": [],
         "blocked_reactions": {
             "Heparin",  # Replaced by Warfarin in Starlight's vanilla medicine.yml override
         },
@@ -561,7 +509,6 @@ FORK_REGISTRY = {
             # NOTE: Starlight adds Necrosol & Warfarin reactions in vanilla medicine.yml path
             # (not in _Starlight/) — parser limitation, these won't be auto-detected
         },
-        "dispenser_chemicals": set(),
         "vanilla_override_reaction_files": VANILLA_REACTION_PATHS,
     },
 
@@ -570,7 +517,6 @@ FORK_REGISTRY = {
         "name": "Delta-V",
         "repo": "DeltaV-Station/Delta-v",
         "branch": "master",
-        "raw_url": "https://raw.githubusercontent.com/DeltaV-Station/Delta-v/master/{path}",
         "custom_dir": "_DV",
         "color": "#3b82f6",
         "reagent_files": [
@@ -639,10 +585,6 @@ FORK_REGISTRY = {
             "Resources/Locale/en-US/_DV/seeds.ftl",
         ],
         "seed_files": ["Resources/Prototypes/_DV/Hydroponics/seeds.yml"],
-        "botany_locale_files": [],
-        "blocked_reactions": set(),
-        "modified_reactions": {},
-        "dispenser_chemicals": set(),
         "vanilla_override_reaction_files": VANILLA_REACTION_PATHS,
         # D3c: fork item-fill channels
         "item_fill_files": [
@@ -672,7 +614,6 @@ FORK_REGISTRY = {
         "name": "Dead Space",
         "repo": "dead-space-server/dead-space-14",
         "branch": "master",
-        "raw_url": "https://raw.githubusercontent.com/dead-space-server/dead-space-14/master/{path}",
         "custom_dir": "_DeadSpace",
         "color": "#94a3b8",
         "reagent_files": [
@@ -698,10 +639,6 @@ FORK_REGISTRY = {
         ],
         "locale_files": [],
         "seed_files": ["Resources/Prototypes/_DeadSpace/Hydroponics/seeds.yml"],
-        "botany_locale_files": [],
-        "blocked_reactions": set(),
-        "modified_reactions": {},
-        "dispenser_chemicals": set(),
         "vanilla_override_reaction_files": VANILLA_REACTION_PATHS,
     },
 
@@ -710,7 +647,6 @@ FORK_REGISTRY = {
         "name": "Frontier",
         "repo": "new-frontiers-14/frontier-station-14",
         "branch": "master",
-        "raw_url": "https://raw.githubusercontent.com/new-frontiers-14/frontier-station-14/master/{path}",
         "custom_dir": "_NF",
         "color": "#fb923c",
         "reagent_files": [
@@ -744,12 +680,9 @@ FORK_REGISTRY = {
             "Resources/Locale/en-US/_NF/seeds/seeds.ftl",
         ],
         "seed_files": ["Resources/Prototypes/_NF/Hydroponics/seeds.yml"],
-        "botany_locale_files": [],
         "blocked_reactions": {
             "Lye",  # Missing from Frontier's vanilla chemicals.yml
         },
-        "modified_reactions": {},
-        "dispenser_chemicals": set(),
         "vanilla_override_reaction_files": VANILLA_REACTION_PATHS,
     },
 
@@ -758,7 +691,6 @@ FORK_REGISTRY = {
         "name": "Funky Station",
         "repo": "funky-station/funky-station",
         "branch": "master",
-        "raw_url": "https://raw.githubusercontent.com/funky-station/funky-station/master/{path}",
         "custom_dir": "_Funkystation",
         "color": "#c084fc",
         "parent_fork": "goob",  # inherits Goob's custom chemistry too
@@ -812,7 +744,6 @@ FORK_REGISTRY = {
             "Resources/Prototypes/_Funkystation/Hydroponics/seeds.yml",
             "Resources/Prototypes/_Impstation/Hydroponics/seeds.yml",
         ],
-        "botany_locale_files": [],
         "blocked_reactions": {
             "Lye",           # Missing from Funky's vanilla chemicals.yml
             "ArtifactGlue",  # Missing from Funky's vanilla chemicals.yml
@@ -828,7 +759,6 @@ FORK_REGISTRY = {
             "Ambuzol": "Recipe changed: uses Multiver instead of Dylovene",
             "Opporozidone": "Recipe changed: Cognizine as catalyst + Plasma(5) + Doxarubixadone",
         },
-        "dispenser_chemicals": set(),
         "vanilla_override_reaction_files": VANILLA_REACTION_PATHS,
     },
 
@@ -841,7 +771,6 @@ FORK_REGISTRY = {
         "name": "Trauma Station",
         "repo": "Trauma-Station/Trauma-Station",
         "branch": "master",
-        "raw_url": "https://raw.githubusercontent.com/Trauma-Station/Trauma-Station/master/{path}",
         "custom_dir": "_Trauma",
         "color": "#ef4444",
         "parent_fork": "goob",
@@ -874,10 +803,6 @@ FORK_REGISTRY = {
             "Resources/Locale/en-US/_Trauma/botany/seeds.ftl",
         ],
         "seed_files": ["Resources/Prototypes/_Trauma/Hydroponics/seeds.yml"],
-        "botany_locale_files": [],
-        "blocked_reactions": set(),
-        "modified_reactions": {},
-        "dispenser_chemicals": set(),
         "vanilla_override_reaction_files": VANILLA_REACTION_PATHS,
     },
 
@@ -888,7 +813,6 @@ FORK_REGISTRY = {
         "name": "Omu Station",
         "repo": "ProjectOmu/OmuStation",
         "branch": "master",
-        "raw_url": "https://raw.githubusercontent.com/ProjectOmu/OmuStation/master/{path}",
         "custom_dir": "_Omu",
         "color": "#f59e0b",
         "parent_fork": "goob",
@@ -923,10 +847,6 @@ FORK_REGISTRY = {
             "Resources/Locale/en-US/_Gardenstation/reagents/reagents.ftl",
         ],
         "seed_files": ["Resources/Prototypes/_Gardenstation/Hydroponics/seeds.yml"],
-        "botany_locale_files": [],
-        "blocked_reactions": set(),
-        "modified_reactions": {},
-        "dispenser_chemicals": set(),
         "vanilla_override_reaction_files": VANILLA_REACTION_PATHS,
     },
 
@@ -935,7 +855,6 @@ FORK_REGISTRY = {
         "name": "Carpmosia",
         "repo": "carpmosia/carpmosia",
         "branch": "dev",
-        "raw_url": "https://raw.githubusercontent.com/carpmosia/carpmosia/dev/{path}",
         "custom_dir": "_Carpmosia",
         "color": "#14b8a6",
         "reagent_files": [
@@ -952,10 +871,6 @@ FORK_REGISTRY = {
         ],
         "locale_files": [],
         "seed_files": ["Resources/Prototypes/_Carpmosia/Hydroponics/seeds.yml"],
-        "botany_locale_files": [],
-        "blocked_reactions": set(),
-        "modified_reactions": {},
-        "dispenser_chemicals": set(),
         "vanilla_override_reaction_files": VANILLA_REACTION_PATHS,
     },
 
@@ -966,7 +881,6 @@ FORK_REGISTRY = {
         "name": "Monolith",
         "repo": "Monolith-Station/Monolith",
         "branch": "main",
-        "raw_url": "https://raw.githubusercontent.com/Monolith-Station/Monolith/main/{path}",
         "custom_dir": "_Mono",
         "color": "#78716c",
         "parent_fork": "frontier",
@@ -996,10 +910,6 @@ FORK_REGISTRY = {
         ],
         # Monolith keeps its _NF seeds at the pre-move Entities path
         "seed_files": ["Resources/Prototypes/_NF/Entities/Objects/Specific/Hydroponics/seeds.yml"],
-        "botany_locale_files": [],
-        "blocked_reactions": set(),
-        "modified_reactions": {},
-        "dispenser_chemicals": set(),
         "vanilla_override_reaction_files": VANILLA_REACTION_PATHS,
     },
 
@@ -1008,7 +918,6 @@ FORK_REGISTRY = {
         "name": "Harmony",
         "repo": "ss14-harmony/ss14-harmony",
         "branch": "master",
-        "raw_url": "https://raw.githubusercontent.com/ss14-harmony/ss14-harmony/master/{path}",
         "custom_dir": "_Harmony",
         "color": "#84cc16",
         "reagent_files": [
@@ -1025,10 +934,6 @@ FORK_REGISTRY = {
         ],
         "locale_files": [],
         "seed_files": ["Resources/Prototypes/_Harmony/Hydroponics/seeds.yml"],
-        "botany_locale_files": [],
-        "blocked_reactions": set(),
-        "modified_reactions": {},
-        "dispenser_chemicals": set(),
         "vanilla_override_reaction_files": VANILLA_REACTION_PATHS,
     },
 
@@ -1038,7 +943,6 @@ FORK_REGISTRY = {
         "name": "Corvax",
         "repo": "space-syndicate/space-station-14",
         "branch": "master",
-        "raw_url": "https://raw.githubusercontent.com/space-syndicate/space-station-14/master/{path}",
         "custom_dir": "Corvax",
         "color": "#6366f1",
         "reagent_files": [
@@ -1050,11 +954,6 @@ FORK_REGISTRY = {
             "Resources/Prototypes/Corvax/Recipes/Reactions/drinks.yml",
         ],
         "locale_files": [],
-        "seed_files": [],
-        "botany_locale_files": [],
-        "blocked_reactions": set(),
-        "modified_reactions": {},
-        "dispenser_chemicals": set(),
         "vanilla_override_reaction_files": VANILLA_REACTION_PATHS,
     },
 
@@ -1064,7 +963,6 @@ FORK_REGISTRY = {
         "name": "ADT (Время Приключений)",
         "repo": "AdventureTimeSS14/space_station_ADT",
         "branch": "master",
-        "raw_url": "https://raw.githubusercontent.com/AdventureTimeSS14/space_station_ADT/master/{path}",
         "custom_dir": "ADT",
         "color": "#f43f5e",
         "parent_fork": "corvax",
@@ -1100,10 +998,6 @@ FORK_REGISTRY = {
             "Resources/Locale/en-US/ADT/reagents/meta/toxins.ftl",
         ],
         "seed_files": ["Resources/Prototypes/ADT/Hydroponics/seeds.yml"],
-        "botany_locale_files": [],
-        "blocked_reactions": set(),
-        "modified_reactions": {},
-        "dispenser_chemicals": set(),
         "vanilla_override_reaction_files": VANILLA_REACTION_PATHS,
         # D3c: fork item-fill channels (pillomat = ADT pill vendor)
         "item_fill_files": [
@@ -1132,7 +1026,6 @@ FORK_REGISTRY = {
         "name": "Sunrise",
         "repo": "space-sunrise/sunrise-station",
         "branch": "master",
-        "raw_url": "https://raw.githubusercontent.com/space-sunrise/sunrise-station/master/{path}",
         "custom_dir": "_Sunrise",
         "color": "#d946ef",
         "reagent_files": [
@@ -1163,10 +1056,6 @@ FORK_REGISTRY = {
             "Resources/Locale/en-US/_prototypes/_sunrise/entities/objects/specific/hydroponics/seeds.ftl",
         ],
         "seed_files": ["Resources/Prototypes/_Sunrise/Hydroponics/seeds.yml"],
-        "botany_locale_files": [],
-        "blocked_reactions": set(),
-        "modified_reactions": {},
-        "dispenser_chemicals": set(),
         "vanilla_override_reaction_files": VANILLA_REACTION_PATHS,
     },
 
@@ -1177,7 +1066,6 @@ FORK_REGISTRY = {
         "name": "Fish Station (Рыбья)",
         "repo": "space-sunrise/fish-station",
         "branch": "master",
-        "raw_url": "https://raw.githubusercontent.com/space-sunrise/fish-station/master/{path}",
         "custom_dir": "_Fish",
         "color": "#0ea5e9",
         "parent_fork": "sunrise",
@@ -1203,10 +1091,6 @@ FORK_REGISTRY = {
             "Resources/Locale/en-US/_prototypes/_fish/entities/objects/specific/hydroponics/seeds.ftl",
         ],
         "seed_files": ["Resources/Prototypes/_Fish/Hydroponics/seeds.yml"],
-        "botany_locale_files": [],
-        "blocked_reactions": set(),
-        "modified_reactions": {},
-        "dispenser_chemicals": set(),
         "vanilla_override_reaction_files": VANILLA_REACTION_PATHS,
     },
 }
@@ -1215,6 +1099,12 @@ FORK_REGISTRY = {
 # Phase 2b harvest (fork-added content inside patched vanilla files). Explicit
 # per-fork override still possible by setting the key in the entry above.
 for _fork_id, _fconf in FORK_REGISTRY.items():
+    # T2c: raw_url is mechanically repo+branch — derive it instead of
+    # repeating the same GitHub-raw URL in every entry.
+    _fconf.setdefault(
+        "raw_url",
+        f"https://raw.githubusercontent.com/{_fconf['repo']}/{_fconf['branch']}/{{path}}",
+    )
     if _fork_id != "vanilla":
         _fconf.setdefault("vanilla_override_reagent_files", VANILLA_REAGENT_PATHS)
 
