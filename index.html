@@ -188,6 +188,7 @@
       <button class="tab-btn" id="btn-trees" data-tab="trees" role="tab" aria-selected="false" aria-controls="tab-trees">Craft Trees</button>
       <button class="tab-btn" id="btn-graph" data-tab="graph" role="tab" aria-selected="false" aria-controls="tab-graph">Graph</button>
       <button class="tab-btn" id="btn-botany" data-tab="botany" role="tab" aria-selected="false" aria-controls="tab-botany">Botany</button>
+      <button class="tab-btn" id="btn-maps" data-tab="maps" role="tab" aria-selected="false" aria-controls="tab-maps">Maps</button>
       <button class="tab-btn" id="btn-stats" data-tab="stats" role="tab" aria-selected="false" aria-controls="tab-stats">Stats</button>
       <button class="tab-btn tab-btn-antag" id="btn-antag" data-tab="antag" role="tab" aria-selected="false" aria-controls="tab-antag" style="display:none">&#9760; Antag Strategies</button>
     </div>
@@ -385,6 +386,34 @@
         <div id="antagDelivery"></div>
       </div>
     </div>
+
+    <!-- Maps Tab -->
+    <div class="tab-panel" id="tab-maps" role="tabpanel" aria-labelledby="btn-maps">
+      <div class="maps-toolbar">
+        <select id="mapsMapSelect" aria-label="Station map"></select>
+        <div class="maps-search-wrap">
+          <input type="text" id="mapsSearch" class="search-input" placeholder="Search an item on this map… (crowbar, plasma, defib)" autocomplete="off" disabled>
+          <div id="mapsSuggest" class="maps-suggest" hidden></div>
+        </div>
+      </div>
+      <div class="maps-body">
+        <div class="maps-canvas-wrap">
+          <canvas id="mapsCanvas"></canvas>
+          <div class="maps-zoom-controls">
+            <button id="mapsZoomIn" aria-label="Zoom in">+</button>
+            <button id="mapsZoomOut" aria-label="Zoom out">−</button>
+            <button id="mapsZoomFit" aria-label="Fit map">⛶</button>
+          </div>
+          <div id="mapsStatus" class="maps-status"></div>
+        </div>
+        <aside class="maps-locations" id="mapsLocations"></aside>
+      </div>
+      <div class="maps-legend">
+        <span><i class="maps-dot maps-dot-floor"></i> on the floor</span>
+        <span><i class="maps-dot maps-dot-container"></i> inside a locker/crate</span>
+        <span><i class="maps-dot maps-dot-vendor"></i> vending machine</span>
+      </div>
+    </div>
   </main>
 </div>
 
@@ -404,7 +433,8 @@
   <div class="loading-bar"><div class="loading-bar-fill"></div></div>
 </div>
 
-<script src="app.js?v=6"></script>
+<script src="app.js?v=7"></script>
 <script defer src="tutorial.js?v=2"></script>
+<script src="maps.js?v=1" defer></script>
 </body>
 </html>

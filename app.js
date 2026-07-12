@@ -2546,6 +2546,7 @@ function encodeURLState() {
   if (antagFilterMethods.size) params.set('af_m', [...antagFilterMethods].sort().join(','));
   const q = document.getElementById('searchInput')?.value;
   if (q) params.set('q', q);
+  if (window.mapsURLState) for (const [k, v] of Object.entries(window.mapsURLState())) params.set(k, v);
   return params.toString() ? '#' + params.toString() : '';
 }
 
@@ -2561,7 +2562,7 @@ function decodeURLState() {
 
   // Tab (whitelist)
   const tab = params.get('tab');
-  const validTabs = ['reagents','reactions','calculator','trees','graph','stats','antag'];
+  const validTabs = ['reagents','reactions','calculator','trees','graph','stats','antag','maps'];
   if (tab && validTabs.includes(tab)) {
     const btn = document.querySelector(`.tab-btn[data-tab="${safeSel(tab)}"]`);
     if (btn) btn.click();
