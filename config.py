@@ -1883,16 +1883,3 @@ CATEGORY_SHEET_MAP = {
     "Ores": "Materials",
 }
 
-# Reagent columns
-REAGENT_COLUMNS = [
-    "Name", "ID", "Group", "Color", "Recipe", "Produces",
-    "Temp Req", "Mixer", "Effects", "Metabolism", "Overdose",
-    "Craft Chain", "Physical Desc", "Flavor", "Source", "Notes",
-]
-
-# Reaction columns
-REACTION_COLUMNS = [
-    "Reaction Name", "Reactants", "Products", "Min Temp", "Max Temp",
-    "Mixer Required", "Effects", "Priority", "Impact",
-    "Full Craft Chain", "Source",
-]
