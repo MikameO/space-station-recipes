@@ -104,9 +104,70 @@
     drawBeacons(ctx);   // Task 12
     drawMarkers(ctx);   // Task 12
   }
-  function drawBeacons() {}        // replaced in Task 12
-  function drawMarkers() {}        // replaced in Task 12
-  function buildSearchIndex() {}   // replaced in Task 12
+  const KIND_COLOR = { 0: '#39ff85', 1: '#ffb627', 2: '#c17aff', 4: '#ff3d5a' };
+  function tileToScreen(x, y) {
+    const b = S.mapData.bounds;
+    return [(Math.floor(x) - b.minX + 0.5) * S.scale + S.ox,
+            (b.maxY - Math.floor(y) + 0.5) * S.scale + S.oy];
+  }
+  function drawBeacons(ctx) {
+    if (!S.mapData || S.scale < 1.2) return;   // labels only when zoomed in enough
+    ctx.font = `${Math.max(10, Math.min(13, S.scale * 3))}px 'Share Tech Mono', monospace`;
+    ctx.textAlign = 'center'; ctx.fillStyle = '#00e5ff'; ctx.globalAlpha = 0.85;
+    for (const [name, x, y] of S.mapData.beacons) {
+      const [sx, sy] = tileToScreen(x, y);
+      ctx.fillText(name, sx, sy);
+    }
+    ctx.globalAlpha = 1;
+  }
+  function drawMarkers(ctx) {
+    if (!S.selectedProto || !S.mapData) return;
+    const rec = S.mapData.items[S.selectedProto];
+    if (!rec) return;
+    const r = Math.max(3, Math.min(8, S.scale * 1.2));
+    for (const p of rec.p) {
+      if (p[2] === 3) continue;              // off-grid: list only
+      const [sx, sy] = tileToScreen(p[0], p[1]);
+      ctx.beginPath(); ctx.arc(sx, sy, r, 0, Math.PI * 2);
+      ctx.fillStyle = KIND_COLOR[p[2]] || '#39ff85';
+      ctx.fill();
+      ctx.strokeStyle = '#06090f'; ctx.lineWidth = 1.5; ctx.stroke();
+    }
+  }
+
+  let searchIdx = [];
+  function buildSearchIndex() {
+    searchIdx = Object.entries(S.mapData.items)
+      .map(([pid, r]) => ({ pid, name: r.n || pid, count: r.p.length, cat: r.c }))
+      .sort((a, b) => b.count - a.count);
+    const inp = document.getElementById('mapsSearch');
+    inp.value = ''; S.selectedProto = null;
+    inp.oninput = () => suggest(inp.value.trim().toLowerCase());
+    inp.onkeydown = e => {
+      if (e.key === 'Enter') {
+        const first = document.querySelector('#mapsSuggest [data-pid]');
+        if (first) pick(first.dataset.pid);
+      }
+    };
+  }
+  function suggest(q) {
+    const box = document.getElementById('mapsSuggest');
+    if (!q) { box.hidden = true; return; }
+    const hits = searchIdx.filter(e => e.name.toLowerCase().includes(q) || e.pid.toLowerCase().includes(q)).slice(0, 12);
+    box.innerHTML = hits.map(h =>
+      `<button data-pid="${h.pid}"><span>${h.name}</span><small>${h.pid} · ${h.count}</small></button>`).join('') ||
+      '<div class="maps-nohit">not found on this map</div>';
+    box.hidden = false;
+    box.querySelectorAll('[data-pid]').forEach(b => b.onclick = () => pick(b.dataset.pid));
+  }
+  function pick(pid) {
+    S.selectedProto = pid;
+    const rec = S.mapData.items[pid];
+    document.getElementById('mapsSearch').value = rec.n || pid;
+    document.getElementById('mapsSuggest').hidden = true;
+    draw(); renderLocations(pid);
+    if (typeof track === 'function') track('maps_search');
+  }
   function renderLocations() {}    // replaced in Task 13
   window.addEventListener('resize', () => { if (S.img && document.getElementById('tab-maps').classList.contains('active')) zoomFit(); });
 
