@@ -1,7 +1,7 @@
 {
  "meta": {
-  "schemaVersion": "3.7.0",
-  "generated": "2026-07-12T21:35:51",
+  "schemaVersion": "3.8.0",
+  "generated": "2026-07-13T02:28:56",
   "forks": {
    "vanilla": {
     "name": "Vanilla SS14",
@@ -1728,6 +1728,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "metabolismRate": 0.75,
    "antagScore": 4
   },
   "ADTDevazigon": {
@@ -2696,6 +2697,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "metabolismRate": 0.1,
    "antagScore": 3,
    "plantEffects": [
     {
@@ -3377,6 +3379,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "metabolismRate": 1.0,
    "antagScore": 5
   },
   "ADTNikematide": {
@@ -4136,7 +4139,8 @@
     "[Bloodstream] Popup (local): medicine effect usual (if total damage > 0.5) @5%"
    ],
    "boilingPoint": null,
-   "meltingPoint": null
+   "meltingPoint": null,
+   "metabolismRate": 0.3
   },
   "ADTSodiumizole": {
    "id": "ADTSodiumizole",
@@ -4415,7 +4419,8 @@
     "[Bloodstream] Popup (local): medicine effect usual (if total damage > 0.5) @5%"
    ],
    "boilingPoint": null,
-   "meltingPoint": null
+   "meltingPoint": null,
+   "metabolismRate": 0.3
   },
   "ADTSugarKnight": {
    "id": "ADTSugarKnight",
@@ -6222,6 +6227,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "metabolismRate": 0.25,
    "antagScore": 2
   },
   "AU14DrugSpeedDemon": {
@@ -6263,6 +6269,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "metabolismRate": 0.4,
    "antagScore": 5,
    "antagTags": [
     "utility"
@@ -6712,6 +6719,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "metabolismRate": 3.0,
    "antagScore": 3
   },
   "Admiralty": {
@@ -6824,7 +6832,8 @@
     "[Poison] Removes 50.0u AdvancedMutationToxin (if AdvancedMutationToxin > 10u)"
    ],
    "boilingPoint": null,
-   "meltingPoint": null
+   "meltingPoint": null,
+   "metabolismRate": 5.0
   },
   "Affogato": {
    "id": "Affogato",
@@ -6978,6 +6987,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "metabolismRate": 0.01,
    "antagScore": 3
   },
   "Aiuri": {
@@ -7042,6 +7052,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "metabolismRate": 0.2,
    "antagScore": 2
   },
   "Ale": {
@@ -7347,6 +7358,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "metabolismRate": 0.05,
    "antagScore": 2
   },
   "AlliesCocktail": {
@@ -7672,6 +7684,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "metabolismRate": 3.0,
    "antagScore": 2
   },
   "Aluminium": {
@@ -8140,6 +8153,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "metabolismRate": 0.2,
    "antagScore": 7,
    "antagTags": [
     "lethal",
@@ -8787,6 +8801,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "metabolismRate": 0.15,
    "antagScore": 2,
    "plantEffects": [
     {
@@ -9020,6 +9035,7 @@
    ],
    "boilingPoint": 255.0,
    "meltingPoint": 36.0,
+   "metabolismRate": 0.05,
    "antagScore": 5
   },
   "Amoxla": {
@@ -9150,6 +9166,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "metabolismRate": 0.05,
    "antagScore": 2
   },
   "Andalusia": {
@@ -9671,7 +9688,8 @@
     "[Medicine] Heals Poison 6 (if body temp < 213.0K)"
    ],
    "boilingPoint": null,
-   "meltingPoint": null
+   "meltingPoint": null,
+   "metabolismRate": 1.0
   },
   "Antifreeze": {
    "id": "Antifreeze",
@@ -10948,6 +10966,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "metabolismRate": 0.25,
    "antagScore": 3,
    "plantEffects": [
     {
@@ -12130,6 +12149,7 @@
    ],
    "boilingPoint": 255.0,
    "meltingPoint": 36.0,
+   "metabolismRate": 0.2,
    "antagScore": 5
   },
   "BatteryAcid": {
@@ -12978,7 +12998,8 @@
     "[Poison] Effect: Polymorph (if BingleJuice > 25u)"
    ],
    "boilingPoint": null,
-   "meltingPoint": null
+   "meltingPoint": null,
+   "metabolismRate": 0.05
   },
   "BirdFlu": {
    "id": "BirdFlu",
@@ -13034,7 +13055,8 @@
     "[Poison] Removes 40u BirdFlu (if self > 50u)"
    ],
    "boilingPoint": null,
-   "meltingPoint": null
+   "meltingPoint": null,
+   "metabolismRate": 0.25
   },
   "BirdFluConcentrate": {
    "id": "BirdFluConcentrate",
@@ -13086,7 +13108,8 @@
     "[Poison] Removes 15u BirdFluConcentrate (if self > 25u)"
    ],
    "boilingPoint": null,
-   "meltingPoint": null
+   "meltingPoint": null,
+   "metabolismRate": 0.25
   },
   "Bitters": {
    "id": "Bitters",
@@ -13407,6 +13430,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "metabolismRate": 0.05,
    "antagScore": 2
   },
   "BlackRussian": {
@@ -13806,6 +13830,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "metabolismRate": 0.01,
    "antagScore": 3
   },
   "Blood": {
@@ -14908,6 +14933,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "metabolismRate": 0.1,
    "antagScore": 2
   },
   "Brainbomb": {
@@ -15472,6 +15498,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "metabolismRate": 0.25,
    "antagScore": 2
   },
   "Brutedon": {
@@ -15533,7 +15560,8 @@
     "[Medicine] Heals Brute 6 (if body temp < 213.0K)"
    ],
    "boilingPoint": null,
-   "meltingPoint": null
+   "meltingPoint": null,
+   "metabolismRate": 1.0
   },
   "BubbleTea": {
    "id": "BubbleTea",
@@ -15806,6 +15834,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "metabolismRate": 0.2,
    "antagScore": 2
   },
   "Butter": {
@@ -16867,6 +16896,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "metabolismRate": 0.1,
    "antagScore": 3
   },
   "CMKelotane": {
@@ -17876,6 +17906,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "metabolismRate": 4.0,
    "antagScore": 1
   },
   "CMUCardiocaine": {
@@ -17936,6 +17967,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "metabolismRate": 0.1,
    "antagScore": 2
   },
   "CMUHepatocytin": {
@@ -17995,6 +18027,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "metabolismRate": 0.1,
    "antagScore": 2
   },
   "CMUNephronate": {
@@ -18054,6 +18087,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "metabolismRate": 0.1,
    "antagScore": 2
   },
   "CMUOsteoCalc": {
@@ -18113,6 +18147,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "metabolismRate": 0.1,
    "antagScore": 2
   },
   "CMUOxycodone": {
@@ -18175,6 +18210,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "metabolismRate": 0.1,
    "antagScore": 2
   },
   "CMUParacetamol": {
@@ -18230,7 +18266,8 @@
     "[Medicine] Effect: CMUApplyPainSuppressionEffect"
    ],
    "boilingPoint": null,
-   "meltingPoint": null
+   "meltingPoint": null,
+   "metabolismRate": 0.1
   },
   "CMUPulmovine": {
    "id": "CMUPulmovine",
@@ -18289,6 +18326,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "metabolismRate": 0.1,
    "antagScore": 2
   },
   "CMUTramadol": {
@@ -18350,6 +18388,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "metabolismRate": 0.1,
    "antagScore": 2
   },
   "CMUYautjaBlood": {
@@ -18467,7 +18506,8 @@
     "[Poison] Removes 40u Cacaphonium (if self > 50u)"
    ],
    "boilingPoint": null,
-   "meltingPoint": null
+   "meltingPoint": null,
+   "metabolismRate": 0.25
   },
   "CactusJuice": {
    "id": "CactusJuice",
@@ -18717,7 +18757,8 @@
     "[Drink] Popup (local): caffeine effect jitters (if Caffeine > 60u) @5%"
    ],
    "boilingPoint": null,
-   "meltingPoint": null
+   "meltingPoint": null,
+   "metabolismRate": 0.3
   },
   "Caipirinha": {
    "id": "Caipirinha",
@@ -18996,7 +19037,8 @@
     "[Bloodstream] Popup (local): reagent effect anxietymed fade (if Calmafluxine < 0.1u) @35%"
    ],
    "boilingPoint": null,
-   "meltingPoint": null
+   "meltingPoint": null,
+   "metabolismRate": 0.03
   },
   "Calomel": {
    "id": "Calomel",
@@ -19055,6 +19097,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "metabolismRate": 1.0,
    "antagScore": 2,
    "plantEffects": [
     {
@@ -19202,6 +19245,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "metabolismRate": 0.2,
    "antagScore": 3
   },
   "CapsaicinOil": {
@@ -19365,7 +19409,8 @@
     "[Medicine] Heals Poison 1"
    ],
    "boilingPoint": null,
-   "meltingPoint": null
+   "meltingPoint": null,
+   "metabolismRate": 0.1
   },
   "Carbon": {
    "id": "Carbon",
@@ -19634,6 +19679,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "metabolismRate": 0.05,
    "antagScore": 2
   },
   "CarribeanLovers": {
@@ -19789,6 +19835,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "metabolismRate": 0.1,
    "antagScore": 1
   },
   "CatExtract": {
@@ -19828,6 +19875,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "metabolismRate": 0.25,
    "antagScore": 1
   },
   "Celestin": {
@@ -19896,6 +19944,7 @@
    ],
    "boilingPoint": 212.0,
    "meltingPoint": 170.0,
+   "metabolismRate": 1.0,
    "antagScore": 5
   },
   "Celliminol": {
@@ -20052,6 +20101,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "metabolismRate": 0.1,
    "antagScore": 5
   },
   "Cement": {
@@ -20907,7 +20957,8 @@
     "[Poison] Removes 40u Chitterzine (if self > 50u)"
    ],
    "boilingPoint": null,
-   "meltingPoint": null
+   "meltingPoint": null,
+   "metabolismRate": 0.25
   },
   "ChloralHydrate": {
    "id": "ChloralHydrate",
@@ -22912,6 +22963,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "metabolismRate": 0.2,
    "antagScore": 2
   },
   "Convermol": {
@@ -22973,6 +23025,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "metabolismRate": 1.0,
    "antagScore": 2
   },
   "CoolantIPC": {
@@ -23137,6 +23190,7 @@
    ],
    "boilingPoint": 2595.0,
    "meltingPoint": 1083.0,
+   "metabolismRate": 0.1,
    "antagScore": 2
   },
   "CopperBlood": {
@@ -23250,6 +23304,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "metabolismRate": 0.2,
    "antagScore": 2
   },
   "Corgium": {
@@ -23704,6 +23759,7 @@
    ],
    "boilingPoint": 187.0,
    "meltingPoint": 98.0,
+   "metabolismRate": 0.05,
    "antagScore": 5
   },
   "CranberrySauce": {
@@ -23797,6 +23853,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "metabolismRate": 2.5,
    "antagScore": 1
   },
   "Cream": {
@@ -24563,6 +24620,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "metabolismRate": 0.1,
    "antagScore": 5
   },
   "Cyanoxadone": {
@@ -25082,7 +25140,8 @@
     "[Medicine] Effect: Polymorph (if MetabolizerTypeCondition, Darvinium > 5u)"
    ],
    "boilingPoint": null,
-   "meltingPoint": null
+   "meltingPoint": null,
+   "metabolismRate": 250.0
   },
   "DeadRum": {
    "id": "DeadRum",
@@ -25888,6 +25947,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "metabolismRate": 0.1,
    "antagScore": 3
   },
   "DevilsKiss": {
@@ -27567,6 +27627,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "metabolismRate": 3.0,
    "antagScore": 2
   },
   "Echion": {
@@ -27704,6 +27765,7 @@
    ],
    "boilingPoint": 98.0,
    "meltingPoint": -5.0,
+   "metabolismRate": 0.2,
    "antagScore": 4
   },
   "Egg": {
@@ -28676,6 +28738,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "metabolismRate": 0.01,
    "antagScore": 3
   },
   "ErikaSurprise": {
@@ -29391,6 +29454,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "metabolismRate": 0.2,
    "antagScore": 3
   },
   "Fentanyl": {
@@ -29484,6 +29548,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "metabolismRate": 0.05,
    "antagScore": 5
   },
   "Fernet": {
@@ -30200,6 +30265,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "metabolismRate": 0.1,
    "plantEffects": [
     {
      "kind": "PlantAdjustNutrition",
@@ -30415,6 +30481,7 @@
    ],
    "boilingPoint": 165,
    "meltingPoint": -87,
+   "metabolismRate": 3.0,
    "antagScore": 8,
    "antagTags": [
     "lethal",
@@ -30464,6 +30531,7 @@
    ],
    "boilingPoint": 78.2,
    "meltingPoint": -19.4,
+   "metabolismRate": 3.0,
    "antagScore": 3
   },
   "FluorosulfuricAcidPredator": {
@@ -30758,6 +30826,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "metabolismRate": 0.03,
    "antagScore": 2
   },
   "FourBit": {
@@ -31087,6 +31156,7 @@
    ],
    "boilingPoint": 50.0,
    "meltingPoint": 45.0,
+   "metabolismRate": 0.45,
    "antagScore": 6,
    "antagTags": [
     "area-denial"
@@ -31635,6 +31705,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "metabolismRate": 1.0,
    "antagScore": 5,
    "plantEffects": [
     {
@@ -32098,6 +32169,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "metabolismRate": 1.0,
    "antagScore": 2
   },
   "GlorpExtract": {
@@ -32375,7 +32447,8 @@
     "[Medicine] Heals Brute 0.3 Heals Poison 0.1 Heals Heat 0.1 Heals Shock 0.1 Heals Cold 0.1"
    ],
    "boilingPoint": null,
-   "meltingPoint": null
+   "meltingPoint": null,
+   "metabolismRate": 0.05
   },
   "GrapeSoda": {
    "id": "GrapeSoda",
@@ -33391,7 +33464,8 @@
     "[Medicine] Heals Radiation 4 (if body temp < 213.0K)"
    ],
    "boilingPoint": null,
-   "meltingPoint": null
+   "meltingPoint": null,
+   "metabolismRate": 1.0
   },
   "HakkaMate": {
    "id": "HakkaMate",
@@ -34651,6 +34725,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "metabolismRate": 0.05,
    "antagScore": 3
   },
   "Hooch": {
@@ -35271,6 +35346,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "metabolismRate": 0.2,
    "antagScore": 2
   },
   "Hyronalin": {
@@ -35397,6 +35473,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "metabolismRate": 0.15,
    "antagScore": 2,
    "plantEffects": [
     {
@@ -37837,7 +37914,8 @@
     "[Bloodstream] Effect: ModifyBleed"
    ],
    "boilingPoint": null,
-   "meltingPoint": null
+   "meltingPoint": null,
+   "metabolismRate": 0.1
   },
   "Inc": {
    "id": "Inc",
@@ -38086,6 +38164,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "metabolismRate": 0.25,
    "antagScore": 1
   },
   "Iodine": {
@@ -38605,6 +38684,7 @@
    ],
    "boilingPoint": 2862.0,
    "meltingPoint": 1538.0,
+   "metabolismRate": 0.1,
    "antagScore": 2
   },
   "JackRose": {
@@ -39037,6 +39117,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "metabolismRate": 1.0,
    "antagScore": 5
   },
   "JuiceApple": {
@@ -40126,6 +40207,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "metabolismRate": 0.25,
    "antagScore": 1
   },
   "JuiceThatMakesYouScream": {
@@ -40200,6 +40282,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "metabolismRate": 0.25,
    "antagScore": 1
   },
   "JuiceTomato": {
@@ -41051,6 +41134,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "metabolismRate": 0.01,
    "plantEffects": [
     {
      "kind": "PlantAdjustNutrition",
@@ -41126,6 +41210,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "metabolismRate": 0.25,
    "antagScore": 2
   },
   "LaughinSyrup": {
@@ -41249,6 +41334,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "metabolismRate": 0.03,
    "antagScore": 6,
    "antagTags": [
     "lethal",
@@ -41952,7 +42038,8 @@
     "[Medicine] Thirst x-3 (if self > 20u)"
    ],
    "boilingPoint": null,
-   "meltingPoint": null
+   "meltingPoint": null,
+   "metabolismRate": 0.2
   },
   "Leporazine": {
    "id": "Leporazine",
@@ -42110,6 +42197,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "metabolismRate": 0.2,
    "antagScore": 4
   },
   "Lexorin": {
@@ -42239,6 +42327,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "metabolismRate": 0.2,
    "antagScore": 1
   },
   "Licoxide": {
@@ -42292,6 +42381,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "metabolismRate": 2.0,
    "antagScore": 6,
    "antagTags": [
     "lethal",
@@ -42570,6 +42660,7 @@
    ],
    "boilingPoint": 1330.0,
    "meltingPoint": 180.5,
+   "metabolismRate": 0.1,
    "antagScore": 3
   },
   "LongHaul": {
@@ -42850,7 +42941,8 @@
     "[Bloodstream] Effect: RollPsionicAbility (if LotophagoiOil > 20u)"
    ],
    "boilingPoint": null,
-   "meltingPoint": null
+   "meltingPoint": null,
+   "metabolismRate": 0.2
   },
   "Luxurium": {
    "id": "Luxurium",
@@ -43741,7 +43833,8 @@
     "[Poison] Removes 40u Marotine (if self > 50u)"
    ],
    "boilingPoint": null,
-   "meltingPoint": null
+   "meltingPoint": null,
+   "metabolismRate": 0.25
   },
   "MarotineConcentrate": {
    "id": "MarotineConcentrate",
@@ -43793,7 +43886,8 @@
     "[Poison] Removes 15u MarotineConcentrate (if self > 25u)"
    ],
    "boilingPoint": null,
-   "meltingPoint": null
+   "meltingPoint": null,
+   "metabolismRate": 0.25
   },
   "Martini": {
    "id": "Martini",
@@ -44198,6 +44292,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "metabolismRate": 0.2,
    "antagScore": 5,
    "antagTags": [
     "debilitating"
@@ -44456,7 +44551,8 @@
     "[Medicine] Status: ClawsGrowthSuppression"
    ],
    "boilingPoint": null,
-   "meltingPoint": null
+   "meltingPoint": null,
+   "metabolismRate": 0.02
   },
   "Mesophenerol": {
    "id": "Mesophenerol",
@@ -44517,7 +44613,8 @@
     "[Medicine] Removes 3u NaturalLetoferol"
    ],
    "boilingPoint": null,
-   "meltingPoint": null
+   "meltingPoint": null,
+   "metabolismRate": 1.0
   },
   "Mesotaxinide": {
    "id": "Mesotaxinide",
@@ -44585,6 +44682,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "metabolismRate": 0.25,
    "antagScore": 3
   },
   "Methane": {
@@ -44767,7 +44865,8 @@
     "[Poison] Removes 40u Methril (if self > 50u)"
    ],
    "boilingPoint": null,
-   "meltingPoint": null
+   "meltingPoint": null,
+   "metabolismRate": 0.25
   },
   "MethrilConcentrate": {
    "id": "MethrilConcentrate",
@@ -44819,7 +44918,8 @@
     "[Poison] Removes 15u MethrilConcentrate (if self > 25u)"
    ],
    "boilingPoint": null,
-   "meltingPoint": null
+   "meltingPoint": null,
+   "metabolismRate": 0.25
   },
   "Methylamine": {
    "id": "Methylamine",
@@ -44940,6 +45040,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "metabolismRate": 0.01,
    "antagScore": 4,
    "plantEffects": [
     {
@@ -45579,6 +45680,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "metabolismRate": 0.05,
    "antagScore": 1
   },
   "Mitotrophin": {
@@ -46307,6 +46409,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "metabolismRate": 0.1,
    "antagScore": 5
   },
   "MoscowMule": {
@@ -46515,7 +46618,8 @@
     "[Poison] Removes 15u MothamphetamineConcentrate (if self > 25u)"
    ],
    "boilingPoint": null,
-   "meltingPoint": null
+   "meltingPoint": null,
+   "metabolismRate": 0.25
   },
   "MotorOil": {
    "id": "MotorOil",
@@ -47099,6 +47203,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "metabolismRate": 0.05,
    "antagScore": 2,
    "plantEffects": [
     {
@@ -47621,6 +47726,7 @@
    ],
    "boilingPoint": 563.7,
    "meltingPoint": 353.5,
+   "metabolismRate": 0.1,
    "antagScore": 2
   },
   "NanoProcessor": {
@@ -47837,6 +47943,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "metabolismRate": 0.2,
    "antagScore": 4
   },
   "Natusixadone": {
@@ -48212,7 +48319,8 @@
     "[Medicine] Heals Airloss 2 Heals Brute 1.2 Heals Burn 1.6 Heals Toxin 2 (if total damage > 30)"
    ],
    "boilingPoint": null,
-   "meltingPoint": null
+   "meltingPoint": null,
+   "metabolismRate": 0.2
   },
   "Negroni": {
    "id": "Negroni",
@@ -48566,6 +48674,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "metabolismRate": 0.02,
    "antagScore": 2
   },
   "NevcottaPowder": {
@@ -48607,6 +48716,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "metabolismRate": 0.05,
    "antagScore": 5
   },
   "Nicotine": {
@@ -48756,6 +48866,7 @@
    ],
    "boilingPoint": 356,
    "meltingPoint": 231,
+   "metabolismRate": 3.0,
    "antagScore": 3,
    "plantEffects": [
     {
@@ -50605,6 +50716,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "metabolismRate": 0.1,
    "antagScore": 2
   },
   "Oxygen": {
@@ -51195,6 +51307,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "metabolismRate": 1.0,
    "antagScore": 3
   },
   "PentenicAcid": {
@@ -51261,6 +51374,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "metabolismRate": 0.25,
    "plantEffects": [
     {
      "kind": "PlantAdjustWeeds",
@@ -51353,6 +51467,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "metabolismRate": 0.4,
    "antagScore": 4
   },
   "Peranol": {
@@ -51413,7 +51528,8 @@
     "[Medicine] Temp -7500 (if body temp > 253.15K, organ: Hydrakin)"
    ],
    "boilingPoint": null,
-   "meltingPoint": null
+   "meltingPoint": null,
+   "metabolismRate": 0.02
   },
   "PestKiller": {
    "id": "PestKiller",
@@ -51526,6 +51642,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "metabolismRate": 0.02,
    "antagScore": 2
   },
   "Pesto": {
@@ -51645,6 +51762,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "metabolismRate": 0.1,
    "antagScore": 4,
    "plantEffects": [
     {
@@ -51773,7 +51891,8 @@
     "[Medicine] Effect: ClawsGrowth"
    ],
    "boilingPoint": null,
-   "meltingPoint": null
+   "meltingPoint": null,
+   "metabolismRate": 0.05
   },
   "Phenylacetone": {
    "id": "Phenylacetone",
@@ -52953,6 +53072,7 @@
    ],
    "boilingPoint": 78.2,
    "meltingPoint": -19.4,
+   "metabolismRate": 3.0,
    "antagScore": 9,
    "antagTags": [
     "lethal",
@@ -53916,6 +54036,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "metabolismRate": 0.25,
    "antagScore": 1
   },
   "Probital": {
@@ -54049,6 +54170,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "metabolismRate": 3.0,
    "antagScore": 2
   },
   "ProcenylLazideSludge": {
@@ -54161,7 +54283,8 @@
     "[Poison] Status: Vulgarity"
    ],
    "boilingPoint": null,
-   "meltingPoint": null
+   "meltingPoint": null,
+   "metabolismRate": 0.1
   },
   "Prometheum": {
    "id": "Prometheum",
@@ -54352,6 +54475,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "metabolismRate": 0.2,
    "antagScore": 2
   },
   "Psicodine": {
@@ -54674,6 +54798,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "metabolismRate": 0.25,
    "antagScore": 4
   },
   "PureOil": {
@@ -54725,7 +54850,8 @@
     "[Bloodstream] Effect: RollPsionicAbility (if PureOil > 20u)"
    ],
    "boilingPoint": null,
-   "meltingPoint": null
+   "meltingPoint": null,
+   "metabolismRate": 0.2
   },
   "PwrGame": {
    "id": "PwrGame",
@@ -54931,6 +55057,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "metabolismRate": 0.1,
    "antagScore": 5
   },
   "Pyroxadone": {
@@ -55111,6 +55238,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "metabolismRate": 3.0,
    "antagScore": 3
   },
   "RMCAluminum": {
@@ -55148,6 +55276,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "metabolismRate": 0.1,
    "antagScore": 1
   },
   "RMCAntiZed": {
@@ -55402,6 +55531,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "metabolismRate": 0.1,
    "plantEffects": [
     {
      "kind": "PlantAdjustWeeds",
@@ -55456,6 +55586,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "metabolismRate": 0.01,
    "antagScore": 1
   },
   "RMCCherryJelly": {
@@ -55564,6 +55695,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "metabolismRate": 0.05,
    "antagScore": 5
   },
   "RMCChlorine": {
@@ -55598,7 +55730,8 @@
     "[Poison] Effect: Biocidic"
    ],
    "boilingPoint": null,
-   "meltingPoint": null
+   "meltingPoint": null,
+   "metabolismRate": 0.1
   },
   "RMCChocolateDrink": {
    "id": "RMCChocolateDrink",
@@ -55634,7 +55767,8 @@
     "[Drink] Thirst x0.2"
    ],
    "boilingPoint": null,
-   "meltingPoint": null
+   "meltingPoint": null,
+   "metabolismRate": 0.1
   },
   "RMCCitalopram": {
    "id": "RMCCitalopram",
@@ -55689,7 +55823,8 @@
     "[Medicine] Popup (local): antidepressant effect rmccitalopram @5%"
    ],
    "boilingPoint": null,
-   "meltingPoint": null
+   "meltingPoint": null,
+   "metabolismRate": 0.01
   },
   "RMCCocoMilk": {
    "id": "RMCCocoMilk",
@@ -55725,7 +55860,8 @@
     "[Drink] Thirst x0.4"
    ],
    "boilingPoint": null,
-   "meltingPoint": null
+   "meltingPoint": null,
+   "metabolismRate": 0.2
   },
   "RMCCopper": {
    "id": "RMCCopper",
@@ -55762,6 +55898,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "metabolismRate": 0.01,
    "antagScore": 1
   },
   "RMCCyanide": {
@@ -55798,6 +55935,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "metabolismRate": 0.2,
    "antagScore": 1
   },
   "RMCEthanol": {
@@ -55907,6 +56045,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "metabolismRate": 0.1,
    "antagScore": 4
   },
   "RMCGenericToxin": {
@@ -55939,7 +56078,8 @@
     "[Poison] Effect: Toxic"
    ],
    "boilingPoint": null,
-   "meltingPoint": null
+   "meltingPoint": null,
+   "metabolismRate": 0.05
   },
   "RMCGold": {
    "id": "RMCGold",
@@ -55976,6 +56116,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "metabolismRate": 0.1,
    "antagScore": 1
   },
   "RMCGrapeSoda": {
@@ -56107,6 +56248,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "metabolismRate": 0.01,
    "antagScore": 1
   },
   "RMCInstantJuiceApple": {
@@ -56706,7 +56848,8 @@
     "[Medicine] Effect: Hemogenic"
    ],
    "boilingPoint": null,
-   "meltingPoint": null
+   "meltingPoint": null,
+   "metabolismRate": 0.1
   },
   "RMCJuiceBug": {
    "id": "RMCJuiceBug",
@@ -56742,7 +56885,8 @@
     "[Drink] Thirst x0.4"
    ],
    "boilingPoint": null,
-   "meltingPoint": null
+   "meltingPoint": null,
+   "metabolismRate": 0.2
   },
   "RMCJuiceMango": {
    "id": "RMCJuiceMango",
@@ -56950,6 +57094,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "metabolismRate": 0.1,
    "antagScore": 3
   },
   "RMCMercury": {
@@ -56986,7 +57131,8 @@
     "[Poison] Status: Stutter"
    ],
    "boilingPoint": null,
-   "meltingPoint": null
+   "meltingPoint": null,
+   "metabolismRate": 0.1
   },
   "RMCMethane": {
    "id": "RMCMethane",
@@ -57039,6 +57185,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "metabolismRate": 0.1,
    "plantEffects": [
     {
      "kind": "PlantAdjustWeeds",
@@ -57111,7 +57258,8 @@
     "[Medicine] Popup (local): antidepressant effect rmcmethylphenidate @5%"
    ],
    "boilingPoint": null,
-   "meltingPoint": null
+   "meltingPoint": null,
+   "metabolismRate": 0.01
   },
   "RMCMilkshake": {
    "id": "RMCMilkshake",
@@ -57292,7 +57440,8 @@
     "[Poison] Popup (local): rmc body stings @20%"
    ],
    "boilingPoint": null,
-   "meltingPoint": null
+   "meltingPoint": null,
+   "metabolismRate": 0.05
   },
   "RMCNapalm": {
    "id": "RMCNapalm",
@@ -57901,6 +58050,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "metabolismRate": 0.01,
    "antagScore": 1
   },
   "RMCOxygen": {
@@ -57966,6 +58116,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "metabolismRate": 0.01,
    "antagScore": 1
   },
   "RMCParoxetine": {
@@ -58032,6 +58183,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "metabolismRate": 0.01,
    "antagScore": 1
   },
   "RMCPeanutButter": {
@@ -58139,6 +58291,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "metabolismRate": 0.05,
    "antagScore": 4,
    "plantEffects": [
     {
@@ -58194,6 +58347,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "metabolismRate": 0.01,
    "antagScore": 1
   },
   "RMCPlatinum": {
@@ -58261,6 +58415,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "metabolismRate": 0.01,
    "antagScore": 1
   },
   "RMCPsilocybin": {
@@ -58502,6 +58657,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "metabolismRate": 0.1,
    "antagScore": 1
   },
   "RMCSilver": {
@@ -58539,6 +58695,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "metabolismRate": 0.1,
    "antagScore": 1
   },
   "RMCSodium": {
@@ -58576,6 +58733,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "metabolismRate": 0.01,
    "antagScore": 1
   },
   "RMCSoyMilk": {
@@ -58612,7 +58770,8 @@
     "[Drink] Thirst x0.4"
    ],
    "boilingPoint": null,
-   "meltingPoint": null
+   "meltingPoint": null,
+   "metabolismRate": 0.2
   },
   "RMCSpaceDrugs": {
    "id": "RMCSpaceDrugs",
@@ -58767,7 +58926,8 @@
     "[Food] Effect: Nutritious"
    ],
    "boilingPoint": null,
-   "meltingPoint": null
+   "meltingPoint": null,
+   "metabolismRate": 0.1
   },
   "RMCSugar": {
    "id": "RMCSugar",
@@ -58801,7 +58961,8 @@
     "[Food] Effect: Nutritious"
    ],
    "boilingPoint": null,
-   "meltingPoint": null
+   "meltingPoint": null,
+   "metabolismRate": 0.1
   },
   "RMCSulfur": {
    "id": "RMCSulfur",
@@ -58838,6 +58999,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "metabolismRate": 0.01,
    "antagScore": 1
   },
   "RMCSulphuricAcid": {
@@ -58895,7 +59057,8 @@
     "[Poison] Effect: Corrosive"
    ],
    "boilingPoint": null,
-   "meltingPoint": null
+   "meltingPoint": null,
+   "metabolismRate": 0.05
   },
   "RMCSynthBlood": {
    "id": "RMCSynthBlood",
@@ -59044,7 +59207,8 @@
     "[Poison] Effect: Carcinogenic"
    ],
    "boilingPoint": null,
-   "meltingPoint": null
+   "meltingPoint": null,
+   "metabolismRate": 0.1
   },
   "RMCVirusFood": {
    "id": "RMCVirusFood",
@@ -59099,7 +59263,8 @@
     "[Food] Effect: Nutritious"
    ],
    "boilingPoint": null,
-   "meltingPoint": null
+   "meltingPoint": null,
+   "metabolismRate": 0.1
   },
   "RMCXenoAlchBloodloss": {
    "id": "RMCXenoAlchBloodloss",
@@ -59137,7 +59302,8 @@
     "[Poison] Removes 0.4u RMCIron"
    ],
    "boilingPoint": null,
-   "meltingPoint": null
+   "meltingPoint": null,
+   "metabolismRate": 0.4
   },
   "RMCXenoAlchBrute": {
    "id": "RMCXenoAlchBrute",
@@ -59173,7 +59339,8 @@
     "[Poison] Removes 0.4u CMMeralyne"
    ],
    "boilingPoint": null,
-   "meltingPoint": null
+   "meltingPoint": null,
+   "metabolismRate": 0.4
   },
   "RMCXenoAlchBurn": {
    "id": "RMCXenoAlchBurn",
@@ -59209,7 +59376,8 @@
     "[Poison] Removes 0.4u CMDermaline"
    ],
    "boilingPoint": null,
-   "meltingPoint": null
+   "meltingPoint": null,
+   "metabolismRate": 0.4
   },
   "RMCXenoAlchFire": {
    "id": "RMCXenoAlchFire",
@@ -59246,7 +59414,8 @@
     "[Poison] Temp +12000"
    ],
    "boilingPoint": null,
-   "meltingPoint": null
+   "meltingPoint": null,
+   "metabolismRate": 0.4
   },
   "RMCXenoAlchFreeze": {
    "id": "RMCXenoAlchFreeze",
@@ -59284,7 +59453,8 @@
     "[Poison] Removes 0.4u CMClonexadone"
    ],
    "boilingPoint": null,
-   "meltingPoint": null
+   "meltingPoint": null,
+   "metabolismRate": 0.4
   },
   "RMCXenoAlchPain": {
    "id": "RMCXenoAlchPain",
@@ -59324,7 +59494,8 @@
     "[Poison] Removes 0.4u CMUOxycodone"
    ],
    "boilingPoint": null,
-   "meltingPoint": null
+   "meltingPoint": null,
+   "metabolismRate": 0.4
   },
   "RMCXenoAlchPurge": {
    "id": "RMCXenoAlchPurge",
@@ -59358,7 +59529,8 @@
     "[Poison] Effect: RMCAlchemistPurgeNonToxins"
    ],
    "boilingPoint": null,
-   "meltingPoint": null
+   "meltingPoint": null,
+   "metabolismRate": 0.4
   },
   "Radium": {
    "id": "Radium",
@@ -59752,6 +59924,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "metabolismRate": 3.0,
    "antagScore": 3
   },
   "ReaperDelight": {
@@ -60198,7 +60371,8 @@
     "[Medicine] Heals Airloss 10 Heals Brute 15 Heals Burn 20 (if total damage > 95)"
    ],
    "boilingPoint": null,
-   "meltingPoint": null
+   "meltingPoint": null,
+   "metabolismRate": 2.0
   },
   "Rewriter": {
    "id": "Rewriter",
@@ -60389,6 +60563,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "metabolismRate": 0.75,
    "antagScore": 5
   },
   "Rice": {
@@ -61710,6 +61885,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "metabolismRate": 0.2,
    "antagScore": 2
   },
   "SalicylicAcid": {
@@ -62325,6 +62501,7 @@
    ],
    "boilingPoint": 255.0,
    "meltingPoint": 36.0,
+   "metabolismRate": 0.25,
    "antagScore": 5
   },
   "Saxoite": {
@@ -62798,6 +62975,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "metabolismRate": 0.03,
    "antagScore": 3
   },
   "ShadekinBlood": {
@@ -63575,6 +63753,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "metabolismRate": 0.25,
    "antagScore": 2
   },
   "Silencer": {
@@ -63835,6 +64014,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "metabolismRate": 3.0,
    "antagScore": 2,
    "plantEffects": [
     {
@@ -65141,7 +65321,8 @@
     "[Bloodstream] Popup (local): reagent effect painkiller fade (if Soretizone < 0.1u) @40%"
    ],
    "boilingPoint": null,
-   "meltingPoint": null
+   "meltingPoint": null,
+   "metabolismRate": 0.01
   },
   "SoulbreakerToxin": {
    "id": "SoulbreakerToxin",
@@ -65988,6 +66169,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "metabolismRate": 0.75,
    "antagScore": 3
   },
   "SpikedEggnog": {
@@ -66133,6 +66315,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "metabolismRate": 0.2,
    "antagScore": 5
   },
   "Stabilizine": {
@@ -66233,6 +66416,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "metabolismRate": 0.25,
    "antagScore": 5,
    "plantEffects": [
     {
@@ -66550,6 +66734,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "metabolismRate": 0.2,
    "antagScore": 3
   },
   "Stasizium": {
@@ -66936,6 +67121,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "metabolismRate": 0.02,
    "antagScore": 1
   },
   "StypticCrystalCatalyst": {
@@ -67075,6 +67261,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "metabolismRate": 3.0,
    "antagScore": 2,
    "plantEffects": [
     {
@@ -67439,6 +67626,7 @@
    ],
    "boilingPoint": 337.0,
    "meltingPoint": 10.31,
+   "metabolismRate": 3.0,
    "antagScore": 5,
    "antagTags": [
     "lethal"
@@ -68401,6 +68589,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "metabolismRate": 3.0,
    "antagScore": 2,
    "plantEffects": [
     {
@@ -68838,6 +69027,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "metabolismRate": 2.0,
    "antagScore": 7,
    "antagTags": [
     "incapacitating",
@@ -69972,6 +70162,7 @@
    ],
    "boilingPoint": 554,
    "meltingPoint": 351,
+   "metabolismRate": 0.05,
    "antagScore": 3
   },
   "Thermite": {
@@ -70311,7 +70502,8 @@
     "[Drink] Status: Centered"
    ],
    "boilingPoint": null,
-   "meltingPoint": null
+   "meltingPoint": null,
+   "metabolismRate": 0.1
   },
   "Tirimol": {
    "id": "Tirimol",
@@ -70407,7 +70599,8 @@
     "[Bloodstream] Popup (local): entity effect popup tiredness @16%"
    ],
    "boilingPoint": null,
-   "meltingPoint": null
+   "meltingPoint": null,
+   "metabolismRate": 0.75
   },
   "Tirizene": {
    "id": "Tirizene",
@@ -70499,6 +70692,7 @@
    ],
    "boilingPoint": 2862.0,
    "meltingPoint": 1538.0,
+   "metabolismRate": 0.1,
    "antagScore": 2
   },
   "TomatoSauce": {
@@ -71006,6 +71200,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "metabolismRate": 0.1,
    "antagScore": 2
   },
   "TranexamicAcid": {
@@ -71104,6 +71299,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "metabolismRate": 0.25,
    "antagScore": 4
   },
   "Tranquinase": {
@@ -71174,6 +71370,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "metabolismRate": 0.02,
    "antagScore": 4
   },
   "TrappistBeer": {
@@ -72222,6 +72419,7 @@
    ],
    "boilingPoint": 147.0,
    "meltingPoint": -11.0,
+   "metabolismRate": 3.0,
    "antagScore": 3
   },
   "UnknownPathogen": {
@@ -74979,7 +75177,8 @@
     "[Poison] Removes 50.0u XenobioFelinidToxin (if XenobioFelinidToxin > 10u)"
    ],
    "boilingPoint": null,
-   "meltingPoint": null
+   "meltingPoint": null,
+   "metabolismRate": 5.0
   },
   "XenobioGenderFluid": {
    "id": "XenobioGenderFluid",
@@ -75012,7 +75211,8 @@
     "[Narcotic] Removes 50.0u XenobioGenderFluid (if XenobioGenderFluid > 5u)"
    ],
    "boilingPoint": null,
-   "meltingPoint": null
+   "meltingPoint": null,
+   "metabolismRate": 1.0
   },
   "XenobioHumanToxin": {
    "id": "XenobioHumanToxin",
@@ -75045,7 +75245,8 @@
     "[Poison] Removes 50.0u XenobioHumanToxin (if XenobioHumanToxin > 10u)"
    ],
    "boilingPoint": null,
-   "meltingPoint": null
+   "meltingPoint": null,
+   "metabolismRate": 5.0
   },
   "XenobioJellyBlue": {
    "id": "XenobioJellyBlue",
@@ -75077,7 +75278,8 @@
     "[Food] Effect: ModifySlimeComponent (if XenobioJellyBlue > 1u)"
    ],
    "boilingPoint": null,
-   "meltingPoint": null
+   "meltingPoint": null,
+   "metabolismRate": 1.0
   },
   "XenobioJellyCerulean": {
    "id": "XenobioJellyCerulean",
@@ -75109,7 +75311,8 @@
     "[Food] Effect: ModifySlimeComponent (if XenobioJellyCerulean > 1u)"
    ],
    "boilingPoint": null,
-   "meltingPoint": null
+   "meltingPoint": null,
+   "metabolismRate": 1.0
   },
   "XenobioJellyDarkBlue": {
    "id": "XenobioJellyDarkBlue",
@@ -75142,7 +75345,8 @@
     "[Food] Status: ModifyStatusEffect"
    ],
    "boilingPoint": null,
-   "meltingPoint": null
+   "meltingPoint": null,
+   "metabolismRate": 1.0
   },
   "XenobioJellyGreen": {
    "id": "XenobioJellyGreen",
@@ -75175,7 +75379,8 @@
     "[Poison] Removes 50.0u XenobioJellyGreen (if XenobioJellyGreen > 10u)"
    ],
    "boilingPoint": null,
-   "meltingPoint": null
+   "meltingPoint": null,
+   "metabolismRate": 5.0
   },
   "XenobioJellyPink": {
    "id": "XenobioJellyPink",
@@ -75207,7 +75412,8 @@
     "[Poison] Effect: ChangeFactionEntityEffect (if XenobioJellyPink > 5u)"
    ],
    "boilingPoint": null,
-   "meltingPoint": null
+   "meltingPoint": null,
+   "metabolismRate": 1.0
   },
   "XenobioJellyPurple": {
    "id": "XenobioJellyPurple",
@@ -75239,7 +75445,8 @@
     "[Food] Effect: ModifySlimeComponent (if XenobioJellyPurple > 1u)"
    ],
    "boilingPoint": null,
-   "meltingPoint": null
+   "meltingPoint": null,
+   "metabolismRate": 1.0
   },
   "XenobioJellyRed": {
    "id": "XenobioJellyRed",
@@ -75271,7 +75478,8 @@
     "[Food] Effect: ModifySlimeComponent (if XenobioJellyRed > 1u)"
    ],
    "boilingPoint": null,
-   "meltingPoint": null
+   "meltingPoint": null,
+   "metabolismRate": 1.0
   },
   "XenobioSlimeToxin": {
    "id": "XenobioSlimeToxin",
@@ -75316,6 +75524,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "metabolismRate": 0.1,
    "antagScore": 1
   },
   "YellowCake": {
@@ -75818,6 +76027,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "metabolismRate": 0.25,
    "antagScore": 2
   },
   "uraniumhexafluoride": {

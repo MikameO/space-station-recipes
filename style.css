@@ -589,6 +589,8 @@ main {
 .heal-table .heal-row:hover td { color: var(--phosphor); }
 .heal-num { font-weight: 600; }
 .heal-cond { color: var(--amber-warn, #ffb627); font-weight: 700; }
+/* D4: non-default metabolism rate chip in What Heals? */
+.heal-rate { font-size: 0.62rem; color: var(--text-ghost); font-weight: 400; white-space: nowrap; cursor: help; }
 .badge-access { border-left-color: var(--text-ghost); text-transform: none; }
 
 /* B1: Fork Diff */

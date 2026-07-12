@@ -3,6 +3,22 @@
 `data.json` schema version is in `meta.schemaVersion`. Consumers reading this file
 should pin on a compatible range (semver: breaking changes bump major).
 
+## 3.8.0 — 2026-07-12 (Increment D4 — metabolism rate → heal/sec + true per-unit)
+
+New per-reagent field `metabolismRate` (units consumed per ~1s metabolism
+tick), serialized ONLY when the reagent overrides the engine default of 0.5
+— 210 reagents carry a non-default rate (dist: 0.1 ×47, 0.25 ×26, 0.2 ×26,
+0.05 ×20, 1.0 ×19, … up to a 250.0 fast-purge outlier). Frontend consumers
+default absent values to 0.5.
+
+Enables the "What Heals?" mode to distinguish per-second healing from
+per-unit efficiency: the reagent's effect amount is applied PER TICK, so the
+total healing one unit delivers before it fully metabolizes = effect ÷ rate.
+The mode's "Heal / u" column now shows that true per-unit total (and re-ranks
+by it); a new "/ sec" column shows the instantaneous per-tick amount, with an
+`@Xu/s` chip when the rate is non-default. Corrects the v1 mislabel where the
+per-tick amount was shown as "per unit".
+
 ## 3.7.0 — 2026-07-12 (Increment D3 — item-fill sources: vending/dispenser/juicing)
 
 Re-applied onto 3.6.1 after the D3 branch diverged (it was cut from

@@ -1719,22 +1719,41 @@ function renderHealResults() {
   for (const r of Object.values(DATA.reagents)) {
     if (!reagentInActiveFork(r)) continue;
     if (!(r.effectTags || []).includes('heals:' + activeHealType)) continue;
-    rows.push({ r, heal: healPerUnit(r, activeHealType) });
+    const heal = healPerUnit(r, activeHealType);
+    // D4: metabolismRate = units consumed per ~1s tick (default 0.5). The effect
+    // amount is applied PER TICK, so total healing one unit delivers before it is
+    // fully metabolized = perTick / rate. This is the true "per unit" number;
+    // the raw effect is the per-second rate.
+    const rate = r.metabolismRate ?? 0.5;
+    const totalPerU = heal ? Math.round((heal.val / rate) * 10) / 10 : null;
+    rows.push({ r, heal, rate, totalPerU });
   }
   rows.sort((a, b) => {
-    const av = a.heal ? a.heal.val : -1;
-    const bv = b.heal ? b.heal.val : -1;
+    const av = a.totalPerU ?? -1;
+    const bv = b.totalPerU ?? -1;
     return bv - av ||
       ((a.r.accessibility?.weight ?? 9) - (b.r.accessibility?.weight ?? 9)) ||
       (a.r.name || a.r.id).localeCompare(b.r.name || b.r.id);
   });
 
   el.innerHTML = `<table class="data-table heal-table">
-    <thead><tr><th>Medicine</th><th>Heal / u</th><th>Overdose</th><th>Access</th><th>Source</th></tr></thead>
-    <tbody>${rows.map(({ r, heal }) => {
-      const healCell = heal
-        ? `${heal.val}${heal.conditional ? ' <span class="heal-cond" title="Conditional healing — open details">*</span>' : ''}`
+    <thead><tr>
+      <th>Medicine</th>
+      <th title="Total healing one unit delivers before it fully metabolizes (per-tick effect ÷ metabolism rate)">Heal / u</th>
+      <th title="Healing applied each ~1s metabolism tick while the reagent is in the body">/ sec</th>
+      <th>Overdose</th><th>Access</th><th>Source</th>
+    </tr></thead>
+    <tbody>${rows.map(({ r, heal, rate, totalPerU }) => {
+      const healCell = totalPerU != null
+        ? `${totalPerU}${heal.conditional ? ' <span class="heal-cond" title="Conditional healing — open details">*</span>' : ''}`
         : '—';
+      let secCell = '—';
+      if (heal) {
+        const dur = Math.round((1 / rate) * 10) / 10;
+        const slow = rate !== 0.5
+          ? ` <span class="heal-rate" title="Metabolizes ${rate} u/s — 1u lasts ~${dur}s">@${rate}u/s</span>` : '';
+        secCell = `${heal.val}/s${slow}`;
+      }
       const acc = r.accessibility;
       const accBadge = acc
         ? `<span class="badge badge-access" title="${esc(acc.reason || '')}">${esc(acc.tier)}</span>` : '—';
@@ -1750,6 +1769,7 @@ function renderHealResults() {
       return `<tr class="heal-row" onclick="openDetail('${esc(r.id)}')" tabindex="0">
         <td><span class="color-swatch" style="background:${safeColor(r.color)}"></span> ${esc(capName(r.name || r.id))}${speciesBadge}</td>
         <td class="heal-num">${healCell}</td>
+        <td class="heal-num">${secCell}</td>
         <td>${r.overdose ? r.overdose + 'u' : '—'}</td>
         <td>${accBadge}</td>
         <td>${forkBadge}</td>

@@ -769,6 +769,27 @@ def summarize_metabolisms(metabolisms: dict) -> tuple[str, str]:
     return "; ".join(all_effects), ", ".join(paths)
 
 
+def metabolism_rate(metabolisms: dict):
+    """Explicit metabolismRate override of the primary metabolism group, in
+    units consumed per ~1s cycle. Returns None when the reagent uses the engine
+    default (0.5) — the frontend fills that in, keeping data.json lean (D4).
+    First non-underscore group wins for multi-group reagents."""
+    if not isinstance(metabolisms, dict):
+        return None
+    for path_name, path_value in metabolisms.items():
+        if path_name.startswith("_"):
+            continue
+        if isinstance(path_value, dict) and "metabolismRate" in path_value:
+            try:
+                rate = float(path_value["metabolismRate"])
+            except (TypeError, ValueError):
+                return None
+            # an explicit 0.5 equals the engine default — don't store it
+            return rate if rate != 0.5 else None
+        return None  # primary group has no override → engine default
+    return None
+
+
 # ─────────────────────────────────────────────
 # Plant effects (Botany tab)
 # ─────────────────────────────────────────────
@@ -2175,7 +2196,7 @@ def export_json(reagents: dict, reactions: dict, locale: dict,
             # 3.5.0: legacy rmcStatus/rmcNote per-reaction fields and
             # vanillaReagentCount/rmcReagentCount meta removed — forkStatus/
             # forkNotes are the only fork-view fields since the multi-fork era.
-            "schemaVersion": "3.7.0",
+            "schemaVersion": "3.8.0",
             "generated": time.strftime("%Y-%m-%dT%H:%M:%S"),
             "forks": forks_meta,
             "reactionCount": len(reactions),
@@ -2227,6 +2248,7 @@ def export_json(reagents: dict, reactions: dict, locale: dict,
         cats_seen.add(cat)
         source = proto_fork(reagent)
         effects_str, metab_paths = summarize_metabolisms(reagent.get("metabolisms", {}))
+        _metab_rate = metabolism_rate(reagent.get("metabolisms", {}))  # D4
 
         recipe_obj = None
         if rid in reaction_lookup:
@@ -2294,6 +2316,9 @@ def export_json(reagents: dict, reactions: dict, locale: dict,
             "boilingPoint": reagent.get("boilingPoint"),
             "meltingPoint": reagent.get("meltingPoint"),
         }
+        # D4: metabolism rate — only when overridden (default 0.5 filled in UI)
+        if _metab_rate is not None:
+            reagent_obj["metabolismRate"] = _metab_rate
         # Only include antag fields when non-default (saves ~30KB in JSON)
         if antag_score:
             reagent_obj["antagScore"] = antag_score
