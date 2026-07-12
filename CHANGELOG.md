@@ -3,6 +3,79 @@
 `data.json` schema version is in `meta.schemaVersion`. Consumers reading this file
 should pin on a compatible range (semver: breaking changes bump major).
 
+## 3.7.0 — 2026-07-12 (Increment D3 — item-fill sources: vending/dispenser/juicing)
+
+Re-applied onto 3.6.1 after the D3 branch diverged (it was cut from
+3.4.3-era 3a2f55e while main advanced through D1/D2); D1 plants{} and
+D2 species{}/speciesEffects are retained, item-fill adds on top.
+
+Reagents that ship pre-mixed inside spawnable items are no longer blind
+spots. New extractor Phase 5c intersects two indexes — entity solution
+fills (both schemas: new `Solution` component and legacy
+`SolutionContainerManager`) and acquisition channels:
+
+- **Vending inventories** (`startingInventory`; `contrabandInventory`
+  tagged "(hacked)" — unlocked by the contraband wire per
+  `ContrabandWireKey`, crew-accessible; `emaggedInventory` tagged
+  "(EMAG)"; Syndicate/Nukie-id machines tagged "(Syndicate)").
+- **Dispenser bottle packs** (`EntityTableContainerFill` on booze/soda
+  dispensers) — auto-derives what the manual Booze/Soda Dispenser lists
+  tracked by hand (and catches upstream drift: Mead and Coffee Liqueur
+  had been added to the booze dispenser unnoticed).
+- **Juicing** (D3b): seed `productPrototypes` -> produce
+  `Extractable.juiceSolution` -> "Juicing: <plant> (plant)" labels.
+- **Fork channels** (D3c): Goob (weebvend/solsnack/sweettoof/fitness/
+  hotfood + drinks), Delta-V (command/unlocked boozeomat, crescentmoon,
+  nanoblood/nanomedcivilian + 7 drink files), ADT (pillomat/civimed/
+  icecream + drinks/yupi/healing). Channels are ancestry-filtered in
+  per-fork views; total-conversion forks (blocked_categories: RMC14/
+  RuCM) do not inherit vanilla vendors. Known limits: ADT pill packs
+  are StorageFill boxes (container unpacking is a follow-up channel);
+  most fork drinks ride patched vanilla-path vendor copies (follow-up);
+  Sunrise/Corvax custom vendor layers hold no consumables — skipped.
+
+Classifier: auto `Vending*` labels are a bonus channel — antag-only only
+when a manual antag label exists or no other path does (Mayo/Pax/salt
+stay normal). `_SERVICE_KEYWORDS` += "Vending", "Atmospherics";
+cross-service reason prefix is now "Cross-department:". Honest manual
+labels for non-item channels: species bloods (verified against
+`Body/Species/*.yml` bloodReferenceSolution: Vox=Ammonia, Moth=Insect,
+Arachnid=Copper), atmos gases (Frezon/Tritium/N2O), goat/sheep milking.
+
+**Headline fixes:** Absinthe — "unobtainable" -> cross-service
+(Booze-O-Mat, Jailbreaker Verte 120u; the user report that started this
+increment). Lead — the forum-famous unobtainium — antag-only via the
+SyndieJuice Syndicate chem vendor's hacked bucket (ChemistryBottleLead
+x2 30u; `code-reagents-lead` note updated). PoisonWine (hacked
+Booze-O-Mat), EnergyDrink, Butter, olive oil, PestKiller/WeedKiller
+(NutriMax sprays), JuiceBungo/JuiceBluePumpkin/MilkOat (juicing), Gold
+(Gildlager bottle), Saline (CiviMedVend syringe, ADT).
+
+**Unobtainable: 332 -> 297 (vanilla 63 -> 29).** 114 reagents carry
+auto item-source labels (699 entities indexed, 281 stocked items, 27
+juiceable produce). Same 1213 reagents / 1003 reactions, 128 plants.
+Determinism: regen x2 byte-identical after `generated` timestamp strip.
+M1 sweep: clean — no upstream rename signals; 404s are the usual
+fork-lacks-file manifest probes.
+
+## 3.6.1 — 2026-07-12 (Increment D2 — species physiology)
+
+(Backfilled entry — the D2 bump shipped without its own CHANGELOG note.)
+Curated `species{}` physiology (8 hand-written playable species: breathing
+gas, toxic gas, quirks) plus auto-discovered fork races from organ-gated
+effect clauses (~15 chips: Goblin/Thaven/Sheleg/...). Per-reagent
+`speciesEffects` lifted from `if organ: X` effect conditions (15 reagents).
+Frontend: physiology cards + ☠/ℹ danger badges in "What Heals?".
+
+## 3.6.0 — 2026-07-12 (Increment D1 — plant entities + mutation graph)
+
+(Backfilled entry — the D1 bump shipped without its own CHANGELOG note.)
+`plants{}` — seed prototypes as first-class entities (128 plants, 37 with
+mutation targets / 47 mutation edges): id, name, source fork, product
+prototypes, mutation targets, potency-scaled chemicals, growth params.
+Frontend: Plant Evolution chart (30 chains) + swab/cross-pollination guide
+(amber maintainer-knowledge tier).
+
 ## 3.4.3 — 2026-07-12 (Increment C1 — serialize reaction priority)
 
 Reactions now carry the engine's cascade **`priority`** when the upstream
