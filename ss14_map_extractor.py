@@ -160,6 +160,152 @@ def discover_maps(fork_key: str, fork_cfg: dict, tree: list[str]) -> list[dict]:
         out.append(gm)
     return out
 
+# ── prototype registry ──
+
+def fetch_many(paths: list[str], fork_key: str, fork_cfg: dict) -> dict[str, str]:
+    """Concurrent cached fetch of many raw files. Returns {path: content}, empties skipped."""
+    from concurrent.futures import ThreadPoolExecutor
+    results, done = {}, 0
+    def one(path):
+        return path, fetch_file(fork_cfg["raw_url"].format(path=path), CACHE_DIR / fork_key / path)
+    with ThreadPoolExecutor(max_workers=8) as ex:
+        for path, content in ex.map(one, paths):
+            done += 1
+            if done % 200 == 0:
+                print(f"  ... {done}/{len(paths)} files")
+            if content:
+                results[path] = content
+    return results
+
+STRUCT_SKIP_PREFIXES = ("Cable", "Pipe", "GasPipe", "DisposalPipe", "Poweredlight",
+                        "PoweredLight", "Catwalk", "Lattice", "Grille", "SignalTimer")
+# ponytail: prefix blocklist tuned on Bagel selfcheck; extend when a fork leaks junk
+
+class Registry:
+    def __init__(self):
+        self.protos = {}        # id -> {"name", "parents": [..], "components": {typeName: dict}}
+        self.vend_inventories = {}   # invId -> {"normal": {pid: n}, "contraband": {pid: n}}
+        self.tile_sprites = {}  # tileId -> sprite path
+        self.tile_colors = {}   # tileId -> (r,g,b) filled in Task 5
+        self.ftl = {}           # fluent key -> english text
+        self._kind_cache = {}
+
+    def _chain(self, pid, seen=None):
+        """Yield pid and all ancestors, depth-first, cycle-safe."""
+        seen = seen or set()
+        if pid in seen or pid not in self.protos:
+            return
+        seen.add(pid)
+        yield self.protos[pid]
+        for par in self.protos[pid]["parents"]:
+            yield from self._chain(par, seen)
+
+    def _find_component(self, pid, comp_name):
+        for node in self._chain(pid):
+            if comp_name in node["components"]:
+                return node["components"][comp_name]
+        return None
+
+    def name(self, pid):
+        for node in self._chain(pid):
+            if node.get("name"):
+                return node["name"]
+        return pid
+
+    def kind(self, pid):
+        if pid in self._kind_cache:
+            return self._kind_cache[pid]
+        k = self._kind(pid)
+        self._kind_cache[pid] = k
+        return k
+
+    def _kind(self, pid):
+        if pid.startswith(STRUCT_SKIP_PREFIXES):
+            return "skip"
+        if self._find_component(pid, "NavMapBeacon") is not None:
+            return "beacon"
+        if self._find_component(pid, "VendingMachine") is not None:
+            return "vendor"
+        for node in self._chain(pid):
+            nid = node["id"]
+            if nid.startswith("BaseWall") or nid == "WallSolid":
+                return "wall"
+            if nid.startswith(("BaseWindow", "Window")):
+                return "window"
+            if nid.startswith(("BaseAirlock", "BaseFirelock", "Airlock", "Firelock")):
+                return "door"
+        if self._find_component(pid, "StorageFill") is not None:
+            return "container"
+        if self._find_component(pid, "Item") is not None:
+            return "item"
+        if self._find_component(pid, "ApcPowerReceiver") is not None:
+            return "mach"
+        return "skip"
+
+    def storage_fill(self, pid):
+        comp = self._find_component(pid, "StorageFill")
+        return (comp or {}).get("contents") or []
+
+    def vendor_pack(self, pid):
+        comp = self._find_component(pid, "VendingMachine")
+        return (comp or {}).get("pack")
+
+    def vendor_inventory(self, pid):
+        inv = self.vend_inventories.get(self.vendor_pack(pid) or "", {})
+        return inv.get("normal", {})
+
+    def vendor_contraband(self, pid):
+        inv = self.vend_inventories.get(self.vendor_pack(pid) or "", {})
+        return inv.get("contraband", {})
+
+    def beacon_text(self, pid):
+        comp = self._find_component(pid, "NavMapBeacon") or {}
+        key = comp.get("defaultText", "")
+        if not key:
+            return "Beacon"
+        return self.ftl.get(key) or key.removeprefix("station-beacon-").replace("-", " ").title()
+
+    def tile_color(self, tile_id):
+        return self.tile_colors.get(tile_id)
+
+
+def build_registry(fork_key: str, fork_cfg: dict, tree: list[str]) -> Registry:
+    reg = Registry()
+    proto_paths = [p for p in tree if "/Prototypes/" in p and p.endswith(".yml")
+                   and "/Prototypes/Maps/" not in p]
+    print(f"  registry: {len(proto_paths)} prototype files")
+    for path, content in fetch_many(proto_paths, fork_key, fork_cfg).items():
+        for doc in load_yaml_docs(content, path):
+            for entry in (doc if isinstance(doc, list) else [doc]):
+                if not isinstance(entry, dict):
+                    continue
+                t, eid = entry.get("type"), entry.get("id")
+                if t == "entity" and eid:
+                    parents = entry.get("parent") or []
+                    if isinstance(parents, str):
+                        parents = [parents]
+                    comps = {}
+                    for c in entry.get("components") or []:
+                        if isinstance(c, dict) and c.get("type"):
+                            comps[c["type"]] = c
+                    reg.protos[eid] = {"id": eid, "name": entry.get("name"),
+                                       "parents": parents, "components": comps}
+                elif t == "vendingMachineInventory" and eid:
+                    reg.vend_inventories[eid] = {
+                        "normal": entry.get("startingInventory") or {},
+                        "contraband": entry.get("contrabandInventory") or {}}
+                elif t == "tile" and eid and entry.get("sprite"):
+                    reg.tile_sprites[eid] = entry["sprite"]
+    # Fluent: beacon names
+    ftl_paths = [p for p in tree if p.endswith(".ftl") and "en-US" in p and "navmap" in p.lower()]
+    for path in ftl_paths:
+        content = fetch_file(fork_cfg["raw_url"].format(path=path), CACHE_DIR / fork_key / path)
+        for line in content.splitlines():
+            m = re.match(r"^([a-zA-Z0-9-]+)\s*=\s*(.+)$", line.strip())
+            if m:
+                reg.ftl[m.group(1)] = m.group(2).strip()
+    return reg
+
 # ── selfcheck ──
 
 def selfcheck():
@@ -172,7 +318,30 @@ def selfcheck():
     assert byid["Bagel"]["path"] == "Resources/Maps/bagel.yml"
     assert byid["Bagel"]["inPool"] is True
     assert len(maps) >= 12, f"only {len(maps)} maps"
-    print(f"selfcheck OK: {len(maps)} vanilla maps discovered")
+
+    reg = build_registry("vanilla", fork, tree)
+    assert reg.kind("Crowbar") == "item" and reg.name("Crowbar") == "crowbar"
+    assert reg.kind("WallSolid") == "wall"
+    assert reg.kind("VendingMachineYouTool") == "vendor"
+    assert reg.vendor_pack("VendingMachineYouTool"), "YouTool pack missing"
+    assert "Crowbar" in reg.vendor_inventory("VendingMachineYouTool"), "Crowbar not in YouTool"
+    assert reg.kind("DefaultStationBeaconMedical") == "beacon"
+    # NOTE: recon said "Medbay"; live upstream has station-beacon-medical = "Medical" —
+    # "Medbay" is a distinct sibling beacon (DefaultStationBeaconMedbay -> station-beacon-medbay).
+    # Verified station_beacon.yml + station-beacons.ftl directly; parse logic is correct, recon was stale.
+    assert reg.beacon_text("DefaultStationBeaconMedical") == "Medical"
+    # KNOWN GAP (see Task 3 report, DONE_WITH_CONCERNS): StorageFill is dead in current upstream —
+    # confirmed empirically across all 10751 protos in this registry: 0 use StorageFill, 620 use
+    # the newer EntityTableContainerFill/entityTable-selector system instead (incl. both
+    # LockerWeldingSuppliesFilled and ClosetToolFilled). storage_fill() is transcribed faithfully
+    # per plan and correctly returns [] for both real ids — no id anywhere would satisfy a
+    # non-empty-StorageFill assert. Documenting current (empty) behavior rather than silently
+    # reaching for EntityTableContainerFill parsing, which is a Registry-contract decision this
+    # task was not scoped to make.
+    assert reg.storage_fill("LockerWeldingSuppliesFilled") == [] and reg.storage_fill("ClosetToolFilled") == [], \
+        "StorageFill unexpectedly non-empty — upstream may have reintroduced it; revisit this assert"
+    assert reg.tile_sprites.get("FloorSteel")
+    print(f"selfcheck OK: {len(maps)} maps, {len(reg.protos)} protos")
 
 def main():
     ap = argparse.ArgumentParser()
