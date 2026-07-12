@@ -14,7 +14,7 @@
 - Entities: `- proto: Crowbar` → `entities: [{uid, components: [{type: Transform, pos: "x,y", parent: <gridUid>}]}]`. Bagel main grid uid=60 (25 039 ents), secondary grid uid=7536 `Syndi Puddle CS108` (326 ents, name in its `MetaData` component).
 - Playable maps: `Resources/Prototypes/Maps/*.yml` → `- type: gameMap, id: Bagel, mapName: 'Bagel Station', mapPath: /Maps/bagel.yml`. Pool: `Resources/Prototypes/Maps/Pools/default.yml` → `- type: gameMapPool, maps: [Bagel, Box, ...12 ids]`.
 - Beacons: entity protos `DefaultStationBeacon*` with `NavMapBeacon.defaultText: station-beacon-<x>` (a Fluent key). Locale file: `Resources/Locale/en-US/navmap-beacons/station-beacons.ftl` (`station-beacon-medical = Medbay` style lines). Map entities MAY override with a `NavMapBeacon` component carrying `text:`.
-- Items: prototypes with `Item` component (inherited). Container fill (CORRECTED during Task 3 — upstream drifted): `StorageFill` is LEGACY (0 uses in current vanilla; keep parsing it for forks on older code). Modern fill = `EntityTableContainerFill` component: `containers: {<name>: !type:AllSelector {children: [{id, amount?, prob?, weight?} | nested selector]}}`; selector types `AllSelector` (all children), `GroupSelector` (one child by weight), `NestedSelector` (`id` → a `- type: entityTable, id, table: <selector>` prototype). The container *classification* signal is the `EntityStorage` component (on `ClosetBase`/`CrateGeneric` ancestors). Vendors: entity has `VendingMachine.pack: <invId>`; inventory protos `- type: vendingMachineInventory, id, startingInventory: {ProtoId: count}, contrabandInventory: {...}` in `Catalog/VendingMachines/Inventories/*.yml`.
+- Items: prototypes with `Item` component (inherited). Container fill (CORRECTED during Task 3 — upstream drifted): `StorageFill` is LEGACY (0 uses in current vanilla; keep parsing it for forks on older code). Modern fill = `EntityTableContainerFill` component: `containers: {<name>: !type:AllSelector {children: [{id, amount?, prob?, weight?} | nested selector]}}`; selector types `AllSelector` (all children), `GroupSelector` (one child by weight), `NestedSelector` (`tableId` → a `- type: entityTable, id, table: <selector>` prototype). The container *classification* signal is the `EntityStorage` component (on `ClosetBase`/`CrateGeneric` ancestors). Vendors: entity has `VendingMachine.pack: <invId>`; inventory protos `- type: vendingMachineInventory, id, startingInventory: {ProtoId: count}, contrabandInventory: {...}` in `Catalog/VendingMachines/Inventories/*.yml`.
 - Tiles: `Resources/Prototypes/Tiles/*.yml` → `- type: tile, id: FloorSteel, sprite: /Textures/Tiles/steel.png`.
 - `parent:` in entity protos is a string OR a list.
 - Chem extractor patterns to copy (NOT import — keep pipelines independent): `fetch_file`/`fetch_all_files` (ss14_chem_extractor.py:191-235), `SS14Loader` + `!type:` multi_constructor (ss14_chem_extractor.py:299-330).
@@ -557,7 +557,8 @@ Replace `storage_fill` and the `_kind` container logic:
         p *= float(node.get("prob", 1.0))
         t = node.get("_type")
         if t == "NestedSelector":
-            yield from self._flatten_table(self.entity_tables.get(node.get("id"), {}), p, depth + 1)
+            # real serialized key is tableId (verified live), not id
+            yield from self._flatten_table(self.entity_tables.get(node.get("tableId"), {}), p, depth + 1)
             return
         children = [c for c in (node.get("children") or []) if isinstance(c, dict)]
         if t == "GroupSelector" and children:
