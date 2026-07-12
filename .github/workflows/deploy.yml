@@ -27,7 +27,9 @@ jobs:
         run: |
           mkdir _site
           cp index.html app.js tutorial.js style.css data.json favicon.ico _site/
+          cp sw.js manifest.json favicon.svg favicon-192.png favicon-512.png _site/
           cp -r sprites _site/sprites
+          cp -r libs _site/libs
           [ -f og-image.png ] && cp og-image.png _site/ || true
 
       - uses: actions/configure-pages@v6
