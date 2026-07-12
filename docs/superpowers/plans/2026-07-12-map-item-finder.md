@@ -347,6 +347,25 @@ Expected: FAIL `NameError: build_registry`.
 
 - [ ] **Step 2: Implement the registry**
 
+First a concurrent fetch helper — the registry pulls 2–3k prototype files; serial fetch_file with its 0.3 s politeness sleep would take ~30 min, 8 threads bring it to ~2–4 min (raw.githubusercontent is a CDN, 8 parallel is polite enough):
+
+```python
+def fetch_many(paths: list[str], fork_key: str, fork_cfg: dict) -> dict[str, str]:
+    """Concurrent cached fetch of many raw files. Returns {path: content}, empties skipped."""
+    from concurrent.futures import ThreadPoolExecutor
+    results, done = {}, 0
+    def one(path):
+        return path, fetch_file(fork_cfg["raw_url"].format(path=path), CACHE_DIR / fork_key / path)
+    with ThreadPoolExecutor(max_workers=8) as ex:
+        for path, content in ex.map(one, paths):
+            done += 1
+            if done % 200 == 0:
+                print(f"  ... {done}/{len(paths)} files")
+            if content:
+                results[path] = content
+    return results
+```
+
 ```python
 STRUCT_SKIP_PREFIXES = ("Cable", "Pipe", "GasPipe", "DisposalPipe", "Poweredlight",
                         "PoweredLight", "Catwalk", "Lattice", "Grille", "SignalTimer")
@@ -445,8 +464,7 @@ def build_registry(fork_key: str, fork_cfg: dict, tree: list[str]) -> Registry:
     proto_paths = [p for p in tree if "/Prototypes/" in p and p.endswith(".yml")
                    and "/Prototypes/Maps/" not in p]
     print(f"  registry: {len(proto_paths)} prototype files")
-    for path in proto_paths:
-        content = fetch_file(fork_cfg["raw_url"].format(path=path), CACHE_DIR / fork_key / path)
+    for path, content in fetch_many(proto_paths, fork_key, fork_cfg).items():
         for doc in load_yaml_docs(content, path):
             for entry in (doc if isinstance(doc, list) else [doc]):
                 if not isinstance(entry, dict):
@@ -740,6 +758,71 @@ git commit -m "feat(maps): PNG underlay bake — floors by texture color, wall/w
 
 **Files:**
 - Modify: `ss14_map_extractor.py`
+
+- [ ] **Step 0: Pipeline hardening (from Task 2 quality review)**
+
+Three fixes before the fork loop exists:
+
+(a) Authenticated tree fetch — anonymous api.github.com is capped at 60 req/h and a 403 currently reads as "fork has no tree". Port the `gh auth token` pattern from `scripts/audit_fork_manifests.py:107-129`:
+
+```python
+def _gh_token() -> str:
+    import subprocess
+    try:
+        t = subprocess.run(["gh", "auth", "token"], capture_output=True, text=True, timeout=10)
+        return t.stdout.strip() if t.returncode == 0 else ""
+    except Exception:
+        return ""
+
+def fetch_repo_tree(fork_key: str, fork_cfg: dict) -> list[str]:
+    """All file paths in the fork's repo (git/trees API, cached, gh-authenticated when possible)."""
+    owner, repo, branch = repo_meta(fork_cfg)
+    cache_path = CACHE_DIR / fork_key / "_tree.json"
+    if not cache_path.exists():
+        url = f"https://api.github.com/repos/{owner}/{repo}/git/trees/{branch}?recursive=1"
+        headers = {"User-Agent": "SS14-Map-Extractor/1.0"}
+        token = _gh_token()
+        if token:
+            headers["Authorization"] = f"Bearer {token}"
+        else:
+            print("  NOTE: no gh token — anonymous API limit is 60 req/h")
+        cache_path.parent.mkdir(parents=True, exist_ok=True)
+        for attempt in range(3):
+            try:
+                req = urllib.request.Request(url, headers=headers)
+                with urllib.request.urlopen(req, timeout=120) as resp:
+                    cache_path.write_text(resp.read().decode("utf-8"), encoding="utf-8")
+                break
+            except Exception as e:
+                if attempt < 2:
+                    print(f"  Retry {attempt + 1}/3: {e}"); time.sleep(2 * (attempt + 1))
+                else:
+                    print(f"  FAILED tree fetch for {fork_key}: {e}"); return []
+    data = json.loads(cache_path.read_text(encoding="utf-8"))
+    if data.get("truncated"):
+        print(f"  WARNING: tree truncated for {fork_key}")
+    return [e["path"] for e in data.get("tree", []) if e.get("type") == "blob"]
+```
+(This REPLACES the Task 2 version of `fetch_repo_tree`; keep `repo_meta` as is.)
+
+(b) Selfcheck preflight — right after `tree = fetch_repo_tree(...)` in `selfcheck()` add:
+```python
+    if not tree:
+        sys.exit("tree fetch failed — network or GitHub rate limit? (see WARNINGs above)")
+```
+
+(c) The `--all-forks` loop in `main()` must isolate fork crashes (design-doc invariant "regen never dies whole"):
+```python
+    if args.all_forks:
+        per_fork = {}
+        for key in FORK_REGISTRY:
+            try:
+                per_fork[key] = process_fork(key)
+            except Exception as e:
+                print(f"SKIP fork {key}: crashed: {e}")
+                per_fork[key] = []
+        write_index(per_fork)
+```
 
 - [ ] **Step 1: Selfcheck asserts** (append)
 
