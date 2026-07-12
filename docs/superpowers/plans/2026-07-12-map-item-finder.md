@@ -1589,7 +1589,9 @@ still unwanted (rare; e.g. a duplicate admin variant).
 # ── Maps tab (ss14_map_extractor.py) ──
 # gameMap prototype ids to skip per fork (debug/lobby/arena maps that slip past the pool filter)
 MAP_BLOCKLIST: dict[str, list[str]] = {
-    # "vanilla": ["Debug"],   # fill as regen warnings reveal junk maps
+    # Pass MIN_MAP_ITEMS but not player stations (identified on E3 vanilla bake):
+    "vanilla": ["CentComm", "Dev"],   # admin centcomm + debug map — not player-spawnable
+    # Reach/Relic kept: small but legit explorable (salvage/relic) content.
 }
 ```
 Enable the two blocklist lines in `discover_maps` (drop the ponytail stub).
