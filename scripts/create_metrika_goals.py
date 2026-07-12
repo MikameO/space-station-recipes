@@ -14,10 +14,13 @@ script pushes them all through the Management API in one run.
 Idempotent: fetches existing goals first and skips any whose JS-event id is
 already registered, so re-running after adding new goals is safe.
 
-Auth: needs an OAuth token with the `metrika:write` scope. Easiest path —
-create an app at https://oauth.yandex.ru/ (or use the Metrika API debug
-token page https://yandex.ru/dev/metrika/ru/intro/authorization) and export
-it before running.
+Auth: needs an OAuth token with BOTH `metrika:read` and `metrika:write`
+scopes — the script reads existing goals before creating, and Yandex's
+write scope does not imply read (a write-only token gets 403 on the read
+step; verified 2026-07-12). Easiest path — create an app at
+https://oauth.yandex.ru/ (or use the Metrika API debug token page
+https://yandex.ru/dev/metrika/ru/intro/authorization) and export it
+before running.
 
 Usage
 -----
