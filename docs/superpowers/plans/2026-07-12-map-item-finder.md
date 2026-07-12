@@ -1058,7 +1058,7 @@ def write_index(per_fork: dict):
     for key, maps in per_fork.items():
         if not maps:
             continue
-        label = FORK_REGISTRY[key].get("label", key)
+        label = FORK_REGISTRY[key].get("name", key)  # display-name key is `name` (verified in config.py), not `label`
         forks.append({"key": key, "label": label, "maps": maps})
     OUT_DIR.mkdir(exist_ok=True)
     (OUT_DIR / "index.json").write_text(
@@ -1067,7 +1067,7 @@ def write_index(per_fork: dict):
     print(f"wrote maps/index.json ({sum(len(m) for m in per_fork.values())} maps)")
 ```
 
-In `main()`: `--fork X [--map ID]` → `process_fork` (filter to one map when `--map` given, still `write_index({fork: done})` merging with existing index.json if present — read it, replace that fork's entry, write back). `--all-forks` → loop `for key in FORK_REGISTRY`. Check the `label` key actually exists in `FORK_REGISTRY` values (`python -c "from config import FORK_REGISTRY; print(list(FORK_REGISTRY['vanilla'].keys()))"`) — if the display-name key is named differently (e.g. `name`), use that.
+In `main()`: `--fork X [--map ID]` → `process_fork` (filter to one map when `--map` given, still `write_index({fork: done})` merging with existing index.json if present — read it, replace that fork's entry, write back). `--all-forks` → loop `for key in FORK_REGISTRY`. (Display-name key confirmed = `name` in config.py; `write_index` above already uses it. `SCHEMA_VERSION = 1` already defined at module top.)
 
 - [ ] **Step 4: Run selfcheck until green; run the real thing**
 
