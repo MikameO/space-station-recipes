@@ -67,6 +67,18 @@ function track(goal, params) {
 // Init
 // ─────────────────────────────────────────────
 
+async function loadData(attempt = 1) {
+  try {
+    const resp = await fetch('data.json');
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+    return await resp.json();
+  } catch (e) {
+    if (attempt >= 3) throw e;
+    await new Promise(r => setTimeout(r, 600 * attempt));
+    return loadData(attempt + 1);
+  }
+}
+
 async function init() {
   // B2: offline PWA + companion (second-screen / PiP) compact layout
   if ('serviceWorker' in navigator &&
@@ -79,14 +91,15 @@ async function init() {
   try {
     // No cache-buster: SW serves cached data.json instantly (stale-while-
     // revalidate) and refreshes it in the background; Pages ETag covers the
-    // no-SW case. The old ?v=Date.now() forced a full 3MB download on every
-    // open — twice with the PiP companion window.
-    const resp = await fetch('data.json');
-    DATA = await resp.json();
+    // no-SW case. Three attempts with backoff — one flaky mobile moment
+    // must not strand the user on an error screen (user-reported).
+    DATA = await loadData();
   } catch (e) {
     document.getElementById('loadingOverlay').innerHTML =
       '<div style="color:#ef4444;padding:20px;text-align:center;">' +
-      'Failed to load data.json<br><small>If using file://, try a local server: python -m http.server</small></div>';
+      'Failed to load data.json after 3 attempts<br>' +
+      '<small>Check the connection — the app works offline only after one successful visit.</small><br>' +
+      '<button class="btn-primary" style="margin-top:12px" onclick="location.reload()">Retry</button></div>';
     return;
   }
 
@@ -3175,6 +3188,15 @@ function setupCompanionBar() {
     mainSearch.value = search.value;
     mainSearch.dispatchEvent(new Event('input', { bubbles: true }));
   });
+  // C3.2: filters drawer — the sidebar is chrome-hidden in companion mode,
+  // but people filter by category/effect/fork there too.
+  const filtersBtn = document.getElementById('companionFilters');
+  filtersBtn.addEventListener('click', () => {
+    const open = document.body.classList.toggle('companion-filters-open');
+    filtersBtn.classList.toggle('active', open);
+    track('companion_filters', { open: open ? 1 : 0 });
+  });
+
   const btn = document.getElementById('companionCollapse');
   btn.addEventListener('click', () => {
     const collapsed = document.body.classList.toggle('companion-collapsed');

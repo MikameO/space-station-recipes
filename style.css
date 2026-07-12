@@ -708,6 +708,24 @@ body.companion.companion-collapsed .tab-bar,
 body.companion.companion-collapsed main {
   display: none;
 }
+/* C3.2: filters drawer in companion mode — the sidebar returns as a
+   scrollable overlay under the bar */
+body.companion .companion-bar .btn-small { white-space: nowrap; flex-shrink: 0; }
+body.companion .companion-bar .btn-small.active { border-color: var(--phosphor); color: var(--phosphor); }
+body.companion.companion-filters-open .sidebar {
+  display: block;
+  position: fixed;
+  top: 38px;
+  left: 0;
+  bottom: 0;
+  width: min(320px, 92vw);
+  overflow-y: auto;
+  z-index: 45;
+  background: var(--hull);
+  border-right: 1px solid var(--border-subtle);
+  box-shadow: 4px 0 24px rgba(0,0,0,0.55);
+  padding: 10px 12px;
+}
 body.companion main {
   margin: 0;
   max-width: none;

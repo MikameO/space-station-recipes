@@ -3,12 +3,16 @@
 // network-first with cache fallback — fresh while online, functional offline.
 // data.json is requested with a ?v=Date.now() cache-buster, so fallback
 // matching ignores the query string to hit the cached copy.
-const CACHE = 'chemdb-v5';
+const CACHE = 'chemdb-v6';
+// Data lives in its own UNVERSIONED cache: shell-cache bumps must never
+// wipe the 3MB data.json — losing it right after an update + one flaky
+// network moment = hard "Failed to load" (user-reported on mobile).
+const DATA_CACHE = 'chemdb-data';
 const PRECACHE = [
   './',
   './index.html',
-  './style.css?v=20',
-  './app.js?v=18',
+  './style.css?v=21',
+  './app.js?v=19',
   './tutorial.js?v=2',
   './manifest.json',
   './libs/vis-network.min.js',
@@ -25,7 +29,8 @@ self.addEventListener('install', e => {
 self.addEventListener('activate', e => {
   e.waitUntil(
     caches.keys()
-      .then(keys => Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k))))
+      .then(keys => Promise.all(
+        keys.filter(k => k !== CACHE && k !== DATA_CACHE).map(k => caches.delete(k))))
       .then(() => self.clients.claim())
   );
 });
@@ -40,16 +45,14 @@ self.addEventListener('fetch', e => {
   // window) near-instant.
   if (url.pathname.endsWith('/data.json')) {
     e.respondWith(
-      caches.match(e.request, { ignoreSearch: true }).then(cached => {
-        const fresh = fetch(e.request).then(resp => {
-          if (resp.ok) {
-            const clone = resp.clone();
-            caches.open(CACHE).then(c => c.put(url.pathname, clone));
-          }
-          return resp;
-        }).catch(() => cached);
-        return cached || fresh;
-      })
+      caches.open(DATA_CACHE).then(dc =>
+        dc.match(url.pathname).then(cached => {
+          const fresh = fetch(e.request).then(resp => {
+            if (resp.ok) dc.put(url.pathname, resp.clone());
+            return resp;
+          }).catch(() => cached);
+          return cached || fresh;
+        }))
     );
     return;
   }
