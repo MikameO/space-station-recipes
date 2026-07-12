@@ -72,7 +72,7 @@
   "license": "https://github.com/MikameO/space-station-recipes/blob/main/LICENSE"
 }
 </script>
-<link rel="stylesheet" href="style.css?v=12">
+<link rel="stylesheet" href="style.css?v=13">
 <!-- Yandex.Metrika counter -->
 <script type="text/javascript">
     (function(m,e,t,r,i,k,a){
@@ -258,6 +258,8 @@
         </h3>
         <div class="section-body">
           <p class="reverse-desc">Add multiple targets to get one optimized shopping list</p>
+          <!-- A2: one-click shift-start presets (curated in config.py, validated at build) -->
+          <div class="preset-bar" id="presetBar"></div>
           <div class="batch-controls">
             <div class="batch-row">
               <input type="text" id="batchInput" class="search-input" placeholder="Type reagent..." autocomplete="off" aria-label="Add batch target reagent" style="width:220px">
@@ -415,7 +417,7 @@
   <div class="loading-bar"><div class="loading-bar-fill"></div></div>
 </div>
 
-<script src="app.js?v=9"></script>
+<script src="app.js?v=10"></script>
 <script defer src="tutorial.js?v=2"></script>
 </body>
 </html>

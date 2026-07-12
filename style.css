@@ -516,6 +516,40 @@ main {
   color: var(--phosphor);
 }
 
+/* A2: shift-start preset chips (Batch Planner) */
+.preset-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.preset-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: var(--hull-plate);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-sub);
+  font-family: 'Oxanium', sans-serif;
+  font-size: 12px;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+.preset-chip:hover {
+  border-color: var(--phosphor);
+  color: var(--phosphor);
+}
+.preset-tier-label {
+  font-size: 9px;
+  text-transform: uppercase;
+  opacity: 0.6;
+  border: 1px solid currentColor;
+  padding: 1px 4px;
+  border-radius: 2px;
+}
+.preset-tier-meta .preset-tier-label { color: var(--amber-warn, #ffb627); opacity: 0.9; }
+
 .tab-panel {
   display: none;
   flex: 1;

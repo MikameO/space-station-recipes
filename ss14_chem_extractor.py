@@ -34,6 +34,7 @@ from config import (
     BASE_DISPENSER_CHEMICALS, CATEGORY_SHEET_MAP,
     REAGENT_COLUMNS, REACTION_COLUMNS,
     ANTAG_DATA, ANTAG_STRATEGIES, DELIVERY_MECHANISMS, SYNDICATE_ITEMS,
+    SHIFT_PRESETS,
 )
 from sources import (
     SOURCES, AUTHORITY_WEIGHTS, ALLOWED_DOMAINS,
@@ -2527,6 +2528,21 @@ def export_json(reagents: dict, reactions: dict, locale: dict,
     data["deliveryMechanisms"] = DELIVERY_MECHANISMS
     data["syndicateItems"] = SYNDICATE_ITEMS
 
+    # Shift-start presets (ROADMAP A2) — validate curated reagent ids against
+    # the extracted reagent set so a config typo can't ship a broken preset.
+    presets_out = []
+    for _preset in SHIFT_PRESETS:
+        missing = [r["id"] for r in _preset["reagents"] if r["id"] not in data["reagents"]]
+        if missing:
+            print(f"  WARNING: shift preset '{_preset['id']}' drops unknown reagent ids: {missing}")
+        valid_reagents = [r for r in _preset["reagents"] if r["id"] not in missing]
+        if not valid_reagents:
+            print(f"  WARNING: shift preset '{_preset['id']}' has no valid reagents — skipped")
+            continue
+        presets_out.append({**_preset, "reagents": valid_reagents})
+    data["shiftPresets"] = presets_out
+    print(f"\n  Shift presets: {len(presets_out)}/{len(SHIFT_PRESETS)} exported")
+
     # Print mismatch summary (non-fatal — authored tier is preserved for UI tooltip).
     if mismatches:
         print(f"\n  Computed difficulty mismatches ({len(mismatches)}/{len(ANTAG_STRATEGIES)}):")
@@ -2548,6 +2564,8 @@ def export_json(reagents: dict, reactions: dict, locale: dict,
     attribution_inputs = []
     for s in strategies_out:
         attribution_inputs.append((f"ANTAG_STRATEGIES:{s['id']}", s.get("sources", [])))
+    for p in presets_out:
+        attribution_inputs.append((f"SHIFT_PRESETS:{p['id']}", p.get("sources", [])))
     for rid, robj in data["reagents"].items():
         if robj.get("antagTipsSources"):
             attribution_inputs.append((f"ANTAG_DATA:{rid}", robj["antagTipsSources"]))

@@ -316,6 +316,12 @@ SOURCES = {
         "date": "2026-04-19",
         "note": "Original curator compiled these notes from personal playtime across multiple SS14 forks. Source is undocumented — community verification via PR is encouraged.",
     },
+    "mk-shift-presets": {
+        "type": "maintainer-knowledge",
+        "title": "Shift-start preset curation from maintainer's playtime",
+        "date": "2026-07-12",
+        "note": "Reagent picks and amounts for the one-click shift-start presets (Batch Planner). Compiled from personal playtime; every reagent id is validated against extracted vanilla recipes at build time. Community tuning via PR is encouraged.",
+    },
 }
 
 

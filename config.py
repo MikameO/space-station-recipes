@@ -1481,6 +1481,75 @@ ANTAG_DATA = {
     },
 }
 
+# ─────────────────────────────────────────────
+# Shift-start presets (ROADMAP A2)
+# One-click starter batches for the Batch Planner — peaceful counterpart to
+# ANTAG_STRATEGIES, same provenance model (every entry carries sources).
+# tier: "newbie" (safe shift-opening set) | "meta" (experienced second wave).
+# Reagent ids are validated against extracted reagents at build time; invalid
+# ids are dropped with a warning so a typo can't ship a broken preset.
+# ─────────────────────────────────────────────
+SHIFT_PRESETS = [
+    {
+        "id": "med-chem-starter",
+        "name": "Med-Chem Starter",
+        "role": "chemist",
+        "tier": "newbie",
+        "desc": "Classic shift-opening batch: brute/burn/tox coverage plus a crit stabilizer.",
+        "reagents": [
+            {"id": "Bicaridine", "amount": 90},
+            {"id": "Kelotane", "amount": 90},
+            {"id": "Dylovene", "amount": 90},
+            {"id": "Epinephrine", "amount": 30},
+        ],
+        "sources": ["mk-shift-presets"],
+    },
+    {
+        "id": "med-chem-advanced",
+        "name": "Advanced Meds",
+        "role": "chemist",
+        "tier": "meta",
+        "desc": "Second wave once basics are stocked: stronger burn care, airloss, radiation, cellular damage and body-temp stabilization.",
+        "reagents": [
+            {"id": "Dermaline", "amount": 60},
+            {"id": "DexalinPlus", "amount": 60},
+            {"id": "Hyronalin", "amount": 30},
+            {"id": "Leporazine", "amount": 30},
+            {"id": "Phalanximine", "amount": 30},
+        ],
+        "sources": ["mk-shift-presets"],
+    },
+    {
+        "id": "botany-kit",
+        "name": "Botany Kit",
+        "role": "botanist",
+        "tier": "newbie",
+        "desc": "Grow-room chemistry: nutrients, yield booster, controlled mutations and weed control.",
+        "reagents": [
+            {"id": "EZNutrient", "amount": 60},
+            {"id": "RobustHarvest", "amount": 60},
+            {"id": "UnstableMutagen", "amount": 30},
+            {"id": "Left4Zed", "amount": 30},
+            {"id": "PlantBGone", "amount": 30},
+        ],
+        "sources": ["mk-shift-presets"],
+    },
+    {
+        "id": "bar-prep",
+        "name": "Bar Prep",
+        "role": "bartender",
+        "tier": "newbie",
+        "desc": "Mixable bases to open the bar: soft-drink stock, ice and house vodka.",
+        "reagents": [
+            {"id": "Cola", "amount": 60},
+            {"id": "SodaWater", "amount": 60},
+            {"id": "Ice", "amount": 30},
+            {"id": "Vodka", "amount": 30},
+        ],
+        "sources": ["mk-shift-presets"],
+    },
+]
+
 # Pre-built antagonist strategies/combos
 ANTAG_STRATEGIES = [
     {

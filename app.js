@@ -101,6 +101,7 @@ async function init() {
   setupCraftTrees();
   setupReverseLookup();
   setupBatchPlanner();
+  renderPresetBar(); // A2: shift-start preset chips
   setupShareButton();
   setupDisclaimer();
   setupAntagMode();
@@ -2115,13 +2116,19 @@ function setupBatchPlanner() {
     renderBatchResults(result, resultsDiv, warningsDiv);
   });
 
-  // Expose external API for strategy→batch integration
+  // Expose external API for strategy/preset→batch integration
   window.addBatchTargetExternal = function(id, amount) {
     const r = DATA.reagents[id];
     if (!r) return;
     // Avoid duplicates
     if (batchTargets.find(t => t.id === id)) return;
     batchTargets.push({ id, amount, name: capName(r.name || id) });
+    renderBatchChips();
+  };
+  // A2: real state reset — clearing chip DOM alone left batchTargets populated,
+  // so consecutive strategy/preset loads silently merged into one batch.
+  window.clearBatchTargetsExternal = function() {
+    batchTargets.length = 0;
     renderBatchChips();
   };
 }
@@ -2622,33 +2629,63 @@ function renderDeliveryMechanisms() {
   `;
 }
 
-function loadStrategyIntoBatch(strategyId) {
-  const strat = (DATA.antagStrategies || []).find(s => s.id === strategyId);
-  if (!strat) return;
-  track('strategy_to_batch', { strategy: strategyId });
-
+// Shared loader: fills the Batch Planner with a reagent set and runs the plan.
+// Used by antag strategies and shift presets (A2).
+function loadReagentSetIntoBatch(reagents, label) {
   // Switch to calculator tab
   const calcTab = document.querySelector('.tab-btn[data-tab="calculator"]');
   if (calcTab) calcTab.click();
 
-  // Add each strategy reagent to batch planner
   setTimeout(() => {
-    // Clear existing batch targets
-    const batchChips = document.getElementById('batchChips');
-    if (batchChips) batchChips.innerHTML = '';
+    // Clear existing batch targets (state reset, not just chip DOM — see A2 bugfix)
+    if (typeof window.clearBatchTargetsExternal === 'function') {
+      window.clearBatchTargetsExternal();
+    }
 
     // Use the exposed addBatchTarget if available, or simulate
     if (typeof window.addBatchTargetExternal === 'function') {
-      for (const r of strat.reagents) {
+      for (const r of reagents) {
         window.addBatchTargetExternal(r.id, r.amount);
       }
       // Auto-trigger plan
       const planBtn = document.getElementById('batchPlanBtn');
       if (planBtn) planBtn.click();
     } else {
-      showToast(`Strategy: ${strat.name} — switch to Calculator tab manually.`);
+      showToast(`${label} — switch to Calculator tab manually.`);
     }
   }, 200);
+}
+
+function loadStrategyIntoBatch(strategyId) {
+  const strat = (DATA.antagStrategies || []).find(s => s.id === strategyId);
+  if (!strat) return;
+  track('strategy_to_batch', { strategy: strategyId });
+  loadReagentSetIntoBatch(strat.reagents, `Strategy: ${strat.name}`);
+}
+
+// A2: shift-start presets
+const PRESET_ROLE_ICONS = { chemist: '⚗', botanist: '\u{1F331}', bartender: '\u{1F378}' };
+
+function loadPresetIntoBatch(presetId) {
+  const preset = (DATA.shiftPresets || []).find(p => p.id === presetId);
+  if (!preset) return;
+  track('preset_to_batch', { preset: presetId });
+  loadReagentSetIntoBatch(preset.reagents, `Preset: ${preset.name}`);
+}
+
+function renderPresetBar() {
+  const bar = document.getElementById('presetBar');
+  const presets = DATA.shiftPresets || [];
+  if (!bar || !presets.length) return;
+  bar.innerHTML = presets.map(p => {
+    const icon = PRESET_ROLE_ICONS[p.role] || '⚙';
+    const items = p.reagents.map(r => `${r.amount}u ${r.id}`).join(', ');
+    return `<button class="preset-chip preset-tier-${esc(p.tier)}"
+      onclick="loadPresetIntoBatch('${esc(p.id)}')"
+      title="${esc(p.desc)}\n${esc(items)}">
+      ${icon} ${esc(p.name)}<span class="preset-tier-label">${esc(p.tier)}</span>
+    </button>`;
+  }).join('');
 }
 
 // ─────────────────────────────────────────────
