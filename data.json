@@ -16740,7 +16740,8 @@
    "effects": "[Bloodstream] Heals Asphyxiation 2 (if mob state: Critical); [Bloodstream] Effect: ModifyBleed; [Medicine] Heals Asphyxiation 1 (if mob state: Critical); [Medicine] Jitter (if self > 60u); [Medicine] Status: Unconscious (if self > 60u); [Medicine] Status: Unconscious (if self > 100u) @5%",
    "effectTags": [
     "heals:asphyxiation",
-    "jitter"
+    "jitter",
+    "unconscious"
    ],
    "metabolismPaths": [
     "Bloodstream",
@@ -55139,7 +55140,8 @@
    "effects": "[Poison] Effect: Toxic; [Poison] Emote: Yawn @25%; [Poison] Status: Unconscious (if self > 15u); [Poison] Deals Asphyxiation 15 (if self > 25u)",
    "effectTags": [
     "deals:asphyxiation",
-    "emote"
+    "emote",
+    "unconscious"
    ],
    "metabolismPaths": [
     "Poison"
@@ -56788,7 +56790,8 @@
    "effects": "[Bloodstream] Status: ModifyStatusEffect; [Poison] Status: ModifyStatusEffect; [Poison] Emote: Laugh @5%; [Poison] Jitter; [Poison] Status: Unconscious (if self > 50u)",
    "effectTags": [
     "emote",
-    "jitter"
+    "jitter",
+    "unconscious"
    ],
    "metabolismPaths": [
     "Bloodstream",
@@ -57869,7 +57872,8 @@
    "effects": "[Bloodstream] Status: ModifyStatusEffect; [Narcotic] Emote: Laugh @5%; [Narcotic] Status: ModifyStatusEffect; [Narcotic] Jitter (if self > 30u); [Narcotic] Status: Unconscious (if self > 50u)",
    "effectTags": [
     "emote",
-    "jitter"
+    "jitter",
+    "unconscious"
    ],
    "metabolismPaths": [
     "Bloodstream",
@@ -58219,7 +58223,8 @@
    "effects": "[Bloodstream] Status: ModifyStatusEffect; [Narcotic] Emote: Laugh @5%; [Narcotic] Status: ModifyStatusEffect; [Narcotic] Jitter (if self > 30u); [Narcotic] Status: Unconscious (if self > 50u)",
    "effectTags": [
     "emote",
-    "jitter"
+    "jitter",
+    "unconscious"
    ],
    "metabolismPaths": [
     "Bloodstream",

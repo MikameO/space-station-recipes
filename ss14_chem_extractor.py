@@ -1172,6 +1172,14 @@ def extract_effect_tags(metabolisms: dict) -> list[str]:
                 tags.add("speed")
             elif "AdjustTemperature" in etype:
                 tags.add("temperature")
+            elif "ModifyStatusEffect" in etype or "GenericStatusEffect" in etype:
+                # Status effects render as "Status: <key>" in the human-readable
+                # effects string (see summarize_single_effect). Expose Unconscious
+                # as a filterable tag so sedative/knockout chems surface in the
+                # Effects sidebar; other status keys stay untagged for now.
+                key = str(eff.get("key", eff.get("statusEffectId", ""))).lower()
+                if key == "unconscious":
+                    tags.add("unconscious")
     return sorted(tags)
 
 
