@@ -87,12 +87,16 @@ def compare_reaction(vanilla_rxn: dict, fork_rxn: dict) -> list[str]:
     v_rids = set(v_reacts.keys()) if isinstance(v_reacts, dict) else set()
     f_rids = set(f_reacts.keys()) if isinstance(f_reacts, dict) else set()
 
-    for rid in f_rids - v_rids:
+    # NOTE: all set iterations below are sorted() — set order depends on
+    # per-process str-hash randomization, and these clauses serialize into
+    # forkNotes/rmcNote strings; unsorted iteration shuffled clause order
+    # on every regen, polluting data.json diffs.
+    for rid in sorted(f_rids - v_rids):
         amt = f_reacts[rid].get("amount", 1) if isinstance(f_reacts[rid], dict) else f_reacts[rid]
         diffs.append(f"Added {rid}({amt}) reactant")
-    for rid in v_rids - f_rids:
+    for rid in sorted(v_rids - f_rids):
         diffs.append(f"Removed {rid} reactant")
-    for rid in v_rids & f_rids:
+    for rid in sorted(v_rids & f_rids):
         v_amt = v_reacts[rid].get("amount", 1) if isinstance(v_reacts[rid], dict) else v_reacts[rid]
         f_amt = f_reacts[rid].get("amount", 1) if isinstance(f_reacts[rid], dict) else f_reacts[rid]
         if v_amt != f_amt:
@@ -105,11 +109,11 @@ def compare_reaction(vanilla_rxn: dict, fork_rxn: dict) -> list[str]:
     # Compare products
     v_prods = vanilla_rxn.get("products", {})
     f_prods = fork_rxn.get("products", {})
-    for pid in set(f_prods) - set(v_prods):
+    for pid in sorted(set(f_prods) - set(v_prods)):
         diffs.append(f"Added product {pid}")
-    for pid in set(v_prods) - set(f_prods):
+    for pid in sorted(set(v_prods) - set(f_prods)):
         diffs.append(f"Removed product {pid}")
-    for pid in set(v_prods) & set(f_prods):
+    for pid in sorted(set(v_prods) & set(f_prods)):
         if v_prods[pid] != f_prods[pid]:
             diffs.append(f"{pid} yield {v_prods[pid]}->{f_prods[pid]}")
 
