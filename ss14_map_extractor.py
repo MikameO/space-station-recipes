@@ -20,6 +20,11 @@ SCRIPT_DIR = Path(__file__).resolve().parent   # anchor like the sibling does
 CACHE_DIR = SCRIPT_DIR / "cache_maps"
 OUT_DIR = SCRIPT_DIR / "maps"
 SCHEMA_VERSION = 1
+# Data-driven junk filter: a real playable station has hundreds of searchable
+# items; deathmatch/arena/test maps have <100. Cleaner than a per-fork blocklist
+# and auto-handles all 18 forks. (E3 vanilla: drops Empty=0, MeteorArena=0,
+# dm01-entryway=57, TestTeg=85; keeps Relic=943, Reach=1005.)
+MIN_MAP_ITEMS = 100
 
 # ── fetch (copied from ss14_chem_extractor.py:191, keep in sync manually) ──
 
@@ -700,6 +705,11 @@ def process_fork(fork_key: str, map_filter: str | None = None) -> list[dict]:
             parsed = parse_map_file(fork_key, fork_cfg, gm["path"])
             png_path, bounds = bake_png(fork_key, gm["id"], parsed, reg)
             data = build_map_json(fork_key, gm["id"], gm["name"], parsed, reg, bounds)
+            if len(data["items"]) < MIN_MAP_ITEMS:
+                print(f"  SKIP {fork_key}/{gm['id']}: only {len(data['items'])} items (non-station/junk)")
+                png_path.unlink(missing_ok=True)
+                (OUT_DIR / fork_key / f"{gm['id']}.json").unlink(missing_ok=True)
+                continue
             done.append({"id": gm["id"], "name": gm["name"], "file": f"{fork_key}/{gm['id']}",
                          "inPool": gm["inPool"], "items": len(data["items"]),
                          "beacons": len(data["beacons"]),

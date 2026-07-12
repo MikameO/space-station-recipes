@@ -1564,6 +1564,25 @@ Expected: ~15 maps baked, warnings (if any) reviewed one by one — a broken map
 
 **Files:** Modify: `config.py` (append), `ss14_map_extractor.py` (enable blocklist), run `--all-forks`
 
+**⚠ E4 BLOCKER — repo size (found on E3):** vanilla ALONE bakes to **9.75 MB** JSON
+(16 real stations, PNGs are negligible 0.14 MB). The plan's "< 25 MB for 18 forks"
+estimate is wrong — even if most forks reuse upstream maps, the custom-map forks
+could push `maps/` to 30–60 MB of committed JSON. Root cause: every container/vendor
+position repeats its `via` string ("maintenance closet") — 2200 protos × many
+positions/map. **Decide BEFORE baking 18 forks:** (a) accept it (git + Pages gzip
+handle it; per-map lazy load means runtime transfer is ~1/10th, fine) — simplest;
+(b) dedupe `via` into a per-map string table (`data.vias: [...]`, `p[3]` becomes an
+int index) — ~40% shrink, needs frontend Task 12/13 to deref (small change: `vias[p[3]]`);
+(c) drop the redundant `via` on floor/vendor and reconstruct client-side. Recommend
+(a) for first ship, (b) as a fast-follow if `du -sh maps/` alarms. Whichever: re-bake
+ALL forks under the final schema so bytes are consistent.
+
+**Junk filter already data-driven (E3):** `MIN_MAP_ITEMS = 100` in the extractor drops
+non-station maps (deathmatch/arena/test) by item count — cleaner than per-fork curation
+and auto-covers all forks (E3 vanilla: dropped Empty/MeteorArena/dm01-entryway/TestTeg,
+20→16). `MAP_BLOCKLIST` below is now only for maps that PASS the item threshold but are
+still unwanted (rare; e.g. a duplicate admin variant).
+
 - [ ] **Step 1: config.py** (append at the end)
 
 ```python
