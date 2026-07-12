@@ -117,14 +117,39 @@ def repo_meta(fork_cfg: dict) -> tuple[str, str, str]:
         raise ValueError(f"unparseable raw_url: {fork_cfg['raw_url']}")
     return m.group(1), m.group(2), m.group(3)
 
+def _gh_token() -> str:
+    import subprocess
+    try:
+        t = subprocess.run(["gh", "auth", "token"], capture_output=True, text=True, timeout=10)
+        return t.stdout.strip() if t.returncode == 0 else ""
+    except Exception:
+        return ""
+
 def fetch_repo_tree(fork_key: str, fork_cfg: dict) -> list[str]:
-    """All file paths in the fork's repo (git/trees API, cached)."""
+    """All file paths in the fork's repo (git/trees API, cached, gh-authenticated when possible)."""
     owner, repo, branch = repo_meta(fork_cfg)
-    url = f"https://api.github.com/repos/{owner}/{repo}/git/trees/{branch}?recursive=1"
-    content = fetch_file(url, CACHE_DIR / fork_key / "_tree.json")
-    if not content:
-        return []
-    data = json.loads(content)
+    cache_path = CACHE_DIR / fork_key / "_tree.json"
+    if not cache_path.exists():
+        url = f"https://api.github.com/repos/{owner}/{repo}/git/trees/{branch}?recursive=1"
+        headers = {"User-Agent": "SS14-Map-Extractor/1.0"}
+        token = _gh_token()
+        if token:
+            headers["Authorization"] = f"Bearer {token}"
+        else:
+            print("  NOTE: no gh token — anonymous API limit is 60 req/h")
+        cache_path.parent.mkdir(parents=True, exist_ok=True)
+        for attempt in range(3):
+            try:
+                req = urllib.request.Request(url, headers=headers)
+                with urllib.request.urlopen(req, timeout=120) as resp:
+                    cache_path.write_text(resp.read().decode("utf-8"), encoding="utf-8")
+                break
+            except Exception as e:
+                if attempt < 2:
+                    print(f"  Retry {attempt + 1}/3: {e}"); time.sleep(2 * (attempt + 1))
+                else:
+                    print(f"  FAILED tree fetch for {fork_key}: {e}"); return []
+    data = json.loads(cache_path.read_text(encoding="utf-8"))
     if data.get("truncated"):
         print(f"  WARNING: tree truncated for {fork_key}")
     return [e["path"] for e in data.get("tree", []) if e.get("type") == "blob"]
@@ -512,11 +537,72 @@ def bake_png(fork_key: str, map_id: str, parsed: dict, reg: Registry):
     print(f"  baked {out} {w}x{h}")
     return out, bounds
 
+def build_map_json(fork_key, map_id, map_name, parsed, reg, bounds):
+    main = parsed["main_grid"]
+    offnames = parsed["offgrid_names"]
+    items = {}   # protoId -> {"n", "c", "p": [...]}
+
+    def add(pid, x, y, kind, via=None, extra=None):
+        k = reg.kind(pid)
+        if k not in ("item", "mach", "container", "vendor", "beacon"):
+            return
+        cat = "item" if k == "item" else "mach"
+        rec = items.setdefault(pid, {"n": reg.name(pid), "c": cat, "p": []})
+        p = [x, y, kind]
+        if via is not None:
+            p.append(via)
+            if extra is not None:
+                p.append(extra)
+        rec["p"].append(p)
+
+    beacons = []
+    for proto, poss in parsed["entities"].items():
+        kind = reg.kind(proto)
+        for x, y, grid in poss:
+            offgrid = grid != main
+            if kind == "beacon":
+                if not offgrid:
+                    text = parsed["beacon_overrides"].get((x, y, grid)) or reg.beacon_text(proto)
+                    beacons.append([text, x, y])
+                continue
+            if kind == "skip" or kind in ("wall", "window", "door"):
+                continue
+            if offgrid:
+                add(proto, x, y, 3, offnames.get(grid, "off-grid"))
+                continue
+            # the thing itself is searchable (locker, vendor, machine, item)
+            add(proto, x, y, 0)
+            fills = reg.storage_fill(proto)  # containers AND filled items (duffel bags)
+            if fills:
+                via = reg.name(proto)
+                for entry in fills:
+                    if not isinstance(entry, dict) or not entry.get("id"):
+                        continue
+                    prob = entry.get("prob")
+                    amount = entry.get("amount", 1)
+                    extra = round(prob, 2) if isinstance(prob, (int, float)) and prob < 1 else (amount if amount > 1 else None)
+                    add(entry["id"], x, y, 1, via, extra)
+            if kind == "vendor":
+                via = reg.name(proto)
+                for pid, count in reg.vendor_inventory(proto).items():
+                    add(pid, x, y, 2, via, count)
+                for pid, count in reg.vendor_contraband(proto).items():
+                    add(pid, x, y, 4, via, count)
+    data = {"schemaVersion": SCHEMA_VERSION, "id": map_id, "name": map_name,
+            "fork": fork_key, "bounds": bounds, "beacons": beacons,
+            "offgrid": {str(u): n for u, n in offnames.items()}, "items": items}
+    out = OUT_DIR / fork_key / f"{map_id}.json"
+    out.write_text(json.dumps(data, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
+    print(f"  wrote {out} ({out.stat().st_size // 1024} KB, {len(items)} protos)")
+    return data
+
 # ── selfcheck ──
 
 def selfcheck():
     fork = FORK_REGISTRY["vanilla"]
     tree = fetch_repo_tree("vanilla", fork)
+    if not tree:
+        sys.exit("tree fetch failed — network or GitHub rate limit? (see WARNINGs above)")
     maps = discover_maps("vanilla", fork, tree)
     byid = {m["id"]: m for m in maps}
     assert "Bagel" in byid, f"Bagel missing: {sorted(byid)}"
@@ -583,6 +669,59 @@ def selfcheck():
     assert opaque > 15000, f"suspiciously empty PNG: {opaque} opaque px"
     print(f"selfcheck OK: {len(maps)} maps, {len(reg.protos)} protos, {len(parsed['tiles'])} tiles")
 
+    data = build_map_json("vanilla", "Bagel", "Bagel Station", parsed, reg, bounds)
+    items = data["items"]
+    assert "Crowbar" in items
+    kinds = {p[2] for p in items["Crowbar"]["p"]}
+    assert 0 in kinds, "floor crowbar missing"
+    assert 2 in kinds or 4 in kinds, "vending crowbar missing (YouTool is on Bagel)"
+    assert any(p[2] == 1 for plist in (v["p"] for v in items.values()) for p in plist), "no container-sourced items at all"
+    assert len(data["beacons"]) > 20, f"beacons: {len(data['beacons'])}"
+    assert all(len(b) == 3 for b in data["beacons"])
+    raw = json.dumps(data)
+    assert len(raw) < 2_000_000, f"map json too big: {len(raw)}"
+    print("selfcheck OK: full Bagel pipeline")
+
+def process_fork(fork_key: str, map_filter: str | None = None) -> list[dict]:
+    fork_cfg = FORK_REGISTRY[fork_key]
+    tree = fetch_repo_tree(fork_key, fork_cfg)
+    if not tree:
+        print(f"SKIP fork {fork_key}: no tree"); return []
+    maps = discover_maps(fork_key, fork_cfg, tree)
+    if map_filter:
+        maps = [m for m in maps if m["id"] == map_filter]
+    if not maps:
+        print(f"SKIP fork {fork_key}: no gameMap protos"); return []
+    reg = build_registry(fork_key, fork_cfg, tree)
+    load_tile_colors(fork_key, fork_cfg, reg)
+    done = []
+    for gm in maps:
+        try:
+            parsed = parse_map_file(fork_key, fork_cfg, gm["path"])
+            png_path, bounds = bake_png(fork_key, gm["id"], parsed, reg)
+            data = build_map_json(fork_key, gm["id"], gm["name"], parsed, reg, bounds)
+            done.append({"id": gm["id"], "name": gm["name"], "file": f"{fork_key}/{gm['id']}",
+                         "inPool": gm["inPool"], "items": len(data["items"]),
+                         "beacons": len(data["beacons"]),
+                         "px": [bounds["maxX"] - bounds["minX"] + 1, bounds["maxY"] - bounds["minY"] + 1]})
+        except Exception as e:
+            print(f"  WARNING: {fork_key}/{gm['id']} failed: {e}")
+    print(f"fork {fork_key}: {len(done)}/{len(maps)} maps baked")
+    return done
+
+def write_index(per_fork: dict):
+    forks = []
+    for key, maps in per_fork.items():
+        if not maps:
+            continue
+        label = FORK_REGISTRY[key].get("name", key)  # display-name key is `name` (verified in config.py), not `label`
+        forks.append({"key": key, "label": label, "maps": maps})
+    OUT_DIR.mkdir(exist_ok=True)
+    (OUT_DIR / "index.json").write_text(
+        json.dumps({"schemaVersion": SCHEMA_VERSION, "forks": forks},
+                   ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
+    print(f"wrote maps/index.json ({sum(len(m) for m in per_fork.values())} maps)")
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--fork", default="vanilla")
@@ -592,7 +731,24 @@ def main():
     args = ap.parse_args()
     if args.selfcheck:
         selfcheck(); return
-    print(f"fork={args.fork} map={args.map} all_forks={args.all_forks}")
+    if args.all_forks:
+        per_fork = {}
+        for key in FORK_REGISTRY:
+            try:
+                per_fork[key] = process_fork(key)
+            except Exception as e:
+                print(f"SKIP fork {key}: crashed: {e}")
+                per_fork[key] = []
+        write_index(per_fork)
+        return
+    done = process_fork(args.fork, args.map)
+    index_path = OUT_DIR / "index.json"
+    per_fork = {}
+    if index_path.exists():
+        existing = json.loads(index_path.read_text(encoding="utf-8"))
+        per_fork = {f["key"]: f["maps"] for f in existing.get("forks", [])}
+    per_fork[args.fork] = done
+    write_index(per_fork)
 
 if __name__ == "__main__":
     main()
