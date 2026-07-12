@@ -495,6 +495,22 @@ FORK_REGISTRY = {
         },
         "dispenser_chemicals": set(),
         "vanilla_override_reaction_files": VANILLA_REACTION_PATHS,
+        # D3c: fork item-fill channels (custom layer only; patched vanilla-path
+        # vendor copies are a follow-up — see design doc)
+        "item_fill_files": [
+            "Resources/Prototypes/_Goobstation/Entities/Objects/Consumable/Drinks/drinks.yml",
+            "Resources/Prototypes/_Goobstation/Entities/Objects/Consumable/Drinks/drinks-cartons.yml",
+        ],
+        "vending_inventory_files": [
+            "Resources/Prototypes/_Goobstation/Catalog/VendingMachines/Inventories/fitness.yml",
+            "Resources/Prototypes/_Goobstation/Catalog/VendingMachines/Inventories/hotfood.yml",
+            "Resources/Prototypes/_Goobstation/Catalog/VendingMachines/Inventories/solsnack.yml",
+            "Resources/Prototypes/_Goobstation/Catalog/VendingMachines/Inventories/sweettoof.yml",
+            "Resources/Prototypes/_Goobstation/Catalog/VendingMachines/Inventories/weebvend.yml",
+        ],
+        "vending_machine_files": [
+            "Resources/Prototypes/_Goobstation/Entities/Structures/Machines/vending_machines.yml",
+        ],
     },
 
     # ── Starlight ──
@@ -628,6 +644,27 @@ FORK_REGISTRY = {
         "modified_reactions": {},
         "dispenser_chemicals": set(),
         "vanilla_override_reaction_files": VANILLA_REACTION_PATHS,
+        # D3c: fork item-fill channels
+        "item_fill_files": [
+            "Resources/Prototypes/_DV/Entities/Objects/Consumable/Drinks/drinks.yml",
+            "Resources/Prototypes/_DV/Entities/Objects/Consumable/Drinks/drinks-cartons.yml",
+            "Resources/Prototypes/_DV/Entities/Objects/Consumable/Drinks/drinks_bottles.yml",
+            "Resources/Prototypes/_DV/Entities/Objects/Consumable/Drinks/drinks_cans.yml",
+            "Resources/Prototypes/_DV/Entities/Objects/Consumable/Drinks/drinks_cups.yml",
+            "Resources/Prototypes/_DV/Entities/Objects/Consumable/Drinks/frozen_treats.yml",
+            "Resources/Prototypes/_DV/Entities/Objects/Consumable/Drinks/powdered_drinks.yml",
+        ],
+        "vending_inventory_files": [
+            "Resources/Prototypes/_DV/Catalog/VendingMachines/Inventories/commandboozeomat.yml",
+            "Resources/Prototypes/_DV/Catalog/VendingMachines/Inventories/crescentmoon.yml",
+            "Resources/Prototypes/_DV/Catalog/VendingMachines/Inventories/nanoblood.yml",
+            "Resources/Prototypes/_DV/Catalog/VendingMachines/Inventories/nanomedcivilian.yml",
+            "Resources/Prototypes/_DV/Catalog/VendingMachines/Inventories/unlockedboozeomat.yml",
+            "Resources/Prototypes/_DV/Catalog/VendingMachines/Inventories/unlockedchefvend.yml",
+        ],
+        "vending_machine_files": [
+            "Resources/Prototypes/_DV/Entities/Structures/Machines/vending_machines.yml",
+        ],
     },
 
     # ── Dead Space ──
@@ -1068,6 +1105,24 @@ FORK_REGISTRY = {
         "modified_reactions": {},
         "dispenser_chemicals": set(),
         "vanilla_override_reaction_files": VANILLA_REACTION_PATHS,
+        # D3c: fork item-fill channels (pillomat = ADT pill vendor)
+        "item_fill_files": [
+            "Resources/Prototypes/ADT/Entities/Objects/Consumable/Drinks/drink_bottles.yml",
+            "Resources/Prototypes/ADT/Entities/Objects/Consumable/Drinks/drink_cups.yml",
+            "Resources/Prototypes/ADT/Entities/Objects/Consumable/Drinks/drinks.yml",
+            "Resources/Prototypes/ADT/Entities/Objects/Consumable/Drinks/drinks_cans.yml",
+            "Resources/Prototypes/ADT/Entities/Objects/Consumable/Drinks/drinks_flasks.yml",
+            "Resources/Prototypes/ADT/Entities/Objects/Consumable/Drinks/yupi.yml",
+            "Resources/Prototypes/ADT/Entities/Objects/Specific/Medical/healing.yml",
+        ],
+        "vending_inventory_files": [
+            "Resources/Prototypes/ADT/Catalog/VendingMachines/Inventories/civimed.yml",
+            "Resources/Prototypes/ADT/Catalog/VendingMachines/Inventories/icecream.yml",
+            "Resources/Prototypes/ADT/Catalog/VendingMachines/Inventories/pillomat.yml",
+        ],
+        "vending_machine_files": [
+            "Resources/Prototypes/ADT/Entities/Structures/Machines/vending_machines.yml",
+        ],
     },
 
     # ── Sunrise (RU) ──

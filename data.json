@@ -1,7 +1,7 @@
 {
  "meta": {
   "schemaVersion": "3.4.3",
-  "generated": "2026-07-12T17:21:00",
+  "generated": "2026-07-12T17:25:03",
   "forks": {
    "vanilla": {
     "name": "Vanilla SS14",
@@ -6878,9 +6878,9 @@
     "Chemistry reaction"
    ],
    "accessibility": {
-    "tier": "unknown",
-    "weight": 5,
-    "reason": "Recipe exists but a deep-chain ingredient is unresolved by extractor (likely plant-mutation, mob-drop, or cooking product)"
+    "tier": "cross-service",
+    "weight": 2,
+    "reason": "Recipe requires cross-service ingredient(s)"
    },
    "verifiedMechanics": [
     "Tile: Ignites spilled reagent (x1.35 temperature)",
@@ -7068,8 +7068,8 @@
    "criticalOverdose": null,
    "recipe": null,
    "obtainSources": [
-    "Booze Dispenser: Magm-Ale growler (240u)",
     "Vending: Booze-O-Mat — Magm-Ale bottle (60u)",
+    "Booze Dispenser: Magm-Ale growler (240u)",
     "Booze Dispenser"
    ],
    "accessibility": {
@@ -9333,11 +9333,13 @@
    "overdose": null,
    "criticalOverdose": null,
    "recipe": null,
-   "obtainSources": [],
+   "obtainSources": [
+    "Vending: Booze-O-Mat — angobitters bottle (50u)"
+   ],
    "accessibility": {
-    "tier": "unobtainable",
-    "weight": 999,
-    "reason": "No recipe, no plant, no dispenser source"
+    "tier": "cross-service",
+    "weight": 2,
+    "reason": "Cross-department: Vending: Booze-O-Mat — angobitters bottle (50u)"
    },
    "verifiedMechanics": [
     "Tile: Ignites spilled reagent (x1.35 temperature)",
@@ -10521,12 +10523,13 @@
    "criticalOverdose": null,
    "recipe": null,
    "obtainSources": [
+    "Vending: ChefVend — Astrotame (1u)",
     "Vending: condiment station — Astrotame (1u)"
    ],
    "accessibility": {
     "tier": "cross-service",
     "weight": 2,
-    "reason": "Cross-department: Vending: condiment station — Astrotame (1u)"
+    "reason": "Cross-department: Vending: ChefVend — Astrotame (1u)"
    },
    "verifiedMechanics": [],
    "boilingPoint": null,
@@ -12260,13 +12263,14 @@
    },
    "obtainSources": [
     "Chemistry reaction",
+    "Vending: ChefVend — BBQ sauce (1u)",
     "Vending: ChefVend — BBQ sauce bottle (50u)",
     "Vending: condiment station — BBQ sauce (1u)"
    ],
    "accessibility": {
     "tier": "cross-service",
     "weight": 2,
-    "reason": "Cross-department: Vending: ChefVend — BBQ sauce bottle (50u)"
+    "reason": "Cross-department: Vending: ChefVend — BBQ sauce (1u)"
    },
    "verifiedMechanics": [],
    "boilingPoint": null,
@@ -12432,10 +12436,10 @@
    "recipe": null,
    "obtainSources": [
     "Hops (plant)",
-    "Booze Dispenser: beer growler (240u)",
-    "Vending (hacked): Sustenance Vendor — beer can (40u)",
     "Vending: Booze-O-Mat — beer bottle (60u)",
     "Vending: Booze-O-Mat — beer can (40u)",
+    "Booze Dispenser: beer growler (240u)",
+    "Vending (hacked): Sustenance Vendor — beer can (40u)",
     "Booze Dispenser"
    ],
    "accessibility": {
@@ -15821,12 +15825,13 @@
    "criticalOverdose": null,
    "recipe": null,
    "obtainSources": [
+    "Vending (hacked): ChefVend — stick of cannabis butter (30u)",
     "Vending: ChefVend — stick of butter (30u)"
    ],
    "accessibility": {
     "tier": "cross-service",
     "weight": 2,
-    "reason": "Cross-department: Vending: ChefVend — stick of butter (30u)"
+    "reason": "Cross-department: Vending (hacked): ChefVend — stick of cannabis butter (30u)"
    },
    "verifiedMechanics": [
     "Phase change: melts at 32.0K, boils at 100.0K"
@@ -22025,8 +22030,8 @@
    "recipe": null,
    "obtainSources": [
     "coconut (plant)",
-    "Soda Dispenser: coconut water jug (240u)",
-    "Vending: Booze-O-Mat — coconut water (60u)"
+    "Vending: Booze-O-Mat — coconut water (60u)",
+    "Soda Dispenser: coconut water jug (240u)"
    ],
    "accessibility": {
     "tier": "dispenser",
@@ -22292,8 +22297,8 @@
    },
    "obtainSources": [
     "Chemistry reaction",
-    "Booze Dispenser: coffee liqueur bottle (120u)",
-    "Vending: Booze-O-Mat — coffee liqueur bottle (120u)"
+    "Vending: Booze-O-Mat — coffee liqueur bottle (120u)",
+    "Booze Dispenser: coffee liqueur bottle (120u)"
    ],
    "accessibility": {
     "tier": "dispenser",
@@ -22475,8 +22480,8 @@
    "criticalOverdose": null,
    "recipe": null,
    "obtainSources": [
-    "Booze Dispenser: cognac bottle (120u)",
     "Vending: Booze-O-Mat — cognac bottle (120u)",
+    "Booze Dispenser: cognac bottle (120u)",
     "Booze Dispenser"
    ],
    "accessibility": {
@@ -22614,10 +22619,10 @@
    },
    "obtainSources": [
     "Chemistry reaction",
+    "Vending: Booze-O-Mat — Space Cola bottle (120u)",
     "Soda Dispenser: Space Cola bottle (120u)",
     "Vending (hacked): Robust Softdrinks — Space Cola bottle (120u)",
     "Vending (hacked): ВОДА — Space Cola can (40u)",
-    "Vending: Booze-O-Mat — Space Cola bottle (120u)",
     "Vending: Robust Softdrinks — Space Cola can (40u)",
     "Soda Dispenser"
    ],
@@ -22772,12 +22777,13 @@
    },
    "obtainSources": [
     "Chemistry reaction",
+    "Vending: ChefVend — coldsauce (1u)",
     "Vending: condiment station — coldsauce (1u)"
    ],
    "accessibility": {
     "tier": "cross-service",
     "weight": 2,
-    "reason": "Cross-department: Vending: condiment station — coldsauce (1u)"
+    "reason": "Cross-department: Vending: ChefVend — coldsauce (1u)"
    },
    "verifiedMechanics": [],
    "boilingPoint": null,
@@ -23312,6 +23318,7 @@
    "recipe": null,
    "obtainSources": [
     "corn (plant)",
+    "Vending (hacked): ChefVend — cornmeal bag (120u)",
     "Vending: ChefVend — cornmeal bag (120u)"
    ],
    "accessibility": {
@@ -23813,8 +23820,8 @@
    },
    "obtainSources": [
     "Chemistry reaction",
-    "Soda Dispenser: milk cream XL (240u)",
     "Vending: Booze-O-Mat — milk cream (60u)",
+    "Soda Dispenser: milk cream XL (240u)",
     "Soda Dispenser",
     "Milk processing"
    ],
@@ -28406,8 +28413,8 @@
    "recipe": null,
    "obtainSources": [
     "bungo (plant)",
-    "Juicing: corn (plant)",
     "Vending: ChefVend — universal enzyme (50u)",
+    "Juicing: corn (plant)",
     "Universal Enzyme bottle (kitchen)"
    ],
    "accessibility": {
@@ -29938,9 +29945,9 @@
     "Chemistry reaction"
    ],
    "accessibility": {
-    "tier": "unknown",
-    "weight": 5,
-    "reason": "Recipe exists but a deep-chain ingredient is unresolved by extractor (likely plant-mutation, mob-drop, or cooking product)"
+    "tier": "cross-service",
+    "weight": 2,
+    "reason": "Recipe requires cross-service ingredient(s)"
    },
    "verifiedMechanics": [
     "Tile: Ignites spilled reagent (x1.35 temperature)",
@@ -31752,8 +31759,8 @@
    "criticalOverdose": null,
    "recipe": null,
    "obtainSources": [
-    "Booze Dispenser: Griffeater gin (120u)",
     "Vending: Booze-O-Mat — Griffeater gin (120u)",
+    "Booze Dispenser: Griffeater gin (120u)",
     "Booze Dispenser"
    ],
    "accessibility": {
@@ -34687,12 +34694,13 @@
    "criticalOverdose": null,
    "recipe": null,
    "obtainSources": [
+    "Vending: ChefVend — horseradish sauce (1u)",
     "Vending: condiment station — horseradish sauce (1u)"
    ],
    "accessibility": {
     "tier": "cross-service",
     "weight": 2,
-    "reason": "Cross-department: Vending: condiment station — horseradish sauce (1u)"
+    "reason": "Cross-department: Vending: ChefVend — horseradish sauce (1u)"
    },
    "verifiedMechanics": [],
    "boilingPoint": null,
@@ -34946,13 +34954,14 @@
    },
    "obtainSources": [
     "Chemistry reaction",
+    "Vending: ChefVend — hotsauce (1u)",
     "Vending: ChefVend — hotsauce bottle (50u)",
     "Vending: condiment station — hotsauce (1u)"
    ],
    "accessibility": {
     "tier": "cross-service",
     "weight": 2,
-    "reason": "Cross-department: Vending: ChefVend — hotsauce bottle (50u)"
+    "reason": "Cross-department: Vending: ChefVend — hotsauce (1u)"
    },
    "verifiedMechanics": [],
    "boilingPoint": null,
@@ -35394,6 +35403,7 @@
    },
    "obtainSources": [
     "Chemistry reaction",
+    "Vending: Booze-O-Mat — ice bucket (240u)",
     "Soda Dispenser: ice jug (240u)",
     "Vending (EMAG): Pwr Game Vendor — Blood-red Brew can (5u)",
     "Vending (EMAG): Robust Softdrinks — Blood-red Brew can (5u)",
@@ -35401,7 +35411,6 @@
     "Vending (EMAG): Space-Up! Vendor — Blood-red Brew can (5u)",
     "Vending (EMAG): Star-kist Vendor — Blood-red Brew can (5u)",
     "Vending (EMAG): Sustenance Vendor — Blood-red Brew can (5u)",
-    "Vending: Booze-O-Mat — ice bucket (240u)",
     "Soda Dispenser",
     "Freezer"
    ],
@@ -36235,9 +36244,9 @@
     "Chemistry reaction"
    ],
    "accessibility": {
-    "tier": "unknown",
-    "weight": 5,
-    "reason": "Recipe exists but a deep-chain ingredient is unresolved by extractor (likely plant-mutation, mob-drop, or cooking product)"
+    "tier": "cross-service",
+    "weight": 2,
+    "reason": "Recipe requires cross-service ingredient(s)"
    },
    "verifiedMechanics": [
     "Tile: Extinguishes fires on wet tiles",
@@ -39018,6 +39027,8 @@
    },
    "obtainSources": [
     "Chemistry reaction",
+    "Vending (hacked): NanoMed Public — apple (5u)",
+    "Vending (hacked): Nanoblood (Syndicate) — apple (5u)",
     "Juicing: apple (plant)",
     "Juicing: golden apple (plant)",
     "Vending (hacked): NanoMed Civilian — apple (5u)",
@@ -39633,8 +39644,8 @@
    },
    "obtainSources": [
     "Chemistry reaction",
-    "Juicing: lemon (plant)",
     "Vending: Booze-O-Mat — lemon juice (60u)",
+    "Juicing: lemon (plant)",
     "Soda Dispenser (Lime Juice)"
    ],
    "accessibility": {
@@ -39760,9 +39771,9 @@
    },
    "obtainSources": [
     "Chemistry reaction",
+    "Vending: Booze-O-Mat — lime juice (60u)",
     "Juicing: lime (plant)",
-    "Soda Dispenser: lime juice XL (240u)",
-    "Vending: Booze-O-Mat — lime juice (60u)"
+    "Soda Dispenser: lime juice XL (240u)"
    ],
    "accessibility": {
     "tier": "dispenser",
@@ -39878,10 +39889,10 @@
    },
    "obtainSources": [
     "Chemistry reaction",
+    "Vending: Booze-O-Mat — orange juice (60u)",
     "Juicing: extradimensional orange (plant)",
     "Juicing: orange (plant)",
     "Soda Dispenser: orange juice XL (240u)",
-    "Vending: Booze-O-Mat — orange juice (60u)",
     "Soda Dispenser"
    ],
    "accessibility": {
@@ -40180,8 +40191,8 @@
    "obtainSources": [
     "Chemistry reaction",
     "tomato killer (plant)",
-    "Juicing: tomato (plant)",
-    "Vending: Booze-O-Mat — tomato juice (60u)"
+    "Vending: Booze-O-Mat — tomato juice (60u)",
+    "Juicing: tomato (plant)"
    ],
    "accessibility": {
     "tier": "cross-botany",
@@ -40725,6 +40736,7 @@
    },
    "obtainSources": [
     "Chemistry reaction",
+    "Vending: ChefVend — ketchup (1u)",
     "Vending (hacked): condiment station — ketchup bottle (50u)",
     "Vending: ChefVend — ketchup bottle (50u)",
     "Vending: Sustenance Vendor — ketchup (1u)",
@@ -40733,7 +40745,7 @@
    "accessibility": {
     "tier": "cross-service",
     "weight": 2,
-    "reason": "Cross-department: Vending (hacked): condiment station — ketchup bottle (50u)"
+    "reason": "Cross-department: Vending: ChefVend — ketchup (1u)"
    },
    "verifiedMechanics": [],
    "boilingPoint": null,
@@ -41576,9 +41588,9 @@
     "Chemistry reaction"
    ],
    "accessibility": {
-    "tier": "unknown",
-    "weight": 5,
-    "reason": "Recipe exists but a deep-chain ingredient is unresolved by extractor (likely plant-mutation, mob-drop, or cooking product)"
+    "tier": "cross-service",
+    "weight": 2,
+    "reason": "Recipe requires cross-service ingredient(s)"
    },
    "verifiedMechanics": [
     "Tile: Extinguishes fires on wet tiles",
@@ -43924,13 +43936,13 @@
    },
    "obtainSources": [
     "Chemistry reaction",
-    "Vending (hacked): condiment station — mayonnaise (50u)",
-    "Vending: ChefVend — mayonnaise (50u)"
+    "Vending: ChefVend — mayonnaise (50u)",
+    "Vending (hacked): condiment station — mayonnaise (50u)"
    ],
    "accessibility": {
     "tier": "cross-service",
     "weight": 2,
-    "reason": "Cross-department: Vending (hacked): condiment station — mayonnaise (50u)"
+    "reason": "Cross-department: Vending: ChefVend — mayonnaise (50u)"
    },
    "verifiedMechanics": [],
    "boilingPoint": null,
@@ -44932,6 +44944,7 @@
     "lemoon (plant)",
     "Vending: Booze-O-Mat — milk (120u)",
     "Vending: ChefVend — milk (120u)",
+    "Vending: SweatMAX — mini milk (25u)",
     "Cows",
     "Lemoon (plant mutation)"
    ],
@@ -45151,8 +45164,8 @@
    },
    "obtainSources": [
     "Chemistry reaction",
-    "Juicing: soybeans (plant)",
-    "Vending: ChefVend — soy milk (120u)"
+    "Vending: ChefVend — soy milk (120u)",
+    "Juicing: soybeans (plant)"
    ],
    "accessibility": {
     "tier": "cross-botany",
@@ -45695,9 +45708,9 @@
     "Chemistry reaction"
    ],
    "accessibility": {
-    "tier": "unknown",
-    "weight": 5,
-    "reason": "Recipe exists but a deep-chain ingredient is unresolved by extractor (likely plant-mutation, mob-drop, or cooking product)"
+    "tier": "cross-service",
+    "weight": 2,
+    "reason": "Recipe requires cross-service ingredient(s)"
    },
    "verifiedMechanics": [
     "Tile: Ignites spilled reagent (x1.35 temperature)",
@@ -46811,12 +46824,13 @@
    },
    "obtainSources": [
     "Chemistry reaction",
+    "Vending: ChefVend — mustard (1u)",
     "Vending: condiment station — mustard (1u)"
    ],
    "accessibility": {
     "tier": "cross-service",
     "weight": 2,
-    "reason": "Cross-department: Vending: condiment station — mustard (1u)"
+    "reason": "Cross-department: Vending: ChefVend — mustard (1u)"
    },
    "verifiedMechanics": [],
    "boilingPoint": null,
@@ -50007,9 +50021,9 @@
     "Chemistry reaction"
    ],
    "accessibility": {
-    "tier": "unknown",
-    "weight": 5,
-    "reason": "Recipe exists but a deep-chain ingredient is unresolved by extractor (likely plant-mutation, mob-drop, or cooking product)"
+    "tier": "cross-service",
+    "weight": 2,
+    "reason": "Recipe requires cross-service ingredient(s)"
    },
    "verifiedMechanics": [
     "Tile: Ignites spilled reagent (x1.35 temperature)",
@@ -61317,8 +61331,8 @@
    "criticalOverdose": null,
    "recipe": null,
    "obtainSources": [
-    "Booze Dispenser: Captain Pete's Cuban spiced rum (120u)",
     "Vending: Booze-O-Mat — Captain Pete's Cuban spiced rum (120u)",
+    "Booze Dispenser: Captain Pete's Cuban spiced rum (120u)",
     "Booze Dispenser"
    ],
    "accessibility": {
@@ -61470,8 +61484,8 @@
    },
    "obtainSources": [
     "Chemistry reaction",
-    "Juicing: lemoon (plant)",
-    "Vending: Booze-O-Mat — small sake bottle (60u)"
+    "Vending: Booze-O-Mat — small sake bottle (60u)",
+    "Juicing: lemoon (plant)"
    ],
    "accessibility": {
     "tier": "cross-botany",
@@ -61750,7 +61764,8 @@
    },
    "obtainSources": [
     "Chemistry reaction",
-    "Mango (plant)"
+    "Mango (plant)",
+    "Vending: CiviMedVend — Syringe Saline (15u)"
    ],
    "accessibility": {
     "tier": "cross-botany",
@@ -64334,9 +64349,9 @@
    },
    "obtainSources": [
     "Chemistry reaction",
+    "Vending: Booze-O-Mat — soda water can (40u)",
     "Soda Dispenser: soda water bottle (120u)",
     "Vending (hacked): ВОДА — soda water bottle (120u)",
-    "Vending: Booze-O-Mat — soda water can (40u)",
     "Vending: ВОДА — soda water can (40u)",
     "Soda Dispenser"
    ],
@@ -65188,13 +65203,14 @@
    },
    "obtainSources": [
     "Chemistry reaction",
+    "Vending: ChefVend — soy sauce (1u)",
     "Vending: Mr. Chang — soy sauce (1u)",
     "Vending: condiment station — soy sauce (1u)"
    ],
    "accessibility": {
     "tier": "cross-service",
     "weight": 2,
-    "reason": "Cross-department: Vending: Mr. Chang — soy sauce (1u)"
+    "reason": "Cross-department: Vending: ChefVend — soy sauce (1u)"
    },
    "verifiedMechanics": [
     "[Digestion] Hunger x0.5",
@@ -65301,6 +65317,7 @@
     "ambrosia deus (plant)",
     "ambrosia nobilis (plant)",
     "Тритиевая Конопля (plant)",
+    "Vending (hacked): NanoMed Public — space mirage (20u)",
     "Vending (hacked): NanoMed Civilian — space mirage (20u)",
     "Vending (hacked): NanoMed Plus — space mirage (20u)",
     "Ambrosia Deus (plant)",
@@ -65465,9 +65482,9 @@
    "criticalOverdose": null,
    "recipe": null,
    "obtainSources": [
+    "Vending: Booze-O-Mat — Space Solar Wind bottle (120u)",
     "Soda Dispenser: Space Solar Wind bottle (120u)",
     "Vending (hacked): Space-Up! Vendor — Space Solar Wind bottle (120u)",
-    "Vending: Booze-O-Mat — Space Solar Wind bottle (120u)",
     "Vending: Space-Up! Vendor — Space Solar Wind can (40u)"
    ],
    "accessibility": {
@@ -65604,9 +65621,9 @@
    "criticalOverdose": null,
    "recipe": null,
    "obtainSources": [
+    "Vending: Booze-O-Mat — Space-Up bottle (120u)",
     "Soda Dispenser: Space-Up bottle (120u)",
     "Vending (hacked): Space-Up! Vendor — Space-Up bottle (120u)",
-    "Vending: Booze-O-Mat — Space-Up bottle (120u)",
     "Vending: Space-Up! Vendor — Space-Up can (40u)"
    ],
    "accessibility": {
@@ -67029,8 +67046,8 @@
     "laughin' peas (plant)",
     "sugarcane (plant)",
     "bloonion (plant)",
-    "Soda Dispenser: sugar jug (240u)",
     "Vending: ChefVend — sugar bag (120u)",
+    "Soda Dispenser: sugar jug (240u)",
     "Vending: condiment station — sugar (1u)",
     "Soda Dispenser",
     "Sugarcane (plant)",
@@ -68446,6 +68463,7 @@
     "Тритиевая Конопля (plant)",
     "Cannabiswhite (plant)",
     "Cannabis Vita (plant)",
+    "Vending (hacked): ChefVend — stick of cannabis butter (15u)",
     "Cannabis (plant)"
    ],
    "accessibility": {
@@ -68945,8 +68963,8 @@
    "criticalOverdose": null,
    "recipe": null,
    "obtainSources": [
-    "Booze Dispenser: Caccavo Guaranteed Quality tequila bottle (120u)",
     "Vending: Booze-O-Mat — Caccavo Guaranteed Quality tequila bottle (120u)",
+    "Booze Dispenser: Caccavo Guaranteed Quality tequila bottle (120u)",
     "Booze Dispenser"
    ],
    "accessibility": {
@@ -70462,8 +70480,8 @@
    "criticalOverdose": null,
    "recipe": null,
    "obtainSources": [
-    "Soda Dispenser: tonic water bottle (120u)",
     "Vending: Booze-O-Mat — tonic water can (40u)",
+    "Soda Dispenser: tonic water bottle (120u)",
     "Soda Dispenser"
    ],
    "accessibility": {
@@ -72923,8 +72941,8 @@
    "criticalOverdose": null,
    "recipe": null,
    "obtainSources": [
-    "Booze Dispenser: Goldeneye vermouth bottle (120u)",
     "Vending: Booze-O-Mat — Goldeneye vermouth bottle (120u)",
+    "Booze Dispenser: Goldeneye vermouth bottle (120u)",
     "Booze Dispenser"
    ],
    "accessibility": {
@@ -73280,8 +73298,8 @@
    },
    "obtainSources": [
     "Chemistry reaction",
-    "Booze Dispenser: vodka bottle (120u)",
     "Vending: Booze-O-Mat — vodka bottle (120u)",
+    "Booze Dispenser: vodka bottle (120u)",
     "Booze Dispenser"
    ],
    "accessibility": {
@@ -73878,6 +73896,7 @@
     "watermelon (plant)",
     "Explosive Banana (plant)",
     "Snapcorn (plant)",
+    "Vending: SweatMAX — water bottle (60u)",
     "Soda Dispenser",
     "Sink",
     "Chemical Dispenser"
@@ -74149,8 +74168,8 @@
    "criticalOverdose": null,
    "recipe": null,
    "obtainSources": [
-    "Booze Dispenser: Uncle Git's Special Reserve (120u)",
     "Vending: Booze-O-Mat — Uncle Git's Special Reserve (120u)",
+    "Booze Dispenser: Uncle Git's Special Reserve (120u)",
     "Booze Dispenser"
    ],
    "accessibility": {
@@ -74598,11 +74617,11 @@
    },
    "obtainSources": [
     "Chemistry reaction",
+    "Vending: Booze-O-Mat — Doublebearded Bearded Special wine bottle (120u)",
+    "Vending: Booze-O-Mat — wine can (40u)",
     "Booze Dispenser: Doublebearded Bearded Special wine bottle (120u)",
     "Juicing: holymelon (plant)",
     "Vending (hacked): PietyVend — Doublebearded Bearded Special wine bottle (120u)",
-    "Vending: Booze-O-Mat — Doublebearded Bearded Special wine bottle (120u)",
-    "Vending: Booze-O-Mat — wine can (40u)",
     "Booze Dispenser",
     "Chaplain can bless grape juice"
    ],
