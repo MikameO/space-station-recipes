@@ -490,6 +490,26 @@ main {
 }
 .tab-adv-menu .tab-btn.active::after { display: none; }
 
+/* A4: craft-tree gathering/brewing checklist */
+.tree-check {
+  accent-color: var(--phosphor);
+  width: 14px;
+  height: 14px;
+  margin-right: 2px;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+.tree-node.checked { opacity: 0.45; }
+.tree-node.checked .node-name { text-decoration: line-through; }
+.tree-progress {
+  font-family: 'Oxanium', sans-serif;
+  font-size: 12px;
+  color: var(--phosphor);
+  margin-left: auto;
+  white-space: nowrap;
+  align-self: center;
+}
+
 .tab-panel {
   display: none;
   flex: 1;

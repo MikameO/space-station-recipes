@@ -1318,7 +1318,7 @@ function buildCraftTree(reagentId, amount, visited = new Set()) {
   };
 }
 
-function renderTreeHTML(node, depth = 0) {
+function renderTreeHTML(node, depth = 0, path = '0') {
   const r = DATA.reagents[node.id];
   const color = safeColor(r ? r.color : '');
   const name = r ? (r.name || r.id) : node.id;
@@ -1338,8 +1338,10 @@ function renderTreeHTML(node, depth = 0) {
 
   const amt = node.amount !== 1 ? `${Math.round(node.amount * 10) / 10}x` : '1x';
 
+  // A4: checklist — gathering ("collected it") and brewing ("already added it") aid
   let html = `<li>
     <div class="${cls}">
+      <input type="checkbox" class="tree-check" data-path="${path}" aria-label="Mark ${esc(name)} as collected/added">
       <span class="node-swatch" style="background:${color}"></span>
       <span class="node-amount">${amt}</span>
       <span class="node-name clickable" onclick="openDetail('${node.id}')">${esc(name)}</span>
@@ -1349,9 +1351,9 @@ function renderTreeHTML(node, depth = 0) {
 
   if (node.children.length > 0) {
     html += `<ul class="tree-children">`;
-    for (const child of node.children) {
-      html += renderTreeHTML(child, depth + 1);
-    }
+    node.children.forEach((child, i) => {
+      html += renderTreeHTML(child, depth + 1, `${path}.${i}`);
+    });
     html += `</ul>`;
   }
 
@@ -1361,12 +1363,32 @@ function renderTreeHTML(node, depth = 0) {
 
 let currentTreeReagentId = null;
 
+// A4: checked node paths — survives amount changes (same structure), resets on new reagent
+let treeChecks = new Set();
+
+function updateTreeProgress() {
+  const total = document.querySelectorAll('#treeOutput .tree-check').length;
+  const done = document.querySelectorAll('#treeOutput .tree-check:checked').length;
+  const label = document.getElementById('treeProgress');
+  const reset = document.getElementById('treeResetChecks');
+  if (label) label.textContent = total ? `Collected ${done} / ${total}` : '';
+  if (reset) reset.style.display = total ? '' : 'none';
+}
+
 function rebuildTree() {
   if (!currentTreeReagentId) return;
   const amountInput = document.getElementById('treeAmount');
   const amount = Math.max(1, parseFloat(amountInput.value) || 1);
   const tree = buildCraftTree(currentTreeReagentId, amount);
   document.getElementById('treeOutput').innerHTML = renderTreeHTML(tree);
+  // A4: restore checklist state after re-render
+  document.querySelectorAll('#treeOutput .tree-check').forEach(box => {
+    if (treeChecks.has(box.dataset.path)) {
+      box.checked = true;
+      box.closest('.tree-node').classList.add('checked');
+    }
+  });
+  updateTreeProgress();
 }
 
 function setupCraftTrees() {
@@ -1378,12 +1400,35 @@ function setupCraftTrees() {
     input.value = DATA.reagents[id]?.name || id;
     suggestions.classList.remove('open');
     currentTreeReagentId = id;
+    treeChecks = new Set(); // A4: new tree = fresh checklist
     track('tree_built', { reagent: id });
     rebuildTree();
   });
 
   // Amount input — rebuild tree when changed
   amountInput.addEventListener('input', rebuildTree);
+
+  // A4: checklist wiring (delegated — tree HTML re-renders often)
+  document.getElementById('treeOutput').addEventListener('change', e => {
+    if (!e.target.classList.contains('tree-check')) return;
+    const path = e.target.dataset.path;
+    if (e.target.checked) {
+      treeChecks.add(path);
+      if (treeChecks.size === 1) track('tree_checklist_used', { reagent: currentTreeReagentId });
+    } else {
+      treeChecks.delete(path);
+    }
+    e.target.closest('.tree-node').classList.toggle('checked', e.target.checked);
+    updateTreeProgress();
+  });
+  document.getElementById('treeResetChecks')?.addEventListener('click', () => {
+    treeChecks = new Set();
+    document.querySelectorAll('#treeOutput .tree-check').forEach(box => {
+      box.checked = false;
+      box.closest('.tree-node').classList.remove('checked');
+    });
+    updateTreeProgress();
+  });
 }
 
 // ─────────────────────────────────────────────
