@@ -1699,6 +1699,39 @@ function safeSel(str) {
 // Effect Tag Filters
 // ─────────────────────────────────────────────
 
+// Effect chips are grouped into 5 collapsible collections by valence
+// (see docs/design/2026-07-12-effect-collections.md). Display order fixed.
+const EFFECT_COLLECTIONS = [
+  { id: 'healing', label: 'Healing' },
+  { id: 'damage',  label: 'Damage' },
+  { id: 'buffs',   label: 'Buffs' },
+  { id: 'debuffs', label: 'Debuffs' },
+  { id: 'other',   label: 'Other' },
+];
+
+const _COLL_DAMAGE_EXTRA = new Set(['explosion', 'flammable', 'bleed']);
+const _COLL_BUFFS = new Set([
+  'adrenaline', 'stamina', 'pressure-immune', 'shock-immune',
+  'rad-protection', 'anesthesia', 'numbness', 'centered',
+]);
+const _COLL_DEBUFFS = new Set([
+  'jitter', 'vomit', 'drunk', 'stutter', 'hallucinating', 'drowsy', 'knockdown',
+  'sleep', 'blind', 'mute', 'unconscious', 'stun', 'pacified', 'dementia',
+  'dna-scramble', 'claw-suppression', 'ratvarian', 'vulgar',
+]);
+const _COLL_OTHER = new Set(['thirst', 'hunger', 'emote', 'blood', 'temperature', 'speed']);
+
+// Map an effectTag to its collection id. Prefixes cover the damage-type tags;
+// explicit sets cover the rest. Unknown tags fall back to 'other' so new
+// upstream tags still surface somewhere instead of vanishing.
+function effectCollection(tag) {
+  if (tag.startsWith('heals:') || tag === 'cure') return 'healing';
+  if (tag.startsWith('deals:') || _COLL_DAMAGE_EXTRA.has(tag)) return 'damage';
+  if (_COLL_BUFFS.has(tag)) return 'buffs';
+  if (_COLL_DEBUFFS.has(tag)) return 'debuffs';
+  return 'other';
+}
+
 function setupEffectFilters() {
   const div = document.getElementById('effectFilters');
   // Collect all tags with counts
@@ -1708,19 +1741,36 @@ function setupEffectFilters() {
       tagCounts[tag] = (tagCounts[tag] || 0) + 1;
     }
   }
-  // Sort: heals first, then deals, then others
-  const sorted = Object.entries(tagCounts).sort((a, b) => {
-    const pa = a[0].startsWith('heals:') ? 0 : a[0].startsWith('deals:') ? 1 : 2;
-    const pb = b[0].startsWith('heals:') ? 0 : b[0].startsWith('deals:') ? 1 : 2;
-    return pa - pb || b[1] - a[1];
-  });
+  // Bucket tags into collections; sort each bucket by reagent count desc.
+  const buckets = {};
+  for (const c of EFFECT_COLLECTIONS) buckets[c.id] = [];
+  for (const [tag, count] of Object.entries(tagCounts)) {
+    buckets[effectCollection(tag)].push([tag, count]);
+  }
+  for (const id in buckets) buckets[id].sort((a, b) => b[1] - a[1]);
 
-  div.innerHTML = sorted.map(([tag, count]) => {
+  const chipHtml = (tag, count) => {
     const cls = tag.startsWith('heals:') ? 'heals' : tag.startsWith('deals:') ? 'deals' : '';
     const label = tag.replace('heals:', '\u2764 ').replace('deals:', '\u2620 ');
-    return `<button class="effect-tag-btn ${cls}" data-tag="${tag}" title="${count} reagents">${label}</button>`;
+    const active = activeEffectTags.has(tag) ? ' active' : '';
+    return `<button class="effect-tag-btn ${cls}${active}" data-tag="${tag}" title="${count} reagents">${label}</button>`;
+  };
+
+  // Render one collapsible section per non-empty collection, in fixed order.
+  div.innerHTML = EFFECT_COLLECTIONS.filter(c => buckets[c.id].length).map(c => {
+    const collapsed = sessionStorage.getItem('effcoll:' + c.id) !== '0'; // default collapsed
+    const chips = buckets[c.id].map(([tag, count]) => chipHtml(tag, count)).join('');
+    return `<div class="effect-collection coll-${c.id}${collapsed ? ' collapsed' : ''}" data-coll="${c.id}">
+      <div class="effect-collection__head" role="button" tabindex="0" aria-expanded="${!collapsed}">
+        <span class="effect-collection__chev">\u25b8</span>
+        <span class="effect-collection__label">${c.label}</span>
+        <span class="effect-collection__count">${buckets[c.id].length}</span>
+      </div>
+      <div class="effect-collection__body">${chips}</div>
+    </div>`;
   }).join('');
 
+  // Chip toggle \u2014 add/remove the tag from the active filter set.
   div.querySelectorAll('.effect-tag-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       const tag = btn.dataset.tag;
@@ -1732,6 +1782,21 @@ function setupEffectFilters() {
         btn.classList.add('active');
       }
       renderCurrentTab();
+    });
+  });
+
+  // Collection collapse/expand \u2014 persisted per collection in sessionStorage.
+  div.querySelectorAll('.effect-collection__head').forEach(head => {
+    const toggle = () => {
+      const coll = head.closest('.effect-collection');
+      coll.classList.toggle('collapsed');
+      const isCollapsed = coll.classList.contains('collapsed');
+      head.setAttribute('aria-expanded', String(!isCollapsed));
+      sessionStorage.setItem('effcoll:' + coll.dataset.coll, isCollapsed ? '1' : '0');
+    };
+    head.addEventListener('click', toggle);
+    head.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); }
     });
   });
 
