@@ -481,9 +481,11 @@ def build_registry(fork_key: str, fork_cfg: dict, tree: list[str]) -> Registry:
                     reg.protos[eid] = {"id": eid, "name": entry.get("name"),
                                        "parents": parents, "components": comps}
                 elif t == "vendingMachineInventory" and eid:
-                    reg.vend_inventories[eid] = {
-                        "normal": entry.get("startingInventory") or {},
-                        "contraband": entry.get("contrabandInventory") or {}}
+                    inv = entry.get("startingInventory")
+                    cinv = entry.get("contrabandInventory")
+                    reg.vend_inventories[eid] = {   # dict-guard: a list here would crash the fork loop
+                        "normal": inv if isinstance(inv, dict) else {},
+                        "contraband": cinv if isinstance(cinv, dict) else {}}
                 elif t == "tile" and eid and entry.get("sprite"):
                     reg.tile_sprites[eid] = entry["sprite"]
     # Fluent: beacon names
@@ -491,7 +493,7 @@ def build_registry(fork_key: str, fork_cfg: dict, tree: list[str]) -> Registry:
     for path in ftl_paths:
         content = fetch_file(fork_cfg["raw_url"].format(path=path), CACHE_DIR / fork_key / path)
         for line in content.splitlines():
-            m = re.match(r"^([a-zA-Z0-9-]+)\s*=\s*(.+)$", line.strip())
+            m = re.match(r"^([a-zA-Z0-9-]+)\s*=\s*(.+)$", line.lstrip("﻿").strip())
             if m:
                 reg.ftl[m.group(1)] = m.group(2).strip()
     return reg
@@ -531,6 +533,7 @@ git commit -m "feat(maps): prototype registry — kinds, fills, vendors, beacon 
     assert reg.kind("ClosetToolFilled") == "container"
     assert reg.kind("CrateTrashCartFilled") == "container"
     assert reg.kind("Crowbar") == "item", "container branch must not steal plain items"
+    assert reg.storage_fill("BookshelfFilled"), "dict-amount (NumberSelector) container must not crash"
 ```
 Plus one probability assert: find ONE real proto whose flatten yields `prob < 1` (grep the live cache under `cache_maps/vanilla/.../Catalog/Fills/` for a GroupSelector-filled crate/bookshelf), hardcode that verified id, and assert `any("prob" in f for f in reg.storage_fill("<TheId>"))`. Note the chosen id in the commit message.
 
@@ -548,6 +551,24 @@ In `Registry.__init__` add `self.entity_tables = {}`. In `build_registry`'s prot
 Replace `storage_fill` and the `_kind` container logic:
 
 ```python
+    @staticmethod
+    def _amount(a):
+        """Coerce amount to int — real data uses !type:NumberSelector dicts
+        (Range/Constant/Binomial). Range 'lo, hi' → hi (an 'up to N' hint)."""
+        if isinstance(a, dict):
+            if "value" in a:
+                a = a["value"]
+            elif "range" in a:
+                a = str(a["range"]).split(",")[-1]
+            elif "trials" in a:
+                a = a["trials"]
+            else:
+                return 1
+        try:
+            return max(1, int(float(a)))
+        except (TypeError, ValueError):
+            return 1
+
     def _flatten_table(self, node, p=1.0, depth=0):
         """Yield (proto_id, prob, amount) from an entity-table selector tree.
         ponytail: GroupSelector = weight-proportional split, rolls ignored —
@@ -572,7 +593,7 @@ Replace `storage_fill` and the `_kind` container logic:
                 yield from self._flatten_table(c, p, depth + 1)
             return
         if node.get("id"):  # leaf entity entry
-            yield node["id"], p, int(node.get("amount", 1) or 1)
+            yield node["id"], p, self._amount(node.get("amount", 1))
 
     def storage_fill(self, pid):
         """[{id, prob?, amount?}] — legacy StorageFill or modern EntityTableContainerFill."""
