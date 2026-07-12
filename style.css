@@ -761,6 +761,10 @@ body.companion.companion-filters-open .sidebar {
   box-shadow: 4px 0 24px rgba(0,0,0,0.55);
   padding: 10px 12px;
 }
+/* C3.4: the PiP window is narrower than the 768px mobile breakpoint, whose
+   `.sidebar-content { display:none }` rule hid the drawer's contents — an
+   empty black box. Force the filter content visible when the drawer is open. */
+body.companion.companion-filters-open .sidebar-content { display: block; }
 body.companion main {
   margin: 0;
   max-width: none;
