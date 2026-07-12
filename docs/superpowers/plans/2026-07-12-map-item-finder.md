@@ -14,7 +14,7 @@
 - Entities: `- proto: Crowbar` → `entities: [{uid, components: [{type: Transform, pos: "x,y", parent: <gridUid>}]}]`. Bagel main grid uid=60 (25 039 ents), secondary grid uid=7536 `Syndi Puddle CS108` (326 ents, name in its `MetaData` component).
 - Playable maps: `Resources/Prototypes/Maps/*.yml` → `- type: gameMap, id: Bagel, mapName: 'Bagel Station', mapPath: /Maps/bagel.yml`. Pool: `Resources/Prototypes/Maps/Pools/default.yml` → `- type: gameMapPool, maps: [Bagel, Box, ...12 ids]`.
 - Beacons: entity protos `DefaultStationBeacon*` with `NavMapBeacon.defaultText: station-beacon-<x>` (a Fluent key). Locale file: `Resources/Locale/en-US/navmap-beacons/station-beacons.ftl` (`station-beacon-medical = Medbay` style lines). Map entities MAY override with a `NavMapBeacon` component carrying `text:`.
-- Items: prototypes with `Item` component (inherited). Container fill: `StorageFill.contents: [{id, amount?, prob?}]` (protos live all over `Resources/Prototypes/**`, e.g. `Catalog/Fills/`). Vendors: entity has `VendingMachine.pack: <invId>`; inventory protos `- type: vendingMachineInventory, id, startingInventory: {ProtoId: count}, contrabandInventory: {...}` in `Catalog/VendingMachines/Inventories/*.yml`.
+- Items: prototypes with `Item` component (inherited). Container fill (CORRECTED during Task 3 — upstream drifted): `StorageFill` is LEGACY (0 uses in current vanilla; keep parsing it for forks on older code). Modern fill = `EntityTableContainerFill` component: `containers: {<name>: !type:AllSelector {children: [{id, amount?, prob?, weight?} | nested selector]}}`; selector types `AllSelector` (all children), `GroupSelector` (one child by weight), `NestedSelector` (`id` → a `- type: entityTable, id, table: <selector>` prototype). The container *classification* signal is the `EntityStorage` component (on `ClosetBase`/`CrateGeneric` ancestors). Vendors: entity has `VendingMachine.pack: <invId>`; inventory protos `- type: vendingMachineInventory, id, startingInventory: {ProtoId: count}, contrabandInventory: {...}` in `Catalog/VendingMachines/Inventories/*.yml`.
 - Tiles: `Resources/Prototypes/Tiles/*.yml` → `- type: tile, id: FloorSteel, sprite: /Textures/Tiles/steel.png`.
 - `parent:` in entity protos is a string OR a list.
 - Chem extractor patterns to copy (NOT import — keep pipelines independent): `fetch_file`/`fetch_all_files` (ss14_chem_extractor.py:191-235), `SS14Loader` + `!type:` multi_constructor (ss14_chem_extractor.py:299-330).
@@ -514,6 +514,101 @@ git commit -m "feat(maps): prototype registry — kinds, fills, vendors, beacon 
 
 ---
 
+### Task 3.5: Container fills v2 — EntityTableContainerFill (upstream drift fix)
+
+**Why:** Task 3 discovered `StorageFill` has 0 uses in current vanilla — containers fill via `EntityTableContainerFill` + `entityTable` selector trees (620 uses). Without this, every locker classifies as `skip` and the container layer is empty.
+
+**Files:**
+- Modify: `ss14_map_extractor.py`
+
+- [ ] **Step 1: Selfcheck asserts** — REPLACE the Task 3 storage-fill assert block (the one asserting `storage_fill(...)` returns `[]`) with:
+
+```python
+    fills = reg.storage_fill("ClosetToolFilled")
+    assert fills, "ClosetToolFilled fill empty"
+    fill_ids = {f["id"] for f in fills}
+    assert any(("Crowbar" in i) or ("Wrench" in i) or ("Screwdriver" in i) for i in fill_ids), fill_ids
+    assert reg.kind("ClosetToolFilled") == "container"
+    assert reg.kind("CrateTrashCartFilled") == "container"
+    assert reg.kind("Crowbar") == "item", "container branch must not steal plain items"
+```
+Plus one probability assert: find ONE real proto whose flatten yields `prob < 1` (grep the live cache under `cache_maps/vanilla/.../Catalog/Fills/` for a GroupSelector-filled crate/bookshelf), hardcode that verified id, and assert `any("prob" in f for f in reg.storage_fill("<TheId>"))`. Note the chosen id in the commit message.
+
+Run selfcheck: expected FAIL (`ClosetToolFilled fill empty`).
+
+- [ ] **Step 2: Implement**
+
+In `Registry.__init__` add `self.entity_tables = {}`. In `build_registry`'s prototype loop add:
+
+```python
+                elif t == "entityTable" and eid:
+                    reg.entity_tables[eid] = entry.get("table") or {}
+```
+
+Replace `storage_fill` and the `_kind` container logic:
+
+```python
+    def _flatten_table(self, node, p=1.0, depth=0):
+        """Yield (proto_id, prob, amount) from an entity-table selector tree.
+        ponytail: GroupSelector = weight-proportional split, rolls ignored —
+        good enough for 'where can this item be', not a drop-rate simulator."""
+        if depth > 8 or not isinstance(node, dict):
+            return
+        p *= float(node.get("prob", 1.0))
+        t = node.get("_type")
+        if t == "NestedSelector":
+            yield from self._flatten_table(self.entity_tables.get(node.get("id"), {}), p, depth + 1)
+            return
+        children = [c for c in (node.get("children") or []) if isinstance(c, dict)]
+        if t == "GroupSelector" and children:
+            total = sum(float(c.get("weight", 1.0)) for c in children)
+            for c in children:
+                w = float(c.get("weight", 1.0))
+                yield from self._flatten_table(c, p * (w / total if total else 0), depth + 1)
+            return
+        if children:  # AllSelector or any selector with children
+            for c in children:
+                yield from self._flatten_table(c, p, depth + 1)
+            return
+        if node.get("id"):  # leaf entity entry
+            yield node["id"], p, int(node.get("amount", 1) or 1)
+
+    def storage_fill(self, pid):
+        """[{id, prob?, amount?}] — legacy StorageFill or modern EntityTableContainerFill."""
+        comp = self._find_component(pid, "StorageFill")
+        if comp:
+            return comp.get("contents") or []
+        comp = self._find_component(pid, "EntityTableContainerFill")
+        if not comp:
+            return []
+        out = []
+        for table in (comp.get("containers") or {}).values():
+            for eid, p, amount in self._flatten_table(table):
+                rec = {"id": eid}
+                if p < 0.995:
+                    rec["prob"] = round(p, 2)
+                if amount > 1:
+                    rec["amount"] = amount
+                out.append(rec)
+        return out
+```
+
+In `_kind`, REORDER and replace the container branch: the order becomes beacon → vendor → wall/window/door → **item** → **container** → mach → skip, with the container test being:
+
+```python
+        if (self._find_component(pid, "EntityStorage") is not None
+                or self._find_component(pid, "StorageFill") is not None
+                or self._find_component(pid, "EntityTableContainerFill") is not None):
+            return "container"
+```
+(`item` BEFORE `container`: a filled duffel bag is an Item that also carries EntityTableContainerFill — it must stay searchable as an item; Task 7 resolves contents via `storage_fill()` regardless of kind, see Task 7 note.)
+
+- [ ] **Step 3: Selfcheck to green** (cache-warm, ~30 s). Also spot-print `reg.storage_fill("ClosetToolFilled")` and sanity-eye the ids/probs.
+
+- [ ] **Step 4: Commit** — `git commit -m "feat(maps): container fills v2 — EntityTableContainerFill selector trees (upstream drift)"`
+
+---
+
 ### Task 4: Map file parse (grids, chunks, entities)
 
 **Files:**
@@ -881,16 +976,17 @@ def build_map_json(fork_key, map_id, map_name, parsed, reg, bounds):
                 continue
             # the thing itself is searchable (locker, vendor, machine, item)
             add(proto, x, y, 0)
-            if kind == "container":
+            fills = reg.storage_fill(proto)  # containers AND filled items (duffel bags)
+            if fills:
                 via = reg.name(proto)
-                for entry in reg.storage_fill(proto):
+                for entry in fills:
                     if not isinstance(entry, dict) or not entry.get("id"):
                         continue
                     prob = entry.get("prob")
                     amount = entry.get("amount", 1)
                     extra = round(prob, 2) if isinstance(prob, (int, float)) and prob < 1 else (amount if amount > 1 else None)
                     add(entry["id"], x, y, 1, via, extra)
-            elif kind == "vendor":
+            if kind == "vendor":
                 via = reg.name(proto)
                 for pid, count in reg.vendor_inventory(proto).items():
                     add(pid, x, y, 2, via, count)

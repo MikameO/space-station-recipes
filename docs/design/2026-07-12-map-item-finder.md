@@ -53,8 +53,11 @@ fetch-кэш.
   автоматический фильтр структурного мусора (стены, трубы, провода, декали);
 - станционарное оборудование (вендоматы, диспенсеры, крио и пр.) — отдельная
   категория `machinery`, тоже ищется;
-- `StorageFill.contents` шкафов/ящиков (записи с `prob < 1` сохраняют
-  вероятность);
+- наполнение шкафов/ящиков: legacy `StorageFill.contents` (форки на старом
+  коде) и современный `EntityTableContainerFill` + `entityTable`-прототипы
+  (деревья селекторов AllSelector/GroupSelector/NestedSelector — флэттенятся
+  с перемножением вероятностей; уточнение по дрейфу апстрима, обнаружено
+  на E1: в актуальной vanilla `StorageFill` не используется вовсе);
 - инвентари вендоматов (`VendingMachineInventoryPrototype`);
 - маяки: прототипы `DefaultStationBeacon*` — `NavMapBeacon.defaultText`
   содержит Fluent-ключ, резолвится словарём из
