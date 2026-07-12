@@ -187,6 +187,7 @@ class Registry:
         self.vend_inventories = {}   # invId -> {"normal": {pid: n}, "contraband": {pid: n}}
         self.tile_sprites = {}  # tileId -> sprite path
         self.tile_colors = {}   # tileId -> (r,g,b) filled in Task 5
+        self.entity_tables = {} # entityTable id -> selector tree (modern container fills)
         self.ftl = {}           # fluent key -> english text
         self._kind_cache = {}
 
@@ -234,17 +235,64 @@ class Registry:
                 return "window"
             if nid.startswith(("BaseAirlock", "BaseFirelock", "Airlock", "Firelock")):
                 return "door"
-        if self._find_component(pid, "StorageFill") is not None:
-            return "container"
+        # item BEFORE container: a filled duffel bag is an Item that also carries
+        # EntityTableContainerFill — it must stay searchable as an item; Task 7
+        # resolves contents via storage_fill() regardless of kind.
         if self._find_component(pid, "Item") is not None:
             return "item"
+        if (self._find_component(pid, "EntityStorage") is not None
+                or self._find_component(pid, "StorageFill") is not None
+                or self._find_component(pid, "EntityTableContainerFill") is not None):
+            return "container"
         if self._find_component(pid, "ApcPowerReceiver") is not None:
             return "mach"
         return "skip"
 
+    def _flatten_table(self, node, p=1.0, depth=0):
+        """Yield (proto_id, prob, amount) from an entity-table selector tree.
+        ponytail: GroupSelector = weight-proportional split, rolls ignored —
+        good enough for 'where can this item be', not a drop-rate simulator."""
+        if depth > 8 or not isinstance(node, dict):
+            return
+        p *= float(node.get("prob", 1.0))
+        t = node.get("_type")
+        if t == "NestedSelector":
+            # plan snippet said node.get("id"); real serialized key is tableId
+            # (verified: {"tableId": "FillClosetTool", "_type": "NestedSelector"})
+            yield from self._flatten_table(self.entity_tables.get(node.get("tableId"), {}), p, depth + 1)
+            return
+        children = [c for c in (node.get("children") or []) if isinstance(c, dict)]
+        if t == "GroupSelector" and children:
+            total = sum(float(c.get("weight", 1.0)) for c in children)
+            for c in children:
+                w = float(c.get("weight", 1.0))
+                yield from self._flatten_table(c, p * (w / total if total else 0), depth + 1)
+            return
+        if children:  # AllSelector or any selector with children
+            for c in children:
+                yield from self._flatten_table(c, p, depth + 1)
+            return
+        if node.get("id"):  # leaf entity entry
+            yield node["id"], p, int(node.get("amount", 1) or 1)
+
     def storage_fill(self, pid):
+        """[{id, prob?, amount?}] — legacy StorageFill or modern EntityTableContainerFill."""
         comp = self._find_component(pid, "StorageFill")
-        return (comp or {}).get("contents") or []
+        if comp:
+            return comp.get("contents") or []
+        comp = self._find_component(pid, "EntityTableContainerFill")
+        if not comp:
+            return []
+        out = []
+        for table in (comp.get("containers") or {}).values():
+            for eid, p, amount in self._flatten_table(table):
+                rec = {"id": eid}
+                if p < 0.995:
+                    rec["prob"] = round(p, 2)
+                if amount > 1:
+                    rec["amount"] = amount
+                out.append(rec)
+        return out
 
     def vendor_pack(self, pid):
         comp = self._find_component(pid, "VendingMachine")
@@ -294,6 +342,8 @@ def build_registry(fork_key: str, fork_cfg: dict, tree: list[str]) -> Registry:
                     reg.vend_inventories[eid] = {
                         "normal": entry.get("startingInventory") or {},
                         "contraband": entry.get("contrabandInventory") or {}}
+                elif t == "entityTable" and eid:
+                    reg.entity_tables[eid] = entry.get("table") or {}
                 elif t == "tile" and eid and entry.get("sprite"):
                     reg.tile_sprites[eid] = entry["sprite"]
     # Fluent: beacon names
@@ -330,16 +380,17 @@ def selfcheck():
     # "Medbay" is a distinct sibling beacon (DefaultStationBeaconMedbay -> station-beacon-medbay).
     # Verified station_beacon.yml + station-beacons.ftl directly; parse logic is correct, recon was stale.
     assert reg.beacon_text("DefaultStationBeaconMedical") == "Medical"
-    # KNOWN GAP (see Task 3 report, DONE_WITH_CONCERNS): StorageFill is dead in current upstream —
-    # confirmed empirically across all 10751 protos in this registry: 0 use StorageFill, 620 use
-    # the newer EntityTableContainerFill/entityTable-selector system instead (incl. both
-    # LockerWeldingSuppliesFilled and ClosetToolFilled). storage_fill() is transcribed faithfully
-    # per plan and correctly returns [] for both real ids — no id anywhere would satisfy a
-    # non-empty-StorageFill assert. Documenting current (empty) behavior rather than silently
-    # reaching for EntityTableContainerFill parsing, which is a Registry-contract decision this
-    # task was not scoped to make.
-    assert reg.storage_fill("LockerWeldingSuppliesFilled") == [] and reg.storage_fill("ClosetToolFilled") == [], \
-        "StorageFill unexpectedly non-empty — upstream may have reintroduced it; revisit this assert"
+    fills = reg.storage_fill("ClosetToolFilled")
+    assert fills, "ClosetToolFilled fill empty"
+    fill_ids = {f["id"] for f in fills}
+    assert any(("Crowbar" in i) or ("Wrench" in i) or ("Screwdriver" in i) for i in fill_ids), fill_ids
+    assert reg.kind("ClosetToolFilled") == "container"
+    assert reg.kind("CrateTrashCartFilled") == "container"
+    assert reg.kind("Crowbar") == "item", "container branch must not steal plain items"
+    # prob propagation: LockerWeldingSuppliesFilled fills purely via GroupSelector weight
+    # splits (FillWelderSupplies 1/1/0.25/0.05, FillWelderSuppliesMask 1/0.25/0.25/0.25 —
+    # verified in Catalog/Fills/Lockers/engineer.yml), so every flattened entry has prob<1.
+    assert any("prob" in f for f in reg.storage_fill("LockerWeldingSuppliesFilled"))
     assert reg.tile_sprites.get("FloorSteel")
     print(f"selfcheck OK: {len(maps)} maps, {len(reg.protos)} protos")
 
