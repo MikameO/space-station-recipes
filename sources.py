@@ -92,31 +92,6 @@ ALLOWED_DOMAINS = (
     "web.archive.org",
 )
 
-# GitHub owners allowed for deep-links. Derived from FORK_REGISTRY at runtime
-# in the extractor (see ss14_chem_extractor.py). Kept here as a baseline for
-# offline validation and tests.
-_BASELINE_GH_OWNERS = frozenset({
-    "space-wizards",        # vanilla
-    "Goob-Station",
-    "DeltaV-Station",
-    "new-frontiers-14",
-    "RMC-14",
-    "Simple-Station",
-    "CorvaxGoob",
-    "Space-Wizards-Starlight",
-    "dead-space-14",
-    # Popular-server forks (2026-07-07)
-    "Trauma-Station",
-    "ProjectOmu",
-    "carpmosia",
-    "Monolith-Station",
-    "ss14-harmony",
-    "space-syndicate",      # Corvax
-    "AdventureTimeSS14",    # ADT / Время Приключений
-    "space-sunrise",        # Sunrise + Fish Station
-})
-
-
 # ─────────────────────────────────────────────
 # The catalog
 # ─────────────────────────────────────────────
@@ -410,16 +385,6 @@ def _validate_entry(entry: dict, allowed_gh_owners: set[str]) -> list[str]:
     return warnings
 
 
-def resolve_source(ref, catalog: dict | None = None) -> dict | None:
-    """Resolve a source reference (catalog ID string or inline dict) to an entry."""
-    cat = catalog or SOURCES
-    if isinstance(ref, str):
-        return cat.get(ref)
-    if isinstance(ref, dict):
-        return ref
-    return None
-
-
 def validate_source_refs(
     refs_owners: list[tuple[str, list]],
     allowed_gh_owners: set[str] | None = None,
@@ -433,7 +398,7 @@ def validate_source_refs(
     - warnings: domain mismatches, missing fields, date format, etc.
     """
     cat = catalog or SOURCES
-    owners_gh = allowed_gh_owners or set(_BASELINE_GH_OWNERS)
+    owners_gh = allowed_gh_owners or set()
 
     fatal = []
     warn = []

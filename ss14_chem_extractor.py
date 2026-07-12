@@ -22,19 +22,14 @@ import yaml
 
 from config import (
     FORK_REGISTRY,
-    VANILLA_RAW, RMC14_RAW,
-    VANILLA_REAGENT_FILES, VANILLA_REACTION_FILES, VANILLA_LOCALE_FILES,
-    RMC14_REAGENT_FILES, RMC14_REACTION_FILES, RMC14_LOCALE_FILES,
-    VANILLA_SEED_FILES, RMC14_SEED_FILES, VANILLA_BOTANY_LOCALE_FILES,
     OTHER_REAGENT_SOURCES, DANGEROUS_INTERACTIONS,
-    RMC14_BLOCKED_REACTIONS, RMC14_MODIFIED_REACTIONS,
     BASE_DISPENSER_CHEMICALS, CATEGORY_SHEET_MAP,
     ANTAG_DATA, ANTAG_STRATEGIES, DELIVERY_MECHANISMS, SYNDICATE_ITEMS,
     SHIFT_PRESETS,
 )
 from sources import (
     SOURCES, AUTHORITY_WEIGHTS, ALLOWED_DOMAINS,
-    validate_source_refs, authority_weight, resolve_source,
+    validate_source_refs, authority_weight,
 )
 
 # ─────────────────────────────────────────────
@@ -253,7 +248,7 @@ def fetch_and_extract_sprites():
         print("  Install with: pip install Pillow")
         return
 
-    base_url = VANILLA_RAW.replace("{path}", "Resources/Textures/{rsi}/{state}.png")
+    base_url = FORK_REGISTRY["vanilla"]["raw_url"].replace("{path}", "Resources/Textures/{rsi}/{state}.png")
     fetched = 0
 
     for entry in SPRITE_MANIFEST:
@@ -317,11 +312,6 @@ def _type_constructor(loader_inst, suffix, node):
 
 
 SS14Loader.add_multi_constructor("!type:", _type_constructor)
-
-
-def make_yaml_loader():
-    """Return the SS14-aware YAML loader class."""
-    return SS14Loader
 
 
 def parse_yaml_content(content: str, source_name: str, loader) -> list[dict]:
@@ -1751,26 +1741,6 @@ def build_per_fork_views(
     return per_fork
 
 
-def compute_strategy_difficulty_by_fork(
-    strategy: dict,
-    per_fork_views: dict[str, dict],
-) -> dict[str, dict]:
-    """Run compute_strategy_difficulty once per fork. Returns {fork_id: result}.
-
-    Useful for UI that wants to show the effective difficulty on the server the
-    user is currently filtering by (see app.js activeSource). A strategy that
-    uses a reagent blocked on DeltaV will surface as `impossible` there while
-    staying `easy` on vanilla."""
-    result = {}
-    for fork_id, views in per_fork_views.items():
-        result[fork_id] = compute_strategy_difficulty(
-            strategy,
-            views["accessibility_map"],
-            views["reaction_lookup"],
-        )
-    return result
-
-
 # ─────────────────────────────────────────────
 # Phase 9b: JSON Export
 # ─────────────────────────────────────────────
@@ -2071,7 +2041,11 @@ def export_json(reagents: dict, reactions: dict, locale: dict,
     for _strat in ANTAG_STRATEGIES:
         computed = compute_strategy_difficulty(_strat, accessibility_map, reaction_lookup)
         if per_fork_views:
-            by_fork = compute_strategy_difficulty_by_fork(_strat, per_fork_views)
+            by_fork = {
+                fork_id: compute_strategy_difficulty(
+                    _strat, views["accessibility_map"], views["reaction_lookup"])
+                for fork_id, views in per_fork_views.items()
+            }
             computed["byFork"] = by_fork
             # Inline summary: which forks flip the tier vs global?
             tier_variants = {fid: r["tier"] for fid, r in by_fork.items()}
@@ -2184,7 +2158,7 @@ def export_json(reagents: dict, reactions: dict, locale: dict,
 # ─────────────────────────────────────────────
 
 def main():
-    loader = make_yaml_loader()
+    loader = SS14Loader
 
     # Phase 1: Fetch all forks
     print("=== Phase 1: Fetching files from GitHub ===")

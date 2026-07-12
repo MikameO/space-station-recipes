@@ -1110,21 +1110,6 @@ for _fork_id, _fconf in FORK_REGISTRY.items():
     if _fork_id != "vanilla":
         _fconf.setdefault("vanilla_override_reagent_files", VANILLA_REAGENT_PATHS)
 
-# ── Backward-compatible aliases (used by extractor during transition) ──
-VANILLA_RAW = FORK_REGISTRY["vanilla"]["raw_url"]
-RMC14_RAW = FORK_REGISTRY["rmc14"]["raw_url"]
-VANILLA_REAGENT_FILES = FORK_REGISTRY["vanilla"]["reagent_files"]
-VANILLA_REACTION_FILES = FORK_REGISTRY["vanilla"]["reaction_files"]
-VANILLA_LOCALE_FILES = FORK_REGISTRY["vanilla"]["locale_files"]
-RMC14_REAGENT_FILES = FORK_REGISTRY["rmc14"]["reagent_files"]
-RMC14_REACTION_FILES = FORK_REGISTRY["rmc14"]["reaction_files"]
-RMC14_LOCALE_FILES = FORK_REGISTRY["rmc14"]["locale_files"]
-VANILLA_SEED_FILES = FORK_REGISTRY["vanilla"]["seed_files"]
-VANILLA_BOTANY_LOCALE_FILES = FORK_REGISTRY["vanilla"]["botany_locale_files"]
-RMC14_SEED_FILES = FORK_REGISTRY["rmc14"]["seed_files"]
-RMC14_BLOCKED_REACTIONS = FORK_REGISTRY["rmc14"]["blocked_reactions"]
-RMC14_MODIFIED_REACTIONS = FORK_REGISTRY["rmc14"]["modified_reactions"]
-
 # Combined dispenser chemicals (all forks)
 BASE_DISPENSER_CHEMICALS = set()
 for _fork in FORK_REGISTRY.values():
@@ -1207,45 +1192,6 @@ OTHER_REAGENT_SOURCES = {
     "Nothing": ["EMAG Solar's Best Hot Drink vending machine"],
     "ChangelingSting": ["EMAG Shambler's Juice vending machine"],
     "NukieCola": ["EMAG Robust Softdrinks vending machine"],
-}
-
-# Vanilla reactions BLOCKED/REMOVED in RMC14 fork
-# These reactions exist in vanilla SS14 but are commented out or deleted in RMC14
-RMC14_BLOCKED_REACTIONS = {
-    # Medicine (commented or removed)
-    "Synaptizine", "Cognizine", "Saline", "Arcryox", "Heparin", "Hemorrhinol",
-    # Chemicals (commented or removed)
-    "Desoxyephedrine", "Lye",
-    # Drinks (replaced or commented)
-    "OrangeLimeSoda", "Neurotoxin", "Singulo",
-    # Food breakdowns (removed)
-    "CookingMustard", "BananaBreakdown", "AllicinBreakdown", "NutrimentBreakdown",
-    "FatBreakdown", "UncookedAnimalProteinBreakdown", "ProteinBreakdown", "VitaminBreakdown",
-    # Soap (entire file removed)
-    "CreateSoapRegular", "CreateSoapNT", "CreateSoapDeluxe",
-    "CreateSoapBlood", "CreateSoapSyndie", "CreateSoapOmega",
-    # Fun (removed)
-    "Felinase", "Caninase", "CaninaseFelinaseReaction",
-    # Biological (removed)
-    "SulfurBloodBreakdown",
-    # Cascade-blocked (reaction exists but a required reactant can't be crafted)
-    "Pax",                  # needs Synaptizine (commented out)
-    "Opporozidone",         # needs Cognizine (commented out)
-    "Ethyloxyephedrine",    # needs Desoxyephedrine (commented out)
-    "Diphenylmethylamine",  # needs Ethyloxyephedrine (cascade)
-    # Likely blocked by C# code (present in YAML but confirmed unavailable in-game)
-    "Arithrazine",          # user-confirmed unavailable on RMC14
-    "DoctorsDelight",       # user-confirmed unavailable on RMC14
-}
-
-# Vanilla reactions MODIFIED in RMC14 (different from vanilla version)
-RMC14_MODIFIED_REACTIONS = {
-    "MuteToxin": "Added Uranium as extra reactant",
-    "Smoke": "Priority changed from -10 to 10",
-    "Foam": "Priority changed from -10 to 10",
-    "IronMetalFoam": "Priority changed from -10 to 10",
-    "AluminiumMetalFoam": "Priority changed from -10 to 10",
-    "AmmoniaFromBlood": "Stir mixer requirement removed",
 }
 
 # Dangerous chemical interactions database
