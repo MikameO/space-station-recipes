@@ -1578,6 +1578,8 @@ Enable the two blocklist lines in `discover_maps` (drop the ponytail stub).
 - [ ] **Step 2:** Run `python ss14_map_extractor.py --all-forks` (long: trees + protos per fork; cached afterwards).
 Review output per fork: `fork X: N/M maps baked`. Forks with 0 gameMaps (pure content forks that reuse upstream maps) are expected SKIPs — count them in the commit message. Any *parse* failure (format drift) → inspect, either fix decode or blocklist the map with a comment.
 
+Format-drift guard (add to `decode_chunk` before the unpack loop — cheap insurance against a silent 6-byte-stride misparse): `if len(raw) % 7: print(f"  WARNING: chunk stride {len(raw)}B not /7 — skipping (format drift?)"); return {}`. Empirically low-risk: probed live on E1 — dead-space (an older/smaller fork) serializes `meta.format: 7`, chunk = 1792 B = 256×7, identical to vanilla; all current forks track the same engine tile format. The guard exists so a future engine bump degrades to a warning+skipped map, never a corrupt-but-committed PNG.
+
 - [ ] **Step 3:** Browser check 2 RU forks (per audience): pick a Corvax and an ADT map, search a common item (`лом` won't hit — search `crowbar`; RU search is a spec non-goal), verify markers + beacon labels render (fork beacons may use their own ftl — beacon fallback `.title()` covers missing keys).
 
 - [ ] **Step 4:** `du -sh maps/` sanity (< 25 MB with 18 forks; if way above, check PNG `optimize=True` held and no map has an absurd bounds from a stray far-away tile — if one does, clamp: ignore tiles whose |coord| > 1500 with a warning).
