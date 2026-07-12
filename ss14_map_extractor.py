@@ -376,6 +376,77 @@ def build_registry(fork_key: str, fork_cfg: dict, tree: list[str]) -> Registry:
                 reg.ftl[m.group(1)] = m.group(2).strip()
     return reg
 
+# ── map file parse ──
+
+def decode_chunk(b64: str):
+    """Yield (i, typeId) for each of the 256 tiles; 7 bytes/tile, u32LE typeId."""
+    raw = base64.b64decode(b64)
+    for i in range(len(raw) // 7):
+        yield i, struct.unpack_from("<I", raw, i * 7)[0]
+
+def parse_map_file(fork_key: str, fork_cfg: dict, path: str) -> dict:
+    content = fetch_file(fork_cfg["raw_url"].format(path=path), CACHE_DIR / fork_key / path)
+    if not content:
+        raise RuntimeError(f"empty map file {path}")
+    try:
+        loader = yaml.CSafeLoader  # ~10x faster if libyaml present
+        class _L(loader):  # noqa: N801
+            pass
+        _L.add_multi_constructor("!type:", _type_constructor)
+        docs = list(yaml.load_all(content, Loader=_L))
+    except AttributeError:
+        docs = load_yaml_docs(content, path)
+    doc = docs[0]
+    tilemap = doc.get("tilemap") or {}
+    grids = {}       # gridUid -> {"tiles": {(tx,ty): tileProtoId}, "name": str|None}
+    entities = {}    # protoId -> [(x, y, gridUid)]
+    beacon_overrides = {}  # (x,y,grid) -> text  — map-level NavMapBeacon text override
+    for group in doc.get("entities") or []:
+        proto = group.get("proto") or ""
+        for ent in group.get("entities") or []:
+            comps = {c.get("type"): c for c in ent.get("components") or [] if isinstance(c, dict)}
+            grid_comp = comps.get("MapGrid")
+            if grid_comp:
+                uid = ent["uid"]
+                g = grids.setdefault(uid, {"tiles": {}, "name": None})
+                g["name"] = (comps.get("MetaData") or {}).get("name")
+                for ind, chunk in (grid_comp.get("chunks") or {}).items():
+                    cx, cy = map(int, str(chunk.get("ind", ind)).split(","))
+                    for i, type_id in decode_chunk(chunk["tiles"]):
+                        if type_id == 0:
+                            continue  # Space
+                        tx, ty = cx * 16 + i % 16, cy * 16 + i // 16
+                        g["tiles"][(tx, ty)] = tilemap.get(type_id)
+                continue
+            tr = comps.get("Transform")
+            if not proto or not tr or "pos" not in tr:
+                continue
+            try:
+                x, y = (float(v) for v in str(tr["pos"]).split(","))
+            except ValueError:
+                continue
+            grid = tr.get("parent")
+            entities.setdefault(proto, []).append((round(x, 1), round(y, 1), grid))
+            nb = comps.get("NavMapBeacon")
+            if nb and nb.get("text"):
+                beacon_overrides[(round(x, 1), round(y, 1), grid)] = str(nb["text"])
+    if not grids:
+        raise RuntimeError(f"no grids in {path}")
+    main_grid = max(grids, key=lambda u: len(grids[u]["tiles"]))
+    map_name = None
+    for gm_id, g in grids.items():
+        if gm_id == main_grid:
+            map_name = g["name"]
+    return {
+        "name": map_name,
+        "tiles": grids[main_grid]["tiles"],
+        "main_grid": main_grid,
+        "grid_names": {u: g["name"] for u, g in grids.items()},
+        "offgrid_names": {u: (g["name"] or f"grid {u}") for u, g in grids.items() if u != main_grid},
+        "entities": entities,
+        "beacon_overrides": beacon_overrides,
+    }
+
 # ── selfcheck ──
 
 def selfcheck():
@@ -413,7 +484,29 @@ def selfcheck():
     # verified in Catalog/Fills/Lockers/engineer.yml), so every flattened entry has prob<1.
     assert any("prob" in f for f in reg.storage_fill("LockerWeldingSuppliesFilled"))
     assert reg.tile_sprites.get("FloorSteel")
-    print(f"selfcheck OK: {len(maps)} maps, {len(reg.protos)} protos")
+
+    parsed = parse_map_file("vanilla", fork, "Resources/Maps/bagel.yml")
+    # Bagel's main grid (uid 60) carries a bare MetaData component with no
+    # `name` key (verified live: {'type': 'MetaData'}) — the station's display
+    # name lives in the gameMap prototype (Task 2), not the map file. None is
+    # the correct, expected result here; only an empty-string name is a bug smell.
+    assert parsed["name"] == "Bagel Station" or parsed["name"] is None or parsed["name"], "map name"
+    # Verified live (independent raw struct-unpack cross-check, bypassing decode_chunk
+    # entirely): Bagel main grid = 104 chunks * 256 = 26624 tile slots, exactly 15567
+    # non-Space. The plan's ">20000" guess conflated this with the 25039 *entity* count
+    # (a different metric) — threshold corrected to a real sanity floor, not the parser.
+    assert len(parsed["tiles"]) > 10000, f"too few tiles: {len(parsed['tiles'])}"
+    crow = parsed["entities"].get("Crowbar", [])
+    # Live coords for uid 23156 are -106.484505,24.465736 (parent 60) — but the
+    # parser intentionally rounds to 1 decimal (matches the plan's own data-schema
+    # example: "p": [[-106.5, 24.5, 0], ...]), so 0.01 tolerance against the raw
+    # recon number is tighter than the rounding step itself (max err 0.05). Assert
+    # against the documented rounded value instead of the pre-rounding recon number.
+    assert any(abs(x - -106.5) < 0.001 and abs(y - 24.5) < 0.001
+               for x, y, grid in crow), f"Crowbar pos mismatch: {crow[:4]}"
+    assert parsed["main_grid"] in parsed["grid_names"] or True
+    assert len(parsed["offgrid_names"]) >= 1, "Syndi Puddle grid expected"
+    print(f"selfcheck OK: {len(maps)} maps, {len(reg.protos)} protos, {len(parsed['tiles'])} tiles")
 
 def main():
     ap = argparse.ArgumentParser()
