@@ -107,6 +107,7 @@ async function init() {
   renderPresetBar(); // A2: shift-start preset chips
   setupForkDiff(); // B1
   setupShareButton();
+  setupPipButton(); // B3
   setupDisclaimer();
   setupAntagMode();
   setupAntagFilters();
@@ -3026,6 +3027,30 @@ function setupShareButton() {
     navigator.clipboard.writeText(url)
       .then(() => showToast('Link copied!'))
       .catch(() => showToast('Copy failed — grab the URL from the address bar'));
+  });
+}
+
+// B3: pin-over-game companion window. Document Picture-in-Picture gives a
+// true always-on-top window (Chromium 116+); everywhere else we fall back
+// to a small popup the user can pin with OS tools (PowerToys Win+Ctrl+T).
+function setupPipButton() {
+  const btn = document.getElementById('pipBtn');
+  if (!btn) return;
+  btn.addEventListener('click', async () => {
+    track('pip_open', { api: 'documentPictureInPicture' in window ? 'pip' : 'popup' });
+    const url = './?mode=companion';
+    if ('documentPictureInPicture' in window) {
+      try {
+        const pip = await documentPictureInPicture.requestWindow({ width: 430, height: 640 });
+        pip.document.body.style.margin = '0';
+        const frame = pip.document.createElement('iframe');
+        frame.src = url;
+        frame.style.cssText = 'border:0;width:100vw;height:100vh;display:block';
+        pip.document.body.append(frame);
+        return;
+      } catch (e) { /* user denied or transient-activation lost — use popup */ }
+    }
+    window.open(url, 'chemdb-companion', 'width=430,height=640,popup=yes');
   });
 }
 
