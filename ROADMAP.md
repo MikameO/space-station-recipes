@@ -38,7 +38,7 @@
 3. UI: кнопки пресетов в Calculator (фильтруются активным форком).
 **DoD:** клик по пресету наполняет Batch Planner; количества сверены с рецептами вручную для 2 пресетов; скриншот.
 
-### A3. Режим «Чем лечить?» v1 `[ ]` — HAE 4h (frontend)
+### A3. Режим «Чем лечить?» v1 `[x]` (2026-07-12, commit cdf533d; таб What Heals?: 20 динамических damage-типов из heals:*-тегов, ранжир по heal/u + OD + accessibility-тир, deep-link tab=medbay) — HAE 4h (frontend)
 **Спрос:** O2+O6 — forum-03 («в medicine tab нет поиска»), медики = кратно большая аудитория, чем химики.
 **Шаги:**
 1. Новый режим (в Reagents или Calculator): селектор типа урона Brute / Burn / Toxin / Airloss / Genetic / Radiation (+ учёт активного форка).
