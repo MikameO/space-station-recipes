@@ -376,6 +376,33 @@ def build_registry(fork_key: str, fork_cfg: dict, tree: list[str]) -> Registry:
                 reg.ftl[m.group(1)] = m.group(2).strip()
     return reg
 
+def load_tile_colors(fork_key: str, fork_cfg: dict, reg: Registry):
+    """Average color of each tile texture; cached as one JSON per fork."""
+    from PIL import Image
+    cache = CACHE_DIR / fork_key / "_tile_colors.json"
+    if cache.exists():
+        reg.tile_colors = {k: tuple(v) for k, v in json.loads(cache.read_text()).items()}
+        return
+    import io
+    for tile_id, sprite in reg.tile_sprites.items():
+        rel = "Resources" + sprite if sprite.startswith("/") else "Resources/" + sprite
+        data = fetch_binary(fork_cfg["raw_url"].format(path=rel),
+                            CACHE_DIR / fork_key / rel)
+        if not data:
+            continue
+        try:
+            img = Image.open(io.BytesIO(data)).convert("RGBA")
+            px = [p for p in img.getdata() if p[3] > 0]
+            if px:
+                n = len(px)
+                reg.tile_colors[tile_id] = (sum(p[0] for p in px) // n,
+                                            sum(p[1] for p in px) // n,
+                                            sum(p[2] for p in px) // n)
+        except Exception as e:
+            print(f"  WARNING: tile texture {tile_id}: {e}")
+    cache.parent.mkdir(parents=True, exist_ok=True)
+    cache.write_text(json.dumps({k: list(v) for k, v in reg.tile_colors.items()}))
+
 # ── map file parse ──
 
 def decode_chunk(b64: str):
@@ -483,7 +510,9 @@ def selfcheck():
     # splits (FillWelderSupplies 1/1/0.25/0.05, FillWelderSuppliesMask 1/0.25/0.25/0.25 —
     # verified in Catalog/Fills/Lockers/engineer.yml), so every flattened entry has prob<1.
     assert any("prob" in f for f in reg.storage_fill("LockerWeldingSuppliesFilled"))
-    assert reg.tile_sprites.get("FloorSteel")
+    load_tile_colors("vanilla", fork, reg)
+    c = reg.tile_color("FloorSteel")
+    assert c and abs(c[0] - c[1]) < 40 and sum(c) > 60, f"FloorSteel avg color odd: {c}"
 
     parsed = parse_map_file("vanilla", fork, "Resources/Maps/bagel.yml")
     # Bagel's main grid (uid 60) carries a bare MetaData component with no

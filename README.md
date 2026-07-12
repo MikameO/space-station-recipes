@@ -73,7 +73,7 @@ Then open [localhost:8090](http://localhost:8090). No build step — pure HTML/C
 
 2. Regenerate data:
    ```bash
-   pip install pyyaml openpyxl
+   pip install pyyaml openpyxl pillow
    python ss14_chem_extractor.py
    ```
 
