@@ -371,7 +371,7 @@ def build_registry(fork_key: str, fork_cfg: dict, tree: list[str]) -> Registry:
     for path in ftl_paths:
         content = fetch_file(fork_cfg["raw_url"].format(path=path), CACHE_DIR / fork_key / path)
         for line in content.splitlines():
-            m = re.match(r"^([a-zA-Z0-9-]+)\s*=\s*(.+)$", line.lstrip("﻿").strip())
+            m = re.match(r"^([a-zA-Z0-9-]+)\s*=\s*(.+)$", line.lstrip("\ufeff").strip())
             if m:
                 reg.ftl[m.group(1)] = m.group(2).strip()
     return reg
