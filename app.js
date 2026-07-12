@@ -68,6 +68,14 @@ function track(goal, params) {
 // ─────────────────────────────────────────────
 
 async function init() {
+  // B2: offline PWA + companion (second-screen / PiP) compact layout
+  if ('serviceWorker' in navigator &&
+      (location.protocol === 'https:' || location.hostname === 'localhost')) {
+    navigator.serviceWorker.register('./sw.js').catch(() => {});
+  }
+  if (new URLSearchParams(location.search).get('mode') === 'companion') {
+    document.body.classList.add('companion');
+  }
   try {
     const resp = await fetch('data.json?v=' + Date.now());
     DATA = await resp.json();
@@ -1797,7 +1805,7 @@ function ensureVisLoaded() {
   if (!visLoadPromise) {
     visLoadPromise = new Promise((resolve, reject) => {
       const s = document.createElement('script');
-      s.src = 'https://unpkg.com/vis-network@9.1.6/standalone/umd/vis-network.min.js';
+      s.src = 'libs/vis-network.min.js'; // B2: self-hosted (offline-capable)
       s.onload = resolve;
       s.onerror = () => { visLoadPromise = null; reject(new Error('vis-network load failed')); };
       document.head.appendChild(s);

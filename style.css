@@ -633,6 +633,27 @@ main {
 .diff-mod-id { font-family: 'Share Tech Mono', monospace; color: var(--text-sub); white-space: nowrap; }
 .diff-mod-note { color: var(--text-ghost); }
 
+/* B2: companion mode (?mode=companion) — compact layout for a second
+   screen or the pin-over-game PiP window: no chrome, content edge-to-edge */
+body.companion header,
+body.companion .sidebar {
+  display: none;
+}
+body.companion main {
+  margin: 0;
+  max-width: none;
+  padding: 6px 8px;
+}
+body.companion .tab-bar {
+  padding: 0 4px;
+  position: sticky;
+  top: 0;
+  z-index: 30;
+}
+body.companion .tab-btn { padding: 8px 10px; font-size: 12px; }
+body.companion .tree-node { font-size: 14px; }
+body.companion .tree-check { width: 17px; height: 17px; }
+
 .tab-panel {
   display: none;
   flex: 1;
