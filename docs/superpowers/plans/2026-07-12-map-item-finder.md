@@ -97,15 +97,16 @@ Usage:
   python ss14_map_extractor.py --all-forks
   python ss14_map_extractor.py --selfcheck        # asserts against Bagel
 """
-import argparse, base64, json, os, re, struct, sys, time, urllib.request
+import argparse, base64, json, re, struct, sys, time, urllib.request
 from pathlib import Path
 
 import yaml
 
 from config import FORK_REGISTRY  # same registry the chem extractor uses
 
-CACHE_DIR = Path("cache_maps")
-OUT_DIR = Path("maps")
+SCRIPT_DIR = Path(__file__).resolve().parent   # anchor like the sibling does
+CACHE_DIR = SCRIPT_DIR / "cache_maps"
+OUT_DIR = SCRIPT_DIR / "maps"
 SCHEMA_VERSION = 1
 
 # ── fetch (copied from ss14_chem_extractor.py:191, keep in sync manually) ──
@@ -128,6 +129,7 @@ def fetch_file(url: str, cache_path: Path) -> str:
                 print(f"  WARNING: HTTP {e.code} for {url}")
                 return ""
             if attempt < 2:
+                print(f"  HTTP {e.code}, retry {attempt + 1}/3...")
                 time.sleep(2 * (attempt + 1)); continue
             print(f"  FAILED: HTTP {e.code} for {url}"); return ""
         except Exception as e:
@@ -141,16 +143,28 @@ def fetch_binary(url: str, cache_path: Path) -> bytes:
     if cache_path.exists():
         return cache_path.read_bytes()
     cache_path.parent.mkdir(parents=True, exist_ok=True)
-    try:
-        req = urllib.request.Request(url, headers={"User-Agent": "SS14-Map-Extractor/1.0"})
-        with urllib.request.urlopen(req, timeout=60) as resp:
-            data = resp.read()
-        cache_path.write_bytes(data)
-        time.sleep(0.2)
-        return data
-    except Exception as e:
-        print(f"  WARNING: binary fetch failed {url}: {e}")
-        return b""
+    for attempt in range(3):
+        try:
+            req = urllib.request.Request(url, headers={"User-Agent": "SS14-Map-Extractor/1.0"})
+            with urllib.request.urlopen(req, timeout=60) as resp:
+                data = resp.read()
+            cache_path.write_bytes(data)
+            time.sleep(0.2)
+            return data
+        except urllib.error.HTTPError as e:
+            if e.code in (404, 403):
+                print(f"  WARNING: HTTP {e.code} for {url}")
+                return b""
+            if attempt < 2:
+                time.sleep(2 * (attempt + 1))
+            else:
+                print(f"  WARNING: binary fetch failed {url}: HTTP {e.code}")
+        except Exception as e:
+            if attempt < 2:
+                time.sleep(2 * (attempt + 1))
+            else:
+                print(f"  WARNING: binary fetch failed {url}: {e}")
+    return b""
 
 # ── YAML loader (copied from ss14_chem_extractor.py:299) ──
 
@@ -158,8 +172,13 @@ class SS14Loader(yaml.SafeLoader):
     pass
 
 def _type_constructor(loader, tag_suffix, node):
+    # full 3-branch version — keep identical to ss14_chem_extractor.py:304-316
     if isinstance(node, yaml.MappingNode):
         d = loader.construct_mapping(node, deep=True); d["_type"] = tag_suffix; return d
+    if isinstance(node, yaml.ScalarNode):
+        return {"_type": tag_suffix, "_value": loader.construct_scalar(node)}
+    if isinstance(node, yaml.SequenceNode):
+        return {"_type": tag_suffix, "_items": loader.construct_sequence(node, deep=True)}
     return {"_type": tag_suffix}
 
 SS14Loader.add_multi_constructor("!type:", _type_constructor)
