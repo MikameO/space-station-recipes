@@ -1,7 +1,7 @@
 {
  "meta": {
   "schemaVersion": "3.4.3",
-  "generated": "2026-07-12T17:16:21",
+  "generated": "2026-07-12T17:21:00",
   "forks": {
    "vanilla": {
     "name": "Vanilla SS14",
@@ -513,9 +513,9 @@
     "Chemistry reaction"
    ],
    "accessibility": {
-    "tier": "unknown",
-    "weight": 5,
-    "reason": "Recipe exists but a deep-chain ingredient is unresolved by extractor (likely plant-mutation, mob-drop, or cooking product)"
+    "tier": "cross-botany",
+    "weight": 2,
+    "reason": "Recipe requires cross-botany ingredient(s)"
    },
    "verifiedMechanics": [
     "[Bloodstream] Heals Radiation 4.5 (if body temp < 213.0K)"
@@ -10763,9 +10763,9 @@
     "Chemistry reaction"
    ],
    "accessibility": {
-    "tier": "unknown",
-    "weight": 5,
-    "reason": "Recipe requires unknown ingredient(s)"
+    "tier": "antag-only",
+    "weight": 4,
+    "reason": "Recipe requires antag-only ingredient(s)"
    },
    "verifiedMechanics": [
     "Tile: Ignites spilled reagent (x1.35 temperature)",
@@ -10844,9 +10844,9 @@
     "Chemistry reaction"
    ],
    "accessibility": {
-    "tier": "cross-service",
+    "tier": "cross-botany",
     "weight": 2,
-    "reason": "Recipe requires cross-service ingredient(s)"
+    "reason": "Recipe requires cross-botany ingredient(s)"
    },
    "verifiedMechanics": [
     "Tile: Extinguishes fires on wet tiles",
@@ -11064,9 +11064,9 @@
     "Chemistry reaction"
    ],
    "accessibility": {
-    "tier": "unknown",
-    "weight": 5,
-    "reason": "Recipe requires unknown ingredient(s)"
+    "tier": "cross-botany",
+    "weight": 2,
+    "reason": "Recipe requires cross-botany ingredient(s)"
    },
    "verifiedMechanics": [
     "Tile: Ignites spilled reagent (x1.35 temperature)",
@@ -11500,9 +11500,9 @@
     "Chemistry reaction"
    ],
    "accessibility": {
-    "tier": "cross-service",
+    "tier": "cross-botany",
     "weight": 2,
-    "reason": "Recipe requires cross-service ingredient(s)"
+    "reason": "Recipe requires cross-botany ingredient(s)"
    },
    "verifiedMechanics": [
     "Tile: Ignites spilled reagent (x1.35 temperature)",
@@ -11657,9 +11657,9 @@
     "Chemistry reaction"
    ],
    "accessibility": {
-    "tier": "unknown",
-    "weight": 5,
-    "reason": "Recipe requires unknown ingredient(s)"
+    "tier": "cross-botany",
+    "weight": 2,
+    "reason": "Recipe requires cross-botany ingredient(s)"
    },
    "verifiedMechanics": [
     "Tile: Ignites spilled reagent (x1.35 temperature)",
@@ -11734,9 +11734,9 @@
     "Chemistry reaction"
    ],
    "accessibility": {
-    "tier": "unknown",
-    "weight": 5,
-    "reason": "Recipe requires unknown ingredient(s)"
+    "tier": "cross-botany",
+    "weight": 2,
+    "reason": "Recipe requires cross-botany ingredient(s)"
    },
    "verifiedMechanics": [
     "Tile: Extinguishes fires on wet tiles",
@@ -11931,9 +11931,9 @@
     "Chemistry reaction"
    ],
    "accessibility": {
-    "tier": "unknown",
-    "weight": 5,
-    "reason": "Recipe requires unknown ingredient(s)"
+    "tier": "cross-botany",
+    "weight": 2,
+    "reason": "Recipe requires cross-botany ingredient(s)"
    },
    "verifiedMechanics": [
     "Tile: Ignites spilled reagent (x1.35 temperature)",
@@ -12914,9 +12914,9 @@
     "Chemistry reaction"
    ],
    "accessibility": {
-    "tier": "unknown",
-    "weight": 5,
-    "reason": "Recipe requires unknown ingredient(s)"
+    "tier": "cross-botany",
+    "weight": 2,
+    "reason": "Recipe requires cross-botany ingredient(s)"
    },
    "verifiedMechanics": [
     "Tile: Ignites spilled reagent (x1.35 temperature)",
@@ -13857,6 +13857,7 @@
     "Chemistry reaction",
     "blood tomato (plant)",
     "tomato killer (plant)",
+    "Juicing: blood tomato (plant)",
     "Blood draw (syringe)",
     "Blood Tomato (plant)"
    ],
@@ -14466,9 +14467,9 @@
     "Chemistry reaction"
    ],
    "accessibility": {
-    "tier": "cross-service",
+    "tier": "cross-botany",
     "weight": 2,
-    "reason": "Recipe requires cross-service ingredient(s)"
+    "reason": "Recipe requires cross-botany ingredient(s)"
    },
    "verifiedMechanics": [
     "Tile: Ignites spilled reagent (x1.35 temperature)",
@@ -14689,9 +14690,9 @@
     "Chemistry reaction"
    ],
    "accessibility": {
-    "tier": "unknown",
-    "weight": 5,
-    "reason": "Recipe requires unknown ingredient(s)"
+    "tier": "cross-botany",
+    "weight": 2,
+    "reason": "Recipe requires cross-botany ingredient(s)"
    },
    "verifiedMechanics": [
     "Tile: Ignites spilled reagent (x1.35 temperature)",
@@ -15040,9 +15041,9 @@
     "Chemistry reaction"
    ],
    "accessibility": {
-    "tier": "unknown",
-    "weight": 5,
-    "reason": "Recipe requires unknown ingredient(s)"
+    "tier": "cross-botany",
+    "weight": 2,
+    "reason": "Recipe requires cross-botany ingredient(s)"
    },
    "verifiedMechanics": [
     "Tile: Ignites spilled reagent (x1.35 temperature)",
@@ -15378,9 +15379,9 @@
     "Chemistry reaction"
    ],
    "accessibility": {
-    "tier": "cross-service",
+    "tier": "cross-botany",
     "weight": 2,
-    "reason": "Recipe requires cross-service ingredient(s)"
+    "reason": "Recipe requires cross-botany ingredient(s)"
    },
    "verifiedMechanics": [
     "Tile: Ignites spilled reagent (x1.35 temperature)",
@@ -19546,6 +19547,7 @@
    "recipe": null,
    "obtainSources": [
     "koibeans (plant)",
+    "Juicing: koibeans (plant)",
     "Space Carp (butcher meat)",
     "Koibean (plant)"
    ],
@@ -19686,9 +19688,9 @@
     "Chemistry reaction"
    ],
    "accessibility": {
-    "tier": "unknown",
-    "weight": 5,
-    "reason": "Recipe requires unknown ingredient(s)"
+    "tier": "cross-service",
+    "weight": 2,
+    "reason": "Recipe requires cross-service ingredient(s)"
    },
    "verifiedMechanics": [
     "Tile: Ignites spilled reagent (x1.35 temperature)",
@@ -21473,9 +21475,9 @@
     "Chemistry reaction"
    ],
    "accessibility": {
-    "tier": "unknown",
-    "weight": 5,
-    "reason": "Recipe requires unknown ingredient(s)"
+    "tier": "cross-service",
+    "weight": 2,
+    "reason": "Recipe requires cross-service ingredient(s)"
    },
    "verifiedMechanics": [
     "Tile: Ignites spilled reagent (x1.35 temperature)",
@@ -21969,9 +21971,9 @@
     "Chemistry reaction"
    ],
    "accessibility": {
-    "tier": "cross-service",
+    "tier": "cross-botany",
     "weight": 2,
-    "reason": "Recipe requires cross-service ingredient(s)"
+    "reason": "Recipe requires cross-botany ingredient(s)"
    },
    "verifiedMechanics": [
     "Tile: Ignites spilled reagent (x1.35 temperature)",
@@ -23342,12 +23344,13 @@
    "criticalOverdose": null,
    "recipe": null,
    "obtainSources": [
+    "Juicing: corn (plant)",
     "Vending: condiment station — corn oil (1u)"
    ],
    "accessibility": {
-    "tier": "cross-service",
+    "tier": "cross-botany",
     "weight": 2,
-    "reason": "Cross-department: Vending: condiment station — corn oil (1u)"
+    "reason": "Requires Botany: Juicing: corn (plant)"
    },
    "verifiedMechanics": [],
    "boilingPoint": null,
@@ -23479,9 +23482,9 @@
     "Chemistry reaction"
    ],
    "accessibility": {
-    "tier": "unknown",
-    "weight": 5,
-    "reason": "Recipe requires unknown ingredient(s)"
+    "tier": "cross-botany",
+    "weight": 2,
+    "reason": "Recipe requires cross-botany ingredient(s)"
    },
    "verifiedMechanics": [
     "Tile: Ignites spilled reagent (x1.35 temperature)",
@@ -23578,9 +23581,9 @@
     "Chemistry reaction"
    ],
    "accessibility": {
-    "tier": "cross-service",
+    "tier": "cross-botany",
     "weight": 2,
-    "reason": "Recipe requires cross-service ingredient(s)"
+    "reason": "Recipe requires cross-botany ingredient(s)"
    },
    "verifiedMechanics": [
     "Tile: CreateEntityTileReaction (see YAML for details)",
@@ -27518,9 +27521,9 @@
     "Chemistry reaction"
    ],
    "accessibility": {
-    "tier": "unknown",
-    "weight": 5,
-    "reason": "Recipe exists but a deep-chain ingredient is unresolved by extractor (likely plant-mutation, mob-drop, or cooking product)"
+    "tier": "cross-botany",
+    "weight": 2,
+    "reason": "Recipe requires cross-botany ingredient(s)"
    },
    "verifiedMechanics": [
     "[Medicine] Heals Heat 30 Heals Cold 24 Heals Shock 24 Heals Caustic 18",
@@ -28403,6 +28406,7 @@
    "recipe": null,
    "obtainSources": [
     "bungo (plant)",
+    "Juicing: corn (plant)",
     "Vending: ChefVend — universal enzyme (50u)",
     "Universal Enzyme bottle (kitchen)"
    ],
@@ -28701,9 +28705,9 @@
     "Chemistry reaction"
    ],
    "accessibility": {
-    "tier": "unknown",
-    "weight": 5,
-    "reason": "Recipe requires unknown ingredient(s)"
+    "tier": "cross-botany",
+    "weight": 2,
+    "reason": "Recipe requires cross-botany ingredient(s)"
    },
    "verifiedMechanics": [
     "Tile: Ignites spilled reagent (x1.35 temperature)",
@@ -32159,11 +32163,13 @@
    "overdose": null,
    "criticalOverdose": null,
    "recipe": null,
-   "obtainSources": [],
+   "obtainSources": [
+    "Juicing: golden apple (plant)"
+   ],
    "accessibility": {
-    "tier": "unobtainable",
-    "weight": 999,
-    "reason": "No recipe, no plant, no dispenser source"
+    "tier": "cross-botany",
+    "weight": 2,
+    "reason": "Requires Botany: Juicing: golden apple (plant)"
    },
    "verifiedMechanics": [
     "Phase change: melts at 1064.76K, boils at 2700.0K"
@@ -32221,9 +32227,9 @@
     "Chemistry reaction"
    ],
    "accessibility": {
-    "tier": "unknown",
-    "weight": 5,
-    "reason": "Recipe exists but a deep-chain ingredient is unresolved by extractor (likely plant-mutation, mob-drop, or cooking product)"
+    "tier": "cross-botany",
+    "weight": 2,
+    "reason": "Recipe requires cross-botany ingredient(s)"
    },
    "verifiedMechanics": [
     "Tile: Ignites spilled reagent (x1.35 temperature)",
@@ -34573,9 +34579,9 @@
     "Chemistry reaction"
    ],
    "accessibility": {
-    "tier": "unknown",
-    "weight": 5,
-    "reason": "Recipe requires unknown ingredient(s)"
+    "tier": "cross-service",
+    "weight": 2,
+    "reason": "Recipe requires cross-service ingredient(s)"
    },
    "verifiedMechanics": [
     "[Bloodstream] Emote: Honk @20%",
@@ -35619,9 +35625,9 @@
     "Chemistry reaction"
    ],
    "accessibility": {
-    "tier": "unknown",
-    "weight": 5,
-    "reason": "Recipe requires unknown ingredient(s)"
+    "tier": "cross-botany",
+    "weight": 2,
+    "reason": "Recipe requires cross-botany ingredient(s)"
    },
    "verifiedMechanics": [
     "Tile: Extinguishes fires on wet tiles",
@@ -35691,9 +35697,9 @@
     "Chemistry reaction"
    ],
    "accessibility": {
-    "tier": "unknown",
-    "weight": 5,
-    "reason": "Recipe requires unknown ingredient(s)"
+    "tier": "cross-botany",
+    "weight": 2,
+    "reason": "Recipe requires cross-botany ingredient(s)"
    },
    "verifiedMechanics": [
     "Tile: Extinguishes fires on wet tiles",
@@ -35892,9 +35898,9 @@
     "Chemistry reaction"
    ],
    "accessibility": {
-    "tier": "unknown",
-    "weight": 5,
-    "reason": "Recipe requires unknown ingredient(s)"
+    "tier": "cross-botany",
+    "weight": 2,
+    "reason": "Recipe requires cross-botany ingredient(s)"
    },
    "verifiedMechanics": [
     "Tile: Extinguishes fires on wet tiles",
@@ -36697,9 +36703,9 @@
     "Chemistry reaction"
    ],
    "accessibility": {
-    "tier": "cross-service",
+    "tier": "cross-botany",
     "weight": 2,
-    "reason": "Recipe requires cross-service ingredient(s)"
+    "reason": "Recipe requires cross-botany ingredient(s)"
    },
    "verifiedMechanics": [
     "Tile: Extinguishes fires on wet tiles",
@@ -36769,9 +36775,9 @@
     "Chemistry reaction"
    ],
    "accessibility": {
-    "tier": "unknown",
-    "weight": 5,
-    "reason": "Recipe requires unknown ingredient(s)"
+    "tier": "cross-botany",
+    "weight": 2,
+    "reason": "Recipe requires cross-botany ingredient(s)"
    },
    "verifiedMechanics": [
     "Tile: Extinguishes fires on wet tiles",
@@ -36838,9 +36844,9 @@
     "Chemistry reaction"
    ],
    "accessibility": {
-    "tier": "unknown",
-    "weight": 5,
-    "reason": "Recipe requires unknown ingredient(s)"
+    "tier": "cross-botany",
+    "weight": 2,
+    "reason": "Recipe requires cross-botany ingredient(s)"
    },
    "verifiedMechanics": [
     "Tile: Extinguishes fires on wet tiles",
@@ -36914,9 +36920,9 @@
     "Chemistry reaction"
    ],
    "accessibility": {
-    "tier": "unknown",
-    "weight": 5,
-    "reason": "Recipe exists but a deep-chain ingredient is unresolved by extractor (likely plant-mutation, mob-drop, or cooking product)"
+    "tier": "cross-botany",
+    "weight": 2,
+    "reason": "Recipe requires cross-botany ingredient(s)"
    },
    "verifiedMechanics": [
     "Tile: Extinguishes fires on wet tiles",
@@ -37059,9 +37065,9 @@
     "Chemistry reaction"
    ],
    "accessibility": {
-    "tier": "cross-service",
+    "tier": "cross-botany",
     "weight": 2,
-    "reason": "Recipe requires cross-service ingredient(s)"
+    "reason": "Recipe requires cross-botany ingredient(s)"
    },
    "verifiedMechanics": [
     "Tile: Extinguishes fires on wet tiles",
@@ -38590,9 +38596,9 @@
     "Chemistry reaction"
    ],
    "accessibility": {
-    "tier": "unknown",
-    "weight": 5,
-    "reason": "Recipe requires unknown ingredient(s)"
+    "tier": "cross-botany",
+    "weight": 2,
+    "reason": "Recipe requires cross-botany ingredient(s)"
    },
    "verifiedMechanics": [
     "Tile: Ignites spilled reagent (x1.35 temperature)",
@@ -39011,12 +39017,16 @@
     ]
    },
    "obtainSources": [
-    "Chemistry reaction"
+    "Chemistry reaction",
+    "Juicing: apple (plant)",
+    "Juicing: golden apple (plant)",
+    "Vending (hacked): NanoMed Civilian — apple (5u)",
+    "Vending (hacked): NanoMed Plus — apple (5u)"
    ],
    "accessibility": {
-    "tier": "unknown",
-    "weight": 5,
-    "reason": "Recipe exists but a deep-chain ingredient is unresolved by extractor (likely plant-mutation, mob-drop, or cooking product)"
+    "tier": "cross-botany",
+    "weight": 2,
+    "reason": "Requires Botany: Juicing: apple (plant)"
    },
    "verifiedMechanics": [
     "Tile: Extinguishes fires on wet tiles",
@@ -39079,12 +39089,14 @@
     ]
    },
    "obtainSources": [
-    "Chemistry reaction"
+    "Chemistry reaction",
+    "Juicing: banana (plant)",
+    "Juicing: mimana (plant)"
    ],
    "accessibility": {
-    "tier": "unknown",
-    "weight": 5,
-    "reason": "Recipe exists but a deep-chain ingredient is unresolved by extractor (likely plant-mutation, mob-drop, or cooking product)"
+    "tier": "cross-botany",
+    "weight": 2,
+    "reason": "Requires Botany: Juicing: banana (plant)"
    },
    "verifiedMechanics": [
     "Tile: Extinguishes fires on wet tiles",
@@ -39147,12 +39159,14 @@
     ]
    },
    "obtainSources": [
-    "Chemistry reaction"
+    "Chemistry reaction",
+    "Juicing: anomaly berry (plant)",
+    "Juicing: berries (plant)"
    ],
    "accessibility": {
-    "tier": "unknown",
-    "weight": 5,
-    "reason": "Recipe exists but a deep-chain ingredient is unresolved by extractor (likely plant-mutation, mob-drop, or cooking product)"
+    "tier": "cross-botany",
+    "weight": 2,
+    "reason": "Requires Botany: Juicing: anomaly berry (plant)"
    },
    "verifiedMechanics": [
     "Tile: Extinguishes fires on wet tiles",
@@ -39245,11 +39259,13 @@
    "overdose": null,
    "criticalOverdose": null,
    "recipe": null,
-   "obtainSources": [],
+   "obtainSources": [
+    "Juicing: blue pumpkin (plant)"
+   ],
    "accessibility": {
-    "tier": "unobtainable",
-    "weight": 999,
-    "reason": "No recipe, no plant, no dispenser source"
+    "tier": "cross-botany",
+    "weight": 2,
+    "reason": "Requires Botany: Juicing: blue pumpkin (plant)"
    },
    "verifiedMechanics": [
     "Tile: Extinguishes fires on wet tiles",
@@ -39292,11 +39308,13 @@
    "overdose": null,
    "criticalOverdose": null,
    "recipe": null,
-   "obtainSources": [],
+   "obtainSources": [
+    "Juicing: bungo (plant)"
+   ],
    "accessibility": {
-    "tier": "unobtainable",
-    "weight": 999,
-    "reason": "No recipe, no plant, no dispenser source"
+    "tier": "cross-botany",
+    "weight": 2,
+    "reason": "Requires Botany: Juicing: bungo (plant)"
    },
    "verifiedMechanics": [
     "Tile: Extinguishes fires on wet tiles",
@@ -39360,7 +39378,8 @@
    },
    "obtainSources": [
     "Chemistry reaction",
-    "carrot (plant)"
+    "carrot (plant)",
+    "Juicing: carrot (plant)"
    ],
    "accessibility": {
     "tier": "cross-botany",
@@ -39428,12 +39447,13 @@
     ]
    },
    "obtainSources": [
-    "Chemistry reaction"
+    "Chemistry reaction",
+    "Juicing: cherry (plant)"
    ],
    "accessibility": {
-    "tier": "unknown",
-    "weight": 5,
-    "reason": "Recipe exists but a deep-chain ingredient is unresolved by extractor (likely plant-mutation, mob-drop, or cooking product)"
+    "tier": "cross-botany",
+    "weight": 2,
+    "reason": "Requires Botany: Juicing: cherry (plant)"
    },
    "verifiedMechanics": [
     "Tile: Extinguishes fires on wet tiles",
@@ -39543,12 +39563,13 @@
     ]
    },
    "obtainSources": [
-    "Chemistry reaction"
+    "Chemistry reaction",
+    "Juicing: grape (plant)"
    ],
    "accessibility": {
-    "tier": "unknown",
-    "weight": 5,
-    "reason": "Recipe exists but a deep-chain ingredient is unresolved by extractor (likely plant-mutation, mob-drop, or cooking product)"
+    "tier": "cross-botany",
+    "weight": 2,
+    "reason": "Requires Botany: Juicing: grape (plant)"
    },
    "verifiedMechanics": [
     "Tile: Extinguishes fires on wet tiles",
@@ -39612,6 +39633,7 @@
    },
    "obtainSources": [
     "Chemistry reaction",
+    "Juicing: lemon (plant)",
     "Vending: Booze-O-Mat — lemon juice (60u)",
     "Soda Dispenser (Lime Juice)"
    ],
@@ -39738,6 +39760,7 @@
    },
    "obtainSources": [
     "Chemistry reaction",
+    "Juicing: lime (plant)",
     "Soda Dispenser: lime juice XL (240u)",
     "Vending: Booze-O-Mat — lime juice (60u)"
    ],
@@ -39855,6 +39878,8 @@
    },
    "obtainSources": [
     "Chemistry reaction",
+    "Juicing: extradimensional orange (plant)",
+    "Juicing: orange (plant)",
     "Soda Dispenser: orange juice XL (240u)",
     "Vending: Booze-O-Mat — orange juice (60u)",
     "Soda Dispenser"
@@ -39926,12 +39951,13 @@
    },
    "obtainSources": [
     "Chemistry reaction",
+    "Juicing: pineapple (plant)",
     "Vending: Booze-O-Mat — pineapple juice (60u)"
    ],
    "accessibility": {
-    "tier": "cross-service",
+    "tier": "cross-botany",
     "weight": 2,
-    "reason": "Cross-department: Vending: Booze-O-Mat — pineapple juice (60u)"
+    "reason": "Requires Botany: Juicing: pineapple (plant)"
    },
    "verifiedMechanics": [
     "Tile: Extinguishes fires on wet tiles",
@@ -40154,6 +40180,7 @@
    "obtainSources": [
     "Chemistry reaction",
     "tomato killer (plant)",
+    "Juicing: tomato (plant)",
     "Vending: Booze-O-Mat — tomato juice (60u)"
    ],
    "accessibility": {
@@ -40223,6 +40250,7 @@
    },
    "obtainSources": [
     "Chemistry reaction",
+    "Juicing: watermelon (plant)",
     "Soda Dispenser: watermelon juice jug (240u)",
     "Soda Dispenser"
    ],
@@ -40303,9 +40331,9 @@
     "Chemistry reaction"
    ],
    "accessibility": {
-    "tier": "cross-service",
+    "tier": "cross-botany",
     "weight": 2,
-    "reason": "Recipe requires cross-service ingredient(s)"
+    "reason": "Recipe requires cross-botany ingredient(s)"
    },
    "verifiedMechanics": [
     "Tile: Ignites spilled reagent (x1.35 temperature)",
@@ -41044,11 +41072,13 @@
    "overdose": null,
    "criticalOverdose": null,
    "recipe": null,
-   "obtainSources": [],
+   "obtainSources": [
+    "Juicing: laughin' peas (plant)"
+   ],
    "accessibility": {
-    "tier": "unobtainable",
-    "weight": 999,
-    "reason": "No recipe, no plant, no dispenser source"
+    "tier": "cross-botany",
+    "weight": 2,
+    "reason": "Requires Botany: Juicing: laughin' peas (plant)"
    },
    "verifiedMechanics": [],
    "boilingPoint": null,
@@ -43823,9 +43853,9 @@
     "Chemistry reaction"
    ],
    "accessibility": {
-    "tier": "cross-service",
+    "tier": "cross-botany",
     "weight": 2,
-    "reason": "Recipe requires cross-service ingredient(s)"
+    "reason": "Recipe requires cross-botany ingredient(s)"
    },
    "verifiedMechanics": [
     "Tile: Ignites spilled reagent (x1.35 temperature)",
@@ -44654,9 +44684,9 @@
     "Chemistry reaction"
    ],
    "accessibility": {
-    "tier": "unknown",
-    "weight": 5,
-    "reason": "Recipe exists but a deep-chain ingredient is unresolved by extractor (likely plant-mutation, mob-drop, or cooking product)"
+    "tier": "cross-botany",
+    "weight": 2,
+    "reason": "Recipe requires cross-botany ingredient(s)"
    },
    "verifiedMechanics": [
     "[Poison] Effect: Polymorph (if self > 50u)",
@@ -45010,11 +45040,13 @@
    "overdose": null,
    "criticalOverdose": null,
    "recipe": null,
-   "obtainSources": [],
+   "obtainSources": [
+    "Juicing: oat (plant)"
+   ],
    "accessibility": {
-    "tier": "unobtainable",
-    "weight": 999,
-    "reason": "No recipe, no plant, no dispenser source"
+    "tier": "cross-botany",
+    "weight": 2,
+    "reason": "Requires Botany: Juicing: oat (plant)"
    },
    "verifiedMechanics": [
     "[Digestion] Thirst x4"
@@ -45119,12 +45151,13 @@
    },
    "obtainSources": [
     "Chemistry reaction",
+    "Juicing: soybeans (plant)",
     "Vending: ChefVend — soy milk (120u)"
    ],
    "accessibility": {
-    "tier": "cross-service",
+    "tier": "cross-botany",
     "weight": 2,
-    "reason": "Cross-department: Vending: ChefVend — soy milk (120u)"
+    "reason": "Requires Botany: Juicing: soybeans (plant)"
    },
    "verifiedMechanics": [
     "[Digestion] Thirst x4"
@@ -49226,6 +49259,7 @@
    "criticalOverdose": null,
    "recipe": null,
    "obtainSources": [
+    "Juicing: mimana (plant)",
     "Vending (hacked): Booze-O-Mat — bottle of nothing (120u)",
     "EMAG Solar's Best Hot Drink vending machine"
    ],
@@ -49734,7 +49768,8 @@
    },
    "obtainSources": [
     "Chemistry reaction",
-    "carrot (plant)"
+    "carrot (plant)",
+    "Juicing: carrot (plant)"
    ],
    "accessibility": {
     "tier": "cross-botany",
@@ -50614,9 +50649,9 @@
     "Chemistry reaction"
    ],
    "accessibility": {
-    "tier": "cross-service",
+    "tier": "cross-botany",
     "weight": 2,
-    "reason": "Recipe requires cross-service ingredient(s)"
+    "reason": "Recipe requires cross-botany ingredient(s)"
    },
    "verifiedMechanics": [
     "Tile: Ignites spilled reagent (x1.35 temperature)",
@@ -52142,9 +52177,9 @@
     "Chemistry reaction"
    ],
    "accessibility": {
-    "tier": "cross-service",
+    "tier": "cross-botany",
     "weight": 2,
-    "reason": "Recipe requires cross-service ingredient(s)"
+    "reason": "Recipe requires cross-botany ingredient(s)"
    },
    "verifiedMechanics": [
     "Tile: Ignites spilled reagent (x1.35 temperature)",
@@ -52221,9 +52256,9 @@
     "Chemistry reaction"
    ],
    "accessibility": {
-    "tier": "cross-service",
+    "tier": "cross-botany",
     "weight": 2,
-    "reason": "Recipe requires cross-service ingredient(s)"
+    "reason": "Recipe requires cross-botany ingredient(s)"
    },
    "verifiedMechanics": [
     "Tile: Ignites spilled reagent (x1.35 temperature)",
@@ -55391,9 +55426,9 @@
     "Chemistry reaction"
    ],
    "accessibility": {
-    "tier": "unknown",
-    "weight": 5,
-    "reason": "Recipe requires unknown ingredient(s)"
+    "tier": "cross-botany",
+    "weight": 2,
+    "reason": "Recipe requires cross-botany ingredient(s)"
    },
    "verifiedMechanics": [
     "Tile: Extinguishes fires on wet tiles",
@@ -55910,9 +55945,9 @@
     "Chemistry reaction"
    ],
    "accessibility": {
-    "tier": "unknown",
-    "weight": 5,
-    "reason": "Recipe requires unknown ingredient(s)"
+    "tier": "cross-botany",
+    "weight": 2,
+    "reason": "Recipe requires cross-botany ingredient(s)"
    },
    "verifiedMechanics": [
     "Tile: Extinguishes fires on wet tiles",
@@ -61435,12 +61470,13 @@
    },
    "obtainSources": [
     "Chemistry reaction",
+    "Juicing: lemoon (plant)",
     "Vending: Booze-O-Mat — small sake bottle (60u)"
    ],
    "accessibility": {
-    "tier": "cross-service",
+    "tier": "cross-botany",
     "weight": 2,
-    "reason": "Cross-department: Vending: Booze-O-Mat — small sake bottle (60u)"
+    "reason": "Requires Botany: Juicing: lemoon (plant)"
    },
    "verifiedMechanics": [
     "Tile: Ignites spilled reagent (x1.35 temperature)",
@@ -63954,9 +63990,9 @@
     "Chemistry reaction"
    ],
    "accessibility": {
-    "tier": "unknown",
-    "weight": 5,
-    "reason": "Recipe requires unknown ingredient(s)"
+    "tier": "cross-botany",
+    "weight": 2,
+    "reason": "Recipe requires cross-botany ingredient(s)"
    },
    "verifiedMechanics": [
     "Tile: Extinguishes fires on wet tiles",
@@ -64024,9 +64060,9 @@
     "Chemistry reaction"
    ],
    "accessibility": {
-    "tier": "unknown",
-    "weight": 5,
-    "reason": "Recipe requires unknown ingredient(s)"
+    "tier": "cross-botany",
+    "weight": 2,
+    "reason": "Recipe requires cross-botany ingredient(s)"
    },
    "verifiedMechanics": [
     "Tile: Extinguishes fires on wet tiles",
@@ -65086,9 +65122,9 @@
     "Chemistry reaction"
    ],
    "accessibility": {
-    "tier": "cross-service",
+    "tier": "cross-botany",
     "weight": 2,
-    "reason": "Recipe requires cross-service ingredient(s)"
+    "reason": "Recipe requires cross-botany ingredient(s)"
    },
    "verifiedMechanics": [
     "Tile: Extinguishes fires on wet tiles",
@@ -65391,7 +65427,8 @@
    },
    "obtainSources": [
     "Chemistry reaction",
-    "blue tomato (plant)"
+    "blue tomato (plant)",
+    "Juicing: blue tomato (plant)"
    ],
    "accessibility": {
     "tier": "cross-botany",
@@ -67623,9 +67660,9 @@
     "Chemistry reaction"
    ],
    "accessibility": {
-    "tier": "unknown",
-    "weight": 5,
-    "reason": "Recipe requires unknown ingredient(s)"
+    "tier": "cross-botany",
+    "weight": 2,
+    "reason": "Recipe requires cross-botany ingredient(s)"
    },
    "verifiedMechanics": [
     "Tile: Ignites spilled reagent (x1.35 temperature)",
@@ -68601,9 +68638,9 @@
     "Chemistry reaction"
    ],
    "accessibility": {
-    "tier": "cross-service",
+    "tier": "cross-botany",
     "weight": 2,
-    "reason": "Recipe requires cross-service ingredient(s)"
+    "reason": "Recipe requires cross-botany ingredient(s)"
    },
    "verifiedMechanics": [
     "Tile: Ignites spilled reagent (x1.35 temperature)",
@@ -69431,9 +69468,9 @@
     "Chemistry reaction"
    ],
    "accessibility": {
-    "tier": "unknown",
-    "weight": 5,
-    "reason": "Recipe requires unknown ingredient(s)"
+    "tier": "cross-service",
+    "weight": 2,
+    "reason": "Recipe requires cross-service ingredient(s)"
    },
    "verifiedMechanics": [
     "Tile: Ignites spilled reagent (x1.35 temperature)",
@@ -70503,9 +70540,9 @@
     "Chemistry reaction"
    ],
    "accessibility": {
-    "tier": "cross-service",
+    "tier": "cross-botany",
     "weight": 2,
-    "reason": "Recipe requires cross-service ingredient(s)"
+    "reason": "Recipe requires cross-botany ingredient(s)"
    },
    "verifiedMechanics": [
     "Tile: Ignites spilled reagent (x1.35 temperature)",
@@ -73760,9 +73797,9 @@
     "Chemistry reaction"
    ],
    "accessibility": {
-    "tier": "unknown",
-    "weight": 5,
-    "reason": "Recipe requires unknown ingredient(s)"
+    "tier": "cross-botany",
+    "weight": 2,
+    "reason": "Recipe requires cross-botany ingredient(s)"
    },
    "verifiedMechanics": [
     "Tile: Ignites spilled reagent (x1.35 temperature)",
@@ -74562,6 +74599,7 @@
    "obtainSources": [
     "Chemistry reaction",
     "Booze Dispenser: Doublebearded Bearded Special wine bottle (120u)",
+    "Juicing: holymelon (plant)",
     "Vending (hacked): PietyVend — Doublebearded Bearded Special wine bottle (120u)",
     "Vending: Booze-O-Mat — Doublebearded Bearded Special wine bottle (120u)",
     "Vending: Booze-O-Mat — wine can (40u)",
@@ -133826,7 +133864,7 @@
    ],
    "computedDifficulty": {
     "tier": "expert",
-    "effortScore": 19,
+    "effortScore": 16,
     "breakdown": {
      "ingredients": [
       {
@@ -133837,9 +133875,9 @@
       },
       {
        "id": "Honk",
-       "tier": "unknown",
-       "weight": 5,
-       "reason": "Recipe requires unknown ingredient(s)"
+       "tier": "cross-service",
+       "weight": 2,
+       "reason": "Recipe requires cross-service ingredient(s)"
       }
      ],
      "reactionDepth": 5,
@@ -133934,7 +133972,7 @@
      },
      "goob": {
       "tier": "expert",
-      "effortScore": 19,
+      "effortScore": 16,
       "breakdown": {
        "ingredients": [
         {
@@ -133945,9 +133983,9 @@
         },
         {
          "id": "Honk",
-         "tier": "unknown",
-         "weight": 5,
-         "reason": "Recipe exists but a deep-chain ingredient is unresolved by extractor (likely plant-mutation, mob-drop, or cooking product)"
+         "tier": "cross-botany",
+         "weight": 2,
+         "reason": "Recipe requires cross-botany ingredient(s)"
         }
        ],
        "reactionDepth": 5,
@@ -134069,7 +134107,7 @@
      },
      "funky": {
       "tier": "expert",
-      "effortScore": 19,
+      "effortScore": 16,
       "breakdown": {
        "ingredients": [
         {
@@ -134080,9 +134118,9 @@
         },
         {
          "id": "Honk",
-         "tier": "unknown",
-         "weight": 5,
-         "reason": "Recipe exists but a deep-chain ingredient is unresolved by extractor (likely plant-mutation, mob-drop, or cooking product)"
+         "tier": "cross-botany",
+         "weight": 2,
+         "reason": "Recipe requires cross-botany ingredient(s)"
         }
        ],
        "reactionDepth": 5,
@@ -134096,7 +134134,7 @@
      },
      "trauma": {
       "tier": "expert",
-      "effortScore": 19,
+      "effortScore": 16,
       "breakdown": {
        "ingredients": [
         {
@@ -134107,9 +134145,9 @@
         },
         {
          "id": "Honk",
-         "tier": "unknown",
-         "weight": 5,
-         "reason": "Recipe exists but a deep-chain ingredient is unresolved by extractor (likely plant-mutation, mob-drop, or cooking product)"
+         "tier": "cross-botany",
+         "weight": 2,
+         "reason": "Recipe requires cross-botany ingredient(s)"
         }
        ],
        "reactionDepth": 5,
@@ -134123,7 +134161,7 @@
      },
      "omu": {
       "tier": "expert",
-      "effortScore": 19,
+      "effortScore": 16,
       "breakdown": {
        "ingredients": [
         {
@@ -134134,9 +134172,9 @@
         },
         {
          "id": "Honk",
-         "tier": "unknown",
-         "weight": 5,
-         "reason": "Recipe exists but a deep-chain ingredient is unresolved by extractor (likely plant-mutation, mob-drop, or cooking product)"
+         "tier": "cross-botany",
+         "weight": 2,
+         "reason": "Recipe requires cross-botany ingredient(s)"
         }
        ],
        "reactionDepth": 5,

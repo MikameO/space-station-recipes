@@ -211,6 +211,10 @@ FORK_REGISTRY = {
             "Resources/Prototypes/Entities/Structures/Dispensers/booze.yml",
             "Resources/Prototypes/Entities/Structures/Dispensers/soda.yml",
         ],
+        # D3b: produce entities with Extractable.juiceSolution (juicing channel)
+        "produce_files": [
+            "Resources/Prototypes/Entities/Objects/Consumable/Food/produce.yml",
+        ],
     },
 
     # ── RMC14 ──

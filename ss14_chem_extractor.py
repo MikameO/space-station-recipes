@@ -1725,6 +1725,28 @@ def generate_excel(reagents: dict, reactions: dict, locale: dict,
 # Phase 8b: Plant/Seed Source Extraction
 # ─────────────────────────────────────────────
 
+def _seed_display_name(entry: dict, locale: dict | None) -> str:
+    """Human-readable plant name for a seed prototype (locale key or cleanup)."""
+    raw_name = entry.get("name", entry.get("id", "unknown"))
+    if locale and raw_name in locale:
+        return locale[raw_name]
+    # Clean up seed name: seeds-ambrosiavulgaris-name -> Ambrosia Vulgaris
+    clean = raw_name.replace("seeds-", "").replace("-name", "").replace("-", " ")
+    clean = re.sub(r'([a-z])([A-Z])', r'\1 \2', clean)
+    # Fix known compound words that are all lowercase
+    fixes = {
+        "ambrosiavulgaris": "Ambrosia Vulgaris", "ambrosiadeus": "Ambrosia Deus",
+        "flyamanita": "Fly Amanita", "deathnettle": "Death Nettle",
+        "galaxythistle": "Galaxy Thistle", "spacemans trumpet": "Spaceman's Trumpet",
+        "onionred": "Red Onion", "bluetomato": "Blue Tomato",
+        "bloodtomato": "Blood Tomato", "holymelon": "Holy Melon",
+        "goldenapple": "Golden Apple", "bluepumpkin": "Blue Pumpkin",
+        "rainbow cannabis": "Rainbow Cannabis",
+        "walkingmushroom": "Walking Mushroom",
+    }
+    return fixes.get(clean.lower().strip(), clean.title())
+
+
 def parse_seed_sources(seed_files: dict[str, str], loader,
                        locale: dict | None = None) -> dict[str, list[str]]:
     """Parse seed YAML files to build reagent -> [plant names] mapping."""
@@ -1735,26 +1757,7 @@ def parse_seed_sources(seed_files: dict[str, str], loader,
         for entry in entries:
             if entry.get("type") != "seed":
                 continue
-            raw_name = entry.get("name", entry.get("id", "unknown"))
-            # Resolve locale name
-            if locale and raw_name in locale:
-                seed_name = locale[raw_name]
-            else:
-                # Clean up seed name: seeds-ambrosiavulgaris-name -> Ambrosia Vulgaris
-                clean = raw_name.replace("seeds-", "").replace("-name", "").replace("-", " ")
-                clean = re.sub(r'([a-z])([A-Z])', r'\1 \2', clean)
-                # Fix known compound words that are all lowercase
-                fixes = {
-                    "ambrosiavulgaris": "Ambrosia Vulgaris", "ambrosiadeus": "Ambrosia Deus",
-                    "flyamanita": "Fly Amanita", "deathnettle": "Death Nettle",
-                    "galaxythistle": "Galaxy Thistle", "spacemans trumpet": "Spaceman's Trumpet",
-                    "onionred": "Red Onion", "bluetomato": "Blue Tomato",
-                    "bloodtomato": "Blood Tomato", "holymelon": "Holy Melon",
-                    "goldenapple": "Golden Apple", "bluepumpkin": "Blue Pumpkin",
-                    "rainbow cannabis": "Rainbow Cannabis",
-                    "walkingmushroom": "Walking Mushroom",
-                }
-                seed_name = fixes.get(clean.lower().strip(), clean.title())
+            seed_name = _seed_display_name(entry, locale)
             chemicals = entry.get("chemicals", {})
             if not isinstance(chemicals, dict):
                 continue
@@ -1911,20 +1914,23 @@ def _fmt_qty(qty: float) -> str:
     return f"{qty:g}u"
 
 
-def build_item_sources(fork_data: dict, loader) -> dict[str, list[tuple[str, str]]]:
+def build_item_sources(fork_data: dict, loader,
+                       seed_locale: dict | None = None) -> dict[str, list[tuple[str, str]]]:
     """Build {reagent_id: [(fork_id, label)]} from item-fill channels.
 
-    v1 channels: vending machine inventories (startingInventory; emagged/
-    contraband inventories get an EMAG tag) and dispenser bottle packs
-    (EntityTableContainerFill). The entity index merges across forks
-    first-wins in registry order — same ownership rule as the reagent merge.
-    Output pairs are deduped and sorted for deterministic regen."""
-    # 1. Entity index (fills + machine/dispenser entities), first-wins merge
+    Channels: vending machine inventories (startingInventory; hacked/emagged
+    buckets tagged), dispenser bottle packs (EntityTableContainerFill), and
+    juicing — seed.productPrototypes -> produce Extractable.juiceSolution
+    (D3b). The entity index merges across forks first-wins in registry order —
+    same ownership rule as the reagent merge. Output pairs are deduped and
+    sorted for deterministic regen."""
+    # 1. Entity index (fills + machine/dispenser/produce entities), first-wins merge
     entity_index: dict[str, dict] = {}
     for fork_id in FORK_REGISTRY:
         fdata = fork_data.get(fork_id, {})
         files: dict[str, str] = {}
-        for key in ("item_fill_files", "vending_machine_files", "dispenser_files"):
+        for key in ("item_fill_files", "vending_machine_files",
+                    "dispenser_files", "produce_files"):
             files.update(fdata.get(key) or {})
         if not files:
             continue
@@ -2025,8 +2031,30 @@ def build_item_sources(fork_data: dict, loader) -> dict[str, list[tuple[str, str
                         add_item(rid, fork_id,
                                  f"{machine}{emag}: {item_name} ({_fmt_qty(qty)})")
 
+    # 5. Juicing produce (D3b): seed.productPrototypes -> Extractable.juiceSolution.
+    # No quantity in the label — in-game units scale with plant potency, the
+    # YAML base value would mislead. Grindable food solutions are deliberately
+    # skipped: they mirror seed `chemicals`, already covered by "(plant)" labels.
+    juiced = 0
+    for fork_id in FORK_REGISTRY:
+        seed_files = fork_data.get(fork_id, {}).get("seed_files") or {}
+        for path, content in seed_files.items():
+            for entry in parse_yaml_content(content, path, loader):
+                if entry.get("type") != "seed":
+                    continue
+                plant = _seed_display_name(entry, seed_locale)
+                for peid in entry.get("productPrototypes") or []:
+                    comp = _find_entity_component(entity_index, str(peid), "Extractable")
+                    if not comp:
+                        continue
+                    juice = _reagents_from_solution_spec(comp.get("juiceSolution"))
+                    if juice:
+                        juiced += 1
+                    for rid in juice:
+                        add_item(rid, fork_id, f"Juicing: {plant} (plant)")
+
     print(f"  Item-fill channels: {len(entity_index)} entities indexed, "
-          f"{stocked_items} stocked items resolved, "
+          f"{stocked_items} stocked items resolved, {juiced} juiceable produce, "
           f"{len(item_sources)} reagents with item sources")
     return {rid: sorted(pairs) for rid, pairs in item_sources.items()}
 
@@ -2925,7 +2953,7 @@ def main():
         # inventories, machine names, dispenser packs). Most forks: [].
         item_channel_files = {}
         for key in ("item_fill_files", "vending_inventory_files",
-                    "vending_machine_files", "dispenser_files"):
+                    "vending_machine_files", "dispenser_files", "produce_files"):
             flist = fconf.get(key, [])
             item_channel_files[key] = fetch_all_files(flist, url, fork_id) if flist else {}
         n_channel = sum(len(v) for v in item_channel_files.values())
@@ -3216,8 +3244,8 @@ def main():
     print(f"  Plant reagent sources: {len(reagent_plants)}")
 
     # Phase 5c: Item-fill sources (Increment D3)
-    print("\n=== Phase 5c: Item-fill sources (vending/dispenser channels) ===")
-    item_sources = build_item_sources(fork_data, loader)
+    print("\n=== Phase 5c: Item-fill sources (vending/dispenser/juicing channels) ===")
+    item_sources = build_item_sources(fork_data, loader, seed_locale=all_seed_locale)
 
     all_sources = build_all_sources(reagent_plants, reaction_lookup, base_set,
                                     item_sources)
