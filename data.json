@@ -1,7 +1,7 @@
 {
  "meta": {
   "schemaVersion": "3.6.0",
-  "generated": "2026-07-12T19:32:55",
+  "generated": "2026-07-12T19:36:55",
   "forks": {
    "vanilla": {
     "name": "Vanilla SS14",
@@ -104,13 +104,13 @@
   "reactionCount": 1003,
   "plantCount": 128,
   "sourceAttribution": {
-   "total": 66,
+   "total": 67,
    "attributed": 16,
-   "maintainerKnowledgeOnly": 50,
+   "maintainerKnowledgeOnly": 51,
    "speculationOnly": 0,
    "needsAttribution": [],
-   "coveragePercent": 24,
-   "avgAuthority": 3.94,
+   "coveragePercent": 23,
+   "avgAuthority": 3.91,
    "warnings": [
     "ANTAG_STRATEGIES:silent-kill: URL references a mutable branch (master/main); consider pinning to a commit SHA for link-rot resistance",
     "ANTAG_STRATEGIES:mass-explosion: URL references a mutable branch (master/main); consider pinning to a commit SHA for link-rot resistance",
@@ -121744,6 +121744,13 @@
    "date": "2026-07-12",
    "note": "Reagent picks and amounts for the one-click shift-start presets (Batch Planner). Compiled from personal playtime; every reagent id is validated against extracted vanilla recipes at build time. Community tuning via PR is encouraged.",
    "authorityWeight": 2
+  },
+  "mk-botany-guide": {
+   "type": "maintainer-knowledge",
+   "title": "Cross-pollination / swab guide from maintainer's playtime",
+   "date": "2026-07-12",
+   "note": "The swab and mutation mechanics live in C# systems (MutationSystem, cross-pollination), not in YAML — unlike the mutation TARGET list, which is extracted from seed prototypes. The guide text is playtime knowledge; corrections via PR are encouraged.",
+   "authorityWeight": 2
   }
  },
  "warnings": [
@@ -137830,5 +137837,26 @@
    },
    "rsi": "_Fish/Objects/Specific/Hydroponics/oxygen_mango.rsi"
   }
+ },
+ "botanyGuide": {
+  "title": "Swabs & mutations — how the evolution chart works",
+  "tier": "community",
+  "sources": [
+   "mk-botany-guide"
+  ],
+  "sections": [
+   {
+    "h": "Species mutations (the arrows in the chart)",
+    "body": "Raise a plant's mutation level — most reliably by dosing the tray with Unstable Mutagen (~1-5u; more risks killing the plant) — and on the next growth ticks the plant may jump to one of its listed mutation targets. Only species with arrows here can jump; the targets come straight from the game's seed data."
+   },
+   {
+    "h": "Swabs (cross-pollination)",
+    "body": "Use a gauze swab on flowering plant A to collect its pollen, then swab plant B: B's next generation mixes STATS (potency, yield, lifespan, harvest type, chemicals) between the two. Swabs shuffle traits — they do NOT trigger the species jumps shown in the chart."
+   },
+   {
+    "h": "Practical loop",
+    "body": "1) Mutagen small doses until the species you want appears. 2) Stabilize: harvest, replant the mutated seeds. 3) Swab-breed your best specimens to stack potency/yield onto the new species. 4) Robust Harvest boosts potency; seedless traits need the clippers workaround."
+   }
+  ]
  }
 }

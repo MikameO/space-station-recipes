@@ -297,6 +297,12 @@ SOURCES = {
         "date": "2026-07-12",
         "note": "Reagent picks and amounts for the one-click shift-start presets (Batch Planner). Compiled from personal playtime; every reagent id is validated against extracted vanilla recipes at build time. Community tuning via PR is encouraged.",
     },
+    "mk-botany-guide": {
+        "type": "maintainer-knowledge",
+        "title": "Cross-pollination / swab guide from maintainer's playtime",
+        "date": "2026-07-12",
+        "note": "The swab and mutation mechanics live in C# systems (MutationSystem, cross-pollination), not in YAML — unlike the mutation TARGET list, which is extracted from seed prototypes. The guide text is playtime knowledge; corrections via PR are encouraged.",
+    },
 }
 
 

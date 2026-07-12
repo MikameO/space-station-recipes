@@ -679,6 +679,32 @@ main {
   border-radius: 2px;
 }
 
+/* D1: plant evolution + swab guide */
+.plant-tree { margin-bottom: 6px; }
+.plant-chem-chip { border-left-color: var(--phosphor-dim); opacity: 0.85; }
+.guide-card {
+  margin-top: 14px;
+  padding: 12px 14px;
+  border: 1px solid rgba(255,182,39,0.25);
+  border-left: 3px solid var(--amber-warn, #ffb627);
+  background: rgba(255,182,39,0.04);
+  border-radius: 2px;
+}
+.guide-head {
+  font-family: 'Oxanium', sans-serif;
+  font-size: 0.8rem;
+  color: var(--amber-warn, #ffb627);
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.badge-community { border-left-color: var(--amber-warn, #ffb627); color: var(--amber-warn, #ffb627); }
+.guide-section { margin-bottom: 8px; }
+.guide-section b { color: var(--text-sub); font-size: 0.72rem; }
+.guide-section p { color: var(--text-ghost); font-size: 0.72rem; line-height: 1.5; margin: 2px 0 0; }
+
 /* B2: companion mode (?mode=companion) — compact layout for a second
    screen or the pin-over-game PiP window: no chrome, content edge-to-edge */
 body.companion header,

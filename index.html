@@ -72,7 +72,7 @@
   "license": "https://github.com/MikameO/space-station-recipes/blob/main/LICENSE"
 }
 </script>
-<link rel="stylesheet" href="style.css?v=21">
+<link rel="stylesheet" href="style.css?v=22">
 <!-- Yandex.Metrika counter -->
 <script type="text/javascript">
     (function(m,e,t,r,i,k,a){
@@ -376,6 +376,19 @@
         <span class="plant-chip plant-bad">red hurts it</span>
         <span class="plant-chip plant-neutral">purple mutates</span>
         — the global search and Source filter apply here too.</p>
+      <!-- D1: plant evolution (mutation graph) + curated swab guide -->
+      <div class="batch-section" data-collapsible data-collapse-key="evolution">
+        <h3 class="reverse-title">
+          <span class="reverse-title-text">&#127793; Plant Evolution</span>
+          <button class="hint-chip" data-hint="What grows into what. Arrows come from the game's seed data (mutation targets); raise mutation level with Unstable Mutagen to trigger jumps. The Source filter applies." aria-label="Evolution chart explained">?</button>
+          <span class="section-chevron">&#9660;</span>
+        </h3>
+        <div class="section-body">
+          <div id="plantEvolution"></div>
+          <div id="swabGuide"></div>
+        </div>
+      </div>
+
       <div class="botany-filter-chips" id="botanyFilterChips" role="group" aria-label="Filter by plant effect kind">
         <button class="diff-chip" data-group="care" aria-pressed="false">Growth &amp; Care</button>
         <button class="diff-chip" data-group="yield" aria-pressed="false">Potency &amp; Yield</button>
@@ -470,7 +483,7 @@
   <div class="loading-bar"><div class="loading-bar-fill"></div></div>
 </div>
 
-<script src="app.js?v=19"></script>
+<script src="app.js?v=20"></script>
 <script defer src="tutorial.js?v=2"></script>
 </body>
 </html>

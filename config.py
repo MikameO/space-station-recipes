@@ -1496,6 +1496,32 @@ SHIFT_PRESETS = [
     },
 ]
 
+# ─────────────────────────────────────────────
+# Botany swab / mutation guide (ROADMAP D1)
+# The HOW of cross-pollination lives in C# code, so this layer is curated
+# (amber "community knowledge" tier), while the mutation graph itself is
+# YAML-extracted (green tier). Same provenance model as everything curated.
+# ─────────────────────────────────────────────
+BOTANY_GUIDE = {
+    "title": "Swabs & mutations — how the evolution chart works",
+    "tier": "community",
+    "sources": ["mk-botany-guide"],
+    "sections": [
+        {
+            "h": "Species mutations (the arrows in the chart)",
+            "body": "Raise a plant's mutation level — most reliably by dosing the tray with Unstable Mutagen (~1-5u; more risks killing the plant) — and on the next growth ticks the plant may jump to one of its listed mutation targets. Only species with arrows here can jump; the targets come straight from the game's seed data.",
+        },
+        {
+            "h": "Swabs (cross-pollination)",
+            "body": "Use a gauze swab on flowering plant A to collect its pollen, then swab plant B: B's next generation mixes STATS (potency, yield, lifespan, harvest type, chemicals) between the two. Swabs shuffle traits — they do NOT trigger the species jumps shown in the chart.",
+        },
+        {
+            "h": "Practical loop",
+            "body": "1) Mutagen small doses until the species you want appears. 2) Stabilize: harvest, replant the mutated seeds. 3) Swab-breed your best specimens to stack potency/yield onto the new species. 4) Robust Harvest boosts potency; seedless traits need the clippers workaround.",
+        },
+    ],
+}
+
 # Pre-built antagonist strategies/combos
 ANTAG_STRATEGIES = [
     {

@@ -25,7 +25,7 @@ from config import (
     OTHER_REAGENT_SOURCES, DANGEROUS_INTERACTIONS,
     BASE_DISPENSER_CHEMICALS, CATEGORY_SHEET_MAP,
     ANTAG_DATA, ANTAG_STRATEGIES, DELIVERY_MECHANISMS, SYNDICATE_ITEMS,
-    SHIFT_PRESETS,
+    SHIFT_PRESETS, BOTANY_GUIDE,
 )
 from sources import (
     SOURCES, AUTHORITY_WEIGHTS, ALLOWED_DOMAINS,
@@ -2142,6 +2142,7 @@ def export_json(reagents: dict, reactions: dict, locale: dict,
 
     # Plant entities (D1) — mutation graph + potency-scaled chemicals
     data["plants"] = plants or {}
+    data["botanyGuide"] = BOTANY_GUIDE
 
     # Print mismatch summary (non-fatal — authored tier is preserved for UI tooltip).
     if mismatches:
@@ -2166,6 +2167,7 @@ def export_json(reagents: dict, reactions: dict, locale: dict,
         attribution_inputs.append((f"ANTAG_STRATEGIES:{s['id']}", s.get("sources", [])))
     for p in presets_out:
         attribution_inputs.append((f"SHIFT_PRESETS:{p['id']}", p.get("sources", [])))
+    attribution_inputs.append(("BOTANY_GUIDE", BOTANY_GUIDE.get("sources", [])))
     for rid, robj in data["reagents"].items():
         if robj.get("antagTipsSources"):
             attribution_inputs.append((f"ANTAG_DATA:{rid}", robj["antagTipsSources"]))

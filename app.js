@@ -616,7 +616,70 @@ function botanyCardHTML(r) {
   </div>`;
 }
 
+// D1: plant evolution forest — mutation chains rendered with the
+// craft-tree list styles. Arrows are YAML-extracted (green tier).
+function plantVisibleInFork(p) {
+  if (activeSource === 'all') return true;
+  if (activeSource === 'vanilla') return p.source === 'vanilla';
+  return p.source === 'vanilla' || forkChain(activeSource).includes(p.source);
+}
+
+function plantNodeHTML(id, visited) {
+  const p = DATA.plants[id];
+  if (!p) return '';
+  const loop = visited.has(id);
+  const next = new Set(visited);
+  next.add(id);
+  const forkBadge = p.source !== 'vanilla' && DATA.meta?.forks?.[p.source]
+    ? `<span class="badge badge-fork" style="border-color:${DATA.meta.forks[p.source].color}">${esc(DATA.meta.forks[p.source].name)}</span>` : '';
+  const chems = Object.entries(p.chemicals || {})
+    .filter(([rid]) => !['Nutriment', 'Vitamin', 'Water'].includes(rid)).slice(0, 3)
+    .map(([rid, s]) => `<span class="badge plant-chem-chip" title="${esc(rid)}: ${s.min}–${s.max}u${s.potencyDivisor ? ' (scales with potency/' + s.potencyDivisor + ')' : ''}">${esc(DATA.reagents[rid]?.name ? capName(DATA.reagents[rid].name) : rid)}</span>`).join('');
+  const g = p.growth || {};
+  const tip = `potency ${g.potency ?? '?'} | yield ${g.yield ?? '?'} | matures ${g.maturation ?? '?'} | lifespan ${g.lifespan ?? '?'}`;
+  const kids = loop ? [] : (p.mutations || []).filter(m => DATA.plants[m] && plantVisibleInFork(DATA.plants[m]));
+  return `<li>
+    <div class="tree-node" title="${esc(tip)}">
+      <span class="node-name">${esc(capName(p.name))}</span>
+      ${loop ? '<span class="node-badge badge-c">LOOP</span>' : ''}
+      ${forkBadge} ${chems}
+    </div>
+    ${kids.length ? `<ul class="tree-children">${kids.map(m => plantNodeHTML(m, next)).join('')}</ul>` : ''}
+  </li>`;
+}
+
+function renderPlantEvolution() {
+  const host = document.getElementById('plantEvolution');
+  if (!host) return;
+  const all = Object.values(DATA.plants || {}).filter(plantVisibleInFork);
+  const mutatedInto = new Set();
+  for (const p of all) for (const m of p.mutations || []) mutatedInto.add(m);
+  const roots = all
+    .filter(p => (p.mutations || []).length && !mutatedInto.has(p.id))
+    .sort((a, b) => a.name.localeCompare(b.name));
+  if (!roots.length) {
+    host.innerHTML = '<p class="reverse-desc">No mutation chains under the current Source filter.</p>';
+    return;
+  }
+  host.innerHTML = `<p class="reverse-desc">${roots.length} chains, ${all.filter(p => (p.mutations || []).length).length} plants with mutation targets (of ${all.length} in view)</p>`
+    + roots.map(r => `<ul class="craft-tree plant-tree">${plantNodeHTML(r.id, new Set())}</ul>`).join('');
+}
+
+function renderSwabGuide() {
+  const host = document.getElementById('swabGuide');
+  const guide = DATA.botanyGuide;
+  if (!host || !guide) return;
+  host.innerHTML = `<div class="guide-card">
+    <div class="guide-head">${esc(guide.title)}
+      <span class="badge badge-community" title="Curated from playtime — the mechanics live in C# code, not extractable YAML. PRs welcome.">Community knowledge</span>
+    </div>
+    ${guide.sections.map(s => `<div class="guide-section"><b>${esc(s.h)}</b><p>${esc(s.body)}</p></div>`).join('')}
+  </div>`;
+}
+
 function renderBotany(query = '') {
+  renderPlantEvolution();
+  renderSwabGuide();
   const grid = document.getElementById('botanyGrid');
   let entries = filterReagents(query).filter(e => e.reagent.plantEffects && e.reagent.plantEffects.length);
   if (botanyHideGeneric) {
