@@ -465,9 +465,10 @@ main {
 }
 .tab-adv-menu {
   display: none;
-  position: absolute;
-  top: 100%;
-  left: 0;
+  /* fixed, positioned from the toggle by JS: the tab bar is an
+     overflow-x:auto scroller, so an absolute child gets CLIPPED at the
+     bar's edge — the menu "opened" but was never visible (C3.3) */
+  position: fixed;
   z-index: 60;
   min-width: 150px;
   flex-direction: column;

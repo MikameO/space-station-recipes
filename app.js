@@ -511,9 +511,18 @@ function setupAdvancedDropdown() {
     e.stopPropagation();
     const open = adv.classList.toggle('open');
     toggle.setAttribute('aria-expanded', String(open));
+    if (open) {
+      // C3.3: the menu is position:fixed (the tab bar clips absolute
+      // children via overflow-x:auto) — anchor it under the toggle.
+      const r = toggle.getBoundingClientRect();
+      const menu = adv.querySelector('.tab-adv-menu');
+      menu.style.left = Math.round(r.left) + 'px';
+      menu.style.top = Math.round(r.bottom + 2) + 'px';
+    }
   });
   document.addEventListener('click', e => { if (!adv.contains(e.target)) close(); });
   document.addEventListener('keydown', e => { if (e.key === 'Escape') close(); });
+  window.addEventListener('resize', close);
   // any tab click: close the menu, keep the toggle lit while a hidden tab is active (deep-links included)
   document.querySelectorAll('.tab-btn').forEach(b => b.addEventListener('click', () => {
     if (b.dataset.tab) close();
