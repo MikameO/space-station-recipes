@@ -156,7 +156,7 @@ SOURCES = {
         "url": "https://github.com/space-wizards/space-station-14/blob/master/Resources/Prototypes/Reagents/toxins.yml",
         "title": "Lead reagent in toxins.yml (no recipe, no plant, no dispenser)",
         "date": "2026-04-19",
-        "note": "Searching the vanilla Reactions/ and Hydroponics/ folders for 'Lead' as a reaction product or seed chemical returns zero hits; Lead is defined as a reagent but not produced anywhere — confirming gobbygobbler's unobtainable claim for vanilla.",
+        "note": "Searching the vanilla Reactions/ and Hydroponics/ folders for 'Lead' as a reaction product or seed chemical returns zero hits; Lead is defined as a reagent but not produced anywhere — confirming gobbygobbler's unobtainable claim for vanilla. UPDATE 2026-07-12 (D3 item-fill scan): ChemVendInventorySyndicate.contrabandInventory stocks ChemistryBottleLead x2 (30u) — the SyndieJuice chem vendor (AccessReader: SyndicateAgent) dispenses Lead bottles. No crew path still; classified antag-only, not unobtainable.",
     },
     "code-goob-licoxide-lead": {
         "type": "code",

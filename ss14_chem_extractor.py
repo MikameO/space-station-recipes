@@ -1768,14 +1768,291 @@ def parse_seed_sources(seed_files: dict[str, str], loader,
     return dict(reagent_plants)
 
 
+# ─────────────────────────────────────────────
+# Phase 5c: Item-fill sources (Increment D3)
+# ─────────────────────────────────────────────
+# Reagents that ship pre-mixed inside spawnable items (Absinthe bottles in the
+# Booze-O-Mat, NanoMed pills, dispenser bottle packs). Two indexes intersect:
+# entity solution fills and acquisition channels (vending inventories,
+# EntityTableContainerFill dispenser packs). Labels are formatted so the
+# keyword classifier in compute_reagent_accessibility lands the right tier
+# ("Vending:" → cross-service, "... Dispenser:" → dispenser, "(EMAG)" →
+# antag-only). Design: docs/design/2026-07-12-item-fill-sources.md
+
+# Same nutrition filler exclusion as parse_seed_sources — every snack would
+# otherwise spam these three with vendor labels.
+_ITEM_SOURCE_SKIP_REAGENTS = {"Nutriment", "Vitamin", "Fiber"}
+
+
+def parse_entity_prototypes(files: dict[str, str], loader) -> dict[str, dict]:
+    """Parse YAML files into {entity_id: prototype} (type: entity only)."""
+    entities = {}
+    for path, content in files.items():
+        for entry in parse_yaml_content(content, path, loader):
+            if entry.get("type") == "entity" and entry.get("id"):
+                entities[entry["id"]] = entry
+    return entities
+
+
+def _entity_parents(proto: dict) -> list[str]:
+    parent = proto.get("parent")
+    if isinstance(parent, str):
+        return [parent]
+    if isinstance(parent, list):
+        return [p for p in parent if isinstance(p, str)]
+    return []
+
+
+def _find_entity_component(entity_index: dict, eid: str, comp_type: str,
+                           _seen: set | None = None) -> dict | None:
+    """Nearest component of comp_type up the inheritance chain: own components
+    first, then parents DFS left-to-right (cycle-safe)."""
+    if _seen is None:
+        _seen = set()
+    if eid in _seen:
+        return None
+    _seen.add(eid)
+    proto = entity_index.get(eid)
+    if not proto:
+        return None
+    for comp in proto.get("components") or []:
+        if isinstance(comp, dict) and comp.get("type") == comp_type:
+            return comp
+    for parent in _entity_parents(proto):
+        found = _find_entity_component(entity_index, parent, comp_type, _seen)
+        if found is not None:
+            return found
+    return None
+
+
+def _entity_display_name(entity_index: dict, eid: str,
+                         _seen: set | None = None) -> str:
+    """Nearest `name:` up the inheritance chain; spaced-PascalCase id fallback."""
+    if _seen is None:
+        _seen = set()
+    if eid in _seen:
+        return pascal_to_words(eid)
+    _seen.add(eid)
+    proto = entity_index.get(eid)
+    if not proto:
+        return pascal_to_words(eid)
+    name = proto.get("name")
+    if isinstance(name, str) and name.strip():
+        return name.strip()
+    for parent in _entity_parents(proto):
+        parent_proto = entity_index.get(parent)
+        if parent_proto is not None:
+            found = _entity_display_name(entity_index, parent, _seen)
+            if found:
+                return found
+    return pascal_to_words(eid)
+
+
+def _reagents_from_solution_spec(sol) -> dict[str, float]:
+    """{reagent_id: qty} from one solution spec ({reagents: [{ReagentId, Quantity}]})."""
+    out = {}
+    if not isinstance(sol, dict):
+        return out
+    for reag in sol.get("reagents") or []:
+        if not isinstance(reag, dict):
+            continue
+        rid = reag.get("ReagentId")
+        try:
+            qty = float(reag.get("Quantity", 0))
+        except (TypeError, ValueError):
+            qty = 0.0
+        if isinstance(rid, str) and rid:
+            out[rid] = out.get(rid, 0.0) + qty
+    return out
+
+
+def extract_entity_fill(entity_index: dict, eid: str) -> dict[str, float]:
+    """{reagent_id: qty} for the nearest solution declaration on an entity.
+
+    Supports both solution schemas (upstream #43192/#43194 migration — M1
+    checklist): the new `Solution` component (solution.reagents) and legacy
+    `SolutionContainerManager` (solutions.<name>.reagents). Entities without
+    a declared fill (empty glasses, random-fill pill canisters whose contents
+    come from RandomFillSolution) resolve to {} and are skipped upstream."""
+    comp = _find_entity_component(entity_index, eid, "Solution")
+    if comp:
+        fill = _reagents_from_solution_spec(comp.get("solution"))
+        if fill:
+            return fill
+    comp = _find_entity_component(entity_index, eid, "SolutionContainerManager")
+    if comp:
+        fill: dict[str, float] = {}
+        solutions = comp.get("solutions")
+        if isinstance(solutions, dict):
+            for sol in solutions.values():
+                for rid, qty in _reagents_from_solution_spec(sol).items():
+                    fill[rid] = fill.get(rid, 0.0) + qty
+        if fill:
+            return fill
+    return {}
+
+
+def _collect_entity_ids(node, entity_index: dict, out: set) -> None:
+    """Recursively harvest known entity ids from EntityTable selector trees
+    (AllSelector/GroupSelector/nested !type: dicts — any `id` value that
+    resolves in the entity index counts)."""
+    if isinstance(node, dict):
+        eid = node.get("id")
+        if isinstance(eid, str) and eid in entity_index:
+            out.add(eid)
+        for value in node.values():
+            _collect_entity_ids(value, entity_index, out)
+    elif isinstance(node, list):
+        for value in node:
+            _collect_entity_ids(value, entity_index, out)
+
+
+def _fmt_qty(qty: float) -> str:
+    return f"{qty:g}u"
+
+
+def build_item_sources(fork_data: dict, loader) -> dict[str, list[tuple[str, str]]]:
+    """Build {reagent_id: [(fork_id, label)]} from item-fill channels.
+
+    v1 channels: vending machine inventories (startingInventory; emagged/
+    contraband inventories get an EMAG tag) and dispenser bottle packs
+    (EntityTableContainerFill). The entity index merges across forks
+    first-wins in registry order — same ownership rule as the reagent merge.
+    Output pairs are deduped and sorted for deterministic regen."""
+    # 1. Entity index (fills + machine/dispenser entities), first-wins merge
+    entity_index: dict[str, dict] = {}
+    for fork_id in FORK_REGISTRY:
+        fdata = fork_data.get(fork_id, {})
+        files: dict[str, str] = {}
+        for key in ("item_fill_files", "vending_machine_files", "dispenser_files"):
+            files.update(fdata.get(key) or {})
+        if not files:
+            continue
+        for eid, proto in parse_entity_prototypes(files, loader).items():
+            if eid not in entity_index:
+                proto["_fork"] = fork_id
+                entity_index[eid] = proto
+
+    if not entity_index:
+        return {}
+
+    # 2. Vending pack id -> machine display name (alphabetical tie-break).
+    # Syndicate-access machines (e.g. VendingMachineChemicalsSyndicate aka
+    # "SyndieJuice" gated by AccessReader SyndicateAgent) get a " (Syndicate)"
+    # suffix so the accessibility classifier lands antag-only for reagents
+    # whose only path they are (Lead bottles).
+    pack_names: dict[str, str] = {}
+    for eid, proto in entity_index.items():
+        for comp in proto.get("components") or []:
+            if isinstance(comp, dict) and comp.get("type") == "VendingMachine":
+                pack = comp.get("pack")
+                if isinstance(pack, str) and pack:
+                    name = _entity_display_name(entity_index, eid)
+                    if "syndicate" in eid.lower() or "nukie" in eid.lower():
+                        name += " (Syndicate)"
+                    prev = pack_names.get(pack)
+                    if prev is None or name < prev:
+                        pack_names[pack] = name
+                break
+
+    item_sources: dict[str, set] = defaultdict(set)
+    fill_cache: dict[str, dict] = {}
+
+    def fill_of(eid: str) -> dict[str, float]:
+        if eid not in fill_cache:
+            fill_cache[eid] = extract_entity_fill(entity_index, eid)
+        return fill_cache[eid]
+
+    def add_item(rid: str, fork_id: str, label: str) -> None:
+        if rid not in _ITEM_SOURCE_SKIP_REAGENTS:
+            item_sources[rid].add((fork_id, label))
+
+    # 3. Vending machine inventories
+    stocked_items = 0
+    for fork_id in FORK_REGISTRY:
+        inv_files = fork_data.get(fork_id, {}).get("vending_inventory_files") or {}
+        for path, content in inv_files.items():
+            for proto in parse_yaml_content(content, path, loader):
+                if proto.get("type") != "vendingMachineInventory":
+                    continue
+                inv_id = str(proto.get("id", ""))
+                machine = pack_names.get(inv_id) or pascal_to_words(
+                    inv_id.removesuffix("Inventory"))
+                # contrabandInventory unlocks via the vending machine's
+                # contraband WIRE (ContrabandWireKey in VendingMachineComponent)
+                # — crew-hackable with a multitool, not antag-gated. Only
+                # emaggedInventory needs the antag EMAG.
+                for inv_key, tag in (("startingInventory", ""),
+                                     ("emaggedInventory", " (EMAG)"),
+                                     ("contrabandInventory", " (hacked)")):
+                    inv = proto.get(inv_key)
+                    if not isinstance(inv, dict):
+                        continue
+                    for eid in inv:
+                        fill = fill_of(str(eid))
+                        if fill:
+                            stocked_items += 1
+                        for rid, qty in fill.items():
+                            item_name = _entity_display_name(entity_index, str(eid))
+                            add_item(rid, fork_id,
+                                     f"Vending{tag}: {machine} — {item_name} ({_fmt_qty(qty)})")
+
+    # 4. Dispenser bottle packs (booze/soda) — EntityTableContainerFill
+    for fork_id in FORK_REGISTRY:
+        disp_files = fork_data.get(fork_id, {}).get("dispenser_files") or {}
+        for path, content in disp_files.items():
+            for proto in parse_yaml_content(content, path, loader):
+                if proto.get("type") != "entity" or not proto.get("id"):
+                    continue
+                fill_comp = None
+                for comp in proto.get("components") or []:
+                    if isinstance(comp, dict) and comp.get("type") == "EntityTableContainerFill":
+                        fill_comp = comp
+                        break
+                if not fill_comp:
+                    continue
+                eid = proto["id"]
+                machine = _entity_display_name(entity_index, eid).title()
+                emag = " (EMAG)" if "emag" in eid.lower() else ""
+                stocked: set = set()
+                _collect_entity_ids(fill_comp.get("containers"), entity_index, stocked)
+                for item_eid in sorted(stocked):
+                    fill = fill_of(item_eid)
+                    if fill:
+                        stocked_items += 1
+                    for rid, qty in fill.items():
+                        item_name = _entity_display_name(entity_index, item_eid)
+                        add_item(rid, fork_id,
+                                 f"{machine}{emag}: {item_name} ({_fmt_qty(qty)})")
+
+    print(f"  Item-fill channels: {len(entity_index)} entities indexed, "
+          f"{stocked_items} stocked items resolved, "
+          f"{len(item_sources)} reagents with item sources")
+    return {rid: sorted(pairs) for rid, pairs in item_sources.items()}
+
+
 def build_all_sources(reagent_plants: dict, reaction_lookup: dict,
-                      base_set: set) -> dict[str, list[str]]:
-    """Build complete sources dict for each reagent."""
+                      base_set: set,
+                      item_sources: dict[str, list[tuple[str, str]]] | None = None,
+                      allowed_forks: set[str] | None = None) -> dict[str, list[str]]:
+    """Build complete sources dict for each reagent.
+
+    item_sources: {rid: [(fork_id, label)]} from build_item_sources (D3).
+    allowed_forks: when set (per-fork views), only item labels whose channel
+    belongs to those forks are included."""
     sources = defaultdict(list)
 
     # 1. Plant sources
     for reagent_id, plants in reagent_plants.items():
         sources[reagent_id].extend(plants)
+
+    # 1b. Item-fill channels (D3) — vending machines, dispenser packs
+    for reagent_id, tagged in (item_sources or {}).items():
+        for fork_id, label in tagged:
+            if allowed_forks is not None and fork_id not in allowed_forks:
+                continue
+            if label not in sources[reagent_id]:
+                sources[reagent_id].append(label)
 
     # 2. Other known sources
     for reagent_id, src_list in OTHER_REAGENT_SOURCES.items():
@@ -1849,8 +2126,9 @@ def compute_antag_score(effect_tags: list[str]) -> int:
 #     per-fork difficulty. A strategy using a reagent blocked in DeltaV surfaces
 #     as 'impossible' there while remaining 'easy' on vanilla. See
 #     build_per_fork_views() below.
-# Lead (unobtainable everywhere — no recipe produces it in any fork)
-# is already correctly classified globally.
+# Lead has no recipe in any fork; the D3 item-fill scan found its only
+# source — Lead bottles in the Syndicate chem vendor (antag-only), so it
+# classifies antag-only rather than unobtainable (see code-reagents-lead).
 
 TIER_WEIGHTS = {
     "dispenser":     0,
@@ -1863,7 +2141,8 @@ TIER_WEIGHTS = {
     "unobtainable":  999, # literal dead-end: no recipe AND no sources
 }
 
-_SERVICE_KEYWORDS  = ("NanoMed", "Booze", "Soda", "BoozeVend", "SodaVend", "Drobe")
+_SERVICE_KEYWORDS  = ("NanoMed", "Booze", "Soda", "BoozeVend", "SodaVend", "Drobe",
+                      "Vending", "Atmospherics")
 _MOB_KEYWORDS      = ("butcher", "blood draw", "Slime", "Zombie", "mob")
 _ANTAG_KEYWORDS    = ("EMAG", "Syndicate", "Chaplain", "Antag")
 _DISPENSER_KEYWORDS = ("Dispenser", "Sink", "ChemVend")
@@ -1892,10 +2171,19 @@ def compute_reagent_accessibility(
     if is_dispenser or any(any(k in s for k in _DISPENSER_KEYWORDS) for s in sources):
         return {"tier": "dispenser", "weight": 0, "reason": "Chemical Dispenser"}
 
-    # Tier 3: antag-only (strongest filter — antag sources override plant/service)
+    # Tier 3: antag-only (strongest filter — antag sources override plant/service).
+    # Exception (D3): auto-derived vending labels (EMAG bucket, Syndicate-access
+    # machines) are a bonus channel, not the defining acquisition path — they
+    # only make a reagent antag-only when nothing else (recipe or another
+    # source) provides it (Pax has a recipe; Lead does not). Manual antag
+    # labels (uplink, loadouts, EMAG-only curated entries) keep overriding.
     antag_srcs = [s for s in sources if any(k in s for k in _ANTAG_KEYWORDS)]
     if antag_srcs:
-        return {"tier": "antag-only", "weight": 4, "reason": f"Antag-only: {antag_srcs[0]}"}
+        soft_only = all(s.startswith("Vending") for s in antag_srcs)
+        has_other_path = (rid in reaction_lookup) or any(
+            s != "Chemistry reaction" and s not in antag_srcs for s in sources)
+        if not (soft_only and has_other_path):
+            return {"tier": "antag-only", "weight": 4, "reason": f"Antag-only: {antag_srcs[0]}"}
 
     # Tier 2a: cross-botany (plant-derived)
     plant_srcs = [s for s in sources if s.endswith("(plant)")]
@@ -1907,10 +2195,10 @@ def compute_reagent_accessibility(
     if mob_srcs:
         return {"tier": "mob-drop", "weight": 3, "reason": f"Mob-derived: {mob_srcs[0]}"}
 
-    # Tier 2c: cross-service (vending machines)
+    # Tier 2c: cross-service (vending machines, other departments' gear)
     service_srcs = [s for s in sources if any(k in s for k in _SERVICE_KEYWORDS)]
     if service_srcs:
-        return {"tier": "cross-service", "weight": 2, "reason": f"Service vending: {service_srcs[0]}"}
+        return {"tier": "cross-service", "weight": 2, "reason": f"Cross-department: {service_srcs[0]}"}
 
     # Tier 1: self-chem — has recipe, all ingredients resolve to dispenser/self-chem
     if rid in reaction_lookup:
@@ -2097,6 +2385,7 @@ def build_per_fork_views(
     base_set: set,
     fork_diffs: dict | None = None,
     fork_reagent_blocks: dict | None = None,
+    item_sources: dict | None = None,
 ) -> dict[str, dict]:
     """Build filtered {reaction_lookup, all_sources, accessibility_map} per fork.
 
@@ -2153,8 +2442,18 @@ def build_per_fork_views(
 
         fork_reaction_lookup = build_reaction_lookup(fork_reactions)
 
-        # Per-fork all_sources (plants are global, recipes are fork-filtered)
-        fork_all_sources = build_all_sources(reagent_plants, fork_reaction_lookup, base_set)
+        # Per-fork all_sources (plants are global, recipes are fork-filtered).
+        # Item-fill channels are filtered by ancestry: a Goob view keeps
+        # vanilla's Booze-O-Mat sources, but a total-conversion fork
+        # (blocked_categories marker: RMC14/RuCM replace the whole station
+        # loadout) must not inherit vanilla vendors it doesn't ship.
+        if fconf.get("blocked_categories"):
+            allowed_channel_forks = set(chain)
+        else:
+            allowed_channel_forks = set(chain) | {fork_id, "vanilla"}
+        fork_all_sources = build_all_sources(
+            reagent_plants, fork_reaction_lookup, base_set,
+            item_sources, allowed_channel_forks)
 
         # Per-fork accessibility — only for non-abstract reagents visible in this fork
         fork_accessibility_map = {}
@@ -2209,7 +2508,8 @@ def export_json(reagents: dict, reactions: dict, locale: dict,
                 all_sources: dict | None = None,
                 fork_diffs: dict | None = None,
                 reagent_plants: dict | None = None,
-                fork_reagent_blocks: dict | None = None):
+                fork_reagent_blocks: dict | None = None,
+                item_sources: dict | None = None):
     """Export all data as a JSON file for the web frontend.
     fork_diffs: {fork_id: (blocked_set, modified_dict)} from auto-diff.
     reagent_plants: {reagent_id: [plant_label...]} from parse_seed_sources;
@@ -2491,7 +2791,7 @@ def export_json(reagents: dict, reactions: dict, locale: dict,
     # Falls back to empty dict if plants weren't threaded through (old call sites).
     per_fork_views = build_per_fork_views(
         reactions, reagents, reagent_plants or {}, base_set, fork_diffs,
-        fork_reagent_blocks,
+        fork_reagent_blocks, item_sources,
     ) if reagent_plants is not None else {}
 
     strategies_out = []
@@ -2621,11 +2921,23 @@ def main():
         if seed_files:
             print(f"  Fetched {len(seed_files)} seed files")
 
+        # D3: item-fill channel manifests (entities with solutions, vending
+        # inventories, machine names, dispenser packs). Most forks: [].
+        item_channel_files = {}
+        for key in ("item_fill_files", "vending_inventory_files",
+                    "vending_machine_files", "dispenser_files"):
+            flist = fconf.get(key, [])
+            item_channel_files[key] = fetch_all_files(flist, url, fork_id) if flist else {}
+        n_channel = sum(len(v) for v in item_channel_files.values())
+        if n_channel:
+            print(f"  Fetched {n_channel} item-channel files")
+
         fork_data[fork_id] = {
             "reagent_files": reagent_files,
             "reaction_files": reaction_files,
             "locale_files": locale_files,
             "seed_files": seed_files,
+            **item_channel_files,
         }
 
     # Phase 1b: Fetch vanilla-path files from each fork for auto-diff + harvest
@@ -2902,7 +3214,13 @@ def main():
         all_seed_files.update(fdata.get("seed_files", {}))
     reagent_plants = parse_seed_sources(all_seed_files, loader, all_seed_locale)
     print(f"  Plant reagent sources: {len(reagent_plants)}")
-    all_sources = build_all_sources(reagent_plants, reaction_lookup, base_set)
+
+    # Phase 5c: Item-fill sources (Increment D3)
+    print("\n=== Phase 5c: Item-fill sources (vending/dispenser channels) ===")
+    item_sources = build_item_sources(fork_data, loader)
+
+    all_sources = build_all_sources(reagent_plants, reaction_lookup, base_set,
+                                    item_sources)
     print(f"  Total reagents with sources: {len(all_sources)}")
 
     # Phase 6-7: Generate Excel
@@ -2920,7 +3238,7 @@ def main():
     export_json(
         all_reagents, all_reactions, locale, reaction_lookup, base_set,
         all_sources, fork_diffs, reagent_plants=reagent_plants,
-        fork_reagent_blocks=fork_reagent_blocks,
+        fork_reagent_blocks=fork_reagent_blocks, item_sources=item_sources,
     )
 
     print("\n=== Phase 9: Extracting sprites from SS14 repo ===")

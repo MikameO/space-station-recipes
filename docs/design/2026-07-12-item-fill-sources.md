@@ -74,14 +74,21 @@ RMC14/RuCM — вне v1 (своя CM-структура вендоров; Speed
 
 | Канал | Формат метки | Тир (механизм) |
 |---|---|---|
-| Вендомат | `Vending: Booze-O-Mat — Jailbreaker Verte (120u)` | cross-service (добавить `"Vending:"` в `_SERVICE_KEYWORDS`) |
-| Вендомат EMAG | `Vending (EMAG): ...` | antag-only (существующий keyword `EMAG`, antag-проверка раньше service) |
+| Вендомат | `Vending: Booze-O-Mat — Jailbreaker Verte (120u)` | cross-service (добавить `"Vending"` в `_SERVICE_KEYWORDS`; без двоеточия — иначе не матчатся варианты с тегами) |
+| Вендомат emaggedInventory | `Vending (EMAG): ...` | antag-only (keyword `EMAG`) — но см. правило «мягких» меток ниже |
+| Вендомат contrabandInventory | `Vending (hacked): ...` | cross-service — контрабанд-бакет открывается **проводом** (`ContrabandWireKey` в VendingMachineComponent), доступен экипажу с мультитулом, эмаг не нужен |
+| Синдикатский автомат | `Vending: SyndieJuice (Syndicate) — ...` | antag-only (машины с `Syndicate`/`Nukie` в id — AccessReader SyndicateAgent; keyword `Syndicate`) |
 | Пак диспенсера | `Booze Dispenser: ale (30u)` | dispenser (существующий keyword `Dispenser` — консистентно с текущими ручными записями Vodka и др.) |
 | Сок | `Juicing: Bungo (plant)` | cross-botany (существующий `endswith("(plant)")`) |
 | Атмос (ручная) | `Atmospherics (gas mixing)` | cross-service (добавить `"Atmospherics"` в keywords) |
 
-Опасный нюанс: у тир-0 проверки keyword `"Dispenser"` матчится ПЕРВЫМ — метки вендоматов
-не должны содержать слово Dispenser.
+Опасные нюансы:
+- у тир-0 проверки keyword `"Dispenser"` матчится ПЕРВЫМ — метки вендоматов не должны
+  содержать слово Dispenser;
+- **правило «мягких» меток** (найдено на регрессии Mayo/Pax): авто-метки `Vending*` — бонусный
+  канал, не определяющий тир. Antag-проверка возвращает antag-only, только если среди
+  antag-источников есть ручная метка ЛИБО у реагента нет другого пути (ни рецепта, ни
+  иного источника). Иначе EMAG-майонез из контрабанд-бакета делал соль/перец/Pax «антажными».
 
 ## Честные метки остатку (ручной довесок)
 

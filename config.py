@@ -162,6 +162,55 @@ FORK_REGISTRY = {
             "Oxygen", "Phosphorus", "Plasma", "Potassium", "Radium", "Silicon",
             "Silver", "Sodium", "Sulfur", "Sugar", "Water", "WeldingFuel", "Oil",
         },
+        # ── D3: item-fill source channels ──
+        # Entities that ship pre-filled with reagents (bottles/cans/pills) plus
+        # the acquisition channels that hand them out (vending inventories,
+        # bar/soda dispenser packs). Design: docs/design/2026-07-12-item-fill-sources.md
+        # Other forks default to [] (extractor uses .get); populated per fork in D3c.
+        "item_fill_files": [
+            "Resources/Prototypes/Entities/Objects/Consumable/Drinks/drinks_base.yml",
+            "Resources/Prototypes/Entities/Objects/Consumable/Drinks/drinks_base_materials.yml",
+            "Resources/Prototypes/Entities/Objects/Consumable/Drinks/drinks_bottles_glass.yml",
+            "Resources/Prototypes/Entities/Objects/Consumable/Drinks/drinks_bottles_plastic.yml",
+            "Resources/Prototypes/Entities/Objects/Consumable/Drinks/drinks_cans.yml",
+            "Resources/Prototypes/Entities/Objects/Consumable/Drinks/drinks-cartons.yml",
+            "Resources/Prototypes/Entities/Objects/Consumable/Drinks/drinks_fun.yml",
+            "Resources/Prototypes/Entities/Objects/Consumable/Drinks/drinks_special.yml",
+            "Resources/Prototypes/Entities/Objects/Consumable/Food/Containers/condiments.yml",
+            "Resources/Prototypes/Entities/Objects/Consumable/Food/ingredients.yml",
+            "Resources/Prototypes/Entities/Objects/Specific/Hydroponics/sprays.yml",
+            "Resources/Prototypes/Entities/Objects/Specific/Medical/healing.yml",
+            "Resources/Prototypes/Entities/Objects/Specific/Chemistry/chemistry-bottles.yml",
+        ],
+        "vending_inventory_files": [
+            "Resources/Prototypes/Catalog/VendingMachines/Inventories/boozeomat.yml",
+            "Resources/Prototypes/Catalog/VendingMachines/Inventories/chang.yml",
+            "Resources/Prototypes/Catalog/VendingMachines/Inventories/chapel.yml",
+            "Resources/Prototypes/Catalog/VendingMachines/Inventories/chefvend.yml",
+            "Resources/Prototypes/Catalog/VendingMachines/Inventories/chemvend.yml",
+            "Resources/Prototypes/Catalog/VendingMachines/Inventories/coffee.yml",
+            "Resources/Prototypes/Catalog/VendingMachines/Inventories/cola.yml",
+            "Resources/Prototypes/Catalog/VendingMachines/Inventories/condiments.yml",
+            "Resources/Prototypes/Catalog/VendingMachines/Inventories/discount.yml",
+            "Resources/Prototypes/Catalog/VendingMachines/Inventories/donut.yml",
+            "Resources/Prototypes/Catalog/VendingMachines/Inventories/medical.yml",
+            "Resources/Prototypes/Catalog/VendingMachines/Inventories/nutri.yml",
+            "Resources/Prototypes/Catalog/VendingMachines/Inventories/pwrgame.yml",
+            "Resources/Prototypes/Catalog/VendingMachines/Inventories/shamblersjuice.yml",
+            "Resources/Prototypes/Catalog/VendingMachines/Inventories/snack.yml",
+            "Resources/Prototypes/Catalog/VendingMachines/Inventories/soda.yml",
+            "Resources/Prototypes/Catalog/VendingMachines/Inventories/sovietsoda.yml",
+            "Resources/Prototypes/Catalog/VendingMachines/Inventories/spaceup.yml",
+            "Resources/Prototypes/Catalog/VendingMachines/Inventories/starkist.yml",
+            "Resources/Prototypes/Catalog/VendingMachines/Inventories/sustenance.yml",
+        ],
+        "vending_machine_files": [
+            "Resources/Prototypes/Entities/Structures/Machines/vending_machines.yml",
+        ],
+        "dispenser_files": [
+            "Resources/Prototypes/Entities/Structures/Dispensers/booze.yml",
+            "Resources/Prototypes/Entities/Structures/Dispensers/soda.yml",
+        ],
     },
 
     # ── RMC14 ──
@@ -1207,6 +1256,17 @@ OTHER_REAGENT_SOURCES = {
     "Nothing": ["EMAG Solar's Best Hot Drink vending machine"],
     "ChangelingSting": ["EMAG Shambler's Juice vending machine"],
     "NukieCola": ["EMAG Robust Softdrinks vending machine"],
+    # D3a honest labels — non-item channels the parser can't see.
+    # Species bloods verified against Body/Species/*.yml bloodReferenceSolution
+    # (2026-07-12): vox=AmmoniaBlood, moth=InsectBlood, arachnid=CopperBlood.
+    "AmmoniaBlood": ["Blood draw: Vox crew (syringe)"],
+    "CopperBlood": ["Blood draw: Arachnid crew (syringe)"],
+    "InsectBlood": ["Blood draw: Moth crew (syringe)"],
+    "Frezon": ["Atmospherics (gas mixing)"],
+    "Tritium": ["Atmospherics (plasma burn chamber)"],
+    "NitrousOxide": ["Atmospherics (gas mixing)"],
+    "MilkGoat": ["Milking goats (mob interaction)"],
+    "MilkSheep": ["Milking sheep (mob interaction)"],
 }
 
 # Vanilla reactions BLOCKED/REMOVED in RMC14 fork
