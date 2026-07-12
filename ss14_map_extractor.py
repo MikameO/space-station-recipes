@@ -46,6 +46,7 @@ def fetch_file(url: str, cache_path: Path) -> str:
             print(f"  FAILED: HTTP {e.code} for {url}"); return ""
         except Exception as e:
             if attempt < 2:
+                print(f"  Retry {attempt + 1}/3: {e}")
                 time.sleep(2 * (attempt + 1))
             else:
                 print(f"  FAILED after 3 attempts: {e} for {url}"); return ""
@@ -73,6 +74,7 @@ def fetch_binary(url: str, cache_path: Path) -> bytes:
                 print(f"  WARNING: binary fetch failed {url}: HTTP {e.code}")
         except Exception as e:
             if attempt < 2:
+                print(f"  Retry {attempt + 1}/3: {e}")
                 time.sleep(2 * (attempt + 1))
             else:
                 print(f"  WARNING: binary fetch failed {url}: {e}")
@@ -107,10 +109,70 @@ def load_yaml_docs(content: str, source: str) -> list:
         print(f"  YAML error in {source}: {e}")
         return []
 
+# ── map discovery ──
+
+def repo_meta(fork_cfg: dict) -> tuple[str, str, str]:
+    m = re.match(r"https://raw\.githubusercontent\.com/([^/]+)/([^/]+)/([^/]+)/", fork_cfg["raw_url"])
+    if not m:
+        raise ValueError(f"unparseable raw_url: {fork_cfg['raw_url']}")
+    return m.group(1), m.group(2), m.group(3)
+
+def fetch_repo_tree(fork_key: str, fork_cfg: dict) -> list[str]:
+    """All file paths in the fork's repo (git/trees API, cached)."""
+    owner, repo, branch = repo_meta(fork_cfg)
+    url = f"https://api.github.com/repos/{owner}/{repo}/git/trees/{branch}?recursive=1"
+    content = fetch_file(url, CACHE_DIR / fork_key / "_tree.json")
+    if not content:
+        return []
+    data = json.loads(content)
+    if data.get("truncated"):
+        print(f"  WARNING: tree truncated for {fork_key}")
+    return [e["path"] for e in data.get("tree", []) if e.get("type") == "blob"]
+
+def discover_maps(fork_key: str, fork_cfg: dict, tree: list[str]) -> list[dict]:
+    """Parse gameMap + gameMapPool prototypes → [{id, name, path, inPool}]."""
+    proto_paths = [p for p in tree if "/Prototypes/Maps/" in p and p.endswith(".yml")]
+    game_maps, pool_ids = {}, set()
+    for path in proto_paths:
+        content = fetch_file(fork_cfg["raw_url"].format(path=path), CACHE_DIR / fork_key / path)
+        for doc in load_yaml_docs(content, path):
+            for entry in (doc if isinstance(doc, list) else [doc]):
+                if not isinstance(entry, dict):
+                    continue
+                if entry.get("type") == "gameMap" and entry.get("mapPath"):
+                    map_path = "Resources" + entry["mapPath"]
+                    game_maps[entry["id"]] = {
+                        "id": entry["id"],
+                        "name": entry.get("mapName", entry["id"]),
+                        "path": map_path,
+                    }
+                elif entry.get("type") == "gameMapPool":
+                    pool_ids.update(entry.get("maps", []))
+    block = set()  # ponytail: MAP_BLOCKLIST from config.py lands in Task 16
+    out = []
+    for gid, gm in sorted(game_maps.items()):
+        if gid in block:
+            continue
+        if gm["path"] not in tree:
+            print(f"  WARNING: {fork_key}/{gid} mapPath missing in repo: {gm['path']}")
+            continue
+        gm["inPool"] = gid in pool_ids
+        out.append(gm)
+    return out
+
 # ── selfcheck ──
 
 def selfcheck():
-    print("selfcheck: not implemented yet"); sys.exit(1)
+    fork = FORK_REGISTRY["vanilla"]
+    tree = fetch_repo_tree("vanilla", fork)
+    maps = discover_maps("vanilla", fork, tree)
+    byid = {m["id"]: m for m in maps}
+    assert "Bagel" in byid, f"Bagel missing: {sorted(byid)}"
+    assert byid["Bagel"]["name"] == "Bagel Station"
+    assert byid["Bagel"]["path"] == "Resources/Maps/bagel.yml"
+    assert byid["Bagel"]["inPool"] is True
+    assert len(maps) >= 12, f"only {len(maps)} maps"
+    print(f"selfcheck OK: {len(maps)} vanilla maps discovered")
 
 def main():
     ap = argparse.ArgumentParser()
