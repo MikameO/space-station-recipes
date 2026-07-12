@@ -57,7 +57,7 @@
 
 ## Серия B — «Companion & миграция» (фронтенд)
 
-### B1. Fork diff UI («переехал на Goob — что поменялось?») `[ ]` — HAE 4h (frontend)
+### B1. Fork diff UI («переехал на Goob — что поменялось?») `[x]` (2026-07-12, commit bdb2431) — HAE 4h (frontend)
 **Спрос:** O8, steam-17 (игроки жонглируют форками), Reddit-хедмин («играйте разные форки»).
 **Шаги:**
 1. Экран «Fork A vs Fork B»: added / removed / modified по реагентам и реакциям (инфраструктура first-wins merge + auto-diff уже вычисляет различия — нужен UI-разворот).
@@ -65,7 +65,7 @@
 3. Deep-link на пару форков.
 **DoD:** выбор пары форков выдаёт корректные списки (спот-чек Vanilla↔Goob по 3 известным различиям); скриншот.
 
-### B2. PWA offline + companion-лэйаут `[ ]` — HAE 4h (frontend) — **зависит от A1**
+### B2. PWA offline + companion-лэйаут `[x]` (2026-07-12, commit adeaa51; offline доказан убийством сервера) — HAE 4h (frontend) — **зависит от A1**
 **Спрос:** O4 (устойчивость к инфра-сбоям 2026, steam-11) + «второй экран» (5.5).
 **Шаги:**
 1. Self-host `vis-network` (в `libs/`) — убрать последнюю внешнюю зависимость (lazy-загрузка уже из A1).
@@ -74,7 +74,7 @@
 4. Проверить `manifest.json` (standalone, иконки — уже есть).
 **DoD:** DevTools offline → reload работает полностью; installable (Lighthouse PWA); скриншот companion-режима на mobile-вьюпорте.
 
-### B3. «📌 Поверх игры» — Document Picture-in-Picture `[ ]` — HAE 2h (frontend) — **зависит от B2**
+### B3. «📌 Поверх игры» — Document Picture-in-Picture `[x]` (2026-07-12, commit 473307f; юзер подтвердил PiP на проде скриншотом) — HAE 2h (frontend) — **зависит от B2**
 **Спрос:** твоя идея №3 (плавающий калькулятор поверх полноэкранной игры).
 **Шаги:**
 1. Кнопка в companion-режиме: `documentPictureInPicture.requestWindow()` (Chromium 116+) → перенос компакт-калькулятора в always-on-top окно.
@@ -91,7 +91,7 @@
 **Шаги:** добавить `priority` в сериализацию реакций; regen; M1-чек warnings; schemaVersion → 3.4.3; CHANGELOG.
 **DoD:** реакции с приоритетом в YAML несут его в `data.json` (спот-чек 3 шт.); фронтенд не сломан.
 
-### C2. Симулятор «что будет, если смешать» `[ ]` — HAE 8h (frontend) — **зависит от C1**
+### C2. Симулятор «что будет, если смешать» `[x]` (2026-07-12, commit 5caf51a) — HAE 8h (frontend) — **зависит от C1**
 **Спрос:** O1 — топ-возможность исследования (gh-01: #22575 условия реакций, #15905 ghetto chem; steam-01/03).
 **Шаги:**
 1. Движок: fixed-point цикл по `reactions` с учётом priority, minTemp/maxTemp, mixer, катализаторов и **порядка добавления** ингредиентов.
@@ -103,7 +103,7 @@
 
 ## Серия D — «Медленная полоса» (расширение экстрактора; строго по одному, после C1)
 
-### D1. Ботаника: сущности растений + дерево эволюции + swab-гайд `[ ]` — HAE 8h (data + frontend)
+### D1. Ботаника: сущности растений + дерево эволюции + swab-гайд `[x]` (2026-07-12, commits 7c699bb + 6f568fd) — HAE 8h (data + frontend)
 **Спрос:** O5, gh-04 (#25454 +5 «мутации бессмысленны»), forum-04 (botany×chem), твоя идея №2.
 **Шаги:**
 1. Расширить Phase 8b ([ss14_chem_extractor.py:1721](ss14_chem_extractor.py:1721)) — сейчас парсит семена только в маппинг «реагент→растения»; извлекать растения как сущности: id, имя (+локали), `chemicals`, **`mutationPrototypes`**, exude/consume gasses, idealHeat/вода → новый ключ `plants` в `data.json`.
