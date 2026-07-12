@@ -479,17 +479,40 @@ function buildSourceFilters() {
 function setupTabs() {
   document.querySelectorAll('.tab-btn').forEach(btn => {
     btn.addEventListener('click', () => {
+      const tab = btn.dataset.tab;
+      if (!tab) return; // A1: the Advanced toggle is a .tab-btn without data-tab
       document.querySelectorAll('.tab-btn').forEach(b => { b.classList.remove('active'); b.setAttribute('aria-selected', 'false'); });
       document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
       btn.classList.add('active');
       btn.setAttribute('aria-selected', 'true');
-      const tab = btn.dataset.tab;
       document.getElementById('tab-' + tab).classList.add('active');
       activeTab = tab;
       if (tab !== 'reagents') track('tab_' + tab); // reagents is the default view
       renderCurrentTab();
     });
   });
+  setupAdvancedDropdown();
+}
+
+// A1: Reactions / Graph / Stats live in the Advanced dropdown (final removal pends Metrika)
+function setupAdvancedDropdown() {
+  const adv = document.getElementById('tabAdv');
+  const toggle = document.getElementById('btnAdvanced');
+  if (!adv || !toggle) return;
+  const ADV_TABS = ['reactions', 'graph', 'stats'];
+  const close = () => { adv.classList.remove('open'); toggle.setAttribute('aria-expanded', 'false'); };
+  toggle.addEventListener('click', e => {
+    e.stopPropagation();
+    const open = adv.classList.toggle('open');
+    toggle.setAttribute('aria-expanded', String(open));
+  });
+  document.addEventListener('click', e => { if (!adv.contains(e.target)) close(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') close(); });
+  // any tab click: close the menu, keep the toggle lit while a hidden tab is active (deep-links included)
+  document.querySelectorAll('.tab-btn').forEach(b => b.addEventListener('click', () => {
+    if (b.dataset.tab) close();
+    toggle.classList.toggle('has-active', ADV_TABS.includes(activeTab));
+  }));
 }
 
 function setupLogoHome() {
@@ -1504,9 +1527,33 @@ function renderCalcResults(targetId, amount, result) {
 // ─────────────────────────────────────────────
 
 let lastGraphHash = '';
+// A1: vis-network is lazy-loaded on first Graph open — keeps first paint free of the ~460KB CDN hit
+let visLoadPromise = null;
+function ensureVisLoaded() {
+  if (typeof vis !== 'undefined') return Promise.resolve();
+  if (!visLoadPromise) {
+    visLoadPromise = new Promise((resolve, reject) => {
+      const s = document.createElement('script');
+      s.src = 'https://unpkg.com/vis-network@9.1.6/standalone/umd/vis-network.min.js';
+      s.onload = resolve;
+      s.onerror = () => { visLoadPromise = null; reject(new Error('vis-network load failed')); };
+      document.head.appendChild(s);
+    });
+  }
+  return visLoadPromise;
+}
+
 function renderGraph() {
   const container = document.getElementById('graphContainer');
   const info = document.getElementById('graphInfo');
+
+  if (typeof vis === 'undefined') {
+    if (info) info.textContent = 'Loading graph engine…';
+    ensureVisLoaded()
+      .then(() => { if (activeTab === 'graph') { lastGraphHash = null; renderGraph(); } })
+      .catch(() => { if (info) info.textContent = 'Graph engine failed to load — check connection and reopen the tab.'; });
+    return;
+  }
 
   // Get filtered reagent IDs
   const filtered = filterReagents(document.getElementById('searchInput').value);

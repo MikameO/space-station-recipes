@@ -462,6 +462,34 @@ main {
 .tab-btn-antag.pulse { animation: antag-pulse 0.8s ease-in-out 2; }
 .antag-tab-content { display: flex; flex-direction: column; gap: 24px; }
 
+/* A1: Advanced tab dropdown (Reactions / Graph / Stats — pending Metrika verdict) */
+.tab-adv { position: relative; display: flex; }
+.tab-adv-caret { font-size: 9px; opacity: 0.7; margin-left: 4px; }
+.tab-adv-toggle.has-active {
+  color: var(--phosphor);
+  border-bottom-color: var(--phosphor);
+  text-shadow: 0 0 8px var(--phosphor-glow);
+}
+.tab-adv-menu {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 60;
+  min-width: 150px;
+  flex-direction: column;
+  background: var(--hull-plate);
+  border: 1px solid var(--border-subtle);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+}
+.tab-adv.open .tab-adv-menu { display: flex; }
+.tab-adv-menu .tab-btn {
+  width: 100%;
+  text-align: left;
+  border-bottom: 2px solid transparent;
+}
+.tab-adv-menu .tab-btn.active::after { display: none; }
+
 .tab-panel {
   display: none;
   flex: 1;

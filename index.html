@@ -72,7 +72,7 @@
   "license": "https://github.com/MikameO/space-station-recipes/blob/main/LICENSE"
 }
 </script>
-<link rel="stylesheet" href="style.css?v=9">
+<link rel="stylesheet" href="style.css?v=10">
 <!-- Yandex.Metrika counter -->
 <script type="text/javascript">
     (function(m,e,t,r,i,k,a){
@@ -86,7 +86,7 @@
 </script>
 <noscript><div><img src="https://mc.yandex.ru/watch/108585248" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
 <!-- /Yandex.Metrika counter -->
-<script defer src="https://unpkg.com/vis-network@9.1.6/standalone/umd/vis-network.min.js"></script>
+<!-- vis-network is lazy-loaded by app.js on first Graph tab open (A1) -->
 </head>
 <body>
 
@@ -171,7 +171,8 @@
         </div>
       </div>
 
-      <div class="filter-section" data-collapsible>
+      <!-- A1: hidden pending Metrika verdict (ROADMAP A1); markup kept so statsPanel render stays harmless -->
+      <div class="filter-section" data-collapsible style="display:none">
         <h3>Stats <span class="section-chevron">&#9660;</span></h3>
         <div class="section-body">
           <div id="statsPanel" class="stats-panel"></div>
@@ -183,12 +184,18 @@
   <main>
     <div class="tab-bar" role="tablist">
       <button class="tab-btn active" id="btn-reagents" data-tab="reagents" role="tab" aria-selected="true" aria-controls="tab-reagents">Reagents</button>
-      <button class="tab-btn" id="btn-reactions" data-tab="reactions" role="tab" aria-selected="false" aria-controls="tab-reactions">Reactions</button>
       <button class="tab-btn" id="btn-calculator" data-tab="calculator" role="tab" aria-selected="false" aria-controls="tab-calculator">Calculator</button>
       <button class="tab-btn" id="btn-trees" data-tab="trees" role="tab" aria-selected="false" aria-controls="tab-trees">Craft Trees</button>
-      <button class="tab-btn" id="btn-graph" data-tab="graph" role="tab" aria-selected="false" aria-controls="tab-graph">Graph</button>
       <button class="tab-btn" id="btn-botany" data-tab="botany" role="tab" aria-selected="false" aria-controls="tab-botany">Botany</button>
-      <button class="tab-btn" id="btn-stats" data-tab="stats" role="tab" aria-selected="false" aria-controls="tab-stats">Stats</button>
+      <!-- A1: low-usage tabs live in Advanced; final removal pends the Metrika checkpoint (ROADMAP A1) -->
+      <div class="tab-adv" id="tabAdv">
+        <button class="tab-btn tab-adv-toggle" id="btnAdvanced" type="button" aria-haspopup="true" aria-expanded="false">&#9881; Advanced <span class="tab-adv-caret">&#9662;</span></button>
+        <div class="tab-adv-menu">
+          <button class="tab-btn" id="btn-reactions" data-tab="reactions" role="tab" aria-selected="false" aria-controls="tab-reactions">Reactions</button>
+          <button class="tab-btn" id="btn-graph" data-tab="graph" role="tab" aria-selected="false" aria-controls="tab-graph">Graph</button>
+          <button class="tab-btn" id="btn-stats" data-tab="stats" role="tab" aria-selected="false" aria-controls="tab-stats">Stats</button>
+        </div>
+      </div>
       <button class="tab-btn tab-btn-antag" id="btn-antag" data-tab="antag" role="tab" aria-selected="false" aria-controls="tab-antag" style="display:none">&#9760; Antag Strategies</button>
     </div>
 
@@ -404,7 +411,7 @@
   <div class="loading-bar"><div class="loading-bar-fill"></div></div>
 </div>
 
-<script src="app.js?v=6"></script>
+<script src="app.js?v=7"></script>
 <script defer src="tutorial.js?v=2"></script>
 </body>
 </html>
