@@ -6,3 +6,6 @@ cache/
 .claude/
 .DS_Store
 Thumbs.db
+.gstack/
+# Community-demand research: raw scraped third-party UGC kept local (not republished)
+research/ss14-community-demand/raw/
