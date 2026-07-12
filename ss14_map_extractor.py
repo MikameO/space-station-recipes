@@ -474,6 +474,44 @@ def parse_map_file(fork_key: str, fork_cfg: dict, path: str) -> dict:
         "beacon_overrides": beacon_overrides,
     }
 
+# ── PNG underlay bake ──
+
+WALL_COLOR = (58, 78, 109, 255)      # matches site --border-active family
+WINDOW_COLOR = (44, 82, 130, 255)
+DOOR_COLOR = (138, 153, 179, 255)
+FLOOR_FALLBACK = (34, 42, 54, 255)
+
+def bake_png(fork_key: str, map_id: str, parsed: dict, reg: Registry):
+    from PIL import Image
+    tiles = parsed["tiles"]
+    xs = [t[0] for t in tiles]; ys = [t[1] for t in tiles]
+    bounds = {"minX": min(xs), "minY": min(ys), "maxX": max(xs), "maxY": max(ys)}
+    w = bounds["maxX"] - bounds["minX"] + 1
+    h = bounds["maxY"] - bounds["minY"] + 1
+    img = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+    put = img.putpixel
+    for (tx, ty), tile_id in tiles.items():
+        c = reg.tile_color(tile_id) if tile_id else None
+        rgba = (*c, 255) if c else FLOOR_FALLBACK
+        put((tx - bounds["minX"], bounds["maxY"] - ty), rgba)
+    overlay = {"wall": WALL_COLOR, "window": WINDOW_COLOR, "door": DOOR_COLOR}
+    main = parsed["main_grid"]
+    for proto, poss in parsed["entities"].items():
+        color = overlay.get(reg.kind(proto))
+        if not color:
+            continue
+        for x, y, grid in poss:
+            if grid != main:
+                continue
+            px, py = int(x // 1) - bounds["minX"], bounds["maxY"] - int(y // 1)
+            if 0 <= px < w and 0 <= py < h:
+                put((px, py), color)
+    out = OUT_DIR / fork_key / f"{map_id}.png"
+    out.parent.mkdir(parents=True, exist_ok=True)
+    img.save(out, optimize=True)
+    print(f"  baked {out} {w}x{h}")
+    return out, bounds
+
 # ── selfcheck ──
 
 def selfcheck():
@@ -535,6 +573,14 @@ def selfcheck():
                for x, y, grid in crow), f"Crowbar pos mismatch: {crow[:4]}"
     assert parsed["main_grid"] in parsed["grid_names"] or True
     assert len(parsed["offgrid_names"]) >= 1, "Syndi Puddle grid expected"
+
+    png_path, bounds = bake_png("vanilla", "Bagel", parsed, reg)
+    from PIL import Image
+    img = Image.open(png_path)
+    assert img.width == bounds["maxX"] - bounds["minX"] + 1
+    assert img.height == bounds["maxY"] - bounds["minY"] + 1
+    opaque = sum(1 for p in img.convert("RGBA").getdata() if p[3] > 0)
+    assert opaque > 15000, f"suspiciously empty PNG: {opaque} opaque px"
     print(f"selfcheck OK: {len(maps)} maps, {len(reg.protos)} protos, {len(parsed['tiles'])} tiles")
 
 def main():
