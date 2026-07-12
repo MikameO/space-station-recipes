@@ -168,7 +168,50 @@
     draw(); renderLocations(pid);
     if (typeof track === 'function') track('maps_search');
   }
-  function renderLocations() {}    // replaced in Task 13
+  function nearestBeacon(x, y) {
+    let best = null, bd = Infinity;
+    for (const [name, bx, by] of S.mapData.beacons) {
+      const d = (bx - x) ** 2 + (by - y) ** 2;
+      if (d < bd) { bd = d; best = name; }
+    }
+    return best || 'no beacon';
+  }
+  const KIND_LABEL = { 0: 'on the floor', 1: 'in', 2: 'vend', 4: 'vend (contraband)' };
+  function renderLocations(pid) {
+    const el = document.getElementById('mapsLocations');
+    if (!pid) { el.innerHTML = '<p class="maps-hint">Pick an item to see where it lives.</p>'; return; }
+    const rec = S.mapData.items[pid];
+    const groups = new Map();   // key -> [...positions]
+    for (const p of rec.p) {
+      const key = p[2] === 3 ? '☄ ' + (p[3] || 'off-grid') : nearestBeacon(p[0], p[1]);
+      if (!groups.has(key)) groups.set(key, []);
+      groups.get(key).push(p);
+    }
+    const entries = [...groups.entries()].sort((a, b) => b[1].length - a[1].length);
+    const rows = entries.map(([label, ps], gi) => {
+      const bits = ps.map(p => {
+        const badge = `<i class="maps-dot" style="background:${KIND_COLOR[p[2]] || '#8a99b3'}"></i>`;
+        if (p[2] === 0) return badge + ' ' + KIND_LABEL[0];
+        if (p[2] === 1) return badge + ` in ${p[3]}` + (p[4] ? (p[4] < 1 ? ` (~${Math.round(p[4] * 100)}%)` : ` ×${p[4]}`) : '');
+        if (p[2] === 2 || p[2] === 4) return badge + ` ${KIND_LABEL[p[2]]} ${p[3]}` + (p[4] ? ` ×${p[4]}` : '');
+        return badge + ' ' + label;
+      });
+      return `<button class="maps-loc" data-gi="${gi}"><b>${label}</b><span>${ps.length}</span><small>${[...new Set(bits)].join(' · ')}</small></button>`;
+    });
+    el.innerHTML = rows.join('');
+    el.querySelectorAll('.maps-loc').forEach(btn => btn.onclick = () => {
+      const ps = entries[+btn.dataset.gi][1].filter(p => p[2] !== 3);
+      if (!ps.length) return;
+      const cx = ps.reduce((s, p) => s + p[0], 0) / ps.length;
+      const cy = ps.reduce((s, p) => s + p[1], 0) / ps.length;
+      const c = document.getElementById('mapsCanvas');
+      S.scale = Math.max(S.scale, 4);
+      const b = S.mapData.bounds;
+      S.ox = c.width / 2 - (Math.floor(cx) - b.minX + 0.5) * S.scale;
+      S.oy = c.height / 2 - (b.maxY - Math.floor(cy) + 0.5) * S.scale;
+      draw();
+    });
+  }
   window.addEventListener('resize', () => { if (S.img && document.getElementById('tab-maps').classList.contains('active')) zoomFit(); });
 
   function zoomAt(cx, cy, factor) {
