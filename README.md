@@ -6,12 +6,12 @@
 
 **Interactive chemistry reference for [Space Station 14](https://spacestation14.com/)**
 
-Search reagents, plan reactions, explore craft trees, and calculate batch recipes across 18 community forks.
+Search reagents, plan reactions, explore craft trees, and calculate batch recipes across 19 community forks.
 
 [![License: GPL-3.0](https://img.shields.io/badge/License-GPL--3.0-22c55e?style=flat-square)](LICENSE)
 ![Reagents](https://img.shields.io/badge/Reagents-1213-39ff85?style=flat-square)
-![Reactions](https://img.shields.io/badge/Reactions-1003-00e5ff?style=flat-square)
-![Forks](https://img.shields.io/badge/Forks-18-ffb627?style=flat-square)
+![Reactions](https://img.shields.io/badge/Reactions-1005-00e5ff?style=flat-square)
+![Forks](https://img.shields.io/badge/Forks-19-ffb627?style=flat-square)
 
 </div>
 
@@ -22,7 +22,7 @@ Search reagents, plan reactions, explore craft trees, and calculate batch recipe
 | | Feature | Description |
 |---|---------|-------------|
 | **Search** | Full-text search | Search across names, effects, descriptions, and flavors |
-| **Multi-fork** | 18 SS14 forks | Vanilla, RMC14, Russian Marine Corps, Goob, Funky, Delta-V, Starlight, Frontier, Dead Space, Trauma, Omu, Carpmosia, Monolith, Harmony, Corvax, ADT, Sunrise, Fish |
+| **Multi-fork** | 19 SS14 forks | Vanilla, RMC14, Colonial Marines Universe, Russian Marine Corps, Goob, Funky, Delta-V, Starlight, Frontier, Dead Space, Trauma, Omu, Carpmosia, Monolith, Harmony, Corvax, ADT, Sunrise, Fish |
 | **Calculator** | Recipe planner | Single recipe calc, batch shift planner, and reverse lookup |
 | **Trees** | Craft trees | Visual dependency chains for any reagent synthesis path |
 | **Graph** | Network viz | Interactive graph of all reagent relationships |
@@ -37,7 +37,8 @@ Search reagents, plan reactions, explore craft trees, and calculate batch recipe
 |------|:--------:|:---------:|---|
 | **Vanilla SS14** | 407 | 316 | `upstream` |
 | **RMC14** | 113 | 68 | Colonial Marines |
-| **Russian Marine Corps** | 20 | 14 | RU, RMC14-based |
+| **Colonial Marines Universe** | 11 | 16 | Colonial Marines · AU-14 |
+| **Russian Marine Corps** | 20 | 14 | RU, CMU-based |
 | **Goob Station** | 100 | 85 | |
 | **ADT (Время Приключений)** | 100 | 77 | RU, Corvax-based |
 | **Trauma Station** | 43 | 42 | Goob-based |

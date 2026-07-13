@@ -1,7 +1,7 @@
 {
  "meta": {
   "schemaVersion": "3.8.0",
-  "generated": "2026-07-13T02:28:56",
+  "generated": "2026-07-13T18:51:23",
   "forks": {
    "vanilla": {
     "name": "Vanilla SS14",
@@ -13,11 +13,17 @@
     "color": "#06b6d4",
     "reagentCount": 113
    },
+   "cmu": {
+    "name": "Colonial Marines Universe",
+    "color": "#7c3aed",
+    "reagentCount": 11,
+    "parent": "rmc14"
+   },
    "rucm": {
     "name": "Russian Marine Corps",
     "color": "#9f1239",
-    "reagentCount": 20,
-    "parent": "rmc14"
+    "reagentCount": 9,
+    "parent": "cmu"
    },
    "goob": {
     "name": "Goob Station",
@@ -101,7 +107,7 @@
     "parent": "sunrise"
    }
   },
-  "reactionCount": 1003,
+  "reactionCount": 1005,
   "plantCount": 128,
   "sourceAttribution": {
    "total": 68,
@@ -6235,7 +6241,7 @@
    "name": "Speed Demon",
    "group": "",
    "category": "Narcotics",
-   "source": "rucm",
+   "source": "cmu",
    "color": "#8A2BE2",
    "desc": "A dangerous street drug that greatly increases speed and reflexes, but is highly toxic.",
    "physicalDesc": "glowing",
@@ -6336,7 +6342,7 @@
    "name": "Abomination Venom",
    "group": "Biological",
    "category": "Biological",
-   "source": "rucm",
+   "source": "cmu",
    "color": "#56213a",
    "desc": "",
    "physicalDesc": "viscous",
@@ -17851,7 +17857,7 @@
    "name": "Black Goo",
    "group": "",
    "category": "Toxins",
-   "source": "rucm",
+   "source": "cmu",
    "color": "#0a0b0d",
    "desc": "A strange substance of unknown origin. . .",
    "physicalDesc": "unidentifiable",
@@ -18396,7 +18402,7 @@
    "name": "Yautja blood",
    "group": "Biological",
    "category": "Biological",
-   "source": "rucm",
+   "source": "cmu",
    "color": "#2cf274",
    "desc": "Vivid green alien blood with a sharp metallic smell.",
    "physicalDesc": "ferrous",
@@ -59174,7 +59180,7 @@
    "meltingPoint": 170.0,
    "antagScore": 3,
    "forkStatus": {
-    "rucm": "blocked"
+    "cmu": "blocked"
    }
   },
   "RMCUranium": {
@@ -59271,7 +59277,7 @@
    "name": "Vapinine",
    "group": "",
    "category": "Toxins",
-   "source": "rucm",
+   "source": "cmu",
    "color": "#5d0000",
    "desc": "A xenonid alchemical toxin that destroys blood in the victim's bloodstream.",
    "physicalDesc": "metallic",
@@ -59310,7 +59316,7 @@
    "name": "Sagunine",
    "group": "",
    "category": "Toxins",
-   "source": "rucm",
+   "source": "cmu",
    "color": "#8f1914",
    "desc": "A xenonid alchemical toxin that causes brute trauma and breaks down brute medicines.",
    "physicalDesc": "pungent",
@@ -59347,7 +59353,7 @@
    "name": "Cholinine",
    "group": "",
    "category": "Toxins",
-   "source": "rucm",
+   "source": "cmu",
    "color": "#d46a1f",
    "desc": "A xenonid alchemical toxin that causes caustic burns and breaks down burn medicines.",
    "physicalDesc": "acidic",
@@ -59384,7 +59390,7 @@
    "name": "Pyrinine",
    "group": "",
    "category": "Toxins",
-   "source": "rucm",
+   "source": "cmu",
    "color": "#ff3f00",
    "desc": "A xenonid alchemical toxin that overheats the victim.",
    "physicalDesc": "burning",
@@ -59422,7 +59428,7 @@
    "name": "Crynine",
    "group": "",
    "category": "Toxins",
-   "source": "rucm",
+   "source": "cmu",
    "color": "#5eb7de",
    "desc": "A xenonid alchemical toxin that chills the victim and breaks down cryogenic medicines.",
    "physicalDesc": "cold",
@@ -59461,14 +59467,14 @@
    "name": "Noctine",
    "group": "",
    "category": "Toxins",
-   "source": "rucm",
+   "source": "cmu",
    "color": "#7b45b7",
    "desc": "A xenonid alchemical toxin that increases pain and breaks down painkillers.",
    "physicalDesc": "acrid",
    "flavor": "",
    "isBase": true,
    "isDispenser": false,
-   "effects": "[Poison] Effect: RMCAlchemistPain; [Poison] Jitter @10%; [Poison] Removes 0.4u CMUParacetamol; [Poison] Removes 0.4u CMUTramadol; [Poison] Removes 0.4u CMUOxycodone",
+   "effects": "[Poison] Effect: RMCAlchemistPain; [Poison] Jitter @10%; [Poison] Removes 0.4u CMUParacetamol; [Poison] Removes 0.4u CMUTramadol; [Poison] Removes 0.4u CMUOxycodone; [Poison] Removes 0.4u CMUSleen; [Poison] Removes 0.4u CMUSoporific",
    "effectTags": [
     "jitter"
    ],
@@ -59491,7 +59497,9 @@
     "[Poison] Jitter @10%",
     "[Poison] Removes 0.4u CMUParacetamol",
     "[Poison] Removes 0.4u CMUTramadol",
-    "[Poison] Removes 0.4u CMUOxycodone"
+    "[Poison] Removes 0.4u CMUOxycodone",
+    "[Poison] Removes 0.4u CMUSleen",
+    "[Poison] Removes 0.4u CMUSoporific"
    ],
    "boilingPoint": null,
    "meltingPoint": null,
@@ -59502,7 +59510,7 @@
    "name": "Xenosterine",
    "group": "",
    "category": "Toxins",
-   "source": "rucm",
+   "source": "cmu",
    "color": "#dde7c2",
    "desc": "A xenonid alchemical toxin that strips non-toxic chemicals from the victim's bloodstream.",
    "physicalDesc": "nondescript",
@@ -78098,7 +78106,7 @@
   },
   "AU14SpaceCleaner": {
    "id": "AU14SpaceCleaner",
-   "source": "rucm",
+   "source": "cmu",
    "reactants": {
     "Water": {
      "amount": 2,
@@ -78178,6 +78186,7 @@
    "impact": null,
    "forkStatus": {
     "rmc14": "blocked",
+    "cmu": "blocked",
     "rucm": "blocked",
     "deltav": "modified",
     "funky": "modified"
@@ -78403,6 +78412,7 @@
    "impact": null,
    "forkStatus": {
     "rmc14": "blocked",
+    "cmu": "blocked",
     "rucm": "blocked"
    }
   },
@@ -78483,6 +78493,7 @@
    "impact": "Medium",
    "forkStatus": {
     "rmc14": "blocked",
+    "cmu": "blocked",
     "rucm": "blocked",
     "funky": "modified",
     "monolith": "modified",
@@ -78546,6 +78557,7 @@
    "priority": -10,
    "forkStatus": {
     "rmc14": "modified",
+    "cmu": "modified",
     "rucm": "modified",
     "funky": "modified",
     "trauma": "modified",
@@ -78553,6 +78565,7 @@
    },
    "forkNotes": {
     "rmc14": "Priority changed from -10 to 10",
+    "cmu": "Priority -10->10",
     "rucm": "Priority -10->10",
     "funky": "Priority -10->10",
     "trauma": "Priority -10->10",
@@ -78644,10 +78657,12 @@
    "impact": null,
    "forkStatus": {
     "rmc14": "modified",
+    "cmu": "modified",
     "rucm": "modified"
    },
    "forkNotes": {
     "rmc14": "Added RMCIron(1) reactant; Removed Iron reactant",
+    "cmu": "Added RMCIron(1) reactant; Removed Iron reactant",
     "rucm": "Added RMCIron(1) reactant; Removed Iron reactant"
    }
   },
@@ -78736,6 +78751,7 @@
    "impact": null,
    "forkStatus": {
     "rmc14": "blocked",
+    "cmu": "blocked",
     "rucm": "blocked",
     "deadspace": "modified",
     "funky": "modified",
@@ -79090,6 +79106,7 @@
    "impact": null,
    "forkStatus": {
     "rmc14": "blocked",
+    "cmu": "blocked",
     "rucm": "blocked",
     "frontier": "modified",
     "funky": "blocked"
@@ -79121,6 +79138,7 @@
    "impact": null,
    "forkStatus": {
     "rmc14": "blocked",
+    "cmu": "blocked",
     "rucm": "blocked",
     "goob": "modified",
     "starlight": "modified",
@@ -79205,6 +79223,7 @@
    "impact": null,
    "forkStatus": {
     "rmc14": "blocked",
+    "cmu": "blocked",
     "rucm": "blocked",
     "goob": "blocked",
     "starlight": "blocked",
@@ -79243,6 +79262,7 @@
    "impact": null,
    "forkStatus": {
     "rmc14": "modified",
+    "cmu": "blocked",
     "rucm": "blocked",
     "frontier": "modified",
     "funky": "modified",
@@ -79656,6 +79676,7 @@
    "impact": null,
    "forkStatus": {
     "rmc14": "blocked",
+    "cmu": "blocked",
     "rucm": "blocked",
     "frontier": "blocked",
     "funky": "blocked",
@@ -79713,6 +79734,7 @@
    "impact": null,
    "forkStatus": {
     "rmc14": "modified",
+    "cmu": "blocked",
     "rucm": "blocked"
    },
    "forkNotes": {
@@ -79798,6 +79820,7 @@
    "impact": null,
    "forkStatus": {
     "rmc14": "blocked",
+    "cmu": "blocked",
     "rucm": "blocked",
     "funky": "blocked",
     "monolith": "blocked"
@@ -79852,6 +79875,7 @@
    "impact": null,
    "forkStatus": {
     "rmc14": "blocked",
+    "cmu": "blocked",
     "rucm": "blocked"
    }
   },
@@ -80348,6 +80372,7 @@
    "impact": null,
    "forkStatus": {
     "rmc14": "blocked",
+    "cmu": "blocked",
     "rucm": "blocked"
    }
   },
@@ -80378,10 +80403,12 @@
    "impact": null,
    "forkStatus": {
     "rmc14": "modified",
+    "cmu": "modified",
     "rucm": "modified"
    },
    "forkNotes": {
     "rmc14": "Added RMCSugar(1) reactant; Removed Sugar reactant",
+    "cmu": "Added RMCSugar(1) reactant; Removed Sugar reactant",
     "rucm": "Added RMCSugar(1) reactant; Removed Sugar reactant"
    }
   },
@@ -80689,10 +80716,12 @@
    "impact": null,
    "forkStatus": {
     "rmc14": "modified",
+    "cmu": "modified",
     "rucm": "modified"
    },
    "forkNotes": {
     "rmc14": "Added RMCIron(1) reactant; Removed Iron reactant",
+    "cmu": "Added RMCIron(1) reactant; Removed Iron reactant",
     "rucm": "Added RMCIron(1) reactant; Removed Iron reactant"
    }
   },
@@ -80769,6 +80798,7 @@
    "impact": null,
    "forkStatus": {
     "rmc14": "blocked",
+    "cmu": "blocked",
     "rucm": "blocked"
    }
   },
@@ -80930,6 +80960,7 @@
    "impact": null,
    "forkStatus": {
     "rmc14": "blocked",
+    "cmu": "blocked",
     "rucm": "blocked",
     "funky": "blocked"
    }
@@ -81203,6 +81234,7 @@
    "impact": null,
    "forkStatus": {
     "rmc14": "blocked",
+    "cmu": "blocked",
     "rucm": "blocked"
    }
   },
@@ -81799,6 +81831,7 @@
    "impact": "Medium",
    "forkStatus": {
     "rmc14": "blocked",
+    "cmu": "blocked",
     "rucm": "blocked",
     "funky": "modified"
    },
@@ -82017,6 +82050,7 @@
    "impact": null,
    "forkStatus": {
     "rmc14": "modified",
+    "cmu": "modified",
     "rucm": "modified",
     "goob": "modified",
     "starlight": "modified",
@@ -82032,6 +82066,7 @@
    },
    "forkNotes": {
     "rmc14": "Added Saxoite(1) reactant; Removed Brass reactant",
+    "cmu": "Added Saxoite(1) reactant; Removed Brass reactant",
     "rucm": "Added Saxoite(1) reactant; Removed Brass reactant",
     "goob": "Added Saxoite(1) reactant; Removed Brass reactant",
     "starlight": "Added Saxoite(1) reactant; Removed Brass reactant",
@@ -82447,7 +82482,7 @@
   },
   "CMUBiogenicMatrix": {
    "id": "CMUBiogenicMatrix",
-   "source": "rucm",
+   "source": "cmu",
    "reactants": {
     "CMBicaridine": {
      "amount": 2,
@@ -82485,7 +82520,7 @@
   },
   "CMUCardiocaine": {
    "id": "CMUCardiocaine",
-   "source": "rucm",
+   "source": "cmu",
    "reactants": {
     "CMEpinephrine": {
      "amount": 1,
@@ -82511,7 +82546,7 @@
   },
   "CMUCreateSludgeGC": {
    "id": "CMUCreateSludgeGC",
-   "source": "rucm",
+   "source": "cmu",
    "reactants": {
     "CMBicaridine": {
      "amount": 16,
@@ -82541,7 +82576,7 @@
   },
   "CMUHepatocytin": {
    "id": "CMUHepatocytin",
-   "source": "rucm",
+   "source": "cmu",
    "reactants": {
     "CMDylovene": {
      "amount": 1,
@@ -82567,7 +82602,7 @@
   },
   "CMUNapalmB": {
    "id": "CMUNapalmB",
-   "source": "rucm",
+   "source": "cmu",
    "reactants": {
     "RMCNapalm": {
      "amount": 2,
@@ -82598,7 +82633,7 @@
   },
   "CMUNapalmE": {
    "id": "CMUNapalmE",
-   "source": "rucm",
+   "source": "cmu",
    "reactants": {
     "RMCPhoron": {
      "amount": 1,
@@ -82625,7 +82660,7 @@
   },
   "CMUNapalmUT": {
    "id": "CMUNapalmUT",
-   "source": "rucm",
+   "source": "cmu",
    "reactants": {
     "RMCNapalm": {
      "amount": 1,
@@ -82652,7 +82687,7 @@
   },
   "CMUNephronate": {
    "id": "CMUNephronate",
-   "source": "rucm",
+   "source": "cmu",
    "reactants": {
     "CMDylovene": {
      "amount": 1,
@@ -82678,7 +82713,7 @@
   },
   "CMUOsteoCalc": {
    "id": "CMUOsteoCalc",
-   "source": "rucm",
+   "source": "cmu",
    "reactants": {
     "CMBicaridine": {
      "amount": 1,
@@ -82704,7 +82739,7 @@
   },
   "CMUOxycodone": {
    "id": "CMUOxycodone",
-   "source": "rucm",
+   "source": "cmu",
    "reactants": {
     "CMUTramadol": {
      "amount": 1,
@@ -82730,7 +82765,7 @@
   },
   "CMUParacetamol": {
    "id": "CMUParacetamol",
-   "source": "rucm",
+   "source": "cmu",
    "reactants": {
     "CMInaprovaline": {
      "amount": 1,
@@ -82756,7 +82791,7 @@
   },
   "CMUPulmovine": {
    "id": "CMUPulmovine",
-   "source": "rucm",
+   "source": "cmu",
    "reactants": {
     "CMDexalinPlus": {
      "amount": 1,
@@ -82780,9 +82815,75 @@
    "effects": "",
    "impact": null
   },
+  "CMUSleen": {
+   "id": "CMUSleen",
+   "source": "cmu",
+   "reactants": {
+    "CMUOxycodone": {
+     "amount": 1,
+     "catalyst": false
+    },
+    "CMUTramadol": {
+     "amount": 1,
+     "catalyst": false
+    },
+    "RMCEthanol": {
+     "amount": 1,
+     "catalyst": false
+    },
+    "CMInaprovaline": {
+     "amount": 1,
+     "catalyst": false
+    }
+   },
+   "products": {
+    "CMUSleen": 4
+   },
+   "minTemp": null,
+   "maxTemp": null,
+   "mixer": [],
+   "effects": "",
+   "impact": null,
+   "forkStatus": {
+    "rucm": "blocked"
+   }
+  },
+  "CMUSoporific": {
+   "id": "CMUSoporific",
+   "source": "cmu",
+   "reactants": {
+    "RMCChloralhydrate": {
+     "amount": 1,
+     "catalyst": false
+    },
+    "RMCChlorine": {
+     "amount": 1,
+     "catalyst": false
+    },
+    "RMCEthanol": {
+     "amount": 1,
+     "catalyst": false
+    },
+    "RMCSugar": {
+     "amount": 1,
+     "catalyst": false
+    }
+   },
+   "products": {
+    "CMUSoporific": 4
+   },
+   "minTemp": null,
+   "maxTemp": null,
+   "mixer": [],
+   "effects": "",
+   "impact": null,
+   "forkStatus": {
+    "rucm": "blocked"
+   }
+  },
   "CMUTramadol": {
    "id": "CMUTramadol",
-   "source": "rucm",
+   "source": "cmu",
    "reactants": {
     "CMUParacetamol": {
      "amount": 1,
@@ -82925,11 +83026,13 @@
    "impact": null,
    "forkStatus": {
     "rmc14": "modified",
+    "cmu": "modified",
     "rucm": "modified",
     "monolith": "blocked"
    },
    "forkNotes": {
     "rmc14": "Added RMCSugar(1) reactant; Removed Sugar reactant",
+    "cmu": "Added RMCSugar(1) reactant; Removed Sugar reactant",
     "rucm": "Added RMCSugar(1) reactant; Removed Sugar reactant"
    }
   },
@@ -83053,6 +83156,7 @@
    "impact": null,
    "forkStatus": {
     "rmc14": "blocked",
+    "cmu": "blocked",
     "rucm": "blocked",
     "frontier": "blocked",
     "funky": "blocked",
@@ -83084,6 +83188,7 @@
    "priority": 20,
    "forkStatus": {
     "rmc14": "blocked",
+    "cmu": "blocked",
     "rucm": "blocked",
     "frontier": "blocked",
     "funky": "blocked",
@@ -83221,6 +83326,7 @@
    "impact": null,
    "forkStatus": {
     "rmc14": "blocked",
+    "cmu": "blocked",
     "rucm": "blocked"
    }
   },
@@ -83504,6 +83610,7 @@
    "impact": null,
    "forkStatus": {
     "rmc14": "blocked",
+    "cmu": "blocked",
     "rucm": "blocked"
    }
   },
@@ -84139,6 +84246,7 @@
    "impact": null,
    "forkStatus": {
     "rmc14": "blocked",
+    "cmu": "blocked",
     "rucm": "blocked"
    }
   },
@@ -84173,10 +84281,12 @@
    "impact": null,
    "forkStatus": {
     "rmc14": "modified",
+    "cmu": "modified",
     "rucm": "modified"
    },
    "forkNotes": {
     "rmc14": "Added RMCOxygen(1) reactant; Added RMCSugar(1) reactant; Removed Oxygen reactant; Removed Sugar reactant",
+    "cmu": "Added RMCOxygen(1) reactant; Added RMCSugar(1) reactant; Removed Oxygen reactant; Removed Sugar reactant",
     "rucm": "Added RMCOxygen(1) reactant; Added RMCSugar(1) reactant; Removed Oxygen reactant; Removed Sugar reactant"
    }
   },
@@ -84255,10 +84365,12 @@
    "impact": null,
    "forkStatus": {
     "rmc14": "modified",
+    "cmu": "modified",
     "rucm": "modified"
    },
    "forkNotes": {
     "rmc14": "Added RMCSugar(1) reactant; Removed Sugar reactant",
+    "cmu": "Added RMCSugar(1) reactant; Removed Sugar reactant",
     "rucm": "Added RMCSugar(1) reactant; Removed Sugar reactant"
    }
   },
@@ -84385,10 +84497,12 @@
    "impact": null,
    "forkStatus": {
     "rmc14": "modified",
+    "cmu": "modified",
     "rucm": "modified"
    },
    "forkNotes": {
     "rmc14": "Added RMCSugar(1) reactant; Removed Sugar reactant",
+    "cmu": "Added RMCSugar(1) reactant; Removed Sugar reactant",
     "rucm": "Added RMCSugar(1) reactant; Removed Sugar reactant"
    }
   },
@@ -84505,6 +84619,7 @@
    "impact": null,
    "forkStatus": {
     "rmc14": "blocked",
+    "cmu": "blocked",
     "rucm": "blocked"
    }
   },
@@ -84952,10 +85067,12 @@
    "impact": null,
    "forkStatus": {
     "rmc14": "modified",
+    "cmu": "modified",
     "rucm": "modified"
    },
    "forkNotes": {
     "rmc14": "Added RMCSugar(1) reactant; Removed Sugar reactant",
+    "cmu": "Added RMCSugar(1) reactant; Removed Sugar reactant",
     "rucm": "Added RMCSugar(1) reactant; Removed Sugar reactant"
    }
   },
@@ -85004,6 +85121,7 @@
    "impact": "Low",
    "forkStatus": {
     "rmc14": "modified",
+    "cmu": "modified",
     "rucm": "modified",
     "goob": "modified",
     "starlight": "modified",
@@ -85023,6 +85141,7 @@
    },
    "forkNotes": {
     "rmc14": "Added Milk(15) reactant; Removed Cream reactant; TableSalt amount 1->5; TableSalt catalyst added",
+    "cmu": "Added Milk(15) reactant; Removed Cream reactant; TableSalt amount 1->5; TableSalt catalyst added",
     "rucm": "Added Milk(15) reactant; Removed Cream reactant; TableSalt amount 1->5; TableSalt catalyst added",
     "goob": "Added Milk(15) reactant; Removed Cream reactant; TableSalt amount 1->5; TableSalt catalyst added",
     "starlight": "Added Milk(15) reactant; Removed Cream reactant; TableSalt amount 1->5; TableSalt catalyst added",
@@ -85074,6 +85193,7 @@
    "impact": "Low",
    "forkStatus": {
     "rmc14": "modified",
+    "cmu": "modified",
     "rucm": "modified",
     "goob": "modified",
     "starlight": "modified",
@@ -85089,6 +85209,7 @@
    },
    "forkNotes": {
     "rmc14": "Added RMCSugar(5) reactant; Removed Butter reactant; Removed Sugar reactant; Egg amount 6->12; Flour amount 20->15; Milk amount 10->5",
+    "cmu": "Added RMCSugar(5) reactant; Removed Butter reactant; Removed Sugar reactant; Egg amount 6->12; Flour amount 20->15; Milk amount 10->5",
     "rucm": "Added RMCSugar(5) reactant; Removed Butter reactant; Removed Sugar reactant; Egg amount 6->12; Flour amount 20->15; Milk amount 10->5",
     "goob": "Removed Butter reactant; Egg amount 6->12; Flour amount 20->15; Milk amount 10->5; Sugar amount 10->5",
     "starlight": "Removed Butter reactant; Egg amount 6->12; Flour amount 20->15; Milk amount 10->5; Sugar amount 10->5",
@@ -85128,10 +85249,12 @@
    "impact": "Low",
    "forkStatus": {
     "rmc14": "modified",
+    "cmu": "modified",
     "rucm": "modified"
    },
    "forkNotes": {
     "rmc14": "Added RMCSugar(2) reactant; Removed Sugar reactant",
+    "cmu": "Added RMCSugar(2) reactant; Removed Sugar reactant",
     "rucm": "Added RMCSugar(2) reactant; Removed Sugar reactant"
    }
   },
@@ -85244,6 +85367,7 @@
    "impact": "Low",
    "forkStatus": {
     "rmc14": "modified",
+    "cmu": "modified",
     "rucm": "modified",
     "goob": "modified",
     "starlight": "modified",
@@ -85259,6 +85383,7 @@
    },
    "forkNotes": {
     "rmc14": "Flour amount 45->15; Water amount 15->10",
+    "cmu": "Flour amount 45->15; Water amount 15->10",
     "rucm": "Flour amount 45->15; Water amount 15->10",
     "goob": "Flour amount 45->15; Water amount 15->10",
     "starlight": "Flour amount 45->15; Water amount 15->10",
@@ -85298,6 +85423,7 @@
    "impact": "Low",
    "forkStatus": {
     "rmc14": "modified",
+    "cmu": "modified",
     "rucm": "modified",
     "goob": "modified",
     "starlight": "modified",
@@ -85313,6 +85439,7 @@
    },
    "forkNotes": {
     "rmc14": "Fiber amount 40->10; Water amount 15->10",
+    "cmu": "Fiber amount 40->10; Water amount 15->10",
     "rucm": "Fiber amount 40->10; Water amount 15->10",
     "goob": "Fiber amount 40->10; Water amount 15->10",
     "starlight": "Fiber amount 40->10; Water amount 15->10",
@@ -85444,6 +85571,7 @@
    "impact": "Low",
    "forkStatus": {
     "rmc14": "modified",
+    "cmu": "modified",
     "rucm": "modified",
     "goob": "modified",
     "starlight": "modified",
@@ -85459,6 +85587,7 @@
    },
    "forkNotes": {
     "rmc14": "Added Egg(12) reactant; Added TableSalt(5) reactant; Removed Butter reactant; Removed Sugar reactant; Removed Water reactant; Flour amount 40->15",
+    "cmu": "Added Egg(12) reactant; Added TableSalt(5) reactant; Removed Butter reactant; Removed Sugar reactant; Removed Water reactant; Flour amount 40->15",
     "rucm": "Added Egg(12) reactant; Added TableSalt(5) reactant; Removed Butter reactant; Removed Sugar reactant; Removed Water reactant; Flour amount 40->15",
     "goob": "Added Egg(12) reactant; Added TableSalt(5) reactant; Removed Butter reactant; Removed Sugar reactant; Removed Water reactant; Flour amount 40->15",
     "starlight": "Added Egg(12) reactant; Added TableSalt(5) reactant; Removed Butter reactant; Removed Sugar reactant; Removed Water reactant; Flour amount 40->15",
@@ -85666,6 +85795,7 @@
    "impact": "Low",
    "forkStatus": {
     "rmc14": "blocked",
+    "cmu": "blocked",
     "rucm": "blocked",
     "goob": "modified",
     "starlight": "modified",
@@ -85719,6 +85849,7 @@
    "impact": "Low",
    "forkStatus": {
     "rmc14": "blocked",
+    "cmu": "blocked",
     "rucm": "blocked",
     "goob": "modified",
     "starlight": "modified",
@@ -85820,6 +85951,7 @@
    "impact": "Low",
    "forkStatus": {
     "rmc14": "blocked",
+    "cmu": "blocked",
     "rucm": "blocked",
     "goob": "modified",
     "starlight": "modified",
@@ -85901,6 +86033,7 @@
    "impact": "Medium",
    "forkStatus": {
     "rmc14": "blocked",
+    "cmu": "blocked",
     "rucm": "blocked",
     "funky": "blocked",
     "omu": "blocked",
@@ -85933,6 +86066,7 @@
    "priority": -1,
    "forkStatus": {
     "rmc14": "blocked",
+    "cmu": "blocked",
     "rucm": "blocked",
     "goob": "modified",
     "starlight": "modified",
@@ -85986,6 +86120,7 @@
    "impact": "Medium",
    "forkStatus": {
     "rmc14": "blocked",
+    "cmu": "blocked",
     "rucm": "blocked",
     "goob": "modified",
     "starlight": "modified",
@@ -86051,6 +86186,7 @@
    "impact": "Low",
    "forkStatus": {
     "rmc14": "modified",
+    "cmu": "modified",
     "rucm": "modified",
     "goob": "modified",
     "starlight": "modified",
@@ -86066,6 +86202,7 @@
    },
    "forkNotes": {
     "rmc14": "MilkSoy amount 55->30",
+    "cmu": "MilkSoy amount 55->30",
     "rucm": "MilkSoy amount 55->30",
     "goob": "MilkSoy amount 55->30",
     "starlight": "MilkSoy amount 55->30",
@@ -86125,10 +86262,12 @@
    "impact": "Low",
    "forkStatus": {
     "rmc14": "modified",
+    "cmu": "modified",
     "rucm": "modified"
    },
    "forkNotes": {
     "rmc14": "Added RMCSugar(5) reactant; Removed Sugar reactant",
+    "cmu": "Added RMCSugar(5) reactant; Removed Sugar reactant",
     "rucm": "Added RMCSugar(5) reactant; Removed Sugar reactant"
    }
   },
@@ -86318,6 +86457,7 @@
    "impact": null,
    "forkStatus": {
     "rmc14": "blocked",
+    "cmu": "blocked",
     "rucm": "blocked",
     "adt": "modified"
    },
@@ -86352,6 +86492,7 @@
    "impact": null,
    "forkStatus": {
     "rmc14": "blocked",
+    "cmu": "blocked",
     "rucm": "blocked"
    }
   },
@@ -86602,12 +86743,14 @@
    "impact": null,
    "forkStatus": {
     "rmc14": "modified",
+    "cmu": "modified",
     "rucm": "modified",
     "deltav": "blocked",
     "monolith": "blocked"
    },
    "forkNotes": {
     "rmc14": "Added RMCSugar(1) reactant; Removed Sugar reactant",
+    "cmu": "Added RMCSugar(1) reactant; Removed Sugar reactant",
     "rucm": "Added RMCSugar(1) reactant; Removed Sugar reactant"
    }
   },
@@ -86902,6 +87045,7 @@
    "impact": null,
    "forkStatus": {
     "rmc14": "blocked",
+    "cmu": "blocked",
     "rucm": "blocked",
     "funky": "blocked"
    }
@@ -86959,6 +87103,7 @@
    "impact": "Medium",
    "forkStatus": {
     "rmc14": "blocked",
+    "cmu": "blocked",
     "rucm": "blocked"
    }
   },
@@ -87089,6 +87234,7 @@
    "impact": null,
    "forkStatus": {
     "rmc14": "blocked",
+    "cmu": "blocked",
     "rucm": "blocked"
    }
   },
@@ -87119,6 +87265,7 @@
    "impact": null,
    "forkStatus": {
     "rmc14": "blocked",
+    "cmu": "blocked",
     "rucm": "blocked",
     "deltav": "blocked",
     "funky": "blocked"
@@ -87147,6 +87294,7 @@
    "impact": null,
    "forkStatus": {
     "rmc14": "blocked",
+    "cmu": "blocked",
     "rucm": "blocked"
    }
   },
@@ -87185,6 +87333,7 @@
    "impact": "Medium",
    "forkStatus": {
     "rmc14": "blocked",
+    "cmu": "blocked",
     "rucm": "blocked"
    }
   },
@@ -87215,6 +87364,7 @@
    "impact": "Medium",
    "forkStatus": {
     "rmc14": "blocked",
+    "cmu": "blocked",
     "rucm": "blocked",
     "deadspace": "modified"
    },
@@ -87373,6 +87523,7 @@
    "impact": null,
    "forkStatus": {
     "rmc14": "blocked",
+    "cmu": "blocked",
     "rucm": "blocked",
     "frontier": "modified",
     "monolith": "modified",
@@ -87489,6 +87640,7 @@
    "impact": null,
    "forkStatus": {
     "rmc14": "blocked",
+    "cmu": "blocked",
     "rucm": "blocked",
     "funky": "blocked"
    }
@@ -87520,6 +87672,7 @@
    "impact": null,
    "forkStatus": {
     "rmc14": "blocked",
+    "cmu": "blocked",
     "rucm": "blocked"
    }
   },
@@ -87744,6 +87897,7 @@
    "impact": "Medium",
    "forkStatus": {
     "rmc14": "blocked",
+    "cmu": "blocked",
     "rucm": "blocked"
    }
   },
@@ -87778,6 +87932,7 @@
    "impact": null,
    "forkStatus": {
     "rmc14": "blocked",
+    "cmu": "blocked",
     "rucm": "blocked"
    }
   },
@@ -87915,6 +88070,7 @@
    "impact": "Medium",
    "forkStatus": {
     "rmc14": "blocked",
+    "cmu": "blocked",
     "rucm": "blocked",
     "goob": "modified",
     "trauma": "modified",
@@ -87953,6 +88109,7 @@
    "impact": null,
    "forkStatus": {
     "rmc14": "blocked",
+    "cmu": "blocked",
     "rucm": "blocked",
     "funky": "modified"
    },
@@ -88043,6 +88200,7 @@
    "impact": null,
    "forkStatus": {
     "rmc14": "blocked",
+    "cmu": "blocked",
     "rucm": "blocked"
    }
   },
@@ -88077,6 +88235,7 @@
    "impact": null,
    "forkStatus": {
     "rmc14": "blocked",
+    "cmu": "blocked",
     "rucm": "blocked",
     "frontier": "blocked",
     "funky": "blocked",
@@ -88182,6 +88341,7 @@
    "impact": null,
    "forkStatus": {
     "rmc14": "blocked",
+    "cmu": "blocked",
     "rucm": "blocked"
    }
   },
@@ -88464,6 +88624,7 @@
    "priority": -10,
    "forkStatus": {
     "rmc14": "modified",
+    "cmu": "modified",
     "rucm": "modified",
     "funky": "modified",
     "trauma": "modified",
@@ -88471,6 +88632,7 @@
    },
    "forkNotes": {
     "rmc14": "Priority changed from -10 to 10",
+    "cmu": "Priority -10->10",
     "rucm": "Priority -10->10",
     "funky": "Priority -10->10",
     "trauma": "Priority -10->10",
@@ -89112,11 +89274,13 @@
    "impact": null,
    "forkStatus": {
     "rmc14": "modified",
+    "cmu": "modified",
     "rucm": "modified",
     "deltav": "modified"
    },
    "forkNotes": {
     "rmc14": "Added RMCSugar(1) reactant; Removed Sugar reactant",
+    "cmu": "Added RMCSugar(1) reactant; Removed Sugar reactant",
     "rucm": "Added RMCSugar(1) reactant; Removed Sugar reactant",
     "deltav": "Added JuiceLime(1) reactant; Water amount 2->3; Grog yield 4->6; Added mixer: Stir"
    }
@@ -89306,6 +89470,7 @@
    "impact": null,
    "forkStatus": {
     "rmc14": "blocked",
+    "cmu": "blocked",
     "rucm": "blocked"
    }
   },
@@ -89340,6 +89505,7 @@
    "impact": null,
    "forkStatus": {
     "rmc14": "blocked",
+    "cmu": "blocked",
     "rucm": "blocked"
    }
   },
@@ -89492,6 +89658,7 @@
    "impact": null,
    "forkStatus": {
     "rmc14": "blocked",
+    "cmu": "blocked",
     "rucm": "blocked",
     "goob": "modified",
     "starlight": "modified",
@@ -89538,6 +89705,7 @@
    "impact": null,
    "forkStatus": {
     "rmc14": "blocked",
+    "cmu": "blocked",
     "rucm": "blocked",
     "goob": "blocked",
     "starlight": "blocked",
@@ -89976,6 +90144,7 @@
    "priority": -1,
    "forkStatus": {
     "rmc14": "blocked",
+    "cmu": "blocked",
     "rucm": "blocked"
    }
   },
@@ -90048,6 +90217,7 @@
    "impact": null,
    "forkStatus": {
     "rmc14": "blocked",
+    "cmu": "blocked",
     "rucm": "blocked",
     "funky": "modified"
    },
@@ -90132,10 +90302,12 @@
    "impact": null,
    "forkStatus": {
     "rmc14": "modified",
+    "cmu": "modified",
     "rucm": "modified"
    },
    "forkNotes": {
     "rmc14": "Added RMCSugar(1) reactant; Removed Sugar reactant",
+    "cmu": "Added RMCSugar(1) reactant; Removed Sugar reactant",
     "rucm": "Added RMCSugar(1) reactant; Removed Sugar reactant"
    }
   },
@@ -90870,6 +91042,7 @@
    "impact": null,
    "forkStatus": {
     "rmc14": "blocked",
+    "cmu": "blocked",
     "rucm": "blocked",
     "fish": "modified"
    },
@@ -90904,6 +91077,7 @@
    "impact": null,
    "forkStatus": {
     "rmc14": "blocked",
+    "cmu": "blocked",
     "rucm": "blocked"
    }
   },
@@ -91022,6 +91196,7 @@
    "impact": "Medium",
    "forkStatus": {
     "rmc14": "blocked",
+    "cmu": "blocked",
     "rucm": "blocked",
     "funky": "modified"
    },
@@ -91078,6 +91253,7 @@
    "impact": null,
    "forkStatus": {
     "rmc14": "blocked",
+    "cmu": "blocked",
     "rucm": "blocked"
    }
   },
@@ -91237,6 +91413,7 @@
    "priority": -10,
    "forkStatus": {
     "rmc14": "modified",
+    "cmu": "modified",
     "rucm": "modified",
     "funky": "modified",
     "trauma": "modified",
@@ -91244,6 +91421,7 @@
    },
    "forkNotes": {
     "rmc14": "Priority changed from -10 to 10",
+    "cmu": "Priority -10->10",
     "rucm": "Priority -10->10",
     "funky": "Priority -10->10",
     "trauma": "Priority -10->10",
@@ -91516,6 +91694,7 @@
    "impact": null,
    "forkStatus": {
     "rmc14": "blocked",
+    "cmu": "blocked",
     "rucm": "blocked",
     "funky": "blocked"
    }
@@ -91641,6 +91820,7 @@
    "impact": "Medium",
    "forkStatus": {
     "rmc14": "blocked",
+    "cmu": "blocked",
     "rucm": "blocked",
     "funky": "modified"
    },
@@ -91692,6 +91872,7 @@
    "impact": null,
    "forkStatus": {
     "rmc14": "modified",
+    "cmu": "blocked",
     "rucm": "blocked"
    },
    "forkNotes": {
@@ -91751,6 +91932,7 @@
    "impact": null,
    "forkStatus": {
     "rmc14": "blocked",
+    "cmu": "blocked",
     "rucm": "blocked"
    }
   },
@@ -91867,10 +92049,12 @@
    "impact": null,
    "forkStatus": {
     "rmc14": "modified",
+    "cmu": "modified",
     "rucm": "modified"
    },
    "forkNotes": {
     "rmc14": "Added RMCSugar(1) reactant; Removed Sugar reactant",
+    "cmu": "Added RMCSugar(1) reactant; Removed Sugar reactant",
     "rucm": "Added RMCSugar(1) reactant; Removed Sugar reactant"
    }
   },
@@ -91955,6 +92139,7 @@
    "impact": null,
    "forkStatus": {
     "rmc14": "blocked",
+    "cmu": "blocked",
     "rucm": "blocked"
    }
   },
@@ -92146,6 +92331,7 @@
    "impact": null,
    "forkStatus": {
     "rmc14": "modified",
+    "cmu": "modified",
     "rucm": "modified",
     "goob": "modified",
     "frontier": "modified",
@@ -92155,6 +92341,7 @@
    },
    "forkNotes": {
     "rmc14": "Added Lead(1) reactant; Removed Lithium reactant",
+    "cmu": "Added Lead(1) reactant; Removed Lithium reactant",
     "rucm": "Added Lead(1) reactant; Removed Lithium reactant",
     "goob": "Added Lead(1) as extra reactant; added maxTemp: 265",
     "frontier": "Added Lead(1) reactant; Removed Lithium reactant",
@@ -92216,6 +92403,7 @@
    "impact": null,
    "forkStatus": {
     "rmc14": "blocked",
+    "cmu": "blocked",
     "rucm": "blocked"
    }
   },
@@ -92334,6 +92522,7 @@
    "impact": null,
    "forkStatus": {
     "rmc14": "blocked",
+    "cmu": "blocked",
     "rucm": "blocked",
     "frontier": "blocked",
     "funky": "blocked",
@@ -92520,6 +92709,7 @@
    "impact": null,
    "forkStatus": {
     "rmc14": "blocked",
+    "cmu": "blocked",
     "rucm": "blocked"
    }
   },
@@ -92739,11 +92929,13 @@
    "impact": null,
    "forkStatus": {
     "rmc14": "modified",
+    "cmu": "modified",
     "rucm": "modified",
     "frontier": "modified"
    },
    "forkNotes": {
     "rmc14": "Added RMCBlackGoo(0.5) reactant; Added RMCSugar(1) reactant; Removed Sugar reactant",
+    "cmu": "Added RMCBlackGoo(0.5) reactant; Added RMCSugar(1) reactant; Removed Sugar reactant",
     "rucm": "Added RMCBlackGoo(0.5) reactant; Added RMCSugar(1) reactant; Removed Sugar reactant",
     "frontier": "Added Honey(1) reactant; Removed Sugar reactant"
    }
@@ -93427,10 +93619,12 @@
    "impact": null,
    "forkStatus": {
     "rmc14": "modified",
+    "cmu": "modified",
     "rucm": "modified"
    },
    "forkNotes": {
     "rmc14": "Added RMCSugar(1) reactant; Removed Sugar reactant",
+    "cmu": "Added RMCSugar(1) reactant; Removed Sugar reactant",
     "rucm": "Added RMCSugar(1) reactant; Removed Sugar reactant"
    }
   },
@@ -93749,6 +93943,7 @@
    "impact": "Medium",
    "forkStatus": {
     "rmc14": "modified",
+    "cmu": "blocked",
     "rucm": "blocked",
     "goob": "modified",
     "starlight": "modified",
@@ -94558,6 +94753,7 @@
    "impact": "High",
    "forkStatus": {
     "rmc14": "blocked",
+    "cmu": "blocked",
     "rucm": "blocked",
     "goob": "modified",
     "trauma": "modified",
@@ -94592,6 +94788,7 @@
    "impact": "Medium",
    "forkStatus": {
     "rmc14": "blocked",
+    "cmu": "blocked",
     "rucm": "blocked"
    }
   },
@@ -94722,6 +94919,7 @@
    "impact": null,
    "forkStatus": {
     "rmc14": "blocked",
+    "cmu": "blocked",
     "rucm": "blocked"
    }
   },
@@ -94782,6 +94980,7 @@
    "impact": null,
    "forkStatus": {
     "rmc14": "blocked",
+    "cmu": "blocked",
     "rucm": "blocked"
    }
   },
@@ -94886,6 +95085,7 @@
    "impact": null,
    "forkStatus": {
     "rmc14": "blocked",
+    "cmu": "blocked",
     "rucm": "blocked"
    }
   },
@@ -95058,6 +95258,7 @@
    "impact": null,
    "forkStatus": {
     "rmc14": "blocked",
+    "cmu": "blocked",
     "rucm": "blocked",
     "goob": "modified",
     "funky": "modified",
@@ -95130,6 +95331,7 @@
    "impact": null,
    "forkStatus": {
     "rmc14": "blocked",
+    "cmu": "blocked",
     "rucm": "blocked",
     "frontier": "blocked",
     "omu": "blocked",
@@ -95361,6 +95563,7 @@
    "impact": "Medium",
    "forkStatus": {
     "rmc14": "blocked",
+    "cmu": "blocked",
     "rucm": "blocked",
     "sunrise": "modified",
     "fish": "modified"
@@ -95575,6 +95778,7 @@
    "impact": null,
    "forkStatus": {
     "rmc14": "blocked",
+    "cmu": "blocked",
     "rucm": "blocked",
     "goob": "blocked",
     "starlight": "blocked",
@@ -95645,6 +95849,7 @@
    "impact": null,
    "forkStatus": {
     "rmc14": "blocked",
+    "cmu": "blocked",
     "rucm": "blocked"
    }
   },
@@ -95671,6 +95876,7 @@
    "impact": null,
    "forkStatus": {
     "rmc14": "blocked",
+    "cmu": "blocked",
     "rucm": "blocked"
    }
   },
@@ -95989,6 +96195,7 @@
    "impact": null,
    "forkStatus": {
     "rmc14": "blocked",
+    "cmu": "blocked",
     "rucm": "blocked"
    }
   },
@@ -96254,6 +96461,7 @@
    "impact": null,
    "forkStatus": {
     "rmc14": "blocked",
+    "cmu": "blocked",
     "rucm": "blocked"
    }
   },
@@ -96387,6 +96595,7 @@
    "impact": null,
    "forkStatus": {
     "rmc14": "blocked",
+    "cmu": "blocked",
     "rucm": "blocked"
    }
   },
@@ -96455,6 +96664,7 @@
    "impact": "Medium",
    "forkStatus": {
     "rmc14": "blocked",
+    "cmu": "blocked",
     "rucm": "blocked",
     "adt": "modified"
    },
@@ -96515,6 +96725,7 @@
    "impact": "Medium",
    "forkStatus": {
     "rmc14": "blocked",
+    "cmu": "blocked",
     "rucm": "blocked",
     "funky": "modified"
    },
@@ -96571,6 +96782,7 @@
    "impact": "Medium",
    "forkStatus": {
     "rmc14": "blocked",
+    "cmu": "blocked",
     "rucm": "blocked",
     "funky": "modified"
    },
@@ -96782,10 +96994,10 @@
    "impact": null,
    "priority": 10,
    "forkStatus": {
-    "rucm": "modified"
+    "cmu": "modified"
    },
    "forkNotes": {
-    "rucm": "Water amount 3->1; RMCCLF3 yield 3->1; RMCHydrogen yield 6->2; RMCOxygen yield 3->1"
+    "cmu": "Water amount 3->1; RMCCLF3 yield 3->1; RMCHydrogen yield 6->2; RMCOxygen yield 3->1"
    }
   },
   "RMCCLF3Bad": {
@@ -96857,10 +97069,10 @@
    "effects": "",
    "impact": null,
    "forkStatus": {
-    "rucm": "modified"
+    "cmu": "modified"
    },
    "forkNotes": {
-    "rucm": "Removed RMCBlackGoo reactant"
+    "cmu": "Removed RMCBlackGoo reactant"
    }
   },
   "RMCCreateWater": {
@@ -96973,7 +97185,7 @@
    "effects": "",
    "impact": null,
    "forkStatus": {
-    "rucm": "blocked"
+    "cmu": "blocked"
    }
   },
   "RMCInstantGrape": {
@@ -96998,7 +97210,7 @@
    "effects": "",
    "impact": null,
    "forkStatus": {
-    "rucm": "blocked"
+    "cmu": "blocked"
    }
   },
   "RMCInstantOrange": {
@@ -97023,7 +97235,7 @@
    "effects": "",
    "impact": null,
    "forkStatus": {
-    "rucm": "blocked"
+    "cmu": "blocked"
    }
   },
   "RMCInstantPineapple": {
@@ -97048,7 +97260,7 @@
    "effects": "",
    "impact": null,
    "forkStatus": {
-    "rucm": "blocked"
+    "cmu": "blocked"
    }
   },
   "RMCInstantWatermelon": {
@@ -97073,7 +97285,7 @@
    "effects": "",
    "impact": null,
    "forkStatus": {
-    "rucm": "blocked"
+    "cmu": "blocked"
    }
   },
   "RMCIronMetalFoam": {
@@ -97201,10 +97413,10 @@
    "effects": "",
    "impact": null,
    "forkStatus": {
-    "rucm": "modified"
+    "cmu": "modified"
    },
    "forkNotes": {
-    "rucm": "Removed RMCBlackGoo reactant"
+    "cmu": "Removed RMCBlackGoo reactant"
    }
   },
   "RMCMilkshake": {
@@ -97261,10 +97473,10 @@
    "effects": "",
    "impact": null,
    "forkStatus": {
-    "rucm": "modified"
+    "cmu": "modified"
    },
    "forkNotes": {
-    "rucm": "Removed RMCBlackGoo reactant"
+    "cmu": "Removed RMCBlackGoo reactant"
    }
   },
   "RMCNapalm": {
@@ -97347,10 +97559,10 @@
    "effects": "",
    "impact": null,
    "forkStatus": {
-    "rucm": "modified"
+    "cmu": "modified"
    },
    "forkNotes": {
-    "rucm": "RMCNapalmHighCombustion yield 2->1"
+    "cmu": "RMCNapalmHighCombustion yield 2->1"
    }
   },
   "RMCNapalmSticky": {
@@ -97375,10 +97587,10 @@
    "effects": "",
    "impact": null,
    "forkStatus": {
-    "rucm": "modified"
+    "cmu": "modified"
    },
    "forkNotes": {
-    "rucm": "RMCNapalmSticky yield 2->1"
+    "cmu": "RMCNapalmSticky yield 2->1"
    }
   },
   "RMCParoxetine": {
@@ -97411,10 +97623,10 @@
    "effects": "",
    "impact": null,
    "forkStatus": {
-    "rucm": "modified"
+    "cmu": "modified"
    },
    "forkNotes": {
-    "rucm": "Removed RMCBlackGoo reactant"
+    "cmu": "Removed RMCBlackGoo reactant"
    }
   },
   "RMCPotassiumExplosion": {
@@ -97463,10 +97675,10 @@
    "impact": "High",
    "priority": 10,
    "forkStatus": {
-    "rucm": "modified"
+    "cmu": "modified"
    },
    "forkNotes": {
-    "rucm": "Added RMCBlackGoo(0.5) reactant"
+    "cmu": "Added RMCBlackGoo(0.5) reactant"
    }
   },
   "RMCSpaceDrugs": {
@@ -97499,10 +97711,10 @@
    "effects": "",
    "impact": null,
    "forkStatus": {
-    "rucm": "modified"
+    "cmu": "modified"
    },
    "forkNotes": {
-    "rucm": "Removed RMCBlackGoo reactant"
+    "cmu": "Removed RMCBlackGoo reactant"
    }
   },
   "RMCSulphuricAcid": {
@@ -98090,6 +98302,7 @@
    "impact": null,
    "forkStatus": {
     "rmc14": "modified",
+    "cmu": "modified",
     "rucm": "modified",
     "frontier": "modified",
     "funky": "modified",
@@ -98098,6 +98311,7 @@
    },
    "forkNotes": {
     "rmc14": "Removed mixer requirement",
+    "cmu": "Removed mixer requirement",
     "rucm": "Removed mixer requirement",
     "frontier": "Removed mixer requirement",
     "funky": "Removed mixer requirement",
@@ -98327,6 +98541,7 @@
    "impact": null,
    "forkStatus": {
     "rmc14": "blocked",
+    "cmu": "blocked",
     "rucm": "blocked"
    }
   },
@@ -98463,10 +98678,12 @@
    "impact": null,
    "forkStatus": {
     "rmc14": "modified",
+    "cmu": "modified",
     "rucm": "modified"
    },
    "forkNotes": {
     "rmc14": "Added RMCSugar(1) reactant; Removed Sugar reactant",
+    "cmu": "Added RMCSugar(1) reactant; Removed Sugar reactant",
     "rucm": "Added RMCSugar(1) reactant; Removed Sugar reactant"
    }
   },
@@ -98601,6 +98818,7 @@
    "impact": null,
    "forkStatus": {
     "rmc14": "blocked",
+    "cmu": "blocked",
     "rucm": "blocked"
    }
   },
@@ -98810,6 +99028,7 @@
    "impact": "Low",
    "forkStatus": {
     "rmc14": "modified",
+    "cmu": "modified",
     "rucm": "modified",
     "frontier": "modified",
     "funky": "modified",
@@ -98818,6 +99037,7 @@
    },
    "forkNotes": {
     "rmc14": "Removed mixer requirement",
+    "cmu": "Removed mixer requirement",
     "rucm": "Removed mixer requirement",
     "frontier": "Removed mixer requirement",
     "funky": "Removed mixer requirement",
@@ -98924,6 +99144,7 @@
    "impact": null,
    "forkStatus": {
     "rmc14": "blocked",
+    "cmu": "blocked",
     "rucm": "blocked"
    }
   },
@@ -99103,6 +99324,7 @@
    "impact": null,
    "forkStatus": {
     "rmc14": "blocked",
+    "cmu": "blocked",
     "rucm": "blocked"
    }
   },
@@ -99171,6 +99393,7 @@
    "impact": "Medium",
    "forkStatus": {
     "rmc14": "blocked",
+    "cmu": "blocked",
     "rucm": "blocked",
     "funky": "modified"
    },
@@ -99205,10 +99428,12 @@
    "impact": null,
    "forkStatus": {
     "rmc14": "modified",
+    "cmu": "modified",
     "rucm": "modified"
    },
    "forkNotes": {
     "rmc14": "Added RMCSugar(1) reactant; Removed Sugar reactant",
+    "cmu": "Added RMCSugar(1) reactant; Removed Sugar reactant",
     "rucm": "Added RMCSugar(1) reactant; Removed Sugar reactant"
    }
   },
@@ -99456,6 +99681,7 @@
    "priority": -10,
    "forkStatus": {
     "rmc14": "modified",
+    "cmu": "modified",
     "rucm": "modified",
     "funky": "modified",
     "trauma": "modified",
@@ -99463,6 +99689,7 @@
    },
    "forkNotes": {
     "rmc14": "Priority changed from -10 to 10",
+    "cmu": "Priority -10->10",
     "rucm": "Priority -10->10",
     "funky": "Priority -10->10",
     "trauma": "Priority -10->10",
@@ -99620,6 +99847,7 @@
    "impact": "Medium",
    "forkStatus": {
     "rmc14": "blocked",
+    "cmu": "blocked",
     "rucm": "blocked"
    }
   },
@@ -99667,6 +99895,7 @@
    "impact": null,
    "forkStatus": {
     "rmc14": "blocked",
+    "cmu": "blocked",
     "rucm": "blocked"
    }
   },
@@ -99697,6 +99926,7 @@
    "impact": "Medium",
    "forkStatus": {
     "rmc14": "blocked",
+    "cmu": "blocked",
     "rucm": "blocked",
     "adt": "modified"
    },
@@ -99889,6 +100119,7 @@
    "impact": null,
    "forkStatus": {
     "rmc14": "blocked",
+    "cmu": "blocked",
     "rucm": "blocked"
    }
   },
@@ -99919,6 +100150,7 @@
    "impact": null,
    "forkStatus": {
     "rmc14": "blocked",
+    "cmu": "blocked",
     "rucm": "blocked"
    }
   },
@@ -99947,6 +100179,7 @@
    "impact": null,
    "forkStatus": {
     "rmc14": "blocked",
+    "cmu": "blocked",
     "rucm": "blocked",
     "frontier": "modified",
     "funky": "modified",
@@ -99987,6 +100220,7 @@
    "impact": "Medium",
    "forkStatus": {
     "rmc14": "blocked",
+    "cmu": "blocked",
     "rucm": "blocked"
    }
   },
@@ -100275,6 +100509,7 @@
    "impact": "Medium",
    "forkStatus": {
     "rmc14": "blocked",
+    "cmu": "blocked",
     "rucm": "blocked",
     "goob": "modified",
     "trauma": "modified",
@@ -100471,6 +100706,7 @@
    "impact": null,
    "forkStatus": {
     "rmc14": "blocked",
+    "cmu": "blocked",
     "rucm": "blocked",
     "goob": "blocked",
     "starlight": "blocked",
@@ -100676,6 +100912,7 @@
    "impact": null,
    "forkStatus": {
     "rmc14": "blocked",
+    "cmu": "blocked",
     "rucm": "blocked"
    }
   },
@@ -101007,6 +101244,7 @@
    "impact": null,
    "forkStatus": {
     "rmc14": "blocked",
+    "cmu": "blocked",
     "rucm": "blocked",
     "goob": "blocked",
     "starlight": "blocked",
@@ -101512,11 +101750,13 @@
    "impact": null,
    "forkStatus": {
     "rmc14": "modified",
+    "cmu": "modified",
     "rucm": "modified",
     "monolith": "blocked"
    },
    "forkNotes": {
     "rmc14": "Added RMCSugar(1) reactant; Removed Sugar reactant",
+    "cmu": "Added RMCSugar(1) reactant; Removed Sugar reactant",
     "rucm": "Added RMCSugar(1) reactant; Removed Sugar reactant"
    }
   },
@@ -101601,6 +101841,7 @@
    "impact": null,
    "forkStatus": {
     "rmc14": "blocked",
+    "cmu": "blocked",
     "rucm": "blocked"
    }
   },
@@ -101771,6 +102012,7 @@
    "impact": null,
    "forkStatus": {
     "rmc14": "blocked",
+    "cmu": "blocked",
     "rucm": "blocked",
     "funky": "modified"
    },
@@ -101943,6 +102185,7 @@
    "impact": null,
    "forkStatus": {
     "rmc14": "blocked",
+    "cmu": "blocked",
     "rucm": "blocked"
    }
   },
@@ -101996,6 +102239,7 @@
    "impact": null,
    "forkStatus": {
     "rmc14": "blocked",
+    "cmu": "blocked",
     "rucm": "blocked"
    }
   },
@@ -102495,6 +102739,7 @@
    "impact": null,
    "forkStatus": {
     "rmc14": "blocked",
+    "cmu": "blocked",
     "rucm": "blocked"
    }
   },
@@ -102754,6 +102999,7 @@
    "impact": "Low",
    "forkStatus": {
     "rmc14": "blocked",
+    "cmu": "blocked",
     "rucm": "blocked",
     "sunrise": "blocked",
     "fish": "blocked"
@@ -102879,11 +103125,13 @@
    "impact": null,
    "forkStatus": {
     "rmc14": "modified",
+    "cmu": "modified",
     "rucm": "modified",
     "monolith": "blocked"
    },
    "forkNotes": {
     "rmc14": "Added RMCSugar(1) reactant; Removed Sugar reactant",
+    "cmu": "Added RMCSugar(1) reactant; Removed Sugar reactant",
     "rucm": "Added RMCSugar(1) reactant; Removed Sugar reactant"
    }
   },
@@ -110289,6 +110537,62 @@
    "from": "RMCEthanol",
    "to": "CMUOxycodone",
    "reaction": "CMUOxycodone",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "CMUOxycodone",
+   "to": "CMUSleen",
+   "reaction": "CMUSleen",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "CMUTramadol",
+   "to": "CMUSleen",
+   "reaction": "CMUSleen",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "RMCEthanol",
+   "to": "CMUSleen",
+   "reaction": "CMUSleen",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "CMInaprovaline",
+   "to": "CMUSleen",
+   "reaction": "CMUSleen",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "RMCChloralhydrate",
+   "to": "CMUSoporific",
+   "reaction": "CMUSoporific",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "RMCChlorine",
+   "to": "CMUSoporific",
+   "reaction": "CMUSoporific",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "RMCEthanol",
+   "to": "CMUSoporific",
+   "reaction": "CMUSoporific",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "RMCSugar",
+   "to": "CMUSoporific",
+   "reaction": "CMUSoporific",
    "amount": 1,
    "catalyst": false
   },
@@ -122629,6 +122933,33 @@
       "mismatch": true,
       "mismatchReason": "unobtainable ingredient present; deep reaction chain (depth 3)"
      },
+     "cmu": {
+      "tier": "hard",
+      "effortScore": 9,
+      "breakdown": {
+       "ingredients": [
+        {
+         "id": "ChloralHydrate",
+         "tier": "self-chem",
+         "weight": 1,
+         "reason": "Chemistry reaction from dispenser base"
+        },
+        {
+         "id": "Lexorin",
+         "tier": "unknown",
+         "weight": 5,
+         "reason": "Recipe exists but a deep-chain ingredient is unresolved by extractor (likely plant-mutation, mob-drop, or cooking product)"
+        }
+       ],
+       "reactionDepth": 3,
+       "crossDepartmentPenalty": 0,
+       "temperatureConstraintPenalty": 0,
+       "unobtainablePenalty": 0
+      },
+      "authoredTier": "easy",
+      "mismatch": true,
+      "mismatchReason": "deep reaction chain (depth 3)"
+     },
      "rucm": {
       "tier": "hard",
       "effortScore": 9,
@@ -123158,6 +123489,39 @@
       "mismatchReason": ""
      },
      "rmc14": {
+      "tier": "medium",
+      "effortScore": 8,
+      "breakdown": {
+       "ingredients": [
+        {
+         "id": "PolytrinicAcid",
+         "tier": "cross-botany",
+         "weight": 2,
+         "reason": "Recipe requires cross-botany ingredient(s)"
+        },
+        {
+         "id": "Fluorosurfactant",
+         "tier": "cross-botany",
+         "weight": 2,
+         "reason": "Recipe requires cross-botany ingredient(s)"
+        },
+        {
+         "id": "Water",
+         "tier": "dispenser",
+         "weight": 0,
+         "reason": "Chemical Dispenser"
+        }
+       ],
+       "reactionDepth": 2,
+       "crossDepartmentPenalty": 2,
+       "temperatureConstraintPenalty": 0,
+       "unobtainablePenalty": 0
+      },
+      "authoredTier": "medium",
+      "mismatch": false,
+      "mismatchReason": ""
+     },
+     "cmu": {
       "tier": "medium",
       "effortScore": 8,
       "breakdown": {
@@ -123825,6 +124189,33 @@
       "mismatch": true,
       "mismatchReason": ""
      },
+     "cmu": {
+      "tier": "trivial",
+      "effortScore": 0,
+      "breakdown": {
+       "ingredients": [
+        {
+         "id": "Potassium",
+         "tier": "dispenser",
+         "weight": 0,
+         "reason": "Chemical Dispenser"
+        },
+        {
+         "id": "Water",
+         "tier": "dispenser",
+         "weight": 0,
+         "reason": "Chemical Dispenser"
+        }
+       ],
+       "reactionDepth": 0,
+       "crossDepartmentPenalty": 0,
+       "temperatureConstraintPenalty": 0,
+       "unobtainablePenalty": 0
+      },
+      "authoredTier": "easy",
+      "mismatch": true,
+      "mismatchReason": ""
+     },
      "rucm": {
       "tier": "trivial",
       "effortScore": 0,
@@ -124372,6 +124763,45 @@
       "mismatchReason": "deep reaction chain (depth 4)"
      },
      "rmc14": {
+      "tier": "medium",
+      "effortScore": 8,
+      "breakdown": {
+       "ingredients": [
+        {
+         "id": "Phosphorus",
+         "tier": "dispenser",
+         "weight": 0,
+         "reason": "Chemical Dispenser"
+        },
+        {
+         "id": "Potassium",
+         "tier": "dispenser",
+         "weight": 0,
+         "reason": "Chemical Dispenser"
+        },
+        {
+         "id": "Sugar",
+         "tier": "dispenser",
+         "weight": 0,
+         "reason": "Chemical Dispenser"
+        },
+        {
+         "id": "Lexorin",
+         "tier": "unknown",
+         "weight": 5,
+         "reason": "Recipe exists but a deep-chain ingredient is unresolved by extractor (likely plant-mutation, mob-drop, or cooking product)"
+        }
+       ],
+       "reactionDepth": 3,
+       "crossDepartmentPenalty": 0,
+       "temperatureConstraintPenalty": 0,
+       "unobtainablePenalty": 0
+      },
+      "authoredTier": "medium",
+      "mismatch": false,
+      "mismatchReason": ""
+     },
+     "cmu": {
       "tier": "medium",
       "effortScore": 8,
       "breakdown": {
@@ -125163,6 +125593,39 @@
       "mismatch": true,
       "mismatchReason": "cross-department ingredient(s)"
      },
+     "cmu": {
+      "tier": "medium",
+      "effortScore": 8,
+      "breakdown": {
+       "ingredients": [
+        {
+         "id": "Napalm",
+         "tier": "cross-botany",
+         "weight": 2,
+         "reason": "Requires Botany: lemonade (plant)"
+        },
+        {
+         "id": "Fluorosurfactant",
+         "tier": "cross-botany",
+         "weight": 2,
+         "reason": "Recipe requires cross-botany ingredient(s)"
+        },
+        {
+         "id": "Water",
+         "tier": "dispenser",
+         "weight": 0,
+         "reason": "Chemical Dispenser"
+        }
+       ],
+       "reactionDepth": 2,
+       "crossDepartmentPenalty": 2,
+       "temperatureConstraintPenalty": 0,
+       "unobtainablePenalty": 0
+      },
+      "authoredTier": "hard",
+      "mismatch": true,
+      "mismatchReason": "cross-department ingredient(s)"
+     },
      "rucm": {
       "tier": "medium",
       "effortScore": 8,
@@ -125780,6 +126243,27 @@
       "mismatch": true,
       "mismatchReason": "cross-department ingredient(s)"
      },
+     "cmu": {
+      "tier": "easy",
+      "effortScore": 4,
+      "breakdown": {
+       "ingredients": [
+        {
+         "id": "Histamine",
+         "tier": "cross-botany",
+         "weight": 2,
+         "reason": "Requires Botany: nettle (plant)"
+        }
+       ],
+       "reactionDepth": 0,
+       "crossDepartmentPenalty": 2,
+       "temperatureConstraintPenalty": 0,
+       "unobtainablePenalty": 0
+      },
+      "authoredTier": "expert",
+      "mismatch": true,
+      "mismatchReason": "cross-department ingredient(s)"
+     },
      "rucm": {
       "tier": "easy",
       "effortScore": 4,
@@ -126216,6 +126700,33 @@
         }
        ],
        "reactionDepth": 0,
+       "crossDepartmentPenalty": 0,
+       "temperatureConstraintPenalty": 0,
+       "unobtainablePenalty": 10
+      },
+      "authoredTier": "easy",
+      "mismatch": true,
+      "mismatchReason": "unobtainable ingredient present"
+     },
+     "cmu": {
+      "tier": "impossible",
+      "effortScore": 1011,
+      "breakdown": {
+       "ingredients": [
+        {
+         "id": "ChloralHydrate",
+         "tier": "self-chem",
+         "weight": 1,
+         "reason": "Chemistry reaction from dispenser base"
+        },
+        {
+         "id": "Nocturine",
+         "tier": "unobtainable",
+         "weight": 999,
+         "reason": "No recipe, no plant, no dispenser source"
+        }
+       ],
+       "reactionDepth": 1,
        "crossDepartmentPenalty": 0,
        "temperatureConstraintPenalty": 0,
        "unobtainablePenalty": 10
@@ -126753,6 +127264,39 @@
       "mismatchReason": ""
      },
      "rmc14": {
+      "tier": "trivial",
+      "effortScore": 0,
+      "breakdown": {
+       "ingredients": [
+        {
+         "id": "Aluminium",
+         "tier": "dispenser",
+         "weight": 0,
+         "reason": "Chemical Dispenser"
+        },
+        {
+         "id": "Potassium",
+         "tier": "dispenser",
+         "weight": 0,
+         "reason": "Chemical Dispenser"
+        },
+        {
+         "id": "Sulfur",
+         "tier": "dispenser",
+         "weight": 0,
+         "reason": "Chemical Dispenser"
+        }
+       ],
+       "reactionDepth": 0,
+       "crossDepartmentPenalty": 0,
+       "temperatureConstraintPenalty": 0,
+       "unobtainablePenalty": 0
+      },
+      "authoredTier": "easy",
+      "mismatch": true,
+      "mismatchReason": ""
+     },
+     "cmu": {
       "tier": "trivial",
       "effortScore": 0,
       "breakdown": {
@@ -127401,6 +127945,27 @@
       "mismatch": false,
       "mismatchReason": ""
      },
+     "cmu": {
+      "tier": "hard",
+      "effortScore": 10,
+      "breakdown": {
+       "ingredients": [
+        {
+         "id": "ChlorineTrifluoride",
+         "tier": "cross-botany",
+         "weight": 2,
+         "reason": "Requires Botany: lemonade (plant)"
+        }
+       ],
+       "reactionDepth": 1,
+       "crossDepartmentPenalty": 2,
+       "temperatureConstraintPenalty": 5,
+       "unobtainablePenalty": 0
+      },
+      "authoredTier": "hard",
+      "mismatch": false,
+      "mismatchReason": ""
+     },
      "rucm": {
       "tier": "hard",
       "effortScore": 10,
@@ -127852,6 +128417,45 @@
       "mismatchReason": ""
      },
      "rmc14": {
+      "tier": "easy",
+      "effortScore": 2,
+      "breakdown": {
+       "ingredients": [
+        {
+         "id": "Phosphorus",
+         "tier": "dispenser",
+         "weight": 0,
+         "reason": "Chemical Dispenser"
+        },
+        {
+         "id": "Potassium",
+         "tier": "dispenser",
+         "weight": 0,
+         "reason": "Chemical Dispenser"
+        },
+        {
+         "id": "Sugar",
+         "tier": "dispenser",
+         "weight": 0,
+         "reason": "Chemical Dispenser"
+        },
+        {
+         "id": "UnstableMutagen",
+         "tier": "self-chem",
+         "weight": 1,
+         "reason": "Chemistry reaction from dispenser base"
+        }
+       ],
+       "reactionDepth": 1,
+       "crossDepartmentPenalty": 0,
+       "temperatureConstraintPenalty": 0,
+       "unobtainablePenalty": 0
+      },
+      "authoredTier": "medium",
+      "mismatch": true,
+      "mismatchReason": ""
+     },
+     "cmu": {
       "tier": "easy",
       "effortScore": 2,
       "breakdown": {
@@ -128602,6 +129206,27 @@
       "mismatch": false,
       "mismatchReason": ""
      },
+     "cmu": {
+      "tier": "hard",
+      "effortScore": 10,
+      "breakdown": {
+       "ingredients": [
+        {
+         "id": "ChlorineTrifluoride",
+         "tier": "cross-botany",
+         "weight": 2,
+         "reason": "Requires Botany: lemonade (plant)"
+        }
+       ],
+       "reactionDepth": 1,
+       "crossDepartmentPenalty": 2,
+       "temperatureConstraintPenalty": 5,
+       "unobtainablePenalty": 0
+      },
+      "authoredTier": "hard",
+      "mismatch": false,
+      "mismatchReason": ""
+     },
      "rucm": {
       "tier": "hard",
       "effortScore": 10,
@@ -129047,6 +129672,33 @@
       "authoredTier": "medium",
       "mismatch": true,
       "mismatchReason": "cross-department ingredient(s); temperature-constrained reaction; deep reaction chain (depth 3)"
+     },
+     "cmu": {
+      "tier": "hard",
+      "effortScore": 12,
+      "breakdown": {
+       "ingredients": [
+        {
+         "id": "MuteToxin",
+         "tier": "cross-botany",
+         "weight": 2,
+         "reason": "Requires Botany: mimana (plant)"
+        },
+        {
+         "id": "Lexorin",
+         "tier": "unknown",
+         "weight": 5,
+         "reason": "Recipe exists but a deep-chain ingredient is unresolved by extractor (likely plant-mutation, mob-drop, or cooking product)"
+        }
+       ],
+       "reactionDepth": 3,
+       "crossDepartmentPenalty": 2,
+       "temperatureConstraintPenalty": 0,
+       "unobtainablePenalty": 0
+      },
+      "authoredTier": "medium",
+      "mismatch": true,
+      "mismatchReason": "cross-department ingredient(s); deep reaction chain (depth 3)"
      },
      "rucm": {
       "tier": "hard",
@@ -129566,6 +130218,27 @@
       "mismatch": true,
       "mismatchReason": "unobtainable ingredient present"
      },
+     "cmu": {
+      "tier": "impossible",
+      "effortScore": 1009,
+      "breakdown": {
+       "ingredients": [
+        {
+         "id": "Romerol",
+         "tier": "unobtainable",
+         "weight": 999,
+         "reason": "No recipe, no plant, no dispenser source"
+        }
+       ],
+       "reactionDepth": 0,
+       "crossDepartmentPenalty": 0,
+       "temperatureConstraintPenalty": 0,
+       "unobtainablePenalty": 10
+      },
+      "authoredTier": "hard",
+      "mismatch": true,
+      "mismatchReason": "unobtainable ingredient present"
+     },
      "rucm": {
       "tier": "impossible",
       "effortScore": 1009,
@@ -129988,6 +130661,27 @@
       "mismatch": true,
       "mismatchReason": "unobtainable ingredient present"
      },
+     "cmu": {
+      "tier": "impossible",
+      "effortScore": 1009,
+      "breakdown": {
+       "ingredients": [
+        {
+         "id": "Hemorrhinol",
+         "tier": "unobtainable",
+         "weight": 999,
+         "reason": "No recipe, no plant, no dispenser source"
+        }
+       ],
+       "reactionDepth": 0,
+       "crossDepartmentPenalty": 0,
+       "temperatureConstraintPenalty": 0,
+       "unobtainablePenalty": 10
+      },
+      "authoredTier": "medium",
+      "mismatch": true,
+      "mismatchReason": "unobtainable ingredient present"
+     },
      "rucm": {
       "tier": "impossible",
       "effortScore": 1009,
@@ -130389,6 +131083,27 @@
       "mismatchReason": ""
      },
      "rmc14": {
+      "tier": "medium",
+      "effortScore": 7,
+      "breakdown": {
+       "ingredients": [
+        {
+         "id": "Tazinide",
+         "tier": "unknown",
+         "weight": 5,
+         "reason": "Recipe exists but a deep-chain ingredient is unresolved by extractor (likely plant-mutation, mob-drop, or cooking product)"
+        }
+       ],
+       "reactionDepth": 2,
+       "crossDepartmentPenalty": 0,
+       "temperatureConstraintPenalty": 0,
+       "unobtainablePenalty": 0
+      },
+      "authoredTier": "expert",
+      "mismatch": true,
+      "mismatchReason": ""
+     },
+     "cmu": {
       "tier": "medium",
       "effortScore": 7,
       "breakdown": {
@@ -130843,6 +131558,39 @@
       "mismatchReason": "cross-department ingredient(s); temperature-constrained reaction; deep reaction chain (depth 4)"
      },
      "rmc14": {
+      "tier": "impossible",
+      "effortScore": 1015,
+      "breakdown": {
+       "ingredients": [
+        {
+         "id": "Stimulants",
+         "tier": "unobtainable",
+         "weight": 999,
+         "reason": "No recipe, no plant, no dispenser source"
+        },
+        {
+         "id": "Dexalin",
+         "tier": "cross-botany",
+         "weight": 2,
+         "reason": "Requires Botany: Mango (plant)"
+        },
+        {
+         "id": "Tricordrazine",
+         "tier": "cross-botany",
+         "weight": 2,
+         "reason": "Requires Botany: ambrosia nobilis (plant)"
+        }
+       ],
+       "reactionDepth": 0,
+       "crossDepartmentPenalty": 2,
+       "temperatureConstraintPenalty": 0,
+       "unobtainablePenalty": 10
+      },
+      "authoredTier": "medium",
+      "mismatch": true,
+      "mismatchReason": "unobtainable ingredient present; cross-department ingredient(s)"
+     },
+     "cmu": {
       "tier": "impossible",
       "effortScore": 1015,
       "breakdown": {
@@ -131517,6 +132265,45 @@
       "mismatchReason": "unobtainable ingredient present"
      },
      "rmc14": {
+      "tier": "impossible",
+      "effortScore": 1009,
+      "breakdown": {
+       "ingredients": [
+        {
+         "id": "Phosphorus",
+         "tier": "dispenser",
+         "weight": 0,
+         "reason": "Chemical Dispenser"
+        },
+        {
+         "id": "Potassium",
+         "tier": "dispenser",
+         "weight": 0,
+         "reason": "Chemical Dispenser"
+        },
+        {
+         "id": "Sugar",
+         "tier": "dispenser",
+         "weight": 0,
+         "reason": "Chemical Dispenser"
+        },
+        {
+         "id": "TearGas",
+         "tier": "unobtainable",
+         "weight": 999,
+         "reason": "No recipe, no plant, no dispenser source"
+        }
+       ],
+       "reactionDepth": 0,
+       "crossDepartmentPenalty": 0,
+       "temperatureConstraintPenalty": 0,
+       "unobtainablePenalty": 10
+      },
+      "authoredTier": "medium",
+      "mismatch": true,
+      "mismatchReason": "unobtainable ingredient present"
+     },
+     "cmu": {
       "tier": "impossible",
       "effortScore": 1009,
       "breakdown": {
@@ -132287,6 +133074,33 @@
       "mismatch": true,
       "mismatchReason": "unobtainable ingredient present; cross-department ingredient(s)"
      },
+     "cmu": {
+      "tier": "impossible",
+      "effortScore": 1013,
+      "breakdown": {
+       "ingredients": [
+        {
+         "id": "Happiness",
+         "tier": "cross-botany",
+         "weight": 2,
+         "reason": "Requires Botany: rainbow cannabis (plant)"
+        },
+        {
+         "id": "Honk",
+         "tier": "unobtainable",
+         "weight": 999,
+         "reason": "No recipe, no plant, no dispenser source"
+        }
+       ],
+       "reactionDepth": 0,
+       "crossDepartmentPenalty": 2,
+       "temperatureConstraintPenalty": 0,
+       "unobtainablePenalty": 10
+      },
+      "authoredTier": "easy",
+      "mismatch": true,
+      "mismatchReason": "unobtainable ingredient present; cross-department ingredient(s)"
+     },
      "rucm": {
       "tier": "impossible",
       "effortScore": 1013,
@@ -132800,6 +133614,33 @@
       "mismatchReason": "cross-department ingredient(s); deep reaction chain (depth 5)"
      },
      "rmc14": {
+      "tier": "impossible",
+      "effortScore": 2008,
+      "breakdown": {
+       "ingredients": [
+        {
+         "id": "Felinase",
+         "tier": "unobtainable",
+         "weight": 999,
+         "reason": "No recipe, no plant, no dispenser source"
+        },
+        {
+         "id": "Caninase",
+         "tier": "unobtainable",
+         "weight": 999,
+         "reason": "No recipe, no plant, no dispenser source"
+        }
+       ],
+       "reactionDepth": 0,
+       "crossDepartmentPenalty": 0,
+       "temperatureConstraintPenalty": 0,
+       "unobtainablePenalty": 10
+      },
+      "authoredTier": "expert",
+      "mismatch": true,
+      "mismatchReason": "unobtainable ingredient present"
+     },
+     "cmu": {
       "tier": "impossible",
       "effortScore": 2008,
       "breakdown": {
@@ -133347,6 +134188,27 @@
       "mismatch": true,
       "mismatchReason": "cross-department ingredient(s)"
      },
+     "cmu": {
+      "tier": "medium",
+      "effortScore": 5,
+      "breakdown": {
+       "ingredients": [
+        {
+         "id": "Thermite",
+         "tier": "cross-botany",
+         "weight": 2,
+         "reason": "Requires Botany: ghost pepper (plant)"
+        }
+       ],
+       "reactionDepth": 1,
+       "crossDepartmentPenalty": 2,
+       "temperatureConstraintPenalty": 0,
+       "unobtainablePenalty": 0
+      },
+      "authoredTier": "easy",
+      "mismatch": true,
+      "mismatchReason": "cross-department ingredient(s)"
+     },
      "rucm": {
       "tier": "medium",
       "effortScore": 5,
@@ -133772,6 +134634,27 @@
       "authoredTier": "easy",
       "mismatch": true,
       "mismatchReason": "unobtainable ingredient present"
+     },
+     "cmu": {
+      "tier": "medium",
+      "effortScore": 6,
+      "breakdown": {
+       "ingredients": [
+        {
+         "id": "AU14DrugSpeedDemon",
+         "tier": "antag-only",
+         "weight": 4,
+         "reason": "Antag-only: Antag drug dealer bottle, 5x15u pills (RuCM)"
+        }
+       ],
+       "reactionDepth": 0,
+       "crossDepartmentPenalty": 2,
+       "temperatureConstraintPenalty": 0,
+       "unobtainablePenalty": 0
+      },
+      "authoredTier": "easy",
+      "mismatch": true,
+      "mismatchReason": "cross-department ingredient(s)"
      },
      "rucm": {
       "tier": "medium",

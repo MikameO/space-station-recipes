@@ -286,19 +286,88 @@ FORK_REGISTRY = {
         "vanilla_override_reaction_files": VANILLA_REACTION_PATHS,
     },
 
-    # ── Russian Marine Corps / RuCM (RU, forks from RMC-14) ──
-    # Must stay right AFTER "rmc14": the repo carries its own copies of the
-    # _RMC14 layer with local additions (XenoAlch toxins, CMU medicine
-    # reactions) mixed into parent files. First-wins merge skips the
-    # identical-ID copies, so only RuCM's new content survives — but only if
-    # rmc14 is registered first. RuCM-exclusive content lives in _CMU14/_AU14.
+    # ── Colonial Marines Universe / CMU ──
+    # AU-14/ColonialMarinesUniverse — the upstream origin of the _CMU14/_AU14
+    # content that RuCM (below) mirrors. Registered as its own fork: parent_fork
+    # "rmc14" supplies the CM base chem system, and CMU's own _CMU14 layer adds
+    # drugs/toxins plus Yautja (Predator) and Abomination (Aliens) reagents.
+    # Like RuCM, CMU carries its own copies of the _RMC14 layer files; first-wins
+    # merge dedups identical IDs against the rmc14 parent so only CMU's additions
+    # survive, and parent_override_* auto-diffs CMU's copy of the _RMC14 layer to
+    # annotate recipes/reagents CMU changed or removed. Must be registered AFTER
+    # "rmc14" so the parent builds first.
+    "cmu": {
+        "name": "Colonial Marines Universe",
+        "repo": "AU-14/ColonialMarinesUniverse",
+        "branch": "master",
+        "custom_dir": "_CMU14",
+        "color": "#7c3aed",
+        "parent_fork": "rmc14",
+        # Same vanilla-category replacement as parent RMC14 (CM chem system)
+        "blocked_categories": {"Medicine", "Narcotics", "Cleaning", "Fun", "Chemicals", "Botany"},
+        "reagent_files": [
+            # CMU's copy of the parent-layer toxins — carries CM/XenoAlch toxin
+            # additions; first-wins dedups the identical-ID copies vs rmc14.
+            "Resources/Prototypes/_RMC14/Reagents/toxins.yml",
+            # CMU-exclusive _CMU14 reagents
+            "Resources/Prototypes/_CMU14/Economy/Recipes/Reagents/drugs.yml",
+            "Resources/Prototypes/_CMU14/Economy/Recipes/Reagents/toxins.yml",
+            "Resources/Prototypes/_CMU14/Threats/Abominations/reagents.yml",
+            "Resources/Prototypes/_CMU14/Threats/Yautja/Species/reagents.yml",
+        ],
+        "reaction_files": [
+            # CMU's copy of the parent-layer medicine reactions — new CM reactions
+            # mixed in; first-wins dedups vs rmc14.
+            "Resources/Prototypes/_RMC14/Recipes/Reactions/medicine.yml",
+            "Resources/Prototypes/_CMU14/Economy/Recipes/Reactions/other.yml",
+            "Resources/Prototypes/_CMU14/Economy/Recipes/Reactions/pyrotechnic.yml",
+        ],
+        "locale_files": [
+            "Resources/Locale/en-US/_AU14/drugs.ftl",
+            "Resources/Locale/en-US/_AU14/medicine.ftl",
+            "Resources/Locale/en-US/_CMU14/yautja/yautja.ftl",
+            "Resources/Locale/en-US/_CMU14/reagents/properties.ftl",
+        ],
+        "dispenser_chemicals": set(),  # CM dispenser chems already global via rmc14
+        "vanilla_override_reaction_files": VANILLA_REACTION_PATHS,
+        # Auto-diff CMU's copies of the _RMC14 parent layer against the rmc14
+        # build to annotate parent recipes/reagents CMU changed or removed.
+        "parent_override_reaction_files": [
+            "Resources/Prototypes/_RMC14/Recipes/Reactions/chemicals.yml",
+            "Resources/Prototypes/_RMC14/Recipes/Reactions/elements.yml",
+            "Resources/Prototypes/_RMC14/Recipes/Reactions/ingredients.yml",
+            "Resources/Prototypes/_RMC14/Recipes/Reactions/medicine.yml",
+            "Resources/Prototypes/_RMC14/Recipes/Reactions/narcotics.yml",
+            "Resources/Prototypes/_RMC14/Recipes/Reactions/other.yml",
+            "Resources/Prototypes/_RMC14/Recipes/Reactions/pyrotechnic.yml",
+            "Resources/Prototypes/_RMC14/Recipes/Reactions/toxins.yml",
+        ],
+        "parent_override_reagent_files": [
+            "Resources/Prototypes/_RMC14/Reagents/base_reagent.yml",
+            "Resources/Prototypes/_RMC14/Reagents/elements.yml",
+            "Resources/Prototypes/_RMC14/Reagents/medicine.yml",
+            "Resources/Prototypes/_RMC14/Reagents/narcotics.yml",
+            "Resources/Prototypes/_RMC14/Reagents/other.yml",
+            "Resources/Prototypes/_RMC14/Reagents/pyrotechnic.yml",
+            "Resources/Prototypes/_RMC14/Reagents/synth_blood.yml",
+            "Resources/Prototypes/_RMC14/Reagents/toxins.yml",
+        ],
+    },
+
+    # ── Russian Marine Corps / RuCM (RU, downstream fork of CMU) ──
+    # parent_fork "cmu": RussianCM forks from ColonialMarinesUniverse, so it
+    # inherits CMU's _CMU14/_AU14 layer (and rmc14 beneath it) via ancestry and
+    # adds RU translations plus a few local tweaks. Must be registered AFTER cmu
+    # so the parent builds first; first-wins then credits the shared _CMU14/_AU14
+    # IDs to CMU while RuCM still shows them through inheritance. parent_override_*
+    # diffs RuCM's copies of the _RMC14 layer against the parent build.
     "rucm": {
         "name": "Russian Marine Corps",
         "repo": "flex5hybrid/RussianCM",
         "branch": "master",
         "custom_dir": "_CMU14",
         "color": "#9f1239",
-        "parent_fork": "rmc14",
+        "parent_fork": "cmu",
         # Same vanilla-category replacement as parent RMC14 (CM chem system)
         "blocked_categories": {"Medicine", "Narcotics", "Cleaning", "Fun", "Chemicals", "Botany"},
         "reagent_files": [
