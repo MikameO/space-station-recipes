@@ -312,6 +312,12 @@ FORK_REGISTRY = {
             # CMU-exclusive _CMU14 reagents
             "Resources/Prototypes/_CMU14/Economy/Recipes/Reagents/drugs.yml",
             "Resources/Prototypes/_CMU14/Economy/Recipes/Reagents/toxins.yml",
+            "Resources/Prototypes/_CMU14/Economy/Recipes/Reagents/properties.yml",
+            # Medical reagents (painkillers incl. CMUSleen, organ-repair) were
+            # missing from the manifest, so CMUSleen showed a reaction but no
+            # reagent and was invisible. Correct path is Treatment/Reagents.
+            "Resources/Prototypes/_CMU14/Medical/Treatment/Reagents/painkillers.yml",
+            "Resources/Prototypes/_CMU14/Medical/Treatment/Reagents/organ_repair.yml",
             "Resources/Prototypes/_CMU14/Threats/Abominations/reagents.yml",
             "Resources/Prototypes/_CMU14/Threats/Yautja/Species/reagents.yml",
         ],

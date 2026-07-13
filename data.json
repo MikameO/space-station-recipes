@@ -1,7 +1,7 @@
 {
  "meta": {
   "schemaVersion": "3.9.0",
-  "generated": "2026-07-13T20:06:00",
+  "generated": "2026-07-13T20:16:53",
   "forks": {
    "vanilla": {
     "name": "Vanilla SS14",
@@ -18,16 +18,8 @@
    "cmu": {
     "name": "Colonial Marines Universe",
     "color": "#7c3aed",
-    "reagentCount": 11,
+    "reagentCount": 22,
     "parent": "rmc14",
-    "totalConversion": true,
-    "renamedReagents": 20
-   },
-   "rucm": {
-    "name": "Russian Marine Corps",
-    "color": "#9f1239",
-    "reagentCount": 9,
-    "parent": "cmu",
     "totalConversion": true,
     "renamedReagents": 20
    },
@@ -17800,7 +17792,7 @@
    "name": "Biogenic Matrix",
    "group": "Medicine",
    "category": "Medicine",
-   "source": "rucm",
+   "source": "cmu",
    "color": "#b06f73",
    "desc": "A sterile protein-lattice slurry used by limb printers to grow graft-ready replacement limbs.",
    "physicalDesc": "viscous",
@@ -17926,7 +17918,7 @@
    "name": "Cardiocaine",
    "group": "Medicine",
    "category": "Medicine",
-   "source": "rucm",
+   "source": "cmu",
    "color": "#c02020",
    "desc": "A cardiac-targeting compound; attempts to restart a stopped heart.",
    "physicalDesc": "acrid",
@@ -17987,7 +17979,7 @@
    "name": "Hepatocytin",
    "group": "Medicine",
    "category": "Medicine",
-   "source": "rucm",
+   "source": "cmu",
    "color": "#a87830",
    "desc": "A regenerative compound for liver tissue repair.",
    "physicalDesc": "thick and grainy",
@@ -18047,7 +18039,7 @@
    "name": "Nephronate",
    "group": "Medicine",
    "category": "Medicine",
-   "source": "rucm",
+   "source": "cmu",
    "color": "#a0e070",
    "desc": "A renal-targeting compound for kidney tissue repair.",
    "physicalDesc": "tangy",
@@ -18107,7 +18099,7 @@
    "name": "Osteocalc",
    "group": "Medicine",
    "category": "Medicine",
-   "source": "rucm",
+   "source": "cmu",
    "color": "#e0e0c0",
    "desc": "A calcium-rich slurry that accelerates bone integrity regeneration.",
    "physicalDesc": "crystalline",
@@ -18167,15 +18159,16 @@
    "name": "Oxycodone",
    "group": "Medicine",
    "category": "Medicine",
-   "source": "rucm",
+   "source": "cmu",
    "color": "#d09060",
    "desc": "A heavy opioid for severe pain. Can fully mask pain shock while it lasts.",
    "physicalDesc": "oily",
    "flavor": "medicine",
    "isBase": false,
    "isDispenser": false,
-   "effects": "[Medicine] Effect: CMUApplyPainSuppressionEffect; [Medicine] Deals Poison 0.2; [Medicine] Deals Poison 2 (if self > 20u); [Medicine] Drunk (if self > 20u)",
+   "effects": "[Medicine] Effect: CMUApplyPainSuppressionEffect; [Medicine] Status: ModifyStatusEffect (if self > 20u); [Medicine] Deals Poison 4 (if self > 20u); [Medicine] Deals Asphyxiation 3 (if self > 30u); [Medicine] Drunk (if self > 20u)",
    "effectTags": [
+    "deals:asphyxiation",
     "deals:poison",
     "drunk"
    ],
@@ -18183,7 +18176,7 @@
     "Medicine"
    ],
    "overdose": 20,
-   "criticalOverdose": null,
+   "criticalOverdose": 30,
    "recipe": {
     "reactants": {
      "CMUTramadol": {
@@ -18216,34 +18209,38 @@
    },
    "verifiedMechanics": [
     "[Medicine] Effect: CMUApplyPainSuppressionEffect",
-    "[Medicine] Deals Poison 0.2",
-    "[Medicine] Deals Poison 2 (if self > 20u)",
+    "[Medicine] Status: ModifyStatusEffect (if self > 20u)",
+    "[Medicine] Deals Poison 4 (if self > 20u)",
+    "[Medicine] Deals Asphyxiation 3 (if self > 30u)",
     "[Medicine] Drunk (if self > 20u)"
    ],
    "boilingPoint": null,
    "meltingPoint": null,
    "metabolismRate": 0.1,
-   "antagScore": 2
+   "antagScore": 5
   },
   "CMUParacetamol": {
    "id": "CMUParacetamol",
    "name": "Paracetamol",
    "group": "Medicine",
    "category": "Medicine",
-   "source": "rucm",
+   "source": "cmu",
    "color": "#ffffff",
    "desc": "A mild pain reliever. Suppresses pain accumulation, masks one pain tier, and helps excess pain fade.",
    "physicalDesc": "fizzy",
    "flavor": "bitter",
    "isBase": false,
    "isDispenser": false,
-   "effects": "[Medicine] Effect: CMUApplyPainSuppressionEffect",
-   "effectTags": [],
+   "effects": "[Medicine] Effect: CMUApplyPainSuppressionEffect; [Medicine] Status: ModifyStatusEffect (if self > 60u); [Medicine] Deals Poison 2 (if self > 60u); [Medicine] Deals Asphyxiation 3 (if self > 100u)",
+   "effectTags": [
+    "deals:asphyxiation",
+    "deals:poison"
+   ],
    "metabolismPaths": [
     "Medicine"
    ],
-   "overdose": null,
-   "criticalOverdose": null,
+   "overdose": 60,
+   "criticalOverdose": 100,
    "recipe": {
     "reactants": {
      "CMInaprovaline": {
@@ -18275,18 +18272,22 @@
     "reason": "Chemistry reaction from dispenser base"
    },
    "verifiedMechanics": [
-    "[Medicine] Effect: CMUApplyPainSuppressionEffect"
+    "[Medicine] Effect: CMUApplyPainSuppressionEffect",
+    "[Medicine] Status: ModifyStatusEffect (if self > 60u)",
+    "[Medicine] Deals Poison 2 (if self > 60u)",
+    "[Medicine] Deals Asphyxiation 3 (if self > 100u)"
    ],
    "boilingPoint": null,
    "meltingPoint": null,
-   "metabolismRate": 0.1
+   "metabolismRate": 0.05,
+   "antagScore": 5
   },
   "CMUPulmovine": {
    "id": "CMUPulmovine",
    "name": "Pulmovine",
    "group": "Medicine",
    "category": "Medicine",
-   "source": "rucm",
+   "source": "cmu",
    "color": "#80c0ff",
    "desc": "An aerosolized agent for lung tissue repair.",
    "physicalDesc": "fizzy",
@@ -18341,20 +18342,157 @@
    "metabolismRate": 0.1,
    "antagScore": 2
   },
+  "CMUSleen": {
+   "id": "CMUSleen",
+   "name": "CMU Sleen",
+   "group": "Medicine",
+   "category": "Medicine",
+   "source": "cmu",
+   "color": "#c392d4",
+   "desc": "",
+   "physicalDesc": "oily",
+   "flavor": "medicine",
+   "isBase": false,
+   "isDispenser": false,
+   "effects": "[Medicine] Effect: CMUApplyPainSuppressionEffect; [Medicine] Status: ModifyStatusEffect (if self > 20u); [Medicine] Deals Poison 3 (if self > 20u); [Medicine] Deals Asphyxiation 3 (if self > 30u)",
+   "effectTags": [
+    "deals:asphyxiation",
+    "deals:poison"
+   ],
+   "metabolismPaths": [
+    "Medicine"
+   ],
+   "overdose": 20,
+   "criticalOverdose": 30,
+   "recipe": {
+    "reactants": {
+     "CMUOxycodone": {
+      "amount": 1,
+      "catalyst": false
+     },
+     "CMUTramadol": {
+      "amount": 1,
+      "catalyst": false
+     },
+     "RMCEthanol": {
+      "amount": 1,
+      "catalyst": false
+     },
+     "CMInaprovaline": {
+      "amount": 1,
+      "catalyst": false
+     }
+    },
+    "products": {
+     "CMUSleen": 4
+    },
+    "minTemp": null,
+    "maxTemp": null,
+    "mixer": []
+   },
+   "obtainSources": [
+    "Chemistry reaction"
+   ],
+   "accessibility": {
+    "tier": "self-chem",
+    "weight": 1,
+    "reason": "Chemistry reaction from dispenser base"
+   },
+   "verifiedMechanics": [
+    "[Medicine] Effect: CMUApplyPainSuppressionEffect",
+    "[Medicine] Status: ModifyStatusEffect (if self > 20u)",
+    "[Medicine] Deals Poison 3 (if self > 20u)",
+    "[Medicine] Deals Asphyxiation 3 (if self > 30u)"
+   ],
+   "boilingPoint": null,
+   "meltingPoint": null,
+   "metabolismRate": 0.2,
+   "antagScore": 5
+  },
+  "CMUSoporific": {
+   "id": "CMUSoporific",
+   "name": "CMU Soporific",
+   "group": "Medicine",
+   "category": "Medicine",
+   "source": "cmu",
+   "color": "#87a7d8",
+   "desc": "",
+   "physicalDesc": "nondescript",
+   "flavor": "bitter",
+   "isBase": false,
+   "isDispenser": false,
+   "effects": "[Medicine] Effect: CMUApplyPainSuppressionEffect; [Medicine] Status: ModifyStatusEffect; [Medicine] Status: ModifyStatusEffect (if self > 8u); [Medicine] Status: ModifyStatusEffect (if self > 30u); [Medicine] Deals Poison 5 (if self > 30u); [Medicine] Deals Asphyxiation 3 (if self > 50u)",
+   "effectTags": [
+    "deals:asphyxiation",
+    "deals:poison"
+   ],
+   "metabolismPaths": [
+    "Medicine"
+   ],
+   "overdose": 30,
+   "criticalOverdose": 50,
+   "recipe": {
+    "reactants": {
+     "RMCChloralhydrate": {
+      "amount": 1,
+      "catalyst": false
+     },
+     "RMCChlorine": {
+      "amount": 1,
+      "catalyst": false
+     },
+     "RMCEthanol": {
+      "amount": 1,
+      "catalyst": false
+     },
+     "RMCSugar": {
+      "amount": 1,
+      "catalyst": false
+     }
+    },
+    "products": {
+     "CMUSoporific": 4
+    },
+    "minTemp": null,
+    "maxTemp": null,
+    "mixer": []
+   },
+   "obtainSources": [
+    "Chemistry reaction"
+   ],
+   "accessibility": {
+    "tier": "unknown",
+    "weight": 5,
+    "reason": "Recipe exists but a deep-chain ingredient is unresolved by extractor (likely plant-mutation, mob-drop, or cooking product)"
+   },
+   "verifiedMechanics": [
+    "[Medicine] Effect: CMUApplyPainSuppressionEffect",
+    "[Medicine] Status: ModifyStatusEffect",
+    "[Medicine] Status: ModifyStatusEffect (if self > 8u)",
+    "[Medicine] Status: ModifyStatusEffect (if self > 30u)",
+    "[Medicine] Deals Poison 5 (if self > 30u)",
+    "[Medicine] Deals Asphyxiation 3 (if self > 50u)"
+   ],
+   "boilingPoint": null,
+   "meltingPoint": null,
+   "metabolismRate": 0.1,
+   "antagScore": 5
+  },
   "CMUTramadol": {
    "id": "CMUTramadol",
    "name": "Tramadol",
    "group": "Medicine",
    "category": "Medicine",
-   "source": "rucm",
+   "source": "cmu",
    "color": "#e0c0a0",
    "desc": "A moderate opioid pain reliever. Strongly masks pain and helps excess pain fade.",
    "physicalDesc": "acrid",
    "flavor": "medicine",
    "isBase": false,
    "isDispenser": false,
-   "effects": "[Medicine] Effect: CMUApplyPainSuppressionEffect; [Medicine] Deals Poison 1 (if self > 30u); [Medicine] Drunk (if self > 30u)",
+   "effects": "[Medicine] Effect: CMUApplyPainSuppressionEffect; [Medicine] Status: ModifyStatusEffect (if self > 30u); [Medicine] Deals Poison 2.5 (if self > 30u); [Medicine] Deals Asphyxiation 3 (if self > 50u); [Medicine] Drunk (if self > 30u)",
    "effectTags": [
+    "deals:asphyxiation",
     "deals:poison",
     "drunk"
    ],
@@ -18362,7 +18500,7 @@
     "Medicine"
    ],
    "overdose": 30,
-   "criticalOverdose": null,
+   "criticalOverdose": 50,
    "recipe": {
     "reactants": {
      "CMUParacetamol": {
@@ -18395,13 +18533,15 @@
    },
    "verifiedMechanics": [
     "[Medicine] Effect: CMUApplyPainSuppressionEffect",
-    "[Medicine] Deals Poison 1 (if self > 30u)",
+    "[Medicine] Status: ModifyStatusEffect (if self > 30u)",
+    "[Medicine] Deals Poison 2.5 (if self > 30u)",
+    "[Medicine] Deals Asphyxiation 3 (if self > 50u)",
     "[Medicine] Drunk (if self > 30u)"
    ],
    "boilingPoint": null,
    "meltingPoint": null,
-   "metabolismRate": 0.1,
-   "antagScore": 2
+   "metabolismRate": 0.05,
+   "antagScore": 5
   },
   "CMUYautjaBlood": {
    "id": "CMUYautjaBlood",
