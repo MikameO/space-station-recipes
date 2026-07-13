@@ -1827,3 +1827,11 @@ REACTION_COLUMNS = [
     "Mixer Required", "Effects", "Priority", "Impact",
     "Full Craft Chain", "Source",
 ]
+
+# ── Maps tab (ss14_map_extractor.py) ──
+# gameMap ids to hide even though they pass MIN_MAP_ITEMS: admin/debug maps
+# that are full stations but not player-spawnable. (Junk/empty maps are dropped
+# data-drivenly by MIN_MAP_ITEMS, so this is only the semantic exceptions.)
+MAP_BLOCKLIST: dict[str, list[str]] = {
+    "vanilla": ["CentComm", "Dev"],   # central command + debug map
+}

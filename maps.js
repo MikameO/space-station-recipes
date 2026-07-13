@@ -188,9 +188,10 @@
     const el = document.getElementById('mapsLocations');
     if (!pid) { el.innerHTML = '<p class="maps-hint">Pick an item to see where it lives.</p>'; return; }
     const rec = S.mapData.items[pid];
+    const V = S.mapData.vias || [];   // schema v2: p[3] is an index into the vias table
     const groups = new Map();   // key -> [...positions]
     for (const p of rec.p) {
-      const key = p[2] === 3 ? '☄ ' + (p[3] || 'off-grid') : nearestBeacon(p[0], p[1]);
+      const key = p[2] === 3 ? '☄ ' + (V[p[3]] || 'off-grid') : nearestBeacon(p[0], p[1]);
       if (!groups.has(key)) groups.set(key, []);
       groups.get(key).push(p);
     }
@@ -199,8 +200,8 @@
       const bits = ps.map(p => {
         const badge = `<i class="maps-dot" style="background:${KIND_COLOR[p[2]] || '#8a99b3'}"></i>`;
         if (p[2] === 0) return badge + ' ' + KIND_LABEL[0];
-        if (p[2] === 1) return badge + ` in ${p[3]}` + (p[4] ? (p[4] < 1 ? ` (~${Math.round(p[4] * 100)}%)` : ` ×${p[4]}`) : '');
-        if (p[2] === 2 || p[2] === 4) return badge + ` ${KIND_LABEL[p[2]]} ${p[3]}` + (p[4] ? ` ×${p[4]}` : '');
+        if (p[2] === 1) return badge + ` in ${V[p[3]]}` + (p[4] ? (p[4] < 1 ? ` (~${Math.round(p[4] * 100)}%)` : ` ×${p[4]}`) : '');
+        if (p[2] === 2 || p[2] === 4) return badge + ` ${KIND_LABEL[p[2]]} ${V[p[3]]}` + (p[4] ? ` ×${p[4]}` : '');
         return badge + ' ' + label;
       });
       return `<button class="maps-loc" data-gi="${gi}"><b>${label}</b><span>${ps.length}</span><small>${[...new Set(bits)].join(' · ')}</small></button>`;

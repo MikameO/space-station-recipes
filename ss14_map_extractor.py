@@ -14,12 +14,12 @@ from pathlib import Path
 
 import yaml
 
-from config import FORK_REGISTRY  # same registry the chem extractor uses
+from config import FORK_REGISTRY, MAP_BLOCKLIST  # shared registry + maps blocklist
 
 SCRIPT_DIR = Path(__file__).resolve().parent   # anchor like the sibling does
 CACHE_DIR = SCRIPT_DIR / "cache_maps"
 OUT_DIR = SCRIPT_DIR / "maps"
-SCHEMA_VERSION = 1
+SCHEMA_VERSION = 2   # v2: per-map `vias` string table, p[3] is an index not a string
 # Data-driven junk filter: a real playable station has hundreds of searchable
 # items; deathmatch/arena/test maps have <100. Cleaner than a per-fork blocklist
 # and auto-handles all 18 forks. (E3 vanilla: drops Empty=0, MeteorArena=0,
@@ -178,7 +178,7 @@ def discover_maps(fork_key: str, fork_cfg: dict, tree: list[str]) -> list[dict]:
                     }
                 elif entry.get("type") == "gameMapPool":
                     pool_ids.update(entry.get("maps", []))
-    block = set()  # ponytail: MAP_BLOCKLIST from config.py lands in Task 16
+    block = set(MAP_BLOCKLIST.get(fork_key, []))  # admin/debug maps to hide
     out = []
     for gid, gm in sorted(game_maps.items()):
         if gid in block:
@@ -438,6 +438,9 @@ def load_tile_colors(fork_key: str, fork_cfg: dict, reg: Registry):
 def decode_chunk(b64: str):
     """Yield (i, typeId) for each of the 256 tiles; 7 bytes/tile, u32LE typeId."""
     raw = base64.b64decode(b64)
+    if len(raw) % 7:  # format-drift guard: non-7-byte stride → skip, don't emit garbage
+        print(f"  WARNING: chunk stride {len(raw)}B not /7 — skipping (format drift?)")
+        return
     for i in range(len(raw) // 7):
         yield i, struct.unpack_from("<I", raw, i * 7)[0]
 
@@ -546,6 +549,12 @@ def build_map_json(fork_key, map_id, map_name, parsed, reg, bounds):
     main = parsed["main_grid"]
     offnames = parsed["offgrid_names"]
     items = {}   # protoId -> {"n", "c", "p": [...]}
+    vias = []; via_idx = {}   # schema v2: dedup source-location strings (heavy repeat)
+    def intern(s):
+        i = via_idx.get(s)
+        if i is None:
+            i = via_idx[s] = len(vias); vias.append(s)
+        return i
 
     def add(pid, x, y, kind, via=None, extra=None):
         k = reg.kind(pid)
@@ -555,7 +564,7 @@ def build_map_json(fork_key, map_id, map_name, parsed, reg, bounds):
         rec = items.setdefault(pid, {"n": reg.name(pid), "c": cat, "p": []})
         p = [x, y, kind]
         if via is not None:
-            p.append(via)
+            p.append(intern(via))   # index into data.vias, not the string
             if extra is not None:
                 p.append(extra)
         rec["p"].append(p)
@@ -594,7 +603,7 @@ def build_map_json(fork_key, map_id, map_name, parsed, reg, bounds):
                 for pid, count in reg.vendor_contraband(proto).items():
                     add(pid, x, y, 4, via, count)
     data = {"schemaVersion": SCHEMA_VERSION, "id": map_id, "name": map_name,
-            "fork": fork_key, "bounds": bounds, "beacons": beacons,
+            "fork": fork_key, "bounds": bounds, "beacons": beacons, "vias": vias,
             "offgrid": {str(u): n for u, n in offnames.items()}, "items": items}
     out = OUT_DIR / fork_key / f"{map_id}.json"
     out.write_text(json.dumps(data, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
@@ -681,6 +690,11 @@ def selfcheck():
     assert 0 in kinds, "floor crowbar missing"
     assert 2 in kinds or 4 in kinds, "vending crowbar missing (YouTool is on Bagel)"
     assert any(p[2] == 1 for plist in (v["p"] for v in items.values()) for p in plist), "no container-sourced items at all"
+    # schema v2: p[3] is an index into data["vias"] (deduped strings), not the string itself
+    assert data["vias"], "vias table empty"
+    cont = next(p for p in items["Crowbar"]["p"] if p[2] == 1)
+    assert isinstance(cont[3], int) and 0 <= cont[3] < len(data["vias"]), f"via index invalid: {cont}"
+    assert isinstance(data["vias"][cont[3]], str), "via must deref to a string"
     assert len(data["beacons"]) > 20, f"beacons: {len(data['beacons'])}"
     assert all(len(b) == 3 for b in data["beacons"])
     raw = json.dumps(data)
