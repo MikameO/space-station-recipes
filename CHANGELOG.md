@@ -3,6 +3,27 @@
 `data.json` schema version is in `meta.schemaVersion`. Consumers reading this file
 should pin on a compatible range (semver: breaking changes bump major).
 
+## 3.9.0 — 2026-07-13 (Increment D5 — renamed-reagent dead recipes on total-conversion forks)
+
+Bug fix (user report: Fluorosurfactant/Space Mirage show a recipe on Russian
+Marine Corps but don't craft in-game). Root cause: RMC-14 is a **total
+conversion** that renames 20 base reagents (`Fluorine→RMCFluorine`, `Carbon`,
+`Oxygen`, `Ethanol`, …) keeping the vanilla locale name; its repo still ships
+vanilla-path copies, so the merged data showed vanilla recipes that reference
+reagents the fork's game doesn't actually provide.
+
+- Extractor Phase 4e: per-fork **rename map** (fork reagent sharing a vanilla
+  BASE reagent's locale name under a prefixed id → the vanilla twin is
+  shadowed), gated on a ≥5-rename threshold so a lone coincidental collision
+  can't mass-block an additive fork. A forward-reachability fixpoint marks
+  reactions that (transitively) need a shadowed reagent as `forkStatus=blocked`.
+  RMC-14 / RuCM: 20 renames → ~275 dead vanilla reactions blocked. All 16
+  additive forks unaffected (Fluorosurfactant still makeable there and on
+  vanilla).
+- New `meta.forks[fork].totalConversion` + `renamedReagents` → the source
+  filter shows a red warning banner on RMC-family forks.
+- Decision record: docs/decisions/2026-07-12_rmc-renamed-reagents.md.
+
 ## 3.8.0 — 2026-07-12 (Increment D4 — metabolism rate → heal/sec + true per-unit)
 
 New per-reagent field `metabolismRate` (units consumed per ~1s metabolism

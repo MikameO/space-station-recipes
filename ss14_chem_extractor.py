@@ -2041,6 +2041,93 @@ def fork_ancestry(fork_id: str) -> list[str]:
     return chain
 
 
+def build_shadowed_reagents(parsed, base_ids):
+    """Per-fork set of vanilla reagent ids the fork RENAMED away (D5).
+
+    A total-conversion fork gives a base reagent a new, prefixed id while
+    keeping the vanilla locale name (RMC-14: Fluorine → RMCFluorine, both
+    `reagent-name-fluorine`). The vanilla twin is then NOT obtainable in that
+    fork's game, so vanilla recipes referencing it are dead — even though the
+    fork's repo still ships vanilla-path copies that define it. Detected via the
+    shared locale-name key; propagated down parent chains (RuCM inherits
+    RMC-14's renames). See docs/decisions/2026-07-12_rmc-renamed-reagents.md.
+
+    Restricted to BASE reagents (`base_ids`): a total conversion renames the
+    dispensable element set. This avoids false positives where an additive fork
+    merely adds a variant that reuses a crafted reagent's locale name (Sunrise/
+    Fish reuse `reagent-name-fluorosulfuric-acid`, `-mutetoxin` — not renames).
+    Caller further gates on a rename-count threshold."""
+    vanilla_reagents = parsed["vanilla"]["reagents"]
+    vanilla_ids = set(vanilla_reagents)
+    name_to_vanilla = {}
+    for rid, r in vanilla_reagents.items():
+        nm = r.get("name")
+        if nm:
+            name_to_vanilla.setdefault(nm, rid)
+    own = {}
+    for fork_id, pdata in parsed.items():
+        if fork_id == "vanilla":
+            continue
+        sh = set()
+        for rid, r in pdata.get("reagents", {}).items():
+            if rid in vanilla_ids:
+                continue  # the fork's copy of a vanilla reagent, not a rename
+            twin = name_to_vanilla.get(r.get("name"))
+            if twin and twin != rid and twin in base_ids:
+                sh.add(twin)
+        own[fork_id] = sh
+    shadowed = {}
+    for fork_id in own:
+        acc = set()
+        for anc in fork_ancestry(fork_id):
+            acc |= own.get(anc, set())
+        shadowed[fork_id] = acc
+    return shadowed
+
+
+def dead_reactions_from_shadow(fork_id, all_reactions, base_set, shadowed):
+    """Reactions unmakeable on `fork_id` because they (transitively) need a
+    shadowed reagent (D5). Forward-reachability fixpoint over the fork's visible
+    reactions: obtainable = base reagents minus shadowed, closed under reactions
+    whose non-catalyst reactants are all obtainable; a reaction is dead if any
+    non-catalyst reactant is never obtainable."""
+    if not shadowed:
+        return set()
+
+    def is_cat(info):
+        return isinstance(info, dict) and info.get("catalyst")
+
+    lineage = set(fork_ancestry(fork_id))
+    visible = {
+        rid: rx for rid, rx in all_reactions.items()
+        if rx.get("_fork") == "vanilla" or rx.get("_fork") in lineage
+    }
+    obtainable = set(base_set) - shadowed
+    changed = True
+    while changed:
+        changed = False
+        for rx in visible.values():
+            prods = rx.get("products") or {}
+            if not prods:
+                continue
+            if all(is_cat(info) or react in obtainable
+                   for react, info in (rx.get("reactants") or {}).items()):
+                for p in prods:
+                    # a shadowed reagent can't be re-obtained via a recipe either
+                    # (the fork has no slot for the vanilla id — only its prefixed
+                    # twin), so producing it doesn't make it available
+                    if p not in obtainable and p not in shadowed:
+                        obtainable.add(p)
+                        changed = True
+    dead = set()
+    for rid, rx in visible.items():
+        for react, info in (rx.get("reactants") or {}).items():
+            if not is_cat(info) and react not in obtainable:
+                dead.add(rid)
+                break
+    return dead
+
+
 def build_per_fork_views(
     reactions: dict,
     reagents: dict,
@@ -2153,7 +2240,8 @@ def export_json(reagents: dict, reactions: dict, locale: dict,
                 reagent_plants: dict | None = None,
                 fork_reagent_blocks: dict | None = None,
                 plants: dict | None = None,
-                item_sources: dict | None = None):
+                item_sources: dict | None = None,
+                shadowed_by_fork: dict | None = None):
     """Export all data as a JSON file for the web frontend.
     fork_diffs: {fork_id: (blocked_set, modified_dict)} from auto-diff.
     reagent_plants: {reagent_id: [plant_label...]} from parse_seed_sources;
@@ -2183,6 +2271,11 @@ def export_json(reagents: dict, reactions: dict, locale: dict,
             # must also show its parents' content (Funky ships Goob chems).
             if fconf.get("parent_fork"):
                 forks_meta[fid]["parent"] = fconf["parent_fork"]
+            # D5: total-conversion flag — the fork renamed base reagents, so
+            # most vanilla recipes don't apply. Drives the UI warning banner.
+            if shadowed_by_fork and shadowed_by_fork.get(fid):
+                forks_meta[fid]["totalConversion"] = True
+                forks_meta[fid]["renamedReagents"] = len(shadowed_by_fork[fid])
 
     data = {
         "meta": {
@@ -2196,7 +2289,7 @@ def export_json(reagents: dict, reactions: dict, locale: dict,
             # 3.5.0: legacy rmcStatus/rmcNote per-reaction fields and
             # vanillaReagentCount/rmcReagentCount meta removed — forkStatus/
             # forkNotes are the only fork-view fields since the multi-fork era.
-            "schemaVersion": "3.8.0",
+            "schemaVersion": "3.9.0",
             "generated": time.strftime("%Y-%m-%dT%H:%M:%S"),
             "forks": forks_meta,
             "reactionCount": len(reactions),
@@ -2902,6 +2995,34 @@ def main():
     print(f"  Products with recipes: {len(reaction_lookup)}")
     print(f"  Base chemicals: {len(base_set)}")
 
+    # Phase 4e: renamed-reagent dead reactions (total-conversion forks, D5).
+    # RMC-14 renames base reagents (Fluorine→RMCFluorine); vanilla recipes that
+    # need the shadowed twin can't be made in-game though the merged data shows
+    # them. Fold the dead set into the same fork_diffs blocked channel.
+    print("\n=== Phase 4e: Renamed-reagent dead reactions (total-conversion forks) ===")
+    # A total conversion renames the base-element set wholesale (RMC-14: 21).
+    # Gate on a threshold so a lone coincidental locale-name collision (ADT
+    # reuses `reagent-name-toxin`) can't mass-block an additive fork.
+    TOTAL_CONVERSION_MIN_RENAMES = 5
+    _raw_shadow = build_shadowed_reagents(parsed, base_set)
+    shadowed_by_fork = {
+        f: s for f, s in _raw_shadow.items()
+        if len(s) >= TOTAL_CONVERSION_MIN_RENAMES
+    }
+    _skipped = {f: len(s) for f, s in _raw_shadow.items()
+                if 0 < len(s) < TOTAL_CONVERSION_MIN_RENAMES}
+    if _skipped:
+        print(f"  (ignored sub-threshold base-name collisions: {_skipped})")
+    for fork_id, sh in shadowed_by_fork.items():
+        dead = dead_reactions_from_shadow(fork_id, all_reactions, base_set, sh)
+        if not dead:
+            continue
+        blocked, modified = fork_diffs.get(fork_id, (set(), {}))
+        new_dead = dead - blocked
+        fork_diffs[fork_id] = (blocked | dead, modified)
+        print(f"  {FORK_REGISTRY[fork_id]['name']}: {len(sh)} renamed base reagents "
+              f"→ {len(dead)} dead reactions (+{len(new_dead)} new blocks)")
+
     # Phase 5b: Parse plant/seed sources
     print("\n=== Phase 5b: Parsing plant/seed sources ===")
     botany_locale = load_all_localization(botany_locale_files)
@@ -2930,7 +3051,7 @@ def main():
         all_reagents, all_reactions, locale, reaction_lookup, base_set,
         all_sources, fork_diffs, reagent_plants=reagent_plants,
         fork_reagent_blocks=fork_reagent_blocks, plants=plants,
-        item_sources=item_sources,
+        item_sources=item_sources, shadowed_by_fork=shadowed_by_fork,
     )
 
     print("\n=== Phase 9: Extracting sprites from SS14 repo ===")

@@ -134,6 +134,9 @@
 **Спрос:** уточнение O2+O6 (медики) — «за сколько вылечит», не только «сколько на юнит». Побочно исправляет неточность A3.
 **Сделано:** экстрактор сериализует `metabolismRate` (только отклонения от дефолта 0.5; 210 реагентов); в «Чем лечить?» колонка Heal/u = эффект÷rate (истинный total-per-unit, ре-ранжир), новая колонка /sec = per-tick, чип `@Xu/s` для нестандартного rate. Спот-чек: Inaprovaline 0.1, Bicaridine default; ADT Detoxisol 5/s ÷ 0.75 = 6.7/u @0.75u/s (e2e в браузере). Regen ×2 байт-идентичен, M1 чист.
 
+### D5. Мёртвые рецепты на тотальных конверсиях (RMC rename) `[x]` (2026-07-13, баг-репорт пользователя; schema 3.9.0; Tier-2, решение в docs/decisions/2026-07-12_rmc-renamed-reagents.md) — HAE 4h (data + frontend)
+**Баг:** Fluorosurfactant/Space Mirage показывают рецепт на Russian Marine Corps, но в игре не варятся. **Root cause** (systematic-debugging): RMC-14 переименовывает 20 базовых реагентов (Fluorine→RMCFluorine…), держит vanilla-слой в репо → тул показывает vanilla-рецепты на несуществующих в форке реагентах. **Fix:** экстрактор Phase 4e — rename-карта (locale-имя + base-фильтр + порог ≥5) → транзитивное замыкание мёртвых реакций → forkStatus=blocked (~275 на rmc14/rucm); meta.totalConversion → красный баннер. Аддитивные 16 форков не задеты. Верифицировано: Fluorosurfactant getFilteredReactions=0 на rucm / =1 на vanilla; баннер strong; regen ×2 байт-идентичен.
+
 ## Порядок, параллельность, чекпойнты
 
 ```

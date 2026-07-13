@@ -325,6 +325,13 @@ header h1 {
   margin-top: 6px;
   line-height: 1.4;
 }
+/* D5: total-conversion forks (RMC family) — stronger red warning */
+.fork-disclaimer-strong {
+  color: var(--red-alert);
+  background: rgba(255,61,90,0.08);
+  border-color: rgba(255,61,90,0.35);
+  font-size: 0.64rem;
+}
 .fork-dot {
   display: inline-block;
   width: 8px;

@@ -451,17 +451,7 @@ function buildSourceFilters() {
     radio.addEventListener('change', () => {
       activeSource = radio.value;
       if (radio.value !== 'all') track('fork_select', { fork: radio.value });
-      // Show disclaimer for forks with blocked reactions
-      const disc = document.getElementById('forkDisclaimer');
-      if (disc) {
-        if (radio.value !== 'all' && radio.value !== 'vanilla' && DATA.meta?.forks?.[radio.value]) {
-          const forkMeta = DATA.meta.forks[radio.value];
-          disc.textContent = `${forkMeta.name}: showing vanilla + fork-exclusive chemistry. Blocked reactions filtered out.`;
-          disc.style.display = 'block';
-        } else {
-          disc.style.display = 'none';
-        }
-      }
+      updateForkDisclaimer(radio.value);
       renderCurrentTab();
       rebuildTree(); // re-filter Trees tab if a tree is displayed
       // Re-render open detail panel with new fork context
@@ -481,6 +471,27 @@ function buildSourceFilters() {
 // ─────────────────────────────────────────────
 // Tabs
 // ─────────────────────────────────────────────
+
+// Fork source note. Total-conversion forks (D5: RMC-14 renames base reagents)
+// get a stronger warning — most vanilla recipes are blocked as unavailable.
+function updateForkDisclaimer(forkVal) {
+  const disc = document.getElementById('forkDisclaimer');
+  if (!disc) return;
+  const meta = DATA.meta?.forks?.[forkVal];
+  if (forkVal === 'all' || forkVal === 'vanilla' || !meta) {
+    disc.style.display = 'none';
+    disc.classList.remove('fork-disclaimer-strong');
+    return;
+  }
+  if (meta.totalConversion) {
+    disc.innerHTML = `&#9888; <b>${esc(meta.name)} is a total conversion</b> — it renames ${meta.renamedReagents} base reagents (e.g. Fluorine&rarr;RMCFluorine). Most vanilla recipes don't work here and are hidden as unavailable; its own chemistry uses the renamed reagents.`;
+    disc.classList.add('fork-disclaimer-strong');
+  } else {
+    disc.textContent = `${meta.name}: showing vanilla + fork-exclusive chemistry. Blocked reactions filtered out.`;
+    disc.classList.remove('fork-disclaimer-strong');
+  }
+  disc.style.display = 'block';
+}
 
 function setupTabs() {
   document.querySelectorAll('.tab-btn').forEach(btn => {
@@ -3211,7 +3222,7 @@ function decodeURLState() {
   const validSources = ['all', ...Object.keys(DATA.meta?.forks || {})];
   if (src && validSources.includes(src)) {
     const radio = document.querySelector(`input[name="source"][value="${CSS.escape(src)}"]`);
-    if (radio) { radio.checked = true; activeSource = src; }
+    if (radio) { radio.checked = true; activeSource = src; updateForkDisclaimer(src); }
   }
 
   // Base type (whitelist)
