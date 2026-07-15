@@ -740,6 +740,8 @@ FORK_REGISTRY = {
             "Resources/Prototypes/_NF/Reagents/Consumables/Drink/drinks.yml",
             "Resources/Prototypes/_NF/Reagents/Consumables/Food/food.yml",
             "Resources/Prototypes/_NF/Reagents/Consumables/Food/ingredients.yml",
+            # audit_fork_manifests: untracked chem files
+            "Resources/Prototypes/_NF/Reagents/Consumables/Drink/juice.yml",
         ],
         "reaction_files": [
             "Resources/Prototypes/_NF/Recipes/Reactions/chemicals.yml",
@@ -865,6 +867,8 @@ FORK_REGISTRY = {
             "Resources/Prototypes/_Trauma/Reagents/narcotics.yml",
             "Resources/Prototypes/_Trauma/Reagents/pyrotechnics.yml",
             "Resources/Prototypes/_Trauma/Reagents/toxins.yml",
+            # audit_fork_manifests: untracked chem files
+            "Resources/Prototypes/_Trauma/Reagents/medicine.yml",
         ],
         "reaction_files": [
             "Resources/Prototypes/_Trauma/Recipes/Reactions/botany.yml",
@@ -875,6 +879,8 @@ FORK_REGISTRY = {
             "Resources/Prototypes/_Trauma/Recipes/Reactions/pyrotechnics.yml",
             "Resources/Prototypes/_Trauma/Recipes/Reactions/single_reagent.yml",
             "Resources/Prototypes/_Trauma/Recipes/Reactions/toxins.yml",
+            # audit_fork_manifests: untracked chem files
+            "Resources/Prototypes/_Trauma/Recipes/Reactions/medicine.yml",
         ],
         "locale_files": [
             "Resources/Locale/en-US/_Trauma/botany/seeds.ftl",
@@ -1155,6 +1161,8 @@ FORK_REGISTRY = {
             # disease blood draws -> centrifuge -> vaccine crafting
             "Resources/Prototypes/_Sunrise/Vaccine/Reagents/blood.yml",
             "Resources/Prototypes/_Sunrise/Vaccine/Reagents/vaccine.yml",
+            # audit_fork_manifests: untracked chem files
+            "Resources/Prototypes/_Fish/Reagents/foxium.yml",
         ],
         "reaction_files": [
             "Resources/Prototypes/_Fish/Recipes/Reactions/medicine.yml",

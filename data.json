@@ -1,7 +1,7 @@
 {
  "meta": {
   "schemaVersion": "3.9.0",
-  "generated": "2026-07-15T16:13:29",
+  "generated": "2026-07-15T16:19:25",
   "forks": {
    "vanilla": {
     "name": "Vanilla SS14",
@@ -54,7 +54,7 @@
    "frontier": {
     "name": "Frontier",
     "color": "#fb923c",
-    "reagentCount": 31
+    "reagentCount": 33
    },
    "funky": {
     "name": "Funky Station",
@@ -65,7 +65,7 @@
    "trauma": {
     "name": "Trauma Station",
     "color": "#ef4444",
-    "reagentCount": 43,
+    "reagentCount": 44,
     "parent": "goob"
    },
    "omu": {
@@ -109,11 +109,11 @@
    "fish": {
     "name": "Fish Station (Рыбья)",
     "color": "#0ea5e9",
-    "reagentCount": 9,
+    "reagentCount": 10,
     "parent": "sunrise"
    }
   },
-  "reactionCount": 1003,
+  "reactionCount": 1004,
   "plantCount": 128,
   "sourceAttribution": {
    "total": 68,
@@ -26225,6 +26225,61 @@
    "meltingPoint": null,
    "antagScore": 2
   },
+  "Dewormer": {
+   "id": "Dewormer",
+   "name": "Dewormer",
+   "group": "Medicine",
+   "category": "Medicine",
+   "source": "trauma",
+   "color": "#e0ae7b",
+   "desc": "",
+   "physicalDesc": "chalky",
+   "flavor": "medicine",
+   "isBase": false,
+   "isDispenser": false,
+   "effects": "[Bloodstream] Effect: DiseaseProgressChange",
+   "effectTags": [],
+   "metabolismPaths": [
+    "Bloodstream"
+   ],
+   "overdose": null,
+   "criticalOverdose": null,
+   "recipe": {
+    "reactants": {
+     "Immurin": {
+      "amount": 2,
+      "catalyst": false
+     },
+     "SodiumHydroxide": {
+      "amount": 1,
+      "catalyst": false
+     },
+     "TableSalt": {
+      "amount": 1,
+      "catalyst": false
+     }
+    },
+    "products": {
+     "Dewormer": 5
+    },
+    "minTemp": null,
+    "maxTemp": null,
+    "mixer": []
+   },
+   "obtainSources": [
+    "Chemistry reaction"
+   ],
+   "accessibility": {
+    "tier": "cross-service",
+    "weight": 2,
+    "reason": "Recipe requires cross-service ingredient(s)"
+   },
+   "verifiedMechanics": [
+    "[Bloodstream] Effect: DiseaseProgressChange"
+   ],
+   "boilingPoint": null,
+   "meltingPoint": null
+  },
   "Dexalin": {
    "id": "Dexalin",
    "name": "dexalin",
@@ -31213,6 +31268,42 @@
      "amount": -0.1
     }
    ]
+  },
+  "Foxium": {
+   "id": "Foxium",
+   "name": "Foxium",
+   "group": "Fun",
+   "category": "Fun",
+   "source": "fish",
+   "color": "#e2722b",
+   "desc": "",
+   "physicalDesc": "vibrant",
+   "flavor": "weh",
+   "isBase": true,
+   "isDispenser": false,
+   "effects": "[Poison] Emote: Fox @50%",
+   "effectTags": [
+    "emote"
+   ],
+   "metabolismPaths": [
+    "Poison"
+   ],
+   "overdose": null,
+   "criticalOverdose": null,
+   "recipe": null,
+   "obtainSources": [],
+   "accessibility": {
+    "tier": "unobtainable",
+    "weight": 999,
+    "reason": "No recipe, no plant, no dispenser source"
+   },
+   "verifiedMechanics": [
+    "[Poison] Emote: Fox @50%"
+   ],
+   "boilingPoint": null,
+   "meltingPoint": null,
+   "metabolismRate": 0.25,
+   "antagScore": 1
   },
   "Fresium": {
    "id": "Fresium",
@@ -40196,6 +40287,53 @@
     }
    ]
   },
+  "JuicePear": {
+   "id": "JuicePear",
+   "name": "pear juice",
+   "group": "Drinks",
+   "category": "Drinks (Non-Alc)",
+   "source": "frontier",
+   "color": "#F8E08E",
+   "desc": "Mellow, sweet and subtly fragrant.",
+   "physicalDesc": "cloudy",
+   "flavor": "pear",
+   "isBase": true,
+   "isDispenser": false,
+   "effects": "[Digestion] Thirst x3",
+   "effectTags": [
+    "thirst"
+   ],
+   "metabolismPaths": [
+    "Digestion"
+   ],
+   "overdose": null,
+   "criticalOverdose": null,
+   "recipe": null,
+   "obtainSources": [],
+   "accessibility": {
+    "tier": "unobtainable",
+    "weight": 999,
+    "reason": "No recipe, no plant, no dispenser source"
+   },
+   "verifiedMechanics": [
+    "Tile: Extinguishes fires on wet tiles",
+    "Tile: SpillIfPuddlePresentTileReaction (see YAML for details)",
+    "Reactive: Extinguish [Touch]",
+    "[Digestion] Thirst x3"
+   ],
+   "boilingPoint": null,
+   "meltingPoint": null,
+   "plantEffects": [
+    {
+     "kind": "PlantAdjustWater",
+     "label": "Water",
+     "text": "Water +1",
+     "group": "care",
+     "tone": "good",
+     "amount": 1
+    }
+   ]
+  },
   "JuicePineapple": {
    "id": "JuicePineapple",
    "name": "pineapple juice",
@@ -40246,6 +40384,53 @@
     "tier": "cross-botany",
     "weight": 2,
     "reason": "Requires Botany: Juicing: pineapple (plant)"
+   },
+   "verifiedMechanics": [
+    "Tile: Extinguishes fires on wet tiles",
+    "Tile: SpillIfPuddlePresentTileReaction (see YAML for details)",
+    "Reactive: Extinguish [Touch]",
+    "[Digestion] Thirst x3"
+   ],
+   "boilingPoint": null,
+   "meltingPoint": null,
+   "plantEffects": [
+    {
+     "kind": "PlantAdjustWater",
+     "label": "Water",
+     "text": "Water +1",
+     "group": "care",
+     "tone": "good",
+     "amount": 1
+    }
+   ]
+  },
+  "JuicePomegranate": {
+   "id": "JuicePomegranate",
+   "name": "pomegranate juice",
+   "group": "Drinks",
+   "category": "Drinks (Non-Alc)",
+   "source": "frontier",
+   "color": "#A8151A",
+   "desc": "Sweet fruity with a tangy note.",
+   "physicalDesc": "crisp",
+   "flavor": "pomegranate",
+   "isBase": true,
+   "isDispenser": false,
+   "effects": "[Digestion] Thirst x3",
+   "effectTags": [
+    "thirst"
+   ],
+   "metabolismPaths": [
+    "Digestion"
+   ],
+   "overdose": null,
+   "criticalOverdose": null,
+   "recipe": null,
+   "obtainSources": [],
+   "accessibility": {
+    "tier": "unobtainable",
+    "weight": 999,
+    "reason": "No recipe, no plant, no dispenser source"
    },
    "verifiedMechanics": [
     "Tile: Extinguishes fires on wet tiles",
@@ -87389,6 +87574,32 @@
    "effects": "",
    "impact": null
   },
+  "Dewormer": {
+   "id": "Dewormer",
+   "source": "trauma",
+   "reactants": {
+    "Immurin": {
+     "amount": 2,
+     "catalyst": false
+    },
+    "SodiumHydroxide": {
+     "amount": 1,
+     "catalyst": false
+    },
+    "TableSalt": {
+     "amount": 1,
+     "catalyst": false
+    }
+   },
+   "products": {
+    "Dewormer": 5
+   },
+   "minTemp": null,
+   "maxTemp": null,
+   "mixer": [],
+   "effects": "",
+   "impact": null
+  },
   "Dexalin": {
    "id": "Dexalin",
    "source": "vanilla",
@@ -104193,6 +104404,7 @@
   "FluorosulfuricAcidPredator",
   "ForeverWeed",
   "FourteenLokoSunrise",
+  "Foxium",
   "Frezon",
   "FrostOil",
   "FruitTeaPowder",
@@ -104231,6 +104443,8 @@
   "JuiceCrab",
   "JuiceLemonade",
   "JuiceMango",
+  "JuicePear",
+  "JuicePomegranate",
   "JuicePotato",
   "JuiceThatMakesYouHew",
   "JuiceThatMakesYouScream",
@@ -118588,6 +118802,27 @@
    "to": "NanoMachines",
    "reaction": "NanoMachines",
    "amount": 5,
+   "catalyst": false
+  },
+  {
+   "from": "Immurin",
+   "to": "Dewormer",
+   "reaction": "Dewormer",
+   "amount": 2,
+   "catalyst": false
+  },
+  {
+   "from": "SodiumHydroxide",
+   "to": "Dewormer",
+   "reaction": "Dewormer",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "TableSalt",
+   "to": "Dewormer",
+   "reaction": "Dewormer",
+   "amount": 1,
    "catalyst": false
   },
   {
