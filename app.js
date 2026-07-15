@@ -67,20 +67,40 @@ function track(goal, params) {
 // Init
 // ─────────────────────────────────────────────
 
-async function init() {
+async function loadData(attempt = 1) {
   try {
-    const resp = await fetch('data.json?v=' + Date.now());
-    DATA = await resp.json();
+    const resp = await fetch('data.json');
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+    return await resp.json();
   } catch (e) {
-    // Fallback for file:// — try embedded
-    if (typeof EMBEDDED_DATA !== 'undefined') {
-      DATA = EMBEDDED_DATA;
-    } else {
-      document.getElementById('loadingOverlay').innerHTML =
-        '<div style="color:#ef4444;padding:20px;text-align:center;">' +
-        'Failed to load data.json<br><small>If using file://, try a local server: python -m http.server</small></div>';
-      return;
-    }
+    if (attempt >= 3) throw e;
+    await new Promise(r => setTimeout(r, 600 * attempt));
+    return loadData(attempt + 1);
+  }
+}
+
+async function init() {
+  // B2: offline PWA + companion (second-screen / PiP) compact layout
+  if ('serviceWorker' in navigator &&
+      (location.protocol === 'https:' || location.hostname === 'localhost')) {
+    navigator.serviceWorker.register('./sw.js').catch(() => {});
+  }
+  if (new URLSearchParams(location.search).get('mode') === 'companion') {
+    document.body.classList.add('companion');
+  }
+  try {
+    // No cache-buster: SW serves cached data.json instantly (stale-while-
+    // revalidate) and refreshes it in the background; Pages ETag covers the
+    // no-SW case. Three attempts with backoff — one flaky mobile moment
+    // must not strand the user on an error screen (user-reported).
+    DATA = await loadData();
+  } catch (e) {
+    document.getElementById('loadingOverlay').innerHTML =
+      '<div style="color:#ef4444;padding:20px;text-align:center;">' +
+      'Failed to load data.json after 3 attempts<br>' +
+      '<small>Check the connection — the app works offline only after one successful visit.</small><br>' +
+      '<button class="btn-primary" style="margin-top:12px" onclick="location.reload()">Retry</button></div>';
+    return;
   }
 
   // Validate data structure
@@ -101,7 +121,12 @@ async function init() {
   setupCraftTrees();
   setupReverseLookup();
   setupBatchPlanner();
+  renderPresetBar(); // A2: shift-start preset chips
+  setupForkDiff(); // B1
+  setupBeakerSim(); // C2
   setupShareButton();
+  setupPipButton(); // B3
+  setupCompanionBar(); // C3
   setupDisclaimer();
   setupAntagMode();
   setupAntagFilters();
@@ -147,19 +172,22 @@ function buildSearchIndex() {
 // Fork ancestry: forkId -> [self, parent, grandparent, ...]. A derivative
 // fork ships its parents' custom content too (Funky runs Goob chems, RuCM
 // runs RMC14 chems), so the source filter treats ancestor content as native.
-// Cached — meta.forks is static per page load.
-const forkChainCache = {};
 function forkChain(forkId) {
-  if (!forkChainCache[forkId]) {
-    const chain = [];
-    let cur = forkId;
-    while (cur && cur !== 'vanilla' && !chain.includes(cur)) {
-      chain.push(cur);
-      cur = DATA.meta?.forks?.[cur]?.parent;
-    }
-    forkChainCache[forkId] = chain;
+  const chain = [];
+  let cur = forkId;
+  while (cur && cur !== 'vanilla' && !chain.includes(cur)) {
+    chain.push(cur);
+    cur = DATA.meta?.forks?.[cur]?.parent;
   }
-  return forkChainCache[forkId];
+  return chain;
+}
+
+// Shared fork-lineage visibility: is this entity (reagent or reaction)
+// native-or-inherited under forkId and not blocked by it?
+function forkVisible(entity, forkId) {
+  if (entity.source !== 'vanilla' && !forkChain(forkId).includes(entity.source)) return false;
+  if (entity.forkStatus && entity.forkStatus[forkId] === 'blocked') return false;
+  return true;
 }
 
 function filterReagents(query) {
@@ -168,24 +196,9 @@ function filterReagents(query) {
 
   return searchIndex.filter(entry => {
     const r = entry.reagent;
-    // Source filter: fork mode shows fork-lineage + vanilla (minus blocked)
-    if (activeSource !== 'all' && activeSource !== 'vanilla') {
-      const forkId = activeSource;
-      if (r.source !== 'vanilla' && !forkChain(forkId).includes(r.source)) {
-        return false; // reagent from outside this fork's lineage — hide
-      }
-      // Reagent removed by this fork (e.g. RuCM removed RMCUltrazine)
-      if (r.forkStatus && r.forkStatus[forkId] === 'blocked') return false;
-      // Vanilla/ancestor reagent: hide when its recipe is blocked on this fork
-      if (r.source !== forkId) {
-        const rxn = r.recipe ? Object.values(DATA.reactions).find(rx => rx.products[r.id]) : null;
-        if (rxn && rxn.forkStatus && rxn.forkStatus[forkId] === 'blocked') return false;
-        // Backward compat: check rmcStatus for rmc14 if forkStatus missing
-        if (forkId === 'rmc14' && rxn && !rxn.forkStatus && rxn.rmcStatus === 'blocked') return false;
-      }
-    } else if (activeSource === 'vanilla') {
-      if (r.source !== 'vanilla') return false;
-    }
+    // Source filter: fork mode shows fork-lineage + vanilla (minus blocked).
+    // Shared with the medbay mode — see reagentInActiveFork/forkVisible.
+    if (!reagentInActiveFork(r)) return false;
     if (activeBaseType === 'base' && !r.isBase) return false;
     if (activeBaseType === 'crafted' && r.isBase) return false;
     if (activeTaste === 'tasteless' && r.flavor) return false;
@@ -255,14 +268,7 @@ function filterReactions(query) {
   return Object.values(DATA.reactions).filter(rxn => {
     // Source filter: fork mode hides blocked + out-of-lineage reactions
     if (activeSource !== 'all' && activeSource !== 'vanilla') {
-      const forkId = activeSource;
-      if (rxn.source !== 'vanilla' && !forkChain(forkId).includes(rxn.source)) {
-        return false; // reaction from outside this fork's lineage
-      }
-      if (rxn.source !== forkId) {
-        if (rxn.forkStatus && rxn.forkStatus[forkId] === 'blocked') return false;
-        if (forkId === 'rmc14' && !rxn.forkStatus && rxn.rmcStatus === 'blocked') return false;
-      }
+      if (!forkVisible(rxn, activeSource)) return false;
     } else if (activeSource === 'vanilla') {
       if (rxn.source !== 'vanilla') return false;
     }
@@ -445,17 +451,7 @@ function buildSourceFilters() {
     radio.addEventListener('change', () => {
       activeSource = radio.value;
       if (radio.value !== 'all') track('fork_select', { fork: radio.value });
-      // Show disclaimer for forks with blocked reactions
-      const disc = document.getElementById('forkDisclaimer');
-      if (disc) {
-        if (radio.value !== 'all' && radio.value !== 'vanilla' && DATA.meta?.forks?.[radio.value]) {
-          const forkMeta = DATA.meta.forks[radio.value];
-          disc.textContent = `${forkMeta.name}: showing vanilla + fork-exclusive chemistry. Blocked reactions filtered out.`;
-          disc.style.display = 'block';
-        } else {
-          disc.style.display = 'none';
-        }
-      }
+      updateForkDisclaimer(radio.value);
       renderCurrentTab();
       rebuildTree(); // re-filter Trees tab if a tree is displayed
       // Re-render open detail panel with new fork context
@@ -476,20 +472,73 @@ function buildSourceFilters() {
 // Tabs
 // ─────────────────────────────────────────────
 
+// Fork source note. Total-conversion forks (D5: RMC-14 renames base reagents)
+// get a stronger warning — most vanilla recipes are blocked as unavailable.
+function updateForkDisclaimer(forkVal) {
+  const disc = document.getElementById('forkDisclaimer');
+  if (!disc) return;
+  const meta = DATA.meta?.forks?.[forkVal];
+  if (forkVal === 'all' || forkVal === 'vanilla' || !meta) {
+    disc.style.display = 'none';
+    disc.classList.remove('fork-disclaimer-strong');
+    return;
+  }
+  if (meta.totalConversion) {
+    disc.innerHTML = `&#9888; <b>${esc(meta.name)} is a total conversion</b> — it renames ${meta.renamedReagents} base reagents (e.g. Fluorine&rarr;RMCFluorine). Most vanilla recipes don't work here and are hidden as unavailable; its own chemistry uses the renamed reagents.`;
+    disc.classList.add('fork-disclaimer-strong');
+  } else {
+    disc.textContent = `${meta.name}: showing vanilla + fork-exclusive chemistry. Blocked reactions filtered out.`;
+    disc.classList.remove('fork-disclaimer-strong');
+  }
+  disc.style.display = 'block';
+}
+
 function setupTabs() {
   document.querySelectorAll('.tab-btn').forEach(btn => {
     btn.addEventListener('click', () => {
+      const tab = btn.dataset.tab;
+      if (!tab) return; // A1: the Advanced toggle is a .tab-btn without data-tab
       document.querySelectorAll('.tab-btn').forEach(b => { b.classList.remove('active'); b.setAttribute('aria-selected', 'false'); });
       document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
       btn.classList.add('active');
       btn.setAttribute('aria-selected', 'true');
-      const tab = btn.dataset.tab;
       document.getElementById('tab-' + tab).classList.add('active');
       activeTab = tab;
       if (tab !== 'reagents') track('tab_' + tab); // reagents is the default view
       renderCurrentTab();
     });
   });
+  setupAdvancedDropdown();
+}
+
+// A1: Reactions / Graph / Stats live in the Advanced dropdown (final removal pends Metrika)
+function setupAdvancedDropdown() {
+  const adv = document.getElementById('tabAdv');
+  const toggle = document.getElementById('btnAdvanced');
+  if (!adv || !toggle) return;
+  const ADV_TABS = ['reactions', 'graph', 'stats'];
+  const close = () => { adv.classList.remove('open'); toggle.setAttribute('aria-expanded', 'false'); };
+  toggle.addEventListener('click', e => {
+    e.stopPropagation();
+    const open = adv.classList.toggle('open');
+    toggle.setAttribute('aria-expanded', String(open));
+    if (open) {
+      // C3.3: the menu is position:fixed (the tab bar clips absolute
+      // children via overflow-x:auto) — anchor it under the toggle.
+      const r = toggle.getBoundingClientRect();
+      const menu = adv.querySelector('.tab-adv-menu');
+      menu.style.left = Math.round(r.left) + 'px';
+      menu.style.top = Math.round(r.bottom + 2) + 'px';
+    }
+  });
+  document.addEventListener('click', e => { if (!adv.contains(e.target)) close(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') close(); });
+  window.addEventListener('resize', close);
+  // any tab click: close the menu, keep the toggle lit while a hidden tab is active (deep-links included)
+  document.querySelectorAll('.tab-btn').forEach(b => b.addEventListener('click', () => {
+    if (b.dataset.tab) close();
+    toggle.classList.toggle('has-active', ADV_TABS.includes(activeTab));
+  }));
 }
 
 function setupLogoHome() {
@@ -513,6 +562,8 @@ function renderCurrentTab() {
   const query = document.getElementById('searchInput').value;
   if (activeTab === 'reagents') renderReagents(query);
   else if (activeTab === 'reactions') renderReactions(query);
+  else if (activeTab === 'medbay') renderMedbay();
+  else if (activeTab === 'forkdiff') renderForkDiff();
   else if (activeTab === 'graph') renderGraph();
   else if (activeTab === 'botany') renderBotany(query);
   else if (activeTab === 'stats') renderStatsTab();
@@ -585,7 +636,70 @@ function botanyCardHTML(r) {
   </div>`;
 }
 
+// D1: plant evolution forest — mutation chains rendered with the
+// craft-tree list styles. Arrows are YAML-extracted (green tier).
+function plantVisibleInFork(p) {
+  if (activeSource === 'all') return true;
+  if (activeSource === 'vanilla') return p.source === 'vanilla';
+  return p.source === 'vanilla' || forkChain(activeSource).includes(p.source);
+}
+
+function plantNodeHTML(id, visited) {
+  const p = DATA.plants[id];
+  if (!p) return '';
+  const loop = visited.has(id);
+  const next = new Set(visited);
+  next.add(id);
+  const forkBadge = p.source !== 'vanilla' && DATA.meta?.forks?.[p.source]
+    ? `<span class="badge badge-fork" style="border-color:${DATA.meta.forks[p.source].color}">${esc(DATA.meta.forks[p.source].name)}</span>` : '';
+  const chems = Object.entries(p.chemicals || {})
+    .filter(([rid]) => !['Nutriment', 'Vitamin', 'Water'].includes(rid)).slice(0, 3)
+    .map(([rid, s]) => `<span class="badge plant-chem-chip" title="${esc(rid)}: ${s.min}–${s.max}u${s.potencyDivisor ? ' (scales with potency/' + s.potencyDivisor + ')' : ''}">${esc(DATA.reagents[rid]?.name ? capName(DATA.reagents[rid].name) : rid)}</span>`).join('');
+  const g = p.growth || {};
+  const tip = `potency ${g.potency ?? '?'} | yield ${g.yield ?? '?'} | matures ${g.maturation ?? '?'} | lifespan ${g.lifespan ?? '?'}`;
+  const kids = loop ? [] : (p.mutations || []).filter(m => DATA.plants[m] && plantVisibleInFork(DATA.plants[m]));
+  return `<li>
+    <div class="tree-node" title="${esc(tip)}">
+      <span class="node-name">${esc(capName(p.name))}</span>
+      ${loop ? '<span class="node-badge badge-c">LOOP</span>' : ''}
+      ${forkBadge} ${chems}
+    </div>
+    ${kids.length ? `<ul class="tree-children">${kids.map(m => plantNodeHTML(m, next)).join('')}</ul>` : ''}
+  </li>`;
+}
+
+function renderPlantEvolution() {
+  const host = document.getElementById('plantEvolution');
+  if (!host) return;
+  const all = Object.values(DATA.plants || {}).filter(plantVisibleInFork);
+  const mutatedInto = new Set();
+  for (const p of all) for (const m of p.mutations || []) mutatedInto.add(m);
+  const roots = all
+    .filter(p => (p.mutations || []).length && !mutatedInto.has(p.id))
+    .sort((a, b) => a.name.localeCompare(b.name));
+  if (!roots.length) {
+    host.innerHTML = '<p class="reverse-desc">No mutation chains under the current Source filter.</p>';
+    return;
+  }
+  host.innerHTML = `<p class="reverse-desc">${roots.length} chains, ${all.filter(p => (p.mutations || []).length).length} plants with mutation targets (of ${all.length} in view)</p>`
+    + roots.map(r => `<ul class="craft-tree plant-tree">${plantNodeHTML(r.id, new Set())}</ul>`).join('');
+}
+
+function renderSwabGuide() {
+  const host = document.getElementById('swabGuide');
+  const guide = DATA.botanyGuide;
+  if (!host || !guide) return;
+  host.innerHTML = `<div class="guide-card">
+    <div class="guide-head">${esc(guide.title)}
+      <span class="badge badge-community" title="Curated from playtime — the mechanics live in C# code, not extractable YAML. PRs welcome.">Community knowledge</span>
+    </div>
+    ${guide.sections.map(s => `<div class="guide-section"><b>${esc(s.h)}</b><p>${esc(s.body)}</p></div>`).join('')}
+  </div>`;
+}
+
 function renderBotany(query = '') {
+  renderPlantEvolution();
+  renderSwabGuide();
   const grid = document.getElementById('botanyGrid');
   let entries = filterReagents(query).filter(e => e.reagent.plantEffects && e.reagent.plantEffects.length);
   if (botanyHideGeneric) {
@@ -653,6 +767,39 @@ function getCatColor(cat) {
   return '#64748b';
 }
 
+// A5: recipe complexity = number of distinct reactions in the fork-aware craft closure.
+// base/dispenser = 0; catalysts add no steps (mirrors buildCraftTree); no recipe → Infinity (sorts last).
+// v1 is a pure step counter — "hard to obtain" weighting deliberately deferred.
+const recipeStepsCache = new Map();
+function recipeSteps(reagentId) {
+  const key = activeSource + ':' + reagentId;
+  if (recipeStepsCache.has(key)) return recipeStepsCache.get(key);
+  let steps;
+  if (DATA.baseChemicals.includes(reagentId)) {
+    steps = 0;
+  } else if (getFilteredReactions(reagentId).length === 0) {
+    steps = Infinity;
+  } else {
+    const reactions = new Set();
+    (function walk(id, visiting) {
+      if (DATA.baseChemicals.includes(id) || visiting.has(id)) return;
+      const rxns = getFilteredReactions(id);
+      if (!rxns.length) return;
+      const rxn = rxns[0];
+      if (reactions.has(rxn.id)) return;
+      reactions.add(rxn.id);
+      const next = new Set(visiting);
+      next.add(id);
+      for (const [rid, info] of Object.entries(rxn.reactants)) {
+        if (!info.catalyst) walk(rid, next);
+      }
+    })(reagentId, new Set());
+    steps = reactions.size;
+  }
+  recipeStepsCache.set(key, steps);
+  return steps;
+}
+
 function sortResults(results) {
   const getName = e => (e.reagent.name || e.reagent.id).toLowerCase();
   switch (activeSort) {
@@ -662,6 +809,10 @@ function sortResults(results) {
       a.reagent.category.localeCompare(b.reagent.category) || getName(a).localeCompare(getName(b)));
     case 'used-in':   return results.sort((a, b) =>
       (usedInLookup[b.reagent.id] || 0) - (usedInLookup[a.reagent.id] || 0) || getName(a).localeCompare(getName(b)));
+    case 'steps-asc': { // A5
+      const sv = e => { const s = recipeSteps(e.reagent.id); return Number.isFinite(s) ? s : 1e9; };
+      return results.sort((a, b) => sv(a) - sv(b) || getName(a).localeCompare(getName(b)));
+    }
     case 'antag-desc': return results.sort((a, b) =>
       (b.reagent.antagScore || 0) - (a.reagent.antagScore || 0) || getName(a).localeCompare(getName(b)));
     default: return results;
@@ -782,6 +933,7 @@ function reagentCardHTML(r) {
       ${r.isBase ? `<span class="badge badge-base">${r.isDispenser ? 'DISPENSER' : 'BASE'}</span>` : ''}
       ${(!r.recipe && (!r.obtainSources || r.obtainSources.length === 0) && !r.isDispenser) ? `<span class="badge badge-unobtainable" title="No recipe, no plant, no dispenser source \u2014 unobtainable in vanilla play">UNOBTAINABLE</span>` : ''}
       ${r.overdose ? `<span class="badge badge-od">OD ${r.overdose}u</span>` : ''}
+      ${activeSort === 'steps-asc' && Number.isFinite(recipeSteps(r.id)) ? `<span class="badge badge-steps">&#9879; ${recipeSteps(r.id)} step${recipeSteps(r.id) === 1 ? '' : 's'}</span>` : ''}
       ${r.source !== 'vanilla' && DATA.meta?.forks?.[r.source] ? `<span class="badge badge-fork" style="border-color:${DATA.meta.forks[r.source].color}">${DATA.meta.forks[r.source].name}</span>` : ''}
       ${antagMode && r.antagScore ? `<span class="badge badge-antag">${'\u2620'} ${r.antagScore}/10</span>` : ''}
       ${antagMode && r.antagTags ? r.antagTags.map(t => `<span class="badge badge-antag-tag">${esc(t)}</span>`).join('') : ''}
@@ -1233,6 +1385,411 @@ function rebuildDetailTree() {
 }
 
 // ─────────────────────────────────────────────
+// Fork Diff — "moved servers, what changed?" (B1)
+// Membership diffs come from the same fork-visibility rules as the filters;
+// recipe-change notes are the build-time comparator's forkNotes strings.
+// ─────────────────────────────────────────────
+
+function setupForkDiff() {
+  const fromSel = document.getElementById('forkDiffFrom');
+  const toSel = document.getElementById('forkDiffTo');
+  if (!fromSel || !toSel) return;
+  // meta.forks already lists vanilla first — no need to prepend it
+  const opts = Object.entries(DATA.meta?.forks || {}).map(([id, f]) => [id, f.name || id]);
+  for (const [id, name] of opts) {
+    fromSel.add(new Option(name, id));
+    toSel.add(new Option(name, id));
+  }
+  const firstFork = opts.find(([id]) => id !== 'vanilla');
+  fromSel.value = 'vanilla';
+  toSel.value = firstFork ? firstFork[0] : 'vanilla';
+  fromSel.addEventListener('change', renderForkDiff);
+  toSel.addEventListener('change', renderForkDiff);
+}
+
+function renderForkDiff() {
+  const el = document.getElementById('forkDiffResults');
+  const from = document.getElementById('forkDiffFrom')?.value;
+  const to = document.getElementById('forkDiffTo')?.value;
+  if (!el || !from || !to) return;
+  if (from === to) {
+    el.innerHTML = '<div class="empty-state"><div class="empty-state-headline">Pick two different forks to compare.</div></div>';
+    return;
+  }
+  track('forkdiff_view', { from, to });
+
+  const addedR = [], removedR = [];
+  for (const r of Object.values(DATA.reagents)) {
+    const inF = reagentInFork(r, from), inT = reagentInFork(r, to);
+    if (!inF && inT) addedR.push(r);
+    else if (inF && !inT) removedR.push(r);
+  }
+  const addedX = [], removedX = [], modX = [];
+  for (const rx of Object.values(DATA.reactions)) {
+    const inF = reactionInFork(rx, from), inT = reactionInFork(rx, to);
+    if (!inF && inT) addedX.push(rx);
+    else if (inF && !inT) removedX.push(rx);
+    else if (inF && inT) {
+      const noteF = rx.forkNotes?.[from] || '';
+      const noteT = rx.forkNotes?.[to] || '';
+      if (noteF !== noteT) modX.push({ rx, noteF, noteT });
+    }
+  }
+  const byName = arr => arr.sort((a, b) => (a.name || a.id).localeCompare(b.name || b.id));
+  byName(addedR); byName(removedR);
+  const byId = arr => arr.sort((a, b) => (a.rx ? a.rx.id : a.id).localeCompare(b.rx ? b.rx.id : b.id));
+  byId(addedX); byId(removedX); byId(modX);
+
+  const chip = r => `<button class="diff-chip" onclick="openDetail('${esc(r.id)}')">${esc(capName(r.name || r.id))}</button>`;
+  const rxRow = rx => `<span class="diff-chip diff-chip-static">${esc(rx.id)}</span>`;
+  const section = (title, cls, items, renderer) => items.length
+    ? `<div class="diff-section">
+        <h3 class="diff-h ${cls}">${title} <span class="diff-count">${items.length}</span></h3>
+        <div class="diff-body">${items.map(renderer).join('')}</div>
+      </div>`
+    : '';
+  const modRow = m => `<div class="diff-mod">
+      <span class="diff-mod-id">${esc(m.rx.id)}</span>
+      <span class="diff-mod-note">${esc(m.noteF || 'vanilla recipe')} &#8594; ${esc(m.noteT || 'vanilla recipe')}</span>
+    </div>`;
+
+  const total = addedR.length + removedR.length + addedX.length + removedX.length + modX.length;
+  el.innerHTML = total === 0
+    ? '<div class="empty-state"><div class="empty-state-headline">No differences — these forks share the same chemistry.</div></div>'
+    : section('Reagents you gain', 'diff-added', addedR, chip)
+    + section('Reagents you lose', 'diff-removed', removedR, chip)
+    + section('Reactions you gain', 'diff-added', addedX, rxRow)
+    + section('Reactions you lose', 'diff-removed', removedX, rxRow)
+    + section('Recipes that differ', 'diff-modified', modX, modRow);
+}
+
+// ─────────────────────────────────────────────
+// Beaker Simulator (C2) — replays SS14's reaction pass over a mixture.
+// Per engine rules: the highest-priority eligible reaction fires first
+// (priority serialized since schema 3.4.3; e.g. Smoke/Foam are -10 so real
+// recipes win their reagents), consumes at the largest integer multiple,
+// then the pass repeats until nothing can react. Mixer-gated reactions
+// (Stir/Shake) never auto-fire in a plain beaker.
+// ─────────────────────────────────────────────
+
+function simulateBeaker(contents, tempK) {
+  const state = {};
+  for (const [id, amt] of Object.entries(contents)) state[id] = amt;
+  const log = [];
+  const MAX_STEPS = 30;
+
+  for (let step = 1; step <= MAX_STEPS; step++) {
+    let best = null;
+    for (const rx of Object.values(DATA.reactions)) {
+      if (!reactionInFork(rx, activeSource === 'all' ? 'all' : activeSource)) continue;
+      if (rx.mixer && rx.mixer.length) continue; // needs Stir/Shake — not a beaker pour
+      if (rx.minTemp && tempK < rx.minTemp) continue;
+      if (rx.maxTemp && tempK > rx.maxTemp) continue;
+      let mult = Infinity;
+      let ok = true;
+      for (const [rid, info] of Object.entries(rx.reactants)) {
+        const have = state[rid] || 0;
+        if (have < info.amount) { ok = false; break; }
+        if (!info.catalyst) mult = Math.min(mult, Math.floor(have / info.amount));
+      }
+      if (!ok || !isFinite(mult) || mult < 1) continue;
+      const pri = rx.priority ?? 0;
+      if (!best || pri > best.pri) best = { rx, mult, pri };
+    }
+    if (!best) break;
+
+    const { rx, mult } = best;
+    const consumed = [];
+    for (const [rid, info] of Object.entries(rx.reactants)) {
+      if (info.catalyst) { consumed.push(`${info.amount}u ${rid} (cat, kept)`); continue; }
+      state[rid] = +(state[rid] - info.amount * mult).toFixed(2);
+      consumed.push(`${info.amount * mult}u ${rid}`);
+      if (state[rid] <= 0.001) delete state[rid];
+    }
+    const produced = [];
+    for (const [pid, amt] of Object.entries(rx.products || {})) {
+      state[pid] = +((state[pid] || 0) + amt * mult).toFixed(2);
+      produced.push(`${+(amt * mult).toFixed(2)}u ${pid}`);
+    }
+    log.push({ step, id: rx.id, consumed, produced, effects: rx.effects || '', impact: rx.impact || '', priority: rx.priority });
+  }
+  return { final: state, log, truncated: log.length >= MAX_STEPS };
+}
+
+const beakerContents = {}; // reagentId -> units
+
+function renderBeakerChips() {
+  const el = document.getElementById('beakerChips');
+  el.innerHTML = Object.entries(beakerContents).map(([id, amt]) =>
+    `<span class="reverse-chip">
+      <span class="color-swatch" style="background:${safeColor(DATA.reagents[id]?.color)};width:8px;height:8px"></span>
+      ${esc(capName(DATA.reagents[id]?.name || id))} ${amt}u
+      <span class="reverse-chip-remove" data-id="${esc(id)}">&times;</span>
+    </span>`).join('');
+  el.querySelectorAll('.reverse-chip-remove').forEach(btn => {
+    btn.addEventListener('click', () => {
+      delete beakerContents[btn.dataset.id];
+      renderBeakerChips();
+    });
+  });
+}
+
+function setupBeakerSim() {
+  const input = document.getElementById('beakerInput');
+  const suggestions = document.getElementById('beakerSuggestions');
+  if (!input) return;
+  let pendingId = null;
+  setupAutocomplete(input, suggestions, (id) => {
+    pendingId = id;
+    input.value = capName(DATA.reagents[id]?.name || id);
+    suggestions.classList.remove('open');
+  });
+  document.getElementById('beakerAddBtn').addEventListener('click', () => {
+    if (!pendingId) return;
+    const amt = Math.max(0.5, parseFloat(document.getElementById('beakerAmount').value) || 30);
+    beakerContents[pendingId] = (beakerContents[pendingId] || 0) + amt;
+    pendingId = null;
+    input.value = '';
+    renderBeakerChips();
+  });
+  document.getElementById('beakerSimBtn').addEventListener('click', () => {
+    if (!Object.keys(beakerContents).length) return;
+    const tempK = parseFloat(document.getElementById('beakerTemp').value) || 293;
+    track('beaker_sim', { n: Object.keys(beakerContents).length, tempK });
+    const { final, log, truncated } = simulateBeaker(beakerContents, tempK);
+    renderBeakerLog(final, log, truncated);
+  });
+}
+
+function renderBeakerLog(final, log, truncated) {
+  const el = document.getElementById('beakerLog');
+  const dangerRe = /explosion|explode|ignite|flash|emp|smoke|foam|flammable/i;
+  const stepsHTML = log.length
+    ? log.map(s => {
+        const danger = dangerRe.test(s.effects) || dangerRe.test(s.impact) || dangerRe.test(s.id);
+        return `<div class="beaker-step ${danger ? 'beaker-danger' : ''}">
+          <span class="beaker-step-n">${s.step}</span>
+          <span class="beaker-step-body">
+            <b>${esc(s.id)}</b>${s.priority != null ? ` <span class="beaker-pri" title="reaction priority">p${s.priority}</span>` : ''}:
+            ${esc(s.consumed.join(' + '))} &#8594; ${s.produced.length ? esc(s.produced.join(' + ')) : '<i>no products</i>'}
+            ${danger ? ' <span class="beaker-warn">&#9888; ' + esc(s.impact || 'hazardous effect') + '</span>' : ''}
+            ${!danger && s.impact ? ` <span class="beaker-note">${esc(s.impact)}</span>` : ''}
+          </span>
+        </div>`;
+      }).join('')
+    : '<div class="beaker-step"><i>Nothing reacts at this temperature.</i></div>';
+  const finalHTML = Object.keys(final).length
+    ? Object.entries(final).map(([id, amt]) =>
+        `<span class="reverse-chip">
+          <span class="color-swatch" style="background:${safeColor(DATA.reagents[id]?.color)};width:8px;height:8px"></span>
+          ${esc(capName(DATA.reagents[id]?.name || id))} ${amt}u
+        </span>`).join('')
+    : '<i>Empty beaker — everything was consumed.</i>';
+  el.innerHTML = `
+    <div class="beaker-log-title">Reaction cascade${truncated ? ' (stopped at 30 steps)' : ''}</div>
+    ${stepsHTML}
+    <div class="beaker-log-title" style="margin-top:10px">Final beaker</div>
+    <div class="reverse-chips">${finalHTML}</div>`;
+}
+
+// ─────────────────────────────────────────────
+// What Heals? — medical mode (A3)
+// Damage-type chips are built from live heals:* effectTags, so fork-added
+// damage types appear without code changes.
+// ─────────────────────────────────────────────
+
+let activeHealType = null;
+let activeSpecies = null; // D2: null = all species
+
+// Same source-visibility rules as filterReagents, minus sidebar filters —
+// the medbay mode stands alone.
+function reagentInFork(r, forkId) {
+  if (forkId === 'vanilla') return r.source === 'vanilla';
+  if (forkId === 'all') return true;
+  if (!forkVisible(r, forkId)) return false;
+  // Vanilla/ancestor reagent: hide when its recipe is blocked on this fork
+  if (r.source !== forkId) {
+    const rxn = r.recipe ? Object.values(DATA.reactions).find(rx => rx.products[r.id]) : null;
+    if (rxn && rxn.forkStatus && rxn.forkStatus[forkId] === 'blocked') return false;
+  }
+  return true;
+}
+
+function reagentInActiveFork(r) { return reagentInFork(r, activeSource); }
+
+function reactionInFork(rx, forkId) {
+  if (forkId === 'vanilla') return rx.source === 'vanilla';
+  if (forkId === 'all') return true;
+  return forkVisible(rx, forkId);
+}
+
+// Parse "Heals <Type> <N>" out of the effects clause list for one heal tag.
+// Prefers unconditional clauses; a conditional-only match is flagged for the UI.
+function healPerUnit(r, healLabel) {
+  const clauses = (r.effects || '').split(';');
+  const re = new RegExp('Heals\\s+' + healLabel + '\\s+([\\d.]+)', 'i');
+  let best = null;
+  for (const cl of clauses) {
+    const m = cl.match(re);
+    if (!m) continue;
+    const conditional = /\(if\s/.test(cl);
+    const val = parseFloat(m[1]);
+    if (!best || (best.conditional && !conditional) ||
+        (conditional === best.conditional && val > best.val)) {
+      best = { val, conditional };
+    }
+  }
+  return best;
+}
+
+function renderMedbay() {
+  const chipsEl = document.getElementById('healTypeChips');
+  if (!chipsEl) return;
+
+  // Available heal types under the active fork filter
+  const counts = {};
+  for (const r of Object.values(DATA.reagents)) {
+    if (!reagentInActiveFork(r)) continue;
+    for (const t of r.effectTags || []) {
+      if (t.startsWith('heals:')) {
+        const type = t.slice(6);
+        counts[type] = (counts[type] || 0) + 1;
+      }
+    }
+  }
+  const types = Object.keys(counts).sort((a, b) => counts[b] - counts[a]);
+  if (activeHealType && !counts[activeHealType]) activeHealType = null;
+  if (!activeHealType && types.length) activeHealType = types[0];
+
+  chipsEl.innerHTML = types.map(t =>
+    `<button class="heal-chip ${t === activeHealType ? 'active' : ''}" data-type="${esc(t)}">
+      ${esc(capName(t))} <span class="heal-chip-count">${counts[t]}</span>
+    </button>`).join('');
+  chipsEl.querySelectorAll('.heal-chip').forEach(btn => {
+    btn.addEventListener('click', () => {
+      activeHealType = btn.dataset.type;
+      track('whatheals_type', { type: activeHealType });
+      renderMedbay();
+    });
+  });
+
+  renderSpeciesChips();
+  renderSpeciesInfo();
+  renderHealResults();
+}
+
+// D2: species context. Physiology facts are curated (amber tier); the
+// per-medicine ☠/ℹ badges come from YAML-extracted organ conditions.
+function renderSpeciesChips() {
+  const host = document.getElementById('speciesChips');
+  if (!host) return;
+  const phys = DATA.species?.physiology || {};
+  // Union: curated species + any species found in extracted organ
+  // conditions (fork races like Goblin/Thaven appear automatically).
+  const found = new Set(Object.keys(phys));
+  for (const r of Object.values(DATA.reagents)) {
+    for (const s of Object.keys(r.speciesEffects || {})) found.add(s);
+  }
+  const items = [['', 'All species'],
+    ...[...found].sort((a, b) => a.localeCompare(b)).map(k => [k, phys[k]?.name || k])];
+  host.innerHTML = items.map(([id, label]) =>
+    `<button class="heal-chip species-chip ${(activeSpecies || '') === id ? 'active' : ''}" data-species="${esc(id)}">${esc(capName(label))}</button>`).join('');
+  host.querySelectorAll('.species-chip').forEach(btn => {
+    btn.addEventListener('click', () => {
+      activeSpecies = btn.dataset.species || null;
+      track('whatheals_species', { species: activeSpecies || 'all' });
+      renderMedbay();
+    });
+  });
+}
+
+function renderSpeciesInfo() {
+  const host = document.getElementById('speciesInfo');
+  if (!host) return;
+  const p = activeSpecies ? DATA.species?.physiology?.[activeSpecies] : null;
+  if (!p) { host.innerHTML = ''; return; }
+  const tox = p.toxicGas
+    ? ` — <b class="species-tox">&#9760; ${esc(p.toxicGas)} is TOXIC to them</b>` : '';
+  host.innerHTML = `<div class="guide-card species-card">
+    <div class="guide-head">${esc(p.name)} physiology
+      <span class="badge badge-community" title="Physiology facts are curated from playtime (species prototypes are not extracted yet). The per-medicine ☠/ℹ notes in the table ARE extracted from reagent YAML.">Community knowledge</span>
+    </div>
+    <p class="species-line">Breathes <b>${esc(p.breathes)}</b>${tox}. ${esc(p.note)}</p>
+  </div>`;
+}
+
+function renderHealResults() {
+  const el = document.getElementById('healResults');
+  if (!el) return;
+  if (!activeHealType) {
+    el.innerHTML = '<div class="empty-state"><div class="empty-state-headline">No healing data under the current fork filter.</div></div>';
+    return;
+  }
+
+  const rows = [];
+  for (const r of Object.values(DATA.reagents)) {
+    if (!reagentInActiveFork(r)) continue;
+    if (!(r.effectTags || []).includes('heals:' + activeHealType)) continue;
+    const heal = healPerUnit(r, activeHealType);
+    // D4: metabolismRate = units consumed per ~1s tick (default 0.5). The effect
+    // amount is applied PER TICK, so total healing one unit delivers before it is
+    // fully metabolized = perTick / rate. This is the true "per unit" number;
+    // the raw effect is the per-second rate.
+    const rate = r.metabolismRate ?? 0.5;
+    const totalPerU = heal ? Math.round((heal.val / rate) * 10) / 10 : null;
+    rows.push({ r, heal, rate, totalPerU });
+  }
+  rows.sort((a, b) => {
+    const av = a.totalPerU ?? -1;
+    const bv = b.totalPerU ?? -1;
+    return bv - av ||
+      ((a.r.accessibility?.weight ?? 9) - (b.r.accessibility?.weight ?? 9)) ||
+      (a.r.name || a.r.id).localeCompare(b.r.name || b.r.id);
+  });
+
+  el.innerHTML = `<table class="data-table heal-table">
+    <thead><tr>
+      <th>Medicine</th>
+      <th title="Total healing one unit delivers before it fully metabolizes (per-tick effect ÷ metabolism rate)">Heal / u</th>
+      <th title="Healing applied each ~1s metabolism tick while the reagent is in the body">/ sec</th>
+      <th>Overdose</th><th>Access</th><th>Source</th>
+    </tr></thead>
+    <tbody>${rows.map(({ r, heal, rate, totalPerU }) => {
+      const healCell = totalPerU != null
+        ? `${totalPerU}${heal.conditional ? ' <span class="heal-cond" title="Conditional healing — open details">*</span>' : ''}`
+        : '—';
+      let secCell = '—';
+      if (heal) {
+        const dur = Math.round((1 / rate) * 10) / 10;
+        const slow = rate !== 0.5
+          ? ` <span class="heal-rate" title="Metabolizes ${rate} u/s — 1u lasts ~${dur}s">@${rate}u/s</span>` : '';
+        secCell = `${heal.val}/s${slow}`;
+      }
+      const acc = r.accessibility;
+      const accBadge = acc
+        ? `<span class="badge badge-access" title="${esc(acc.reason || '')}">${esc(acc.tier)}</span>` : '—';
+      const forkBadge = r.source !== 'vanilla' && DATA.meta?.forks?.[r.source]
+        ? `<span class="badge badge-fork" style="border-color:${DATA.meta.forks[r.source].color}">${esc(DATA.meta.forks[r.source].name)}</span>`
+        : 'vanilla';
+      let speciesBadge = '';
+      if (activeSpecies && r.speciesEffects && r.speciesEffects[activeSpecies]) {
+        const clauses = r.speciesEffects[activeSpecies];
+        const harmful = clauses.some(c => /Deals|Vomit|Toxin/i.test(c));
+        speciesBadge = ` <span class="badge ${harmful ? 'species-bad' : 'species-note'}" title="${esc(clauses.join(' | '))}">${harmful ? '&#9760;' : '&#8505;'} ${esc(activeSpecies)}</span>`;
+      }
+      return `<tr class="heal-row" onclick="openDetail('${esc(r.id)}')" tabindex="0">
+        <td><span class="color-swatch" style="background:${safeColor(r.color)}"></span> ${esc(capName(r.name || r.id))}${speciesBadge}</td>
+        <td class="heal-num">${healCell}</td>
+        <td class="heal-num">${secCell}</td>
+        <td>${r.overdose ? r.overdose + 'u' : '—'}</td>
+        <td>${accBadge}</td>
+        <td>${forkBadge}</td>
+      </tr>`;
+    }).join('')}</tbody>
+  </table>`;
+}
+
+// ─────────────────────────────────────────────
 // Craft Trees
 // ─────────────────────────────────────────────
 
@@ -1248,14 +1805,7 @@ function getFilteredReactions(reagentId) {
 
   const forkId = activeSource;
   const chain = forkChain(forkId);
-  rxns = rxns.filter(rx => {
-    if (rx.source !== 'vanilla' && !chain.includes(rx.source)) return false;
-    if (rx.source !== forkId) {
-      if (rx.forkStatus && rx.forkStatus[forkId] === 'blocked') return false;
-      if (forkId === 'rmc14' && !rx.forkStatus && rx.rmcStatus === 'blocked') return false;
-    }
-    return true;
-  });
+  rxns = rxns.filter(rx => forkVisible(rx, forkId));
   // Prefer the closest lineage match: self, then parent, ..., then vanilla
   const rank = rx => rx.source === 'vanilla' ? chain.length : chain.indexOf(rx.source);
   rxns.sort((a, b) => rank(a) - rank(b));
@@ -1295,7 +1845,7 @@ function buildCraftTree(reagentId, amount, visited = new Set()) {
   };
 }
 
-function renderTreeHTML(node, depth = 0) {
+function renderTreeHTML(node, depth = 0, path = '0') {
   const r = DATA.reagents[node.id];
   const color = safeColor(r ? r.color : '');
   const name = r ? (r.name || r.id) : node.id;
@@ -1315,8 +1865,10 @@ function renderTreeHTML(node, depth = 0) {
 
   const amt = node.amount !== 1 ? `${Math.round(node.amount * 10) / 10}x` : '1x';
 
+  // A4: checklist — gathering ("collected it") and brewing ("already added it") aid
   let html = `<li>
     <div class="${cls}">
+      <input type="checkbox" class="tree-check" data-path="${path}" aria-label="Mark ${esc(name)} as collected/added">
       <span class="node-swatch" style="background:${color}"></span>
       <span class="node-amount">${amt}</span>
       <span class="node-name clickable" onclick="openDetail('${node.id}')">${esc(name)}</span>
@@ -1326,9 +1878,9 @@ function renderTreeHTML(node, depth = 0) {
 
   if (node.children.length > 0) {
     html += `<ul class="tree-children">`;
-    for (const child of node.children) {
-      html += renderTreeHTML(child, depth + 1);
-    }
+    node.children.forEach((child, i) => {
+      html += renderTreeHTML(child, depth + 1, `${path}.${i}`);
+    });
     html += `</ul>`;
   }
 
@@ -1338,12 +1890,32 @@ function renderTreeHTML(node, depth = 0) {
 
 let currentTreeReagentId = null;
 
+// A4: checked node paths — survives amount changes (same structure), resets on new reagent
+let treeChecks = new Set();
+
+function updateTreeProgress() {
+  const total = document.querySelectorAll('#treeOutput .tree-check').length;
+  const done = document.querySelectorAll('#treeOutput .tree-check:checked').length;
+  const label = document.getElementById('treeProgress');
+  const reset = document.getElementById('treeResetChecks');
+  if (label) label.textContent = total ? `Collected ${done} / ${total}` : '';
+  if (reset) reset.style.display = total ? '' : 'none';
+}
+
 function rebuildTree() {
   if (!currentTreeReagentId) return;
   const amountInput = document.getElementById('treeAmount');
   const amount = Math.max(1, parseFloat(amountInput.value) || 1);
   const tree = buildCraftTree(currentTreeReagentId, amount);
   document.getElementById('treeOutput').innerHTML = renderTreeHTML(tree);
+  // A4: restore checklist state after re-render
+  document.querySelectorAll('#treeOutput .tree-check').forEach(box => {
+    if (treeChecks.has(box.dataset.path)) {
+      box.checked = true;
+      box.closest('.tree-node').classList.add('checked');
+    }
+  });
+  updateTreeProgress();
 }
 
 function setupCraftTrees() {
@@ -1355,12 +1927,35 @@ function setupCraftTrees() {
     input.value = DATA.reagents[id]?.name || id;
     suggestions.classList.remove('open');
     currentTreeReagentId = id;
+    treeChecks = new Set(); // A4: new tree = fresh checklist
     track('tree_built', { reagent: id });
     rebuildTree();
   });
 
   // Amount input — rebuild tree when changed
   amountInput.addEventListener('input', rebuildTree);
+
+  // A4: checklist wiring (delegated — tree HTML re-renders often)
+  document.getElementById('treeOutput').addEventListener('change', e => {
+    if (!e.target.classList.contains('tree-check')) return;
+    const path = e.target.dataset.path;
+    if (e.target.checked) {
+      treeChecks.add(path);
+      if (treeChecks.size === 1) track('tree_checklist_used', { reagent: currentTreeReagentId });
+    } else {
+      treeChecks.delete(path);
+    }
+    e.target.closest('.tree-node').classList.toggle('checked', e.target.checked);
+    updateTreeProgress();
+  });
+  document.getElementById('treeResetChecks')?.addEventListener('click', () => {
+    treeChecks = new Set();
+    document.querySelectorAll('#treeOutput .tree-check').forEach(box => {
+      box.checked = false;
+      box.closest('.tree-node').classList.remove('checked');
+    });
+    updateTreeProgress();
+  });
 }
 
 // ─────────────────────────────────────────────
@@ -1504,9 +2099,33 @@ function renderCalcResults(targetId, amount, result) {
 // ─────────────────────────────────────────────
 
 let lastGraphHash = '';
+// A1: vis-network is lazy-loaded on first Graph open — keeps first paint free of the ~460KB CDN hit
+let visLoadPromise = null;
+function ensureVisLoaded() {
+  if (typeof vis !== 'undefined') return Promise.resolve();
+  if (!visLoadPromise) {
+    visLoadPromise = new Promise((resolve, reject) => {
+      const s = document.createElement('script');
+      s.src = 'libs/vis-network.min.js'; // B2: self-hosted (offline-capable)
+      s.onload = resolve;
+      s.onerror = () => { visLoadPromise = null; reject(new Error('vis-network load failed')); };
+      document.head.appendChild(s);
+    });
+  }
+  return visLoadPromise;
+}
+
 function renderGraph() {
   const container = document.getElementById('graphContainer');
   const info = document.getElementById('graphInfo');
+
+  if (typeof vis === 'undefined') {
+    if (info) info.textContent = 'Loading graph engine…';
+    ensureVisLoaded()
+      .then(() => { if (activeTab === 'graph') { lastGraphHash = null; renderGraph(); } })
+      .catch(() => { if (info) info.textContent = 'Graph engine failed to load — check connection and reopen the tab.'; });
+    return;
+  }
 
   // Get filtered reagent IDs
   const filtered = filterReagents(document.getElementById('searchInput').value);
@@ -1688,11 +2307,6 @@ function capName(name) {
 function safeColor(c) {
   if (!c) return '#3d4a5e';
   return /^#[0-9A-Fa-f]{3,8}$/.test(c) ? c : '#3d4a5e';
-}
-
-function safeSel(str) {
-  if (!str) return '';
-  return CSS.escape(str);
 }
 
 // ─────────────────────────────────────────────
@@ -1985,13 +2599,19 @@ function setupBatchPlanner() {
     renderBatchResults(result, resultsDiv, warningsDiv);
   });
 
-  // Expose external API for strategy→batch integration
+  // Expose external API for strategy/preset→batch integration
   window.addBatchTargetExternal = function(id, amount) {
     const r = DATA.reagents[id];
     if (!r) return;
     // Avoid duplicates
     if (batchTargets.find(t => t.id === id)) return;
     batchTargets.push({ id, amount, name: capName(r.name || id) });
+    renderBatchChips();
+  };
+  // A2: real state reset — clearing chip DOM alone left batchTargets populated,
+  // so consecutive strategy/preset loads silently merged into one batch.
+  window.clearBatchTargetsExternal = function() {
+    batchTargets.length = 0;
     renderBatchChips();
   };
 }
@@ -2492,33 +3112,63 @@ function renderDeliveryMechanisms() {
   `;
 }
 
-function loadStrategyIntoBatch(strategyId) {
-  const strat = (DATA.antagStrategies || []).find(s => s.id === strategyId);
-  if (!strat) return;
-  track('strategy_to_batch', { strategy: strategyId });
-
+// Shared loader: fills the Batch Planner with a reagent set and runs the plan.
+// Used by antag strategies and shift presets (A2).
+function loadReagentSetIntoBatch(reagents, label) {
   // Switch to calculator tab
   const calcTab = document.querySelector('.tab-btn[data-tab="calculator"]');
   if (calcTab) calcTab.click();
 
-  // Add each strategy reagent to batch planner
   setTimeout(() => {
-    // Clear existing batch targets
-    const batchChips = document.getElementById('batchChips');
-    if (batchChips) batchChips.innerHTML = '';
+    // Clear existing batch targets (state reset, not just chip DOM — see A2 bugfix)
+    if (typeof window.clearBatchTargetsExternal === 'function') {
+      window.clearBatchTargetsExternal();
+    }
 
     // Use the exposed addBatchTarget if available, or simulate
     if (typeof window.addBatchTargetExternal === 'function') {
-      for (const r of strat.reagents) {
+      for (const r of reagents) {
         window.addBatchTargetExternal(r.id, r.amount);
       }
       // Auto-trigger plan
       const planBtn = document.getElementById('batchPlanBtn');
       if (planBtn) planBtn.click();
     } else {
-      showToast(`Strategy: ${strat.name} — switch to Calculator tab manually.`);
+      showToast(`${label} — switch to Calculator tab manually.`);
     }
   }, 200);
+}
+
+function loadStrategyIntoBatch(strategyId) {
+  const strat = (DATA.antagStrategies || []).find(s => s.id === strategyId);
+  if (!strat) return;
+  track('strategy_to_batch', { strategy: strategyId });
+  loadReagentSetIntoBatch(strat.reagents, `Strategy: ${strat.name}`);
+}
+
+// A2: shift-start presets
+const PRESET_ROLE_ICONS = { chemist: '⚗', botanist: '\u{1F331}', bartender: '\u{1F378}' };
+
+function loadPresetIntoBatch(presetId) {
+  const preset = (DATA.shiftPresets || []).find(p => p.id === presetId);
+  if (!preset) return;
+  track('preset_to_batch', { preset: presetId });
+  loadReagentSetIntoBatch(preset.reagents, `Preset: ${preset.name}`);
+}
+
+function renderPresetBar() {
+  const bar = document.getElementById('presetBar');
+  const presets = DATA.shiftPresets || [];
+  if (!bar || !presets.length) return;
+  bar.innerHTML = presets.map(p => {
+    const icon = PRESET_ROLE_ICONS[p.role] || '⚙';
+    const items = p.reagents.map(r => `${r.amount}u ${r.id}`).join(', ');
+    return `<button class="preset-chip preset-tier-${esc(p.tier)}"
+      onclick="loadPresetIntoBatch('${esc(p.id)}')"
+      title="${esc(p.desc)}\n${esc(items)}">
+      ${icon} ${esc(p.name)}<span class="preset-tier-label">${esc(p.tier)}</span>
+    </button>`;
+  }).join('');
 }
 
 // ─────────────────────────────────────────────
@@ -2562,9 +3212,9 @@ function decodeURLState() {
 
   // Tab (whitelist)
   const tab = params.get('tab');
-  const validTabs = ['reagents','reactions','calculator','trees','graph','stats','antag','maps'];
+  const validTabs = ['reagents','reactions','calculator','medbay','forkdiff','trees','graph','stats','antag','maps'];
   if (tab && validTabs.includes(tab)) {
-    const btn = document.querySelector(`.tab-btn[data-tab="${safeSel(tab)}"]`);
+    const btn = document.querySelector(`.tab-btn[data-tab="${CSS.escape(tab)}"]`);
     if (btn) btn.click();
   }
 
@@ -2572,15 +3222,15 @@ function decodeURLState() {
   const src = params.get('src');
   const validSources = ['all', ...Object.keys(DATA.meta?.forks || {})];
   if (src && validSources.includes(src)) {
-    const radio = document.querySelector(`input[name="source"][value="${safeSel(src)}"]`);
-    if (radio) { radio.checked = true; activeSource = src; }
+    const radio = document.querySelector(`input[name="source"][value="${CSS.escape(src)}"]`);
+    if (radio) { radio.checked = true; activeSource = src; updateForkDisclaimer(src); }
   }
 
   // Base type (whitelist)
   const bt = params.get('bt');
   const validBt = ['all','base','crafted'];
   if (bt && validBt.includes(bt)) {
-    const radio = document.querySelector(`input[name="basetype"][value="${safeSel(bt)}"]`);
+    const radio = document.querySelector(`input[name="basetype"][value="${CSS.escape(bt)}"]`);
     if (radio) { radio.checked = true; activeBaseType = bt; }
   }
 
@@ -2588,7 +3238,7 @@ function decodeURLState() {
   const taste = params.get('taste');
   const validTaste = ['all','has-taste','tasteless'];
   if (taste && validTaste.includes(taste)) {
-    const radio = document.querySelector(`input[name="taste"][value="${safeSel(taste)}"]`);
+    const radio = document.querySelector(`input[name="taste"][value="${CSS.escape(taste)}"]`);
     if (radio) { radio.checked = true; activeTaste = taste; }
   }
 
@@ -2616,7 +3266,7 @@ function decodeURLState() {
     for (const val of wanted) {
       backingSet.add(val);
       const chip = document.querySelector(
-        `#antagFilterBar .antag-filter-chips[data-filter="${safeSel(filterName)}"] .diff-chip[data-value="${safeSel(val)}"]`
+        `#antagFilterBar .antag-filter-chips[data-filter="${CSS.escape(filterName)}"] .diff-chip[data-value="${CSS.escape(val)}"]`
       );
       if (chip) {
         chip.classList.add('active');
@@ -2636,7 +3286,7 @@ function decodeURLState() {
     const val = params.get(key);
     if (val && validSet.includes(val)) {
       setter(val);
-      const sel = document.querySelector(`#antagFilterBar select[data-filter="${safeSel(dataAttr)}"]`);
+      const sel = document.querySelector(`#antagFilterBar select[data-filter="${CSS.escape(dataAttr)}"]`);
       if (sel) sel.value = val;
     }
   }
@@ -2645,7 +3295,7 @@ function decodeURLState() {
   const cats = params.get('cats');
   if (cats) {
     cats.split(',').forEach(cat => {
-      const cb = document.querySelector(`#categoryFilters input[value="${safeSel(cat)}"]`);
+      const cb = document.querySelector(`#categoryFilters input[value="${CSS.escape(cat)}"]`);
       if (cb) { cb.checked = true; activeCategories.add(cat); }
     });
   }
@@ -2654,7 +3304,7 @@ function decodeURLState() {
   const fx = params.get('fx');
   if (fx) {
     fx.split(',').forEach(tag => {
-      const btn = document.querySelector(`.effect-tag-btn[data-tag="${safeSel(tag)}"]`);
+      const btn = document.querySelector(`.effect-tag-btn[data-tag="${CSS.escape(tag)}"]`);
       if (btn) { btn.classList.add('active'); activeEffectTags.add(tag); }
     });
   }
@@ -2675,13 +3325,73 @@ function setupShareButton() {
     track('share_click', { tab: activeTab, antag: antagMode ? 1 : 0 });
     const hash = encodeURLState();
     const url = location.origin + location.pathname + hash;
-    navigator.clipboard.writeText(url).then(() => showToast('Link copied!')).catch(() => {
-      // Fallback
-      const ta = document.createElement('textarea');
-      ta.value = url; document.body.appendChild(ta); ta.select();
-      document.execCommand('copy'); document.body.removeChild(ta);
-      showToast('Link copied!');
-    });
+    navigator.clipboard.writeText(url)
+      .then(() => showToast('Link copied!'))
+      .catch(() => showToast('Copy failed — grab the URL from the address bar'));
+  });
+}
+
+// C3: companion top bar — search proxy + collapse-to-slim-bar so the
+// floating window stops covering the game between lookups.
+function setupCompanionBar() {
+  if (!document.body.classList.contains('companion')) return;
+  const search = document.getElementById('companionSearch');
+  const mainSearch = document.getElementById('searchInput');
+  search.addEventListener('input', () => {
+    mainSearch.value = search.value;
+    mainSearch.dispatchEvent(new Event('input', { bubbles: true }));
+  });
+  // C3.2: filters drawer — the sidebar is chrome-hidden in companion mode,
+  // but people filter by category/effect/fork there too.
+  const filtersBtn = document.getElementById('companionFilters');
+  filtersBtn.addEventListener('click', () => {
+    const open = document.body.classList.toggle('companion-filters-open');
+    filtersBtn.classList.toggle('active', open);
+    track('companion_filters', { open: open ? 1 : 0 });
+  });
+
+  const btn = document.getElementById('companionCollapse');
+  btn.addEventListener('click', () => {
+    const collapsed = document.body.classList.toggle('companion-collapsed');
+    btn.innerHTML = collapsed ? '&#9635;' : '&#9601;';
+    btn.title = collapsed ? 'Expand' : 'Collapse to a slim bar';
+    track('companion_collapse', { collapsed: collapsed ? 1 : 0 });
+    // Physically shrink the floating window where the platform allows it
+    // (PiP/popup windows honor resizeTo on a user gesture); if it refuses,
+    // the CSS collapse still reduces the content to the slim bar.
+    try {
+      const w = window.top;
+      if (collapsed) {
+        window.__companionSize = [w.outerWidth, w.outerHeight];
+        w.resizeTo(Math.max(280, w.outerWidth), 64);
+      } else if (window.__companionSize) {
+        w.resizeTo(window.__companionSize[0], Math.max(420, window.__companionSize[1]));
+      }
+    } catch (e) { /* cross-origin top or platform refusal — CSS path is enough */ }
+  });
+}
+
+// B3: pin-over-game companion window. Document Picture-in-Picture gives a
+// true always-on-top window (Chromium 116+); everywhere else we fall back
+// to a small popup the user can pin with OS tools (PowerToys Win+Ctrl+T).
+function setupPipButton() {
+  const btn = document.getElementById('pipBtn');
+  if (!btn) return;
+  btn.addEventListener('click', async () => {
+    track('pip_open', { api: 'documentPictureInPicture' in window ? 'pip' : 'popup' });
+    const url = './?mode=companion';
+    if ('documentPictureInPicture' in window) {
+      try {
+        const pip = await documentPictureInPicture.requestWindow({ width: 430, height: 640 });
+        pip.document.body.style.margin = '0';
+        const frame = pip.document.createElement('iframe');
+        frame.src = url;
+        frame.style.cssText = 'border:0;width:100vw;height:100vh;display:block';
+        pip.document.body.append(frame);
+        return;
+      } catch (e) { /* user denied or transient-activation lost — use popup */ }
+    }
+    window.open(url, 'chemdb-companion', 'width=430,height=640,popup=yes');
   });
 }
 

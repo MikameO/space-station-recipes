@@ -61,26 +61,8 @@ if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8")
 
 
-# ─────────────────────────────────────────────
-# YAML loader tolerant of !type: engine tags (same as audit_dead_reactions)
-# ─────────────────────────────────────────────
-
-class _IgnoreTag(yaml.SafeLoader):
-    pass
-
-
-def _tag_ignore(loader, tag_suffix, node):
-    if isinstance(node, yaml.ScalarNode):
-        return loader.construct_scalar(node)
-    if isinstance(node, yaml.MappingNode):
-        return loader.construct_mapping(node, deep=True)
-    if isinstance(node, yaml.SequenceNode):
-        return loader.construct_sequence(node, deep=True)
-    return None
-
-
-_IgnoreTag.add_multi_constructor("!type:", _tag_ignore)
-_IgnoreTag.add_multi_constructor("!", _tag_ignore)
+# YAML loader tolerant of !type: engine tags — shared with audit_dead_reactions
+from _ss14_yaml import IgnoreTagLoader as _IgnoreTag  # noqa: E402
 
 
 def _count_prototypes(text: str) -> dict[str, int]:

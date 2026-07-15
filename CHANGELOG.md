@@ -47,6 +47,133 @@ multiplication; `amount` may be a `!type:…NumberSelector` and is coerced.
 - **Search is English** proto/display-name only (no RU terms).
 - Maps whose chunks use the older 6-byte tile stride warn and skip those chunks
   (PNG gaps, items unaffected) rather than emitting garbage.
+## 3.9.0 — 2026-07-13 (Increment D5 — renamed-reagent dead recipes on total-conversion forks)
+
+Bug fix (user report: Fluorosurfactant/Space Mirage show a recipe on Russian
+Marine Corps but don't craft in-game). Root cause: RMC-14 is a **total
+conversion** that renames 20 base reagents (`Fluorine→RMCFluorine`, `Carbon`,
+`Oxygen`, `Ethanol`, …) keeping the vanilla locale name; its repo still ships
+vanilla-path copies, so the merged data showed vanilla recipes that reference
+reagents the fork's game doesn't actually provide.
+
+- Extractor Phase 4e: per-fork **rename map** (fork reagent sharing a vanilla
+  BASE reagent's locale name under a prefixed id → the vanilla twin is
+  shadowed), gated on a ≥5-rename threshold so a lone coincidental collision
+  can't mass-block an additive fork. A forward-reachability fixpoint marks
+  reactions that (transitively) need a shadowed reagent as `forkStatus=blocked`.
+  RMC-14 / RuCM: 20 renames → ~275 dead vanilla reactions blocked. All 16
+  additive forks unaffected (Fluorosurfactant still makeable there and on
+  vanilla).
+- New `meta.forks[fork].totalConversion` + `renamedReagents` → the source
+  filter shows a red warning banner on RMC-family forks.
+- Decision record: docs/decisions/2026-07-12_rmc-renamed-reagents.md.
+
+## 3.8.0 — 2026-07-12 (Increment D4 — metabolism rate → heal/sec + true per-unit)
+
+New per-reagent field `metabolismRate` (units consumed per ~1s metabolism
+tick), serialized ONLY when the reagent overrides the engine default of 0.5
+— 210 reagents carry a non-default rate (dist: 0.1 ×47, 0.25 ×26, 0.2 ×26,
+0.05 ×20, 1.0 ×19, … up to a 250.0 fast-purge outlier). Frontend consumers
+default absent values to 0.5.
+
+Enables the "What Heals?" mode to distinguish per-second healing from
+per-unit efficiency: the reagent's effect amount is applied PER TICK, so the
+total healing one unit delivers before it fully metabolizes = effect ÷ rate.
+The mode's "Heal / u" column now shows that true per-unit total (and re-ranks
+by it); a new "/ sec" column shows the instantaneous per-tick amount, with an
+`@Xu/s` chip when the rate is non-default. Corrects the v1 mislabel where the
+per-tick amount was shown as "per unit".
+
+## 3.7.0 — 2026-07-12 (Increment D3 — item-fill sources: vending/dispenser/juicing)
+
+Re-applied onto 3.6.1 after the D3 branch diverged (it was cut from
+3.4.3-era 3a2f55e while main advanced through D1/D2); D1 plants{} and
+D2 species{}/speciesEffects are retained, item-fill adds on top.
+
+Reagents that ship pre-mixed inside spawnable items are no longer blind
+spots. New extractor Phase 5c intersects two indexes — entity solution
+fills (both schemas: new `Solution` component and legacy
+`SolutionContainerManager`) and acquisition channels:
+
+- **Vending inventories** (`startingInventory`; `contrabandInventory`
+  tagged "(hacked)" — unlocked by the contraband wire per
+  `ContrabandWireKey`, crew-accessible; `emaggedInventory` tagged
+  "(EMAG)"; Syndicate/Nukie-id machines tagged "(Syndicate)").
+- **Dispenser bottle packs** (`EntityTableContainerFill` on booze/soda
+  dispensers) — auto-derives what the manual Booze/Soda Dispenser lists
+  tracked by hand (and catches upstream drift: Mead and Coffee Liqueur
+  had been added to the booze dispenser unnoticed).
+- **Juicing** (D3b): seed `productPrototypes` -> produce
+  `Extractable.juiceSolution` -> "Juicing: <plant> (plant)" labels.
+- **Fork channels** (D3c): Goob (weebvend/solsnack/sweettoof/fitness/
+  hotfood + drinks), Delta-V (command/unlocked boozeomat, crescentmoon,
+  nanoblood/nanomedcivilian + 7 drink files), ADT (pillomat/civimed/
+  icecream + drinks/yupi/healing). Channels are ancestry-filtered in
+  per-fork views; total-conversion forks (blocked_categories: RMC14/
+  RuCM) do not inherit vanilla vendors. Known limits: ADT pill packs
+  are StorageFill boxes (container unpacking is a follow-up channel);
+  most fork drinks ride patched vanilla-path vendor copies (follow-up);
+  Sunrise/Corvax custom vendor layers hold no consumables — skipped.
+
+Classifier: auto `Vending*` labels are a bonus channel — antag-only only
+when a manual antag label exists or no other path does (Mayo/Pax/salt
+stay normal). `_SERVICE_KEYWORDS` += "Vending", "Atmospherics";
+cross-service reason prefix is now "Cross-department:". Honest manual
+labels for non-item channels: species bloods (verified against
+`Body/Species/*.yml` bloodReferenceSolution: Vox=Ammonia, Moth=Insect,
+Arachnid=Copper), atmos gases (Frezon/Tritium/N2O), goat/sheep milking.
+
+**Headline fixes:** Absinthe — "unobtainable" -> cross-service
+(Booze-O-Mat, Jailbreaker Verte 120u; the user report that started this
+increment). Lead — the forum-famous unobtainium — antag-only via the
+SyndieJuice Syndicate chem vendor's hacked bucket (ChemistryBottleLead
+x2 30u; `code-reagents-lead` note updated). PoisonWine (hacked
+Booze-O-Mat), EnergyDrink, Butter, olive oil, PestKiller/WeedKiller
+(NutriMax sprays), JuiceBungo/JuiceBluePumpkin/MilkOat (juicing), Gold
+(Gildlager bottle), Saline (CiviMedVend syringe, ADT).
+
+**Unobtainable: 332 -> 297 (vanilla 63 -> 29).** 114 reagents carry
+auto item-source labels (699 entities indexed, 281 stocked items, 27
+juiceable produce). Same 1213 reagents / 1003 reactions, 128 plants.
+Determinism: regen x2 byte-identical after `generated` timestamp strip.
+M1 sweep: clean — no upstream rename signals; 404s are the usual
+fork-lacks-file manifest probes.
+
+## 3.6.1 — 2026-07-12 (Increment D2 — species physiology)
+
+(Backfilled entry — the D2 bump shipped without its own CHANGELOG note.)
+Curated `species{}` physiology (8 hand-written playable species: breathing
+gas, toxic gas, quirks) plus auto-discovered fork races from organ-gated
+effect clauses (~15 chips: Goblin/Thaven/Sheleg/...). Per-reagent
+`speciesEffects` lifted from `if organ: X` effect conditions (15 reagents).
+Frontend: physiology cards + ☠/ℹ danger badges in "What Heals?".
+
+## 3.6.0 — 2026-07-12 (Increment D1 — plant entities + mutation graph)
+
+(Backfilled entry — the D1 bump shipped without its own CHANGELOG note.)
+`plants{}` — seed prototypes as first-class entities (128 plants, 37 with
+mutation targets / 47 mutation edges): id, name, source fork, product
+prototypes, mutation targets, potency-scaled chemicals, growth params.
+Frontend: Plant Evolution chart (30 chains) + swab/cross-pollination guide
+(amber maintainer-knowledge tier).
+
+## 3.4.3 — 2026-07-12 (Increment C1 — serialize reaction priority)
+
+Reactions now carry the engine's cascade **`priority`** when the upstream
+YAML defines it — omitted otherwise (engine default is 0; values can be
+negative: Smoke/Foam are -10 so real recipes win the reagents first).
+37 of 1003 reactions have one: vanilla 13 (PotassiumExplosion/Flash/
+Fresium 20, Hydroxide/CreateSoapRegular -1, Smoke/Foam/metal foams -10),
+RMC14 10, Trauma 4, Goob 3, RuCM 3, Starlight 2, Sunrise 1, Omu 1.
+Prerequisite for the beaker simulator (C2).
+
+Data refresh drift vs 3.4.2: none — same 1213 reagents / 1003 reactions,
+identical ids and per-fork counts; the only textual churn is clause
+reordering inside 14 `forkNotes` strings (unsorted set iteration in
+`compare_reaction`). M1 warning sweep: clean — no upstream rename signals
+(Solution→entity, EdibleComponent, EntityEffects conditions,
+ExudeGasses/ConsumeGasses); 404s are the usual fork-lacks-vanilla-file
+manifest probes (soap.yml on rmc14/rucm/funky/omu/monolith).
 
 ## 3.4.2 — 2026-07-11 (Increment O — full curation list: fork seeds, Vaccine, vendor layers, locales)
 

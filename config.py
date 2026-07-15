@@ -65,48 +65,11 @@ FORK_REGISTRY = {
         "name": "Vanilla SS14",
         "repo": "space-wizards/space-station-14",
         "branch": "master",
-        "raw_url": "https://raw.githubusercontent.com/space-wizards/space-station-14/master/{path}",
         "custom_dir": None,
         "color": "#22c55e",
-        "reagent_files": [
-            "Resources/Prototypes/Reagents/biological.yml",
-            "Resources/Prototypes/Reagents/botany.yml",
-            "Resources/Prototypes/Reagents/chemicals.yml",
-            "Resources/Prototypes/Reagents/cleaning.yml",
-            "Resources/Prototypes/Reagents/elements.yml",
-            "Resources/Prototypes/Reagents/fun.yml",
-            "Resources/Prototypes/Reagents/gases.yml",
-            "Resources/Prototypes/Reagents/medicine.yml",
-            "Resources/Prototypes/Reagents/narcotics.yml",
-            "Resources/Prototypes/Reagents/pyrotechnic.yml",
-            "Resources/Prototypes/Reagents/toxins.yml",
-            "Resources/Prototypes/Reagents/Consumable/Drink/alcohol.yml",
-            "Resources/Prototypes/Reagents/Consumable/Drink/base_drink.yml",
-            "Resources/Prototypes/Reagents/Consumable/Drink/drinks.yml",
-            "Resources/Prototypes/Reagents/Consumable/Drink/juice.yml",
-            "Resources/Prototypes/Reagents/Consumable/Drink/soda.yml",
-            "Resources/Prototypes/Reagents/Consumable/Food/condiments.yml",
-            "Resources/Prototypes/Reagents/Consumable/Food/food.yml",
-            "Resources/Prototypes/Reagents/Consumable/Food/ingredients.yml",
-            "Resources/Prototypes/Reagents/Materials/glass.yml",
-            "Resources/Prototypes/Reagents/Materials/materials.yml",
-            "Resources/Prototypes/Reagents/Materials/metals.yml",
-            "Resources/Prototypes/Reagents/Materials/ores.yml",
-        ],
-        "reaction_files": [
-            "Resources/Prototypes/Recipes/Reactions/biological.yml",
-            "Resources/Prototypes/Recipes/Reactions/botany.yml",
-            "Resources/Prototypes/Recipes/Reactions/chemicals.yml",
-            "Resources/Prototypes/Recipes/Reactions/cleaning.yml",
-            "Resources/Prototypes/Recipes/Reactions/drinks.yml",
-            "Resources/Prototypes/Recipes/Reactions/food.yml",
-            "Resources/Prototypes/Recipes/Reactions/fun.yml",
-            "Resources/Prototypes/Recipes/Reactions/gas.yml",
-            "Resources/Prototypes/Recipes/Reactions/medicine.yml",
-            "Resources/Prototypes/Recipes/Reactions/pyrotechnic.yml",
-            "Resources/Prototypes/Recipes/Reactions/single_reagent.yml",
-            "Resources/Prototypes/Recipes/Reactions/soap.yml",
-        ],
+        # T2c: these are the canonical lists (see constants above)
+        "reagent_files": VANILLA_REAGENT_PATHS,
+        "reaction_files": VANILLA_REACTION_PATHS,
         "locale_files": [
             "Resources/Locale/en-US/reagents/meta/biological.ftl",
             "Resources/Locale/en-US/reagents/meta/botany.ftl",
@@ -154,14 +117,65 @@ FORK_REGISTRY = {
             "Resources/Locale/en-US/botany/seeds.ftl",
             "Resources/Locale/en-US/seeds/seeds.ftl",
         ],
-        "blocked_reactions": set(),
-        "modified_reactions": {},
         "dispenser_chemicals": {
             "Aluminium", "Carbon", "Chlorine", "Copper", "Ethanol", "Fluorine",
             "Hydrogen", "Iodine", "Iron", "Lithium", "Mercury", "Nitrogen",
             "Oxygen", "Phosphorus", "Plasma", "Potassium", "Radium", "Silicon",
             "Silver", "Sodium", "Sulfur", "Sugar", "Water", "WeldingFuel", "Oil",
         },
+        # ── D3: item-fill source channels ──
+        # Entities that ship pre-filled with reagents (bottles/cans/pills) plus
+        # the acquisition channels that hand them out (vending inventories,
+        # bar/soda dispenser packs). Design: docs/design/2026-07-12-item-fill-sources.md
+        # Other forks default to [] (extractor uses .get); populated per fork in D3c.
+        "item_fill_files": [
+            "Resources/Prototypes/Entities/Objects/Consumable/Drinks/drinks_base.yml",
+            "Resources/Prototypes/Entities/Objects/Consumable/Drinks/drinks_base_materials.yml",
+            "Resources/Prototypes/Entities/Objects/Consumable/Drinks/drinks_bottles_glass.yml",
+            "Resources/Prototypes/Entities/Objects/Consumable/Drinks/drinks_bottles_plastic.yml",
+            "Resources/Prototypes/Entities/Objects/Consumable/Drinks/drinks_cans.yml",
+            "Resources/Prototypes/Entities/Objects/Consumable/Drinks/drinks-cartons.yml",
+            "Resources/Prototypes/Entities/Objects/Consumable/Drinks/drinks_fun.yml",
+            "Resources/Prototypes/Entities/Objects/Consumable/Drinks/drinks_special.yml",
+            "Resources/Prototypes/Entities/Objects/Consumable/Food/Containers/condiments.yml",
+            "Resources/Prototypes/Entities/Objects/Consumable/Food/ingredients.yml",
+            "Resources/Prototypes/Entities/Objects/Specific/Hydroponics/sprays.yml",
+            "Resources/Prototypes/Entities/Objects/Specific/Medical/healing.yml",
+            "Resources/Prototypes/Entities/Objects/Specific/Chemistry/chemistry-bottles.yml",
+        ],
+        "vending_inventory_files": [
+            "Resources/Prototypes/Catalog/VendingMachines/Inventories/boozeomat.yml",
+            "Resources/Prototypes/Catalog/VendingMachines/Inventories/chang.yml",
+            "Resources/Prototypes/Catalog/VendingMachines/Inventories/chapel.yml",
+            "Resources/Prototypes/Catalog/VendingMachines/Inventories/chefvend.yml",
+            "Resources/Prototypes/Catalog/VendingMachines/Inventories/chemvend.yml",
+            "Resources/Prototypes/Catalog/VendingMachines/Inventories/coffee.yml",
+            "Resources/Prototypes/Catalog/VendingMachines/Inventories/cola.yml",
+            "Resources/Prototypes/Catalog/VendingMachines/Inventories/condiments.yml",
+            "Resources/Prototypes/Catalog/VendingMachines/Inventories/discount.yml",
+            "Resources/Prototypes/Catalog/VendingMachines/Inventories/donut.yml",
+            "Resources/Prototypes/Catalog/VendingMachines/Inventories/medical.yml",
+            "Resources/Prototypes/Catalog/VendingMachines/Inventories/nutri.yml",
+            "Resources/Prototypes/Catalog/VendingMachines/Inventories/pwrgame.yml",
+            "Resources/Prototypes/Catalog/VendingMachines/Inventories/shamblersjuice.yml",
+            "Resources/Prototypes/Catalog/VendingMachines/Inventories/snack.yml",
+            "Resources/Prototypes/Catalog/VendingMachines/Inventories/soda.yml",
+            "Resources/Prototypes/Catalog/VendingMachines/Inventories/sovietsoda.yml",
+            "Resources/Prototypes/Catalog/VendingMachines/Inventories/spaceup.yml",
+            "Resources/Prototypes/Catalog/VendingMachines/Inventories/starkist.yml",
+            "Resources/Prototypes/Catalog/VendingMachines/Inventories/sustenance.yml",
+        ],
+        "vending_machine_files": [
+            "Resources/Prototypes/Entities/Structures/Machines/vending_machines.yml",
+        ],
+        "dispenser_files": [
+            "Resources/Prototypes/Entities/Structures/Dispensers/booze.yml",
+            "Resources/Prototypes/Entities/Structures/Dispensers/soda.yml",
+        ],
+        # D3b: produce entities with Extractable.juiceSolution (juicing channel)
+        "produce_files": [
+            "Resources/Prototypes/Entities/Objects/Consumable/Food/produce.yml",
+        ],
     },
 
     # ── RMC14 ──
@@ -169,7 +183,6 @@ FORK_REGISTRY = {
         "name": "RMC14",
         "repo": "RMC-14/RMC-14",
         "branch": "master",
-        "raw_url": "https://raw.githubusercontent.com/RMC-14/RMC-14/master/{path}",
         "custom_dir": "_RMC14",
         "color": "#06b6d4",
         # RMC14 completely replaces these vanilla categories with its own CM system
@@ -224,8 +237,6 @@ FORK_REGISTRY = {
             "Resources/Locale/en-US/_RMC14/medical/toxins.ftl",
             "Resources/Locale/en-US/_RMC14/medical/synth.ftl",
         ],
-        "seed_files": [],
-        "botany_locale_files": [],
         "blocked_reactions": {
             # Commented out in medicine.yml
             "Synaptizine", "Cognizine", "Saline",
@@ -275,20 +286,94 @@ FORK_REGISTRY = {
         "vanilla_override_reaction_files": VANILLA_REACTION_PATHS,
     },
 
-    # ── Russian Marine Corps / RuCM (RU, forks from RMC-14) ──
-    # Must stay right AFTER "rmc14": the repo carries its own copies of the
-    # _RMC14 layer with local additions (XenoAlch toxins, CMU medicine
-    # reactions) mixed into parent files. First-wins merge skips the
-    # identical-ID copies, so only RuCM's new content survives — but only if
-    # rmc14 is registered first. RuCM-exclusive content lives in _CMU14/_AU14.
+    # ── Colonial Marines Universe / CMU ──
+    # AU-14/ColonialMarinesUniverse — the upstream origin of the _CMU14/_AU14
+    # content that RuCM (below) mirrors. Registered as its own fork: parent_fork
+    # "rmc14" supplies the CM base chem system, and CMU's own _CMU14 layer adds
+    # drugs/toxins plus Yautja (Predator) and Abomination (Aliens) reagents.
+    # Like RuCM, CMU carries its own copies of the _RMC14 layer files; first-wins
+    # merge dedups identical IDs against the rmc14 parent so only CMU's additions
+    # survive, and parent_override_* auto-diffs CMU's copy of the _RMC14 layer to
+    # annotate recipes/reagents CMU changed or removed. Must be registered AFTER
+    # "rmc14" so the parent builds first.
+    "cmu": {
+        "name": "Colonial Marines Universe",
+        "repo": "AU-14/ColonialMarinesUniverse",
+        "branch": "master",
+        "custom_dir": "_CMU14",
+        "color": "#7c3aed",
+        "parent_fork": "rmc14",
+        # Same vanilla-category replacement as parent RMC14 (CM chem system)
+        "blocked_categories": {"Medicine", "Narcotics", "Cleaning", "Fun", "Chemicals", "Botany"},
+        "reagent_files": [
+            # CMU's copy of the parent-layer toxins — carries CM/XenoAlch toxin
+            # additions; first-wins dedups the identical-ID copies vs rmc14.
+            "Resources/Prototypes/_RMC14/Reagents/toxins.yml",
+            # CMU-exclusive _CMU14 reagents
+            "Resources/Prototypes/_CMU14/Economy/Recipes/Reagents/drugs.yml",
+            "Resources/Prototypes/_CMU14/Economy/Recipes/Reagents/toxins.yml",
+            "Resources/Prototypes/_CMU14/Economy/Recipes/Reagents/properties.yml",
+            # Medical reagents (painkillers incl. CMUSleen, organ-repair) were
+            # missing from the manifest, so CMUSleen showed a reaction but no
+            # reagent and was invisible. Correct path is Treatment/Reagents.
+            "Resources/Prototypes/_CMU14/Medical/Treatment/Reagents/painkillers.yml",
+            "Resources/Prototypes/_CMU14/Medical/Treatment/Reagents/organ_repair.yml",
+            "Resources/Prototypes/_CMU14/Threats/Abominations/reagents.yml",
+            "Resources/Prototypes/_CMU14/Threats/Yautja/Species/reagents.yml",
+        ],
+        "reaction_files": [
+            # CMU's copy of the parent-layer medicine reactions — new CM reactions
+            # mixed in; first-wins dedups vs rmc14.
+            "Resources/Prototypes/_RMC14/Recipes/Reactions/medicine.yml",
+            "Resources/Prototypes/_CMU14/Economy/Recipes/Reactions/other.yml",
+            "Resources/Prototypes/_CMU14/Economy/Recipes/Reactions/pyrotechnic.yml",
+        ],
+        "locale_files": [
+            "Resources/Locale/en-US/_AU14/drugs.ftl",
+            "Resources/Locale/en-US/_AU14/medicine.ftl",
+            "Resources/Locale/en-US/_CMU14/yautja/yautja.ftl",
+            "Resources/Locale/en-US/_CMU14/reagents/properties.ftl",
+        ],
+        "dispenser_chemicals": set(),  # CM dispenser chems already global via rmc14
+        "vanilla_override_reaction_files": VANILLA_REACTION_PATHS,
+        # Auto-diff CMU's copies of the _RMC14 parent layer against the rmc14
+        # build to annotate parent recipes/reagents CMU changed or removed.
+        "parent_override_reaction_files": [
+            "Resources/Prototypes/_RMC14/Recipes/Reactions/chemicals.yml",
+            "Resources/Prototypes/_RMC14/Recipes/Reactions/elements.yml",
+            "Resources/Prototypes/_RMC14/Recipes/Reactions/ingredients.yml",
+            "Resources/Prototypes/_RMC14/Recipes/Reactions/medicine.yml",
+            "Resources/Prototypes/_RMC14/Recipes/Reactions/narcotics.yml",
+            "Resources/Prototypes/_RMC14/Recipes/Reactions/other.yml",
+            "Resources/Prototypes/_RMC14/Recipes/Reactions/pyrotechnic.yml",
+            "Resources/Prototypes/_RMC14/Recipes/Reactions/toxins.yml",
+        ],
+        "parent_override_reagent_files": [
+            "Resources/Prototypes/_RMC14/Reagents/base_reagent.yml",
+            "Resources/Prototypes/_RMC14/Reagents/elements.yml",
+            "Resources/Prototypes/_RMC14/Reagents/medicine.yml",
+            "Resources/Prototypes/_RMC14/Reagents/narcotics.yml",
+            "Resources/Prototypes/_RMC14/Reagents/other.yml",
+            "Resources/Prototypes/_RMC14/Reagents/pyrotechnic.yml",
+            "Resources/Prototypes/_RMC14/Reagents/synth_blood.yml",
+            "Resources/Prototypes/_RMC14/Reagents/toxins.yml",
+        ],
+    },
+
+    # ── Russian Marine Corps / RuCM (RU, downstream fork of CMU) ──
+    # parent_fork "cmu": RussianCM forks from ColonialMarinesUniverse, so it
+    # inherits CMU's _CMU14/_AU14 layer (and rmc14 beneath it) via ancestry and
+    # adds RU translations plus a few local tweaks. Must be registered AFTER cmu
+    # so the parent builds first; first-wins then credits the shared _CMU14/_AU14
+    # IDs to CMU while RuCM still shows them through inheritance. parent_override_*
+    # diffs RuCM's copies of the _RMC14 layer against the parent build.
     "rucm": {
         "name": "Russian Marine Corps",
         "repo": "flex5hybrid/RussianCM",
         "branch": "master",
-        "raw_url": "https://raw.githubusercontent.com/flex5hybrid/RussianCM/master/{path}",
         "custom_dir": "_CMU14",
         "color": "#9f1239",
-        "parent_fork": "rmc14",
+        "parent_fork": "cmu",
         # Same vanilla-category replacement as parent RMC14 (CM chem system)
         "blocked_categories": {"Medicine", "Narcotics", "Cleaning", "Fun", "Chemicals", "Botany"},
         "reagent_files": [
@@ -296,8 +381,10 @@ FORK_REGISTRY = {
             "Resources/Prototypes/_RMC14/Reagents/toxins.yml",
             "Resources/Prototypes/_CMU14/Economy/Recipes/Reagents/drugs.yml",
             "Resources/Prototypes/_CMU14/Economy/Recipes/Reagents/toxins.yml",
-            "Resources/Prototypes/_CMU14/Medical/reagents/organ_repair.yml",
-            "Resources/Prototypes/_CMU14/Medical/reagents/painkillers.yml",
+            # Path is Medical/Treatment/Reagents (the Medical/reagents form was a
+            # typo — silently 404'd, so RuCM lost CMUSleen & the organ-repair set)
+            "Resources/Prototypes/_CMU14/Medical/Treatment/Reagents/organ_repair.yml",
+            "Resources/Prototypes/_CMU14/Medical/Treatment/Reagents/painkillers.yml",
             "Resources/Prototypes/_CMU14/Threats/Abominations/reagents.yml",
             "Resources/Prototypes/_CMU14/Threats/Yautja/Species/reagents.yml",
         ],
@@ -314,10 +401,6 @@ FORK_REGISTRY = {
             # RuCM's copy of the parent locale — adds XenoAlch names (pure additions)
             "Resources/Locale/en-US/_RMC14/medical/toxins.ftl",
         ],
-        "seed_files": [],
-        "botany_locale_files": [],
-        "blocked_reactions": set(),
-        "modified_reactions": {},
         "dispenser_chemicals": set(),  # CM dispenser chems already global via rmc14
         "vanilla_override_reaction_files": VANILLA_REACTION_PATHS,
         # RuCM's copies of parent RMC14 reaction files, auto-diffed against the
@@ -364,7 +447,6 @@ FORK_REGISTRY = {
         "name": "Goob Station",
         "repo": "Goob-Station/Goob-Station",
         "branch": "master",
-        "raw_url": "https://raw.githubusercontent.com/Goob-Station/Goob-Station/master/{path}",
         "custom_dir": "_Goobstation",
         "color": "#f472b6",
         "reagent_files": [
@@ -427,7 +509,6 @@ FORK_REGISTRY = {
         ],
         "locale_files": [],
         "seed_files": ["Resources/Prototypes/_Goobstation/Hydroponics/seeds.yml"],
-        "botany_locale_files": [],
         "blocked_reactions": set(),  # Goob doesn't block vanilla reactions — modifies in-place
         "modified_reactions": {
             "Stimulants": "Product yield increased from 2 to 3",
@@ -440,8 +521,23 @@ FORK_REGISTRY = {
             "Licoxide": "Added Lead(1) as extra reactant; added maxTemp: 265",
             "PlasticSheet": "Reactant amounts doubled: Oil 5→10, Ash 3→6, SulfuricAcid 2→4",
         },
-        "dispenser_chemicals": set(),
         "vanilla_override_reaction_files": VANILLA_REACTION_PATHS,
+        # D3c: fork item-fill channels (custom layer only; patched vanilla-path
+        # vendor copies are a follow-up — see design doc)
+        "item_fill_files": [
+            "Resources/Prototypes/_Goobstation/Entities/Objects/Consumable/Drinks/drinks.yml",
+            "Resources/Prototypes/_Goobstation/Entities/Objects/Consumable/Drinks/drinks-cartons.yml",
+        ],
+        "vending_inventory_files": [
+            "Resources/Prototypes/_Goobstation/Catalog/VendingMachines/Inventories/fitness.yml",
+            "Resources/Prototypes/_Goobstation/Catalog/VendingMachines/Inventories/hotfood.yml",
+            "Resources/Prototypes/_Goobstation/Catalog/VendingMachines/Inventories/solsnack.yml",
+            "Resources/Prototypes/_Goobstation/Catalog/VendingMachines/Inventories/sweettoof.yml",
+            "Resources/Prototypes/_Goobstation/Catalog/VendingMachines/Inventories/weebvend.yml",
+        ],
+        "vending_machine_files": [
+            "Resources/Prototypes/_Goobstation/Entities/Structures/Machines/vending_machines.yml",
+        ],
     },
 
     # ── Starlight ──
@@ -449,7 +545,6 @@ FORK_REGISTRY = {
         "name": "Starlight",
         "repo": "fskx/starlight-ss14",
         "branch": "Starlight",
-        "raw_url": "https://raw.githubusercontent.com/fskx/starlight-ss14/Starlight/{path}",
         "custom_dir": "_Starlight",
         "color": "#facc15",
         "reagent_files": [
@@ -483,7 +578,6 @@ FORK_REGISTRY = {
             "Resources/Locale/en-US/_Starlight/seeds/seeds.ftl",
         ],
         "seed_files": ["Resources/Prototypes/_Starlight/Hydroponics/seeds.yml"],
-        "botany_locale_files": [],
         "blocked_reactions": {
             "Heparin",  # Replaced by Warfarin in Starlight's vanilla medicine.yml override
         },
@@ -492,7 +586,6 @@ FORK_REGISTRY = {
             # NOTE: Starlight adds Necrosol & Warfarin reactions in vanilla medicine.yml path
             # (not in _Starlight/) — parser limitation, these won't be auto-detected
         },
-        "dispenser_chemicals": set(),
         "vanilla_override_reaction_files": VANILLA_REACTION_PATHS,
     },
 
@@ -501,7 +594,6 @@ FORK_REGISTRY = {
         "name": "Delta-V",
         "repo": "DeltaV-Station/Delta-v",
         "branch": "master",
-        "raw_url": "https://raw.githubusercontent.com/DeltaV-Station/Delta-v/master/{path}",
         "custom_dir": "_DV",
         "color": "#3b82f6",
         "reagent_files": [
@@ -570,11 +662,28 @@ FORK_REGISTRY = {
             "Resources/Locale/en-US/_DV/seeds.ftl",
         ],
         "seed_files": ["Resources/Prototypes/_DV/Hydroponics/seeds.yml"],
-        "botany_locale_files": [],
-        "blocked_reactions": set(),
-        "modified_reactions": {},
-        "dispenser_chemicals": set(),
         "vanilla_override_reaction_files": VANILLA_REACTION_PATHS,
+        # D3c: fork item-fill channels
+        "item_fill_files": [
+            "Resources/Prototypes/_DV/Entities/Objects/Consumable/Drinks/drinks.yml",
+            "Resources/Prototypes/_DV/Entities/Objects/Consumable/Drinks/drinks-cartons.yml",
+            "Resources/Prototypes/_DV/Entities/Objects/Consumable/Drinks/drinks_bottles.yml",
+            "Resources/Prototypes/_DV/Entities/Objects/Consumable/Drinks/drinks_cans.yml",
+            "Resources/Prototypes/_DV/Entities/Objects/Consumable/Drinks/drinks_cups.yml",
+            "Resources/Prototypes/_DV/Entities/Objects/Consumable/Drinks/frozen_treats.yml",
+            "Resources/Prototypes/_DV/Entities/Objects/Consumable/Drinks/powdered_drinks.yml",
+        ],
+        "vending_inventory_files": [
+            "Resources/Prototypes/_DV/Catalog/VendingMachines/Inventories/commandboozeomat.yml",
+            "Resources/Prototypes/_DV/Catalog/VendingMachines/Inventories/crescentmoon.yml",
+            "Resources/Prototypes/_DV/Catalog/VendingMachines/Inventories/nanoblood.yml",
+            "Resources/Prototypes/_DV/Catalog/VendingMachines/Inventories/nanomedcivilian.yml",
+            "Resources/Prototypes/_DV/Catalog/VendingMachines/Inventories/unlockedboozeomat.yml",
+            "Resources/Prototypes/_DV/Catalog/VendingMachines/Inventories/unlockedchefvend.yml",
+        ],
+        "vending_machine_files": [
+            "Resources/Prototypes/_DV/Entities/Structures/Machines/vending_machines.yml",
+        ],
     },
 
     # ── Dead Space ──
@@ -582,7 +691,6 @@ FORK_REGISTRY = {
         "name": "Dead Space",
         "repo": "dead-space-server/dead-space-14",
         "branch": "master",
-        "raw_url": "https://raw.githubusercontent.com/dead-space-server/dead-space-14/master/{path}",
         "custom_dir": "_DeadSpace",
         "color": "#94a3b8",
         "reagent_files": [
@@ -608,10 +716,6 @@ FORK_REGISTRY = {
         ],
         "locale_files": [],
         "seed_files": ["Resources/Prototypes/_DeadSpace/Hydroponics/seeds.yml"],
-        "botany_locale_files": [],
-        "blocked_reactions": set(),
-        "modified_reactions": {},
-        "dispenser_chemicals": set(),
         "vanilla_override_reaction_files": VANILLA_REACTION_PATHS,
     },
 
@@ -620,7 +724,6 @@ FORK_REGISTRY = {
         "name": "Frontier",
         "repo": "new-frontiers-14/frontier-station-14",
         "branch": "master",
-        "raw_url": "https://raw.githubusercontent.com/new-frontiers-14/frontier-station-14/master/{path}",
         "custom_dir": "_NF",
         "color": "#fb923c",
         "reagent_files": [
@@ -654,12 +757,9 @@ FORK_REGISTRY = {
             "Resources/Locale/en-US/_NF/seeds/seeds.ftl",
         ],
         "seed_files": ["Resources/Prototypes/_NF/Hydroponics/seeds.yml"],
-        "botany_locale_files": [],
         "blocked_reactions": {
             "Lye",  # Missing from Frontier's vanilla chemicals.yml
         },
-        "modified_reactions": {},
-        "dispenser_chemicals": set(),
         "vanilla_override_reaction_files": VANILLA_REACTION_PATHS,
     },
 
@@ -668,7 +768,6 @@ FORK_REGISTRY = {
         "name": "Funky Station",
         "repo": "funky-station/funky-station",
         "branch": "master",
-        "raw_url": "https://raw.githubusercontent.com/funky-station/funky-station/master/{path}",
         "custom_dir": "_Funkystation",
         "color": "#c084fc",
         "parent_fork": "goob",  # inherits Goob's custom chemistry too
@@ -722,7 +821,6 @@ FORK_REGISTRY = {
             "Resources/Prototypes/_Funkystation/Hydroponics/seeds.yml",
             "Resources/Prototypes/_Impstation/Hydroponics/seeds.yml",
         ],
-        "botany_locale_files": [],
         "blocked_reactions": {
             "Lye",           # Missing from Funky's vanilla chemicals.yml
             "ArtifactGlue",  # Missing from Funky's vanilla chemicals.yml
@@ -738,7 +836,6 @@ FORK_REGISTRY = {
             "Ambuzol": "Recipe changed: uses Multiver instead of Dylovene",
             "Opporozidone": "Recipe changed: Cognizine as catalyst + Plasma(5) + Doxarubixadone",
         },
-        "dispenser_chemicals": set(),
         "vanilla_override_reaction_files": VANILLA_REACTION_PATHS,
     },
 
@@ -751,7 +848,6 @@ FORK_REGISTRY = {
         "name": "Trauma Station",
         "repo": "Trauma-Station/Trauma-Station",
         "branch": "master",
-        "raw_url": "https://raw.githubusercontent.com/Trauma-Station/Trauma-Station/master/{path}",
         "custom_dir": "_Trauma",
         "color": "#ef4444",
         "parent_fork": "goob",
@@ -784,10 +880,6 @@ FORK_REGISTRY = {
             "Resources/Locale/en-US/_Trauma/botany/seeds.ftl",
         ],
         "seed_files": ["Resources/Prototypes/_Trauma/Hydroponics/seeds.yml"],
-        "botany_locale_files": [],
-        "blocked_reactions": set(),
-        "modified_reactions": {},
-        "dispenser_chemicals": set(),
         "vanilla_override_reaction_files": VANILLA_REACTION_PATHS,
     },
 
@@ -798,7 +890,6 @@ FORK_REGISTRY = {
         "name": "Omu Station",
         "repo": "ProjectOmu/OmuStation",
         "branch": "master",
-        "raw_url": "https://raw.githubusercontent.com/ProjectOmu/OmuStation/master/{path}",
         "custom_dir": "_Omu",
         "color": "#f59e0b",
         "parent_fork": "goob",
@@ -833,10 +924,6 @@ FORK_REGISTRY = {
             "Resources/Locale/en-US/_Gardenstation/reagents/reagents.ftl",
         ],
         "seed_files": ["Resources/Prototypes/_Gardenstation/Hydroponics/seeds.yml"],
-        "botany_locale_files": [],
-        "blocked_reactions": set(),
-        "modified_reactions": {},
-        "dispenser_chemicals": set(),
         "vanilla_override_reaction_files": VANILLA_REACTION_PATHS,
     },
 
@@ -845,7 +932,6 @@ FORK_REGISTRY = {
         "name": "Carpmosia",
         "repo": "carpmosia/carpmosia",
         "branch": "dev",
-        "raw_url": "https://raw.githubusercontent.com/carpmosia/carpmosia/dev/{path}",
         "custom_dir": "_Carpmosia",
         "color": "#14b8a6",
         "reagent_files": [
@@ -862,10 +948,6 @@ FORK_REGISTRY = {
         ],
         "locale_files": [],
         "seed_files": ["Resources/Prototypes/_Carpmosia/Hydroponics/seeds.yml"],
-        "botany_locale_files": [],
-        "blocked_reactions": set(),
-        "modified_reactions": {},
-        "dispenser_chemicals": set(),
         "vanilla_override_reaction_files": VANILLA_REACTION_PATHS,
     },
 
@@ -876,7 +958,6 @@ FORK_REGISTRY = {
         "name": "Monolith",
         "repo": "Monolith-Station/Monolith",
         "branch": "main",
-        "raw_url": "https://raw.githubusercontent.com/Monolith-Station/Monolith/main/{path}",
         "custom_dir": "_Mono",
         "color": "#78716c",
         "parent_fork": "frontier",
@@ -906,10 +987,6 @@ FORK_REGISTRY = {
         ],
         # Monolith keeps its _NF seeds at the pre-move Entities path
         "seed_files": ["Resources/Prototypes/_NF/Entities/Objects/Specific/Hydroponics/seeds.yml"],
-        "botany_locale_files": [],
-        "blocked_reactions": set(),
-        "modified_reactions": {},
-        "dispenser_chemicals": set(),
         "vanilla_override_reaction_files": VANILLA_REACTION_PATHS,
     },
 
@@ -918,7 +995,6 @@ FORK_REGISTRY = {
         "name": "Harmony",
         "repo": "ss14-harmony/ss14-harmony",
         "branch": "master",
-        "raw_url": "https://raw.githubusercontent.com/ss14-harmony/ss14-harmony/master/{path}",
         "custom_dir": "_Harmony",
         "color": "#84cc16",
         "reagent_files": [
@@ -935,10 +1011,6 @@ FORK_REGISTRY = {
         ],
         "locale_files": [],
         "seed_files": ["Resources/Prototypes/_Harmony/Hydroponics/seeds.yml"],
-        "botany_locale_files": [],
-        "blocked_reactions": set(),
-        "modified_reactions": {},
-        "dispenser_chemicals": set(),
         "vanilla_override_reaction_files": VANILLA_REACTION_PATHS,
     },
 
@@ -948,7 +1020,6 @@ FORK_REGISTRY = {
         "name": "Corvax",
         "repo": "space-syndicate/space-station-14",
         "branch": "master",
-        "raw_url": "https://raw.githubusercontent.com/space-syndicate/space-station-14/master/{path}",
         "custom_dir": "Corvax",
         "color": "#6366f1",
         "reagent_files": [
@@ -960,11 +1031,6 @@ FORK_REGISTRY = {
             "Resources/Prototypes/Corvax/Recipes/Reactions/drinks.yml",
         ],
         "locale_files": [],
-        "seed_files": [],
-        "botany_locale_files": [],
-        "blocked_reactions": set(),
-        "modified_reactions": {},
-        "dispenser_chemicals": set(),
         "vanilla_override_reaction_files": VANILLA_REACTION_PATHS,
     },
 
@@ -974,7 +1040,6 @@ FORK_REGISTRY = {
         "name": "ADT (Время Приключений)",
         "repo": "AdventureTimeSS14/space_station_ADT",
         "branch": "master",
-        "raw_url": "https://raw.githubusercontent.com/AdventureTimeSS14/space_station_ADT/master/{path}",
         "custom_dir": "ADT",
         "color": "#f43f5e",
         "parent_fork": "corvax",
@@ -1010,11 +1075,25 @@ FORK_REGISTRY = {
             "Resources/Locale/en-US/ADT/reagents/meta/toxins.ftl",
         ],
         "seed_files": ["Resources/Prototypes/ADT/Hydroponics/seeds.yml"],
-        "botany_locale_files": [],
-        "blocked_reactions": set(),
-        "modified_reactions": {},
-        "dispenser_chemicals": set(),
         "vanilla_override_reaction_files": VANILLA_REACTION_PATHS,
+        # D3c: fork item-fill channels (pillomat = ADT pill vendor)
+        "item_fill_files": [
+            "Resources/Prototypes/ADT/Entities/Objects/Consumable/Drinks/drink_bottles.yml",
+            "Resources/Prototypes/ADT/Entities/Objects/Consumable/Drinks/drink_cups.yml",
+            "Resources/Prototypes/ADT/Entities/Objects/Consumable/Drinks/drinks.yml",
+            "Resources/Prototypes/ADT/Entities/Objects/Consumable/Drinks/drinks_cans.yml",
+            "Resources/Prototypes/ADT/Entities/Objects/Consumable/Drinks/drinks_flasks.yml",
+            "Resources/Prototypes/ADT/Entities/Objects/Consumable/Drinks/yupi.yml",
+            "Resources/Prototypes/ADT/Entities/Objects/Specific/Medical/healing.yml",
+        ],
+        "vending_inventory_files": [
+            "Resources/Prototypes/ADT/Catalog/VendingMachines/Inventories/civimed.yml",
+            "Resources/Prototypes/ADT/Catalog/VendingMachines/Inventories/icecream.yml",
+            "Resources/Prototypes/ADT/Catalog/VendingMachines/Inventories/pillomat.yml",
+        ],
+        "vending_machine_files": [
+            "Resources/Prototypes/ADT/Entities/Structures/Machines/vending_machines.yml",
+        ],
     },
 
     # ── Sunrise (RU) ──
@@ -1024,7 +1103,6 @@ FORK_REGISTRY = {
         "name": "Sunrise",
         "repo": "space-sunrise/sunrise-station",
         "branch": "master",
-        "raw_url": "https://raw.githubusercontent.com/space-sunrise/sunrise-station/master/{path}",
         "custom_dir": "_Sunrise",
         "color": "#d946ef",
         "reagent_files": [
@@ -1055,10 +1133,6 @@ FORK_REGISTRY = {
             "Resources/Locale/en-US/_prototypes/_sunrise/entities/objects/specific/hydroponics/seeds.ftl",
         ],
         "seed_files": ["Resources/Prototypes/_Sunrise/Hydroponics/seeds.yml"],
-        "botany_locale_files": [],
-        "blocked_reactions": set(),
-        "modified_reactions": {},
-        "dispenser_chemicals": set(),
         "vanilla_override_reaction_files": VANILLA_REACTION_PATHS,
     },
 
@@ -1069,7 +1143,6 @@ FORK_REGISTRY = {
         "name": "Fish Station (Рыбья)",
         "repo": "space-sunrise/fish-station",
         "branch": "master",
-        "raw_url": "https://raw.githubusercontent.com/space-sunrise/fish-station/master/{path}",
         "custom_dir": "_Fish",
         "color": "#0ea5e9",
         "parent_fork": "sunrise",
@@ -1095,10 +1168,6 @@ FORK_REGISTRY = {
             "Resources/Locale/en-US/_prototypes/_fish/entities/objects/specific/hydroponics/seeds.ftl",
         ],
         "seed_files": ["Resources/Prototypes/_Fish/Hydroponics/seeds.yml"],
-        "botany_locale_files": [],
-        "blocked_reactions": set(),
-        "modified_reactions": {},
-        "dispenser_chemicals": set(),
         "vanilla_override_reaction_files": VANILLA_REACTION_PATHS,
     },
 }
@@ -1107,23 +1176,14 @@ FORK_REGISTRY = {
 # Phase 2b harvest (fork-added content inside patched vanilla files). Explicit
 # per-fork override still possible by setting the key in the entry above.
 for _fork_id, _fconf in FORK_REGISTRY.items():
+    # T2c: raw_url is mechanically repo+branch — derive it instead of
+    # repeating the same GitHub-raw URL in every entry.
+    _fconf.setdefault(
+        "raw_url",
+        f"https://raw.githubusercontent.com/{_fconf['repo']}/{_fconf['branch']}/{{path}}",
+    )
     if _fork_id != "vanilla":
         _fconf.setdefault("vanilla_override_reagent_files", VANILLA_REAGENT_PATHS)
-
-# ── Backward-compatible aliases (used by extractor during transition) ──
-VANILLA_RAW = FORK_REGISTRY["vanilla"]["raw_url"]
-RMC14_RAW = FORK_REGISTRY["rmc14"]["raw_url"]
-VANILLA_REAGENT_FILES = FORK_REGISTRY["vanilla"]["reagent_files"]
-VANILLA_REACTION_FILES = FORK_REGISTRY["vanilla"]["reaction_files"]
-VANILLA_LOCALE_FILES = FORK_REGISTRY["vanilla"]["locale_files"]
-RMC14_REAGENT_FILES = FORK_REGISTRY["rmc14"]["reagent_files"]
-RMC14_REACTION_FILES = FORK_REGISTRY["rmc14"]["reaction_files"]
-RMC14_LOCALE_FILES = FORK_REGISTRY["rmc14"]["locale_files"]
-VANILLA_SEED_FILES = FORK_REGISTRY["vanilla"]["seed_files"]
-VANILLA_BOTANY_LOCALE_FILES = FORK_REGISTRY["vanilla"]["botany_locale_files"]
-RMC14_SEED_FILES = FORK_REGISTRY["rmc14"]["seed_files"]
-RMC14_BLOCKED_REACTIONS = FORK_REGISTRY["rmc14"]["blocked_reactions"]
-RMC14_MODIFIED_REACTIONS = FORK_REGISTRY["rmc14"]["modified_reactions"]
 
 # Combined dispenser chemicals (all forks)
 BASE_DISPENSER_CHEMICALS = set()
@@ -1207,45 +1267,17 @@ OTHER_REAGENT_SOURCES = {
     "Nothing": ["EMAG Solar's Best Hot Drink vending machine"],
     "ChangelingSting": ["EMAG Shambler's Juice vending machine"],
     "NukieCola": ["EMAG Robust Softdrinks vending machine"],
-}
-
-# Vanilla reactions BLOCKED/REMOVED in RMC14 fork
-# These reactions exist in vanilla SS14 but are commented out or deleted in RMC14
-RMC14_BLOCKED_REACTIONS = {
-    # Medicine (commented or removed)
-    "Synaptizine", "Cognizine", "Saline", "Arcryox", "Heparin", "Hemorrhinol",
-    # Chemicals (commented or removed)
-    "Desoxyephedrine", "Lye",
-    # Drinks (replaced or commented)
-    "OrangeLimeSoda", "Neurotoxin", "Singulo",
-    # Food breakdowns (removed)
-    "CookingMustard", "BananaBreakdown", "AllicinBreakdown", "NutrimentBreakdown",
-    "FatBreakdown", "UncookedAnimalProteinBreakdown", "ProteinBreakdown", "VitaminBreakdown",
-    # Soap (entire file removed)
-    "CreateSoapRegular", "CreateSoapNT", "CreateSoapDeluxe",
-    "CreateSoapBlood", "CreateSoapSyndie", "CreateSoapOmega",
-    # Fun (removed)
-    "Felinase", "Caninase", "CaninaseFelinaseReaction",
-    # Biological (removed)
-    "SulfurBloodBreakdown",
-    # Cascade-blocked (reaction exists but a required reactant can't be crafted)
-    "Pax",                  # needs Synaptizine (commented out)
-    "Opporozidone",         # needs Cognizine (commented out)
-    "Ethyloxyephedrine",    # needs Desoxyephedrine (commented out)
-    "Diphenylmethylamine",  # needs Ethyloxyephedrine (cascade)
-    # Likely blocked by C# code (present in YAML but confirmed unavailable in-game)
-    "Arithrazine",          # user-confirmed unavailable on RMC14
-    "DoctorsDelight",       # user-confirmed unavailable on RMC14
-}
-
-# Vanilla reactions MODIFIED in RMC14 (different from vanilla version)
-RMC14_MODIFIED_REACTIONS = {
-    "MuteToxin": "Added Uranium as extra reactant",
-    "Smoke": "Priority changed from -10 to 10",
-    "Foam": "Priority changed from -10 to 10",
-    "IronMetalFoam": "Priority changed from -10 to 10",
-    "AluminiumMetalFoam": "Priority changed from -10 to 10",
-    "AmmoniaFromBlood": "Stir mixer requirement removed",
+    # D3a honest labels — non-item channels the parser can't see.
+    # Species bloods verified against Body/Species/*.yml bloodReferenceSolution
+    # (2026-07-12): vox=AmmoniaBlood, moth=InsectBlood, arachnid=CopperBlood.
+    "AmmoniaBlood": ["Blood draw: Vox crew (syringe)"],
+    "CopperBlood": ["Blood draw: Arachnid crew (syringe)"],
+    "InsectBlood": ["Blood draw: Moth crew (syringe)"],
+    "Frezon": ["Atmospherics (gas mixing)"],
+    "Tritium": ["Atmospherics (plasma burn chamber)"],
+    "NitrousOxide": ["Atmospherics (gas mixing)"],
+    "MilkGoat": ["Milking goats (mob interaction)"],
+    "MilkSheep": ["Milking sheep (mob interaction)"],
 }
 
 # Dangerous chemical interactions database
@@ -1479,6 +1511,144 @@ ANTAG_DATA = {
         "score": 3, "tags": ["utility"],
         "tips": "Flammable gas. Can be released to cause fires. Component in many recipes. Available from dispensers.",
     },
+}
+
+# ─────────────────────────────────────────────
+# Shift-start presets (ROADMAP A2)
+# One-click starter batches for the Batch Planner — peaceful counterpart to
+# ANTAG_STRATEGIES, same provenance model (every entry carries sources).
+# tier: "newbie" (safe shift-opening set) | "meta" (experienced second wave).
+# Reagent ids are validated against extracted reagents at build time; invalid
+# ids are dropped with a warning so a typo can't ship a broken preset.
+# ─────────────────────────────────────────────
+SHIFT_PRESETS = [
+    {
+        "id": "med-chem-starter",
+        "name": "Med-Chem Starter",
+        "role": "chemist",
+        "tier": "newbie",
+        "desc": "Classic shift-opening batch: brute/burn/tox coverage plus a crit stabilizer.",
+        "reagents": [
+            {"id": "Bicaridine", "amount": 90},
+            {"id": "Kelotane", "amount": 90},
+            {"id": "Dylovene", "amount": 90},
+            {"id": "Epinephrine", "amount": 30},
+        ],
+        "sources": ["mk-shift-presets"],
+    },
+    {
+        "id": "med-chem-advanced",
+        "name": "Advanced Meds",
+        "role": "chemist",
+        "tier": "meta",
+        "desc": "Second wave once basics are stocked: stronger burn care, airloss, radiation, cellular damage and body-temp stabilization.",
+        "reagents": [
+            {"id": "Dermaline", "amount": 60},
+            {"id": "DexalinPlus", "amount": 60},
+            {"id": "Hyronalin", "amount": 30},
+            {"id": "Leporazine", "amount": 30},
+            {"id": "Phalanximine", "amount": 30},
+        ],
+        "sources": ["mk-shift-presets"],
+    },
+    {
+        "id": "botany-kit",
+        "name": "Botany Kit",
+        "role": "botanist",
+        "tier": "newbie",
+        "desc": "Grow-room chemistry: nutrients, yield booster, controlled mutations and weed control.",
+        "reagents": [
+            {"id": "EZNutrient", "amount": 60},
+            {"id": "RobustHarvest", "amount": 60},
+            {"id": "UnstableMutagen", "amount": 30},
+            {"id": "Left4Zed", "amount": 30},
+            {"id": "PlantBGone", "amount": 30},
+        ],
+        "sources": ["mk-shift-presets"],
+    },
+    {
+        "id": "bar-prep",
+        "name": "Bar Prep",
+        "role": "bartender",
+        "tier": "newbie",
+        "desc": "Mixable bases to open the bar: soft-drink stock, ice and house vodka.",
+        "reagents": [
+            {"id": "Cola", "amount": 60},
+            {"id": "SodaWater", "amount": 60},
+            {"id": "Ice", "amount": 30},
+            {"id": "Vodka", "amount": 30},
+        ],
+        "sources": ["mk-shift-presets"],
+    },
+]
+
+# ─────────────────────────────────────────────
+# Species physiology (ROADMAP D2)
+# Curated layer (amber tier): breathing + quirks per playable species.
+# The per-reagent organ conditions ("if organ: Moth") are YAML-extracted
+# separately (green tier) — this dict only covers what body prototypes
+# would tell us if they were in the extraction manifest.
+# ─────────────────────────────────────────────
+SPECIES_DATA = {
+    "Human": {
+        "name": "Human", "breathes": "oxygen", "toxicGas": None,
+        "note": "Baseline physiology — all standard medicine applies.",
+    },
+    "Dwarf": {
+        "name": "Dwarf", "breathes": "oxygen", "toxicGas": None,
+        "note": "Human-like; notably resistant to alcohol.",
+    },
+    "Slime": {
+        "name": "Slime person", "breathes": "oxygen", "toxicGas": None,
+        "note": "Slime metabolism — several reagents behave differently (see per-reagent organ notes).",
+    },
+    "Vox": {
+        "name": "Vox", "breathes": "nitrogen", "toxicGas": "oxygen",
+        "note": "Breathes NITROGEN; oxygen is toxic to them — avoid oxygen-based breathing meds; internals with N2 required off-station.",
+    },
+    "Diona": {
+        "name": "Diona", "breathes": "oxygen", "toxicGas": None,
+        "note": "Plant-based multi-organ physiology; regenerates in light, several meds metabolize oddly.",
+    },
+    "Moth": {
+        "name": "Moth person", "breathes": "oxygen", "toxicGas": None,
+        "note": "Insectoid — pesticides (e.g. Bug Spray) poison them; can eat cloth.",
+    },
+    "Arachnid": {
+        "name": "Arachnid", "breathes": "oxygen", "toxicGas": None,
+        "note": "Insectoid physiology; web-related interactions.",
+    },
+    "Reptilian": {
+        "name": "Reptilian", "breathes": "oxygen", "toxicGas": None,
+        "note": "Cold-sensitive; temperature meds matter more.",
+    },
+}
+SPECIES_GUIDE_SOURCES = ["mk-species-guide"]
+
+# ─────────────────────────────────────────────
+# Botany swab / mutation guide (ROADMAP D1)
+# The HOW of cross-pollination lives in C# code, so this layer is curated
+# (amber "community knowledge" tier), while the mutation graph itself is
+# YAML-extracted (green tier). Same provenance model as everything curated.
+# ─────────────────────────────────────────────
+BOTANY_GUIDE = {
+    "title": "Swabs & mutations — how the evolution chart works",
+    "tier": "community",
+    "sources": ["mk-botany-guide"],
+    "sections": [
+        {
+            "h": "Species mutations (the arrows in the chart)",
+            "body": "Raise a plant's mutation level — most reliably by dosing the tray with Unstable Mutagen (~1-5u; more risks killing the plant) — and on the next growth ticks the plant may jump to one of its listed mutation targets. Only species with arrows here can jump; the targets come straight from the game's seed data.",
+        },
+        {
+            "h": "Swabs (cross-pollination)",
+            "body": "Use a gauze swab on flowering plant A to collect its pollen, then swab plant B: B's next generation mixes STATS (potency, yield, lifespan, harvest type, chemicals) between the two. Swabs shuffle traits — they do NOT trigger the species jumps shown in the chart.",
+        },
+        {
+            "h": "Practical loop",
+            "body": "1) Mutagen small doses until the species you want appears. 2) Stabilize: harvest, replant the mutated seeds. 3) Swab-breed your best specimens to stack potency/yield onto the new species. 4) Robust Harvest boosts potency; seedless traits need the clippers workaround.",
+        },
+    ],
 }
 
 # Pre-built antagonist strategies/combos
@@ -1813,20 +1983,6 @@ CATEGORY_SHEET_MAP = {
     "Metals": "Materials",
     "Ores": "Materials",
 }
-
-# Reagent columns
-REAGENT_COLUMNS = [
-    "Name", "ID", "Group", "Color", "Recipe", "Produces",
-    "Temp Req", "Mixer", "Effects", "Metabolism", "Overdose",
-    "Craft Chain", "Physical Desc", "Flavor", "Source", "Notes",
-]
-
-# Reaction columns
-REACTION_COLUMNS = [
-    "Reaction Name", "Reactants", "Products", "Min Temp", "Max Temp",
-    "Mixer Required", "Effects", "Priority", "Impact",
-    "Full Craft Chain", "Source",
-]
 
 # ── Maps tab (ss14_map_extractor.py) ──
 # gameMap ids to hide even though they pass MIN_MAP_ITEMS: admin/debug maps

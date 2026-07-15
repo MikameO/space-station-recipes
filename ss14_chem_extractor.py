@@ -19,25 +19,17 @@ from pathlib import Path
 from collections import defaultdict
 
 import yaml
-import openpyxl
-from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
-from openpyxl.utils import get_column_letter
 
 from config import (
     FORK_REGISTRY,
-    VANILLA_RAW, RMC14_RAW,
-    VANILLA_REAGENT_FILES, VANILLA_REACTION_FILES, VANILLA_LOCALE_FILES,
-    RMC14_REAGENT_FILES, RMC14_REACTION_FILES, RMC14_LOCALE_FILES,
-    VANILLA_SEED_FILES, RMC14_SEED_FILES, VANILLA_BOTANY_LOCALE_FILES,
     OTHER_REAGENT_SOURCES, DANGEROUS_INTERACTIONS,
-    RMC14_BLOCKED_REACTIONS, RMC14_MODIFIED_REACTIONS,
     BASE_DISPENSER_CHEMICALS, CATEGORY_SHEET_MAP,
-    REAGENT_COLUMNS, REACTION_COLUMNS,
     ANTAG_DATA, ANTAG_STRATEGIES, DELIVERY_MECHANISMS, SYNDICATE_ITEMS,
+    SHIFT_PRESETS, BOTANY_GUIDE, SPECIES_DATA, SPECIES_GUIDE_SOURCES,
 )
 from sources import (
     SOURCES, AUTHORITY_WEIGHTS, ALLOWED_DOMAINS,
-    validate_source_refs, authority_weight, resolve_source,
+    validate_source_refs, authority_weight,
 )
 
 # ─────────────────────────────────────────────
@@ -69,7 +61,6 @@ def proto_fork(proto: dict) -> str:
 
 SCRIPT_DIR = Path(__file__).parent
 CACHE_DIR = SCRIPT_DIR / "cache"
-OUTPUT_FILE = SCRIPT_DIR / "SS14_Chemistry_Database.xlsx"
 JSON_FILE = SCRIPT_DIR / "data.json"
 
 
@@ -87,12 +78,16 @@ def compare_reaction(vanilla_rxn: dict, fork_rxn: dict) -> list[str]:
     v_rids = set(v_reacts.keys()) if isinstance(v_reacts, dict) else set()
     f_rids = set(f_reacts.keys()) if isinstance(f_reacts, dict) else set()
 
-    for rid in f_rids - v_rids:
+    # NOTE: all set iterations below are sorted() — set order depends on
+    # per-process str-hash randomization, and these clauses serialize into
+    # forkNotes/rmcNote strings; unsorted iteration shuffled clause order
+    # on every regen, polluting data.json diffs.
+    for rid in sorted(f_rids - v_rids):
         amt = f_reacts[rid].get("amount", 1) if isinstance(f_reacts[rid], dict) else f_reacts[rid]
         diffs.append(f"Added {rid}({amt}) reactant")
-    for rid in v_rids - f_rids:
+    for rid in sorted(v_rids - f_rids):
         diffs.append(f"Removed {rid} reactant")
-    for rid in v_rids & f_rids:
+    for rid in sorted(v_rids & f_rids):
         v_amt = v_reacts[rid].get("amount", 1) if isinstance(v_reacts[rid], dict) else v_reacts[rid]
         f_amt = f_reacts[rid].get("amount", 1) if isinstance(f_reacts[rid], dict) else f_reacts[rid]
         if v_amt != f_amt:
@@ -105,11 +100,11 @@ def compare_reaction(vanilla_rxn: dict, fork_rxn: dict) -> list[str]:
     # Compare products
     v_prods = vanilla_rxn.get("products", {})
     f_prods = fork_rxn.get("products", {})
-    for pid in set(f_prods) - set(v_prods):
+    for pid in sorted(set(f_prods) - set(v_prods)):
         diffs.append(f"Added product {pid}")
-    for pid in set(v_prods) - set(f_prods):
+    for pid in sorted(set(v_prods) - set(f_prods)):
         diffs.append(f"Removed product {pid}")
-    for pid in set(v_prods) & set(f_prods):
+    for pid in sorted(set(v_prods) & set(f_prods)):
         if v_prods[pid] != f_prods[pid]:
             diffs.append(f"{pid} yield {v_prods[pid]}->{f_prods[pid]}")
 
@@ -253,7 +248,7 @@ def fetch_and_extract_sprites():
         print("  Install with: pip install Pillow")
         return
 
-    base_url = VANILLA_RAW.replace("{path}", "Resources/Textures/{rsi}/{state}.png")
+    base_url = FORK_REGISTRY["vanilla"]["raw_url"].replace("{path}", "Resources/Textures/{rsi}/{state}.png")
     fetched = 0
 
     for entry in SPRITE_MANIFEST:
@@ -317,11 +312,6 @@ def _type_constructor(loader_inst, suffix, node):
 
 
 SS14Loader.add_multi_constructor("!type:", _type_constructor)
-
-
-def make_yaml_loader():
-    """Return the SS14-aware YAML loader class."""
-    return SS14Loader
 
 
 def parse_yaml_content(content: str, source_name: str, loader) -> list[dict]:
@@ -547,70 +537,6 @@ def identify_base_chemicals(reagents: dict, reaction_lookup: dict) -> set[str]:
         if rid not in reaction_lookup:
             base.add(rid)
     return base
-
-
-def get_craft_chain_compact(reagent_id: str, reaction_lookup: dict, base_set: set,
-                            visited: set | None = None) -> str:
-    """Build compact one-line craft chain string."""
-    if visited is None:
-        visited = set()
-    if reagent_id in visited:
-        return f"{reagent_id}[LOOP]"
-    if reagent_id in base_set or reagent_id not in reaction_lookup:
-        return f"{reagent_id}[B]"
-
-    visited = visited | {reagent_id}
-    rxn = reaction_lookup[reagent_id][0]  # take first reaction path
-    reactants = rxn.get("reactants", {})
-
-    parts = []
-    for reactant_id, info in reactants.items():
-        amount = info.get("amount", 1) if isinstance(info, dict) else 1
-        catalyst = info.get("catalyst", False) if isinstance(info, dict) else False
-        sub = get_craft_chain_compact(reactant_id, reaction_lookup, base_set, visited)
-        prefix = f"{amount}x" if amount != 1 else ""
-        cat_mark = "[cat]" if catalyst else ""
-        parts.append(f"{prefix}{sub}{cat_mark}")
-
-    return f"{reagent_id}({' + '.join(parts)})"
-
-
-def get_craft_chain_expanded(reagent_id: str, reaction_lookup: dict, base_set: set,
-                              indent: int = 0, visited: set | None = None) -> str:
-    """Build expanded multi-line craft chain."""
-    if visited is None:
-        visited = set()
-    prefix = "  " * indent
-
-    if reagent_id in visited:
-        return f"{prefix}{reagent_id} [CIRCULAR]\n"
-    if reagent_id in base_set or reagent_id not in reaction_lookup:
-        return f"{prefix}{reagent_id} [BASE]\n"
-
-    visited = visited | {reagent_id}
-    rxn = reaction_lookup[reagent_id][0]
-    reactants = rxn.get("reactants", {})
-    products = rxn.get("products", {})
-
-    prod_amount = products.get(reagent_id, "?")
-    temp_str = ""
-    if rxn.get("minTemp"):
-        temp_str += f" (min {rxn['minTemp']}K)"
-    if rxn.get("maxTemp"):
-        temp_str += f" (max {rxn['maxTemp']}K)"
-    mixer = rxn.get("requiredMixerCategories", [])
-    mixer_str = f" [{', '.join(mixer)}]" if mixer else ""
-
-    lines = [f"{prefix}{reagent_id} = {prod_amount}u{temp_str}{mixer_str}\n"]
-    for reactant_id, info in reactants.items():
-        amount = info.get("amount", 1) if isinstance(info, dict) else 1
-        catalyst = info.get("catalyst", False) if isinstance(info, dict) else False
-        cat_mark = " (CATALYST)" if catalyst else ""
-        lines.append(f"{prefix}  + {amount}x {reactant_id}{cat_mark}\n")
-        if reactant_id not in base_set and reactant_id in reaction_lookup and reactant_id not in visited:
-            lines.append(get_craft_chain_expanded(reactant_id, reaction_lookup, base_set, indent + 2, visited))
-
-    return "".join(lines)
 
 
 # ─────────────────────────────────────────────
@@ -841,6 +767,27 @@ def summarize_metabolisms(metabolisms: dict) -> tuple[str, str]:
                 all_effects.append(f"[{path_name}] {summary}")
 
     return "; ".join(all_effects), ", ".join(paths)
+
+
+def metabolism_rate(metabolisms: dict):
+    """Explicit metabolismRate override of the primary metabolism group, in
+    units consumed per ~1s cycle. Returns None when the reagent uses the engine
+    default (0.5) — the frontend fills that in, keeping data.json lean (D4).
+    First non-underscore group wins for multi-group reagents."""
+    if not isinstance(metabolisms, dict):
+        return None
+    for path_name, path_value in metabolisms.items():
+        if path_name.startswith("_"):
+            continue
+        if isinstance(path_value, dict) and "metabolismRate" in path_value:
+            try:
+                rate = float(path_value["metabolismRate"])
+            except (TypeError, ValueError):
+                return None
+            # an explicit 0.5 equals the engine default — don't store it
+            return rate if rate != 0.5 else None
+        return None  # primary group has no override → engine default
+    return None
 
 
 # ─────────────────────────────────────────────
@@ -1355,371 +1302,31 @@ def categorize_reagent(reagent: dict) -> str:
     return CATEGORY_SHEET_MAP.get(fname.capitalize(), "Other")
 
 
-def categorize_reaction(reaction: dict) -> str:
-    """Determine sheet for a reaction. Fork-agnostic since schema 3.3.0."""
-    source = reaction.get("_source_file", "")
-    fname = source.split("/")[-1].replace(".yml", "")
-    mapping = {
-        "drinks": "Drink Recipes",
-        "medicine": "All Reactions",
-        "chemicals": "All Reactions",
-        "biological": "All Reactions",
-        "botany": "All Reactions",
-        "cleaning": "All Reactions",
-        "food": "All Reactions",
-        "fun": "All Reactions",
-        "gas": "All Reactions",
-        "pyrotechnic": "All Reactions",
-        "single_reagent": "All Reactions",
-        "soap": "All Reactions",
-    }
-    return mapping.get(fname, "All Reactions")
-
-
-# ─────────────────────────────────────────────
-# Phase 8: Excel Generation
-# ─────────────────────────────────────────────
-
-HEADER_FONT = Font(name="Calibri", bold=True, size=11, color="FFFFFF")
-HEADER_FILL = PatternFill(start_color="2F5496", end_color="2F5496", fill_type="solid")
-HEADER_ALIGN = Alignment(horizontal="center", vertical="center", wrap_text=True)
-CELL_ALIGN = Alignment(vertical="top", wrap_text=True)
-THIN_BORDER = Border(
-    left=Side(style="thin", color="D9D9D9"),
-    right=Side(style="thin", color="D9D9D9"),
-    top=Side(style="thin", color="D9D9D9"),
-    bottom=Side(style="thin", color="D9D9D9"),
-)
-
-
-def apply_headers(ws, columns: list[str]):
-    """Write and format header row."""
-    for col_idx, header in enumerate(columns, 1):
-        cell = ws.cell(row=1, column=col_idx, value=header)
-        cell.font = HEADER_FONT
-        cell.fill = HEADER_FILL
-        cell.alignment = HEADER_ALIGN
-        cell.border = THIN_BORDER
-    ws.freeze_panes = "A2"
-    ws.auto_filter.ref = f"A1:{get_column_letter(len(columns))}1"
-
-
-def safe_hex_fill(color_str: str) -> PatternFill | None:
-    """Create a PatternFill from a hex color string, or None if invalid."""
-    if not color_str:
-        return None
-    color = color_str.strip().lstrip("#")
-    # Handle RGBA (take first 6 chars for RGB)
-    if len(color) == 8:
-        color = color[:6]
-    if len(color) != 6:
-        return None
-    try:
-        int(color, 16)
-        return PatternFill(start_color=color, end_color=color, fill_type="solid")
-    except ValueError:
-        return None
-
-
-def write_reagent_row(ws, row: int, reagent: dict, locale: dict,
-                      reaction_lookup: dict, base_set: set):
-    """Write a single reagent row."""
-    rid = reagent.get("id", "")
-    name = resolve_name(reagent, locale)
-    group = reagent.get("group", "")
-    color = reagent.get("color", "")
-
-    # Find recipe (reaction that produces this reagent)
-    recipe_str = ""
-    produces_str = ""
-    temp_str = ""
-    mixer_str = ""
-    if rid in reaction_lookup:
-        rxn = reaction_lookup[rid][0]
-        reactants = rxn.get("reactants", {})
-        parts = []
-        for react_id, info in reactants.items():
-            amount = info.get("amount", 1) if isinstance(info, dict) else 1
-            catalyst = info.get("catalyst", False) if isinstance(info, dict) else False
-            cat = " (cat)" if catalyst else ""
-            parts.append(f"{amount}x {react_id}{cat}")
-        recipe_str = " + ".join(parts)
-
-        products = rxn.get("products", {})
-        prod_parts = [f"{v}x {k}" for k, v in products.items()]
-        produces_str = ", ".join(prod_parts)
-
-        min_t = rxn.get("minTemp")
-        max_t = rxn.get("maxTemp")
-        temp_parts = []
-        if min_t:
-            temp_parts.append(f"min {min_t}K")
-        if max_t:
-            temp_parts.append(f"max {max_t}K")
-        temp_str = ", ".join(temp_parts)
-
-        mixers = rxn.get("requiredMixerCategories", [])
-        mixer_str = ", ".join(mixers) if mixers else ""
-
-    # Effects
-    metabolisms = reagent.get("metabolisms", {})
-    effects_str, metabolism_paths = summarize_metabolisms(metabolisms)
-
-    # Overdose — RMC14 top-level field + vanilla threshold extraction
-    overdose = ""
-    if reagent.get("overdose"):
-        overdose = str(reagent["overdose"])
-    else:
-        od = extract_overdose_threshold(reagent.get("metabolisms", {}))
-        if od:
-            overdose = str(od)
-    if reagent.get("criticalOverdose"):
-        overdose += f" / crit: {reagent['criticalOverdose']}"
-
-    # Craft chain
-    craft_chain = ""
-    if rid in reaction_lookup:
-        try:
-            craft_chain = get_craft_chain_compact(rid, reaction_lookup, base_set)
-        except RecursionError:
-            craft_chain = "[TOO DEEP]"
-
-    # Physical description
-    phys_key = reagent.get("physicalDesc", "")
-    phys_desc = locale.get(phys_key, phys_key) if phys_key else ""
-
-    # Flavor
-    flavor = reagent.get("flavor", "")
-    if isinstance(flavor, dict):
-        flavor = str(flavor)
-
-    # Source
-    source = reagent.get("_source_file", "")
-    source_label = FORK_REGISTRY.get(proto_fork(reagent), {}).get("name", "Vanilla")
-    source_short = f"{source_label}: {source.split('/')[-1]}"
-
-    # Notes
-    notes_parts = []
-    if reagent.get("abstract"):
-        notes_parts.append("ABSTRACT")
-    if reagent.get("slipData"):
-        notes_parts.append("Slippery")
-    if reagent.get("fizziness"):
-        notes_parts.append(f"Fizzy: {reagent['fizziness']}")
-    if reagent.get("worksOnTheDead"):
-        notes_parts.append("Works on dead")
-    if reagent.get("plantMetabolism"):
-        notes_parts.append("Plant metabolism")
-    notes_str = "; ".join(notes_parts)
-
-    # Write cells
-    values = [
-        name, rid, group, color, recipe_str, produces_str,
-        temp_str, mixer_str, effects_str, metabolism_paths, overdose,
-        craft_chain, phys_desc, flavor, source_short, notes_str,
-    ]
-    for col_idx, val in enumerate(values, 1):
-        cell = ws.cell(row=row, column=col_idx, value=str(val) if val else "")
-        cell.alignment = CELL_ALIGN
-        cell.border = THIN_BORDER
-
-    # Color fill for color column
-    if color:
-        fill = safe_hex_fill(color)
-        if fill:
-            ws.cell(row=row, column=4).fill = fill
-            # Use white text if dark background
-            try:
-                r, g, b = int(color[1:3], 16), int(color[3:5], 16), int(color[5:7], 16)
-                if (r * 299 + g * 587 + b * 114) / 1000 < 128:
-                    ws.cell(row=row, column=4).font = Font(color="FFFFFF")
-            except (ValueError, IndexError):
-                pass
-
-
-def write_reaction_row(ws, row: int, reaction: dict, reaction_lookup: dict, base_set: set):
-    """Write a single reaction row."""
-    rid = reaction.get("id", "")
-    reactants = reaction.get("reactants", {})
-    products = reaction.get("products", {})
-
-    react_parts = []
-    for react_id, info in reactants.items():
-        amount = info.get("amount", 1) if isinstance(info, dict) else 1
-        catalyst = info.get("catalyst", False) if isinstance(info, dict) else False
-        cat = " (catalyst)" if catalyst else ""
-        react_parts.append(f"{amount}x {react_id}{cat}")
-
-    prod_parts = [f"{v}x {k}" for k, v in products.items()]
-
-    min_temp = reaction.get("minTemp", "")
-    max_temp = reaction.get("maxTemp", "")
-    mixers = reaction.get("requiredMixerCategories", [])
-    effects = summarize_reaction_effects(reaction)
-    priority = reaction.get("priority", "")
-    impact = reaction.get("impact", "")
-
-    # Craft chain for primary product
-    craft_chain = ""
-    if products:
-        primary = list(products.keys())[0]
-        try:
-            craft_chain = get_craft_chain_compact(primary, reaction_lookup, base_set)
-        except RecursionError:
-            craft_chain = "[TOO DEEP]"
-
-    source = reaction.get("_source_file", "")
-    source_label = FORK_REGISTRY.get(proto_fork(reaction), {}).get("name", "Vanilla")
-    source_short = f"{source_label}: {source.split('/')[-1]}"
-
-    values = [
-        rid, " + ".join(react_parts), ", ".join(prod_parts),
-        str(min_temp) if min_temp else "", str(max_temp) if max_temp else "",
-        ", ".join(mixers), effects, str(priority) if priority else "",
-        str(impact) if impact else "", craft_chain, source_short,
-    ]
-    for col_idx, val in enumerate(values, 1):
-        cell = ws.cell(row=row, column=col_idx, value=val)
-        cell.alignment = CELL_ALIGN
-        cell.border = THIN_BORDER
-
-
-def auto_width(ws, max_width: int = 50):
-    """Auto-adjust column widths."""
-    for col in ws.columns:
-        max_len = 0
-        col_letter = get_column_letter(col[0].column)
-        for cell in col:
-            if cell.value:
-                max_len = max(max_len, min(len(str(cell.value)), max_width))
-        ws.column_dimensions[col_letter].width = max(max_len + 2, 10)
-
-
-def generate_excel(reagents: dict, reactions: dict, locale: dict,
-                   reaction_lookup: dict, base_set: set):
-    """Generate the complete Excel workbook."""
-    wb = openpyxl.Workbook()
-
-    # Remove default sheet
-    wb.remove(wb.active)
-
-    # Group reagents by category
-    reagent_groups = defaultdict(list)
-    for rid, reagent in sorted(reagents.items()):
-        if reagent.get("abstract"):
-            continue
-        cat = categorize_reagent(reagent)
-        reagent_groups[cat].append(reagent)
-
-    # Group reactions by category
-    reaction_groups = defaultdict(list)
-    for rid, reaction in sorted(reactions.items()):
-        cat = categorize_reaction(reaction)
-        reaction_groups[cat].append(reaction)
-        # Also put non-drink reactions into All Reactions
-        if cat != "All Reactions" and cat != "RMC14 Recipes" and cat != "Drink Recipes":
-            reaction_groups["All Reactions"].append(reaction)
-
-    # === Overview Sheet ===
-    ws = wb.create_sheet("Overview")
-    ws.cell(row=1, column=1, value="SS14 Chemistry Database").font = Font(bold=True, size=16)
-    ws.cell(row=2, column=1, value=f"Generated: {time.strftime('%Y-%m-%d %H:%M')}")
-    ws.cell(row=4, column=1, value="Category").font = Font(bold=True)
-    ws.cell(row=4, column=2, value="Count").font = Font(bold=True)
-    row = 5
-    for cat in sorted(reagent_groups.keys()):
-        ws.cell(row=row, column=1, value=cat)
-        ws.cell(row=row, column=2, value=len(reagent_groups[cat]))
-        row += 1
-    ws.cell(row=row + 1, column=1, value="Total Reagents").font = Font(bold=True)
-    ws.cell(row=row + 1, column=2, value=sum(len(v) for v in reagent_groups.values())).font = Font(bold=True)
-    ws.cell(row=row + 3, column=1, value="Reaction Category").font = Font(bold=True)
-    ws.cell(row=row + 3, column=2, value="Count").font = Font(bold=True)
-    r2 = row + 4
-    for cat in sorted(reaction_groups.keys()):
-        ws.cell(row=r2, column=1, value=cat)
-        ws.cell(row=r2, column=2, value=len(reaction_groups[cat]))
-        r2 += 1
-
-    ws.cell(row=r2 + 2, column=1, value="Legend").font = Font(bold=True)
-    ws.cell(row=r2 + 3, column=1, value="[B] = Base dispenser chemical")
-    ws.cell(row=r2 + 4, column=1, value="[cat] = Catalyst (not consumed)")
-    ws.cell(row=r2 + 5, column=1, value="[LOOP] = Circular dependency")
-    ws.cell(row=r2 + 6, column=1, value="Temp in Kelvin (273K = 0°C, 310K = 37°C)")
-    auto_width(ws)
-
-    # === Reagent Sheets ===
-    sheet_order = [
-        "Elements", "Medicine", "Chemicals", "Toxins", "Narcotics",
-        "Cleaning", "Pyrotechnic", "Gases", "Botany", "Biological", "Fun",
-        "Drinks (Alcoholic)", "Drinks (Non-Alc)", "Food & Condiments", "Materials",
-        "RMC14 Medicine", "RMC14 Elements", "RMC14 Toxins", "RMC14 Drinks",
-        "RMC14 Narcotics", "RMC14 Pyrotechnic", "RMC14 Other",
-    ]
-
-    for sheet_name in sheet_order:
-        reagents_list = reagent_groups.get(sheet_name, [])
-        if not reagents_list:
-            continue
-
-        # Excel sheet name max 31 chars
-        ws_name = sheet_name[:31]
-        ws = wb.create_sheet(ws_name)
-        apply_headers(ws, REAGENT_COLUMNS)
-
-        for idx, reagent in enumerate(reagents_list, 2):
-            write_reagent_row(ws, idx, reagent, locale, reaction_lookup, base_set)
-        auto_width(ws)
-
-    # Also handle any uncategorized
-    for sheet_name, reagents_list in reagent_groups.items():
-        if sheet_name not in sheet_order and reagents_list:
-            ws_name = sheet_name[:31]
-            if ws_name not in wb.sheetnames:
-                ws = wb.create_sheet(ws_name)
-                apply_headers(ws, REAGENT_COLUMNS)
-                for idx, reagent in enumerate(reagents_list, 2):
-                    write_reagent_row(ws, idx, reagent, locale, reaction_lookup, base_set)
-                auto_width(ws)
-
-    # === Reaction Sheets ===
-    reaction_order = ["Drink Recipes", "All Reactions", "RMC14 Recipes"]
-    for sheet_name in reaction_order:
-        reactions_list = reaction_groups.get(sheet_name, [])
-        if not reactions_list:
-            continue
-
-        ws = wb.create_sheet(sheet_name[:31])
-        apply_headers(ws, REACTION_COLUMNS)
-
-        for idx, rxn in enumerate(reactions_list, 2):
-            write_reaction_row(ws, idx, rxn, reaction_lookup, base_set)
-        auto_width(ws)
-
-    # === Craft Trees Sheet ===
-    ws = wb.create_sheet("Craft Trees")
-    ws.cell(row=1, column=1, value="Reagent").font = Font(bold=True)
-    ws.cell(row=1, column=2, value="Full Craft Tree").font = Font(bold=True)
-    ws.freeze_panes = "A2"
-    row = 2
-    for rid in sorted(reaction_lookup.keys()):
-        if rid in reagents and not reagents[rid].get("abstract"):
-            try:
-                tree = get_craft_chain_expanded(rid, reaction_lookup, base_set)
-            except RecursionError:
-                tree = f"{rid} [TOO DEEP]"
-            ws.cell(row=row, column=1, value=rid)
-            ws.cell(row=row, column=2, value=tree)
-            ws.cell(row=row, column=2).alignment = Alignment(wrap_text=True, vertical="top")
-            row += 1
-    auto_width(ws, max_width=100)
-
-    return wb
-
 
 # ─────────────────────────────────────────────
 # Phase 8b: Plant/Seed Source Extraction
 # ─────────────────────────────────────────────
+
+def _plant_display_name(raw_name: str, locale: dict | None) -> str:
+    """Resolve a seed's display name: locale first, cleaned key otherwise."""
+    if locale and raw_name in locale:
+        return locale[raw_name]
+    # Clean up seed name: seeds-ambrosiavulgaris-name -> Ambrosia Vulgaris
+    clean = raw_name.replace("seeds-", "").replace("-name", "").replace("-", " ")
+    clean = re.sub(r'([a-z])([A-Z])', r'\1 \2', clean)
+    # Fix known compound words that are all lowercase
+    fixes = {
+        "ambrosiavulgaris": "Ambrosia Vulgaris", "ambrosiadeus": "Ambrosia Deus",
+        "flyamanita": "Fly Amanita", "deathnettle": "Death Nettle",
+        "galaxythistle": "Galaxy Thistle", "spacemans trumpet": "Spaceman's Trumpet",
+        "onionred": "Red Onion", "bluetomato": "Blue Tomato",
+        "bloodtomato": "Blood Tomato", "holymelon": "Holy Melon",
+        "goldenapple": "Golden Apple", "bluepumpkin": "Blue Pumpkin",
+        "rainbow cannabis": "Rainbow Cannabis",
+        "walkingmushroom": "Walking Mushroom",
+    }
+    return fixes.get(clean.lower().strip(), clean.title())
+
 
 def parse_seed_sources(seed_files: dict[str, str], loader,
                        locale: dict | None = None) -> dict[str, list[str]]:
@@ -1731,26 +1338,7 @@ def parse_seed_sources(seed_files: dict[str, str], loader,
         for entry in entries:
             if entry.get("type") != "seed":
                 continue
-            raw_name = entry.get("name", entry.get("id", "unknown"))
-            # Resolve locale name
-            if locale and raw_name in locale:
-                seed_name = locale[raw_name]
-            else:
-                # Clean up seed name: seeds-ambrosiavulgaris-name -> Ambrosia Vulgaris
-                clean = raw_name.replace("seeds-", "").replace("-name", "").replace("-", " ")
-                clean = re.sub(r'([a-z])([A-Z])', r'\1 \2', clean)
-                # Fix known compound words that are all lowercase
-                fixes = {
-                    "ambrosiavulgaris": "Ambrosia Vulgaris", "ambrosiadeus": "Ambrosia Deus",
-                    "flyamanita": "Fly Amanita", "deathnettle": "Death Nettle",
-                    "galaxythistle": "Galaxy Thistle", "spacemans trumpet": "Spaceman's Trumpet",
-                    "onionred": "Red Onion", "bluetomato": "Blue Tomato",
-                    "bloodtomato": "Blood Tomato", "holymelon": "Holy Melon",
-                    "goldenapple": "Golden Apple", "bluepumpkin": "Blue Pumpkin",
-                    "rainbow cannabis": "Rainbow Cannabis",
-                    "walkingmushroom": "Walking Mushroom",
-                }
-                seed_name = fixes.get(clean.lower().strip(), clean.title())
+            seed_name = _plant_display_name(entry.get("name", entry.get("id", "unknown")), locale)
             chemicals = entry.get("chemicals", {})
             if not isinstance(chemicals, dict):
                 continue
@@ -1764,14 +1352,370 @@ def parse_seed_sources(seed_files: dict[str, str], loader,
     return dict(reagent_plants)
 
 
+def parse_plants(fork_data: dict, loader, locale: dict | None = None) -> dict:
+    """Parse seed prototypes into plant entities (D1, schema 3.6.0).
+
+    First fork to define a seed id wins — same merge rule as reagents
+    (fork_data iterates in FORK_REGISTRY order, vanilla first). Mutation
+    refs pointing at seeds no fork defines are dropped with a warning.
+    Returns {seed_id: {id, name, source, products, mutations, chemicals,
+    growth, rsi}}."""
+    plants = {}
+    for fork_id, fdata in fork_data.items():
+        for path, content in fdata.get("seed_files", {}).items():
+            entries = parse_yaml_content(content, path, loader)
+            for entry in entries:
+                if entry.get("type") != "seed":
+                    continue
+                sid = entry.get("id")
+                if not sid or sid in plants:
+                    continue
+                chems = {}
+                chemicals = entry.get("chemicals", {})
+                if isinstance(chemicals, dict):
+                    for rid, spec in chemicals.items():
+                        if isinstance(spec, dict):
+                            chems[rid] = {
+                                "min": spec.get("Min", 0),
+                                "max": spec.get("Max", 0),
+                                "potencyDivisor": spec.get("PotencyDivisor"),
+                            }
+                growth = {k: entry[k] for k in (
+                    "lifespan", "maturation", "production", "yield", "potency",
+                    "idealLight", "idealHeat", "nutrientConsumption", "waterConsumption",
+                ) if entry.get(k) is not None}
+                plants[sid] = {
+                    "id": sid,
+                    "name": _plant_display_name(entry.get("name", sid), locale),
+                    "source": fork_id,
+                    "products": entry.get("productPrototypes") or [],
+                    "mutations": entry.get("mutationPrototypes") or [],
+                    "chemicals": chems,
+                    "growth": growth,
+                    "rsi": entry.get("plantRsi", ""),
+                }
+    # Validate mutation targets against the merged plant set
+    dropped = []
+    for p in plants.values():
+        valid = [m for m in p["mutations"] if m in plants]
+        if len(valid) != len(p["mutations"]):
+            dropped.extend(m for m in p["mutations"] if m not in plants)
+        p["mutations"] = valid
+    if dropped:
+        print(f"  WARNING: dropped {len(dropped)} mutation refs to unknown seeds: {sorted(set(dropped))[:8]}")
+    return plants
+
+
+# ─────────────────────────────────────────────
+# Phase 5c: Item-fill sources (Increment D3)
+# ─────────────────────────────────────────────
+# Reagents that ship pre-mixed inside spawnable items (Absinthe bottles in the
+# Booze-O-Mat, NanoMed pills, dispenser bottle packs). Two indexes intersect:
+# entity solution fills and acquisition channels (vending inventories,
+# EntityTableContainerFill dispenser packs). Labels are formatted so the
+# keyword classifier in compute_reagent_accessibility lands the right tier
+# ("Vending:" → cross-service, "... Dispenser:" → dispenser, "(EMAG)" →
+# antag-only). Design: docs/design/2026-07-12-item-fill-sources.md
+
+# Same nutrition filler exclusion as parse_seed_sources — every snack would
+# otherwise spam these three with vendor labels.
+_ITEM_SOURCE_SKIP_REAGENTS = {"Nutriment", "Vitamin", "Fiber"}
+
+
+def parse_entity_prototypes(files: dict[str, str], loader) -> dict[str, dict]:
+    """Parse YAML files into {entity_id: prototype} (type: entity only)."""
+    entities = {}
+    for path, content in files.items():
+        for entry in parse_yaml_content(content, path, loader):
+            if entry.get("type") == "entity" and entry.get("id"):
+                entities[entry["id"]] = entry
+    return entities
+
+
+def _entity_parents(proto: dict) -> list[str]:
+    parent = proto.get("parent")
+    if isinstance(parent, str):
+        return [parent]
+    if isinstance(parent, list):
+        return [p for p in parent if isinstance(p, str)]
+    return []
+
+
+def _find_entity_component(entity_index: dict, eid: str, comp_type: str,
+                           _seen: set | None = None) -> dict | None:
+    """Nearest component of comp_type up the inheritance chain: own components
+    first, then parents DFS left-to-right (cycle-safe)."""
+    if _seen is None:
+        _seen = set()
+    if eid in _seen:
+        return None
+    _seen.add(eid)
+    proto = entity_index.get(eid)
+    if not proto:
+        return None
+    for comp in proto.get("components") or []:
+        if isinstance(comp, dict) and comp.get("type") == comp_type:
+            return comp
+    for parent in _entity_parents(proto):
+        found = _find_entity_component(entity_index, parent, comp_type, _seen)
+        if found is not None:
+            return found
+    return None
+
+
+def _entity_display_name(entity_index: dict, eid: str,
+                         _seen: set | None = None) -> str:
+    """Nearest `name:` up the inheritance chain; spaced-PascalCase id fallback."""
+    if _seen is None:
+        _seen = set()
+    if eid in _seen:
+        return pascal_to_words(eid)
+    _seen.add(eid)
+    proto = entity_index.get(eid)
+    if not proto:
+        return pascal_to_words(eid)
+    name = proto.get("name")
+    if isinstance(name, str) and name.strip():
+        return name.strip()
+    for parent in _entity_parents(proto):
+        parent_proto = entity_index.get(parent)
+        if parent_proto is not None:
+            found = _entity_display_name(entity_index, parent, _seen)
+            if found:
+                return found
+    return pascal_to_words(eid)
+
+
+def _reagents_from_solution_spec(sol) -> dict[str, float]:
+    """{reagent_id: qty} from one solution spec ({reagents: [{ReagentId, Quantity}]})."""
+    out = {}
+    if not isinstance(sol, dict):
+        return out
+    for reag in sol.get("reagents") or []:
+        if not isinstance(reag, dict):
+            continue
+        rid = reag.get("ReagentId")
+        try:
+            qty = float(reag.get("Quantity", 0))
+        except (TypeError, ValueError):
+            qty = 0.0
+        if isinstance(rid, str) and rid:
+            out[rid] = out.get(rid, 0.0) + qty
+    return out
+
+
+def extract_entity_fill(entity_index: dict, eid: str) -> dict[str, float]:
+    """{reagent_id: qty} for the nearest solution declaration on an entity.
+
+    Supports both solution schemas (upstream #43192/#43194 migration — M1
+    checklist): the new `Solution` component (solution.reagents) and legacy
+    `SolutionContainerManager` (solutions.<name>.reagents). Entities without
+    a declared fill (empty glasses, random-fill pill canisters whose contents
+    come from RandomFillSolution) resolve to {} and are skipped upstream."""
+    comp = _find_entity_component(entity_index, eid, "Solution")
+    if comp:
+        fill = _reagents_from_solution_spec(comp.get("solution"))
+        if fill:
+            return fill
+    comp = _find_entity_component(entity_index, eid, "SolutionContainerManager")
+    if comp:
+        fill: dict[str, float] = {}
+        solutions = comp.get("solutions")
+        if isinstance(solutions, dict):
+            for sol in solutions.values():
+                for rid, qty in _reagents_from_solution_spec(sol).items():
+                    fill[rid] = fill.get(rid, 0.0) + qty
+        if fill:
+            return fill
+    return {}
+
+
+def _collect_entity_ids(node, entity_index: dict, out: set) -> None:
+    """Recursively harvest known entity ids from EntityTable selector trees
+    (AllSelector/GroupSelector/nested !type: dicts — any `id` value that
+    resolves in the entity index counts)."""
+    if isinstance(node, dict):
+        eid = node.get("id")
+        if isinstance(eid, str) and eid in entity_index:
+            out.add(eid)
+        for value in node.values():
+            _collect_entity_ids(value, entity_index, out)
+    elif isinstance(node, list):
+        for value in node:
+            _collect_entity_ids(value, entity_index, out)
+
+
+def _fmt_qty(qty: float) -> str:
+    return f"{qty:g}u"
+
+
+def build_item_sources(fork_data: dict, loader,
+                       seed_locale: dict | None = None) -> dict[str, list[tuple[str, str]]]:
+    """Build {reagent_id: [(fork_id, label)]} from item-fill channels.
+
+    Channels: vending machine inventories (startingInventory; hacked/emagged
+    buckets tagged), dispenser bottle packs (EntityTableContainerFill), and
+    juicing — seed.productPrototypes -> produce Extractable.juiceSolution
+    (D3b). The entity index merges across forks first-wins in registry order —
+    same ownership rule as the reagent merge. Output pairs are deduped and
+    sorted for deterministic regen."""
+    # 1. Entity index (fills + machine/dispenser/produce entities), first-wins merge
+    entity_index: dict[str, dict] = {}
+    for fork_id in FORK_REGISTRY:
+        fdata = fork_data.get(fork_id, {})
+        files: dict[str, str] = {}
+        for key in ("item_fill_files", "vending_machine_files",
+                    "dispenser_files", "produce_files"):
+            files.update(fdata.get(key) or {})
+        if not files:
+            continue
+        for eid, proto in parse_entity_prototypes(files, loader).items():
+            if eid not in entity_index:
+                proto["_fork"] = fork_id
+                entity_index[eid] = proto
+
+    if not entity_index:
+        return {}
+
+    # 2. Vending pack id -> machine display name (alphabetical tie-break).
+    # Syndicate-access machines (e.g. VendingMachineChemicalsSyndicate aka
+    # "SyndieJuice" gated by AccessReader SyndicateAgent) get a " (Syndicate)"
+    # suffix so the accessibility classifier lands antag-only for reagents
+    # whose only path they are (Lead bottles).
+    pack_names: dict[str, str] = {}
+    for eid, proto in entity_index.items():
+        for comp in proto.get("components") or []:
+            if isinstance(comp, dict) and comp.get("type") == "VendingMachine":
+                pack = comp.get("pack")
+                if isinstance(pack, str) and pack:
+                    name = _entity_display_name(entity_index, eid)
+                    if "syndicate" in eid.lower() or "nukie" in eid.lower():
+                        name += " (Syndicate)"
+                    prev = pack_names.get(pack)
+                    if prev is None or name < prev:
+                        pack_names[pack] = name
+                break
+
+    item_sources: dict[str, set] = defaultdict(set)
+    fill_cache: dict[str, dict] = {}
+
+    def fill_of(eid: str) -> dict[str, float]:
+        if eid not in fill_cache:
+            fill_cache[eid] = extract_entity_fill(entity_index, eid)
+        return fill_cache[eid]
+
+    def add_item(rid: str, fork_id: str, label: str) -> None:
+        if rid not in _ITEM_SOURCE_SKIP_REAGENTS:
+            item_sources[rid].add((fork_id, label))
+
+    # 3. Vending machine inventories
+    stocked_items = 0
+    for fork_id in FORK_REGISTRY:
+        inv_files = fork_data.get(fork_id, {}).get("vending_inventory_files") or {}
+        for path, content in inv_files.items():
+            for proto in parse_yaml_content(content, path, loader):
+                if proto.get("type") != "vendingMachineInventory":
+                    continue
+                inv_id = str(proto.get("id", ""))
+                machine = pack_names.get(inv_id) or pascal_to_words(
+                    inv_id.removesuffix("Inventory"))
+                # contrabandInventory unlocks via the vending machine's
+                # contraband WIRE (ContrabandWireKey in VendingMachineComponent)
+                # — crew-hackable with a multitool, not antag-gated. Only
+                # emaggedInventory needs the antag EMAG.
+                for inv_key, tag in (("startingInventory", ""),
+                                     ("emaggedInventory", " (EMAG)"),
+                                     ("contrabandInventory", " (hacked)")):
+                    inv = proto.get(inv_key)
+                    if not isinstance(inv, dict):
+                        continue
+                    for eid in inv:
+                        fill = fill_of(str(eid))
+                        if fill:
+                            stocked_items += 1
+                        for rid, qty in fill.items():
+                            item_name = _entity_display_name(entity_index, str(eid))
+                            add_item(rid, fork_id,
+                                     f"Vending{tag}: {machine} — {item_name} ({_fmt_qty(qty)})")
+
+    # 4. Dispenser bottle packs (booze/soda) — EntityTableContainerFill
+    for fork_id in FORK_REGISTRY:
+        disp_files = fork_data.get(fork_id, {}).get("dispenser_files") or {}
+        for path, content in disp_files.items():
+            for proto in parse_yaml_content(content, path, loader):
+                if proto.get("type") != "entity" or not proto.get("id"):
+                    continue
+                fill_comp = None
+                for comp in proto.get("components") or []:
+                    if isinstance(comp, dict) and comp.get("type") == "EntityTableContainerFill":
+                        fill_comp = comp
+                        break
+                if not fill_comp:
+                    continue
+                eid = proto["id"]
+                machine = _entity_display_name(entity_index, eid).title()
+                emag = " (EMAG)" if "emag" in eid.lower() else ""
+                stocked: set = set()
+                _collect_entity_ids(fill_comp.get("containers"), entity_index, stocked)
+                for item_eid in sorted(stocked):
+                    fill = fill_of(item_eid)
+                    if fill:
+                        stocked_items += 1
+                    for rid, qty in fill.items():
+                        item_name = _entity_display_name(entity_index, item_eid)
+                        add_item(rid, fork_id,
+                                 f"{machine}{emag}: {item_name} ({_fmt_qty(qty)})")
+
+    # 5. Juicing produce (D3b): seed.productPrototypes -> Extractable.juiceSolution.
+    # No quantity in the label — in-game units scale with plant potency, the
+    # YAML base value would mislead. Grindable food solutions are deliberately
+    # skipped: they mirror seed `chemicals`, already covered by "(plant)" labels.
+    juiced = 0
+    for fork_id in FORK_REGISTRY:
+        seed_files = fork_data.get(fork_id, {}).get("seed_files") or {}
+        for path, content in seed_files.items():
+            for entry in parse_yaml_content(content, path, loader):
+                if entry.get("type") != "seed":
+                    continue
+                plant = _plant_display_name(entry.get("name", entry.get("id", "unknown")), seed_locale)
+                for peid in entry.get("productPrototypes") or []:
+                    comp = _find_entity_component(entity_index, str(peid), "Extractable")
+                    if not comp:
+                        continue
+                    juice = _reagents_from_solution_spec(comp.get("juiceSolution"))
+                    if juice:
+                        juiced += 1
+                    for rid in juice:
+                        add_item(rid, fork_id, f"Juicing: {plant} (plant)")
+
+    print(f"  Item-fill channels: {len(entity_index)} entities indexed, "
+          f"{stocked_items} stocked items resolved, {juiced} juiceable produce, "
+          f"{len(item_sources)} reagents with item sources")
+    return {rid: sorted(pairs) for rid, pairs in item_sources.items()}
+
+
 def build_all_sources(reagent_plants: dict, reaction_lookup: dict,
-                      base_set: set) -> dict[str, list[str]]:
-    """Build complete sources dict for each reagent."""
+                      base_set: set,
+                      item_sources: dict[str, list[tuple[str, str]]] | None = None,
+                      allowed_forks: set[str] | None = None) -> dict[str, list[str]]:
+    """Build complete sources dict for each reagent.
+
+    item_sources: {rid: [(fork_id, label)]} from build_item_sources (D3).
+    allowed_forks: when set (per-fork views), only item labels whose channel
+    belongs to those forks are included."""
     sources = defaultdict(list)
 
     # 1. Plant sources
     for reagent_id, plants in reagent_plants.items():
         sources[reagent_id].extend(plants)
+
+    # 1b. Item-fill channels (D3) — vending machines, dispenser packs
+    for reagent_id, tagged in (item_sources or {}).items():
+        for fork_id, label in tagged:
+            if allowed_forks is not None and fork_id not in allowed_forks:
+                continue
+            if label not in sources[reagent_id]:
+                sources[reagent_id].append(label)
 
     # 2. Other known sources
     for reagent_id, src_list in OTHER_REAGENT_SOURCES.items():
@@ -1845,8 +1789,9 @@ def compute_antag_score(effect_tags: list[str]) -> int:
 #     per-fork difficulty. A strategy using a reagent blocked in DeltaV surfaces
 #     as 'impossible' there while remaining 'easy' on vanilla. See
 #     build_per_fork_views() below.
-# Lead (unobtainable everywhere — no recipe produces it in any fork)
-# is already correctly classified globally.
+# Lead has no recipe in any fork; the D3 item-fill scan found its only
+# source — Lead bottles in the Syndicate chem vendor (antag-only), so it
+# classifies antag-only rather than unobtainable (see code-reagents-lead).
 
 TIER_WEIGHTS = {
     "dispenser":     0,
@@ -1859,7 +1804,8 @@ TIER_WEIGHTS = {
     "unobtainable":  999, # literal dead-end: no recipe AND no sources
 }
 
-_SERVICE_KEYWORDS  = ("NanoMed", "Booze", "Soda", "BoozeVend", "SodaVend", "Drobe")
+_SERVICE_KEYWORDS  = ("NanoMed", "Booze", "Soda", "BoozeVend", "SodaVend", "Drobe",
+                      "Vending", "Atmospherics")
 _MOB_KEYWORDS      = ("butcher", "blood draw", "Slime", "Zombie", "mob")
 _ANTAG_KEYWORDS    = ("EMAG", "Syndicate", "Chaplain", "Antag")
 _DISPENSER_KEYWORDS = ("Dispenser", "Sink", "ChemVend")
@@ -1888,10 +1834,19 @@ def compute_reagent_accessibility(
     if is_dispenser or any(any(k in s for k in _DISPENSER_KEYWORDS) for s in sources):
         return {"tier": "dispenser", "weight": 0, "reason": "Chemical Dispenser"}
 
-    # Tier 3: antag-only (strongest filter — antag sources override plant/service)
+    # Tier 3: antag-only (strongest filter — antag sources override plant/service).
+    # Exception (D3): auto-derived vending labels (EMAG bucket, Syndicate-access
+    # machines) are a bonus channel, not the defining acquisition path — they
+    # only make a reagent antag-only when nothing else (recipe or another
+    # source) provides it (Pax has a recipe; Lead does not). Manual antag
+    # labels (uplink, loadouts, EMAG-only curated entries) keep overriding.
     antag_srcs = [s for s in sources if any(k in s for k in _ANTAG_KEYWORDS)]
     if antag_srcs:
-        return {"tier": "antag-only", "weight": 4, "reason": f"Antag-only: {antag_srcs[0]}"}
+        soft_only = all(s.startswith("Vending") for s in antag_srcs)
+        has_other_path = (rid in reaction_lookup) or any(
+            s != "Chemistry reaction" and s not in antag_srcs for s in sources)
+        if not (soft_only and has_other_path):
+            return {"tier": "antag-only", "weight": 4, "reason": f"Antag-only: {antag_srcs[0]}"}
 
     # Tier 2a: cross-botany (plant-derived)
     plant_srcs = [s for s in sources if s.endswith("(plant)")]
@@ -1903,10 +1858,10 @@ def compute_reagent_accessibility(
     if mob_srcs:
         return {"tier": "mob-drop", "weight": 3, "reason": f"Mob-derived: {mob_srcs[0]}"}
 
-    # Tier 2c: cross-service (vending machines)
+    # Tier 2c: cross-service (vending machines, other departments' gear)
     service_srcs = [s for s in sources if any(k in s for k in _SERVICE_KEYWORDS)]
     if service_srcs:
-        return {"tier": "cross-service", "weight": 2, "reason": f"Service vending: {service_srcs[0]}"}
+        return {"tier": "cross-service", "weight": 2, "reason": f"Cross-department: {service_srcs[0]}"}
 
     # Tier 1: self-chem — has recipe, all ingredients resolve to dispenser/self-chem
     if rid in reaction_lookup:
@@ -2086,6 +2041,93 @@ def fork_ancestry(fork_id: str) -> list[str]:
     return chain
 
 
+def build_shadowed_reagents(parsed, base_ids):
+    """Per-fork set of vanilla reagent ids the fork RENAMED away (D5).
+
+    A total-conversion fork gives a base reagent a new, prefixed id while
+    keeping the vanilla locale name (RMC-14: Fluorine → RMCFluorine, both
+    `reagent-name-fluorine`). The vanilla twin is then NOT obtainable in that
+    fork's game, so vanilla recipes referencing it are dead — even though the
+    fork's repo still ships vanilla-path copies that define it. Detected via the
+    shared locale-name key; propagated down parent chains (RuCM inherits
+    RMC-14's renames). See docs/decisions/2026-07-12_rmc-renamed-reagents.md.
+
+    Restricted to BASE reagents (`base_ids`): a total conversion renames the
+    dispensable element set. This avoids false positives where an additive fork
+    merely adds a variant that reuses a crafted reagent's locale name (Sunrise/
+    Fish reuse `reagent-name-fluorosulfuric-acid`, `-mutetoxin` — not renames).
+    Caller further gates on a rename-count threshold."""
+    vanilla_reagents = parsed["vanilla"]["reagents"]
+    vanilla_ids = set(vanilla_reagents)
+    name_to_vanilla = {}
+    for rid, r in vanilla_reagents.items():
+        nm = r.get("name")
+        if nm:
+            name_to_vanilla.setdefault(nm, rid)
+    own = {}
+    for fork_id, pdata in parsed.items():
+        if fork_id == "vanilla":
+            continue
+        sh = set()
+        for rid, r in pdata.get("reagents", {}).items():
+            if rid in vanilla_ids:
+                continue  # the fork's copy of a vanilla reagent, not a rename
+            twin = name_to_vanilla.get(r.get("name"))
+            if twin and twin != rid and twin in base_ids:
+                sh.add(twin)
+        own[fork_id] = sh
+    shadowed = {}
+    for fork_id in own:
+        acc = set()
+        for anc in fork_ancestry(fork_id):
+            acc |= own.get(anc, set())
+        shadowed[fork_id] = acc
+    return shadowed
+
+
+def dead_reactions_from_shadow(fork_id, all_reactions, base_set, shadowed):
+    """Reactions unmakeable on `fork_id` because they (transitively) need a
+    shadowed reagent (D5). Forward-reachability fixpoint over the fork's visible
+    reactions: obtainable = base reagents minus shadowed, closed under reactions
+    whose non-catalyst reactants are all obtainable; a reaction is dead if any
+    non-catalyst reactant is never obtainable."""
+    if not shadowed:
+        return set()
+
+    def is_cat(info):
+        return isinstance(info, dict) and info.get("catalyst")
+
+    lineage = set(fork_ancestry(fork_id))
+    visible = {
+        rid: rx for rid, rx in all_reactions.items()
+        if rx.get("_fork") == "vanilla" or rx.get("_fork") in lineage
+    }
+    obtainable = set(base_set) - shadowed
+    changed = True
+    while changed:
+        changed = False
+        for rx in visible.values():
+            prods = rx.get("products") or {}
+            if not prods:
+                continue
+            if all(is_cat(info) or react in obtainable
+                   for react, info in (rx.get("reactants") or {}).items()):
+                for p in prods:
+                    # a shadowed reagent can't be re-obtained via a recipe either
+                    # (the fork has no slot for the vanilla id — only its prefixed
+                    # twin), so producing it doesn't make it available
+                    if p not in obtainable and p not in shadowed:
+                        obtainable.add(p)
+                        changed = True
+    dead = set()
+    for rid, rx in visible.items():
+        for react, info in (rx.get("reactants") or {}).items():
+            if not is_cat(info) and react not in obtainable:
+                dead.add(rid)
+                break
+    return dead
+
+
 def build_per_fork_views(
     reactions: dict,
     reagents: dict,
@@ -2093,6 +2135,7 @@ def build_per_fork_views(
     base_set: set,
     fork_diffs: dict | None = None,
     fork_reagent_blocks: dict | None = None,
+    item_sources: dict | None = None,
 ) -> dict[str, dict]:
     """Build filtered {reaction_lookup, all_sources, accessibility_map} per fork.
 
@@ -2149,8 +2192,18 @@ def build_per_fork_views(
 
         fork_reaction_lookup = build_reaction_lookup(fork_reactions)
 
-        # Per-fork all_sources (plants are global, recipes are fork-filtered)
-        fork_all_sources = build_all_sources(reagent_plants, fork_reaction_lookup, base_set)
+        # Per-fork all_sources (plants are global, recipes are fork-filtered).
+        # Item-fill channels are filtered by ancestry: a Goob view keeps
+        # vanilla's Booze-O-Mat sources, but a total-conversion fork
+        # (blocked_categories marker: RMC14/RuCM replace the whole station
+        # loadout) must not inherit vanilla vendors it doesn't ship.
+        if fconf.get("blocked_categories"):
+            allowed_channel_forks = set(chain)
+        else:
+            allowed_channel_forks = set(chain) | {fork_id, "vanilla"}
+        fork_all_sources = build_all_sources(
+            reagent_plants, fork_reaction_lookup, base_set,
+            item_sources, allowed_channel_forks)
 
         # Per-fork accessibility — only for non-abstract reagents visible in this fork
         fork_accessibility_map = {}
@@ -2176,26 +2229,6 @@ def build_per_fork_views(
     return per_fork
 
 
-def compute_strategy_difficulty_by_fork(
-    strategy: dict,
-    per_fork_views: dict[str, dict],
-) -> dict[str, dict]:
-    """Run compute_strategy_difficulty once per fork. Returns {fork_id: result}.
-
-    Useful for UI that wants to show the effective difficulty on the server the
-    user is currently filtering by (see app.js activeSource). A strategy that
-    uses a reagent blocked on DeltaV will surface as `impossible` there while
-    staying `easy` on vanilla."""
-    result = {}
-    for fork_id, views in per_fork_views.items():
-        result[fork_id] = compute_strategy_difficulty(
-            strategy,
-            views["accessibility_map"],
-            views["reaction_lookup"],
-        )
-    return result
-
-
 # ─────────────────────────────────────────────
 # Phase 9b: JSON Export
 # ─────────────────────────────────────────────
@@ -2205,7 +2238,10 @@ def export_json(reagents: dict, reactions: dict, locale: dict,
                 all_sources: dict | None = None,
                 fork_diffs: dict | None = None,
                 reagent_plants: dict | None = None,
-                fork_reagent_blocks: dict | None = None):
+                fork_reagent_blocks: dict | None = None,
+                plants: dict | None = None,
+                item_sources: dict | None = None,
+                shadowed_by_fork: dict | None = None):
     """Export all data as a JSON file for the web frontend.
     fork_diffs: {fork_id: (blocked_set, modified_dict)} from auto-diff.
     reagent_plants: {reagent_id: [plant_label...]} from parse_seed_sources;
@@ -2225,7 +2261,11 @@ def export_json(reagents: dict, reactions: dict, locale: dict,
     forks_meta = {}
     for fid, fconf in FORK_REGISTRY.items():
         count = fork_reagent_counts.get(fid, 0)
-        if fid == "vanilla" or count > 0:
+        # A pure downstream fork can OWN zero reagents — first-wins credits shared
+        # content to the upstream (RuCM ships CMU's chemistry, so CMU owns it) —
+        # yet it is still a real server players filter by, and its view is full via
+        # parent inheritance. Keep such forks listed instead of dropping them.
+        if fid == "vanilla" or count > 0 or fconf.get("parent_fork"):
             forks_meta[fid] = {
                 "name": fconf["name"],
                 "color": fconf["color"],
@@ -2235,16 +2275,29 @@ def export_json(reagents: dict, reactions: dict, locale: dict,
             # must also show its parents' content (Funky ships Goob chems).
             if fconf.get("parent_fork"):
                 forks_meta[fid]["parent"] = fconf["parent_fork"]
+            # D5: total-conversion flag — the fork renamed base reagents, so
+            # most vanilla recipes don't apply. Drives the UI warning banner.
+            if shadowed_by_fork and shadowed_by_fork.get(fid):
+                forks_meta[fid]["totalConversion"] = True
+                forks_meta[fid]["renamedReagents"] = len(shadowed_by_fork[fid])
 
     data = {
         "meta": {
-            "schemaVersion": "3.4.2",
+            # 3.7.0: item-fill obtainSources — vending/dispenser/juicing
+            # channels folded into obtainSources (D3); item-carried reagents
+            # (Absinthe, Lead, ...) no longer render as unobtainable.
+            # 3.6.1: species{} (curated physiology) + per-reagent
+            # speciesEffects lifted from organ-conditional effect clauses.
+            # 3.6.0: plants{} — seed prototypes as first-class entities
+            # (mutation graph, potency-scaled chemicals, growth params).
+            # 3.5.0: legacy rmcStatus/rmcNote per-reaction fields and
+            # vanillaReagentCount/rmcReagentCount meta removed — forkStatus/
+            # forkNotes are the only fork-view fields since the multi-fork era.
+            "schemaVersion": "3.9.0",
             "generated": time.strftime("%Y-%m-%dT%H:%M:%S"),
             "forks": forks_meta,
-            # Backward compat
-            "vanillaReagentCount": fork_reagent_counts.get("vanilla", 0),
-            "rmcReagentCount": fork_reagent_counts.get("rmc14", 0),
             "reactionCount": len(reactions),
+            "plantCount": len(plants or {}),
         },
         "reagents": {},
         "reactions": {},
@@ -2292,6 +2345,7 @@ def export_json(reagents: dict, reactions: dict, locale: dict,
         cats_seen.add(cat)
         source = proto_fork(reagent)
         effects_str, metab_paths = summarize_metabolisms(reagent.get("metabolisms", {}))
+        _metab_rate = metabolism_rate(reagent.get("metabolisms", {}))  # D4
 
         recipe_obj = None
         if rid in reaction_lookup:
@@ -2359,6 +2413,9 @@ def export_json(reagents: dict, reactions: dict, locale: dict,
             "boilingPoint": reagent.get("boilingPoint"),
             "meltingPoint": reagent.get("meltingPoint"),
         }
+        # D4: metabolism rate — only when overridden (default 0.5 filled in UI)
+        if _metab_rate is not None:
+            reagent_obj["metabolismRate"] = _metab_rate
         # Only include antag fields when non-default (saves ~30KB in JSON)
         if antag_score:
             reagent_obj["antagScore"] = antag_score
@@ -2435,18 +2492,17 @@ def export_json(reagents: dict, reactions: dict, locale: dict,
             "effects": summarize_reaction_effects(rxn),
             "impact": rxn.get("impact"),
         }
+        # Increment C1 — cascade priority for the beaker simulator: the engine
+        # picks the highest-priority reaction when several compete (Smoke/Foam
+        # are -10 so real recipes win the reagents). Only present when the
+        # YAML defines it; absent means engine default 0. Can be negative.
+        if rxn.get("priority") is not None:
+            reaction_obj["priority"] = rxn["priority"]
         # Only add fork fields if there's something to report
         if fork_status:
             reaction_obj["forkStatus"] = fork_status
         if fork_notes:
             reaction_obj["forkNotes"] = fork_notes
-        # Backward compat: rmcStatus / rmcNote
-        rmc_status = fork_status.get("rmc14", "available")
-        reaction_obj["rmcStatus"] = rmc_status
-        if rmc_status == "modified":
-            reaction_obj["rmcNote"] = fork_notes.get("rmc14", "")
-        else:
-            reaction_obj["rmcNote"] = ""
 
         data["reactions"][rid] = reaction_obj
 
@@ -2481,7 +2537,7 @@ def export_json(reagents: dict, reactions: dict, locale: dict,
     # Falls back to empty dict if plants weren't threaded through (old call sites).
     per_fork_views = build_per_fork_views(
         reactions, reagents, reagent_plants or {}, base_set, fork_diffs,
-        fork_reagent_blocks,
+        fork_reagent_blocks, item_sources,
     ) if reagent_plants is not None else {}
 
     strategies_out = []
@@ -2490,7 +2546,11 @@ def export_json(reagents: dict, reactions: dict, locale: dict,
     for _strat in ANTAG_STRATEGIES:
         computed = compute_strategy_difficulty(_strat, accessibility_map, reaction_lookup)
         if per_fork_views:
-            by_fork = compute_strategy_difficulty_by_fork(_strat, per_fork_views)
+            by_fork = {
+                fork_id: compute_strategy_difficulty(
+                    _strat, views["accessibility_map"], views["reaction_lookup"])
+                for fork_id, views in per_fork_views.items()
+            }
             computed["byFork"] = by_fork
             # Inline summary: which forks flip the tier vs global?
             tier_variants = {fid: r["tier"] for fid, r in by_fork.items()}
@@ -2517,6 +2577,46 @@ def export_json(reagents: dict, reactions: dict, locale: dict,
     data["deliveryMechanisms"] = DELIVERY_MECHANISMS
     data["syndicateItems"] = SYNDICATE_ITEMS
 
+    # Shift-start presets (ROADMAP A2) — validate curated reagent ids against
+    # the extracted reagent set so a config typo can't ship a broken preset.
+    presets_out = []
+    for _preset in SHIFT_PRESETS:
+        missing = [r["id"] for r in _preset["reagents"] if r["id"] not in data["reagents"]]
+        if missing:
+            print(f"  WARNING: shift preset '{_preset['id']}' drops unknown reagent ids: {missing}")
+        valid_reagents = [r for r in _preset["reagents"] if r["id"] not in missing]
+        if not valid_reagents:
+            print(f"  WARNING: shift preset '{_preset['id']}' has no valid reagents — skipped")
+            continue
+        presets_out.append({**_preset, "reagents": valid_reagents})
+    data["shiftPresets"] = presets_out
+    print(f"\n  Shift presets: {len(presets_out)}/{len(SHIFT_PRESETS)} exported")
+
+    # Plant entities (D1) — mutation graph + potency-scaled chemicals
+    data["plants"] = plants or {}
+    data["botanyGuide"] = BOTANY_GUIDE
+
+    # Species layer (D2): curated physiology + auto-extracted per-reagent
+    # organ conditions. The "(if organ: X)" clauses already live in the
+    # humanized effects strings — lift them into a structured field so the
+    # UI doesn't regex display text.
+    data["species"] = {"physiology": SPECIES_DATA, "sources": SPECIES_GUIDE_SOURCES}
+    organ_re = re.compile(r"\(if organ: (\w+)\)")
+    species_reagent_count = 0
+    for rid, robj in data["reagents"].items():
+        fx = robj.get("effects") or ""
+        if "organ:" not in fx:
+            continue
+        by_species = {}
+        for clause in fx.split(";"):
+            m = organ_re.search(clause)
+            if m:
+                by_species.setdefault(m.group(1), []).append(clause.strip())
+        if by_species:
+            robj["speciesEffects"] = by_species
+            species_reagent_count += 1
+    print(f"  Species: {len(SPECIES_DATA)} curated, {species_reagent_count} reagents with organ-conditional effects")
+
     # Print mismatch summary (non-fatal — authored tier is preserved for UI tooltip).
     if mismatches:
         print(f"\n  Computed difficulty mismatches ({len(mismatches)}/{len(ANTAG_STRATEGIES)}):")
@@ -2538,6 +2638,10 @@ def export_json(reagents: dict, reactions: dict, locale: dict,
     attribution_inputs = []
     for s in strategies_out:
         attribution_inputs.append((f"ANTAG_STRATEGIES:{s['id']}", s.get("sources", [])))
+    for p in presets_out:
+        attribution_inputs.append((f"SHIFT_PRESETS:{p['id']}", p.get("sources", [])))
+    attribution_inputs.append(("BOTANY_GUIDE", BOTANY_GUIDE.get("sources", [])))
+    attribution_inputs.append(("SPECIES_DATA", SPECIES_GUIDE_SOURCES))
     for rid, robj in data["reagents"].items():
         if robj.get("antagTipsSources"):
             attribution_inputs.append((f"ANTAG_DATA:{rid}", robj["antagTipsSources"]))
@@ -2586,7 +2690,7 @@ def export_json(reagents: dict, reactions: dict, locale: dict,
 # ─────────────────────────────────────────────
 
 def main():
-    loader = make_yaml_loader()
+    loader = SS14Loader
 
     # Phase 1: Fetch all forks
     print("=== Phase 1: Fetching files from GitHub ===")
@@ -2611,11 +2715,23 @@ def main():
         if seed_files:
             print(f"  Fetched {len(seed_files)} seed files")
 
+        # D3: item-fill channel manifests (entities with solutions, vending
+        # inventories, machine names, dispenser packs). Most forks: [].
+        item_channel_files = {}
+        for key in ("item_fill_files", "vending_inventory_files",
+                    "vending_machine_files", "dispenser_files", "produce_files"):
+            flist = fconf.get(key, [])
+            item_channel_files[key] = fetch_all_files(flist, url, fork_id) if flist else {}
+        n_channel = sum(len(v) for v in item_channel_files.values())
+        if n_channel:
+            print(f"  Fetched {n_channel} item-channel files")
+
         fork_data[fork_id] = {
             "reagent_files": reagent_files,
             "reaction_files": reaction_files,
             "locale_files": locale_files,
             "seed_files": seed_files,
+            **item_channel_files,
         }
 
     # Phase 1b: Fetch vanilla-path files from each fork for auto-diff + harvest
@@ -2883,6 +2999,34 @@ def main():
     print(f"  Products with recipes: {len(reaction_lookup)}")
     print(f"  Base chemicals: {len(base_set)}")
 
+    # Phase 4e: renamed-reagent dead reactions (total-conversion forks, D5).
+    # RMC-14 renames base reagents (Fluorine→RMCFluorine); vanilla recipes that
+    # need the shadowed twin can't be made in-game though the merged data shows
+    # them. Fold the dead set into the same fork_diffs blocked channel.
+    print("\n=== Phase 4e: Renamed-reagent dead reactions (total-conversion forks) ===")
+    # A total conversion renames the base-element set wholesale (RMC-14: 21).
+    # Gate on a threshold so a lone coincidental locale-name collision (ADT
+    # reuses `reagent-name-toxin`) can't mass-block an additive fork.
+    TOTAL_CONVERSION_MIN_RENAMES = 5
+    _raw_shadow = build_shadowed_reagents(parsed, base_set)
+    shadowed_by_fork = {
+        f: s for f, s in _raw_shadow.items()
+        if len(s) >= TOTAL_CONVERSION_MIN_RENAMES
+    }
+    _skipped = {f: len(s) for f, s in _raw_shadow.items()
+                if 0 < len(s) < TOTAL_CONVERSION_MIN_RENAMES}
+    if _skipped:
+        print(f"  (ignored sub-threshold base-name collisions: {_skipped})")
+    for fork_id, sh in shadowed_by_fork.items():
+        dead = dead_reactions_from_shadow(fork_id, all_reactions, base_set, sh)
+        if not dead:
+            continue
+        blocked, modified = fork_diffs.get(fork_id, (set(), {}))
+        new_dead = dead - blocked
+        fork_diffs[fork_id] = (blocked | dead, modified)
+        print(f"  {FORK_REGISTRY[fork_id]['name']}: {len(sh)} renamed base reagents "
+              f"→ {len(dead)} dead reactions (+{len(new_dead)} new blocks)")
+
     # Phase 5b: Parse plant/seed sources
     print("\n=== Phase 5b: Parsing plant/seed sources ===")
     botany_locale = load_all_localization(botany_locale_files)
@@ -2892,25 +3036,26 @@ def main():
         all_seed_files.update(fdata.get("seed_files", {}))
     reagent_plants = parse_seed_sources(all_seed_files, loader, all_seed_locale)
     print(f"  Plant reagent sources: {len(reagent_plants)}")
-    all_sources = build_all_sources(reagent_plants, reaction_lookup, base_set)
-    print(f"  Total reagents with sources: {len(all_sources)}")
 
-    # Phase 6-7: Generate Excel
-    print("\n=== Phase 6-7: Generating Excel ===")
-    wb = generate_excel(all_reagents, all_reactions, locale, reaction_lookup, base_set)
-    wb.save(str(OUTPUT_FILE))
-    print(f"\n  Saved to: {OUTPUT_FILE}")
-    print(f"  Sheets: {len(wb.sheetnames)}")
-    for name in wb.sheetnames:
-        ws = wb[name]
-        print(f"    {name}: {ws.max_row - 1 if ws.max_row > 1 else 0} rows")
+    # Phase 5c: Item-fill sources (Increment D3)
+    print("\n=== Phase 5c: Item-fill sources (vending/dispenser/juicing channels) ===")
+    item_sources = build_item_sources(fork_data, loader, seed_locale=all_seed_locale)
+
+    all_sources = build_all_sources(reagent_plants, reaction_lookup, base_set,
+                                    item_sources)
+    print(f"  Total reagents with sources: {len(all_sources)}")
 
     # Phase 8: Generate JSON for web frontend
     print("\n=== Phase 8: Generating JSON for web frontend ===")
+    plants = parse_plants(fork_data, loader, all_seed_locale)
+    mut_count = sum(1 for p in plants.values() if p["mutations"])
+    print(f"  Plants: {len(plants)} entities ({mut_count} with mutation targets)")
+
     export_json(
         all_reagents, all_reactions, locale, reaction_lookup, base_set,
         all_sources, fork_diffs, reagent_plants=reagent_plants,
-        fork_reagent_blocks=fork_reagent_blocks,
+        fork_reagent_blocks=fork_reagent_blocks, plants=plants,
+        item_sources=item_sources, shadowed_by_fork=shadowed_by_fork,
     )
 
     print("\n=== Phase 9: Extracting sprites from SS14 repo ===")

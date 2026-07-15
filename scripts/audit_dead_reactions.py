@@ -29,26 +29,9 @@ if str(_ROOT) not in sys.path:
     sys.path.insert(0, str(_ROOT))
 
 from config import FORK_REGISTRY  # noqa: E402
+from _ss14_yaml import IgnoreTagLoader as _IgnoreTag  # noqa: E402
 
 CACHE = _ROOT / "cache"
-
-
-class _IgnoreTag(yaml.SafeLoader):
-    pass
-
-
-def _tag_ignore(loader, tag_suffix, node):
-    if isinstance(node, yaml.ScalarNode):
-        return loader.construct_scalar(node)
-    if isinstance(node, yaml.MappingNode):
-        return loader.construct_mapping(node, deep=True)
-    if isinstance(node, yaml.SequenceNode):
-        return loader.construct_sequence(node, deep=True)
-    return None
-
-
-_IgnoreTag.add_multi_constructor("!type:", _tag_ignore)
-_IgnoreTag.add_multi_constructor("!", _tag_ignore)
 
 
 def _load_yml(path: Path):

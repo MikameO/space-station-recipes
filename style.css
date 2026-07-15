@@ -45,7 +45,6 @@
   /* Structural */
   --border-subtle: #1a2540;
   --border-active: #2c5282;
-  --corner-cut: 6px;
   --glow-spread: 12px;
 }
 
@@ -91,15 +90,6 @@ body::after {
 }
 
 /* ── ANGULAR CLIP UTILITY ── */
-.clip-corner {
-  clip-path: polygon(
-    var(--corner-cut) 0%, 100% 0%,
-    100% calc(100% - var(--corner-cut)),
-    calc(100% - var(--corner-cut)) 100%,
-    0% 100%, 0% var(--corner-cut)
-  );
-}
-
 /* ══════════════════════════════════════════
    HEADER — Station masthead
    ══════════════════════════════════════════ */
@@ -171,7 +161,10 @@ header h1 {
   letter-spacing: 0.06em;
 }
 
-.header-right { display: flex; align-items: center; gap: 10px; flex: 1; max-width: 480px; }
+.header-right { display: flex; align-items: center; gap: 10px; flex: 1; max-width: 560px; }
+/* C3.1: the search box must survive the button row growing (📌 pushed it
+   to zero width — buttons don't shrink, the input was the only thing that could) */
+.header-right .search-input { min-width: 130px; }
 
 /* ── SEARCH ── */
 .search-input {
@@ -322,7 +315,7 @@ header h1 {
 }
 .radio-label input:checked::after { border-radius: 50%; }
 
-.rmc-disclaimer, .fork-disclaimer {
+.fork-disclaimer {
   font-size: 0.6rem;
   color: var(--amber);
   background: var(--amber-dim);
@@ -331,6 +324,13 @@ header h1 {
   padding: 6px 8px;
   margin-top: 6px;
   line-height: 1.4;
+}
+/* D5: total-conversion forks (RMC family) — stronger red warning */
+.fork-disclaimer-strong {
+  color: var(--red-alert);
+  background: rgba(255,61,90,0.08);
+  border-color: rgba(255,61,90,0.35);
+  font-size: 0.64rem;
 }
 .fork-dot {
   display: inline-block;
@@ -462,6 +462,333 @@ main {
 .tab-btn-antag.pulse { animation: antag-pulse 0.8s ease-in-out 2; }
 .antag-tab-content { display: flex; flex-direction: column; gap: 24px; }
 
+/* A1: Advanced tab dropdown (Reactions / Graph / Stats — pending Metrika verdict) */
+.tab-adv { position: relative; display: flex; }
+.tab-adv-caret { font-size: 9px; opacity: 0.7; margin-left: 4px; }
+.tab-adv-toggle.has-active {
+  color: var(--phosphor);
+  border-bottom-color: var(--phosphor);
+  text-shadow: 0 0 8px var(--phosphor-glow);
+}
+.tab-adv-menu {
+  display: none;
+  /* fixed, positioned from the toggle by JS: the tab bar is an
+     overflow-x:auto scroller, so an absolute child gets CLIPPED at the
+     bar's edge — the menu "opened" but was never visible (C3.3) */
+  position: fixed;
+  z-index: 60;
+  min-width: 150px;
+  flex-direction: column;
+  background: var(--hull-plate);
+  border: 1px solid var(--border-subtle);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+}
+.tab-adv.open .tab-adv-menu { display: flex; }
+.tab-adv-menu .tab-btn {
+  width: 100%;
+  text-align: left;
+  border-bottom: 2px solid transparent;
+}
+.tab-adv-menu .tab-btn.active::after { display: none; }
+
+/* A4: craft-tree gathering/brewing checklist */
+.tree-check {
+  accent-color: var(--phosphor);
+  width: 14px;
+  height: 14px;
+  margin-right: 2px;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+.tree-node.checked { opacity: 0.45; }
+.tree-node.checked .node-name { text-decoration: line-through; }
+.tree-progress {
+  font-family: 'Oxanium', sans-serif;
+  font-size: 12px;
+  color: var(--phosphor);
+  margin-left: auto;
+  white-space: nowrap;
+  align-self: center;
+}
+
+/* A5: recipe-complexity chip (shown while sorting by Fewest Steps) */
+.badge-steps {
+  border-left-color: var(--phosphor);
+  color: var(--phosphor);
+}
+
+/* A2: shift-start preset chips (Batch Planner) */
+.preset-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.preset-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: var(--hull-plate);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-sub);
+  font-family: 'Oxanium', sans-serif;
+  font-size: 12px;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+.preset-chip:hover {
+  border-color: var(--phosphor);
+  color: var(--phosphor);
+}
+.preset-tier-label {
+  font-size: 9px;
+  text-transform: uppercase;
+  opacity: 0.6;
+  border: 1px solid currentColor;
+  padding: 1px 4px;
+  border-radius: 2px;
+}
+.preset-tier-meta .preset-tier-label { color: var(--amber-warn, #ffb627); opacity: 0.9; }
+
+/* A3: What Heals? medical mode */
+.heal-type-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 12px 0 16px;
+}
+.heal-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: var(--hull-plate);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-sub);
+  font-family: 'Oxanium', sans-serif;
+  font-size: 12px;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+.heal-chip:hover { border-color: var(--phosphor); color: var(--phosphor); }
+.heal-chip.active {
+  border-color: var(--phosphor);
+  color: var(--phosphor);
+  text-shadow: 0 0 8px var(--phosphor-glow);
+}
+.heal-chip-count {
+  font-size: 10px;
+  opacity: 0.6;
+  border: 1px solid currentColor;
+  padding: 0 4px;
+  border-radius: 2px;
+}
+/* D2: species context in What Heals? */
+.species-chips { margin-top: 0; }
+.species-card { margin: 0 0 12px; }
+.species-line { color: var(--text-sub); font-size: 0.74rem; margin: 0; line-height: 1.5; }
+.species-tox { color: var(--red-alert); }
+.badge.species-bad { border-left-color: var(--red-alert); color: var(--red-alert); }
+.badge.species-note { border-left-color: var(--cyan, #06b6d4); color: var(--cyan, #06b6d4); }
+
+.heal-table .heal-row { cursor: pointer; }
+.heal-table .heal-row:hover td { color: var(--phosphor); }
+.heal-num { font-weight: 600; }
+.heal-cond { color: var(--amber-warn, #ffb627); font-weight: 700; }
+/* D4: non-default metabolism rate chip in What Heals? */
+.heal-rate { font-size: 0.62rem; color: var(--text-ghost); font-weight: 400; white-space: nowrap; cursor: help; }
+.badge-access { border-left-color: var(--text-ghost); text-transform: none; }
+
+/* B1: Fork Diff */
+.forkdiff-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 12px 0 16px;
+  font-family: 'Oxanium', sans-serif;
+  font-size: 12px;
+  color: var(--text-sub);
+}
+.forkdiff-arrow { color: var(--phosphor); font-size: 16px; }
+.diff-section { margin-bottom: 18px; }
+.diff-h {
+  font-family: 'Oxanium', sans-serif;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  margin-bottom: 8px;
+}
+.diff-h.diff-added { color: var(--phosphor); }
+.diff-h.diff-removed { color: var(--red-alert); }
+.diff-h.diff-modified { color: var(--amber-warn, #ffb627); }
+.diff-count {
+  font-size: 10px;
+  border: 1px solid currentColor;
+  padding: 0 5px;
+  border-radius: 2px;
+  vertical-align: middle;
+}
+.diff-body { display: flex; flex-wrap: wrap; gap: 6px; }
+.diff-chip {
+  padding: 3px 9px;
+  background: var(--hull-plate);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-sub);
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 11px;
+  cursor: pointer;
+}
+.diff-chip:hover { border-color: var(--phosphor); color: var(--phosphor); }
+.diff-chip-static { cursor: default; }
+.diff-chip-static:hover { border-color: var(--border-subtle); color: var(--text-sub); }
+.diff-mod {
+  width: 100%;
+  display: flex;
+  gap: 10px;
+  padding: 5px 8px;
+  background: rgba(255,182,39,0.04);
+  border-left: 2px solid var(--amber-warn, #ffb627);
+  font-size: 11px;
+}
+.diff-mod-id { font-family: 'Share Tech Mono', monospace; color: var(--text-sub); white-space: nowrap; }
+.diff-mod-note { color: var(--text-ghost); }
+
+/* C2: beaker simulator */
+.beaker-temp-label {
+  font-family: 'Oxanium', sans-serif;
+  font-size: 12px;
+  color: var(--text-sub);
+  white-space: nowrap;
+}
+.beaker-log-title {
+  font-family: 'Oxanium', sans-serif;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--phosphor);
+  margin: 8px 0 6px;
+}
+.beaker-step {
+  display: flex;
+  gap: 8px;
+  padding: 5px 8px;
+  font-size: 12px;
+  border-left: 2px solid var(--border-subtle);
+  margin-bottom: 3px;
+  background: rgba(255,255,255,0.02);
+}
+.beaker-step-n {
+  font-family: 'Share Tech Mono', monospace;
+  color: var(--text-ghost);
+  min-width: 16px;
+}
+.beaker-danger {
+  border-left-color: var(--red-alert);
+  background: rgba(255,61,90,0.05);
+}
+.beaker-warn { color: var(--red-alert); font-weight: 600; }
+.beaker-note { color: var(--text-ghost); font-style: italic; }
+.beaker-pri {
+  font-size: 10px;
+  color: var(--text-ghost);
+  border: 1px solid var(--border-subtle);
+  padding: 0 3px;
+  border-radius: 2px;
+}
+
+/* D1: plant evolution + swab guide */
+.plant-tree { margin-bottom: 6px; }
+.plant-chem-chip { border-left-color: var(--phosphor-dim); opacity: 0.85; }
+.guide-card {
+  margin-top: 14px;
+  padding: 12px 14px;
+  border: 1px solid rgba(255,182,39,0.25);
+  border-left: 3px solid var(--amber-warn, #ffb627);
+  background: rgba(255,182,39,0.04);
+  border-radius: 2px;
+}
+.guide-head {
+  font-family: 'Oxanium', sans-serif;
+  font-size: 0.8rem;
+  color: var(--amber-warn, #ffb627);
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.badge-community { border-left-color: var(--amber-warn, #ffb627); color: var(--amber-warn, #ffb627); }
+.guide-section { margin-bottom: 8px; }
+.guide-section b { color: var(--text-sub); font-size: 0.72rem; }
+.guide-section p { color: var(--text-ghost); font-size: 0.72rem; line-height: 1.5; margin: 2px 0 0; }
+
+/* B2: companion mode (?mode=companion) — compact layout for a second
+   screen or the pin-over-game PiP window: no chrome, content edge-to-edge */
+body.companion header,
+body.companion .sidebar {
+  display: none;
+}
+
+/* C3: companion top bar (search + collapse) and slim collapsed state */
+.companion-bar { display: none; }
+body.companion .companion-bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  padding: 5px 8px;
+  background: var(--hull-plate);
+  border-bottom: 1px solid var(--border-subtle);
+}
+body.companion .companion-bar .search-input {
+  flex: 1;
+  min-width: 0;
+  font-size: 13px;
+}
+body.companion.companion-collapsed .tab-bar,
+body.companion.companion-collapsed main {
+  display: none;
+}
+/* C3.2: filters drawer in companion mode — the sidebar returns as a
+   scrollable overlay under the bar */
+body.companion .companion-bar .btn-small { white-space: nowrap; flex-shrink: 0; }
+body.companion .companion-bar .btn-small.active { border-color: var(--phosphor); color: var(--phosphor); }
+body.companion.companion-filters-open .sidebar {
+  display: block;
+  position: fixed;
+  top: 38px;
+  left: 0;
+  bottom: 0;
+  width: min(320px, 92vw);
+  overflow-y: auto;
+  z-index: 45;
+  background: var(--hull);
+  border-right: 1px solid var(--border-subtle);
+  box-shadow: 4px 0 24px rgba(0,0,0,0.55);
+  padding: 10px 12px;
+}
+/* C3.4: the PiP window is narrower than the 768px mobile breakpoint, whose
+   `.sidebar-content { display:none }` rule hid the drawer's contents — an
+   empty black box. Force the filter content visible when the drawer is open. */
+body.companion.companion-filters-open .sidebar-content { display: block; }
+body.companion main {
+  margin: 0;
+  max-width: none;
+  padding: 6px 8px;
+}
+body.companion .tab-bar {
+  padding: 0 4px;
+  position: sticky;
+  top: 0;
+  z-index: 30;
+}
+body.companion .tab-btn { padding: 8px 10px; font-size: 12px; }
+body.companion .tree-node { font-size: 14px; }
+body.companion .tree-check { width: 17px; height: 17px; }
+
 .tab-panel {
   display: none;
   flex: 1;
@@ -581,12 +908,6 @@ main {
   color: var(--phosphor);
 }
 
-.badge-rmc {
-  background: var(--cyan-dim);
-  border-left: 2px solid var(--cyan);
-  color: var(--cyan);
-}
-
 .badge-modified {
   background: var(--amber-dim);
   border-left: 2px solid var(--amber);
@@ -675,7 +996,7 @@ main {
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.14em;
-  color: var(--text-ghost);
+  color: var(--text-sub);
   padding-left: 2px;
   margin-bottom: 2px;
   line-height: 1.3;
@@ -704,9 +1025,6 @@ main {
   letter-spacing: 0.02em;
   line-height: 1.45;
   opacity: 0.95;
-}
-.effects-verbose .effect-group__head {
-  color: var(--text-sub);
 }
 .effects-verbose .effect-row--heal        { border-left-color: #22c55e; background: rgba(34,197,94,0.07); }
 .effects-verbose .effect-row--heal        .effect-row__text { color: #a7f3c4; }
@@ -751,7 +1069,6 @@ main {
 .effects-verbose .effect-category__head--other       { color: #94a3b8; }
 
 /* Effect filters in sidebar */
-.effect-filters { display: block; }
 .effect-tag-btn {
   padding: 2px 7px;
   background: transparent;
@@ -1663,18 +1980,6 @@ body.antag-active .antag-toggle {
 }
 
 /* Strategy cards bar */
-.antag-strategies-bar {
-  display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 10px; margin-bottom: 16px; padding: 12px;
-  border: 1px solid rgba(255,61,90,0.15); border-radius: 2px;
-  background: rgba(255,61,90,0.03);
-}
-.antag-strategies-bar h3 {
-  grid-column: 1 / -1; color: var(--red-alert);
-  font-family: 'Oxanium', sans-serif; font-size: 0.75rem;
-  text-transform: uppercase; letter-spacing: 0.12em;
-  margin-bottom: 4px;
-}
 /* Increment D — Antag strategy filter bar */
 .antag-filter-bar {
   display: flex; flex-wrap: wrap; gap: 10px 14px;
@@ -1894,16 +2199,6 @@ body.antag-active .antag-toggle {
 .strategy-calc-btn:hover { background: rgba(255,61,90,0.2); }
 
 /* Delivery mechanisms section */
-.antag-delivery-section {
-  margin-bottom: 16px; padding: 12px;
-  border: 1px solid rgba(255,61,90,0.1); border-radius: 2px;
-  background: rgba(255,61,90,0.02);
-}
-.antag-delivery-section h3 {
-  color: var(--red-alert); font-family: 'Oxanium', sans-serif;
-  font-size: 0.75rem; text-transform: uppercase;
-  letter-spacing: 0.12em; margin-bottom: 10px;
-}
 .delivery-grid {
   display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   gap: 8px;
@@ -2030,11 +2325,6 @@ body.antag-active .antag-toggle {
   image-rendering: pixelated; image-rendering: crisp-edges;
   vertical-align: middle;
 }
-.sprite-icon-lg {
-  width: 48px; height: 48px;
-  image-rendering: pixelated; image-rendering: crisp-edges;
-}
-
 /* ══════════════════════════════════════════
    RESPONSIVE
    ══════════════════════════════════════════ */
@@ -2676,7 +2966,7 @@ body.antag-active .empty-state-chip:focus-visible {
   .antag-icon,
   .tut-spotlight,
   .loading-brand,
-  .loader-spinner,
+  .loading-spinner,
   .loading-bar-fill,
   .loading-text,
   .tab-btn-antag.pulse {

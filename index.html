@@ -72,7 +72,7 @@
   "license": "https://github.com/MikameO/space-station-recipes/blob/main/LICENSE"
 }
 </script>
-<link rel="stylesheet" href="style.css?v=10">
+<link rel="stylesheet" href="style.css?v=28">
 <!-- Yandex.Metrika counter -->
 <script type="text/javascript">
     (function(m,e,t,r,i,k,a){
@@ -86,9 +86,16 @@
 </script>
 <noscript><div><img src="https://mc.yandex.ru/watch/108585248" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
 <!-- /Yandex.Metrika counter -->
-<script defer src="https://unpkg.com/vis-network@9.1.6/standalone/umd/vis-network.min.js"></script>
+<!-- vis-network is lazy-loaded by app.js on first Graph tab open (A1) -->
 </head>
 <body>
+
+<!-- C3: companion-mode top bar — search + collapse (hidden outside ?mode=companion) -->
+<div id="companionBar" class="companion-bar">
+  <input type="text" id="companionSearch" class="search-input" placeholder="Search reagents, effects..." autocomplete="off" aria-label="Companion search">
+  <button class="btn-small" id="companionFilters" title="Filters (source, category, effects)">&#9881; Filters</button>
+  <button class="btn-small" id="companionCollapse" title="Collapse to a slim bar">&#9601;</button>
+</div>
 
 <header>
   <div class="header-left">
@@ -111,6 +118,8 @@
       <svg class="feedback-icon" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 3h14v10H7l-4 4V3z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><circle cx="7.5" cy="8" r="1" fill="currentColor"/><circle cx="10" cy="8" r="1" fill="currentColor"/><circle cx="12.5" cy="8" r="1" fill="currentColor"/></svg>
     </a>
     <button class="share-btn" id="shareBtn" title="Copy shareable link">&#128279;</button>
+    <!-- B3: pin a compact companion window over the game (Document PiP, popup fallback) -->
+    <button class="share-btn" id="pipBtn" title="Pin over game — floating always-on-top companion (Chrome/Edge). Falls back to a compact popup.">&#128204;</button>
   </div>
 </header>
 
@@ -171,7 +180,8 @@
         </div>
       </div>
 
-      <div class="filter-section" data-collapsible>
+      <!-- A1: hidden pending Metrika verdict (ROADMAP A1); markup kept so statsPanel render stays harmless -->
+      <div class="filter-section" data-collapsible style="display:none">
         <h3>Stats <span class="section-chevron">&#9660;</span></h3>
         <div class="section-body">
           <div id="statsPanel" class="stats-panel"></div>
@@ -183,13 +193,21 @@
   <main>
     <div class="tab-bar" role="tablist">
       <button class="tab-btn active" id="btn-reagents" data-tab="reagents" role="tab" aria-selected="true" aria-controls="tab-reagents">Reagents</button>
-      <button class="tab-btn" id="btn-reactions" data-tab="reactions" role="tab" aria-selected="false" aria-controls="tab-reactions">Reactions</button>
       <button class="tab-btn" id="btn-calculator" data-tab="calculator" role="tab" aria-selected="false" aria-controls="tab-calculator">Calculator</button>
+      <button class="tab-btn" id="btn-medbay" data-tab="medbay" role="tab" aria-selected="false" aria-controls="tab-medbay">What Heals?</button>
       <button class="tab-btn" id="btn-trees" data-tab="trees" role="tab" aria-selected="false" aria-controls="tab-trees">Craft Trees</button>
-      <button class="tab-btn" id="btn-graph" data-tab="graph" role="tab" aria-selected="false" aria-controls="tab-graph">Graph</button>
       <button class="tab-btn" id="btn-botany" data-tab="botany" role="tab" aria-selected="false" aria-controls="tab-botany">Botany</button>
       <button class="tab-btn" id="btn-maps" data-tab="maps" role="tab" aria-selected="false" aria-controls="tab-maps">Maps</button>
-      <button class="tab-btn" id="btn-stats" data-tab="stats" role="tab" aria-selected="false" aria-controls="tab-stats">Stats</button>
+      <!-- A1: low-usage tabs live in Advanced; final removal pends the Metrika checkpoint (ROADMAP A1) -->
+      <div class="tab-adv" id="tabAdv">
+        <button class="tab-btn tab-adv-toggle" id="btnAdvanced" type="button" aria-haspopup="true" aria-expanded="false">&#9881; Advanced <span class="tab-adv-caret">&#9662;</span></button>
+        <div class="tab-adv-menu">
+          <button class="tab-btn" id="btn-reactions" data-tab="reactions" role="tab" aria-selected="false" aria-controls="tab-reactions">Reactions</button>
+          <button class="tab-btn" id="btn-graph" data-tab="graph" role="tab" aria-selected="false" aria-controls="tab-graph">Graph</button>
+          <button class="tab-btn" id="btn-stats" data-tab="stats" role="tab" aria-selected="false" aria-controls="tab-stats">Stats</button>
+          <button class="tab-btn" id="btn-forkdiff" data-tab="forkdiff" role="tab" aria-selected="false" aria-controls="tab-forkdiff">Fork Diff</button>
+        </div>
+      </div>
       <button class="tab-btn tab-btn-antag" id="btn-antag" data-tab="antag" role="tab" aria-selected="false" aria-controls="tab-antag" style="display:none">&#9760; Antag Strategies</button>
     </div>
 
@@ -202,6 +220,7 @@
           <option value="name-desc">Name Z→A</option>
           <option value="category">Category</option>
           <option value="used-in">Most Used</option>
+          <option value="steps-asc">Fewest Steps</option>
           <option value="antag-desc">Antag Score ↓</option>
         </select>
         <button class="hint-chip" data-hint="Most Used = sorted by how many reactions reference the reagent. Antag Score = potency heuristic across damage, stealth, and method." aria-label="Sort options explained">?</button>
@@ -251,6 +270,8 @@
         </h3>
         <div class="section-body">
           <p class="reverse-desc">Add multiple targets to get one optimized shopping list</p>
+          <!-- A2: one-click shift-start presets (curated in config.py, validated at build) -->
+          <div class="preset-bar" id="presetBar"></div>
           <div class="batch-controls">
             <div class="batch-row">
               <input type="text" id="batchInput" class="search-input" placeholder="Type reagent..." autocomplete="off" aria-label="Add batch target reagent" style="width:220px">
@@ -263,6 +284,30 @@
           <button class="btn-primary" id="batchPlanBtn" style="margin-bottom:12px">Plan Batch</button>
           <div id="batchWarnings"></div>
           <div class="calc-results" id="batchResults"></div>
+        </div>
+      </div>
+
+      <!-- C2: Beaker Simulator — what will ACTUALLY happen when you mix -->
+      <div class="batch-section" data-collapsible data-collapse-key="beaker">
+        <h3 class="reverse-title">
+          <span class="reverse-title-text">Beaker Simulator</span>
+          <button class="hint-chip" data-hint="Simulates the actual reaction cascade: priority order, temperature windows, catalysts. 'What Can I Make?' answers what's craftable — this answers what physically happens, including the smoke you didn't want." aria-label="Beaker simulator explained">?</button>
+          <span class="section-chevron">&#9660;</span>
+        </h3>
+        <div class="section-body">
+          <p class="reverse-desc">Enter beaker contents — watch the cascade, see the final mix</p>
+          <div class="batch-controls">
+            <div class="batch-row">
+              <input type="text" id="beakerInput" class="search-input" placeholder="Type reagent..." autocomplete="off" aria-label="Add beaker reagent" style="width:220px">
+              <div class="calc-suggestions" id="beakerSuggestions"></div>
+              <input type="number" id="beakerAmount" class="search-input" value="30" min="0.5" max="9999" step="0.5" aria-label="Beaker reagent amount" style="width:80px">
+              <button class="btn-small" id="beakerAddBtn">+ Add</button>
+              <label class="beaker-temp-label">Temp <input type="number" id="beakerTemp" class="search-input" value="293" min="0" max="10000" aria-label="Beaker temperature in Kelvin" style="width:80px"> K</label>
+            </div>
+          </div>
+          <div class="reverse-chips" id="beakerChips"></div>
+          <button class="btn-primary" id="beakerSimBtn" style="margin-bottom:12px">Simulate Mix</button>
+          <div id="beakerLog"></div>
         </div>
       </div>
 
@@ -285,10 +330,34 @@
     </div>
 
     <!-- Craft Trees Tab -->
+    <!-- Fork Diff Tab (B1): moved servers — what changed? -->
+    <div class="tab-panel" id="tab-forkdiff" role="tabpanel" aria-labelledby="btn-forkdiff">
+      <p class="reverse-desc">Moving between servers? Pick two forks — see what's added, removed or rebalanced. Notes come from the build-time comparator (verified against fork YAML).</p>
+      <div class="forkdiff-controls">
+        <label>From <select id="forkDiffFrom" class="sort-select"></select></label>
+        <span class="forkdiff-arrow">&#8594;</span>
+        <label>To <select id="forkDiffTo" class="sort-select"></select></label>
+      </div>
+      <div id="forkDiffResults"></div>
+    </div>
+
+    <!-- What Heals Tab (A3): damage type → medicines ranked by heal-per-unit -->
+    <div class="tab-panel" id="tab-medbay" role="tabpanel" aria-labelledby="btn-medbay">
+      <p class="reverse-desc">Pick a damage type — medicines ranked by healing per unit. Respects the fork filter; <span class="heal-cond">*</span> marks conditional healing (open details).</p>
+      <div class="heal-type-chips" id="healTypeChips"></div>
+      <!-- D2: species context — curated physiology + YAML-extracted organ effects -->
+      <div class="heal-type-chips species-chips" id="speciesChips" role="group" aria-label="Species context"></div>
+      <div id="speciesInfo"></div>
+      <div id="healResults"></div>
+    </div>
+
     <div class="tab-panel" id="tab-trees" role="tabpanel" aria-labelledby="btn-trees">
       <div class="tree-controls">
         <input type="text" id="treeTarget" class="search-input" placeholder="Type reagent name..." autocomplete="off" aria-label="Craft tree reagent search">
         <input type="number" id="treeAmount" class="tree-amount-input" value="1" min="1" max="9999" step="1" title="Target amount (units)">
+        <!-- A4: gathering/brewing checklist -->
+        <span class="tree-progress" id="treeProgress" aria-live="polite"></span>
+        <button class="btn-small" id="treeResetChecks" title="Uncheck all items" style="display:none">Reset</button>
         <div class="calc-suggestions" id="treeSuggestions"></div>
       </div>
       <div class="tree-output" id="treeOutput"></div>
@@ -311,6 +380,19 @@
         <span class="plant-chip plant-bad">red hurts it</span>
         <span class="plant-chip plant-neutral">purple mutates</span>
         — the global search and Source filter apply here too.</p>
+      <!-- D1: plant evolution (mutation graph) + curated swab guide -->
+      <div class="batch-section" data-collapsible data-collapse-key="evolution">
+        <h3 class="reverse-title">
+          <span class="reverse-title-text">&#127793; Plant Evolution</span>
+          <button class="hint-chip" data-hint="What grows into what. Arrows come from the game's seed data (mutation targets); raise mutation level with Unstable Mutagen to trigger jumps. The Source filter applies." aria-label="Evolution chart explained">?</button>
+          <span class="section-chevron">&#9660;</span>
+        </h3>
+        <div class="section-body">
+          <div id="plantEvolution"></div>
+          <div id="swabGuide"></div>
+        </div>
+      </div>
+
       <div class="botany-filter-chips" id="botanyFilterChips" role="group" aria-label="Filter by plant effect kind">
         <button class="diff-chip" data-group="care" aria-pressed="false">Growth &amp; Care</button>
         <button class="diff-chip" data-group="yield" aria-pressed="false">Potency &amp; Yield</button>
@@ -433,7 +515,7 @@
   <div class="loading-bar"><div class="loading-bar-fill"></div></div>
 </div>
 
-<script src="app.js?v=7"></script>
+<script src="app.js?v=26"></script>
 <script defer src="tutorial.js?v=2"></script>
 <script src="maps.js?v=10" defer></script>
 </body>

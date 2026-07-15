@@ -92,31 +92,6 @@ ALLOWED_DOMAINS = (
     "web.archive.org",
 )
 
-# GitHub owners allowed for deep-links. Derived from FORK_REGISTRY at runtime
-# in the extractor (see ss14_chem_extractor.py). Kept here as a baseline for
-# offline validation and tests.
-_BASELINE_GH_OWNERS = frozenset({
-    "space-wizards",        # vanilla
-    "Goob-Station",
-    "DeltaV-Station",
-    "new-frontiers-14",
-    "RMC-14",
-    "Simple-Station",
-    "CorvaxGoob",
-    "Space-Wizards-Starlight",
-    "dead-space-14",
-    # Popular-server forks (2026-07-07)
-    "Trauma-Station",
-    "ProjectOmu",
-    "carpmosia",
-    "Monolith-Station",
-    "ss14-harmony",
-    "space-syndicate",      # Corvax
-    "AdventureTimeSS14",    # ADT / Время Приключений
-    "space-sunrise",        # Sunrise + Fish Station
-})
-
-
 # ─────────────────────────────────────────────
 # The catalog
 # ─────────────────────────────────────────────
@@ -156,7 +131,7 @@ SOURCES = {
         "url": "https://github.com/space-wizards/space-station-14/blob/master/Resources/Prototypes/Reagents/toxins.yml",
         "title": "Lead reagent in toxins.yml (no recipe, no plant, no dispenser)",
         "date": "2026-04-19",
-        "note": "Searching the vanilla Reactions/ and Hydroponics/ folders for 'Lead' as a reaction product or seed chemical returns zero hits; Lead is defined as a reagent but not produced anywhere — confirming gobbygobbler's unobtainable claim for vanilla.",
+        "note": "Searching the vanilla Reactions/ and Hydroponics/ folders for 'Lead' as a reaction product or seed chemical returns zero hits; Lead is defined as a reagent but not produced anywhere — confirming gobbygobbler's unobtainable claim for vanilla. UPDATE 2026-07-12 (D3 item-fill scan): ChemVendInventorySyndicate.contrabandInventory stocks ChemistryBottleLead x2 (30u) — the SyndieJuice chem vendor (AccessReader: SyndicateAgent) dispenses Lead bottles. No crew path still; classified antag-only, not unobtainable.",
     },
     "code-goob-licoxide-lead": {
         "type": "code",
@@ -316,6 +291,24 @@ SOURCES = {
         "date": "2026-04-19",
         "note": "Original curator compiled these notes from personal playtime across multiple SS14 forks. Source is undocumented — community verification via PR is encouraged.",
     },
+    "mk-shift-presets": {
+        "type": "maintainer-knowledge",
+        "title": "Shift-start preset curation from maintainer's playtime",
+        "date": "2026-07-12",
+        "note": "Reagent picks and amounts for the one-click shift-start presets (Batch Planner). Compiled from personal playtime; every reagent id is validated against extracted vanilla recipes at build time. Community tuning via PR is encouraged.",
+    },
+    "mk-species-guide": {
+        "type": "maintainer-knowledge",
+        "title": "Species physiology notes from maintainer's playtime",
+        "date": "2026-07-12",
+        "note": "Breathing gases and physiology quirks per playable species. Species/body prototypes are not part of the extraction manifest (yet) — unlike per-reagent organ conditions, which ARE extracted from reagent YAML. Corrections via PR encouraged.",
+    },
+    "mk-botany-guide": {
+        "type": "maintainer-knowledge",
+        "title": "Cross-pollination / swab guide from maintainer's playtime",
+        "date": "2026-07-12",
+        "note": "The swab and mutation mechanics live in C# systems (MutationSystem, cross-pollination), not in YAML — unlike the mutation TARGET list, which is extracted from seed prototypes. The guide text is playtime knowledge; corrections via PR are encouraged.",
+    },
 }
 
 
@@ -404,16 +397,6 @@ def _validate_entry(entry: dict, allowed_gh_owners: set[str]) -> list[str]:
     return warnings
 
 
-def resolve_source(ref, catalog: dict | None = None) -> dict | None:
-    """Resolve a source reference (catalog ID string or inline dict) to an entry."""
-    cat = catalog or SOURCES
-    if isinstance(ref, str):
-        return cat.get(ref)
-    if isinstance(ref, dict):
-        return ref
-    return None
-
-
 def validate_source_refs(
     refs_owners: list[tuple[str, list]],
     allowed_gh_owners: set[str] | None = None,
@@ -427,7 +410,7 @@ def validate_source_refs(
     - warnings: domain mismatches, missing fields, date format, etc.
     """
     cat = catalog or SOURCES
-    owners_gh = allowed_gh_owners or set(_BASELINE_GH_OWNERS)
+    owners_gh = allowed_gh_owners or set()
 
     fatal = []
     warn = []
