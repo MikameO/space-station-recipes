@@ -1,7 +1,7 @@
 {
  "meta": {
   "schemaVersion": "3.9.0",
-  "generated": "2026-07-15T15:53:16",
+  "generated": "2026-07-15T16:13:29",
   "forks": {
    "vanilla": {
     "name": "Vanilla SS14",
@@ -49,7 +49,7 @@
    "deadspace": {
     "name": "Dead Space",
     "color": "#94a3b8",
-    "reagentCount": 23
+    "reagentCount": 22
    },
    "frontier": {
     "name": "Frontier",
@@ -113,7 +113,7 @@
     "parent": "sunrise"
    }
   },
-  "reactionCount": 1005,
+  "reactionCount": 1003,
   "plantCount": 128,
   "sourceAttribution": {
    "total": 68,
@@ -20622,7 +20622,7 @@
    "flavor": "soda",
    "isBase": true,
    "isDispenser": false,
-   "effects": "[Digestion] Thirst x2; [Drink] Effect: Polymorph (if ChangelingStingSunrise > 25u) @2%; [Drink] Removes 1000u ChangelingStingSunrise (if ChangelingStingSunrise > 25u) @8%; [Drink] Effect: Polymorph (if ChangelingStingSunrise > 25u) @5%; [Drink] Removes 1000u ChangelingStingSunrise (if ChangelingStingSunrise > 25u) @16%; [Drink] Effect: Polymorph (if ChangelingStingSunrise > 25u) @8%; [Drink] Removes 1000u ChangelingStingSunrise (if ChangelingStingSunrise > 25u) @25%; [Drink] Effect: Polymorph (if ChangelingStingSunrise > 25u) @11%; [Drink] Removes 1000u ChangelingStingSunrise (if ChangelingStingSunrise > 25u) @33%; [Drink] Effect: Polymorph (if ChangelingStingSunrise > 25u) @13%; [Drink] Removes 1000u ChangelingStingSunrise (if ChangelingStingSunrise > 25u) @41%; [Drink] Effect: Polymorph (if ChangelingStingSunrise > 25u) @16%; [Drink] Removes 1000u ChangelingStingSunrise (if ChangelingStingSunrise > 25u) @50%; [Drink] Effect: Polymorph (if ChangelingStingSunrise > 25u) @19%; [Drink] Removes 1000u ChangelingStingSunrise (if ChangelingStingSunrise > 25u) @58%; [Drink] Effect: Polymorph (if ChangelingStingSunrise > 25u) @22%; [Drink] Removes 1000u ChangelingStingSunrise (if ChangelingStingSunrise > 25u) @66%; [Drink] Effect: Polymorph (if ChangelingStingSunrise > 25u) @25%; [Drink] Removes 1000u ChangelingStingSunrise (if ChangelingStingSunrise > 25u) @75%; [Drink] Effect: Polymorph (if ChangelingStingSunrise > 25u) @27%; [Drink] Removes 1000u ChangelingStingSunrise (if ChangelingStingSunrise > 25u) @83%; [Drink] Effect: Polymorph (if ChangelingStingSunrise > 25u) @30%; [Drink] Removes 1000u ChangelingStingSunrise (if ChangelingStingSunrise > 25u) @91%; [Drink] Effect: Polymorph (if ChangelingStingSunrise > 25u) @33%; [Drink] Removes 1000u ChangelingStingSunrise (if ChangelingStingSunrise > 25u)",
+   "effects": "[Digestion] Thirst x2; [Drink] Effect: Polymorph (if ChangelingStingSunrise > 5u) @0%; [Drink] Removes 1000u ChangelingStingSunrise (if ChangelingStingSunrise > 5u) @8%; [Drink] Effect: Polymorph (if ChangelingStingSunrise > 5u) @0%; [Drink] Removes 1000u ChangelingStingSunrise (if ChangelingStingSunrise > 5u) @16%; [Drink] Effect: Polymorph (if ChangelingStingSunrise > 5u) @0%; [Drink] Removes 1000u ChangelingStingSunrise (if ChangelingStingSunrise > 5u) @25%; [Drink] Effect: Polymorph (if ChangelingStingSunrise > 5u) @0%; [Drink] Removes 1000u ChangelingStingSunrise (if ChangelingStingSunrise > 5u) @33%; [Drink] Effect: Polymorph (if ChangelingStingSunrise > 5u) @0%; [Drink] Removes 1000u ChangelingStingSunrise (if ChangelingStingSunrise > 5u) @41%; [Drink] Effect: Polymorph (if ChangelingStingSunrise > 5u) @0%; [Drink] Removes 1000u ChangelingStingSunrise (if ChangelingStingSunrise > 5u) @50%; [Drink] Effect: Polymorph (if ChangelingStingSunrise > 5u) @0%; [Drink] Removes 1000u ChangelingStingSunrise (if ChangelingStingSunrise > 5u) @58%; [Drink] Effect: Polymorph (if ChangelingStingSunrise > 5u) @0%; [Drink] Removes 1000u ChangelingStingSunrise (if ChangelingStingSunrise > 5u) @66%; [Drink] Effect: Polymorph (if ChangelingStingSunrise > 5u) @0%; [Drink] Removes 1000u ChangelingStingSunrise (if ChangelingStingSunrise > 5u) @75%; [Drink] Effect: Polymorph (if ChangelingStingSunrise > 5u) @0%; [Drink] Removes 1000u ChangelingStingSunrise (if ChangelingStingSunrise > 5u) @83%; [Drink] Effect: Polymorph (if ChangelingStingSunrise > 5u) @0%; [Drink] Removes 1000u ChangelingStingSunrise (if ChangelingStingSunrise > 5u) @91%; [Drink] Effect: Polymorph (if ChangelingStingSunrise > 5u) @1%; [Drink] Removes 1000u ChangelingStingSunrise (if ChangelingStingSunrise > 5u)",
    "effectTags": [
     "thirst"
    ],
@@ -20644,30 +20644,30 @@
     "Tile: SpillIfPuddlePresentTileReaction (see YAML for details)",
     "Reactive: Extinguish [Touch]",
     "[Digestion] Thirst x2",
-    "[Drink] Effect: Polymorph (if ChangelingStingSunrise > 25u) @2%",
-    "[Drink] Removes 1000u ChangelingStingSunrise (if ChangelingStingSunrise > 25u) @8%",
-    "[Drink] Effect: Polymorph (if ChangelingStingSunrise > 25u) @5%",
-    "[Drink] Removes 1000u ChangelingStingSunrise (if ChangelingStingSunrise > 25u) @16%",
-    "[Drink] Effect: Polymorph (if ChangelingStingSunrise > 25u) @8%",
-    "[Drink] Removes 1000u ChangelingStingSunrise (if ChangelingStingSunrise > 25u) @25%",
-    "[Drink] Effect: Polymorph (if ChangelingStingSunrise > 25u) @11%",
-    "[Drink] Removes 1000u ChangelingStingSunrise (if ChangelingStingSunrise > 25u) @33%",
-    "[Drink] Effect: Polymorph (if ChangelingStingSunrise > 25u) @13%",
-    "[Drink] Removes 1000u ChangelingStingSunrise (if ChangelingStingSunrise > 25u) @41%",
-    "[Drink] Effect: Polymorph (if ChangelingStingSunrise > 25u) @16%",
-    "[Drink] Removes 1000u ChangelingStingSunrise (if ChangelingStingSunrise > 25u) @50%",
-    "[Drink] Effect: Polymorph (if ChangelingStingSunrise > 25u) @19%",
-    "[Drink] Removes 1000u ChangelingStingSunrise (if ChangelingStingSunrise > 25u) @58%",
-    "[Drink] Effect: Polymorph (if ChangelingStingSunrise > 25u) @22%",
-    "[Drink] Removes 1000u ChangelingStingSunrise (if ChangelingStingSunrise > 25u) @66%",
-    "[Drink] Effect: Polymorph (if ChangelingStingSunrise > 25u) @25%",
-    "[Drink] Removes 1000u ChangelingStingSunrise (if ChangelingStingSunrise > 25u) @75%",
-    "[Drink] Effect: Polymorph (if ChangelingStingSunrise > 25u) @27%",
-    "[Drink] Removes 1000u ChangelingStingSunrise (if ChangelingStingSunrise > 25u) @83%",
-    "[Drink] Effect: Polymorph (if ChangelingStingSunrise > 25u) @30%",
-    "[Drink] Removes 1000u ChangelingStingSunrise (if ChangelingStingSunrise > 25u) @91%",
-    "[Drink] Effect: Polymorph (if ChangelingStingSunrise > 25u) @33%",
-    "[Drink] Removes 1000u ChangelingStingSunrise (if ChangelingStingSunrise > 25u)"
+    "[Drink] Effect: Polymorph (if ChangelingStingSunrise > 5u) @0%",
+    "[Drink] Removes 1000u ChangelingStingSunrise (if ChangelingStingSunrise > 5u) @8%",
+    "[Drink] Effect: Polymorph (if ChangelingStingSunrise > 5u) @0%",
+    "[Drink] Removes 1000u ChangelingStingSunrise (if ChangelingStingSunrise > 5u) @16%",
+    "[Drink] Effect: Polymorph (if ChangelingStingSunrise > 5u) @0%",
+    "[Drink] Removes 1000u ChangelingStingSunrise (if ChangelingStingSunrise > 5u) @25%",
+    "[Drink] Effect: Polymorph (if ChangelingStingSunrise > 5u) @0%",
+    "[Drink] Removes 1000u ChangelingStingSunrise (if ChangelingStingSunrise > 5u) @33%",
+    "[Drink] Effect: Polymorph (if ChangelingStingSunrise > 5u) @0%",
+    "[Drink] Removes 1000u ChangelingStingSunrise (if ChangelingStingSunrise > 5u) @41%",
+    "[Drink] Effect: Polymorph (if ChangelingStingSunrise > 5u) @0%",
+    "[Drink] Removes 1000u ChangelingStingSunrise (if ChangelingStingSunrise > 5u) @50%",
+    "[Drink] Effect: Polymorph (if ChangelingStingSunrise > 5u) @0%",
+    "[Drink] Removes 1000u ChangelingStingSunrise (if ChangelingStingSunrise > 5u) @58%",
+    "[Drink] Effect: Polymorph (if ChangelingStingSunrise > 5u) @0%",
+    "[Drink] Removes 1000u ChangelingStingSunrise (if ChangelingStingSunrise > 5u) @66%",
+    "[Drink] Effect: Polymorph (if ChangelingStingSunrise > 5u) @0%",
+    "[Drink] Removes 1000u ChangelingStingSunrise (if ChangelingStingSunrise > 5u) @75%",
+    "[Drink] Effect: Polymorph (if ChangelingStingSunrise > 5u) @0%",
+    "[Drink] Removes 1000u ChangelingStingSunrise (if ChangelingStingSunrise > 5u) @83%",
+    "[Drink] Effect: Polymorph (if ChangelingStingSunrise > 5u) @0%",
+    "[Drink] Removes 1000u ChangelingStingSunrise (if ChangelingStingSunrise > 5u) @91%",
+    "[Drink] Effect: Polymorph (if ChangelingStingSunrise > 5u) @1%",
+    "[Drink] Removes 1000u ChangelingStingSunrise (if ChangelingStingSunrise > 5u)"
    ],
    "boilingPoint": null,
    "meltingPoint": null,
@@ -25906,7 +25906,7 @@
    "desc": "",
    "physicalDesc": "translucent",
    "flavor": "medicine",
-   "isBase": false,
+   "isBase": true,
    "isDispenser": false,
    "effects": "[Medicine] Heals Heat 1.5 Heals Shock 1.5 Heals Cold 1.5 Heals Piercing 3.5 Deals Poison 0.05; [Medicine] Deals Asphyxiation 1 Deals Cold 2 Deals Blunt 3 (if Derytracine > 22u); [Medicine] Jitter (if Derytracine > 22u)",
    "effectTags": [
@@ -25925,31 +25925,12 @@
    ],
    "overdose": 22,
    "criticalOverdose": null,
-   "recipe": {
-    "reactants": {
-     "Puncturase": {
-      "amount": 1,
-      "catalyst": false
-     },
-     "Dermaline": {
-      "amount": 1,
-      "catalyst": false
-     }
-    },
-    "products": {
-     "Derytracine": 2
-    },
-    "minTemp": null,
-    "maxTemp": null,
-    "mixer": []
-   },
-   "obtainSources": [
-    "Chemistry reaction"
-   ],
+   "recipe": null,
+   "obtainSources": [],
    "accessibility": {
-    "tier": "cross-botany",
-    "weight": 2,
-    "reason": "Recipe requires cross-botany ingredient(s)"
+    "tier": "unobtainable",
+    "weight": 999,
+    "reason": "No recipe, no plant, no dispenser source"
    },
    "verifiedMechanics": [
     "[Medicine] Heals Heat 1.5 Heals Shock 1.5 Heals Cold 1.5 Heals Piercing 3.5 Deals Poison 0.05",
@@ -51411,64 +51392,6 @@
    "boilingPoint": null,
    "meltingPoint": null,
    "antagScore": 2
-  },
-  "Pendrotoxine": {
-   "id": "Pendrotoxine",
-   "name": "Pendrotoxine",
-   "group": "Toxins",
-   "category": "Toxins",
-   "source": "deadspace",
-   "color": "#849244",
-   "desc": "",
-   "physicalDesc": "reflective",
-   "flavor": "sharp",
-   "isBase": false,
-   "isDispenser": false,
-   "effects": "[Poison] Deals Blunt 5; [Poison] Popup (local): generic reagent effect bruising insides @33%; [Poison] Emote: Scream @30%",
-   "effectTags": [
-    "deals:blunt",
-    "emote"
-   ],
-   "metabolismPaths": [
-    "Poison"
-   ],
-   "overdose": null,
-   "criticalOverdose": null,
-   "recipe": {
-    "reactants": {
-     "Celestin": {
-      "amount": 1,
-      "catalyst": false
-     },
-     "Derytracine": {
-      "amount": 1,
-      "catalyst": false
-     }
-    },
-    "products": {
-     "Pendrotoxine": 2
-    },
-    "minTemp": null,
-    "maxTemp": null,
-    "mixer": []
-   },
-   "obtainSources": [
-    "Chemistry reaction"
-   ],
-   "accessibility": {
-    "tier": "cross-botany",
-    "weight": 2,
-    "reason": "Recipe requires cross-botany ingredient(s)"
-   },
-   "verifiedMechanics": [
-    "[Poison] Deals Blunt 5",
-    "[Poison] Popup (local): generic reagent effect bruising insides @33%",
-    "[Poison] Emote: Scream @30%"
-   ],
-   "boilingPoint": null,
-   "meltingPoint": null,
-   "metabolismRate": 1.0,
-   "antagScore": 3
   },
   "PentenicAcid": {
    "id": "PentenicAcid",
@@ -83073,10 +82996,7 @@
    "maxTemp": null,
    "mixer": [],
    "effects": "",
-   "impact": null,
-   "forkStatus": {
-    "rucm": "blocked"
-   }
+   "impact": null
   },
   "CMUSoporific": {
    "id": "CMUSoporific",
@@ -83106,10 +83026,7 @@
    "maxTemp": null,
    "mixer": [],
    "effects": "",
-   "impact": null,
-   "forkStatus": {
-    "rucm": "blocked"
-   }
+   "impact": null
   },
   "CMUTramadol": {
    "id": "CMUTramadol",
@@ -87327,28 +87244,6 @@
     "rucm": "blocked",
     "funky": "blocked"
    }
-  },
-  "Derytracine": {
-   "id": "Derytracine",
-   "source": "deadspace",
-   "reactants": {
-    "Puncturase": {
-     "amount": 1,
-     "catalyst": false
-    },
-    "Dermaline": {
-     "amount": 1,
-     "catalyst": false
-    }
-   },
-   "products": {
-    "Derytracine": 2
-   },
-   "minTemp": null,
-   "maxTemp": null,
-   "mixer": [],
-   "effects": "",
-   "impact": null
   },
   "Desoxyephedrine": {
    "id": "Desoxyephedrine",
@@ -96127,28 +96022,6 @@
    "effects": "",
    "impact": "Medium"
   },
-  "Pendrotoxine": {
-   "id": "Pendrotoxine",
-   "source": "deadspace",
-   "reactants": {
-    "Celestin": {
-     "amount": 1,
-     "catalyst": false
-    },
-    "Derytracine": {
-     "amount": 1,
-     "catalyst": false
-    }
-   },
-   "products": {
-    "Pendrotoxine": 2
-   },
-   "minTemp": null,
-   "maxTemp": null,
-   "mixer": [],
-   "effects": "",
-   "impact": null
-  },
   "PentenicAcid": {
    "id": "PentenicAcid",
    "source": "goob",
@@ -98366,7 +98239,13 @@
    "maxTemp": null,
    "mixer": [],
    "effects": "",
-   "impact": null
+   "impact": null,
+   "forkStatus": {
+    "cmu": "modified"
+   },
+   "forkNotes": {
+    "cmu": "Removed RMCBlackGoo reactant"
+   }
   },
   "Radler": {
    "id": "Radler",
@@ -99298,7 +99177,13 @@
    "maxTemp": null,
    "mixer": [],
    "effects": "",
-   "impact": null
+   "impact": null,
+   "forkStatus": {
+    "cmu": "modified"
+   },
+   "forkNotes": {
+    "cmu": "Removed RMCBlackGoo reactant"
+   }
   },
   "Salbutamol": {
    "id": "Salbutamol",
@@ -104277,6 +104162,7 @@
   "DarkBlood",
   "DecafBlackTeaPowder",
   "DecafCoffeePowder",
+  "Derytracine",
   "DinoBlood",
   "DrGibb",
   "DrGibbSunrise",
@@ -115474,34 +115360,6 @@
    "from": "Dylovene",
    "to": "Celestin",
    "reaction": "Celestin",
-   "amount": 1,
-   "catalyst": false
-  },
-  {
-   "from": "Puncturase",
-   "to": "Derytracine",
-   "reaction": "Derytracine",
-   "amount": 1,
-   "catalyst": false
-  },
-  {
-   "from": "Dermaline",
-   "to": "Derytracine",
-   "reaction": "Derytracine",
-   "amount": 1,
-   "catalyst": false
-  },
-  {
-   "from": "Celestin",
-   "to": "Pendrotoxine",
-   "reaction": "Pendrotoxine",
-   "amount": 1,
-   "catalyst": false
-  },
-  {
-   "from": "Derytracine",
-   "to": "Pendrotoxine",
-   "reaction": "Pendrotoxine",
    "amount": 1,
    "catalyst": false
   },
