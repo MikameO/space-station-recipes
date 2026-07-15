@@ -1564,7 +1564,25 @@ Expected: ~15 maps baked, warnings (if any) reviewed one by one — a broken map
 
 **Files:** Modify: `config.py` (append), `ss14_map_extractor.py` (enable blocklist), run `--all-forks`
 
-**⚠ E4 BLOCKER — repo size (found on E3):** vanilla ALONE bakes to **9.75 MB** JSON
+**E4 RESOLVED — size (v2 dedup + per-fork cap).** The dedup landed (schema v2:
+`data.vias` table, `p[3]` = index) → −26% per map, −32% on vanilla. But the fork
+bake revealed the *real* driver: **forks copy upstream `Resources` wholesale, so
+their map pools re-list vanilla's own stations** (carpmosia's pool is byte-for-byte
+vanilla's: Bagel/Box/Elkridge/Exo/Fland/Marathon; rmc14/goob/frontier/omu the same).
+We were baking the same Bagel ~8×, once per fork — 72 MB at 11 forks. Also found:
+rucm/trauma pools contain ONLY junk (MeteorArena, dm01-entryway); starlight's pool
+is empty. Fix shipped: `MAX_MAPS_PER_FORK = 8` (rotation-first sort), vanilla
+uncapped via `MAP_CAP_OVERRIDE` as the reference fork. Plus `process_fork` now
+prunes stale files (blocklisted/capped maps are never re-baked, so they lingered
+as orphans — CentComm/Dev survived the E3 commit that way).
+
+**BACKLOG — cross-fork map dedup.** The cap is a blunt instrument; the principled
+fix is to not re-bake a map at all when the fork's copy is identical to upstream
+AND the fork's prototype deltas don't touch it. A fork's Bagel *does* legitimately
+differ (its lockers hold its own items), so this needs a content-diff, not a file
+hash — worth doing only if `maps/` becomes a problem again.
+
+**⚠ ORIGINAL E4 BLOCKER — repo size (found on E3):** vanilla ALONE bakes to **9.75 MB** JSON
 (16 real stations, PNGs are negligible 0.14 MB). The plan's "< 25 MB for 18 forks"
 estimate is wrong — even if most forks reuse upstream maps, the custom-map forks
 could push `maps/` to 30–60 MB of committed JSON. Root cause: every container/vendor
