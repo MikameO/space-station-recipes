@@ -2261,7 +2261,11 @@ def export_json(reagents: dict, reactions: dict, locale: dict,
     forks_meta = {}
     for fid, fconf in FORK_REGISTRY.items():
         count = fork_reagent_counts.get(fid, 0)
-        if fid == "vanilla" or count > 0:
+        # A pure downstream fork can OWN zero reagents — first-wins credits shared
+        # content to the upstream (RuCM ships CMU's chemistry, so CMU owns it) —
+        # yet it is still a real server players filter by, and its view is full via
+        # parent inheritance. Keep such forks listed instead of dropping them.
+        if fid == "vanilla" or count > 0 or fconf.get("parent_fork"):
             forks_meta[fid] = {
                 "name": fconf["name"],
                 "color": fconf["color"],

@@ -381,8 +381,10 @@ FORK_REGISTRY = {
             "Resources/Prototypes/_RMC14/Reagents/toxins.yml",
             "Resources/Prototypes/_CMU14/Economy/Recipes/Reagents/drugs.yml",
             "Resources/Prototypes/_CMU14/Economy/Recipes/Reagents/toxins.yml",
-            "Resources/Prototypes/_CMU14/Medical/reagents/organ_repair.yml",
-            "Resources/Prototypes/_CMU14/Medical/reagents/painkillers.yml",
+            # Path is Medical/Treatment/Reagents (the Medical/reagents form was a
+            # typo — silently 404'd, so RuCM lost CMUSleen & the organ-repair set)
+            "Resources/Prototypes/_CMU14/Medical/Treatment/Reagents/organ_repair.yml",
+            "Resources/Prototypes/_CMU14/Medical/Treatment/Reagents/painkillers.yml",
             "Resources/Prototypes/_CMU14/Threats/Abominations/reagents.yml",
             "Resources/Prototypes/_CMU14/Threats/Yautja/Species/reagents.yml",
         ],

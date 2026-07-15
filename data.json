@@ -1,7 +1,7 @@
 {
  "meta": {
   "schemaVersion": "3.9.0",
-  "generated": "2026-07-13T20:16:53",
+  "generated": "2026-07-15T15:53:16",
   "forks": {
    "vanilla": {
     "name": "Vanilla SS14",
@@ -20,6 +20,14 @@
     "color": "#7c3aed",
     "reagentCount": 22,
     "parent": "rmc14",
+    "totalConversion": true,
+    "renamedReagents": 20
+   },
+   "rucm": {
+    "name": "Russian Marine Corps",
+    "color": "#9f1239",
+    "reagentCount": 0,
+    "parent": "cmu",
     "totalConversion": true,
     "renamedReagents": 20
    },
