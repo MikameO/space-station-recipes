@@ -3,6 +3,51 @@
 `data.json` schema version is in `meta.schemaVersion`. Consumers reading this file
 should pin on a compatible range (semver: breaking changes bump major).
 
+## Maps schema 2 — 2026-07-12 (Series E — station map item finder)
+
+A new artifact family, separate from `data.json` and carrying its own
+`schemaVersion`: `maps/index.json` + `maps/<fork>/<Id>.{png,json}`, produced by
+`ss14_map_extractor.py`.
+
+**What ships:** the **Maps** tab — pick a station, search any item, and see every
+place it spawns on a rendered schematic, grouped by nearest station beacon. This
+first release covers **14 vanilla stations** (Bagel, Box, Elkridge, Exo, Fland,
+Marathon, Oasis, Packed, Plasma, Reach, Relic, Saltern, Serpentcrest, Snowball).
+
+**Item sources indexed** (marker colour = source kind):
+
+| Kind | Marker | Meaning |
+|---|---|---|
+| 0 | green | lies on the floor |
+| 1 | amber | inside a locker/crate — carries spawn probability (`in tool closet (~70%)`) |
+| 2 | violet | stocked in a vending machine, with count |
+| 4 | red | vending machine contraband slot |
+| 3 | — | on a secondary grid: listed by grid name, not drawn |
+
+**Data model:** a per-map PNG underlay (floors coloured by each tile texture's real
+average colour, walls/windows/doors overlaid) plus a JSON item index. Position
+tuples are `[x, y, kind, viaIdx?, extra?]`; `vias` is a per-map string table —
+schema 2 deduped the heavily-repeated source names (`maintenance closet` …), cutting
+~26% per map.
+
+**Upstream drift handled:** `StorageFill` is dead in current SS14. Container
+contents now come from `EntityTableContainerFill` + `entityTable` selector trees
+(`AllSelector`/`GroupSelector`/`NestedSelector`), flattened with probability
+multiplication; `amount` may be a `!type:…NumberSelector` and is coerced.
+
+**Known limits this release:**
+- **Vanilla only** — fork maps are not baked yet. Most forks copy upstream
+  `Resources` wholesale, so their pools re-list vanilla's own stations; baking them
+  naively re-bakes the same station once per fork (72 MB at 11 forks). A per-fork
+  cap (`MAX_MAPS_PER_FORK`) is in the extractor for that follow-up.
+- **Random spawners are not resolved** — an item that *may* appear from a random
+  pool is not indexed as being there.
+- **Secondary grids** (AI sat, outposts) contribute items to the list, labelled by
+  grid name, but are not drawn on the schematic.
+- **Search is English** proto/display-name only (no RU terms).
+- Maps whose chunks use the older 6-byte tile stride warn and skip those chunks
+  (PNG gaps, items unaffected) rather than emitting garbage.
+
 ## 3.4.2 — 2026-07-11 (Increment O — full curation list: fork seeds, Vaccine, vendor layers, locales)
 
 Follow-up to 3.4.1: the maintainer approved including everything the manifest

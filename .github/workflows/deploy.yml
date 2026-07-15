@@ -26,10 +26,11 @@ jobs:
       - name: Collect static files
         run: |
           mkdir _site
-          cp index.html app.js tutorial.js style.css data.json _site/
+          cp index.html app.js tutorial.js maps.js style.css data.json _site/
           cp favicon.ico favicon.svg favicon-192.png favicon-512.png apple-touch-icon.png _site/
           cp manifest.json robots.txt sitemap.xml _site/
           cp -r sprites _site/sprites
+          cp -r maps _site/maps
           [ -f og-image.png ] && cp og-image.png _site/ || true
 
       - uses: actions/configure-pages@v6

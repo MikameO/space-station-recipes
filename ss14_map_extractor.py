@@ -25,6 +25,12 @@ SCHEMA_VERSION = 2   # v2: per-map `vias` string table, p[3] is an index not a s
 # and auto-handles all 18 forks. (E3 vanilla: drops Empty=0, MeteorArena=0,
 # dm01-entryway=57, TestTeg=85; keeps Relic=943, Reach=1005.)
 MIN_MAP_ITEMS = 100
+# Per-fork map cap. Most forks copy upstream Resources wholesale, so their pools
+# re-list vanilla's own stations (carpmosia's pool == vanilla's) — baking all of
+# them re-bakes the same Bagel/Box/Fland once per fork. Cap to the top rotation
+# maps; vanilla stays uncapped as the reference fork.
+MAX_MAPS_PER_FORK = 8
+MAP_CAP_OVERRIDE = {"vanilla": 99}
 
 # ── fetch (copied from ss14_chem_extractor.py:191, keep in sync manually) ──
 
@@ -711,6 +717,11 @@ def process_fork(fork_key: str, map_filter: str | None = None) -> list[dict]:
         maps = [m for m in maps if m["id"] == map_filter]
     if not maps:
         print(f"SKIP fork {fork_key}: no gameMap protos"); return []
+    cap = MAP_CAP_OVERRIDE.get(fork_key, MAX_MAPS_PER_FORK)
+    if not map_filter and len(maps) > cap:
+        maps.sort(key=lambda m: (not m["inPool"], m["id"]))   # rotation maps first
+        print(f"  cap {fork_key}: {len(maps)} -> {cap} maps (rotation-first)")
+        maps = maps[:cap]
     reg = build_registry(fork_key, fork_cfg, tree)
     load_tile_colors(fork_key, fork_cfg, reg)
     done = []
@@ -730,6 +741,15 @@ def process_fork(fork_key: str, map_filter: str | None = None) -> list[dict]:
                          "px": [bounds["maxX"] - bounds["minX"] + 1, bounds["maxY"] - bounds["minY"] + 1]})
         except Exception as e:
             print(f"  WARNING: {fork_key}/{gm['id']} failed: {e}")
+    # prune stale files from earlier bakes (blocklisted/capped maps are never
+    # re-baked, so they'd linger on disk and ship as orphans not in index.json)
+    fdir = OUT_DIR / fork_key
+    if fdir.exists() and not map_filter:
+        keep = {m["id"] for m in done}
+        for f in sorted(fdir.iterdir()):
+            if f.suffix in (".json", ".png") and f.stem not in keep:
+                print(f"  prune stale {fork_key}/{f.name}")
+                f.unlink()
     print(f"fork {fork_key}: {len(done)}/{len(maps)} maps baked")
     return done
 

@@ -29,6 +29,7 @@ Search reagents, plan reactions, explore craft trees, and calculate batch recipe
 | **Botany** | Plant effects | Which chemicals feed, heal, mutate, or kill plants — fertilizers, weedkillers, mutagens |
 | **Stats** | Database stats | Fork comparison, complexity rankings, base chemical usage |
 | **Antag** | Antag Mode | Curated strategies with lethality scores and delivery methods |
+| **Maps** | Item finder | Pick a station map, search any item — see where it spawns on a rendered schematic with locker/vendor/floor sources, grouped by nearest beacon |
 | **Share** | Deep links | URL encodes filters and selection for easy sharing |
 
 ## Supported Forks
@@ -84,11 +85,14 @@ Then open [localhost:8090](http://localhost:8090). No build step — pure HTML/C
 ```
 index.html          Static frontend shell
 app.js              All interactive logic (search, calc, trees, graph, stats)
+maps.js             Maps tab — canvas render, item search, beacon grouping
 style.css           NanoTrasen terminal theme with CRT effects
 data.json           Generated chemistry database (1.1MB, all forks merged)
 config.py           Fork registry and extraction configuration
 ss14_chem_extractor.py   Scrapes SS14 GitHub repos → data.json
+ss14_map_extractor.py    Bakes station maps → maps/<fork>/<Id>.{png,json} + index
 sprites/            Reagent sprite assets (pixel art)
+maps/               Baked per-map PNG underlays + item-location JSON
 ```
 
 ## Data Provenance & Disclaimers
