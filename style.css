@@ -1879,6 +1879,34 @@ body.antag-active .hint-chip:hover, body.antag-active .hint-chip:focus-visible {
 }
 .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
 
+/* Fork badge inside autocomplete suggestions — same-name reagents exist
+   across forks; the badge (fork color) tells them apart. */
+.suggestion-fork {
+  font-size: 0.58rem;
+  font-family: 'Oxanium', sans-serif;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  border: 1px solid;
+  border-radius: 2px;
+  padding: 0 4px;
+  flex-shrink: 0;
+  opacity: 0.85;
+}
+
+/* Beaker "+ Add" — glowing green so the add step is impossible to miss */
+#beakerAddBtn {
+  border-color: var(--phosphor);
+  color: var(--phosphor);
+  background: var(--phosphor-glow);
+  box-shadow: 0 0 8px var(--phosphor-glow), 0 0 14px rgba(57, 255, 133, 0.25);
+  text-shadow: 0 0 6px var(--phosphor-glow);
+}
+#beakerAddBtn:hover {
+  background: var(--phosphor-dim);
+  color: #eaffef;
+  box-shadow: 0 0 12px rgba(57, 255, 133, 0.5);
+}
+
 /* Pin-button discovery callout — z-index above .tut-root (9999) so it is
    visible even while the tutorial spotlight overlay is active. */
 .pin-callout {

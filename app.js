@@ -1558,11 +1558,14 @@ function setupBeakerSim() {
     const tempK = parseFloat(document.getElementById('beakerTemp').value) || 293;
     track('beaker_sim', { n: Object.keys(beakerContents).length, tempK });
     const { final, log, truncated } = simulateBeaker(beakerContents, tempK);
-    renderBeakerLog(final, log, truncated);
+    // Same-name reagents from different forks have different ids and never
+    // cross-react — the #1 reason a "known" recipe silently does nothing.
+    const sources = new Set(Object.keys(beakerContents).map(id => DATA.reagents[id]?.source || 'vanilla'));
+    renderBeakerLog(final, log, truncated, sources.size > 1);
   });
 }
 
-function renderBeakerLog(final, log, truncated) {
+function renderBeakerLog(final, log, truncated, mixedSources) {
   const el = document.getElementById('beakerLog');
   const dangerRe = /explosion|explode|ignite|flash|emp|smoke|foam|flammable/i;
   const stepsHTML = log.length
@@ -1578,7 +1581,9 @@ function renderBeakerLog(final, log, truncated) {
           </span>
         </div>`;
       }).join('')
-    : '<div class="beaker-step"><i>Nothing reacts at this temperature.</i></div>';
+    : `<div class="beaker-step"><i>Nothing reacts at this temperature.</i>${mixedSources
+        ? ' <span class="beaker-note">&#9888; Your beaker mixes reagents from different forks — same-name chemicals from different forks are separate substances and never react with each other. Check the fork tags in the ingredient picker.</span>'
+        : ''}</div>`;
   const finalHTML = Object.keys(final).length
     ? Object.entries(final).map(([id, amt]) =>
         `<span class="reverse-chip">
@@ -2254,17 +2259,36 @@ function setupAutocomplete(input, suggestionsDiv, onSelect) {
       const q = input.value.toLowerCase().trim();
       if (q.length < 1) { suggestionsDiv.classList.remove('open'); return; }
 
-      const matches = searchIndex
-        .filter(e => e.text.includes(q))
-        .slice(0, 15);
+      // Rank by where the query hits: exact name > name prefix > name
+      // substring > effects/desc text (the old flat .includes() let "oxygen"
+      // surface Dexalin before Oxygen itself). The sidebar Source filter
+      // applies here too, and vanilla wins ties between same-name fork twins.
+      const scored = [];
+      for (const e of searchIndex) {
+        if (!e.text.includes(q)) continue;
+        if (!reagentInActiveFork(e.reagent)) continue;
+        const name = (e.reagent.name || e.id).toLowerCase();
+        const tier = name === q ? 0 : name.startsWith(q) ? 1 : name.includes(q) ? 2 : 3;
+        scored.push({ e, tier, name, van: e.reagent.source === 'vanilla' ? 0 : 1 });
+      }
+      scored.sort((a, b) => a.tier - b.tier || a.name.localeCompare(b.name) || a.van - b.van);
+      const matches = scored.slice(0, 15);
 
       if (matches.length === 0) { suggestionsDiv.classList.remove('open'); return; }
 
-      suggestionsDiv.innerHTML = matches.map(e => {
+      suggestionsDiv.innerHTML = matches.map(({ e }) => {
         const r = e.reagent;
+        // Same-name reagents exist across forks with different ids (vanilla
+        // Hydrogen vs RMCHydrogen) and never cross-react — tag non-vanilla
+        // entries with their fork so the pick is informed.
+        const fork = r.source !== 'vanilla' ? DATA.meta?.forks?.[r.source] : null;
+        const forkTag = fork
+          ? `<span class="suggestion-fork" style="color:${safeColor(fork.color)};border-color:${safeColor(fork.color)}">${esc(fork.name || r.source)}</span>`
+          : '';
         return `<div class="suggestion-item" data-id="${r.id}">
           <span class="color-swatch" style="background:${safeColor(r.color)};width:10px;height:10px"></span>
           ${esc(capName(r.name || r.id))}
+          ${forkTag}
           <span style="margin-left:auto;font-size:0.65rem;color:var(--text-dim)">${r.category}</span>
         </div>`;
       }).join('');
