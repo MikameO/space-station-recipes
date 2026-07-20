@@ -11,7 +11,7 @@ A new artifact family, separate from `data.json` and carrying its own
 
 **What ships:** the **Maps** tab — pick a station, search any item, and see every
 place it spawns on a rendered schematic, grouped by nearest station beacon. This
-first release covers **14 vanilla stations** (Bagel, Box, Elkridge, Exo, Fland,
+release covers **14 vanilla stations plus 13 community forks** (88 maps; Bagel, Box, Elkridge, Exo, Fland,
 Marathon, Oasis, Packed, Plasma, Reach, Relic, Saltern, Serpentcrest, Snowball).
 
 **Item sources indexed** (marker colour = source kind):
@@ -36,10 +36,11 @@ contents now come from `EntityTableContainerFill` + `entityTable` selector trees
 multiplication; `amount` may be a `!type:…NumberSelector` and is coerced.
 
 **Known limits this release:**
-- **Vanilla only** — fork maps are not baked yet. Most forks copy upstream
-  `Resources` wholesale, so their pools re-list vanilla's own stations; baking them
-  naively re-bakes the same station once per fork (72 MB at 11 forks). A per-fork
-  cap (`MAX_MAPS_PER_FORK`) is in the extractor for that follow-up.
+- **Fork maps are capped at 8 rotation-first per fork** (`MAX_MAPS_PER_FORK`;
+  vanilla uncapped). Forks copy upstream `Resources` wholesale, so their pools
+  re-list vanilla's own stations — an uncapped bake re-bakes the same station once
+  per fork (72 MB at 11 forks). 14 forks / 88 maps ship at ~44 MB. Five forks
+  (harmony, corvax, adt, sunrise, fish) missed this bake and are a follow-up.
 - **Random spawners are not resolved** — an item that *may* appear from a random
   pool is not indexed as being there.
 - **Secondary grids** (AI sat, outposts) contribute items to the list, labelled by
