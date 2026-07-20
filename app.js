@@ -126,6 +126,7 @@ async function init() {
   setupBeakerSim(); // C2
   setupShareButton();
   setupPipButton(); // B3
+  setupPinCallout();
   setupCompanionBar(); // C3
   setupDisclaimer();
   setupAntagMode();
@@ -3393,6 +3394,55 @@ function setupPipButton() {
     }
     window.open(url, 'chemdb-companion', 'width=430,height=640,popup=yes');
   });
+}
+
+// One-time discovery callout for the pin button. Shown to every visitor —
+// its z-index sits above the tutorial overlay, so first-timers mid-tutorial
+// see it too. Dismissing it (or using the pin button) silences it for good.
+function setupPinCallout() {
+  const SEEN_KEY = 'ss14_pin_callout_seen';
+  const btn = document.getElementById('pipBtn');
+  if (!btn || document.body.classList.contains('companion')) return;
+  try { if (localStorage.getItem(SEEN_KEY)) return; } catch (e) { /* private mode — show every visit */ }
+
+  const el = document.createElement('div');
+  el.className = 'pin-callout';
+  el.setAttribute('role', 'status');
+  el.innerHTML =
+    '<button type="button" class="pin-callout-close" aria-label="Dismiss">&times;</button>' +
+    '<div class="pin-callout-title">&#128204; Pin over your game</div>' +
+    '<div class="pin-callout-body">This button opens a floating always-on-top recipe window &mdash; keep ChemDB visible while you play.</div>';
+  document.body.appendChild(el);
+
+  const position = () => {
+    const r = btn.getBoundingClientRect();
+    const w = el.offsetWidth;
+    // Right-align under the button, clamped to the viewport.
+    let left = Math.min(r.right - w, window.innerWidth - w - 8);
+    if (left < 8) left = 8;
+    el.style.left = left + 'px';
+    el.style.top = (r.bottom + 12) + 'px';
+    el.style.setProperty('--arrow-x', (r.left + r.width / 2 - left) + 'px');
+  };
+
+  const dismiss = (reason) => {
+    if (!el.isConnected) return;
+    try { localStorage.setItem(SEEN_KEY, '1'); } catch (e) { /* private mode */ }
+    el.classList.remove('show');
+    window.removeEventListener('resize', position);
+    setTimeout(() => el.remove(), 300);
+    track('pin_callout_dismiss', { reason });
+  };
+
+  el.querySelector('.pin-callout-close').addEventListener('click', () => dismiss('close'));
+  btn.addEventListener('click', () => dismiss('pin_used'));
+
+  window.addEventListener('resize', position);
+  setTimeout(() => {
+    position();
+    el.classList.add('show');
+    track('pin_callout_shown');
+  }, 1200);
 }
 
 function setupDisclaimer() {
