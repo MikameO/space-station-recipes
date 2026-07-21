@@ -136,30 +136,59 @@ def _gh_token() -> str:
     except Exception:
         return ""
 
+def _api_get(url: str, headers: dict) -> dict | None:
+    for attempt in range(3):
+        try:
+            req = urllib.request.Request(url, headers=headers)
+            with urllib.request.urlopen(req, timeout=120) as resp:
+                return json.loads(resp.read().decode("utf-8"))
+        except Exception as e:
+            if attempt < 2:
+                print(f"  Retry {attempt + 1}/3: {e}"); time.sleep(2 * (attempt + 1))
+            else:
+                print(f"  FAILED API fetch {url}: {e}")
+    return None
+
 def fetch_repo_tree(fork_key: str, fork_cfg: dict) -> list[str]:
     """All file paths in the fork's repo (git/trees API, cached, gh-authenticated when possible)."""
     owner, repo, branch = repo_meta(fork_cfg)
+    api_base = f"https://api.github.com/repos/{owner}/{repo}/git/trees"
     cache_path = CACHE_DIR / fork_key / "_tree.json"
     if not cache_path.exists():
-        url = f"https://api.github.com/repos/{owner}/{repo}/git/trees/{branch}?recursive=1"
         headers = {"User-Agent": "SS14-Map-Extractor/1.0"}
         token = _gh_token()
         if token:
             headers["Authorization"] = f"Bearer {token}"
         else:
             print("  NOTE: no gh token — anonymous API limit is 60 req/h")
+        data = _api_get(f"{api_base}/{branch}?recursive=1", headers)
+        if data is None:
+            print(f"  FAILED tree fetch for {fork_key}"); return []
+        if data.get("truncated"):
+            # Huge repos (Omu vendors everything) overflow the recursive trees
+            # API (100k entries) and the dropped tail silently loses the
+            # Prototypes/Maps paths the extractor reads. Walk down to those two
+            # subtrees and merge their (much smaller) recursive listings in.
+            print(f"  tree truncated for {fork_key} — merging Resources subtrees")
+            top = _api_get(f"{api_base}/{branch}", headers) or {}
+            res_sha = next((e["sha"] for e in top.get("tree", [])
+                            if e["path"] == "Resources" and e["type"] == "tree"), None)
+            res = (_api_get(f"{api_base}/{res_sha}", headers) or {}) if res_sha else {}
+            for sub in ("Prototypes", "Maps"):
+                sha = next((e["sha"] for e in res.get("tree", [])
+                            if e["path"] == sub and e["type"] == "tree"), None)
+                subdata = _api_get(f"{api_base}/{sha}?recursive=1", headers) if sha else None
+                if not subdata:
+                    print(f"  WARNING: no Resources/{sub} subtree for {fork_key}")
+                    continue
+                if subdata.get("truncated"):
+                    print(f"  WARNING: Resources/{sub} subtree ALSO truncated for {fork_key}")
+                prefix = f"Resources/{sub}/"
+                data["tree"].extend({**e, "path": prefix + e["path"]} for e in subdata.get("tree", []))
+            data["tree"] = list({e["path"]: e for e in data["tree"]}.values())
+            data["truncated"] = False  # best-effort: the dirs we read are now complete
         cache_path.parent.mkdir(parents=True, exist_ok=True)
-        for attempt in range(3):
-            try:
-                req = urllib.request.Request(url, headers=headers)
-                with urllib.request.urlopen(req, timeout=120) as resp:
-                    cache_path.write_text(resp.read().decode("utf-8"), encoding="utf-8")
-                break
-            except Exception as e:
-                if attempt < 2:
-                    print(f"  Retry {attempt + 1}/3: {e}"); time.sleep(2 * (attempt + 1))
-                else:
-                    print(f"  FAILED tree fetch for {fork_key}: {e}"); return []
+        cache_path.write_text(json.dumps(data), encoding="utf-8")
     data = json.loads(cache_path.read_text(encoding="utf-8"))
     if data.get("truncated"):
         print(f"  WARNING: tree truncated for {fork_key}")
@@ -167,7 +196,10 @@ def fetch_repo_tree(fork_key: str, fork_cfg: dict) -> list[str]:
 
 def discover_maps(fork_key: str, fork_cfg: dict, tree: list[str]) -> list[dict]:
     """Parse gameMap + gameMapPool prototypes → [{id, name, path, inPool}]."""
-    proto_paths = [p for p in tree if "/Prototypes/Maps/" in p and p.endswith(".yml")]
+    # Match fork-namespaced prototype dirs too (Resources/Prototypes/_Goobstation/
+    # Maps/delta.yml) — the literal "/Prototypes/Maps/" only saw vanilla-style paths.
+    proto_paths = [p for p in tree
+                   if "/Prototypes/" in p and "/Maps/" in p and p.endswith(".yml")]
     game_maps, pool_ids = {}, set()
     for path in proto_paths:
         content = fetch_file(fork_cfg["raw_url"].format(path=path), CACHE_DIR / fork_key / path)
