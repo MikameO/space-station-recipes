@@ -12,6 +12,7 @@ parses them, builds craft dependency trees, and generates an Excel file.
 import json
 import os
 import re
+import sys
 import time
 import urllib.request
 import urllib.error
@@ -31,6 +32,13 @@ from sources import (
     SOURCES, AUTHORITY_WEIGHTS, ALLOWED_DOMAINS,
     validate_source_refs, authority_weight,
 )
+
+# Progress output carries non-ASCII (fork names in Cyrillic, "→" in the
+# Phase 4e summary). A redirected stdout on Windows defaults to the ANSI
+# codepage and dies on those — the run then loses Phases 5c-9, including the
+# data.json write. Same guard the scripts/ audits already use.
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
 # ─────────────────────────────────────────────
 # Fork source detection (generalized from hardcoded _RMC14 check)

@@ -6,12 +6,12 @@
 
 **Interactive chemistry reference for [Space Station 14](https://spacestation14.com/)**
 
-Search reagents, plan reactions, explore craft trees, and calculate batch recipes across 19 community forks.
+Search reagents, plan reactions, explore craft trees, and calculate batch recipes across 20 community forks.
 
 [![License: GPL-3.0](https://img.shields.io/badge/License-GPL--3.0-22c55e?style=flat-square)](LICENSE)
-![Reagents](https://img.shields.io/badge/Reagents-1213-39ff85?style=flat-square)
-![Reactions](https://img.shields.io/badge/Reactions-1005-00e5ff?style=flat-square)
-![Forks](https://img.shields.io/badge/Forks-19-ffb627?style=flat-square)
+![Reagents](https://img.shields.io/badge/Reagents-1369-39ff85?style=flat-square)
+![Reactions](https://img.shields.io/badge/Reactions-1092-00e5ff?style=flat-square)
+![Forks](https://img.shields.io/badge/Forks-20-ffb627?style=flat-square)
 
 </div>
 
@@ -22,7 +22,7 @@ Search reagents, plan reactions, explore craft trees, and calculate batch recipe
 | | Feature | Description |
 |---|---------|-------------|
 | **Search** | Full-text search | Search across names, effects, descriptions, and flavors |
-| **Multi-fork** | 19 SS14 forks | Vanilla, RMC14, Colonial Marines Universe, Russian Marine Corps, Goob, Funky, Delta-V, Starlight, Frontier, Dead Space, Trauma, Omu, Carpmosia, Monolith, Harmony, Corvax, ADT, Sunrise, Fish |
+| **Multi-fork** | 20 SS14 forks | Vanilla, RMC14, Colonial Marines Universe, Russian Marine Corps, Goob, Funky, Delta-V, Starlight, Frontier, Dead Space, Trauma, Omu, Carpmosia, Monolith, Harmony, Corvax, ADT, Sunrise, Fish, Misfits |
 | **Calculator** | Recipe planner | Single recipe calc, batch shift planner, and reverse lookup |
 | **Trees** | Craft trees | Visual dependency chains for any reagent synthesis path |
 | **Graph** | Network viz | Interactive graph of all reagent relationships |
@@ -38,23 +38,24 @@ Search reagents, plan reactions, explore craft trees, and calculate batch recipe
 |------|:--------:|:---------:|---|
 | **Vanilla SS14** | 407 | 316 | `upstream` |
 | **RMC14** | 113 | 68 | Colonial Marines |
-| **Colonial Marines Universe** | 11 | 16 | Colonial Marines · AU-14 |
-| **Russian Marine Corps** | 20 | 14 | RU, CMU-based |
+| **Colonial Marines Universe** | 22 | 16 | Colonial Marines · AU-14 |
+| **Russian Marine Corps** | 0 | 0 | RU, CMU-based — chem inherited from CMU, no own additions |
+| **Misfits: Nuclear Wasteland** | 151 | 88 | EN, Fallout (Nuclear 14 / Einstein Engines) |
 | **Goob Station** | 100 | 85 | |
 | **ADT (Время Приключений)** | 100 | 77 | RU, Corvax-based |
-| **Trauma Station** | 43 | 42 | Goob-based |
+| **Trauma Station** | 44 | 43 | Goob-based |
 | **Delta-V** | 124 | 125 | |
 | **Funky Station** | 103 | 101 | Goob-based |
 | **Monolith** | 28 | 25 | Frontier-based |
 | **Starlight** | 27 | 10 | |
 | **Sunrise** | 37 | 46 | RU |
-| **Frontier** | 31 | 21 | |
+| **Frontier** | 33 | 21 | |
 | **Carpmosia** | 12 | 15 | |
 | **Omu Station** | 20 | 16 | Goob-based |
-| **Dead Space** | 23 | 16 | |
+| **Dead Space** | 22 | 14 | |
 | **Corvax** | 8 | 8 | RU |
 | **Harmony** | 8 | 7 | |
-| **Fish Station (Рыбья)** | 9 | 11 | RU, Sunrise-based |
+| **Fish Station (Рыбья)** | 10 | 11 | RU, Sunrise-based |
 
 ## Quick Start
 

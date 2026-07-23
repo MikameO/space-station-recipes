@@ -1178,6 +1178,105 @@ FORK_REGISTRY = {
         "seed_files": ["Resources/Prototypes/_Fish/Hydroponics/seeds.yml"],
         "vanilla_override_reaction_files": VANILLA_REACTION_PATHS,
     },
+
+    # ── Misfits: Nuclear Wasteland (EN, Fallout total conversion) ──
+    # play.misfitsystems.net — the English MRP Fallout server (game preset
+    # "MFNW"); its repo is the Misfit-Sanctuary continuation of Peptide90's
+    # Nuclear 14, built on Einstein Engines. Two own layers ship chemistry:
+    #   _Nuclear14  — the Fallout chem system (chems, stimpaks, Nuka drinks,
+    #                 wasteland extracts/food, ore-to-reagent grinding)
+    #   _Misfits    — the server's own additions (Black Goo, Berserker mix,
+    #                 promethine, salvaged chems, sterile wipes, uranium EMP)
+    # Neither ancestor (Einstein Engines, Vault-Overseers/nuclear-14) is a
+    # registered fork, so this entry OWNS the _Nuclear14 layer and gets no
+    # parent_fork. The repo ALSO vendors _EE/_Goobstation/_NF/_Harmony/
+    # Nyanotrasen/Corvax/DeltaV layers — deliberately NOT manifested: their
+    # chem ids belong to goob/frontier/harmony/deltav/corvax (registered
+    # earlier), and manifesting the copies would only move attribution.
+    # The fork trims vanilla chemistry hard (biological 10->1, drinks
+    # 128->97 reactions, soap.yml deleted); vanilla_override_reaction_files
+    # auto-diffs those removals into the fork's blocked set.
+    "misfits": {
+        "name": "Misfits: Nuclear Wasteland",
+        "repo": "Misfit-Sanctuary/nuclear-14",
+        "branch": "master",
+        "custom_dir": "_Misfits",
+        "color": "#b45309",
+        "reagent_files": [
+            # _Nuclear14 layer (Fallout chem system)
+            "Resources/Prototypes/_Nuclear14/Reagents/biological.yml",
+            "Resources/Prototypes/_Nuclear14/Reagents/chems.yml",
+            "Resources/Prototypes/_Nuclear14/Reagents/materials.yml",
+            "Resources/Prototypes/_Nuclear14/Reagents/medicine.yml",
+            "Resources/Prototypes/_Nuclear14/Reagents/products.yml",
+            "Resources/Prototypes/_Nuclear14/Reagents/toxins.yml",
+            "Resources/Prototypes/_Nuclear14/Reagents/Consumable/extracts.yml",
+            "Resources/Prototypes/_Nuclear14/Reagents/Consumable/food.yml",
+            "Resources/Prototypes/_Nuclear14/Reagents/Consumable/Drink/alcohol.yml",
+            "Resources/Prototypes/_Nuclear14/Reagents/Consumable/Drink/drinks.yml",
+            "Resources/Prototypes/_Nuclear14/Reagents/Consumable/Drink/liquids.yml",
+            "Resources/Prototypes/_Nuclear14/Reagents/Consumable/Drink/soda.yml",
+            # _Misfits layer (server-own additions; three files ship with a
+            # UTF-8 BOM upstream — PyYAML strips it, verified 2026-07-23)
+            "Resources/Prototypes/_Misfits/Reagents/Berserkermix.yml",
+            "Resources/Prototypes/_Misfits/Reagents/BlackGoo.yml",
+            "Resources/Prototypes/_Misfits/Reagents/bomb_cig.yml",
+            "Resources/Prototypes/_Misfits/Reagents/coconut.yml",
+            "Resources/Prototypes/_Misfits/Reagents/construction_materials.yml",
+            "Resources/Prototypes/_Misfits/Reagents/genetics.yml",
+            "Resources/Prototypes/_Misfits/Reagents/promethine.yml",
+            "Resources/Prototypes/_Misfits/Reagents/yankelsteinium.yml",
+            # Einstein-Engines psionic reagents at the vanilla path (not part
+            # of VANILLA_REAGENT_PATHS, so the Phase 2b harvest never sees
+            # them). Ids shared with Delta-V's psionic files are skipped by
+            # first-wins — deltav is registered earlier.
+            "Resources/Prototypes/Reagents/psionic.yml",
+        ],
+        "reaction_files": [
+            "Resources/Prototypes/_Nuclear14/Recipes/Reactions/chems.yml",
+            "Resources/Prototypes/_Nuclear14/Recipes/Reactions/drinks.yml",
+            "Resources/Prototypes/_Nuclear14/Recipes/Reactions/food.yml",
+            "Resources/Prototypes/_Nuclear14/Recipes/Reactions/materials.yml",
+            "Resources/Prototypes/_Nuclear14/Recipes/Reactions/medicine.yml",
+            "Resources/Prototypes/_Misfits/Recipes/Reactions/Berserkermix.yml",
+            "Resources/Prototypes/_Misfits/Recipes/Reactions/BlackGoo.yml",
+            "Resources/Prototypes/_Misfits/Recipes/Reactions/bomb_cig.yml",
+            "Resources/Prototypes/_Misfits/Recipes/Reactions/promethine.yml",
+            "Resources/Prototypes/_Misfits/Recipes/Reactions/salvaged_chemicals.yml",
+            "Resources/Prototypes/_Misfits/Recipes/Reactions/sterilewipe.yml",
+            "Resources/Prototypes/_Misfits/Recipes/Reactions/uranium_emp.yml",
+        ],
+        "locale_files": [
+            "Resources/Locale/en-US/_Nuclear14/reagents.ftl",
+            "Resources/Locale/en-US/_Nuclear14/seeds.ftl",
+            "Resources/Locale/en-US/_Misfits/chems.ftl",
+            "Resources/Locale/en-US/_Misfits/genetics/reagents.ftl",
+            "Resources/Locale/en-US/_Misfits/medical/BlackGoo.ftl",
+            # names for the vanilla-path psionic reagents above
+            "Resources/Locale/en-US/reagents/psionic.ftl",
+        ],
+        "seed_files": [
+            "Resources/Prototypes/_Nuclear14/Hydroponics/seeds.yml",
+            "Resources/Prototypes/_Misfits/Hydroponics/seeds.yml",
+        ],
+        "vanilla_override_reaction_files": VANILLA_REACTION_PATHS,
+        # D3c: fork item-fill channels (Nuka-Cola vendor, wasteland medkits)
+        "item_fill_files": [
+            "Resources/Prototypes/_Nuclear14/Entities/Objects/Consumable/Drinks/drinks.yml",
+            "Resources/Prototypes/_Nuclear14/Entities/Objects/Consumable/Drinks/drinks_bottles.yml",
+            "Resources/Prototypes/_Nuclear14/Entities/Objects/Specific/Medical/healing.yml",
+        ],
+        "vending_inventory_files": [
+            "Resources/Prototypes/_Nuclear14/Catalog/VendingMachines/Inventories/nuka.yml",
+        ],
+        "vending_machine_files": [
+            "Resources/Prototypes/_Nuclear14/Entities/Structures/Machines/vending_machines.yml",
+        ],
+        "produce_files": [
+            "Resources/Prototypes/_Nuclear14/Entities/Objects/Consumable/Food/produce.yml",
+            "Resources/Prototypes/_Misfits/Entities/Objects/Consumable/Food/produce.yml",
+        ],
+    },
 }
 
 # Every non-vanilla fork gets vanilla-path reagent copies fetched for the
