@@ -473,14 +473,25 @@ def load_tile_colors(fork_key: str, fork_cfg: dict, reg: Registry):
 
 # ── map file parse ──
 
+CHUNK_TILES = 256          # SS14 grid chunk is always 16x16
+TILE_STRIDES = (6, 7)      # map format 6: u32 typeId + flags + variant
+                           # map format 7: + one more byte (rotation/mirroring)
+
 def decode_chunk(b64: str):
-    """Yield (i, typeId) for each of the 256 tiles; 7 bytes/tile, u32LE typeId."""
+    """Yield (i, typeId) for each of the 256 tiles; u32LE typeId at each stride.
+
+    Stride is derived from the payload, not assumed: a fork's map pool mixes
+    formats (Misfits ships Wendover at format 7 = 1792B/chunk next to seven
+    format-6 maps at 1536B). Validated by tilemap resolution — at the right
+    stride every one of the 256 ids resolves, at a wrong one ~half are garbage.
+    """
     raw = base64.b64decode(b64)
-    if len(raw) % 7:  # format-drift guard: non-7-byte stride → skip, don't emit garbage
-        print(f"  WARNING: chunk stride {len(raw)}B not /7 — skipping (format drift?)")
+    stride = len(raw) // CHUNK_TILES
+    if len(raw) % CHUNK_TILES or stride not in TILE_STRIDES:
+        print(f"  WARNING: chunk stride {len(raw)}B/{CHUNK_TILES} tiles unsupported — skipping (format drift?)")
         return
-    for i in range(len(raw) // 7):
-        yield i, struct.unpack_from("<I", raw, i * 7)[0]
+    for i in range(CHUNK_TILES):
+        yield i, struct.unpack_from("<I", raw, i * stride)[0]
 
 def parse_map_file(fork_key: str, fork_cfg: dict, path: str) -> dict:
     content = fetch_file(fork_cfg["raw_url"].format(path=path), CACHE_DIR / fork_key / path)

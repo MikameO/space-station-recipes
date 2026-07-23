@@ -2097,4 +2097,7 @@ CATEGORY_SHEET_MAP = {
 # data-drivenly by MIN_MAP_ITEMS, so this is only the semantic exceptions.)
 MAP_BLOCKLIST: dict[str, list[str]] = {
     "vanilla": ["CentComm", "Dev"],   # central command + debug map
+    # Misfits ships two CentComm variants (Harmony/Main) — same admin-only
+    # rationale as vanilla's CentComm.
+    "misfits": ["CentCommHarmony", "CentCommMain"],
 }

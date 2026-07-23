@@ -11,9 +11,12 @@ A new artifact family, separate from `data.json` and carrying its own
 
 **What ships:** the **Maps** tab — pick a station, search any item, and see every
 place it spawns on a rendered schematic, grouped by nearest station beacon. This
-release covers **14 vanilla stations plus 13 community forks** (89 maps; Bagel, Box, Elkridge, Exo, Fland,
+release covers **14 vanilla stations plus 14 community forks** (95 maps; Bagel, Box, Elkridge, Exo, Fland,
 Marathon, Oasis, Packed, Plasma, Reach, Relic, Saltern, Serpentcrest, Snowball;
-2026-07-21: + Omu Delta Station — the "NTTG Delta" rotation map ported from Corvax).
+2026-07-21: + Omu Delta Station — the "NTTG Delta" rotation map ported from Corvax;
+2026-07-23: + Misfits: Nuclear Wasteland — Wendover, Sunnyvale, Mercer Island,
+Nukie Outpost, Wave 1, Saltern. Fallout maps place no NavMapBeacons, so their
+locations list falls back to the single "no beacon" group).
 
 **Item sources indexed** (marker colour = source kind):
 
