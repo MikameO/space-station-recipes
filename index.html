@@ -72,7 +72,7 @@
   "license": "https://github.com/MikameO/space-station-recipes/blob/main/LICENSE"
 }
 </script>
-<link rel="stylesheet" href="style.css?v=30">
+<link rel="stylesheet" href="style.css?v=31">
 <!-- Yandex.Metrika counter -->
 <script type="text/javascript">
     (function(m,e,t,r,i,k,a){
@@ -113,6 +113,7 @@
       <span class="antag-label">ANTAG</span>
     </button>
     <button class="hint-chip hint-chip-left" data-hint="Reveals antagonist strategies tab: toxin synthesis routes, delivery methods, and difficulty ratings. Toggle off to return to the standard chemist view." aria-label="What is Antag mode?">?</button>
+    <button class="share-btn lang-toggle" id="langToggle" title="Переключить на русский" aria-label="Switch language / Переключить язык">RU</button>
     <button class="help-btn" id="helpBtn" title="Show tutorial" aria-label="Show tutorial">?</button>
     <a class="feedback-btn" href="https://github.com/MikameO/space-station-recipes/issues" target="_blank" rel="noopener noreferrer" title="Feedback &amp; Bug Reports">
       <svg class="feedback-icon" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 3h14v10H7l-4 4V3z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><circle cx="7.5" cy="8" r="1" fill="currentColor"/><circle cx="10" cy="8" r="1" fill="currentColor"/><circle cx="12.5" cy="8" r="1" fill="currentColor"/></svg>
@@ -515,7 +516,9 @@
   <div class="loading-bar"><div class="loading-bar-fill"></div></div>
 </div>
 
-<script src="app.js?v=28"></script>
+<!-- i18n.js must load BEFORE app.js: it exposes applyRussianData for init() -->
+<script src="i18n.js?v=1"></script>
+<script src="app.js?v=29"></script>
 <script defer src="tutorial.js?v=2"></script>
 <script src="maps.js?v=10" defer></script>
 </body>

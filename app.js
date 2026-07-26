@@ -94,6 +94,9 @@ async function init() {
     // no-SW case. Three attempts with backoff — one flaky mobile moment
     // must not strand the user on an error screen (user-reported).
     DATA = await loadData();
+    // L10n-RU: swap nameRu/descRu into the primary fields BEFORE any index
+    // or renderer touches DATA — the whole app picks Russian up for free.
+    if (window.applyRussianData) window.applyRussianData(DATA);
   } catch (e) {
     document.getElementById('loadingOverlay').innerHTML =
       '<div style="color:#ef4444;padding:20px;text-align:center;">' +
@@ -163,7 +166,9 @@ function buildSearchIndex() {
   for (const [id, r] of Object.entries(DATA.reagents)) {
     searchIndex.push({
       id,
-      text: [r.name, r.id, r.group, r.category, r.effects, r.desc, r.flavor, r.physicalDesc]
+      // nameEn exists only in RU mode (set by applyRussianData) — keeps the
+      // English name searchable alongside the displayed Russian one.
+      text: [r.name, r.nameEn, r.id, r.group, r.category, r.effects, r.desc, r.flavor, r.physicalDesc]
         .filter(Boolean).join(' ').toLowerCase(),
       reagent: r,
     });
@@ -1266,7 +1271,7 @@ function openDetail(reagentId, pushHistory = true) {
     recipeHTML = '<div>' + Object.entries(r.recipe.reactants).map(([id, info]) =>
       `<div class="detail-recipe-item">
         <span class="detail-recipe-amount">${info.amount}x</span>
-        <span class="detail-recipe-name" onclick="openDetail('${id}')">${esc(id)}</span>
+        <span class="detail-recipe-name" onclick="openDetail('${id}')">${esc(DATA.reagents[id]?.name || id)}</span>
         ${info.catalyst ? '<span class="badge badge-c" style="font-size:0.6rem">CATALYST</span>' : ''}
       </div>`
     ).join('') + '</div>';
@@ -1277,7 +1282,7 @@ function openDetail(reagentId, pushHistory = true) {
     if (tempParts.length) recipeHTML += `<div style="margin-top:6px;font-size:0.72rem;color:var(--accent-cyan)">${tempParts.join(' | ')}</div>`;
     if (r.recipe.mixer && r.recipe.mixer.length) recipeHTML += `<div style="font-size:0.72rem;color:var(--accent-purple)">Mixer: ${r.recipe.mixer.join(', ')}</div>`;
 
-    const products = Object.entries(r.recipe.products).map(([id, amt]) => `${amt}x ${id}`).join(', ');
+    const products = Object.entries(r.recipe.products).map(([id, amt]) => `${amt}x ${DATA.reagents[id]?.name || id}`).join(', ');
     recipeHTML += `<div style="margin-top:6px;font-size:0.72rem;color:var(--accent-green)">Produces: ${products}</div>`;
   }
 

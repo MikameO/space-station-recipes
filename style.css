@@ -1861,6 +1861,9 @@ body.antag-active .hint-chip:hover, body.antag-active .hint-chip:focus-visible {
 }
 .share-btn:hover { border-color: var(--phosphor-dim); color: var(--phosphor); }
 
+/* L10n-RU: language toggle — share-btn base, just make the label read as text */
+.lang-toggle { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.06em; }
+
 .toast {
   position: fixed;
   bottom: 20px;
