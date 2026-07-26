@@ -3,6 +3,29 @@
 `data.json` schema version is in `meta.schemaVersion`. Consumers reading this file
 should pin on a compatible range (semver: breaking changes bump major).
 
+## 3.10.0 — 2026-07-26 (L10n-RU: Russian localization, phase 1)
+
+**Data:** reagents gain optional `nameRu` / `descRu` / `physicalDescRu`, plants
+gain `nameRu` — resolved from the **native ru-RU Fluent files** of the six
+Russian-first forks (corvax = canonical vanilla-RU via ss14-ru; RuCM covers the
+inherited RMC14/CMU layer). Fields exist only where a real translation does;
+additive change, EN consumers unaffected. Coverage: **725/1369 reagents**
+(vanilla 407/407, adt 100/100, sunrise 37/37, fish 10/10, corvax 8/8,
+rmc14 100/113, cmu 20/22, deadspace 20/22 — the gaps have no upstream
+translation at all), 88/152 plants. Side win: these forks ship no en-US locale,
+so their reagents previously had prettified-ID names and empty descriptions —
+now they have real content.
+
+**Frontend:** RU/EN toggle in the header (`?lang=ru` deep links, localStorage
+persistence). In RU mode the app swaps Russian strings into the primary fields
+before indexing (all views + search pick them up), search matches both
+languages, and a DOM translation layer (`i18n.js`) localizes the UI chrome with
+proper Russian plurals. Untranslated strings gracefully stay English.
+
+Phase 2 (not in this release): generated effect prose, antag curator texts,
+maps item names. Decision record:
+`docs/decisions/2026-07-26_russian-localization.md`.
+
 ## Maps schema 2 — 2026-07-12 (Series E — station map item finder)
 
 A new artifact family, separate from `data.json` and carrying its own
