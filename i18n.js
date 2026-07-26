@@ -429,6 +429,11 @@
     'Curated from playtime — the mechanics live in C# code, not extractable YAML. PRs welcome.': 'Собрано из игрового опыта — механика живёт в C#-коде, не в YAML. PR приветствуются.',
     // Maps extras
     'Pick an item to see where it lives.': 'Выберите предмет, чтобы увидеть, где он лежит.',
+    // Empty search state
+    'Try a different spelling, clear filters, or open the tutorial for a quick orientation.': 'Попробуйте другое написание, сбросьте фильтры или откройте обучение.',
+    'Clear search': 'Очистить поиск',
+    'Open tutorial': 'Открыть обучение',
+    'Did you mean:': 'Возможно, вы имели в виду:',
     // Pin callout
     '📌 Pin over your game': '📌 Закрепите поверх игры',
     // Loading-overlay disclaimer fragments (split by <strong>/<em>/<br>)
