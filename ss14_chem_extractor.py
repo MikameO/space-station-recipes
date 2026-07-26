@@ -368,6 +368,9 @@ def parse_all_prototypes(files: dict[str, str], loader) -> tuple[dict, dict]:
 
 def parse_ftl_content(content: str) -> dict[str, str]:
     """Parse Fluent (.ftl) file into key-value dict."""
+    # Some fork files (RuCM ru-RU) ship with a UTF-8 BOM; the key regex
+    # anchors on [\w], so an un-stripped BOM silently drops the first key.
+    content = content.lstrip("﻿")
     locale = {}
     current_key = None
     current_val_lines = []
@@ -457,6 +460,21 @@ def resolve_desc(reagent: dict, locale: dict) -> str:
         if pattern in locale:
             return locale[pattern]
     return ""
+
+
+def resolve_name_strict(reagent: dict, locale: dict) -> str | None:
+    """resolve_name without the prettify fallback — None when the locale has
+    no translation. Used for the RU dictionary: a missing translation must
+    yield a missing field (frontend falls back to EN), not a fake name."""
+    name_key = reagent.get("name", "")
+    if name_key and name_key in locale:
+        return locale[name_key]
+    rid = reagent.get("id", "")
+    for pattern in (f"reagent-name-{rid.lower()}",
+                    f"reagent-name-{re.sub(r'(?<!^)(?=[A-Z])', '-', rid).lower()}"):
+        if pattern in locale:
+            return locale[pattern]
+    return None
 
 
 # ─────────────────────────────────────────────
@@ -1360,7 +1378,8 @@ def parse_seed_sources(seed_files: dict[str, str], loader,
     return dict(reagent_plants)
 
 
-def parse_plants(fork_data: dict, loader, locale: dict | None = None) -> dict:
+def parse_plants(fork_data: dict, loader, locale: dict | None = None,
+                 locale_ru: dict | None = None) -> dict:
     """Parse seed prototypes into plant entities (D1, schema 3.6.0).
 
     First fork to define a seed id wins — same merge rule as reagents
@@ -1402,6 +1421,10 @@ def parse_plants(fork_data: dict, loader, locale: dict | None = None) -> dict:
                     "growth": growth,
                     "rsi": entry.get("plantRsi", ""),
                 }
+                # L10n-RU: strict lookup — no translation, no field
+                ru_name = (locale_ru or {}).get(entry.get("name", ""))
+                if ru_name:
+                    plants[sid]["nameRu"] = ru_name
     # Validate mutation targets against the merged plant set
     dropped = []
     for p in plants.values():
@@ -2249,7 +2272,8 @@ def export_json(reagents: dict, reactions: dict, locale: dict,
                 fork_reagent_blocks: dict | None = None,
                 plants: dict | None = None,
                 item_sources: dict | None = None,
-                shadowed_by_fork: dict | None = None):
+                shadowed_by_fork: dict | None = None,
+                locale_ru: dict | None = None):
     """Export all data as a JSON file for the web frontend.
     fork_diffs: {fork_id: (blocked_set, modified_dict)} from auto-diff.
     reagent_plants: {reagent_id: [plant_label...]} from parse_seed_sources;
@@ -2291,6 +2315,11 @@ def export_json(reagents: dict, reactions: dict, locale: dict,
 
     data = {
         "meta": {
+            # 3.10.0: RU localization — nameRu/descRu/physicalDescRu on
+            # reagents and nameRu on plants, resolved from the native ru-RU
+            # Fluent files of the 6 Russian-first forks (corvax = canonical
+            # vanilla-RU via ss14-ru). Fields are present only when a real
+            # translation exists; the frontend falls back to EN otherwise.
             # 3.7.0: item-fill obtainSources — vending/dispenser/juicing
             # channels folded into obtainSources (D3); item-carried reagents
             # (Absinthe, Lead, ...) no longer render as unobtainable.
@@ -2301,7 +2330,7 @@ def export_json(reagents: dict, reactions: dict, locale: dict,
             # 3.5.0: legacy rmcStatus/rmcNote per-reaction fields and
             # vanillaReagentCount/rmcReagentCount meta removed — forkStatus/
             # forkNotes are the only fork-view fields since the multi-fork era.
-            "schemaVersion": "3.9.0",
+            "schemaVersion": "3.10.0",
             "generated": time.strftime("%Y-%m-%dT%H:%M:%S"),
             "forks": forks_meta,
             "reactionCount": len(reactions),
@@ -2406,6 +2435,7 @@ def export_json(reagents: dict, reactions: dict, locale: dict,
             "color": reagent.get("color", ""),
             "desc": resolve_desc(reagent, locale),
             "physicalDesc": locale.get(reagent.get("physicalDesc", ""), reagent.get("physicalDesc", "")),
+            # L10n-RU fields are attached below only when a translation exists
             "flavor": str(reagent.get("flavor", "")),
             "isBase": rid in base_set,
             "isDispenser": rid in BASE_DISPENSER_CHEMICALS,
@@ -2421,6 +2451,18 @@ def export_json(reagents: dict, reactions: dict, locale: dict,
             "boilingPoint": reagent.get("boilingPoint"),
             "meltingPoint": reagent.get("meltingPoint"),
         }
+        # L10n-RU: attach only real translations — the frontend treats a
+        # missing field as "fall back to EN", so no prettify fallback here.
+        if locale_ru:
+            name_ru = resolve_name_strict(reagent, locale_ru)
+            if name_ru:
+                reagent_obj["nameRu"] = name_ru
+            desc_ru = resolve_desc(reagent, locale_ru)
+            if desc_ru:
+                reagent_obj["descRu"] = desc_ru
+            pd_ru = locale_ru.get(reagent.get("physicalDesc", ""))
+            if pd_ru:
+                reagent_obj["physicalDescRu"] = pd_ru
         # D4: metabolism rate — only when overridden (default 0.5 filled in UI)
         if _metab_rate is not None:
             reagent_obj["metabolismRate"] = _metab_rate
@@ -2448,6 +2490,17 @@ def export_json(reagents: dict, reactions: dict, locale: dict,
             reagent_obj["plantEffects"] = plant_effects
 
         data["reagents"][rid] = reagent_obj
+
+    # L10n-RU coverage report — which forks still lack native translations
+    if locale_ru:
+        per_fork = {}
+        for r in data["reagents"].values():
+            tot, ru = per_fork.get(r["source"], (0, 0))
+            per_fork[r["source"]] = (tot + 1, ru + (1 if "nameRu" in r else 0))
+        n_ru = sum(ru for _, ru in per_fork.values())
+        print(f"  RU coverage: {n_ru}/{len(data['reagents'])} reagents have nameRu")
+        for f, (tot, ru) in sorted(per_fork.items(), key=lambda kv: -kv[1][0]):
+            print(f"    {f}: {ru}/{tot}")
 
     # Build reactions
     for rid, rxn in sorted(reactions.items()):
@@ -2719,6 +2772,11 @@ def main():
         locale_files = fetch_all_files(fconf.get("locale_files", []), url, fork_id)
         print(f"  Fetched {len(locale_files)} locale files")
 
+        # L10n-RU: native ru-RU Fluent files (only Russian-first forks list any)
+        locale_ru_files = fetch_all_files(fconf.get("locale_files_ru", []), url, fork_id)
+        if locale_ru_files:
+            print(f"  Fetched {len(locale_ru_files)} RU locale files")
+
         seed_files = fetch_all_files(fconf.get("seed_files", []), url, fork_id)
         if seed_files:
             print(f"  Fetched {len(seed_files)} seed files")
@@ -2738,6 +2796,7 @@ def main():
             "reagent_files": reagent_files,
             "reaction_files": reaction_files,
             "locale_files": locale_files,
+            "locale_ru_files": locale_ru_files,
             "seed_files": seed_files,
             **item_channel_files,
         }
@@ -2853,6 +2912,18 @@ def main():
     for fork_id, fdata in fork_data.items():
         locale.update(load_all_localization(fdata["locale_files"]))
     print(f"  Locale entries: {len(locale)}")
+
+    # L10n-RU: one merged RU dictionary, same shape as the EN one. Fork-own
+    # keys are unique, but several RU forks vendor copies of the vanilla
+    # ss14-ru files (Sunrise _strings/, RuCM vanilla paths) that may lag —
+    # merging corvax LAST keeps the canonical ss14-ru text for vanilla keys
+    # while the vendored copies still contribute their fork-only additions.
+    locale_ru = {}
+    ru_merge_order = [f for f in fork_data if f != "corvax"] + \
+                     (["corvax"] if "corvax" in fork_data else [])
+    for fork_id in ru_merge_order:
+        locale_ru.update(load_all_localization(fork_data[fork_id].get("locale_ru_files", {})))
+    print(f"  RU locale entries: {len(locale_ru)}")
 
     # Phase 4: Merge & resolve parents
     print("\n=== Phase 4: Resolving parent inheritance ===")
@@ -3055,7 +3126,7 @@ def main():
 
     # Phase 8: Generate JSON for web frontend
     print("\n=== Phase 8: Generating JSON for web frontend ===")
-    plants = parse_plants(fork_data, loader, all_seed_locale)
+    plants = parse_plants(fork_data, loader, all_seed_locale, locale_ru)
     mut_count = sum(1 for p in plants.values() if p["mutations"])
     print(f"  Plants: {len(plants)} entities ({mut_count} with mutation targets)")
 
@@ -3064,6 +3135,7 @@ def main():
         all_sources, fork_diffs, reagent_plants=reagent_plants,
         fork_reagent_blocks=fork_reagent_blocks, plants=plants,
         item_sources=item_sources, shadowed_by_fork=shadowed_by_fork,
+        locale_ru=locale_ru,
     )
 
     print("\n=== Phase 9: Extracting sprites from SS14 repo ===")

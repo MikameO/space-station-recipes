@@ -401,6 +401,43 @@ FORK_REGISTRY = {
             # RuCM's copy of the parent locale — adds XenoAlch names (pure additions)
             "Resources/Locale/en-US/_RMC14/medical/toxins.ftl",
         ],
+        # RU localization (native ru-RU). RuCM translates the entire inherited
+        # colonial-marines layer, so this list is also the RU source for the
+        # rmc14/cmu content visible through ancestry (ready translations that
+        # ship in a Russian fork's repo — within the user's phase-1 scope).
+        "locale_files_ru": [
+            # RMC14 layer mirrors of rmc14's en-US locale manifest
+            "Resources/Locale/ru-RU/_RMC14/reagents/meta/consumable/drink/alcohol.ftl",
+            "Resources/Locale/ru-RU/_RMC14/reagents/meta/consumable/drink/drinks.ftl",
+            "Resources/Locale/ru-RU/_RMC14/reagents/meta/consumable/drink/juice.ftl",
+            "Resources/Locale/ru-RU/_RMC14/reagents/meta/consumable/drink/soda.ftl",
+            "Resources/Locale/ru-RU/_RMC14/reagents/meta/elements.ftl",
+            "Resources/Locale/ru-RU/_RMC14/reagents/flavors.ftl",
+            "Resources/Locale/ru-RU/_RMC14/reagents/ingredients.ftl",
+            "Resources/Locale/ru-RU/_RMC14/reagents/other.ftl",
+            "Resources/Locale/ru-RU/_RMC14/reagents/pyrotechnic.ftl",
+            "Resources/Locale/ru-RU/_RMC14/reagents/soda.ftl",
+            "Resources/Locale/ru-RU/_RMC14/reagents/toxins.ftl",
+            "Resources/Locale/ru-RU/_RMC14/medical/medicine.ftl",
+            "Resources/Locale/ru-RU/_RMC14/medical/narcotics.ftl",
+            "Resources/Locale/ru-RU/_RMC14/medical/toxins.ftl",
+            "Resources/Locale/ru-RU/_RMC14/medical/synth.ftl",
+            # CMU/AU14 layer
+            "Resources/Locale/ru-RU/_CMU14/medical/reagents.ftl",
+            "Resources/Locale/ru-RU/_CMU14/reagents/properties.ftl",
+            "Resources/Locale/ru-RU/_CMU14/yautja/yautja.ftl",
+            "Resources/Locale/ru-RU/_AU14/drugs.ftl",
+            "Resources/Locale/ru-RU/_AU14/Meds/drugs.ftl",
+            "Resources/Locale/ru-RU/_AU14/abominations/abominations.ftl",
+            # RuCM's vendored vanilla-path copies that carry RMC additions
+            # (Saxoite in fun, KiraSpecial in alcohol); corvax merges last,
+            # so the vanilla keys inside stay canonical ss14-ru.
+            "Resources/Locale/ru-RU/reagents/meta/fun.ftl",
+            "Resources/Locale/ru-RU/reagents/meta/consumable/drink/alcohol.ftl",
+            # Seeds (plant display names)
+            "Resources/Locale/ru-RU/_RMC14/Kitchen/Plants/seeds.ftl",
+            "Resources/Locale/ru-RU/_RMC14/Kitchen/seeds.ftl",
+        ],
         "dispenser_chemicals": set(),  # CM dispenser chems already global via rmc14
         "vanilla_override_reaction_files": VANILLA_REACTION_PATHS,
         # RuCM's copies of parent RMC14 reaction files, auto-diffed against the
@@ -715,6 +752,22 @@ FORK_REGISTRY = {
             "Resources/Prototypes/_DeadSpace/Recipes/Reactions/medicine.yml",
         ],
         "locale_files": [],
+        # RU localization (native ru-RU; Dead Space / Мёртвый Космос is a
+        # Russian-first fork — its content has no en-US locale at all)
+        "locale_files_ru": [
+            "Resources/Locale/ru-RU/_deadspace/reagents/meta/biological.ftl",
+            "Resources/Locale/ru-RU/_deadspace/reagents/meta/chemicals.ftl",
+            "Resources/Locale/ru-RU/_deadspace/reagents/meta/elements.ftl",
+            "Resources/Locale/ru-RU/_deadspace/reagents/meta/toxins.ftl",
+            "Resources/Locale/ru-RU/_deadspace/reagents/meta/consumable/drink/alcohol.ftl",
+            "Resources/Locale/ru-RU/_deadspace/reagents/meta/consumable/drink/condensed_milk.ftl",
+            # Dead Space's addition inside its vendored ADT layer (owns the
+            # ADTVodkaAntivirus reagent, see reagent_files above)
+            "Resources/Locale/ru-RU/_adt/Reagents/vodka_antivirus.ftl",
+            # Seeds (plant display names)
+            "Resources/Locale/ru-RU/_deadspace/seeds/seeds.ftl",
+            "Resources/Locale/ru-RU/_deadspace/prototypes/entities/objects/specific/hydroponics/seeds.ftl",
+        ],
         "seed_files": ["Resources/Prototypes/_DeadSpace/Hydroponics/seeds.yml"],
         "vanilla_override_reaction_files": VANILLA_REACTION_PATHS,
     },
@@ -1037,6 +1090,61 @@ FORK_REGISTRY = {
             "Resources/Prototypes/Corvax/Recipes/Reactions/drinks.yml",
         ],
         "locale_files": [],
+        # RU localization source (Increment L10n-RU). Corvax maintains the
+        # de-facto standard Russian translation of upstream content (ss14-ru),
+        # so this list doubles as the vanilla-RU source: ru-RU/reagents/meta/*
+        # mirrors vanilla's en-US/reagents/meta/* one-to-one. Only forks whose
+        # repos natively ship ru-RU are listed (user scope: ready translations
+        # only, no machine translation).
+        "locale_files_ru": [
+            "Resources/Locale/ru-RU/reagents/meta/biological.ftl",
+            "Resources/Locale/ru-RU/reagents/meta/botany.ftl",
+            "Resources/Locale/ru-RU/reagents/meta/chemicals.ftl",
+            "Resources/Locale/ru-RU/reagents/meta/cleaning.ftl",
+            "Resources/Locale/ru-RU/reagents/meta/elements.ftl",
+            "Resources/Locale/ru-RU/reagents/meta/fun.ftl",
+            "Resources/Locale/ru-RU/reagents/meta/gases.ftl",
+            "Resources/Locale/ru-RU/reagents/meta/medicine.ftl",
+            "Resources/Locale/ru-RU/reagents/meta/narcotics.ftl",
+            "Resources/Locale/ru-RU/reagents/meta/physical-desc.ftl",
+            "Resources/Locale/ru-RU/reagents/meta/pyrotechnic.ftl",
+            "Resources/Locale/ru-RU/reagents/meta/toxins.ftl",
+            "Resources/Locale/ru-RU/reagents/meta/consumable/drink/alcohol.ftl",
+            "Resources/Locale/ru-RU/reagents/meta/consumable/drink/drinks.ftl",
+            "Resources/Locale/ru-RU/reagents/meta/consumable/drink/juice.ftl",
+            "Resources/Locale/ru-RU/reagents/meta/consumable/drink/soda.ftl",
+            "Resources/Locale/ru-RU/reagents/meta/consumable/food/condiments.ftl",
+            "Resources/Locale/ru-RU/reagents/meta/consumable/food/food.ftl",
+            "Resources/Locale/ru-RU/reagents/meta/consumable/food/ingredients.ftl",
+            "Resources/Locale/ru-RU/reagents/Capsaicin.ftl",
+            "Resources/Locale/ru-RU/reagents/absinthe.ftl",
+            "Resources/Locale/ru-RU/reagents/barozine.ftl",
+            "Resources/Locale/ru-RU/reagents/buzzochloricbees.ftl",
+            "Resources/Locale/ru-RU/reagents/carpetium.ftl",
+            "Resources/Locale/ru-RU/reagents/clf3.ftl",
+            "Resources/Locale/ru-RU/reagents/ephedrine.ftl",
+            "Resources/Locale/ru-RU/reagents/ethyloxyephedrine.ftl",
+            "Resources/Locale/ru-RU/reagents/fresium.ftl",
+            "Resources/Locale/ru-RU/reagents/frezon.ftl",
+            "Resources/Locale/ru-RU/reagents/frostoil.ftl",
+            "Resources/Locale/ru-RU/reagents/generic.ftl",
+            "Resources/Locale/ru-RU/reagents/histamine.ftl",
+            "Resources/Locale/ru-RU/reagents/laughter.ftl",
+            "Resources/Locale/ru-RU/reagents/leporazine.ftl",
+            "Resources/Locale/ru-RU/reagents/mannitol.ftl",
+            "Resources/Locale/ru-RU/reagents/norepinephricacid.ftl",
+            "Resources/Locale/ru-RU/reagents/phlogiston.ftl",
+            "Resources/Locale/ru-RU/reagents/psicodine.ftl",
+            # Corvax's own reagent additions
+            "Resources/Locale/ru-RU/corvax/reagents/meta/consumable/drink/alcohol.ftl",
+            "Resources/Locale/ru-RU/corvax/reagents/meta/consumable/drink/drinks.ftl",
+            # Material reagent names (materials-* keys; 404-safe if absent)
+            "Resources/Locale/ru-RU/materials/materials.ftl",
+            # Botany: seed display names (mirrors vanilla botany_locale_files)
+            "Resources/Locale/ru-RU/botany/seeds.ftl",
+            "Resources/Locale/ru-RU/seeds/seeds.ftl",
+            "Resources/Locale/ru-RU/ss14-ru/prototypes/entities/objects/specific/hydroponics/seeds.ftl",
+        ],
         "vanilla_override_reaction_files": VANILLA_REACTION_PATHS,
     },
 
@@ -1079,6 +1187,28 @@ FORK_REGISTRY = {
         ],
         "locale_files": [
             "Resources/Locale/en-US/ADT/reagents/meta/toxins.ftl",
+        ],
+        # RU localization (native ru-RU; ADT is a Russian-first fork)
+        "locale_files_ru": [
+            "Resources/Locale/ru-RU/ADT/reagents/meta/biological.ftl",
+            "Resources/Locale/ru-RU/ADT/reagents/meta/chemicals.ftl",
+            "Resources/Locale/ru-RU/ADT/reagents/meta/fun.ftl",
+            "Resources/Locale/ru-RU/ADT/reagents/meta/gases.ftl",
+            "Resources/Locale/ru-RU/ADT/reagents/meta/medicine.ftl",
+            "Resources/Locale/ru-RU/ADT/reagents/meta/narcotics.ftl",
+            "Resources/Locale/ru-RU/ADT/reagents/meta/pyrotechnic.ftl",
+            "Resources/Locale/ru-RU/ADT/reagents/meta/toxins.ftl",
+            "Resources/Locale/ru-RU/ADT/reagents/meta/consumable/alcohol.ftl",
+            "Resources/Locale/ru-RU/ADT/reagents/meta/consumable/drinks.ftl",
+            "Resources/Locale/ru-RU/ADT/Heretic/reagents/reagents.ftl",
+            "Resources/Locale/ru-RU/ADT/reagents/Condition/reagents.ftl",
+            "Resources/Locale/ru-RU/ADT/reagents/biological.ftl",
+            "Resources/Locale/ru-RU/ADT/reagents/Consumable/Drinks/drink.ftl",
+            "Resources/Locale/ru-RU/ADT/reagents/Consumable/Food/Containers/condensed_milk.ftl",
+            "Resources/Locale/ru-RU/ADT/prototypes/Entities/Objects/Consumable/Food/coffee.ftl",
+            # Seeds (plant display names)
+            "Resources/Locale/ru-RU/ADT/hydroponics/seeds.ftl",
+            "Resources/Locale/ru-RU/ADT/prototypes/Entities/Objects/Specific/Hydroponics/seeds.ftl",
         ],
         "seed_files": ["Resources/Prototypes/ADT/Hydroponics/seeds.yml"],
         "vanilla_override_reaction_files": VANILLA_REACTION_PATHS,
@@ -1138,6 +1268,31 @@ FORK_REGISTRY = {
         "locale_files": [
             "Resources/Locale/en-US/_prototypes/_sunrise/entities/objects/specific/hydroponics/seeds.ftl",
         ],
+        # RU localization (native ru-RU; Sunrise is a Russian-first fork —
+        # own content under _strings/_sunrise/, vanilla mirror not needed
+        # because corvax supplies the canonical vanilla-RU dictionary)
+        "locale_files_ru": [
+            "Resources/Locale/ru-RU/_strings/_sunrise/reagents/meta/biological.ftl",
+            "Resources/Locale/ru-RU/_strings/_sunrise/reagents/meta/fun.ftl",
+            "Resources/Locale/ru-RU/_strings/_sunrise/reagents/meta/gases.ftl",
+            "Resources/Locale/ru-RU/_strings/_sunrise/reagents/meta/medicine.ftl",
+            "Resources/Locale/ru-RU/_strings/_sunrise/reagents/meta/physical-desc.ftl",
+            "Resources/Locale/ru-RU/_strings/_sunrise/reagents/meta/toxins.ftl",
+            "Resources/Locale/ru-RU/_strings/_sunrise/reagents/meta/consumable/drink/alcohol.ftl",
+            "Resources/Locale/ru-RU/_strings/_sunrise/reagents/meta/consumable/drink/drinks.ftl",
+            "Resources/Locale/ru-RU/_strings/_sunrise/reagents/meta/consumable/drink/soda.ftl",
+            "Resources/Locale/ru-RU/_strings/_sunrise/reagents/meta/consumable/food/condiments.ftl",
+            "Resources/Locale/ru-RU/_strings/_sunrise/reagents/universalsolvent.ftl",
+            "Resources/Locale/ru-RU/_strings/_sunrise/synth/synth.ftl",
+            # Sunrise put a few of its own reagent keys (NitroKill,
+            # NocturineAbductor) inside its vendored copies of the vanilla
+            # files; corvax merges LAST so vanilla keys stay canonical.
+            "Resources/Locale/ru-RU/_strings/reagents/meta/toxins.ftl",
+            "Resources/Locale/ru-RU/_strings/reagents/meta/narcotics.ftl",
+            # Seeds (plant display names)
+            "Resources/Locale/ru-RU/_strings/_sunrise/seeds/seeds.ftl",
+            "Resources/Locale/ru-RU/_prototypes/_sunrise/entities/objects/specific/hydroponics/seeds.ftl",
+        ],
         "seed_files": ["Resources/Prototypes/_Sunrise/Hydroponics/seeds.yml"],
         "vanilla_override_reaction_files": VANILLA_REACTION_PATHS,
     },
@@ -1174,6 +1329,17 @@ FORK_REGISTRY = {
         "locale_files": [
             "Resources/Locale/en-US/_fish/Reagents/unknown_pathogens.ftl",
             "Resources/Locale/en-US/_prototypes/_fish/entities/objects/specific/hydroponics/seeds.ftl",
+        ],
+        # RU localization (native ru-RU; Sunrise-based Russian fork)
+        "locale_files_ru": [
+            "Resources/Locale/ru-RU/_strings/_fish/reagents/meta/consumable/drink/juice.ftl",
+            "Resources/Locale/ru-RU/_strings/_fish/reagents/meta/gases.ftl",
+            "Resources/Locale/ru-RU/_fish/Reagents/foxium.ftl",
+            "Resources/Locale/ru-RU/_fish/Reagents/unknown_pathogens.ftl",
+            # Vaccine system reagents (Fish-only _Sunrise/Vaccine extension)
+            "Resources/Locale/ru-RU/_strings/_sunrise/disease/vaccine.ftl",
+            # Seeds (plant display names)
+            "Resources/Locale/ru-RU/_prototypes/_fish/entities/objects/specific/hydroponics/seeds.ftl",
         ],
         "seed_files": ["Resources/Prototypes/_Fish/Hydroponics/seeds.yml"],
         "vanilla_override_reaction_files": VANILLA_REACTION_PATHS,
