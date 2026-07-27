@@ -26,6 +26,36 @@ Phase 2 (not in this release): generated effect prose, antag curator texts,
 maps item names. Decision record:
 `docs/decisions/2026-07-26_russian-localization.md`.
 
+## Maps prices 2 — 2026-07-27 (Series S — sell list: map price manifest)
+
+New per-fork artifact `maps/<fork>/prices.json` (own `schemaVersion`, currently
+2): sell price and class for every non-abstract prototype that can appear in a
+map's item index. Produced by the same `ss14_map_extractor.py` (`--prices` =
+registry-only run, no map baking; a regular fork bake refreshes it too).
+
+**Prices** mirror the live upstream `PricingSystem.GetEstimatedPrice`:
+material composition × stack count, then `StackPrice × count` XOR
+`StaticPrice` (the engine never applies both). Stack size = explicit
+`Stack.count` up the inheritance chain, else the C# default 30 clamped by the
+stack type's `maxCount`. Out of scope (documented): solution contents,
+`MobPrice`, `RandomPrice`, per-map-instance stack overrides.
+
+**Classes** (schema v2: interned table + `items: {pid: [price, classIdx?]}`):
+guns, melee, explosives, armor, clothing, food, drinks, medical, tools,
+materials, storage. Hybrid classifier: components where they are reliable,
+prototype-file path segments up the parent chain where they are not — the
+2026-07-27 census found `Food`/`Drink`/`Sharp` components no longer exist in
+vanilla (food and drinks share `Edible`, knives carry `Tool`), and `Clothing`
+is gated on true body-wear slots (a crowbar equips to Belt yet stays a tool;
+toolbelts and backpacks are storage).
+
+**Frontend:** the `$ Sell list` button on the Maps tab opens a sortable
+manifest of the selected map — Item | Count | Price | Total (default: total
+descending), substring filter, class chips (multi-select), guaranteed-vs-chance
+loot selector (probabilistic container slots count as expected value, ≈N.N),
+vendor-stock toggle (off by default). Row click jumps into the regular marker
+view. Fully localized (RU/EN).
+
 ## Maps schema 2 — 2026-07-12 (Series E — station map item finder)
 
 A new artifact family, separate from `data.json` and carrying its own

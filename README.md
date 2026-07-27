@@ -30,6 +30,7 @@ Search reagents, plan reactions, explore craft trees, and calculate batch recipe
 | **Stats** | Database stats | Fork comparison, complexity rankings, base chemical usage |
 | **Antag** | Antag Mode | Curated strategies with lethality scores and delivery methods |
 | **Maps** | Item finder | Pick a station map, search any item — see where it spawns on a rendered schematic with locker/vendor/floor sources, grouped by nearest beacon |
+| **Sell list** | Map price manifest | Every item on the selected map with count, sell price, and total — sortable columns, class chips (guns/melee/food/armor/…), guaranteed-vs-chance loot filter |
 | **Share** | Deep links | URL encodes filters and selection for easy sharing |
 | **RU** | Русская локализация | RU/EN toggle: reagent names & descriptions from the Russian forks' own ru-RU locales (Corvax ss14-ru, Sunrise, ADT, RuCM, Dead Space, Fish) + full Russian UI |
 
