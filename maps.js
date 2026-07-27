@@ -187,6 +187,7 @@
     const rec = S.mapData.items[pid];
     document.getElementById('mapsSearch').value = rec.n || pid;
     document.getElementById('mapsSuggest').hidden = true;
+    closeList();   // every show-item path must clear the overlay off the map
     draw(); renderLocations(pid);
     if (typeof track === 'function') track('maps_search');
   }
@@ -351,8 +352,7 @@
     document.getElementById('mapsListBody').onclick = e => {
       const tr = e.target.closest('tr[data-pid]');
       if (!tr) return;
-      closeList();
-      pick(tr.dataset.pid);   // markers + location list, same flow as search
+      pick(tr.dataset.pid);   // markers + location list; pick() closes the panel
     };
   }
 
