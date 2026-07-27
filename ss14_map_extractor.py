@@ -8,6 +8,7 @@ Usage:
   python ss14_map_extractor.py --fork vanilla --map Bagel
   python ss14_map_extractor.py --all-forks
   python ss14_map_extractor.py --selfcheck        # asserts against Bagel
+  python ss14_map_extractor.py --prices --all-forks   # sell-list prices only, no map bake
 """
 import argparse, base64, json, re, struct, sys, time, urllib.request
 from pathlib import Path
@@ -256,6 +257,8 @@ class Registry:
         self.tile_sprites = {}  # tileId -> sprite path
         self.tile_colors = {}   # tileId -> (r,g,b) filled in Task 5
         self.entity_tables = {} # entityTable id -> selector tree (modern container fills)
+        self.materials = {}     # material id -> price per unit (sell-list mode)
+        self.stack_types = {}   # stack type id -> {"maxCount", "parent"}
         self.ftl = {}           # fluent key -> english text
         self._kind_cache = {}
 
@@ -380,6 +383,77 @@ class Registry:
                 out.append(rec)
         return out
 
+    def _stack_field(self, pid, field):
+        """Nearest value of one Stack field across the chain. The engine merges
+        component fields per-field (IngotGold1 sets count, stackType sits in the
+        parent's Stack) — nearest-dict-wins would lose the rest."""
+        for node in self._chain(pid):
+            comp = node["components"].get("Stack")
+            if isinstance(comp, dict) and field in comp:
+                return comp[field]
+        return None
+
+    def _stack_max(self, stype):
+        seen = set()
+        while stype and stype not in seen:
+            seen.add(stype)
+            st = self.stack_types.get(stype)
+            if not isinstance(st, dict):
+                return None
+            if st.get("maxCount") is not None:
+                try:
+                    return int(float(st["maxCount"]))
+                except (TypeError, ValueError):
+                    return None
+            par = st.get("parent")
+            stype = par[0] if isinstance(par, list) and par else par
+        return None
+
+    def unit_count(self, pid):
+        """Spawned stack size: explicit Stack.count in chain, else the C# default
+        30 (StackComponent.Count, verified live 2026-07-27) clamped by the stack
+        type's maxCount. 1 for non-stacks."""
+        if self._find_component(pid, "Stack") is None:
+            return 1
+        cnt = self._stack_field(pid, "count")
+        if cnt is not None:
+            try:
+                return max(1, int(float(cnt)))
+            except (TypeError, ValueError):
+                return 1
+        mx = self._stack_max(self._stack_field(pid, "stackType"))
+        return min(30, mx) if mx else 30
+
+    def price(self, pid):
+        """Sell price per spawned entity — mirrors PricingSystem.GetEstimatedPrice
+        (fetched live 2026-07-27): materials x stack count, then StackPrice x count
+        XOR StaticPrice (the engine never applies both). Solutions/MobPrice are out
+        of scope: spec docs/design/2026-07-27-sell-list-mode.md."""
+        count = self.unit_count(pid)
+        total = 0.0
+        comp = self._find_component(pid, "PhysicalComposition")
+        if comp:
+            for mat, qty in (comp.get("materialComposition") or {}).items():
+                try:
+                    total += float(self.materials.get(mat, 0)) * float(qty)
+                except (TypeError, ValueError):
+                    pass
+            total *= count
+        sp = self._find_component(pid, "StackPrice")
+        if sp is not None:
+            try:
+                total += count * float(sp.get("price", 0))
+            except (TypeError, ValueError):
+                pass
+        else:
+            st = self._find_component(pid, "StaticPrice")
+            if st is not None:
+                try:
+                    total += float(st.get("price", 0))
+                except (TypeError, ValueError):
+                    pass
+        return round(total, 1)
+
     def vendor_pack(self, pid):
         comp = self._find_component(pid, "VendingMachine")
         return (comp or {}).get("pack")
@@ -423,6 +497,7 @@ def build_registry(fork_key: str, fork_cfg: dict, tree: list[str]) -> Registry:
                         if isinstance(c, dict) and c.get("type"):
                             comps[c["type"]] = c
                     reg.protos[eid] = {"id": eid, "name": entry.get("name"),
+                                       "abstract": bool(entry.get("abstract")),
                                        "parents": parents, "components": comps}
                 elif t == "vendingMachineInventory" and eid:
                     inv = entry.get("startingInventory")
@@ -434,6 +509,11 @@ def build_registry(fork_key: str, fork_cfg: dict, tree: list[str]) -> Registry:
                     reg.entity_tables[eid] = entry.get("table") or {}
                 elif t == "tile" and eid and entry.get("sprite"):
                     reg.tile_sprites[eid] = entry["sprite"]
+                elif t == "material" and eid:
+                    reg.materials[eid] = entry.get("price", 0)
+                elif t == "stack" and eid:
+                    reg.stack_types[eid] = {"maxCount": entry.get("maxCount"),
+                                            "parent": entry.get("parent")}
     # Fluent: beacon names
     ftl_paths = [p for p in tree if p.endswith(".ftl") and "en-US" in p and "navmap" in p.lower()]
     for path in ftl_paths:
@@ -659,6 +739,26 @@ def build_map_json(fork_key, map_id, map_name, parsed, reg, bounds):
     print(f"  wrote {out} ({out.stat().st_size // 1024} KB, {len(items)} protos)")
     return data
 
+PRICES_SCHEMA_VERSION = 1
+
+def write_prices(fork_key: str, reg: Registry):
+    """maps/<fork>/prices.json — per-proto sell price for the sell-list mode.
+    Registry-only output: baked map JSONs stay untouched (spec 2026-07-27)."""
+    prices = {}
+    for pid, node in reg.protos.items():
+        if node.get("abstract") or reg.kind(pid) not in ("item", "mach", "container", "vendor"):
+            continue
+        p = reg.price(pid)
+        if p > 0:
+            prices[pid] = int(p) if float(p).is_integer() else p
+    fdir = OUT_DIR / fork_key
+    fdir.mkdir(parents=True, exist_ok=True)
+    out = fdir / "prices.json"
+    out.write_text(json.dumps({"schemaVersion": PRICES_SCHEMA_VERSION, "fork": fork_key,
+                               "prices": prices},
+                              ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
+    print(f"  wrote {out} ({out.stat().st_size // 1024} KB, {len(prices)} priced protos)")
+
 # ── selfcheck ──
 
 def selfcheck():
@@ -697,6 +797,21 @@ def selfcheck():
     # splits (FillWelderSupplies 1/1/0.25/0.05, FillWelderSuppliesMask 1/0.25/0.25/0.25 —
     # verified in Catalog/Fills/Lockers/engineer.yml), so every flattened entry has prob<1.
     assert any("prob" in f for f in reg.storage_fill("LockerWeldingSuppliesFilled"))
+    # S1 prices (spec docs/design/2026-07-27-sell-list-mode.md), live-verified 2026-07-27:
+    # metals.yml Gold 0.75/unit; ingots.yml IngotGold composition Gold:100 per unit,
+    # Stack without count -> C# default 30, Gold stack type -> BaseMediumStack maxCount 30;
+    # materials.yml MaterialToothSpaceCarp = StackPrice 50 x count 30, child *1 = count 1
+    # (count from child Stack dict + stackType from parent's — per-field chain merge).
+    assert float(reg.materials.get("Gold", 0)) > 0, "Gold material price missing"
+    assert abs(reg.price("IngotGold1") - 100 * float(reg.materials["Gold"])) < 0.01, reg.price("IngotGold1")
+    assert reg.unit_count("IngotGold") == 30, reg.unit_count("IngotGold")
+    assert abs(reg.price("IngotGold") - 30 * reg.price("IngotGold1")) < 0.01
+    assert reg.price("MaterialToothSpaceCarp") == 1500, reg.price("MaterialToothSpaceCarp")
+    assert reg.price("MaterialToothSpaceCarp1") == 50, reg.price("MaterialToothSpaceCarp1")
+    # SheetSteel: composition x 30, plus BaseSheet's literal StaticPrice 0 must NOT leak in
+    sheet = reg._find_component("SheetSteel", "PhysicalComposition")["materialComposition"]
+    exp = round(30 * sum(float(reg.materials.get(m, 0)) * float(q) for m, q in sheet.items()), 1)
+    assert reg.price("SheetSteel") == exp > 0, (reg.price("SheetSteel"), exp)
     load_tile_colors("vanilla", fork, reg)
     c = reg.tile_color("FloorSteel")
     assert c and abs(c[0] - c[1]) < 40 and sum(c) > 60, f"FloorSteel avg color odd: {c}"
@@ -767,6 +882,7 @@ def process_fork(fork_key: str, map_filter: str | None = None) -> list[dict]:
         maps = maps[:cap]
     reg = build_registry(fork_key, fork_cfg, tree)
     load_tile_colors(fork_key, fork_cfg, reg)
+    write_prices(fork_key, reg)   # regular regen refreshes sell-list prices too
     done = []
     for gm in maps:
         try:
@@ -790,7 +906,8 @@ def process_fork(fork_key: str, map_filter: str | None = None) -> list[dict]:
     if fdir.exists() and not map_filter:
         keep = {m["id"] for m in done}
         for f in sorted(fdir.iterdir()):
-            if f.suffix in (".json", ".png") and f.stem not in keep:
+            # prices.json is a fork-level sibling of the per-map files — never a stale map
+            if f.suffix in (".json", ".png") and f.stem not in keep and f.name != "prices.json":
                 print(f"  prune stale {fork_key}/{f.name}")
                 f.unlink()
     print(f"fork {fork_key}: {len(done)}/{len(maps)} maps baked")
@@ -815,9 +932,24 @@ def main():
     ap.add_argument("--map", default=None, help="single gameMap id, e.g. Bagel")
     ap.add_argument("--all-forks", action="store_true")
     ap.add_argument("--selfcheck", action="store_true")
+    ap.add_argument("--prices", action="store_true",
+                    help="registry-only: write maps/<fork>/prices.json, skip map baking")
     args = ap.parse_args()
     if args.selfcheck:
         selfcheck(); return
+    if args.prices:
+        keys = list(FORK_REGISTRY) if args.all_forks else [args.fork]
+        for key in keys:
+            if args.all_forks and not (OUT_DIR / key).is_dir():
+                continue   # a fork with no baked maps gets no prices (dead weight on Pages)
+            try:
+                tree = fetch_repo_tree(key, FORK_REGISTRY[key])
+                if not tree:
+                    print(f"SKIP fork {key}: no tree"); continue
+                write_prices(key, build_registry(key, FORK_REGISTRY[key], tree))
+            except Exception as e:
+                print(f"SKIP fork {key}: crashed: {e}")
+        return
     if args.all_forks:
         per_fork = {}
         for key in FORK_REGISTRY:
