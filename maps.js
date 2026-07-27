@@ -354,6 +354,13 @@
       if (!tr) return;
       pick(tr.dataset.pid);   // markers + location list; pick() closes the panel
     };
+    // outside click / Escape close; the toggle button is excluded, else its own
+    // click would bubble here and close what it just opened
+    document.addEventListener('click', e => {
+      if (panel.hidden || panel.contains(e.target) || e.target.closest('#mapsListBtn')) return;
+      closeList();
+    });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeList(); });
   }
 
   window.addEventListener('resize', () => { if (S.img && document.getElementById('tab-maps').classList.contains('active')) zoomFit(); });
