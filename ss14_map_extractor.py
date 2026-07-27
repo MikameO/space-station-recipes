@@ -454,6 +454,58 @@ class Registry:
                     pass
         return round(total, 1)
 
+    # True body-wear slots only. Belt/back/pocket are deliberately out: a crowbar
+    # equips to Belt and a backpack to back, but neither is "clothing" to a loot
+    # hunter — they fall through to tools/storage. (Live probe 2026-07-27: slot
+    # casing varies — 'Belt', 'HEAD', 'outerClothing' — so compare lowercased.)
+    WEAR_SLOTS = {"head", "eyes", "ears", "mask", "neck", "outerclothing",
+                  "innerclothing", "jumpsuit", "gloves", "shoes", "socks",
+                  "underpants", "undershirt"}
+
+    def _wearable(self, pid):
+        for node in self._chain(pid):
+            comp = node["components"].get("Clothing")
+            if isinstance(comp, dict) and "slots" in comp:
+                slots = comp["slots"]
+                if isinstance(slots, str):
+                    slots = [slots]
+                return any(str(s).lower() in self.WEAR_SLOTS for s in (slots or []))
+        return False
+
+    def entity_class(self, pid):
+        """Sell-list class. Hybrid signals, first rule wins (live census 2026-07-27):
+        Food/Drink/Sharp components do NOT exist in current vanilla — food and
+        drinks share Edible, knives carry Tool — so paths (checked up the whole
+        parent chain: MedkitFilled sits in Catalog/Fills, its base in
+        Specific/Medical) split what components can't."""
+        def comp(*names):
+            return any(self._find_component(pid, n) is not None for n in names)
+        def anyp(seg):
+            return any(seg in (n.get("path") or "") for n in self._chain(pid))
+        if comp("Gun", "BallisticAmmoProvider", "CartridgeAmmo"):
+            return "guns"
+        if anyp("/Weapons/Melee/"):
+            return "melee"
+        if anyp("/Weapons/Throwable/"):
+            return "explosives"
+        if comp("Armor"):
+            return "armor"
+        if self._wearable(pid):
+            return "clothing"
+        if anyp("/Consumable/Drinks/"):
+            return "drinks"
+        if anyp("/Consumable/Food/") or comp("Edible"):
+            return "food"
+        if comp("Healing", "Pill") or anyp("/Specific/Medical/"):
+            return "medical"
+        if comp("Tool") or anyp("/Tools/"):
+            return "tools"
+        if comp("Material"):
+            return "materials"
+        if comp("Storage", "EntityStorage"):
+            return "storage"
+        return None   # frontend renders it as "misc"; machinery derives from map c
+
     def vendor_pack(self, pid):
         comp = self._find_component(pid, "VendingMachine")
         return (comp or {}).get("pack")
@@ -498,6 +550,7 @@ def build_registry(fork_key: str, fork_cfg: dict, tree: list[str]) -> Registry:
                             comps[c["type"]] = c
                     reg.protos[eid] = {"id": eid, "name": entry.get("name"),
                                        "abstract": bool(entry.get("abstract")),
+                                       "path": path,   # class rules match path segments up the chain
                                        "parents": parents, "components": comps}
                 elif t == "vendingMachineInventory" and eid:
                     inv = entry.get("startingInventory")
@@ -739,25 +792,33 @@ def build_map_json(fork_key, map_id, map_name, parsed, reg, bounds):
     print(f"  wrote {out} ({out.stat().st_size // 1024} KB, {len(items)} protos)")
     return data
 
-PRICES_SCHEMA_VERSION = 1
+PRICES_SCHEMA_VERSION = 2   # v2: interned class table + items {pid: [price, classIdx?]}
 
 def write_prices(fork_key: str, reg: Registry):
-    """maps/<fork>/prices.json — per-proto sell price for the sell-list mode.
-    Registry-only output: baked map JSONs stay untouched (spec 2026-07-27)."""
-    prices = {}
+    """maps/<fork>/prices.json — per-proto sell price + class for the sell-list
+    mode. Registry-only output: baked map JSONs stay untouched (spec 2026-07-27)."""
+    classes, cidx, items = [], {}, {}
     for pid, node in reg.protos.items():
         if node.get("abstract") or reg.kind(pid) not in ("item", "mach", "container", "vendor"):
             continue
         p = reg.price(pid)
-        if p > 0:
-            prices[pid] = int(p) if float(p).is_integer() else p
+        cls = reg.entity_class(pid)
+        if p <= 0 and cls is None:
+            continue   # nothing to say about it
+        ent = [int(p) if float(p).is_integer() else p]
+        if cls is not None:
+            if cls not in cidx:
+                cidx[cls] = len(classes); classes.append(cls)
+            ent.append(cidx[cls])
+        items[pid] = ent
     fdir = OUT_DIR / fork_key
     fdir.mkdir(parents=True, exist_ok=True)
     out = fdir / "prices.json"
     out.write_text(json.dumps({"schemaVersion": PRICES_SCHEMA_VERSION, "fork": fork_key,
-                               "prices": prices},
+                               "classes": classes, "items": items},
                               ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
-    print(f"  wrote {out} ({out.stat().st_size // 1024} KB, {len(prices)} priced protos)")
+    priced = sum(1 for e in items.values() if e[0] > 0)
+    print(f"  wrote {out} ({out.stat().st_size // 1024} KB, {priced} priced / {len(items)} classed protos)")
 
 # ── selfcheck ──
 
@@ -812,6 +873,16 @@ def selfcheck():
     sheet = reg._find_component("SheetSteel", "PhysicalComposition")["materialComposition"]
     exp = round(30 * sum(float(reg.materials.get(m, 0)) * float(q) for m, q in sheet.items()), 1)
     assert reg.price("SheetSteel") == exp > 0, (reg.price("SheetSteel"), exp)
+    # S2.5 classes — ids and their defining paths verified live 2026-07-27
+    for pid, want in [("WeaponLauncherChinaLake", "guns"), ("KitchenKnife", "melee"),
+                      ("GrenadeFlashBang", "explosives"), ("ClothingOuterArmorBasic", "armor"),
+                      ("FoodBurgerBacon", "food"), ("DrinkBeerBottleFull", "drinks"),
+                      ("MedkitFilled", "medical"),   # declared in Catalog/Fills — class comes via parent chain path
+                      ("Crowbar", "tools"),          # equips to Belt slot, still not clothing
+                      ("ClothingHeadHatBeret", "clothing"),
+                      ("ClothingBeltUtility", "storage"),   # toolbelt: worn, but it's a container
+                      ("IngotGold1", "materials")]:
+        assert reg.entity_class(pid) == want, (pid, reg.entity_class(pid))
     load_tile_colors("vanilla", fork, reg)
     c = reg.tile_color("FloorSteel")
     assert c and abs(c[0] - c[1]) < 40 and sum(c) > 60, f"FloorSteel avg color odd: {c}"

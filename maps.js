@@ -7,8 +7,16 @@
     scale: 1, ox: 0, oy: 0,        // canvas transform
     selectedProto: null, inited: false,
     prices: {}, pricesReq: {},     // fork -> {pid: price} | null (known-missing)
+    classes: {},                   // fork -> {pid: className}
     listSort: { key: 'total', dir: -1 },   // sell list: priciest first by default
+    listClasses: null,             // Set of active class chips; null = all
   };
+  const CLASS_ORDER = ['guns', 'melee', 'explosives', 'armor', 'clothing', 'food', 'drinks',
+                       'medical', 'tools', 'materials', 'storage', 'machinery', 'misc'];
+  const CLASS_LABEL = { guns: 'Guns', melee: 'Melee', explosives: 'Explosives', armor: 'Armor',
+                        clothing: 'Clothing', food: 'Food', drinks: 'Drinks', medical: 'Medical',
+                        tools: 'Tools', materials: 'Materials', storage: 'Storage',
+                        machinery: 'Machinery', misc: 'Misc' };
   window.mapsURLState = () => {
     const out = {};
     if (S.mapMeta) out.map = S.mapMeta.file;
@@ -62,6 +70,7 @@
     status.textContent = 'Loading ' + file + '…';
     S.mapData = null; S.selectedProto = null;
     closeList();
+    S.listClasses = null;   // stale chips may not exist on the next map
     document.getElementById('mapsListBtn').disabled = true;
     try {
       const [jr, img] = await Promise.all([
@@ -231,8 +240,17 @@
     if (!S.pricesReq[fork]) {
       S.pricesReq[fork] = fetch('maps/' + fork + '/prices.json')
         .then(r => r.ok ? r.json() : null)
-        .then(j => { S.prices[fork] = j ? j.prices : null; })
-        .catch(() => { S.prices[fork] = null; });
+        .then(j => {
+          if (!j) { S.prices[fork] = null; S.classes[fork] = {}; return; }
+          // schema v2: classes table + items {pid: [price, classIdx?]}
+          const P = {}, C = {}, tbl = j.classes || [];
+          for (const [pid, ent] of Object.entries(j.items || {})) {
+            if (ent[0] > 0) P[pid] = ent[0];
+            if (ent.length > 1) C[pid] = tbl[ent[1]];
+          }
+          S.prices[fork] = P; S.classes[fork] = C;
+        })
+        .catch(() => { S.prices[fork] = null; S.classes[fork] = {}; });
     }
     return S.pricesReq[fork];
   }
@@ -243,22 +261,40 @@
     return r ? r.toLocaleString(localStorage.getItem('chemdb-lang') === 'ru' ? 'ru-RU' : 'en-US') : '<1';
   }
   function buildRows() {
-    const priceMap = S.prices[S.mapMeta.file.split('/')[0]] || {};
+    const fork = S.mapMeta.file.split('/')[0];
+    const priceMap = S.prices[fork] || {};
+    const clsMap = S.classes[fork] || {};
     const withVend = document.getElementById('mapsListVend').checked;
+    const cert = document.getElementById('mapsListCert').value;   // all | sure | chance
     const rows = [];
     for (const [pid, rec] of Object.entries(S.mapData.items)) {
       let q = 0;
       for (const p of rec.p) {
         const k = p[2], extra = p[4];
+        const chance = k === 1 && extra !== undefined && extra < 1;   // probabilistic container slot
+        if (cert === 'sure' && chance) continue;
+        if (cert === 'chance' && !chance) continue;
         if (k === 0 || k === 3) q += 1;                    // floor / off-grid structure
         else if (k === 1) q += (extra === undefined ? 1 : extra);   // <1 = prob (expected), >1 = amount
         else if ((k === 2 || k === 4) && withVend) q += (extra === undefined ? 1 : extra);
       }
       if (q <= 0) continue;   // e.g. vendor-only item with the vendor toggle off
+      const cls = rec.c === 'mach' ? 'machinery' : (clsMap[pid] || 'misc');
+      if (S.listClasses && !S.listClasses.has(cls)) continue;
       const price = priceMap[pid] || 0;
       rows.push({ pid, name: rec.n || pid, qty: q, price, total: q * price });
     }
     return rows;
+  }
+  function renderClassChips() {
+    const clsMap = S.classes[S.mapMeta.file.split('/')[0]] || {};
+    const present = new Set();
+    for (const [pid, rec] of Object.entries(S.mapData.items))
+      present.add(rec.c === 'mach' ? 'machinery' : (clsMap[pid] || 'misc'));
+    document.getElementById('mapsListClasses').innerHTML =
+      `<button class="maps-chip${S.listClasses ? '' : ' on'}" data-cls="*">All</button>` +
+      CLASS_ORDER.filter(c => present.has(c)).map(c =>
+        `<button class="maps-chip${S.listClasses && S.listClasses.has(c) ? ' on' : ''}" data-cls="${c}">${CLASS_LABEL[c]}</button>`).join('');
   }
   function renderList() {
     const flt = document.getElementById('mapsListFilter').value.trim().toLowerCase();
@@ -287,12 +323,24 @@
       await loadPrices(fork);
       document.getElementById('mapsListNote').hidden = S.prices[fork] !== null;
       panel.hidden = false;
+      renderClassChips();
       renderList();
       if (typeof track === 'function') track('maps_sell_list');
     };
     document.getElementById('mapsListClose').onclick = closeList;
     document.getElementById('mapsListFilter').oninput = () => { if (!panel.hidden) renderList(); };
     document.getElementById('mapsListVend').onchange = () => { if (!panel.hidden) renderList(); };
+    document.getElementById('mapsListCert').onchange = () => { if (!panel.hidden) renderList(); };
+    document.getElementById('mapsListClasses').onclick = e => {
+      const chip = e.target.closest('.maps-chip');
+      if (!chip) return;
+      const c = chip.dataset.cls;
+      if (c === '*') S.listClasses = null;
+      else if (!S.listClasses) S.listClasses = new Set([c]);
+      else if (S.listClasses.has(c)) { S.listClasses.delete(c); if (!S.listClasses.size) S.listClasses = null; }
+      else S.listClasses.add(c);
+      renderClassChips(); renderList();
+    };
     document.querySelector('.maps-list-table thead').onclick = e => {
       const th = e.target.closest('th[data-sort]');
       if (!th) return;

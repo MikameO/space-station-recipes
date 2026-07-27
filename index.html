@@ -72,7 +72,7 @@
   "license": "https://github.com/MikameO/space-station-recipes/blob/main/LICENSE"
 }
 </script>
-<link rel="stylesheet" href="style.css?v=32">
+<link rel="stylesheet" href="style.css?v=33">
 <!-- Yandex.Metrika counter -->
 <script type="text/javascript">
     (function(m,e,t,r,i,k,a){
@@ -492,9 +492,15 @@
           <div id="mapsListPanel" class="maps-list-panel" hidden>
             <div class="maps-list-head">
               <input type="text" id="mapsListFilter" placeholder="Filter items…" autocomplete="off">
+              <select id="mapsListCert" aria-label="Loot certainty">
+                <option value="all">All loot</option>
+                <option value="sure">Guaranteed only</option>
+                <option value="chance">Chance spawns only</option>
+              </select>
               <label class="maps-list-vend"><input type="checkbox" id="mapsListVend"> incl. vendors</label>
               <button id="mapsListClose" aria-label="Close list">×</button>
             </div>
+            <div id="mapsListClasses" class="maps-list-classes"></div>
             <div id="mapsListNote" class="maps-list-note" hidden>No price data for this fork yet — sort by count still works</div>
             <div class="maps-list-scroll">
               <table class="maps-list-table">
@@ -537,9 +543,9 @@
 </div>
 
 <!-- i18n.js must load BEFORE app.js: it exposes applyRussianData for init() -->
-<script src="i18n.js?v=2"></script>
+<script src="i18n.js?v=3"></script>
 <script src="app.js?v=29"></script>
 <script defer src="tutorial.js?v=2"></script>
-<script src="maps.js?v=11" defer></script>
+<script src="maps.js?v=12" defer></script>
 </body>
 </html>
