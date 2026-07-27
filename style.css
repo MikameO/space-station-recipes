@@ -3112,12 +3112,15 @@ body.antag-active .empty-state-chip:focus-visible {
   background: rgba(5, 8, 16, 0.96); border: 1px solid var(--border-active); }
 .maps-list-head { display: flex; align-items: center; gap: 10px; padding: 8px 10px;
   border-bottom: 1px solid var(--border-subtle); }
-.maps-list-head input[type="text"] { flex: 1; min-width: 100px; background: var(--panel); color: var(--text-bright);
+.maps-list-filters { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; padding: 8px 10px;
+  border-bottom: 1px solid var(--border-subtle); }
+.maps-list-filters input[type="text"] { flex: 1; min-width: 100px; background: var(--panel); color: var(--text-bright);
   border: 1px solid var(--border-subtle); font-family: 'Share Tech Mono', monospace; padding: 6px 8px; }
 .maps-list-vend { display: flex; align-items: center; gap: 5px; color: var(--text-sub); font-size: 0.8rem;
   white-space: nowrap; cursor: pointer; }
-.maps-list-head select { background: var(--panel); color: var(--text-bright); border: 1px solid var(--border-subtle);
+.maps-list-filters select { background: var(--panel); color: var(--text-bright); border: 1px solid var(--border-subtle);
   font-family: 'Share Tech Mono', monospace; padding: 6px 8px; }
+.maps-list-filters .maps-list-classes { padding: 0; border-bottom: 0; width: 100%; }
 .maps-list-classes { display: flex; flex-wrap: wrap; gap: 6px; padding: 8px 10px;
   border-bottom: 1px solid var(--border-subtle); }
 .maps-chip { background: var(--panel); color: var(--text-sub); border: 1px solid var(--border-subtle);
@@ -3125,7 +3128,7 @@ body.antag-active .empty-state-chip:focus-visible {
 .maps-chip:hover { color: var(--text-bright); border-color: var(--border-active); }
 .maps-chip.on { color: var(--phosphor); border-color: var(--phosphor-dim); background: var(--panel-hover); }
 #mapsListClose { background: none; border: 1px solid var(--border-subtle); color: var(--text-sub);
-  width: 28px; height: 28px; cursor: pointer; font-size: 1rem; flex-shrink: 0; }
+  width: 28px; height: 28px; cursor: pointer; font-size: 1rem; flex-shrink: 0; margin-left: auto; }
 #mapsListClose:hover { color: var(--text-bright); border-color: var(--border-active); }
 .maps-list-note { padding: 6px 10px; color: var(--amber); font-size: 0.8rem; border-bottom: 1px solid var(--border-subtle); }
 .maps-list-scroll { overflow-y: auto; flex: 1; }

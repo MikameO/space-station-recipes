@@ -428,6 +428,7 @@
     'Species mutations (the arrows in the chart)': 'Мутации видов (стрелки на схеме)',
     'Curated from playtime — the mechanics live in C# code, not extractable YAML. PRs welcome.': 'Собрано из игрового опыта — механика живёт в C#-коде, не в YAML. PR приветствуются.',
     // Maps extras
+    'Filters': 'Фильтры',
     'Pick an item to see where it lives.': 'Выберите предмет, чтобы увидеть, где он лежит.',
     // Maps sell list
     '$ Sell list': '$ Что продать',

@@ -311,6 +311,9 @@
     document.querySelectorAll('.maps-list-table th').forEach(th => {
       th.querySelector('.maps-sort-arr').textContent = th.dataset.sort === key ? (dir > 0 ? '▲' : '▼') : '';
     });
+    document.getElementById('mapsListFiltersDot').textContent =
+      (flt || S.listClasses || document.getElementById('mapsListCert').value !== 'all'
+           || document.getElementById('mapsListVend').checked) ? ' •' : '';
   }
   function closeList() {
     const p = document.getElementById('mapsListPanel');
@@ -354,10 +357,20 @@
       if (!tr) return;
       pick(tr.dataset.pid);   // markers + location list; pick() closes the panel
     };
+    const filters = document.getElementById('mapsListFilters');
+    const fbtn = document.getElementById('mapsListFiltersBtn');
+    fbtn.onclick = () => {
+      filters.hidden = !filters.hidden;
+      fbtn.classList.toggle('on', !filters.hidden);
+      fbtn.setAttribute('aria-expanded', String(!filters.hidden));
+    };
     // outside click / Escape close; the toggle button is excluded, else its own
-    // click would bubble here and close what it just opened
+    // click would bubble here and close what it just opened. Detached targets are
+    // in-panel too: chip clicks re-render the chip row, so by the time the click
+    // bubbles here the chip is out of the DOM and contains() would lie.
     document.addEventListener('click', e => {
-      if (panel.hidden || panel.contains(e.target) || e.target.closest('#mapsListBtn')) return;
+      if (panel.hidden || !e.target.isConnected || panel.contains(e.target)
+          || e.target.closest('#mapsListBtn')) return;
       closeList();
     });
     document.addEventListener('keydown', e => { if (e.key === 'Escape') closeList(); });
