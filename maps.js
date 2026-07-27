@@ -6,6 +6,8 @@
     index: null, mapMeta: null, mapData: null, img: null,
     scale: 1, ox: 0, oy: 0,        // canvas transform
     selectedProto: null, inited: false,
+    prices: {}, pricesReq: {},     // fork -> {pid: price} | null (known-missing)
+    listSort: { key: 'total', dir: -1 },   // sell list: priciest first by default
   };
   window.mapsURLState = () => {
     const out = {};
@@ -23,7 +25,7 @@
       if (!r.ok) throw new Error('HTTP ' + r.status);
       S.index = await r.json();
       status.textContent = '';
-      if (!S._navSetup) { S._navSetup = true; setupCanvasNav(); }
+      if (!S._navSetup) { S._navSetup = true; setupCanvasNav(); setupList(); }
       buildMapSelect();
     } catch (e) {
       status.innerHTML = 'Failed to load maps index. <button id="mapsRetry">Retry</button>';
@@ -59,6 +61,8 @@
     const status = document.getElementById('mapsStatus');
     status.textContent = 'Loading ' + file + '…';
     S.mapData = null; S.selectedProto = null;
+    closeList();
+    document.getElementById('mapsListBtn').disabled = true;
     try {
       const [jr, img] = await Promise.all([
         fetch('maps/' + file + '.json').then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); }),
@@ -68,6 +72,8 @@
       S.mapMeta = S.index.forks.flatMap(f => f.maps).find(m => m.file === file);
       status.textContent = '';
       document.getElementById('mapsSearch').disabled = false;
+      document.getElementById('mapsListBtn').disabled = false;
+      loadPrices(file.split('/')[0]);   // warm the sell-list price cache, not awaited
       buildSearchIndex();          // Task 12
       zoomFit();
       // deep-link item restore (Task 14): if ?item= names a real proto on this map, select it
@@ -220,6 +226,88 @@
       draw();
     });
   }
+  // ── sell list: full map manifest with prices (spec: docs/design/2026-07-27-sell-list-mode.md) ──
+  function loadPrices(fork) {
+    if (!S.pricesReq[fork]) {
+      S.pricesReq[fork] = fetch('maps/' + fork + '/prices.json')
+        .then(r => r.ok ? r.json() : null)
+        .then(j => { S.prices[fork] = j ? j.prices : null; })
+        .catch(() => { S.prices[fork] = null; });
+    }
+    return S.pricesReq[fork];
+  }
+  const fmtQty = q => Number.isInteger(q) ? String(q) : '≈' + q.toFixed(1);
+  function fmtMoney(n) {
+    if (!n) return '—';
+    const r = Math.round(n);
+    return r ? r.toLocaleString(localStorage.getItem('chemdb-lang') === 'ru' ? 'ru-RU' : 'en-US') : '<1';
+  }
+  function buildRows() {
+    const priceMap = S.prices[S.mapMeta.file.split('/')[0]] || {};
+    const withVend = document.getElementById('mapsListVend').checked;
+    const rows = [];
+    for (const [pid, rec] of Object.entries(S.mapData.items)) {
+      let q = 0;
+      for (const p of rec.p) {
+        const k = p[2], extra = p[4];
+        if (k === 0 || k === 3) q += 1;                    // floor / off-grid structure
+        else if (k === 1) q += (extra === undefined ? 1 : extra);   // <1 = prob (expected), >1 = amount
+        else if ((k === 2 || k === 4) && withVend) q += (extra === undefined ? 1 : extra);
+      }
+      if (q <= 0) continue;   // e.g. vendor-only item with the vendor toggle off
+      const price = priceMap[pid] || 0;
+      rows.push({ pid, name: rec.n || pid, qty: q, price, total: q * price });
+    }
+    return rows;
+  }
+  function renderList() {
+    const flt = document.getElementById('mapsListFilter').value.trim().toLowerCase();
+    const { key, dir } = S.listSort;
+    let rows = buildRows();
+    if (flt) rows = rows.filter(r => r.name.toLowerCase().includes(flt) || r.pid.toLowerCase().includes(flt));
+    rows.sort((a, b) => (key === 'name' ? dir * a.name.localeCompare(b.name)
+                                        : dir * (a[key] - b[key]) || a.name.localeCompare(b.name)));
+    document.getElementById('mapsListBody').innerHTML = rows.map(r =>
+      `<tr data-pid="${r.pid}"><td class="mlt-name">${r.name}<small>${r.pid}</small></td>` +
+      `<td class="mlt-num">${fmtQty(r.qty)}</td><td class="mlt-num">${fmtMoney(r.price)}</td>` +
+      `<td class="mlt-num mlt-total">${fmtMoney(r.total)}</td></tr>`).join('');
+    document.querySelectorAll('.maps-list-table th').forEach(th => {
+      th.querySelector('.maps-sort-arr').textContent = th.dataset.sort === key ? (dir > 0 ? '▲' : '▼') : '';
+    });
+  }
+  function closeList() {
+    const p = document.getElementById('mapsListPanel');
+    if (p) p.hidden = true;
+  }
+  function setupList() {
+    const panel = document.getElementById('mapsListPanel');
+    document.getElementById('mapsListBtn').onclick = async () => {
+      if (!S.mapData) return;
+      const fork = S.mapMeta.file.split('/')[0];
+      await loadPrices(fork);
+      document.getElementById('mapsListNote').hidden = S.prices[fork] !== null;
+      panel.hidden = false;
+      renderList();
+      if (typeof track === 'function') track('maps_sell_list');
+    };
+    document.getElementById('mapsListClose').onclick = closeList;
+    document.getElementById('mapsListFilter').oninput = () => { if (!panel.hidden) renderList(); };
+    document.getElementById('mapsListVend').onchange = () => { if (!panel.hidden) renderList(); };
+    document.querySelector('.maps-list-table thead').onclick = e => {
+      const th = e.target.closest('th[data-sort]');
+      if (!th) return;
+      const k = th.dataset.sort;
+      S.listSort = { key: k, dir: S.listSort.key === k ? -S.listSort.dir : (k === 'name' ? 1 : -1) };
+      renderList();
+    };
+    document.getElementById('mapsListBody').onclick = e => {
+      const tr = e.target.closest('tr[data-pid]');
+      if (!tr) return;
+      closeList();
+      pick(tr.dataset.pid);   // markers + location list, same flow as search
+    };
+  }
+
   window.addEventListener('resize', () => { if (S.img && document.getElementById('tab-maps').classList.contains('active')) zoomFit(); });
 
   function zoomAt(cx, cy, factor) {

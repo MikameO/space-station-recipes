@@ -429,6 +429,17 @@
     'Curated from playtime — the mechanics live in C# code, not extractable YAML. PRs welcome.': 'Собрано из игрового опыта — механика живёт в C#-коде, не в YAML. PR приветствуются.',
     // Maps extras
     'Pick an item to see where it lives.': 'Выберите предмет, чтобы увидеть, где он лежит.',
+    // Maps sell list
+    '$ Sell list': '$ Что продать',
+    'Every item on this map, priced': 'Все предметы карты с ценами продажи',
+    'Item': 'Предмет',
+    'Count': 'Кол-во',
+    'Price': 'Цена',
+    'Total': 'Итого',
+    'incl. vendors': 'с вендоматами',
+    'Filter items…': 'Фильтр…',
+    'Close list': 'Закрыть список',
+    'No price data for this fork yet — sort by count still works': 'Для этого форка пока нет данных о ценах — сортировка по количеству работает',
     // Empty search state
     'Try a different spelling, clear filters, or open the tutorial for a quick orientation.': 'Попробуйте другое написание, сбросьте фильтры или откройте обучение.',
     'Clear search': 'Очистить поиск',
