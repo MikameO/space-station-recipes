@@ -96,7 +96,6 @@
     'Taste': 'Вкус',
     'Effects': 'Эффекты',
     'Categories': 'Категории',
-    'Stats': 'Статистика',
     'All': 'Все',
     'Base only': 'Только базовые',
     'Crafted only': 'Только крафтовые',
@@ -111,9 +110,6 @@
     'Craft Trees': 'Деревья крафта',
     'Botany': 'Ботаника',
     'Maps': 'Карты',
-    '⚙ Advanced': '⚙ Ещё',
-    'Reactions': 'Реакции',
-    'Graph': 'Граф',
     'Fork Diff': 'Сравнение форков',
     '☠ Antag Strategies': '☠ Стратегии антагониста',
     // Sort bar
@@ -127,12 +123,6 @@
     'Sort reagents': 'Сортировка реагентов',
     'Most Used = sorted by how many reactions reference the reagent. Antag Score = potency heuristic across damage, stealth, and method.': 'Самые используемые = сортировка по числу реакций с этим реагентом. Антаг-рейтинг = эвристика опасности по урону, скрытности и способу применения.',
     'Sort options explained': 'Пояснение сортировок',
-    // Reactions table
-    'Reaction': 'Реакция',
-    'Reactants': 'Реагенты',
-    'Products': 'Продукты',
-    'Temp': 'Темп.',
-    'Mixer': 'Смеситель',
     // Calculator
     'Target Reagent': 'Целевой реагент',
     'Amount (units)': 'Количество (юнитов)',
@@ -182,11 +172,6 @@
     'Craft tree reagent search': 'Поиск реагента для дерева крафта',
     'Reset': 'Сброс',
     'Uncheck all items': 'Снять все отметки',
-    // Graph
-    'Reset View': 'Сбросить вид',
-    'Toggle Physics': 'Физика вкл/выкл',
-    'Loading graph engine…': 'Загрузка движка графа…',
-    'Graph engine failed to load — check connection and reopen the tab.': 'Движок графа не загрузился — проверьте соединение и откройте вкладку заново.',
     // Botany
     'Chemicals that affect plants when added to a hydroponics tray.': 'Химикаты, влияющие на растения при добавлении в гидропонику.',
     'green helps the plant': 'зелёное помогает растению',
@@ -273,7 +258,7 @@
     'PLAN A WHOLE SHIFT': 'СПЛАНИРУЙТЕ ВСЮ СМЕНУ',
     'Queue multiple recipes and get one combined shopping list. Perfect for mass-producing medkits or prepping a code red.': 'Поставьте несколько рецептов в очередь и получите один общий список закупки. Идеально для массового производства аптечек и подготовки к коду красному.',
     'READY FOR DUTY': 'ГОТОВЫ К СМЕНЕ',
-    'That is the core. Explore Craft Trees and Graph tabs whenever you want to see recipes visually. Good luck, chemist.': 'Это основа. Загляните во вкладки «Деревья крафта» и «Граф», чтобы увидеть рецепты наглядно. Удачи, химик.',
+    'That is the core. Explore the Craft Trees tab whenever you want to see recipes visually. Good luck, chemist.': 'Это основа. Загляните во вкладку «Деревья крафта», чтобы увидеть рецепты наглядно. Удачи, химик.',
     'Skip': 'Пропустить',
     'Next': 'Далее',
     'Close': 'Закрыть',
@@ -380,16 +365,8 @@
     'Beaker reagent amount': 'Количество реагента в стакане',
     'Beaker temperature in Kelvin': 'Температура стакана в кельвинах',
     'Add ingredient for reverse lookup': 'Добавить ингредиент для обратного поиска',
-    'Calculate in Batch Planner': 'Рассчитать в планировщике партий',
     'Switch language / Переключить язык': 'Переключить язык / Switch language',
     'Switch to English': 'Switch to English',
-    // Stats tab
-    'Top Categories': 'Топ категорий',
-    'Most Complex Recipes': 'Самые сложные рецепты',
-    'Most Used Base Chemicals': 'Самые используемые базовые химикаты',
-    'Graph Edges': 'Рёбра графа',
-    'Forks': 'Форки',
-    'Fork Comparison': 'Сравнение форков',
     // Presets
     '⚗ Med-Chem Starter': '⚗ Стартовая химия медика',
     '⚗ Advanced Meds': '⚗ Продвинутая медицина',

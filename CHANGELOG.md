@@ -3,6 +3,22 @@
 `data.json` schema version is in `meta.schemaVersion`. Consumers reading this file
 should pin on a compatible range (semver: breaking changes bump major).
 
+## UI A1.1 — 2026-07-28 (Metrika-verdict removals; frontend only, no schema change)
+
+Checkpoint-2 data (17 days of goal events, dev-noise days excluded) sentenced the
+Advanced dropdown: **Stats 0%, Graph 1.4%, Reactions 1.4%** of organic tab opens
+against the "<1–2% → remove" bar set in ROADMAP A1. Removed: the three tabs with
+their render code (~500 lines), the `strategy_to_batch` bridge button (0 uses in
+17 days; antag mode itself stays — 54 activations), and **vis-network** (libs/,
+sw precache, deploy manifest — the last third-party JS dependency; NOTICES entry
+dropped). Fork Diff moved from the retired dropdown into the main tab bar.
+Old share links with `?tab=stats|graph|reactions` fall back to Reagents via the
+`decodeURLState` whitelist. Analytics: goal registry trimmed to sent events
+(counter goals kept for history); earlier the same day 18 missing goals were
+created for post-07-12 features (maps_*, medbay, beaker sim, presets, PiP…),
+whose conversions had been silently dropped. Full numbers:
+`research/site-analytics-2026-07-28/`.
+
 ## 3.10.0 — 2026-07-26 (L10n-RU: Russian localization, phase 1)
 
 **Data:** reagents gain optional `nameRu` / `descRu` / `physicalDescRu`, plants

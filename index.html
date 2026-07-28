@@ -72,7 +72,7 @@
   "license": "https://github.com/MikameO/space-station-recipes/blob/main/LICENSE"
 }
 </script>
-<link rel="stylesheet" href="style.css?v=36">
+<link rel="stylesheet" href="style.css?v=37">
 <!-- Yandex.Metrika counter -->
 <script type="text/javascript">
     (function(m,e,t,r,i,k,a){
@@ -86,7 +86,6 @@
 </script>
 <noscript><div><img src="https://mc.yandex.ru/watch/108585248" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
 <!-- /Yandex.Metrika counter -->
-<!-- vis-network is lazy-loaded by app.js on first Graph tab open (A1) -->
 </head>
 <body>
 
@@ -181,13 +180,6 @@
         </div>
       </div>
 
-      <!-- A1: hidden pending Metrika verdict (ROADMAP A1); markup kept so statsPanel render stays harmless -->
-      <div class="filter-section" data-collapsible style="display:none">
-        <h3>Stats <span class="section-chevron">&#9660;</span></h3>
-        <div class="section-body">
-          <div id="statsPanel" class="stats-panel"></div>
-        </div>
-      </div>
     </div>
   </nav>
 
@@ -199,16 +191,8 @@
       <button class="tab-btn" id="btn-trees" data-tab="trees" role="tab" aria-selected="false" aria-controls="tab-trees">Craft Trees</button>
       <button class="tab-btn" id="btn-botany" data-tab="botany" role="tab" aria-selected="false" aria-controls="tab-botany">Botany</button>
       <button class="tab-btn" id="btn-maps" data-tab="maps" role="tab" aria-selected="false" aria-controls="tab-maps">Maps</button>
-      <!-- A1: low-usage tabs live in Advanced; final removal pends the Metrika checkpoint (ROADMAP A1) -->
-      <div class="tab-adv" id="tabAdv">
-        <button class="tab-btn tab-adv-toggle" id="btnAdvanced" type="button" aria-haspopup="true" aria-expanded="false">&#9881; Advanced <span class="tab-adv-caret">&#9662;</span></button>
-        <div class="tab-adv-menu">
-          <button class="tab-btn" id="btn-reactions" data-tab="reactions" role="tab" aria-selected="false" aria-controls="tab-reactions">Reactions</button>
-          <button class="tab-btn" id="btn-graph" data-tab="graph" role="tab" aria-selected="false" aria-controls="tab-graph">Graph</button>
-          <button class="tab-btn" id="btn-stats" data-tab="stats" role="tab" aria-selected="false" aria-controls="tab-stats">Stats</button>
-          <button class="tab-btn" id="btn-forkdiff" data-tab="forkdiff" role="tab" aria-selected="false" aria-controls="tab-forkdiff">Fork Diff</button>
-        </div>
-      </div>
+      <!-- A1.1 (2026-07-28): Stats/Graph/Reactions removed by Metrika verdict; Fork Diff promoted from the retired Advanced dropdown -->
+      <button class="tab-btn" id="btn-forkdiff" data-tab="forkdiff" role="tab" aria-selected="false" aria-controls="tab-forkdiff">Fork Diff</button>
       <button class="tab-btn tab-btn-antag" id="btn-antag" data-tab="antag" role="tab" aria-selected="false" aria-controls="tab-antag" style="display:none">&#9760; Antag Strategies</button>
     </div>
 
@@ -227,23 +211,6 @@
         <button class="hint-chip" data-hint="Most Used = sorted by how many reactions reference the reagent. Antag Score = potency heuristic across damage, stealth, and method." aria-label="Sort options explained">?</button>
       </div>
       <div class="reagent-grid" id="reagentGrid"></div>
-    </div>
-
-    <!-- Reactions Tab -->
-    <div class="tab-panel" id="tab-reactions" role="tabpanel" aria-labelledby="btn-reactions">
-      <table class="data-table" id="reactionsTable">
-        <thead>
-          <tr>
-            <th>Reaction</th>
-            <th>Reactants</th>
-            <th>Products</th>
-            <th>Temp</th>
-            <th>Mixer</th>
-            <th>Source</th>
-          </tr>
-        </thead>
-        <tbody id="reactionsBody"></tbody>
-      </table>
     </div>
 
     <!-- Calculator Tab -->
@@ -364,16 +331,6 @@
       <div class="tree-output" id="treeOutput"></div>
     </div>
 
-    <!-- Graph Tab -->
-    <div class="tab-panel" id="tab-graph" role="tabpanel" aria-labelledby="btn-graph">
-      <div class="graph-controls">
-        <button class="btn-small" id="graphReset">Reset View</button>
-        <button class="btn-small" id="graphPhysics">Toggle Physics</button>
-        <span class="graph-info" id="graphInfo"></span>
-      </div>
-      <div id="graphContainer" class="graph-container"></div>
-    </div>
-
     <!-- Botany Tab -->
     <div class="tab-panel" id="tab-botany" role="tabpanel" aria-labelledby="btn-botany">
       <p class="calc-legend">Chemicals that affect plants when added to a hydroponics tray.
@@ -404,11 +361,6 @@
         <button class="diff-chip active" id="botanyGenericToggle" aria-pressed="true" title="Nearly every drink and food waters or feeds a plant a little (inherited from the base drink prototype). Hidden by default so real fertilizers and weedkillers stand out.">hide generic drink/food hydration</button>
       </div>
       <div class="reagent-grid" id="botanyGrid"></div>
-    </div>
-
-    <!-- Stats Tab -->
-    <div class="tab-panel" id="tab-stats" role="tabpanel" aria-labelledby="btn-stats">
-      <div id="statsTabContent"></div>
     </div>
 
     <!-- Antag Tab (visible only in Antag Mode) -->
@@ -550,9 +502,9 @@
 </div>
 
 <!-- i18n.js must load BEFORE app.js: it exposes applyRussianData for init() -->
-<script src="i18n.js?v=5"></script>
-<script src="app.js?v=29"></script>
-<script defer src="tutorial.js?v=2"></script>
+<script src="i18n.js?v=6"></script>
+<script src="app.js?v=30"></script>
+<script defer src="tutorial.js?v=3"></script>
 <script src="maps.js?v=16" defer></script>
 </body>
 </html>

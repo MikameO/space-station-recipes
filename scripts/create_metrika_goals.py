@@ -44,12 +44,12 @@ API_BASE = "https://api-metrika.yandex.net/management/v1/counter/{cid}/goals"
 # (js_event_id, human name shown in the Metrika UI)
 # Must stay in sync with the goal ids listed in app.js next to track().
 GOALS: list[tuple[str, str]] = [
-    ("tab_reactions",     "Вкладка: Reactions"),
+    # Removed 2026-07-28 (A1.1, Metrika verdict): tab_reactions, tab_graph,
+    # tab_stats, strategy_to_batch — features deleted from the app. Their
+    # goals stay on the counter so historical conversions remain readable.
     ("tab_calculator",    "Вкладка: Calculator"),
     ("tab_trees",         "Вкладка: Craft Trees"),
-    ("tab_graph",         "Вкладка: Graph"),
     ("tab_botany",        "Вкладка: Botany"),
-    ("tab_stats",         "Вкладка: Stats"),
     ("tab_antag",         "Вкладка: Antag Strategies"),
     ("reagent_open",      "Открыта карточка реагента"),
     ("fork_select",       "Выбран форк в Source-фильтре"),
@@ -61,7 +61,6 @@ GOALS: list[tuple[str, str]] = [
     ("tree_built",        "Построено craft-дерево"),
     ("share_click",       "Скопирована share-ссылка"),
     ("antag_on",          "Включён antag-режим"),
-    ("strategy_to_batch", "Стратегия загружена в batch"),
     ("tutorial_start",    "Туториал: старт"),
     ("tutorial_done",     "Туториал: пройден до конца"),
     ("tutorial_skip",     "Туториал: пропущен"),

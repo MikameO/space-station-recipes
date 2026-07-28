@@ -97,7 +97,7 @@
     {
       id: 'done',
       title: 'READY FOR DUTY',
-      body: 'That is the core. Explore Craft Trees and Graph tabs whenever you want to see recipes visually. Good luck, chemist.',
+      body: 'That is the core. Explore the Craft Trees tab whenever you want to see recipes visually. Good luck, chemist.',
       target: function () { return document.getElementById('helpBtn'); },
       isFinal: true
     }

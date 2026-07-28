@@ -29,16 +29,7 @@ Each retains its original license and copyright.
    is preserved here.
 
 
-2. vis-network
-──────────────
-   Source:    https://github.com/visjs/vis-network
-   Version:  9.1.6
-   License:  MIT (Apache-2.0 / MIT dual license)
-   Copyright: Copyright (c) vis.js contributors
-   Usage:    Loaded via CDN at runtime (not distributed with this project)
-
-
-3. Google Fonts
+2. Google Fonts
 ───────────────
    Fonts:    Share Tech Mono, Chakra Petch, Oxanium
    Source:   https://fonts.google.com/

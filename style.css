@@ -363,13 +363,6 @@ header h1 {
   font-variant-numeric: tabular-nums;
 }
 
-.stats-panel {
-  font-size: 0.68rem;
-  color: var(--text-ghost);
-  line-height: 2;
-  letter-spacing: 0.04em;
-}
-
 .btn-small {
   padding: 2px 8px;
   background: transparent;
@@ -461,35 +454,6 @@ main {
 }
 .tab-btn-antag.pulse { animation: antag-pulse 0.8s ease-in-out 2; }
 .antag-tab-content { display: flex; flex-direction: column; gap: 24px; }
-
-/* A1: Advanced tab dropdown (Reactions / Graph / Stats — pending Metrika verdict) */
-.tab-adv { position: relative; display: flex; }
-.tab-adv-caret { font-size: 9px; opacity: 0.7; margin-left: 4px; }
-.tab-adv-toggle.has-active {
-  color: var(--phosphor);
-  border-bottom-color: var(--phosphor);
-  text-shadow: 0 0 8px var(--phosphor-glow);
-}
-.tab-adv-menu {
-  display: none;
-  /* fixed, positioned from the toggle by JS: the tab bar is an
-     overflow-x:auto scroller, so an absolute child gets CLIPPED at the
-     bar's edge — the menu "opened" but was never visible (C3.3) */
-  position: fixed;
-  z-index: 60;
-  min-width: 150px;
-  flex-direction: column;
-  background: var(--hull-plate);
-  border: 1px solid var(--border-subtle);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
-}
-.tab-adv.open .tab-adv-menu { display: flex; }
-.tab-adv-menu .tab-btn {
-  width: 100%;
-  text-align: left;
-  border-bottom: 2px solid transparent;
-}
-.tab-adv-menu .tab-btn.active::after { display: none; }
 
 /* A4: craft-tree gathering/brewing checklist */
 .tree-check {
@@ -1544,38 +1508,6 @@ body.antag-active .hint-chip:hover, body.antag-active .hint-chip:focus-visible {
 .tree-children.collapsed { display: none; }
 
 /* ══════════════════════════════════════════
-   GRAPH
-   ══════════════════════════════════════════ */
-.graph-controls {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-  margin-bottom: 8px;
-}
-
-.graph-info {
-  font-size: 0.65rem;
-  color: var(--text-ghost);
-  margin-left: auto;
-  letter-spacing: 0.04em;
-}
-
-.graph-container {
-  width: 100%;
-  height: calc(100vh - 168px);
-  background: var(--hull);
-  border: 1px solid var(--border-subtle);
-  border-radius: 2px;
-  position: relative;
-}
-
-/* vis.js nav button overrides */
-.graph-container .vis-navigation .vis-button {
-  background-color: var(--panel) !important;
-  border: 1px solid var(--border-subtle) !important;
-}
-
-/* ══════════════════════════════════════════
    DETAIL PANEL — Specimen readout
    ══════════════════════════════════════════ */
 .detail-panel {
@@ -2274,15 +2206,6 @@ body.antag-active .antag-toggle {
   border: 1px solid var(--border-subtle); cursor: pointer;
 }
 .strategy-reagent-chip:hover { border-color: var(--red-alert); color: var(--red-alert); }
-.strategy-calc-btn {
-  font-size: 0.68rem; padding: 2px 6px; border-radius: 2px;
-  background: rgba(255,61,90,0.1); color: var(--red-alert);
-  border: 1px solid rgba(255,61,90,0.3); cursor: pointer;
-  font-family: 'Oxanium', sans-serif; text-transform: uppercase;
-  letter-spacing: 0.06em; margin-top: 6px;
-}
-.strategy-calc-btn:hover { background: rgba(255,61,90,0.2); }
-
 /* Delivery mechanisms section */
 .delivery-grid {
   display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
@@ -2413,177 +2336,6 @@ body.antag-active .antag-toggle {
 /* ══════════════════════════════════════════
    RESPONSIVE
    ══════════════════════════════════════════ */
-/* ── Stats Tab ────────────────────────────────── */
-
-.stats-overview {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-  gap: 12px;
-  margin-bottom: 24px;
-}
-
-.stats-card {
-  background: var(--panel-raised);
-  border: 1px solid var(--phosphor-dim);
-  border-radius: 6px;
-  padding: 18px 16px;
-  text-align: center;
-  position: relative;
-  overflow: hidden;
-  animation: stats-card-in 0.5s ease both;
-}
-
-.stats-card::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, var(--phosphor), transparent);
-  opacity: 0.6;
-}
-
-.stats-card:nth-child(1) { animation-delay: 0s; }
-.stats-card:nth-child(2) { animation-delay: 0.06s; }
-.stats-card:nth-child(3) { animation-delay: 0.12s; }
-.stats-card:nth-child(4) { animation-delay: 0.18s; }
-.stats-card:nth-child(5) { animation-delay: 0.24s; }
-
-@keyframes stats-card-in {
-  from { opacity: 0; transform: translateY(12px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-.stats-card-value {
-  font-family: 'Share Tech Mono', monospace;
-  font-size: 2rem;
-  color: var(--phosphor);
-  text-shadow: 0 0 12px var(--phosphor-glow), 0 0 30px rgba(57,255,133,0.06);
-  line-height: 1.1;
-}
-
-.stats-card-label {
-  font-family: 'Chakra Petch', sans-serif;
-  font-size: 0.72rem;
-  color: var(--text-ghost);
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  margin-top: 6px;
-}
-
-.stats-section {
-  margin-bottom: 28px;
-}
-
-.stats-section-title {
-  font-family: 'Oxanium', sans-serif;
-  color: var(--phosphor);
-  font-size: 0.85rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.14em;
-  margin-bottom: 14px;
-  padding-bottom: 8px;
-  border-bottom: 1px solid var(--phosphor-dim);
-  position: relative;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.stats-section-title::before {
-  content: '//';
-  color: var(--phosphor-dim);
-  font-family: 'Share Tech Mono', monospace;
-  font-size: 0.75rem;
-}
-
-.stats-bars {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.stats-bar-row {
-  display: grid;
-  grid-template-columns: 160px 1fr 80px;
-  align-items: center;
-  gap: 10px;
-  height: 28px;
-}
-
-.stats-bar-label {
-  font-family: 'Share Tech Mono', monospace;
-  font-size: 0.8rem;
-  color: var(--text-dim);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.stats-bar-label.clickable {
-  color: var(--cyan);
-  cursor: pointer;
-}
-
-.stats-bar-label.clickable:hover {
-  color: var(--phosphor);
-  text-decoration: underline;
-}
-
-.stats-bar-track {
-  height: 18px;
-  background: var(--hull-plate);
-  border-radius: 3px;
-  overflow: hidden;
-  border: 1px solid rgba(255,255,255,0.04);
-}
-
-.stats-bar-fill {
-  height: 100%;
-  background: var(--phosphor-dim);
-  border-radius: 2px;
-  animation: bar-grow 0.6s ease both;
-  min-width: 2px;
-}
-
-@keyframes bar-grow {
-  from { max-width: 0; }
-  to { max-width: 100%; }
-}
-
-.stats-bar-base {
-  background: var(--amber);
-  opacity: 0.7;
-}
-
-.stats-bar-depth {
-  background: var(--violet);
-  opacity: 0.8;
-}
-
-.stats-bar-value {
-  font-family: 'Share Tech Mono', monospace;
-  font-size: 0.75rem;
-  color: var(--text-ghost);
-  text-align: right;
-  white-space: nowrap;
-}
-
-.stats-bar-sub {
-  color: var(--text-ghost);
-  opacity: 0.6;
-}
-
-.stats-footer {
-  font-family: 'Share Tech Mono', monospace;
-  font-size: 0.7rem;
-  color: var(--text-ghost);
-  text-align: center;
-  margin-top: 24px;
-  padding-top: 12px;
-  border-top: 1px solid rgba(255,255,255,0.04);
-}
-
 /* ── GAME CONTEXT LABELS ── */
 .game-label {
   font-size: 0.7em;
@@ -2734,9 +2486,6 @@ body.antag-active .disclaimer-bar {
   .radio-label input, .cat-label input { width: 16px; height: 16px; }
   .hint-chip { width: 24px; height: 24px; font-size: 0.85rem; }
   .detail-close { width: 44px; height: 44px; font-size: 1.4rem; }
-  .stats-bar-row { grid-template-columns: 100px 1fr 60px; gap: 6px; }
-  .stats-bar-label { font-size: 0.7rem; }
-  .stats-overview { grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 8px; }
   header { flex-direction: column; align-items: stretch; height: auto; padding: 10px 14px; }
   .header-right { max-width: 100%; }
   .disclaimer-bar { font-size: 0.62rem; height: 28px; }
@@ -3040,7 +2789,7 @@ body.antag-active .empty-state-chip:focus-visible {
 /* ══════════════════════════════════════════════════════════════
  * REDUCED MOTION — disable CRT scanlines, vignette, and looping
  * animations for users with vestibular / photophobia sensitivity.
- * One-shot transitions (tab-fade, stats-card-in, disclaimer-fade)
+ * One-shot transitions (tab-fade, disclaimer-fade)
  * survive — they convey "something happened" without flicker.
  * ══════════════════════════════════════════════════════════════ */
 @media (prefers-reduced-motion: reduce) {

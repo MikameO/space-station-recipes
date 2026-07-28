@@ -14,8 +14,6 @@ let activeSource = 'all';
 let activeBaseType = 'all'; // 'all' | 'base' | 'crafted'
 let activeCategories = new Set();
 let activeEffectTags = new Set();
-let graphNetwork = null;
-let graphPhysicsOn = true;
 let selectedReagentId = null;
 let detailHistory = []; // stack for back navigation
 let antagMode = false;
@@ -56,7 +54,6 @@ let antagFilterMethods      = new Set(); // subset of {inject, ingest, drink, fo
 //   tree_checklist_used {reagent}            — first checklist tick on a tree
 //   share_click {tab, antag}                 — share link copied
 //   antag_on                                 — antag mode enabled
-//   strategy_to_batch {strategy}             — strategy loaded into batch
 //   preset_to_batch {preset}                 — shift-start preset loaded
 //   whatheals_type {type} / _species {species} — medbay filters
 //   beaker_sim {n, tempK}                    — beaker simulator run
@@ -151,7 +148,6 @@ async function init() {
   decodeURLState();
 
   renderReagents();
-  updateStats();
 
   document.getElementById('loadingOverlay').classList.add('hidden');
   document.getElementById('headerMeta').textContent =
@@ -279,35 +275,6 @@ function findSimilarReagents(query, limit = 3) {
   return scored.slice(0, limit).map(s => s.entry);
 }
 
-function filterReactions(query) {
-  const q = query.toLowerCase().trim();
-  const tokens = q.split(/\s+/).filter(Boolean);
-
-  return Object.values(DATA.reactions).filter(rxn => {
-    // Source filter: fork mode hides blocked + out-of-lineage reactions
-    if (activeSource !== 'all' && activeSource !== 'vanilla') {
-      if (!forkVisible(rxn, activeSource)) return false;
-    } else if (activeSource === 'vanilla') {
-      if (rxn.source !== 'vanilla') return false;
-    }
-    // Category filter: check if any product belongs to a selected category
-    if (activeCategories.size > 0) {
-      const productIds = Object.keys(rxn.products);
-      const matchesCat = productIds.some(pid => {
-        const r = DATA.reagents[pid];
-        return r && activeCategories.has(r.category);
-      });
-      if (!matchesCat) return false;
-    }
-    const text = [rxn.id, ...Object.keys(rxn.reactants), ...Object.keys(rxn.products), rxn.effects]
-      .filter(Boolean).join(' ').toLowerCase();
-    if (tokens.length > 0) {
-      return tokens.every(t => text.includes(t));
-    }
-    return true;
-  });
-}
-
 // ─────────────────────────────────────────────
 // Sidebar
 // ─────────────────────────────────────────────
@@ -423,19 +390,6 @@ function buildSidebar() {
   document.getElementById('sidebar').addEventListener('change', updateFilterCountBadge);
 }
 
-function updateStats() {
-  const panel = document.getElementById('statsPanel');
-  let statsHTML = '';
-  if (DATA.meta?.forks) {
-    for (const [fid, meta] of Object.entries(DATA.meta.forks)) {
-      statsHTML += `<span class="fork-dot" style="background:${meta.color}"></span>${meta.name}: ${meta.reagentCount}<br>`;
-    }
-  }
-  const base = DATA.baseChemicals.length;
-  statsHTML += `Base chemicals: ${base}<br>Reactions: ${Object.keys(DATA.reactions).length}<br>Graph edges: ${DATA.edges.length}`;
-  panel.innerHTML = statsHTML;
-}
-
 // ─────────────────────────────────────────────
 // Dynamic Source Filters
 // ─────────────────────────────────────────────
@@ -515,7 +469,6 @@ function setupTabs() {
   document.querySelectorAll('.tab-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       const tab = btn.dataset.tab;
-      if (!tab) return; // A1: the Advanced toggle is a .tab-btn without data-tab
       document.querySelectorAll('.tab-btn').forEach(b => { b.classList.remove('active'); b.setAttribute('aria-selected', 'false'); });
       document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
       btn.classList.add('active');
@@ -526,37 +479,6 @@ function setupTabs() {
       renderCurrentTab();
     });
   });
-  setupAdvancedDropdown();
-}
-
-// A1: Reactions / Graph / Stats live in the Advanced dropdown (final removal pends Metrika)
-function setupAdvancedDropdown() {
-  const adv = document.getElementById('tabAdv');
-  const toggle = document.getElementById('btnAdvanced');
-  if (!adv || !toggle) return;
-  const ADV_TABS = ['reactions', 'graph', 'stats'];
-  const close = () => { adv.classList.remove('open'); toggle.setAttribute('aria-expanded', 'false'); };
-  toggle.addEventListener('click', e => {
-    e.stopPropagation();
-    const open = adv.classList.toggle('open');
-    toggle.setAttribute('aria-expanded', String(open));
-    if (open) {
-      // C3.3: the menu is position:fixed (the tab bar clips absolute
-      // children via overflow-x:auto) — anchor it under the toggle.
-      const r = toggle.getBoundingClientRect();
-      const menu = adv.querySelector('.tab-adv-menu');
-      menu.style.left = Math.round(r.left) + 'px';
-      menu.style.top = Math.round(r.bottom + 2) + 'px';
-    }
-  });
-  document.addEventListener('click', e => { if (!adv.contains(e.target)) close(); });
-  document.addEventListener('keydown', e => { if (e.key === 'Escape') close(); });
-  window.addEventListener('resize', close);
-  // any tab click: close the menu, keep the toggle lit while a hidden tab is active (deep-links included)
-  document.querySelectorAll('.tab-btn').forEach(b => b.addEventListener('click', () => {
-    if (b.dataset.tab) close();
-    toggle.classList.toggle('has-active', ADV_TABS.includes(activeTab));
-  }));
 }
 
 function setupLogoHome() {
@@ -579,12 +501,9 @@ function setupLogoHome() {
 function renderCurrentTab() {
   const query = document.getElementById('searchInput').value;
   if (activeTab === 'reagents') renderReagents(query);
-  else if (activeTab === 'reactions') renderReactions(query);
   else if (activeTab === 'medbay') renderMedbay();
   else if (activeTab === 'forkdiff') renderForkDiff();
-  else if (activeTab === 'graph') renderGraph();
   else if (activeTab === 'botany') renderBotany(query);
-  else if (activeTab === 'stats') renderStatsTab();
   else if (activeTab === 'antag') { renderAntagStrategies(); renderDeliveryMechanisms(); }
   // calculator and trees tabs have their own autocomplete — no re-render needed on filter change
 }
@@ -763,7 +682,7 @@ function setupSearch() {
     trackTimer = setTimeout(() => {
       const q = input.value.trim();
       if (q.length < 2) return;
-      const results = activeTab === 'reactions' ? filterReactions(q).length : filterReagents(q).length;
+      const results = filterReagents(q).length;
       track(results === 0 ? 'search_zero' : 'search_used', { q: q.slice(0, 100), tab: activeTab, results });
     }, 1400);
   });
@@ -1223,35 +1142,6 @@ function renderEffectsVerbose(parsed) {
     sections.push(`<div class="effect-group">${pathHead}${subsections}</div>`);
   }
   return `<div class="effects-verbose">${sections.join('')}</div>`;
-}
-
-// ─────────────────────────────────────────────
-// Reactions Table
-// ─────────────────────────────────────────────
-
-function renderReactions(query = '') {
-  const results = filterReactions(query);
-  const tbody = document.getElementById('reactionsBody');
-
-  const rows = results.slice(0, 500).map(rxn => {
-    const reactants = Object.entries(rxn.reactants)
-      .map(([id, info]) => `${info.amount}x ${id}${info.catalyst ? ' (cat)' : ''}`).join(' + ');
-    const products = Object.entries(rxn.products).map(([id, amt]) => `${amt}x ${id}`).join(', ');
-    const temp = [rxn.minTemp ? `>${rxn.minTemp}K` : '', rxn.maxTemp ? `<${rxn.maxTemp}K` : ''].filter(Boolean).join(', ');
-    const mixer = (rxn.mixer || []).join(', ');
-
-    return `<tr>
-      <td>${esc(rxn.id)}</td>
-      <td>${esc(reactants)}</td>
-      <td>${esc(products)}</td>
-      <td>${esc(temp)}</td>
-      <td>${esc(mixer)}</td>
-      <td>${rxn.source !== 'vanilla' && DATA.meta?.forks?.[rxn.source] ? '<span class="badge badge-fork" style="border-color:' + DATA.meta.forks[rxn.source].color + '">' + esc(DATA.meta.forks[rxn.source].name) + '</span>' : 'Vanilla'}${(() => { const fs = rxn.forkStatus || {}; const fn = rxn.forkNotes || {}; const mods = Object.entries(fs).filter(([,s]) => s === 'modified'); return mods.length ? ' <span class="badge badge-modified" title="' + mods.map(([f]) => esc((DATA.meta.forks?.[f]?.name || f) + ': ' + (fn[f] || 'Modified'))).join('; ') + '">MOD</span>' : ''; })()}</td>
-    </tr>`;
-  });
-
-  tbody.innerHTML = rows.join('');
-  document.getElementById('resultCount').textContent = `${results.length} reactions`;
 }
 
 // ─────────────────────────────────────────────
@@ -2118,153 +2008,6 @@ function renderCalcResults(targetId, amount, result) {
 }
 
 // ─────────────────────────────────────────────
-// Network Graph
-// ─────────────────────────────────────────────
-
-let lastGraphHash = '';
-// A1: vis-network is lazy-loaded on first Graph open — keeps first paint free of the ~460KB CDN hit
-let visLoadPromise = null;
-function ensureVisLoaded() {
-  if (typeof vis !== 'undefined') return Promise.resolve();
-  if (!visLoadPromise) {
-    visLoadPromise = new Promise((resolve, reject) => {
-      const s = document.createElement('script');
-      s.src = 'libs/vis-network.min.js'; // B2: self-hosted (offline-capable)
-      s.onload = resolve;
-      s.onerror = () => { visLoadPromise = null; reject(new Error('vis-network load failed')); };
-      document.head.appendChild(s);
-    });
-  }
-  return visLoadPromise;
-}
-
-function renderGraph() {
-  const container = document.getElementById('graphContainer');
-  const info = document.getElementById('graphInfo');
-
-  if (typeof vis === 'undefined') {
-    if (info) info.textContent = 'Loading graph engine…';
-    ensureVisLoaded()
-      .then(() => { if (activeTab === 'graph') { lastGraphHash = null; renderGraph(); } })
-      .catch(() => { if (info) info.textContent = 'Graph engine failed to load — check connection and reopen the tab.'; });
-    return;
-  }
-
-  // Get filtered reagent IDs
-  const filtered = filterReagents(document.getElementById('searchInput').value);
-  const ids = new Set(filtered.map(e => e.id));
-
-  // Cache check — don't recreate if same filter set
-  const hash = [...ids].sort().join(',');
-  if (hash === lastGraphHash && graphNetwork) { return; }
-  lastGraphHash = hash;
-
-  // Build vis.js data
-  const nodes = [];
-  const edges = [];
-
-  for (const id of ids) {
-    const r = DATA.reagents[id];
-    if (!r) continue;
-    nodes.push({
-      id,
-      label: r.name || r.id,
-      color: {
-        background: safeColor(r.color),
-        border: r.isBase ? '#22c55e' : '#1e3a5f',
-        highlight: { background: '#fbbf24', border: '#f59e0b' },
-      },
-      shape: r.isBase ? 'diamond' : 'dot',
-      size: r.isBase ? 10 : 7,
-      title: `${r.name || r.id}\n${r.category}\n${r.effects || ''}`.slice(0, 300),
-      font: { color: '#94a3b8', size: 9 },
-    });
-  }
-
-  for (const edge of DATA.edges) {
-    if (ids.has(edge.from) && ids.has(edge.to)) {
-      edges.push({
-        from: edge.from,
-        to: edge.to,
-        arrows: 'to',
-        color: { color: edge.catalyst ? '#f59e0b' : '#1e3a5f', highlight: '#3b82f6' },
-        dashes: edge.catalyst,
-        width: 0.5,
-      });
-    }
-  }
-
-  info.textContent = `${nodes.length} nodes, ${edges.length} edges`;
-
-  if (nodes.length === 0) {
-    if (graphNetwork) { graphNetwork.destroy(); graphNetwork = null; }
-    container.innerHTML = '<div style="padding:40px;text-align:center;color:var(--text-dim)">No reagents match filters. Adjust filters or clear search.</div>';
-    return;
-  }
-
-  if (nodes.length > 400) {
-    if (graphNetwork) { graphNetwork.destroy(); graphNetwork = null; }
-    container.innerHTML = `<div style="padding:40px;text-align:center;color:var(--text-dim)">
-      ${nodes.length} nodes — select a category filter to reduce graph size for better performance.
-      <br><button class="btn-primary" style="margin-top:12px" id="forceGraph">Show Anyway</button>
-    </div>`;
-    document.getElementById('forceGraph').addEventListener('click', () => initGraph(container, nodes, edges));
-    return;
-  }
-
-  initGraph(container, nodes, edges);
-}
-
-function initGraph(container, nodes, edges) {
-  const data = {
-    nodes: new vis.DataSet(nodes),
-    edges: new vis.DataSet(edges),
-  };
-
-  const options = {
-    physics: {
-      solver: 'forceAtlas2Based',
-      forceAtlas2Based: {
-        gravitationalConstant: -30,
-        centralGravity: 0.005,
-        springLength: 80,
-        springConstant: 0.08,
-        damping: 0.4,
-      },
-      stabilization: { iterations: 120 },
-    },
-    interaction: { hover: true, tooltipDelay: 100, navigationButtons: true },
-    layout: { improvedLayout: true },
-  };
-
-  if (graphNetwork) { graphNetwork.destroy(); graphNetwork = null; }
-  graphNetwork = new vis.Network(container, data, options);
-  graphPhysicsOn = true;
-
-  graphNetwork.on('stabilizationIterationsDone', () => {
-    graphNetwork.setOptions({ physics: false });
-    graphPhysicsOn = false;
-  });
-
-  graphNetwork.on('click', (params) => {
-    if (params.nodes.length > 0) {
-      openDetail(params.nodes[0]);
-    }
-  });
-}
-
-// Graph controls
-document.getElementById('graphReset')?.addEventListener('click', () => {
-  if (graphNetwork) graphNetwork.fit();
-});
-
-document.getElementById('graphPhysics')?.addEventListener('click', () => {
-  if (!graphNetwork) return;
-  graphPhysicsOn = !graphPhysicsOn;
-  graphNetwork.setOptions({ physics: graphPhysicsOn });
-});
-
-// ─────────────────────────────────────────────
 // Autocomplete Helper
 // ─────────────────────────────────────────────
 
@@ -2931,7 +2674,7 @@ function resolveEffectiveDifficulty(strat) {
 }
 
 // Increment D — filter antag strategies by user-selected criteria.
-// Reuses the pattern from filterReactions:137. The `activeSource` global
+// Reuses the source-visibility pattern from filterReagents. The `activeSource` global
 // fork filter also applies here (Steelclaw's "which fork?" critique).
 function filterStrategies() {
   const list = DATA.antagStrategies || [];
@@ -3082,7 +2825,6 @@ function renderAntagStrategies() {
       <div class="strategy-reagents">${reagentChips}</div>
       ${renderSources(strat.sources, strat.id)}
       <div class="strategy-actions">
-        <button class="strategy-calc-btn" onclick="event.stopPropagation(); loadStrategyIntoBatch('${esc(strat.id)}')">Calculate in Batch Planner</button>
         <a class="strategy-report-btn"
            title="Report an inaccuracy in this strategy (opens GitHub issue)"
            onclick="event.stopPropagation();"
@@ -3155,7 +2897,7 @@ function renderDeliveryMechanisms() {
 }
 
 // Shared loader: fills the Batch Planner with a reagent set and runs the plan.
-// Used by antag strategies and shift presets (A2).
+// Used by shift presets (A2).
 function loadReagentSetIntoBatch(reagents, label) {
   // Switch to calculator tab
   const calcTab = document.querySelector('.tab-btn[data-tab="calculator"]');
@@ -3179,13 +2921,6 @@ function loadReagentSetIntoBatch(reagents, label) {
       showToast(`${label} — switch to Calculator tab manually.`);
     }
   }, 200);
-}
-
-function loadStrategyIntoBatch(strategyId) {
-  const strat = (DATA.antagStrategies || []).find(s => s.id === strategyId);
-  if (!strat) return;
-  track('strategy_to_batch', { strategy: strategyId });
-  loadReagentSetIntoBatch(strat.reagents, `Strategy: ${strat.name}`);
 }
 
 // A2: shift-start presets
@@ -3254,7 +2989,7 @@ function decodeURLState() {
 
   // Tab (whitelist)
   const tab = params.get('tab');
-  const validTabs = ['reagents','reactions','calculator','medbay','forkdiff','trees','graph','stats','antag','maps'];
+  const validTabs = ['reagents','calculator','medbay','forkdiff','trees','antag','maps'];
   if (tab && validTabs.includes(tab)) {
     const btn = document.querySelector(`.tab-btn[data-tab="${CSS.escape(tab)}"]`);
     if (btn) btn.click();
@@ -3503,151 +3238,6 @@ function showToast(msg) {
   toast.textContent = msg;
   toast.classList.add('show');
   setTimeout(() => toast.classList.remove('show'), 2000);
-}
-
-// ─────────────────────────────────────────────
-// Stats Tab
-// ─────────────────────────────────────────────
-
-let statsRendered = false;
-
-function computeTreeDepth(reagentId, visited = new Set()) {
-  if (DATA.baseChemicals.includes(reagentId) || visited.has(reagentId)) return 0;
-  const rxns = Object.values(DATA.reactions).filter(rx => rx.products[reagentId]);
-  if (rxns.length === 0) return 0;
-  const rxn = rxns[0];
-  visited = new Set(visited);
-  visited.add(reagentId);
-  let maxChild = 0;
-  for (const [reactId, info] of Object.entries(rxn.reactants)) {
-    if (info.catalyst) continue;
-    const d = computeTreeDepth(reactId, visited);
-    if (d > maxChild) maxChild = d;
-  }
-  return maxChild + 1;
-}
-
-function renderStatsTab() {
-  if (statsRendered) return;
-  statsRendered = true;
-
-  const container = document.getElementById('statsTabContent');
-  const reagents = DATA.reagents;
-  const reactions = DATA.reactions;
-  const forks = DATA.meta?.forks || {};
-
-  const totalReagents = Object.keys(reagents).length;
-  const totalReactions = Object.keys(reactions).length;
-  const totalBase = DATA.baseChemicals.length;
-  const totalForks = Object.keys(forks).length;
-  const totalEdges = DATA.edges.length;
-
-  // --- Overview Cards ---
-  let html = `<div class="stats-overview">
-    <div class="stats-card"><div class="stats-card-value">${totalReagents}</div><div class="stats-card-label">Reagents</div></div>
-    <div class="stats-card"><div class="stats-card-value">${totalReactions}</div><div class="stats-card-label">Reactions</div></div>
-    <div class="stats-card"><div class="stats-card-value">${totalBase}</div><div class="stats-card-label">Base Chemicals</div></div>
-    <div class="stats-card"><div class="stats-card-value">${totalEdges}</div><div class="stats-card-label">Graph Edges</div></div>
-    <div class="stats-card"><div class="stats-card-value">${totalForks}</div><div class="stats-card-label">Forks</div></div>
-  </div>`;
-
-  // --- Fork Comparison ---
-  const maxForkReagents = Math.max(...Object.values(forks).map(f => f.reagentCount || 0));
-  html += `<div class="stats-section"><h3 class="stats-section-title">Fork Comparison</h3><div class="stats-bars">`;
-  for (const [fid, meta] of Object.entries(forks)) {
-    const pct = maxForkReagents > 0 ? (meta.reagentCount / maxForkReagents * 100) : 0;
-    const rxCount = meta.reactionCount || 0;
-    html += `<div class="stats-bar-row">
-      <span class="stats-bar-label">${esc(meta.name)}</span>
-      <div class="stats-bar-track">
-        <div class="stats-bar-fill" style="width:${pct}%;background:${meta.color}"></div>
-      </div>
-      <span class="stats-bar-value">${meta.reagentCount} <span class="stats-bar-sub">(${rxCount} rxn)</span></span>
-    </div>`;
-  }
-  html += `</div></div>`;
-
-  // --- Category Distribution ---
-  const catCounts = {};
-  for (const r of Object.values(reagents)) {
-    const cat = r.category || 'Uncategorized';
-    catCounts[cat] = (catCounts[cat] || 0) + 1;
-  }
-  const sortedCats = Object.entries(catCounts).sort((a, b) => b[1] - a[1]).slice(0, 15);
-  const maxCat = sortedCats.length > 0 ? sortedCats[0][1] : 1;
-
-  html += `<div class="stats-section"><h3 class="stats-section-title">Top Categories</h3><div class="stats-bars">`;
-  for (const [cat, count] of sortedCats) {
-    const pct = (count / maxCat * 100);
-    html += `<div class="stats-bar-row">
-      <span class="stats-bar-label">${esc(cat)}</span>
-      <div class="stats-bar-track">
-        <div class="stats-bar-fill" style="width:${pct}%"></div>
-      </div>
-      <span class="stats-bar-value">${count}</span>
-    </div>`;
-  }
-  html += `</div></div>`;
-
-  // --- Most Used Base Chemicals ---
-  const baseCounts = {};
-  for (const rxn of Object.values(reactions)) {
-    for (const reactId of Object.keys(rxn.reactants)) {
-      if (DATA.baseChemicals.includes(reactId)) {
-        baseCounts[reactId] = (baseCounts[reactId] || 0) + 1;
-      }
-    }
-  }
-  const sortedBases = Object.entries(baseCounts).sort((a, b) => b[1] - a[1]).slice(0, 10);
-  const maxBase = sortedBases.length > 0 ? sortedBases[0][1] : 1;
-
-  html += `<div class="stats-section"><h3 class="stats-section-title">Most Used Base Chemicals</h3><div class="stats-bars">`;
-  for (const [id, count] of sortedBases) {
-    const r = reagents[id];
-    const name = r ? (r.name || id) : id;
-    const pct = (count / maxBase * 100);
-    html += `<div class="stats-bar-row">
-      <span class="stats-bar-label clickable" onclick="openDetail('${id}')">${esc(name)}</span>
-      <div class="stats-bar-track">
-        <div class="stats-bar-fill stats-bar-base" style="width:${pct}%"></div>
-      </div>
-      <span class="stats-bar-value">${count} rxn</span>
-    </div>`;
-  }
-  html += `</div></div>`;
-
-  // --- Most Complex Recipes (deepest craft trees) ---
-  const depths = [];
-  for (const [id, r] of Object.entries(reagents)) {
-    if (DATA.baseChemicals.includes(id)) continue;
-    const d = computeTreeDepth(id);
-    if (d >= 3) depths.push({ id, name: r.name || id, depth: d });
-  }
-  depths.sort((a, b) => b.depth - a.depth);
-  const top10 = depths.slice(0, 10);
-
-  if (top10.length > 0) {
-    const maxDepth = top10[0].depth;
-    html += `<div class="stats-section"><h3 class="stats-section-title">Most Complex Recipes</h3><div class="stats-bars">`;
-    for (const item of top10) {
-      const pct = (item.depth / maxDepth * 100);
-      html += `<div class="stats-bar-row">
-        <span class="stats-bar-label clickable" onclick="openDetail('${item.id}')">${esc(item.name)}</span>
-        <div class="stats-bar-track">
-          <div class="stats-bar-fill stats-bar-depth" style="width:${pct}%"></div>
-        </div>
-        <span class="stats-bar-value">${item.depth} steps</span>
-      </div>`;
-    }
-    html += `</div></div>`;
-  }
-
-  // --- Generated timestamp ---
-  if (DATA.meta?.generated) {
-    html += `<div class="stats-footer">Data generated: ${esc(DATA.meta.generated)}</div>`;
-  }
-
-  container.innerHTML = html;
 }
 
 // ─────────────────────────────────────────────

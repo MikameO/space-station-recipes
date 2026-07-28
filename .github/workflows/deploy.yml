@@ -30,7 +30,6 @@ jobs:
           cp sw.js manifest.json robots.txt sitemap.xml _site/
           cp favicon.svg favicon-192.png favicon-512.png apple-touch-icon.png _site/
           cp -r sprites _site/sprites
-          cp -r libs _site/libs
           cp -r maps _site/maps
           [ -f og-image.png ] && cp og-image.png _site/ || true
 
