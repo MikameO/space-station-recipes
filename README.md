@@ -8,6 +8,10 @@
 
 Search reagents, plan reactions, explore craft trees, and calculate batch recipes across 20 community forks.
 
+[![Open the app](https://img.shields.io/badge/%E2%96%B6%20OPEN%20THE%20APP-mikameo.github.io%2Fspace--station--recipes-39ff85?style=for-the-badge)](https://mikameo.github.io/space-station-recipes/)
+
+**Live app:** <https://mikameo.github.io/space-station-recipes/> — no install, runs in any browser, EN/RU
+
 [![License: GPL-3.0](https://img.shields.io/badge/License-GPL--3.0-22c55e?style=flat-square)](LICENSE)
 ![Reagents](https://img.shields.io/badge/Reagents-1369-39ff85?style=flat-square)
 ![Reactions](https://img.shields.io/badge/Reactions-1092-00e5ff?style=flat-square)
@@ -25,9 +29,8 @@ Search reagents, plan reactions, explore craft trees, and calculate batch recipe
 | **Multi-fork** | 20 SS14 forks | Vanilla, RMC14, Colonial Marines Universe, Russian Marine Corps, Goob, Funky, Delta-V, Starlight, Frontier, Dead Space, Trauma, Omu, Carpmosia, Monolith, Harmony, Corvax, ADT, Sunrise, Fish, Misfits |
 | **Calculator** | Recipe planner | Single recipe calc, batch shift planner, and reverse lookup |
 | **Trees** | Craft trees | Visual dependency chains for any reagent synthesis path |
-| **Graph** | Network viz | Interactive graph of all reagent relationships |
 | **Botany** | Plant effects | Which chemicals feed, heal, mutate, or kill plants — fertilizers, weedkillers, mutagens |
-| **Stats** | Database stats | Fork comparison, complexity rankings, base chemical usage |
+| **Medbay** | What Heals? | Pick a damage type (and species) — ranked list of what actually heals it |
 | **Antag** | Antag Mode | Curated strategies with lethality scores and delivery methods |
 | **Maps** | Item finder | Pick a station map, search any item — see where it spawns on a rendered schematic with locker/vendor/floor sources, grouped by nearest beacon |
 | **Sell list** | Map price manifest | Every item on the selected map with count, sell price, and total — sortable columns, class chips (guns/melee/food/armor/…), guaranteed-vs-chance loot filter |
@@ -88,10 +91,10 @@ Then open [localhost:8090](http://localhost:8090). No build step — pure HTML/C
 
 ```
 index.html          Static frontend shell
-app.js              All interactive logic (search, calc, trees, graph, stats)
+app.js              All interactive logic (search, calc, trees, medbay, antag)
 maps.js             Maps tab — canvas render, item search, beacon grouping
 style.css           NanoTrasen terminal theme with CRT effects
-data.json           Generated chemistry database (1.1MB, all forks merged)
+data.json           Generated chemistry database (3.8MB, all forks merged)
 config.py           Fork registry and extraction configuration
 ss14_chem_extractor.py   Scrapes SS14 GitHub repos → data.json
 ss14_map_extractor.py    Bakes station maps → maps/<fork>/<Id>.{png,json} + index
