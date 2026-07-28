@@ -1,0 +1,384 @@
+{
+ "event_to_id": {
+  "tab_reactions": 581811867,
+  "tab_calculator": 581811868,
+  "tab_trees": 581811869,
+  "tab_graph": 581811870,
+  "tab_botany": 581811871,
+  "tab_stats": 581811872,
+  "tab_antag": 581811889,
+  "reagent_open": 581811890,
+  "fork_select": 581811907,
+  "search_used": 581811924,
+  "search_zero": 581811925,
+  "calc_run": 581811942,
+  "batch_plan": 581811943,
+  "reverse_used": 581811944,
+  "tree_built": 581811945,
+  "share_click": 581811946,
+  "antag_on": 581811947,
+  "strategy_to_batch": 581811948,
+  "tutorial_start": 581811981,
+  "tutorial_done": 581811982,
+  "tutorial_skip": 581811983
+ },
+ "goals": [
+  {
+   "id": 581811867,
+   "name": "Вкладка: Reactions",
+   "type": "action",
+   "default_price": 0.0,
+   "is_retargeting": 0,
+   "goal_source": "user",
+   "is_favorite": 0,
+   "status": "Active",
+   "labels": [],
+   "conditions": [
+    {
+     "type": "exact",
+     "url": "tab_reactions"
+    }
+   ]
+  },
+  {
+   "id": 581811868,
+   "name": "Вкладка: Calculator",
+   "type": "action",
+   "default_price": 0.0,
+   "is_retargeting": 0,
+   "goal_source": "user",
+   "is_favorite": 0,
+   "status": "Active",
+   "labels": [],
+   "conditions": [
+    {
+     "type": "exact",
+     "url": "tab_calculator"
+    }
+   ]
+  },
+  {
+   "id": 581811869,
+   "name": "Вкладка: Craft Trees",
+   "type": "action",
+   "default_price": 0.0,
+   "is_retargeting": 0,
+   "goal_source": "user",
+   "is_favorite": 0,
+   "status": "Active",
+   "labels": [],
+   "conditions": [
+    {
+     "type": "exact",
+     "url": "tab_trees"
+    }
+   ]
+  },
+  {
+   "id": 581811870,
+   "name": "Вкладка: Graph",
+   "type": "action",
+   "default_price": 0.0,
+   "is_retargeting": 0,
+   "goal_source": "user",
+   "is_favorite": 0,
+   "status": "Active",
+   "labels": [],
+   "conditions": [
+    {
+     "type": "exact",
+     "url": "tab_graph"
+    }
+   ]
+  },
+  {
+   "id": 581811871,
+   "name": "Вкладка: Botany",
+   "type": "action",
+   "default_price": 0.0,
+   "is_retargeting": 0,
+   "goal_source": "user",
+   "is_favorite": 0,
+   "status": "Active",
+   "labels": [],
+   "conditions": [
+    {
+     "type": "exact",
+     "url": "tab_botany"
+    }
+   ]
+  },
+  {
+   "id": 581811872,
+   "name": "Вкладка: Stats",
+   "type": "action",
+   "default_price": 0.0,
+   "is_retargeting": 0,
+   "goal_source": "user",
+   "is_favorite": 0,
+   "status": "Active",
+   "labels": [],
+   "conditions": [
+    {
+     "type": "exact",
+     "url": "tab_stats"
+    }
+   ]
+  },
+  {
+   "id": 581811889,
+   "name": "Вкладка: Antag Strategies",
+   "type": "action",
+   "default_price": 0.0,
+   "is_retargeting": 0,
+   "goal_source": "user",
+   "is_favorite": 0,
+   "status": "Active",
+   "labels": [],
+   "conditions": [
+    {
+     "type": "exact",
+     "url": "tab_antag"
+    }
+   ]
+  },
+  {
+   "id": 581811890,
+   "name": "Открыта карточка реагента",
+   "type": "action",
+   "default_price": 0.0,
+   "is_retargeting": 0,
+   "goal_source": "user",
+   "is_favorite": 0,
+   "status": "Active",
+   "labels": [],
+   "conditions": [
+    {
+     "type": "exact",
+     "url": "reagent_open"
+    }
+   ]
+  },
+  {
+   "id": 581811907,
+   "name": "Выбран форк в Source-фильтре",
+   "type": "action",
+   "default_price": 0.0,
+   "is_retargeting": 0,
+   "goal_source": "user",
+   "is_favorite": 0,
+   "status": "Active",
+   "labels": [],
+   "conditions": [
+    {
+     "type": "exact",
+     "url": "fork_select"
+    }
+   ]
+  },
+  {
+   "id": 581811924,
+   "name": "Поиск: запрос с результатами",
+   "type": "action",
+   "default_price": 0.0,
+   "is_retargeting": 0,
+   "goal_source": "user",
+   "is_favorite": 0,
+   "status": "Active",
+   "labels": [],
+   "conditions": [
+    {
+     "type": "exact",
+     "url": "search_used"
+    }
+   ]
+  },
+  {
+   "id": 581811925,
+   "name": "Поиск: 0 результатов",
+   "type": "action",
+   "default_price": 0.0,
+   "is_retargeting": 0,
+   "goal_source": "user",
+   "is_favorite": 0,
+   "status": "Active",
+   "labels": [],
+   "conditions": [
+    {
+     "type": "exact",
+     "url": "search_zero"
+    }
+   ]
+  },
+  {
+   "id": 581811942,
+   "name": "Калькулятор: расчёт рецепта",
+   "type": "action",
+   "default_price": 0.0,
+   "is_retargeting": 0,
+   "goal_source": "user",
+   "is_favorite": 0,
+   "status": "Active",
+   "labels": [],
+   "conditions": [
+    {
+     "type": "exact",
+     "url": "calc_run"
+    }
+   ]
+  },
+  {
+   "id": 581811943,
+   "name": "Калькулятор: batch-план",
+   "type": "action",
+   "default_price": 0.0,
+   "is_retargeting": 0,
+   "goal_source": "user",
+   "is_favorite": 0,
+   "status": "Active",
+   "labels": [],
+   "conditions": [
+    {
+     "type": "exact",
+     "url": "batch_plan"
+    }
+   ]
+  },
+  {
+   "id": 581811944,
+   "name": "Калькулятор: reverse lookup",
+   "type": "action",
+   "default_price": 0.0,
+   "is_retargeting": 0,
+   "goal_source": "user",
+   "is_favorite": 0,
+   "status": "Active",
+   "labels": [],
+   "conditions": [
+    {
+     "type": "exact",
+     "url": "reverse_used"
+    }
+   ]
+  },
+  {
+   "id": 581811945,
+   "name": "Построено craft-дерево",
+   "type": "action",
+   "default_price": 0.0,
+   "is_retargeting": 0,
+   "goal_source": "user",
+   "is_favorite": 0,
+   "status": "Active",
+   "labels": [],
+   "conditions": [
+    {
+     "type": "exact",
+     "url": "tree_built"
+    }
+   ]
+  },
+  {
+   "id": 581811946,
+   "name": "Скопирована share-ссылка",
+   "type": "action",
+   "default_price": 0.0,
+   "is_retargeting": 0,
+   "goal_source": "user",
+   "is_favorite": 0,
+   "status": "Active",
+   "labels": [],
+   "conditions": [
+    {
+     "type": "exact",
+     "url": "share_click"
+    }
+   ]
+  },
+  {
+   "id": 581811947,
+   "name": "Включён antag-режим",
+   "type": "action",
+   "default_price": 0.0,
+   "is_retargeting": 0,
+   "goal_source": "user",
+   "is_favorite": 0,
+   "status": "Active",
+   "labels": [],
+   "conditions": [
+    {
+     "type": "exact",
+     "url": "antag_on"
+    }
+   ]
+  },
+  {
+   "id": 581811948,
+   "name": "Стратегия загружена в batch",
+   "type": "action",
+   "default_price": 0.0,
+   "is_retargeting": 0,
+   "goal_source": "user",
+   "is_favorite": 0,
+   "status": "Active",
+   "labels": [],
+   "conditions": [
+    {
+     "type": "exact",
+     "url": "strategy_to_batch"
+    }
+   ]
+  },
+  {
+   "id": 581811981,
+   "name": "Туториал: старт",
+   "type": "action",
+   "default_price": 0.0,
+   "is_retargeting": 0,
+   "goal_source": "user",
+   "is_favorite": 0,
+   "status": "Active",
+   "labels": [],
+   "conditions": [
+    {
+     "type": "exact",
+     "url": "tutorial_start"
+    }
+   ]
+  },
+  {
+   "id": 581811982,
+   "name": "Туториал: пройден до конца",
+   "type": "action",
+   "default_price": 0.0,
+   "is_retargeting": 0,
+   "goal_source": "user",
+   "is_favorite": 0,
+   "status": "Active",
+   "labels": [],
+   "conditions": [
+    {
+     "type": "exact",
+     "url": "tutorial_done"
+    }
+   ]
+  },
+  {
+   "id": 581811983,
+   "name": "Туториал: пропущен",
+   "type": "action",
+   "default_price": 0.0,
+   "is_retargeting": 0,
+   "goal_source": "user",
+   "is_favorite": 0,
+   "status": "Active",
+   "labels": [],
+   "conditions": [
+    {
+     "type": "exact",
+     "url": "tutorial_skip"
+    }
+   ]
+  }
+ ]
+}
