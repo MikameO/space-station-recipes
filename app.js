@@ -40,9 +40,11 @@ let antagFilterMethods      = new Set(); // subset of {inject, ingest, drink, fo
 // registered in Metrika as "JavaScript event" goals with the same id;
 // params surface in the visit-params report.
 //
-// Goal ids sent from this file:
-//   tab_reactions / tab_calculator / tab_trees / tab_graph /
-//   tab_botany / tab_stats / tab_antag       — tab opened
+// Goal ids sent from this file (registry of record:
+// scripts/create_metrika_goals.py — run it after adding an id here,
+// otherwise Metrika silently drops the new event):
+//   tab_<id>                                 — tab opened, dynamic for every
+//                                              tab except default 'reagents'
 //   reagent_open {reagent, tab}              — detail panel opened
 //   fork_select {fork}                       — source filter changed
 //   search_used {q, tab, results}            — settled query with results
@@ -51,10 +53,20 @@ let antagFilterMethods      = new Set(); // subset of {inject, ingest, drink, fo
 //   batch_plan {targets}                     — batch planner run
 //   reverse_used {ingredient}                — reverse lookup ingredient added
 //   tree_built {reagent}                     — craft tree built
+//   tree_checklist_used {reagent}            — first checklist tick on a tree
 //   share_click {tab, antag}                 — share link copied
 //   antag_on                                 — antag mode enabled
 //   strategy_to_batch {strategy}             — strategy loaded into batch
-// tutorial.js additionally sends: tutorial_start / tutorial_done / tutorial_skip
+//   preset_to_batch {preset}                 — shift-start preset loaded
+//   whatheals_type {type} / _species {species} — medbay filters
+//   beaker_sim {n, tempK}                    — beaker simulator run
+//   forkdiff_view {from, to}                 — fork diff pair viewed
+//   pip_open {api}                           — PiP / popup companion opened
+//   companion_filters {open} / companion_collapse {collapsed}
+//   pin_callout_shown / pin_callout_dismiss {reason}
+// tutorial.js additionally sends: tutorial_start {auto} / tutorial_done /
+//   tutorial_skip {step}; maps.js sends: maps_map_select / maps_search /
+//   maps_sell_list / maps_multi_show
 
 const YM_COUNTER_ID = 108585248;
 function track(goal, params) {

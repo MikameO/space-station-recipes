@@ -65,6 +65,27 @@ GOALS: list[tuple[str, str]] = [
     ("tutorial_start",    "Туториал: старт"),
     ("tutorial_done",     "Туториал: пройден до конца"),
     ("tutorial_skip",     "Туториал: пропущен"),
+    # Added 2026-07-28: events shipped after the initial 21 (medbay, maps,
+    # beaker sim, presets, forkdiff, PiP, companion, pin callout). They were
+    # being dropped by Metrika until these goals were created.
+    ("tab_medbay",          "Вкладка: Medbay (Чем лечить)"),
+    ("tab_maps",            "Вкладка: Maps"),
+    ("tab_forkdiff",        "Вкладка: Fork Diff"),
+    ("whatheals_type",      "Medbay: выбран тип урона"),
+    ("whatheals_species",   "Medbay: выбран вид существа"),
+    ("beaker_sim",          "Симулятор стакана: запуск"),
+    ("tree_checklist_used", "Дерево: чеклист использован"),
+    ("preset_to_batch",     "Пресет загружен в batch"),
+    ("forkdiff_view",       "Fork Diff: просмотр пары форков"),
+    ("pip_open",            "Открыт PiP-режим"),
+    ("pin_callout_shown",   "Pin-подсказка показана"),
+    ("pin_callout_dismiss", "Pin-подсказка закрыта"),
+    ("companion_filters",   "Companion: переключены фильтры"),
+    ("companion_collapse",  "Companion: панель свёрнута"),
+    ("maps_map_select",     "Карты: выбрана станция"),
+    ("maps_search",         "Карты: поиск предмета"),
+    ("maps_sell_list",      "Карты: открыт sell-list"),
+    ("maps_multi_show",     "Карты: multi-show"),
 ]
 
 
