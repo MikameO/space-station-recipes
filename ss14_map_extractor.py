@@ -259,6 +259,7 @@ class Registry:
         self.entity_tables = {} # entityTable id -> selector tree (modern container fills)
         self.materials = {}     # material id -> price per unit (sell-list mode)
         self.stack_types = {}   # stack type id -> {"maxCount", "parent"}
+        self.item_sizes = {}    # itemSize id -> weight (storage slots)
         self.ftl = {}           # fluent key -> english text
         self._kind_cache = {}
 
@@ -424,6 +425,31 @@ class Registry:
         mx = self._stack_max(self._stack_field(pid, "stackType"))
         return min(30, mx) if mx else 30
 
+    def _item_field(self, pid, field):
+        """Nearest value of one Item field across the chain — same per-field merge
+        as Stack: Crowbar declares its own Item (sprite only) while size sits in
+        BaseCrowbar's Item. Nearest-dict-wins would default half the tools."""
+        for node in self._chain(pid):
+            comp = node["components"].get("Item")
+            if isinstance(comp, dict) and field in comp:
+                return comp[field]
+        return None
+
+    def item_size(self, pid):
+        """(sizeId, weight) for carryable items, None for non-items. YAML omitting
+        size -> C# default "Small" (ItemComponent.cs, verified live 2026-07-28).
+        Unknown/zero-weight size ids degrade to None rather than a fake ratio."""
+        if self._find_component(pid, "Item") is None:
+            return None
+        sid = self._item_field(pid, "size") or "Small"
+        try:
+            w = float(self.item_sizes.get(sid))
+        except (TypeError, ValueError):
+            return None
+        if w <= 0:
+            return None
+        return (sid, int(w) if w.is_integer() else w)
+
     def price(self, pid):
         """Sell price per spawned entity — mirrors PricingSystem.GetEstimatedPrice
         (fetched live 2026-07-27): materials x stack count, then StackPrice x count
@@ -567,6 +593,8 @@ def build_registry(fork_key: str, fork_cfg: dict, tree: list[str]) -> Registry:
                 elif t == "stack" and eid:
                     reg.stack_types[eid] = {"maxCount": entry.get("maxCount"),
                                             "parent": entry.get("parent")}
+                elif t == "itemSize" and eid:
+                    reg.item_sizes[eid] = entry.get("weight", 0)
     # Fluent: beacon names
     ftl_paths = [p for p in tree if p.endswith(".ftl") and "en-US" in p and "navmap" in p.lower()]
     for path in ftl_paths:
@@ -792,33 +820,44 @@ def build_map_json(fork_key, map_id, map_name, parsed, reg, bounds):
     print(f"  wrote {out} ({out.stat().st_size // 1024} KB, {len(items)} protos)")
     return data
 
-PRICES_SCHEMA_VERSION = 2   # v2: interned class table + items {pid: [price, classIdx?]}
+PRICES_SCHEMA_VERSION = 3   # v3: + sizes table [[id, weight]]; items [price, clsIdx|-1, sizeIdx|-1], trailing -1 trimmed
 
 def write_prices(fork_key: str, reg: Registry):
-    """maps/<fork>/prices.json — per-proto sell price + class for the sell-list
-    mode. Registry-only output: baked map JSONs stay untouched (spec 2026-07-27)."""
+    """maps/<fork>/prices.json — per-proto sell price + class + item size for the
+    sell-list mode. Registry-only output: baked map JSONs stay untouched."""
     classes, cidx, items = [], {}, {}
+    sizes, sidx = [], {}
     for pid, node in reg.protos.items():
         if node.get("abstract") or reg.kind(pid) not in ("item", "mach", "container", "vendor"):
             continue
         p = reg.price(pid)
         cls = reg.entity_class(pid)
-        if p <= 0 and cls is None:
+        sz = reg.item_size(pid)
+        if p <= 0 and cls is None and sz is None:
             continue   # nothing to say about it
-        ent = [int(p) if float(p).is_integer() else p]
+        ci = -1
         if cls is not None:
             if cls not in cidx:
                 cidx[cls] = len(classes); classes.append(cls)
-            ent.append(cidx[cls])
+            ci = cidx[cls]
+        si = -1
+        if sz is not None:
+            if sz[0] not in sidx:
+                sidx[sz[0]] = len(sizes); sizes.append(list(sz))
+            si = sidx[sz[0]]
+        ent = [int(p) if float(p).is_integer() else p, ci, si]
+        while len(ent) > 1 and ent[-1] == -1:
+            ent.pop()
         items[pid] = ent
     fdir = OUT_DIR / fork_key
     fdir.mkdir(parents=True, exist_ok=True)
     out = fdir / "prices.json"
     out.write_text(json.dumps({"schemaVersion": PRICES_SCHEMA_VERSION, "fork": fork_key,
-                               "classes": classes, "items": items},
+                               "classes": classes, "sizes": sizes, "items": items},
                               ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
     priced = sum(1 for e in items.values() if e[0] > 0)
-    print(f"  wrote {out} ({out.stat().st_size // 1024} KB, {priced} priced / {len(items)} classed protos)")
+    sized = sum(1 for e in items.values() if len(e) > 2 and e[2] >= 0)
+    print(f"  wrote {out} ({out.stat().st_size // 1024} KB, {priced} priced / {sized} sized / {len(items)} protos)")
 
 # ── selfcheck ──
 
@@ -883,6 +922,15 @@ def selfcheck():
                       ("ClothingBeltUtility", "storage"),   # toolbelt: worn, but it's a container
                       ("IngotGold1", "materials")]:
         assert reg.entity_class(pid) == want, (pid, reg.entity_class(pid))
+    # S4 item sizes (live-verified 2026-07-28): item_size.yml Tiny=1/Small=2/Normal=4;
+    # Pen declares size Tiny; Crowbar's own Item has no size — Small sits in
+    # BaseCrowbar (per-field chain merge); IngotGold1 inherits Normal from
+    # MaterialBase four levels up; a filled closet is not carryable at all.
+    assert reg.item_sizes.get("Normal") == 4 and reg.item_sizes.get("Tiny") == 1, reg.item_sizes
+    assert reg.item_size("Pen") == ("Tiny", 1), reg.item_size("Pen")
+    assert reg.item_size("Crowbar") == ("Small", 2), reg.item_size("Crowbar")
+    assert reg.item_size("IngotGold1") == ("Normal", 4), reg.item_size("IngotGold1")
+    assert reg.item_size("ClosetToolFilled") is None, reg.item_size("ClosetToolFilled")
     load_tile_colors("vanilla", fork, reg)
     c = reg.tile_color("FloorSteel")
     assert c and abs(c[0] - c[1]) < 40 and sum(c) > 60, f"FloorSteel avg color odd: {c}"
