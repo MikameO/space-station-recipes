@@ -8,8 +8,11 @@
     selectedProto: null, inited: false,
     prices: {}, pricesReq: {},     // fork -> {pid: price} | null (known-missing)
     classes: {},                   // fork -> {pid: className}
+    sizesByPid: {},                // fork -> {pid: [sizeId, weight]} (schema v3)
     listSort: { key: 'total', dir: -1 },   // sell list: priciest first by default
     listClasses: null,             // Set of active class chips; null = all
+    lastRows: [],                  // rows of the last renderList — feed for "show on map"
+    multi: null,                   // Set of pids shown on the map at once; null = single mode
   };
   const CLASS_ORDER = ['guns', 'melee', 'explosives', 'armor', 'clothing', 'food', 'drinks',
                        'medical', 'tools', 'materials', 'storage', 'machinery', 'misc'];
@@ -68,7 +71,7 @@
   async function loadMap(file) {
     const status = document.getElementById('mapsStatus');
     status.textContent = 'Loading ' + file + '…';
-    S.mapData = null; S.selectedProto = null;
+    S.mapData = null; S.selectedProto = null; S.multi = null;
     closeList();
     S.listClasses = null;   // stale chips may not exist on the next map
     document.getElementById('mapsListBtn').disabled = true;
@@ -143,17 +146,21 @@
     ctx.globalAlpha = 1;
   }
   function drawMarkers(ctx) {
-    if (!S.selectedProto || !S.mapData) return;
-    const rec = S.mapData.items[S.selectedProto];
-    if (!rec) return;
+    if (!S.mapData) return;
+    const pids = S.multi ? S.multi : (S.selectedProto ? [S.selectedProto] : null);
+    if (!pids) return;
     const r = Math.max(3, Math.min(8, S.scale * 1.2));
-    for (const p of rec.p) {
-      if (p[2] === 3) continue;              // off-grid: list only
-      const [sx, sy] = tileToScreen(p[0], p[1]);
-      ctx.beginPath(); ctx.arc(sx, sy, r, 0, Math.PI * 2);
-      ctx.fillStyle = KIND_COLOR[p[2]] || '#39ff85';
-      ctx.fill();
-      ctx.strokeStyle = '#06090f'; ctx.lineWidth = 1.5; ctx.stroke();
+    for (const pid of pids) {
+      const rec = S.mapData.items[pid];
+      if (!rec) continue;
+      for (const p of rec.p) {
+        if (p[2] === 3) continue;              // off-grid: list only
+        const [sx, sy] = tileToScreen(p[0], p[1]);
+        ctx.beginPath(); ctx.arc(sx, sy, r, 0, Math.PI * 2);
+        ctx.fillStyle = KIND_COLOR[p[2]] || '#39ff85';
+        ctx.fill();
+        ctx.strokeStyle = '#06090f'; ctx.lineWidth = 1.5; ctx.stroke();
+      }
     }
   }
 
@@ -184,6 +191,7 @@
   }
   function pick(pid) {
     S.selectedProto = pid;
+    S.multi = null;   // single pick replaces a multi-show set
     const rec = S.mapData.items[pid];
     document.getElementById('mapsSearch').value = rec.n || pid;
     document.getElementById('mapsSuggest').hidden = true;
@@ -242,20 +250,22 @@
       S.pricesReq[fork] = fetch('maps/' + fork + '/prices.json')
         .then(r => r.ok ? r.json() : null)
         .then(j => {
-          if (!j) { S.prices[fork] = null; S.classes[fork] = {}; return; }
-          // schema v2: classes table + items {pid: [price, classIdx?]}
-          const P = {}, C = {}, tbl = j.classes || [];
+          if (!j) { S.prices[fork] = null; S.classes[fork] = {}; S.sizesByPid[fork] = {}; return; }
+          // schema v3: classes+sizes tables; items [price, clsIdx|-1, sizeIdx|-1], trailing -1 trimmed
+          const P = {}, C = {}, Z = {}, tbl = j.classes || [], stbl = j.sizes || [];
           for (const [pid, ent] of Object.entries(j.items || {})) {
             if (ent[0] > 0) P[pid] = ent[0];
-            if (ent.length > 1) C[pid] = tbl[ent[1]];
+            if (ent.length > 1 && ent[1] >= 0) C[pid] = tbl[ent[1]];
+            if (ent.length > 2 && ent[2] >= 0 && stbl[ent[2]]) Z[pid] = stbl[ent[2]];
           }
-          S.prices[fork] = P; S.classes[fork] = C;
+          S.prices[fork] = P; S.classes[fork] = C; S.sizesByPid[fork] = Z;
         })
-        .catch(() => { S.prices[fork] = null; S.classes[fork] = {}; });
+        .catch(() => { S.prices[fork] = null; S.classes[fork] = {}; S.sizesByPid[fork] = {}; });
     }
     return S.pricesReq[fork];
   }
   const fmtQty = q => Number.isInteger(q) ? String(q) : '≈' + q.toFixed(1);
+  const fmtRatio = r => !r ? '—' : (r >= 10 ? fmtMoney(r) : r.toFixed(1));
   function fmtMoney(n) {
     if (!n) return '—';
     const r = Math.round(n);
@@ -265,8 +275,11 @@
     const fork = S.mapMeta.file.split('/')[0];
     const priceMap = S.prices[fork] || {};
     const clsMap = S.classes[fork] || {};
+    const szMap = S.sizesByPid[fork] || {};
     const withVend = document.getElementById('mapsListVend').checked;
     const cert = document.getElementById('mapsListCert').value;   // all | sure | chance
+    const minP = parseFloat(document.getElementById('mapsListMinPrice').value) || 0;
+    const maxS = parseFloat(document.getElementById('mapsListMaxSize').value) || 0;
     const rows = [];
     for (const [pid, rec] of Object.entries(S.mapData.items)) {
       let q = 0;
@@ -283,7 +296,11 @@
       const cls = rec.c === 'mach' ? 'machinery' : (clsMap[pid] || 'misc');
       if (S.listClasses && !S.listClasses.has(cls)) continue;
       const price = priceMap[pid] || 0;
-      rows.push({ pid, name: rec.n || pid, qty: q, price, total: q * price });
+      const sz = szMap[pid];                    // [sizeId, weight] | undefined (not carryable)
+      if (minP > 0 && price < minP) continue;
+      if (maxS > 0 && (!sz || sz[1] > maxS)) continue;   // a size cap implies "must fit" — no-size rows drop
+      rows.push({ pid, name: rec.n || pid, qty: q, price, total: q * price,
+                  size: sz ? sz[1] : 0, ratio: sz && price ? price / sz[1] : 0 });
     }
     return rows;
   }
@@ -304,16 +321,33 @@
     if (flt) rows = rows.filter(r => r.name.toLowerCase().includes(flt) || r.pid.toLowerCase().includes(flt));
     rows.sort((a, b) => (key === 'name' ? dir * a.name.localeCompare(b.name)
                                         : dir * (a[key] - b[key]) || a.name.localeCompare(b.name)));
+    S.lastRows = rows;   // feed for "show on map"
     document.getElementById('mapsListBody').innerHTML = rows.map(r =>
       `<tr data-pid="${r.pid}"><td class="mlt-name">${r.name}<small>${r.pid}</small></td>` +
       `<td class="mlt-num">${fmtQty(r.qty)}</td><td class="mlt-num">${fmtMoney(r.price)}</td>` +
+      `<td class="mlt-num">${fmtRatio(r.ratio)}</td>` +
       `<td class="mlt-num mlt-total">${fmtMoney(r.total)}</td></tr>`).join('');
     document.querySelectorAll('.maps-list-table th').forEach(th => {
       th.querySelector('.maps-sort-arr').textContent = th.dataset.sort === key ? (dir > 0 ? '▲' : '▼') : '';
     });
     document.getElementById('mapsListFiltersDot').textContent =
       (flt || S.listClasses || document.getElementById('mapsListCert').value !== 'all'
-           || document.getElementById('mapsListVend').checked) ? ' •' : '';
+           || document.getElementById('mapsListVend').checked
+           || +document.getElementById('mapsListMinPrice').value > 0
+           || +document.getElementById('mapsListMaxSize').value > 0) ? ' •' : '';
+  }
+  function renderMultiLocations(rows) {
+    const el = document.getElementById('mapsLocations');
+    let pts = 0;
+    for (const r of rows) {
+      const rec = S.mapData.items[r.pid];
+      if (rec) pts += rec.p.filter(p => p[2] !== 3).length;
+    }
+    el.innerHTML = `<p class="maps-hint"><b>${rows.length}</b> <span>items</span> · <b>${pts}</b> <span>markers</span></p>` +
+      rows.slice(0, 60).map(r =>
+        `<button class="maps-loc" data-pid="${r.pid}"><b>${r.name}</b><span>${fmtQty(r.qty)}</span><small>${fmtMoney(r.price)}</small></button>`).join('') +
+      (rows.length > 60 ? `<p class="maps-hint">+${rows.length - 60}…</p>` : '');
+    el.querySelectorAll('[data-pid]').forEach(b => b.onclick = () => pick(b.dataset.pid));
   }
   function closeList() {
     const p = document.getElementById('mapsListPanel');
@@ -335,6 +369,17 @@
     document.getElementById('mapsListFilter').oninput = () => { if (!panel.hidden) renderList(); };
     document.getElementById('mapsListVend').onchange = () => { if (!panel.hidden) renderList(); };
     document.getElementById('mapsListCert').onchange = () => { if (!panel.hidden) renderList(); };
+    document.getElementById('mapsListMinPrice').oninput = () => { if (!panel.hidden) renderList(); };
+    document.getElementById('mapsListMaxSize').oninput = () => { if (!panel.hidden) renderList(); };
+    document.getElementById('mapsListShow').onclick = () => {
+      const rows = S.lastRows;
+      if (!rows.length || !S.mapData) return;
+      S.multi = new Set(rows.map(r => r.pid));
+      S.selectedProto = null;
+      document.getElementById('mapsSearch').value = '';
+      closeList(); draw(); renderMultiLocations(rows);
+      if (typeof track === 'function') track('maps_multi_show');
+    };
     document.getElementById('mapsListClasses').onclick = e => {
       const chip = e.target.closest('.maps-chip');
       if (!chip) return;
@@ -373,7 +418,11 @@
           || e.target.closest('#mapsListBtn')) return;
       closeList();
     });
-    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeList(); });
+    document.addEventListener('keydown', e => {
+      if (e.key !== 'Escape') return;
+      if (!panel.hidden) closeList();
+      else if (S.multi) { S.multi = null; draw(); renderLocations(null); }   // second Esc clears multi-show
+    });
   }
 
   window.addEventListener('resize', () => { if (S.img && document.getElementById('tab-maps').classList.contains('active')) zoomFit(); });

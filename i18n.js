@@ -429,6 +429,14 @@
     'Curated from playtime — the mechanics live in C# code, not extractable YAML. PRs welcome.': 'Собрано из игрового опыта — механика живёт в C#-коде, не в YAML. PR приветствуются.',
     // Maps extras
     'Filters': 'Фильтры',
+    'Show on map': 'Показать на карте',
+    'Per slot': 'За слот',
+    'Price ≥': 'Цена ≥',
+    'Size ≤': 'Размер ≤',
+    'Minimum unit price': 'Минимальная цена за штуку',
+    'Maximum item size': 'Максимальный размер предмета',
+    'items': 'предметов',
+    'markers': 'маркеров',
     'Pick an item to see where it lives.': 'Выберите предмет, чтобы увидеть, где он лежит.',
     // Maps sell list
     '$ Sell list': '$ Что продать',

@@ -3117,8 +3117,10 @@ body.antag-active .empty-state-chip:focus-visible {
   border-bottom: 1px solid var(--border-subtle); }
 .maps-list-filters { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; padding: 8px 10px;
   border-bottom: 1px solid var(--border-subtle); }
-.maps-list-filters input[type="text"] { flex: 1; min-width: 100px; background: var(--panel); color: var(--text-bright);
+.maps-list-filters input[type="text"], .maps-list-filters input[type="number"] {
+  flex: 1; min-width: 100px; background: var(--panel); color: var(--text-bright);
   border: 1px solid var(--border-subtle); font-family: 'Share Tech Mono', monospace; padding: 6px 8px; }
+.maps-list-filters input[type="number"] { flex: 0 0 96px; min-width: 0; }
 .maps-list-vend { display: flex; align-items: center; gap: 5px; color: var(--text-sub); font-size: 0.8rem;
   white-space: nowrap; cursor: pointer; }
 .maps-list-filters select { background: var(--panel); color: var(--text-bright); border: 1px solid var(--border-subtle);
