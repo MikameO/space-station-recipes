@@ -54,6 +54,10 @@
     reqObjective: 'blastRadius', reqCostLimit: null,
     reqs: [{ metric: 'shards', min: 20 }],   // opens on a real, useful example
     reqLadder: false, reqResult: undefined,
+    // Reagents the spec search may not touch. Octogen is buildable and
+    // still a chore, so being able to say "anything but that" is worth
+    // more than any weighting I could invent for it.
+    reqExclude: [],
     galleryRange: 0,
     // How long a xeno actually burns. The flame outlasts the target's
     // patience: it runs out, and the hive pats it out at ten stacks a
@@ -134,6 +138,7 @@
     'For': 'Зачем', 'Kills': 'Убивает',
     'Fire': 'Огонь',
     'Reach': 'Дальнобой', 'Damage': 'Урон',
+    'Without': 'Без',
     'Short chain': 'Короткая цепь', 'HE round': 'Фугасный', 'Breach': 'Пролом', 'Denial': 'Отсечение',
     'HE': 'Фугас',
     'Work': 'Материал', 'Steps': 'Реакций',
@@ -308,6 +313,7 @@
       buildCasingSelect();
       buildAddSelect();
       buildCostSelect();
+      buildExcludeSelect();
       renderReqList();
       loadMasks();
       renderMaskList();
@@ -501,6 +507,10 @@
       if (box.disabled) { box.checked = false; S.reqLadder = false; }
     };
     $('ordReqLadder').onchange = e => { S.reqLadder = e.target.checked; };
+    $('ordReqExclude').onchange = e => {
+      S.reqExclude = [...e.target.selectedOptions].map(o => o.value);
+      track('ordnance_req_exclude', { count: S.reqExclude.length });
+    };
     $('ordReqCost').oninput = e => {
       const v = e.target.value.trim();
       S.reqCostLimit = v === '' ? null : Math.max(0, +v);
@@ -513,14 +523,17 @@
     $('ordReqRun').onclick = () => {
       const btn = $('ordReqRun');
       btn.disabled = true;
-      // One frame so the disabled state paints before the synchronous search.
-      requestAnimationFrame(() => {
+      // A short timer rather than a frame. The intent is the same, to let the
+      // disabled state paint before a synchronous search of a few hundred
+      // milliseconds, but requestAnimationFrame never fires in a background
+      // tab, so switching away mid-click left the button disabled for good.
+      setTimeout(() => {
         S.reqResult = S.reqLadder ? reqLadderRows() : reqSearch(liveSpec());
         track('ordnance_req_search',
               { objective: S.reqObjective, reqs: S.reqs.length, ladder: S.reqLadder ? 1 : 0 });
         renderReqResult();
         btn.disabled = false;
-      });
+      }, 16);
     };
     setupSurfaceInput();
   }
@@ -1592,14 +1605,31 @@
   // region by a penalty, so requirements can be met from anywhere.
   function reqPool() {
     const F = S.data.formula;
+    const banned = new Set(S.reqExclude);
     return Object.keys(S.data.reagents).filter(id => {
       const r = S.data.reagents[id];
       // Only what a player can actually obtain. Tank napalms and research
       // variants have no reaction and no dispenser slot, so proposing one is
       // proposing a mixture nobody can build.
       if (!r.obtainable) return false;
+      if (banned.has(id)) return false;
       return r.explosive || r.i || r.d || r.r || id === F.ironReagent;
     });
+  }
+
+  // The exclusion list offers the same reagents the search would otherwise
+  // consider, so nothing in it is a no-op. Built once the data is in.
+  function buildExcludeSelect() {
+    const sel = $('ordReqExclude');
+    if (!sel) return;
+    const F = S.data.formula;
+    const ids = Object.keys(S.data.reagents).filter(id => {
+      const r = S.data.reagents[id];
+      return r.obtainable && (r.explosive || r.i || r.d || r.r || id === F.ironReagent);
+    }).sort((a, b) => rname(a).localeCompare(rname(b)));
+    sel.innerHTML = ids.map(id =>
+      `<option value="${esc(id)}">${esc(rname(id))}</option>`).join('');
+    for (const o of sel.options) o.selected = S.reqExclude.includes(o.value);
   }
 
   // What one unit of a reagent contributes to a metric, read straight off the
