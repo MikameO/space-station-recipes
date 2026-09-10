@@ -20,6 +20,34 @@ let antagMode = false;
 let activeSort = 'name-asc'; // 'name-asc' | 'name-desc' | 'category' | 'used-in' | 'antag-desc'
 let activeTaste = 'all'; // 'all' | 'has-taste' | 'tasteless'
 
+// ─────────────────────────────────────────────
+// Working state that survives a reload
+// ─────────────────────────────────────────────
+// A refresh used to drop the open tab, the craft-tree target and amount, and
+// every tick on the gathering checklist. None of that is worth losing to a
+// stray F5 halfway through a shopping run. It is kept in localStorage rather
+// than the URL because the hash is only written when Share is clicked, and it
+// expires twelve hours after the last use so tomorrow's shift starts clean.
+const SESSION_KEY = 'ss14_session';
+const SESSION_TTL = 12 * 60 * 60 * 1000;
+
+function loadSession() {
+  try {
+    const raw = JSON.parse(localStorage.getItem(SESSION_KEY) || 'null');
+    if (!raw || !raw.at || Date.now() - raw.at > SESSION_TTL) return {};
+    return raw.data || {};
+  } catch (e) {
+    return {};                                   // private mode, or corrupt
+  }
+}
+
+function saveSession(patch) {
+  try {
+    const data = Object.assign(loadSession(), patch);
+    localStorage.setItem(SESSION_KEY, JSON.stringify({ at: Date.now(), data }));
+  } catch (e) { /* private mode: the app just forgets, which is the old behaviour */ }
+}
+
 // Increment D — antag strategy filters (all default 'all').
 // Persisted in URL as af_d / af_s / af_v / af_m.
 // Increment K: difficulty & method are multi-select Sets. Empty Set = no
@@ -149,6 +177,7 @@ async function init() {
   setupBotanyFilters();
   setupSortSelect();
   decodeURLState();
+  restoreSession();
 
   renderReagents();
 
@@ -480,6 +509,7 @@ function setupTabs() {
       btn.setAttribute('aria-selected', 'true');
       document.getElementById('tab-' + tab).classList.add('active');
       activeTab = tab;
+      saveSession({ tab });
       if (tab !== 'reagents') track('tab_' + tab); // reagents is the default view
       renderCurrentTab();
     });
@@ -1811,6 +1841,14 @@ let currentTreeReagentId = null;
 // A4: checked node paths — survives amount changes (same structure), resets on new reagent
 let treeChecks = new Set();
 
+function saveTreeSession() {
+  saveSession({
+    treeTarget: currentTreeReagentId,
+    treeAmount: document.getElementById('treeAmount')?.value || '1',
+    treeChecks: [...treeChecks],
+  });
+}
+
 function updateTreeProgress() {
   const total = document.querySelectorAll('#treeOutput .tree-check').length;
   const done = document.querySelectorAll('#treeOutput .tree-check:checked').length;
@@ -1848,10 +1886,22 @@ function setupCraftTrees() {
     treeChecks = new Set(); // A4: new tree = fresh checklist
     track('tree_built', { reagent: id });
     rebuildTree();
+    saveTreeSession();
   });
 
   // Amount input — rebuild tree when changed
-  amountInput.addEventListener('input', rebuildTree);
+  amountInput.addEventListener('input', () => { rebuildTree(); saveTreeSession(); });
+
+  // Put the tree back the way it was left, ticks and all. Called from
+  // restoreSession so it runs once the data and the autocomplete both exist.
+  window.restoreTreeSession = (saved) => {
+    if (!saved.treeTarget || !DATA.reagents[saved.treeTarget]) return;
+    currentTreeReagentId = saved.treeTarget;
+    input.value = DATA.reagents[saved.treeTarget].name || saved.treeTarget;
+    amountInput.value = saved.treeAmount || '1';
+    treeChecks = new Set(saved.treeChecks || []);
+    rebuildTree();
+  };
 
   // A4: checklist wiring (delegated — tree HTML re-renders often)
   document.getElementById('treeOutput').addEventListener('change', e => {
@@ -1865,6 +1915,7 @@ function setupCraftTrees() {
     }
     e.target.closest('.tree-node').classList.toggle('checked', e.target.checked);
     updateTreeProgress();
+    saveTreeSession();
   });
   document.getElementById('treeResetChecks')?.addEventListener('click', () => {
     treeChecks = new Set();
@@ -1873,6 +1924,7 @@ function setupCraftTrees() {
       box.closest('.tree-node').classList.remove('checked');
     });
     updateTreeProgress();
+    saveTreeSession();
   });
 }
 
@@ -3105,6 +3157,19 @@ function decodeURLState() {
   if (rid) setTimeout(() => openDetail(rid), 100);
 
   renderCurrentTab();
+}
+
+// Runs after decodeURLState, and defers to it: a link someone shared names the
+// tab explicitly and must not be overruled by what this browser was doing last.
+function restoreSession() {
+  const saved = loadSession();
+  const hash = new URLSearchParams(location.hash.slice(1));
+  if (saved.tab && !hash.get('tab')) {
+    const btn = document.querySelector(`.tab-btn[data-tab="${CSS.escape(saved.tab)}"]`);
+    // A hidden tab button means that panel is gated off right now; leave it.
+    if (btn && btn.offsetParent !== null) btn.click();
+  }
+  if (window.restoreTreeSession) window.restoreTreeSession(saved);
 }
 
 function setupShareButton() {
