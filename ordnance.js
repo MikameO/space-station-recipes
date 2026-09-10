@@ -47,6 +47,9 @@
     pick: null,                     // {i, j} cell the user clicked, or null
     surfCells: [],                  // screen polygons of the last surface draw
     costBase: null, paretoMetric: 'power',
+    reqObjective: 'blastRadius', reqCostLimit: null,
+    reqs: [{ metric: 'shards', min: 20 }],   // opens on a real, useful example
+    reqResult: undefined,
     costCache: new Map(),
   };
 
@@ -104,6 +107,13 @@
     'Burn time': 'Длительность горения',
     'Fire reach': 'Охват огня',
     'same everywhere': 'одинаково везде',
+    'at least': 'не менее',
+    'Uses': 'Реагентов:',
+    'cost': 'цена',
+    'Lowest cost': 'Минимальная цена',
+    'requirements not met': 'требования не выполнены',
+    'Nothing in this casing can do that.': 'В этом корпусе такого не собрать.',
+    'No requirements: the search just maximises.': 'Без требований поиск просто максимизирует.',
   };
   const tr = s => (window.I18N_LANG === 'ru' && RU[s]) || s;
   const mlabel = key => tr(METRICS[key].label);
@@ -253,6 +263,7 @@
       buildCasingSelect();
       buildAddSelect();
       buildCostSelect();
+      renderReqList();
       presetMix();
       renderAll();
     } catch (e) {
@@ -405,6 +416,27 @@
     };
     $('ordCostBase').onchange = e => { S.costBase = e.target.value; renderPareto(); };
     $('ordParetoMetric').onchange = e => { S.paretoMetric = e.target.value; renderPareto(); };
+    $('ordReqObjective').onchange = e => { S.reqObjective = e.target.value; };
+    $('ordReqCost').oninput = e => {
+      const v = e.target.value.trim();
+      S.reqCostLimit = v === '' ? null : Math.max(0, +v);
+    };
+    $('ordReqAdd').onclick = () => {
+      if (S.reqs.length >= 5) return;                 // more than this is unreadable
+      S.reqs.push({ metric: 'blastRadius', min: 0 });
+      renderReqList();
+    };
+    $('ordReqRun').onclick = () => {
+      const btn = $('ordReqRun');
+      btn.disabled = true;
+      // One frame so the disabled state paints before the synchronous search.
+      requestAnimationFrame(() => {
+        S.reqResult = reqSearch();
+        track('ordnance_req_search', { objective: S.reqObjective, reqs: S.reqs.length });
+        renderReqResult();
+        btn.disabled = false;
+      });
+    };
     setupSurfaceInput();
   }
 
@@ -1225,6 +1257,286 @@
       tr.style.cursor = 'pointer';
       tr.onclick = () => { S.mix = Object.assign({}, rows[i - 1].mix); track('ordnance_pareto_use'); renderAll(); };
     });
+  }
+
+  // ── build to a spec ────────────────────────────────────────────────────────
+  // Every output of the formula is linear in the amounts (blast radius is a ratio
+  // of two linear terms), so maximising ONE of them never needs more than two
+  // reagents — the optimum sits on a vertex or an edge of the composition
+  // simplex. Extra reagents only start paying once several outputs are required
+  // at once, which is exactly what this searches.
+  //
+  // Method: multi-start hill climbing rather than a grid. A grid over four
+  // components is both slow and coarse, while the landscape here is piecewise
+  // linear and climbs cleanly. Infeasible starts are pulled toward the feasible
+  // region by a penalty, so requirements can be met from anywhere.
+  function reqPool() {
+    const F = S.data.formula;
+    return Object.keys(S.data.reagents).filter(id => {
+      const r = S.data.reagents[id];
+      return r.explosive || r.i || r.d || r.r || id === F.ironReagent;
+    });
+  }
+
+  // What one unit of a reagent contributes to a metric, read straight off the
+  // data rather than by filling a casing with it. Judging a reagent alone is
+  // exactly wrong for the ones that need a partner: iron alone yields no
+  // shrapnel because nothing gives it power, and carbon alone yields no burn
+  // time because nothing lights the fire.
+  function perUnit(metricKey, id) {
+    const r = S.data.reagents[id];
+    if (!r) return 0;
+    const F = S.data.formula;
+    switch (metricKey) {
+      case 'shards': return id === F.ironReagent ? F.shardsPerUnit : 0;
+      case 'power': return r.explosive ? r.power : 0;
+      case 'damage': return (r.explosive ? r.power : 0) * F.damagePerIntensity / F.intensityDivisor;
+      case 'fireIntensity': return r.i;
+      case 'fireDuration': return r.d;
+      case 'reach': return r.r;
+      // Blast radius is power over falloff, so what helps is power per unit and
+      // falloff pushed down; rank by the two together.
+      case 'blastRadius': return r.explosive ? r.power - r.falloff * 20 : 0;
+      default: return 0;
+    }
+  }
+
+  function bestReagentFor(metricKey, pool) {
+    let best = null, bestV = 0;
+    for (const id of pool) {
+      const v = perUnit(metricKey, id);
+      if (v > bestV) { bestV = v; best = id; }
+    }
+    return best;
+  }
+
+  // Build the mixture the way a person would: give each requirement just enough
+  // of the reagent that serves it, light the fire if any fire requirement needs
+  // it, and pour the remaining volume into whatever the objective wants. The
+  // climb then refines it. This is the seed that finds the good answers.
+  function constructiveSeed(pool, cap) {
+    const F = S.data.formula;
+    const mix = {};
+    let used = 0;
+    let needsFire = false;
+    for (const req of S.reqs) {
+      if (!req.metric || !(req.min > 0)) continue;
+      if (req.metric === 'fireDuration' || req.metric === 'fireIntensity' || req.metric === 'reach') {
+        needsFire = true;
+      }
+      const champ = bestReagentFor(req.metric, pool);
+      const rate = champ ? perUnit(req.metric, champ) : 0;
+      if (!champ || rate <= 0) continue;
+      const want = Math.min(cap - used, Math.ceil(req.min / rate));
+      if (want > 0) { mix[champ] = (mix[champ] || 0) + want; used += want; }
+    }
+    // Fire only runs at all when the summed intensity is above zero, so a burn
+    // time requirement is worthless without an igniter in the casing.
+    if (needsFire) {
+      const igniter = bestReagentFor('fireIntensity', pool);
+      const already = Object.keys(mix).reduce((a, id) => a + mix[id] * perUnit('fireIntensity', id), 0);
+      if (igniter && already <= 0 && used < cap) { mix[igniter] = (mix[igniter] || 0) + 1; used += 1; }
+    }
+    const filler = bestReagentFor(S.reqObjective === 'lowestCost' ? 'power' : S.reqObjective, pool);
+    if (filler && used < cap) mix[filler] = (mix[filler] || 0) + (cap - used);
+    return mix;
+  }
+
+  function reqEvaluate(mix) {
+    const c = casingOf();
+    const st = computeStats(mix, c, S.dampener);
+    const F = S.data.formula;
+    const dmgPer = F.damagePerIntensity / F.intensityDivisor;
+    const cost = mixCost(mix, S.costBase);
+
+    // Normalised shortfall per requirement, so one badly-scaled metric cannot
+    // dominate the penalty and stall the climb.
+    let miss = 0;
+    for (const req of S.reqs) {
+      if (!req.metric || !(req.min > 0)) continue;
+      const have = METRICS[req.metric].get(st, dmgPer);
+      if (have < req.min) miss += (req.min - have) / req.min;
+    }
+    if (S.reqCostLimit != null && cost > S.reqCostLimit) {
+      miss += (cost - S.reqCostLimit) / Math.max(S.reqCostLimit, 1);
+    }
+    const objective = S.reqObjective === 'lowestCost'
+      ? -cost
+      : METRICS[S.reqObjective].get(st, dmgPer);
+    return { st, cost, miss, objective, score: objective - miss * 1000 };
+  }
+
+  function reqClimb(start, pool, cap) {
+    let mix = Object.assign({}, start);
+    let cur = reqEvaluate(mix);
+    for (let delta = Math.max(1, Math.round(cap / 8)); delta >= 1; delta = Math.floor(delta / 2)) {
+      for (let step = 0; step < 26; step++) {
+        let bestMix = null, bestEval = cur;
+        const active = Object.keys(mix).filter(id => mix[id] > 0);
+        const used = active.reduce((a, id) => a + mix[id], 0);
+        const tryMix = candidate => {
+          const ev = reqEvaluate(candidate);
+          if (ev.score > bestEval.score + 1e-9) { bestEval = ev; bestMix = candidate; }
+        };
+        for (const to of pool) {
+          if (used + delta <= cap) {                       // grow into free space
+            const m = Object.assign({}, mix);
+            m[to] = (m[to] || 0) + delta;
+            tryMix(m);
+          }
+          for (const from of active) {                     // trade one for another
+            if (from === to || mix[from] < delta) continue;
+            const m = Object.assign({}, mix);
+            m[from] -= delta;
+            if (m[from] <= 0) delete m[from];
+            m[to] = (m[to] || 0) + delta;
+            tryMix(m);
+          }
+        }
+        for (const from of active) {                       // or simply use less
+          const m = Object.assign({}, mix);
+          m[from] -= delta;
+          if (m[from] <= 0) delete m[from];
+          tryMix(m);
+        }
+        // Whole-reagent swaps. Incremental moves cannot cross a valley: trading
+        // 50 octogen for 1 phosphorus plus cyclonite is better at the far end
+        // and worse everywhere in between, so it has to be reachable in one hop.
+        for (const from of active) {
+          for (const to of pool) {
+            if (from === to) continue;
+            const m = Object.assign({}, mix);
+            m[to] = (m[to] || 0) + m[from];
+            delete m[from];
+            tryMix(m);
+          }
+        }
+        if (!bestMix) break;
+        mix = bestMix; cur = bestEval;
+      }
+    }
+    return { mix, ev: cur };
+  }
+
+  function reqSearch() {
+    const cap = casingOf().vol;
+    const pool = reqPool();
+    if (!pool.length) return null;
+
+    // Seeds. Single reagents and pairs cover the faces a one-objective optimum
+    // can sit on. On top of that, each requirement contributes the reagent that
+    // serves it best per unit, because a requirement is often met by one
+    // specific reagent and nothing else — fire duration needs a burn reagent,
+    // shrapnel needs iron — and starting without it wastes the whole climb.
+    const seeds = [{}];
+    if (Object.keys(S.mix).length) seeds.push(Object.assign({}, S.mix));
+    for (const id of pool) seeds.push({ [id]: cap });
+
+    seeds.push(constructiveSeed(pool, cap));
+
+    const champions = [];
+    for (const req of S.reqs) {
+      if (!req.metric || !(req.min > 0)) continue;
+      champions.push(bestReagentFor(req.metric, pool));
+    }
+    champions.push(bestReagentFor(S.reqObjective === 'lowestCost' ? 'power' : S.reqObjective, pool));
+    champions.push(bestReagentFor('fireIntensity', pool));
+    const key = [...new Set(champions.filter(Boolean))];
+    if (key.length > 1) {
+      const share = Math.floor(cap / key.length);
+      const even = {};
+      for (const id of key) even[id] = (even[id] || 0) + share;
+      seeds.push(even);
+    }
+    const shortlist = [...new Set(key.concat(pool))].slice(0, 10);
+    for (let i = 0; i < shortlist.length; i++) {
+      for (let j = i + 1; j < shortlist.length; j++) {
+        seeds.push({ [shortlist[i]]: Math.round(cap / 2), [shortlist[j]]: Math.round(cap / 2) });
+      }
+    }
+    for (const id of key) {
+      for (const other of shortlist) {
+        if (other === id) continue;
+        seeds.push({ [id]: Math.round(cap / 4), [other]: Math.round(cap * 3 / 4) });
+      }
+    }
+
+    let best = null;
+    for (const seed of seeds) {
+      const r = reqClimb(seed, pool, cap);
+      if (!Object.keys(r.mix).length) continue;
+      if (!best) { best = r; continue; }
+      // Feasibility first, then the objective, then cost as the tie-break.
+      const a = r.ev, b = best.ev;
+      const better = a.miss < b.miss - 1e-9
+        || (Math.abs(a.miss - b.miss) < 1e-9 && a.objective > b.objective + 1e-9)
+        || (Math.abs(a.miss - b.miss) < 1e-9 && Math.abs(a.objective - b.objective) < 1e-9
+            && a.cost < b.cost - 1e-9);
+      if (better) best = r;
+    }
+    return best;
+  }
+
+  function renderReqList() {
+    const box = $('ordReqList');
+    const opts = sel => Object.keys(METRICS)
+      .map(k => `<option value="${esc(k)}"${k === sel ? ' selected' : ''}>${esc(mlabel(k))}</option>`)
+      .join('');
+    box.innerHTML = S.reqs.map((req, idx) => `<div class="ord-req-row" data-idx="${idx}">
+      <select class="ord-req-metric" aria-label="Required metric">${opts(req.metric)}</select>
+      <span class="ord-req-op">${esc(tr('at least'))}</span>
+      <input type="number" class="ord-req-min" min="0" step="1" value="${esc(req.min)}"
+             aria-label="Required value">
+      <button class="ord-req-del" aria-label="Remove requirement">&times;</button>
+    </div>`).join('') || `<p class="ord-empty">${esc(tr('No requirements: the search just maximises.'))}</p>`;
+
+    box.querySelectorAll('.ord-req-row').forEach(row => {
+      const idx = +row.dataset.idx;
+      row.querySelector('.ord-req-metric').onchange = e => { S.reqs[idx].metric = e.target.value; };
+      row.querySelector('.ord-req-min').oninput = e => { S.reqs[idx].min = +e.target.value || 0; };
+      row.querySelector('.ord-req-del').onclick = () => { S.reqs.splice(idx, 1); renderReqList(); };
+    });
+  }
+
+  function renderReqResult() {
+    const box = $('ordReqOut');
+    if (S.reqResult === undefined) { box.innerHTML = ''; return; }
+    if (!S.reqResult) {
+      box.innerHTML = `<p class="ord-empty">${esc(tr('Nothing in this casing can do that.'))}</p>`;
+      return;
+    }
+    const { mix, ev } = S.reqResult;
+    const st = ev.st;
+    const F = S.data.formula;
+    const dmgPer = F.damagePerIntensity / F.intensityDivisor;
+    const rows = S.reqs.filter(r => r.metric && r.min > 0).map(r => {
+      const have = METRICS[r.metric].get(st, dmgPer);
+      const ok = have >= r.min - 1e-9;
+      return `<tr class="${ok ? 'ord-ok' : 'ord-bad'}"><td>${esc(mlabel(r.metric))}</td>
+        <td>${esc(tr('at least'))} ${esc(round(r.min, 2))}</td>
+        <td>${esc(round(have, 2))} ${ok ? '\u2713' : '\u2717'}</td></tr>`;
+    }).join('');
+    const objLabel = S.reqObjective === 'lowestCost'
+      ? tr('Lowest cost') : mlabel(S.reqObjective);
+    const objValue = S.reqObjective === 'lowestCost'
+      ? round(ev.cost, 1) + ' ' + rname(S.costBase)
+      : round(ev.objective, 2);
+
+    box.innerHTML = `<div class="ord-req-card">
+      <div class="ord-pick-lead"><span>${esc(objLabel)}</span><strong>${esc(objValue)}</strong></div>
+      <div class="ord-pick-head">${esc(describeMix(mix))}</div>
+      <div class="ord-req-sub">${esc(tr('Uses'))} ${Object.keys(mix).length} \u00b7
+        ${esc(tr('cost'))} ${esc(round(ev.cost, 1))} ${esc(rname(S.costBase))}
+        ${ev.miss > 1e-9 ? ' \u00b7 <b class="ord-bad">' + esc(tr('requirements not met')) + '</b>' : ''}</div>
+      ${rows ? `<table class="ord-pick-table"><tbody>${rows}</tbody></table>` : ''}
+      <button class="ord-chip" id="ordReqUse">Load this mix</button>
+    </div>`;
+    const btn = $('ordReqUse');
+    if (btn) btn.onclick = () => {
+      S.mix = Object.assign({}, mix);
+      track('ordnance_req_use');
+      renderAll();
+    };
   }
 
   // Only the fork that actually has an ordnance layer gets the tab.
