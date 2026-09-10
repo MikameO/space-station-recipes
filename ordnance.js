@@ -507,9 +507,21 @@
       if (box.disabled) { box.checked = false; S.reqLadder = false; }
     };
     $('ordReqLadder').onchange = e => { S.reqLadder = e.target.checked; };
-    $('ordReqExclude').onchange = e => {
-      S.reqExclude = [...e.target.selectedOptions].map(o => o.value);
+    // Delegated: the chips are rebuilt whenever the reagent list is.
+    $('ordReqExclude').addEventListener('click', e => {
+      const chip = e.target.closest('.diff-chip');
+      if (!chip) return;
+      const id = chip.dataset.value;
+      const on = !S.reqExclude.includes(id);
+      S.reqExclude = on ? S.reqExclude.concat(id) : S.reqExclude.filter(x => x !== id);
+      chip.classList.toggle('active', on);
+      chip.setAttribute('aria-pressed', String(on));
+      renderExcludeCount();
       track('ordnance_req_exclude', { count: S.reqExclude.length });
+    });
+    $('ordExcludeClear').onclick = () => {
+      S.reqExclude = [];
+      buildExcludeSelect();
     };
     $('ordReqCost').oninput = e => {
       const v = e.target.value.trim();
@@ -1618,18 +1630,30 @@
   }
 
   // The exclusion list offers the same reagents the search would otherwise
-  // consider, so nothing in it is a no-op. Built once the data is in.
+  // consider, so nothing in it is a no-op. Chips rather than a native multiple
+  // select: that control needs a modifier key nobody discovers, and it hides
+  // the choice inside a scrolling box.
   function buildExcludeSelect() {
-    const sel = $('ordReqExclude');
-    if (!sel) return;
+    const box = $('ordReqExclude');
+    if (!box) return;
     const F = S.data.formula;
     const ids = Object.keys(S.data.reagents).filter(id => {
       const r = S.data.reagents[id];
       return r.obtainable && (r.explosive || r.i || r.d || r.r || id === F.ironReagent);
     }).sort((a, b) => rname(a).localeCompare(rname(b)));
-    sel.innerHTML = ids.map(id =>
-      `<option value="${esc(id)}">${esc(rname(id))}</option>`).join('');
-    for (const o of sel.options) o.selected = S.reqExclude.includes(o.value);
+    box.innerHTML = ids.map(id => {
+      const on = S.reqExclude.includes(id);
+      return `<button type="button" class="diff-chip${on ? ' active' : ''}"
+        data-value="${esc(id)}" aria-pressed="${on}">${esc(rname(id))}</button>`;
+    }).join('');
+    renderExcludeCount();
+  }
+
+  function renderExcludeCount() {
+    const out = $('ordExcludeCount');
+    if (out) out.textContent = S.reqExclude.length ? String(S.reqExclude.length) : '';
+    const clear = $('ordExcludeClear');
+    if (clear) clear.hidden = !S.reqExclude.length;
   }
 
   // What one unit of a reagent contributes to a metric, read straight off the

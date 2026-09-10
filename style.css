@@ -3138,6 +3138,19 @@ b.ord-bad { color: var(--red-alert); }
   font-family: 'Share Tech Mono', monospace; }
 .ord-xeno-dmg { font-size: 0.64rem; color: var(--amber); opacity: 0.85;
   font-family: 'Share Tech Mono', monospace; }
+/* Reagent exclusions. Chips rather than a native multiple select, which needs
+   a modifier key to use and hides the choice in a scroll box. */
+.ord-exclude { border: 1px solid var(--border-subtle); background: var(--panel);
+  padding: 7px 9px; margin: 8px 0; }
+.ord-exclude-head { display: flex; align-items: center; gap: 8px;
+  font-size: 0.74rem; letter-spacing: 0.04em; text-transform: uppercase;
+  color: var(--text-sub); margin-bottom: 6px; }
+.ord-exclude-head b { color: var(--amber); font-weight: 400; }
+.ord-exclude-head .ord-chip { margin-left: auto; }
+.ord-exclude-chips { display: flex; flex-wrap: wrap; gap: 4px; }
+.ord-exclude-chips .diff-chip { text-transform: none; }
+.ord-exclude-chips .diff-chip.active {
+  background: rgba(239,68,68,0.16); color: #fca5a5; border-color: rgba(248,113,113,0.55); }
 .ord-he-dead { color: var(--red-alert); font-weight: 400; }
 .ord-xeno-fire { font-size: 0.64rem; color: #ff7a35;
   font-family: 'Share Tech Mono', monospace; }
