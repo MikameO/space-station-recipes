@@ -201,6 +201,8 @@
     'Lowest cost': 'Минимальная цена',
     'Cost ceiling': 'Потолок цены',
     'Without': 'Без материала',
+    'Left axis': 'Левая ось',
+    'Right axis': 'Правая ось',
     'Cost ladder': 'Лестница цены',
     'Cost in': 'Цена в',
     'no limit': 'без ограничений',

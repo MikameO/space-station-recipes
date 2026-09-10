@@ -3149,6 +3149,13 @@ b.ord-bad { color: var(--red-alert); }
 .ord-exclude-head .ord-chip { margin-left: auto; }
 .ord-exclude-chips { display: flex; flex-wrap: wrap; gap: 4px; }
 .ord-exclude-chips .diff-chip { text-transform: none; }
+/* Mask mode: three mutually exclusive chips where a select used to hide
+   the current mode behind a closed dropdown. */
+.ord-mask-modes { display: flex; flex-wrap: wrap; gap: 4px; }
+.ord-mask-modes .diff-chip { text-transform: none; }
+.ord-mask-modes .diff-chip.active {
+  background: rgba(57,255,133,0.14); color: var(--phosphor);
+  border-color: rgba(57,255,133,0.5); }
 .ord-exclude-chips .diff-chip.active {
   background: rgba(239,68,68,0.16); color: #fca5a5; border-color: rgba(248,113,113,0.55); }
 .ord-he-dead { color: var(--red-alert); font-weight: 400; }

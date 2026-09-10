@@ -58,6 +58,9 @@
     // still a chore, so being able to say "anything but that" is worth
     // more than any weighting I could invent for it.
     reqExclude: [],
+    // Which metric each axis of the curve carries. Defaults reproduce what
+    // the panel drew before it had a choice.
+    chartLeft: 'power', chartRight: 'blastRadius',
     galleryRange: 0,
     // How long a xeno actually burns. The flame outlasts the target's
     // patience: it runs out, and the hive pats it out at ten stacks a
@@ -103,7 +106,6 @@
     'blunt + burn at the centre': 'дробящий + ожоги в центре',
     'base': 'база', 'dampened': 'с гасителем',
     'Flame colour': 'Цвет пламени',
-    'Radius peaks at': 'Радиус пикует на',
     'with': 'при', 'nothing': 'пусто',
     'Best': 'Лучшее', 'at': 'при',
     'blast radius': 'радиус волны',
@@ -134,6 +136,7 @@
     'mixtures clear every mask': 'смесей проходят все маски',
     'No mixture here clears every mask.': 'Здесь ни одна смесь не проходит все маски.',
     'Pinned': 'Закреплено',
+    'peaks at': 'максимален на',
     'ratio held at ': 'соотношение держится на ',
     'For': 'Зачем', 'Kills': 'Убивает',
     'Fire': 'Огонь',
@@ -163,6 +166,19 @@
   };
   const tr = s => (window.I18N_LANG === 'ru' && RU[s]) || s;
   const mlabel = key => tr(METRICS[key].label);
+
+  // Paints the mask-mode chip group from state. One place, because three
+  // different flows change the mode: the chips, adding the first mask, and
+  // clearing them all.
+  function syncMaskMode() {
+    const box = $('ordMaskMode');
+    if (!box) return;
+    for (const chip of box.querySelectorAll('.diff-chip')) {
+      const on = chip.dataset.value === S.maskMode;
+      chip.classList.toggle('active', on);
+      chip.setAttribute('aria-pressed', String(on));
+    }
+  }
 
   function casingOf() { return S.data.casings[S.casing]; }
   function volUsed() { return Object.values(S.mix).reduce((a, b) => a + b, 0); }
@@ -457,6 +473,8 @@
     // One surface answers two questions at once, and which metric belongs on
     // which channel is a matter of what you are looking for. Swapping beats
     // resetting both selects by hand.
+    $('ordChartLeft').onchange = e => { S.chartLeft = e.target.value; renderChart(); };
+    $('ordChartRight').onchange = e => { S.chartRight = e.target.value; renderChart(); };
     $('ordSurfSwap').onclick = () => {
       const h = S.heatHeight;
       S.heatHeight = S.heatMetric;
@@ -490,13 +508,21 @@
     };
     $('ordBurnIn').onchange = e => { S.burnIn = +e.target.value; onBurn(); };
     $('ordBurnAfter').onchange = e => { S.burnAfter = +e.target.value; onBurn(); };
-    $('ordMaskMode').onchange = e => {
-      S.maskMode = e.target.value; saveMasks(); renderHeat();
-    };
+    // Three mutually exclusive chips rather than a select: the same control
+    // shape as the exclusion list next door, and the current mode stays visible
+    // instead of hiding inside a closed dropdown.
+    $('ordMaskMode').addEventListener('click', e => {
+      const chip = e.target.closest('.diff-chip');
+      if (!chip) return;
+      S.maskMode = chip.dataset.value;
+      syncMaskMode();
+      saveMasks();
+      renderHeat();
+    });
     $('ordMaskAdd').onclick = () => { addMask(); track('ordnance_mask_add'); };
     $('ordMaskClear').onclick = () => {
       S.masks = []; S.maskMode = 'off'; saveMasks();
-      $('ordMaskMode').value = 'off';
+      syncMaskMode();
       renderMaskList(); renderHeat();
     };
     $('ordReqObjective').onchange = e => {
@@ -703,7 +729,7 @@
     // Masks are a flat-map tool: stacking translucent regions on a shaded 3D
     // surface reads as mud, and the point is to compare regions, not relief.
     $('ordMaskBlock').hidden = S.surfView !== 'flat';
-    $('ordMaskMode').value = S.maskMode;
+    syncMaskMode();
     $('ordSweepWrap').hidden = S.chartMode !== 'sweep';
     $('ordBlendWrap').hidden = S.chartMode !== 'blend';
   }
@@ -729,8 +755,7 @@
         x = b;
       }
       const st = computeStats(mix, c, S.dampener);
-      pts.push({ x, power: st.power, radius: st.hasBlast ? st.blastRadius : 0,
-                 cost: mixCost(mix, S.costBase), mix });
+      pts.push({ x, st, cost: mixCost(mix, S.costBase), mix });
     }
     return pts;
   }
@@ -741,9 +766,13 @@
     const pts = chartSeries();
     const pad = { l: 46, r: 46, t: 14, b: 30 };
     const iw = w - pad.l - pad.r, ih = h - pad.t - pad.b;
+    const F = S.data.formula;
+    const dmgPer = F.damagePerIntensity / F.intensityDivisor;
+    const left = METRICS[S.chartLeft], right = METRICS[S.chartRight];
+    const lv = p => left.get(p.st, dmgPer), rv = p => right.get(p.st, dmgPer);
     const maxX = Math.max(...pts.map(p => p.x)) || 1;
-    const maxP = Math.max(...pts.map(p => p.power)) || 1;
-    const maxR = Math.max(...pts.map(p => p.radius)) || 1;
+    const maxP = Math.max(...pts.map(lv)) || 1;
+    const maxR = Math.max(...pts.map(rv)) || 1;
     const ink = cssVar('--text-bright') || '#e8ecf4';
     const muted = cssVar('--text-ghost') || '#6b7a93';
     const line = cssVar('--border-subtle') || '#1a2540';
@@ -765,14 +794,15 @@
       pts.forEach((p, i) => { const x = X(p.x), y = get(p); i ? ctx.lineTo(x, y) : ctx.moveTo(x, y); });
       ctx.stroke(); ctx.setLineDash([]);
     };
-    draw(p => Yp(p.power), cPower);
-    draw(p => Yr(p.radius), cRadius, [5, 4]);
+    draw(p => Yp(lv(p)), cPower);
+    draw(p => Yr(rv(p)), cRadius, [5, 4]);
 
-    // Mark the radius peak — the whole reason this chart exists.
-    const peak = pts.reduce((a, b) => b.radius > a.radius ? b : a, pts[0]);
-    if (peak.radius > 0) {
+    // Mark the peak of the right-hand curve. With the defaults that is the
+    // radius peak, which is the whole reason this chart exists.
+    const peak = pts.reduce((a, b) => rv(b) > rv(a) ? b : a, pts[0]);
+    if (rv(peak) > 0) {
       ctx.fillStyle = cRadius;
-      ctx.beginPath(); ctx.arc(X(peak.x), Yr(peak.radius), 4, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc(X(peak.x), Yr(rv(peak)), 4, 0, Math.PI * 2); ctx.fill();
     }
 
     ctx.fillStyle = muted; ctx.font = '11px system-ui, sans-serif';
@@ -795,12 +825,15 @@
     ctx.fillText(xlabel, pad.l + iw / 2, h - 10);
 
     const legend = [];
-    legend.push('<span class="ord-key"><i style="background:' + cPower + '"></i>Power</span>');
-    legend.push('<span class="ord-key"><i class="ord-dash" style="background:' + cRadius + '"></i>Blast radius</span>');
-    if (peak.radius > 0) {
-      legend.push('<span class="ord-key-note">' + tr('Radius peaks at') + ' ' + round(peak.radius, 2)
-        + ' ' + tr('tiles') + ' ' + tr('with') + ' ' + esc(describeMix(peak.mix)) + ' — '
-        + round(peak.power, 0) + ' ' + tr('power') + ', '
+    legend.push('<span class="ord-key"><i style="background:' + cPower + '"></i>'
+      + esc(mlabel(S.chartLeft)) + '</span>');
+    legend.push('<span class="ord-key"><i class="ord-dash" style="background:' + cRadius + '"></i>'
+      + esc(mlabel(S.chartRight)) + '</span>');
+    if (rv(peak) > 0) {
+      legend.push('<span class="ord-key-note">' + esc(mlabel(S.chartRight)) + ' '
+        + tr('peaks at') + ' ' + round(rv(peak), 2)
+        + ' ' + tr('with') + ' ' + esc(describeMix(peak.mix)) + ' — '
+        + esc(mlabel(S.chartLeft)) + ' ' + round(lv(peak), 1) + ', '
         + round(peak.cost, 1) + ' ' + esc(rname(S.costBase)) + '</span>');
     }
     $('ordChartLegend').innerHTML = legend.join('');
@@ -1253,7 +1286,7 @@
       colour: MASK_COLOURS[S.masks.length % MASK_COLOURS.length], on: true,
     });
     if (S.maskMode === 'off') S.maskMode = 'overlay';
-    $('ordMaskMode').value = S.maskMode;
+    syncMaskMode();
     saveMasks();
     renderMaskList();
     renderHeat();
