@@ -167,6 +167,7 @@
     'Colour': 'Цвет',
     'Leave empty': 'Оставить пустым',
     'Height by': 'Высота по',
+    'Swap height and colour': 'Менять высоту и цвет',
     'Reset view': 'Сбросить вид',
     'Click a point on the surface to inspect that mixture.': 'Кликните по точке на поверхности, чтобы разобрать смесь.',
     'Two reagents span the floor and a third supplies the rest, so a three-part mixture becomes one surface. Drag to turn it, scroll to zoom, click any point to read out everything that mixture does. Set the third reagent to a fixed amount and sweep the slider to move through the third dimension one slice at a time.': 'Два реагента задают основание, третий даёт остальное, и трёхкомпонентная смесь становится одной поверхностью. Тяните мышью, чтобы вращать, колесом — чтобы приблизить, кликните по точке для полного разбора. Задайте третьему реагенту фиксированное количество и ведите ползунок, чтобы пройти третье измерение срез за срезом.',

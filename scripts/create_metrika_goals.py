@@ -104,6 +104,7 @@ GOALS: list[tuple[str, str]] = [
     ("ordnance_recipe_use",  "Взрывчатка: готовый рецепт загружен"),
     ("ordnance_gallery_range", "Взрывчатка: дистанция в витрине"),
     ("ordnance_burn_window", "Взрывчатка: окно горения"),
+    ("ordnance_surf_swap", "Взрывчатка: обмен высоты и цвета"),
 ]
 
 

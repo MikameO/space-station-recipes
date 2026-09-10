@@ -48,7 +48,7 @@
     // different mixture the moment an axis changes, so keeping those would move
     // the marker under the user; keeping the mixture lets them hold one point in
     // composition space and watch every other setting change around it.
-    pick: null,                     // { mix } or null
+    pick: null,                     // a place on the floor, or a curve mixture
     surfCells: [],                  // screen polygons of the last surface draw
     costBase: null,
     reqObjective: 'blastRadius', reqCostLimit: null,
@@ -130,6 +130,7 @@
     'mixtures clear every mask': 'смесей проходят все маски',
     'No mixture here clears every mask.': 'Здесь ни одна смесь не проходит все маски.',
     'Pinned': 'Закреплено',
+    'ratio held at ': 'соотношение держится на ',
     'For': 'Зачем', 'Kills': 'Убивает',
     'Fire': 'Огонь',
     'Reach': 'Дальнобой', 'Damage': 'Урон',
@@ -445,6 +446,18 @@
     $('ordHeatCAmount').oninput = e => {
       S.heatCAmount = +e.target.value;
       $('ordHeatCAmountOut').textContent = S.heatCAmount;
+      renderHeat();
+    };
+    // One surface answers two questions at once, and which metric belongs on
+    // which channel is a matter of what you are looking for. Swapping beats
+    // resetting both selects by hand.
+    $('ordSurfSwap').onclick = () => {
+      const h = S.heatHeight;
+      S.heatHeight = S.heatMetric;
+      S.heatMetric = h;
+      $('ordHeatHeight').value = S.heatHeight;
+      $('ordHeatMetric').value = S.heatMetric;
+      track('ordnance_surf_swap', { height: S.heatHeight, colour: S.heatMetric });
       renderHeat();
     };
     $('ordHeatHeight').onchange = e => { S.heatHeight = e.target.value; renderHeat(); };
@@ -858,7 +871,7 @@
     renderMaskRanges(g);
     renderScale(g);
     renderHeatNote(g);
-    renderPick();
+    renderPick(g);
   }
 
   // Camera: yaw turns the floor, pitch tilts it. Screen up is (0, sin p, cos p)
@@ -1336,14 +1349,29 @@
   // ── click readout ──────────────────────────────────────────────────────────
   // The colour metric answers one question; a picked point should answer all of
   // them, so this lists every stat the detonation panel shows plus the cost.
-  function renderPick() {
+  function renderPick(g) {
     const box = $('ordPick');
-    if (!S.pick || !S.pick.mix) {
+    const c = casingOf();
+    // A floor pin is resolved against the grid drawn right now, so the panel and
+    // the marker can never disagree; a curve pin carries its own mixture.
+    let mix = null, ratio = null;
+    if (S.pick && S.pick.kind === 'floor') {
+      const at = g && pickCell(g);
+      if (at) {
+        const cell = g.cells[at.i * g.N + at.j];
+        mix = cell.mix;
+        ratio = [cell.a, cell.b];
+      } else {
+        const p = pickFloor(c.vol);
+        if (p) mix = mixAt(Math.round(p.a), Math.round(p.b), c.vol);
+      }
+    } else if (S.pick) {
+      mix = S.pick.mix;
+    }
+    if (!mix) {
       box.innerHTML = '<p class="ord-empty">Click a point on the surface to inspect that mixture.</p>';
       return;
     }
-    const mix = S.pick.mix;
-    const c = casingOf();
     // Recomputed on every render, so the pinned mixture tracks the casing, the
     // dampener and the chosen metric instead of showing what it was when clicked.
     const st = computeStats(mix, c, S.dampener);
@@ -1372,6 +1400,13 @@
     const notes = [];
     if (volume > c.vol) notes.push(tr('over the casing volume'));
     else if (volume < c.vol) notes.push(tr('casing not full'));
+    if (ratio) {
+      const total = ratio[0] + ratio[1];
+      notes.unshift(total > 0
+        ? tr('ratio held at ') + Math.round(ratio[0] / total * 100) + ':'
+          + Math.round(ratio[1] / total * 100)
+        : tr('ratio held at ') + '\u2014');
+    }
     box.innerHTML = '<div class="ord-pick-bar"><span>' + esc(tr('Pinned')) + '</span>'
       + '<button class="ord-pick-clear" id="ordPickClear" aria-label="Clear pin">&times;</button></div>'
       + '<div class="ord-pick-head">' + esc(describeMix(mix)) + '</div>'
@@ -1388,28 +1423,39 @@
     if (clr) clr.onclick = () => { S.pick = null; renderHeat(); };
   }
 
+  // The pin holds a place on the floor rather than a finished mixture: what
+  // share of the two floor reagents went to the first, and how far out along
+  // that ray the point sat. Storing the mixture instead made the pin vanish the
+  // moment the third reagent moved, which is the one thing a pin is for -- fix
+  // a ratio on the base of the triangle and walk up its height.
   function setPick(cell) {
-    S.pick = cell ? { mix: Object.assign({}, cell.mix) } : null;
+    if (!cell) { S.pick = null; return; }
+    const sum = cell.a + cell.b;
+    const limit = floorLimit(casingOf().vol) || 1;
+    S.pick = {
+      kind: 'floor',
+      axes: [S.heatA, S.heatB],
+      share: sum > 0 ? cell.a / sum : 0.5,
+      reach: Math.min(1, sum / limit),
+    };
   }
 
-  // Where the pinned mixture sits on the current axes, or null when it cannot be
-  // drawn there: its reagents are off the current floor, or the third reagent no
-  // longer supplies what this mixture holds.
+  // Where that ratio lands on the floor as it stands now. A rising third
+  // reagent shrinks the accessible triangle, and the point slides down its own
+  // ray instead of falling off the edge and taking the pin with it.
+  function pickFloor(cap) {
+    if (!S.pick || S.pick.kind !== 'floor') return null;
+    if (S.pick.axes[0] !== S.heatA || S.pick.axes[1] !== S.heatB) return null;
+    const sum = floorLimit(cap) * S.pick.reach;
+    const a = sum * S.pick.share;
+    return { a, b: sum - a };
+  }
+
   function pickCell(g) {
-    if (!S.pick) return null;
-    const mix = S.pick.mix;
-    const ids = Object.keys(mix).filter(id => mix[id] > 0);
-    const axes = new Set([S.heatA, S.heatB]);
-    if (S.heatC) axes.add(S.heatC);
-    if (ids.some(id => !axes.has(id))) return null;
-    const a = mix[S.heatA] || 0;
-    const b = S.heatB === S.heatA ? 0 : (mix[S.heatB] || 0);
-    if (S.heatC && S.heatC !== S.heatA && S.heatC !== S.heatB) {
-      const expect = S.heatCMode === 'fixed' ? S.heatCAmount : g.cap - a - b;
-      if (Math.abs((mix[S.heatC] || 0) - expect) > 1.5) return null;
-    }
-    const i = Math.round(a / g.cap * (g.N - 1));
-    const j = Math.round(b / g.cap * (g.N - 1));
+    const p = pickFloor(g.cap);
+    if (!p) return null;
+    const i = Math.round(p.a / g.cap * (g.N - 1));
+    const j = Math.round(p.b / g.cap * (g.N - 1));
     if (i < 0 || j < 0 || i >= g.N || j >= g.N) return null;
     return g.cells[i * g.N + j] ? { i, j } : null;
   }
@@ -1513,7 +1559,7 @@
       for (const pt of geom.pts) {
         if (Math.abs(pt.x - value) < Math.abs(nearest.x - value)) nearest = pt;
       }
-      S.pick = { mix: Object.assign({}, nearest.mix) };
+      S.pick = { kind: 'mix', mix: Object.assign({}, nearest.mix) };
       track('ordnance_pick', { view: 'curve' });
       renderHeat();
     });
