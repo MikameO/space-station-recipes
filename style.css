@@ -3141,5 +3141,3 @@ b.ord-bad { color: var(--red-alert); }
 .ord-xeno-fire { font-size: 0.64rem; color: #ff7a35;
   font-family: 'Share Tech Mono', monospace; }
 .ord-xeno-noburn { color: var(--text-ghost); }
-/* Marks a catalogue row whose mixture needs a botany or kitchen product. */
-.ord-gated { color: var(--amber); font-size: 0.7em; vertical-align: middle; }

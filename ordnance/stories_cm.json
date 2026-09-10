@@ -467,12 +467,23 @@
    "explosive": false,
    "falloff": 0.0,
    "fireEntity": "RMCTileFireEthanol",
-   "gated": 0.159,
    "i": 0.2,
    "nameKey": "reagent-name-arnold-palmer",
    "obtainable": true,
    "power": 0.0,
-   "r": 0.1
+   "r": 0.1,
+   "steps": [
+    "ArnoldPalmer",
+    "Cryoxadone",
+    "Dexalin",
+    "Fresium",
+    "Ice",
+    "IcedTea",
+    "JuiceLemon",
+    "Lemonade",
+    "TableSalt",
+    "Tea"
+   ]
   },
   "RMCANFO": {
    "d": 0.0,
@@ -483,7 +494,13 @@
    "nameKey": "reagent-name-rmc-anfo",
    "obtainable": true,
    "power": 1.0,
-   "r": 0.0
+   "r": 0.0,
+   "steps": [
+    "RMCANFO",
+    "RMCAmmonia",
+    "RMCAmmoniumNitrate",
+    "RMCPolytrinicAcid"
+   ]
   },
   "RMCAmmoniumNitrate": {
    "color": "#ff9900",
@@ -496,7 +513,12 @@
    "nameKey": "reagent-name-rmc-ammonium-nitrate",
    "obtainable": true,
    "power": 0.4,
-   "r": 0.0
+   "r": 0.0,
+   "steps": [
+    "RMCAmmonia",
+    "RMCAmmoniumNitrate",
+    "RMCPolytrinicAcid"
+   ]
   },
   "RMCBGel": {
    "color": "#00dd00",
@@ -537,6 +559,9 @@
    "obtainable": true,
    "power": 0.0,
    "r": -0.09,
+   "steps": [
+    "RMCCLF3"
+   ],
    "via": [
     {
      "effect": "Oxidizing",
@@ -579,7 +604,15 @@
    "nameKey": "reagent-name-rmc-cyclonite",
    "obtainable": true,
    "power": 1.5,
-   "r": 0.0
+   "r": 0.0,
+   "steps": [
+    "RMCAmmonia",
+    "RMCCyclonite",
+    "RMCFormaldehyde",
+    "RMCHexamine",
+    "RMCMethane",
+    "RMCPolytrinicAcid"
+   ]
   },
   "RMCEthanol": {
    "color": "#6897f7",
@@ -606,7 +639,13 @@
    "nameKey": "reagent-name-rmc-hexamine",
    "obtainable": true,
    "power": 0.0,
-   "r": 0.0
+   "r": 0.0,
+   "steps": [
+    "RMCAmmonia",
+    "RMCFormaldehyde",
+    "RMCHexamine",
+    "RMCMethane"
+   ]
   },
   "RMCHydrogen": {
    "color": "#b6f8ff",
@@ -664,6 +703,9 @@
    "obtainable": true,
    "power": 0.15,
    "r": 0.095,
+   "steps": [
+    "RMCMethane"
+   ],
    "via": [
     {
      "effect": "Flowing",
@@ -692,6 +734,9 @@
    "obtainable": true,
    "power": 0.0,
    "r": 0.06,
+   "steps": [
+    "RMCNapalm"
+   ],
    "via": [
     {
      "effect": "Oxidizing",
@@ -720,6 +765,12 @@
    "obtainable": true,
    "power": 0.0,
    "r": 0.06,
+   "steps": [
+    "RMCCLF3",
+    "RMCMethane",
+    "RMCNapalm",
+    "RMCNapalmB"
+   ],
    "via": [
     {
      "effect": "Oxidizing",
@@ -749,6 +800,12 @@
    "penetrating": true,
    "power": 0.0,
    "r": 0.06,
+   "steps": [
+    "RMCCLF3",
+    "RMCNapalm",
+    "RMCNapalmE",
+    "RMCNapalmSticky"
+   ],
    "via": [
     {
      "effect": "Oxidizing",
@@ -805,6 +862,11 @@
    "obtainable": true,
    "power": 0.0,
    "r": -0.44,
+   "steps": [
+    "RMCCLF3",
+    "RMCNapalm",
+    "RMCNapalmHighCombustion"
+   ],
    "via": [
     {
      "effect": "Oxidizing",
@@ -833,6 +895,10 @@
    "obtainable": true,
    "power": 0.0,
    "r": -0.44,
+   "steps": [
+    "RMCNapalm",
+    "RMCNapalmSticky"
+   ],
    "via": [
     {
      "effect": "Oxidizing",
@@ -860,6 +926,11 @@
    "obtainable": true,
    "power": 0.0,
    "r": 0.06,
+   "steps": [
+    "RMCCLF3",
+    "RMCNapalm",
+    "RMCNapalmUT"
+   ],
    "via": [
     {
      "effect": "Oxidizing",
@@ -959,24 +1030,37 @@
    "effort": 3.0,
    "explosive": true,
    "falloff": -0.5,
-   "gated": 1.5,
    "i": 0.0,
    "nameKey": "reagent-name-rmc-nitroglycerin",
    "obtainable": true,
    "power": 1.0,
-   "r": 0.0
+   "r": 0.0,
+   "steps": [
+    "RMCGlycerol",
+    "RMCNitroglycerin",
+    "RMCPolytrinicAcid"
+   ]
   },
   "RMCOctogen": {
    "d": -0.2,
    "effort": 4.361,
    "explosive": true,
    "falloff": -0.2,
-   "gated": 0.5,
    "i": 0.4,
    "nameKey": "reagent-name-rmc-octogen",
    "obtainable": true,
    "power": 2.0,
    "r": -0.02,
+   "steps": [
+    "RMCAmmonia",
+    "RMCAmmoniumNitrate",
+    "RMCFormaldehyde",
+    "RMCHexamine",
+    "RMCMethane",
+    "RMCOctogen",
+    "RMCParaformaldehyde",
+    "RMCPolytrinicAcid"
+   ],
    "via": [
     {
      "effect": "Oxidizing",
@@ -1038,7 +1122,10 @@
    "nameKey": "reagent-name-rmc-potassium-hydroxide",
    "obtainable": true,
    "power": 0.5,
-   "r": 0.0
+   "r": 0.0,
+   "steps": [
+    "RMCPotassiumHydroxide"
+   ]
   },
   "RMCR189": {
    "color": "#ffe49c",
@@ -1189,27 +1276,14 @@
   {
    "casing": "RMCM40GrenadeCasing",
    "labels": [
-    "66% of the reach-weighted kills for the least work"
+    "Best inside 4 reactions, the length of RMCANFO"
    ],
    "mix": {
     "RMCANFO": 114.0,
     "RMCAmmoniumNitrate": 6.0
    },
    "roles": [
-    "practical"
-   ]
-  },
-  {
-   "casing": "RMCM40GrenadeCasing",
-   "labels": [
-    "Every kill reachable without gated reagents"
-   ],
-   "mix": {
-    "RMCCyclonite": 114.0,
-    "RMCLithium": 6.0
-   },
-   "roles": [
-    "nobotany"
+    "short"
    ]
   },
   {
@@ -1281,27 +1355,14 @@
   {
    "casing": "RMCM15GrenadeCasing",
    "labels": [
-    "66% of the reach-weighted kills for the least work"
+    "Best inside 4 reactions, the length of RMCANFO"
    ],
    "mix": {
     "RMCANFO": 171.0,
     "RMCLithium": 9.0
    },
    "roles": [
-    "practical"
-   ]
-  },
-  {
-   "casing": "RMCM15GrenadeCasing",
-   "labels": [
-    "Every kill reachable without gated reagents"
-   ],
-   "mix": {
-    "RMCANFO": 126.0,
-    "RMCCyclonite": 54.0
-   },
-   "roles": [
-    "nobotany"
+    "short"
    ]
   },
   {
@@ -1361,27 +1422,14 @@
   {
    "casing": "RMCM20MineCasing",
    "labels": [
-    "66% of the reach-weighted kills for the least work"
-   ],
-   "mix": {
-    "RMCANFO": 84.0,
-    "RMCAmmoniumNitrate": 6.0
-   },
-   "roles": [
-    "practical"
-   ]
-  },
-  {
-   "casing": "RMCM20MineCasing",
-   "labels": [
-    "Every kill reachable without gated reagents"
+    "Best inside 4 reactions, the length of RMCANFO"
    ],
    "mix": {
     "RMCANFO": 90.0,
     "RMCLithium": 6.0
    },
    "roles": [
-    "nobotany"
+    "short"
    ]
   },
   {
@@ -1454,27 +1502,14 @@
   {
    "casing": "RMCC4PlasticCasing",
    "labels": [
-    "66% of the reach-weighted kills for the least work"
+    "Best inside 4 reactions, the length of RMCANFO"
    ],
    "mix": {
-    "RMCANFO": 144.0,
-    "RMCCyclonite": 36.0
+    "RMCANFO": 171.0,
+    "RMCLithium": 9.0
    },
    "roles": [
-    "practical"
-   ]
-  },
-  {
-   "casing": "RMCC4PlasticCasing",
-   "labels": [
-    "Every kill reachable without gated reagents"
-   ],
-   "mix": {
-    "RMCANFO": 63.0,
-    "RMCCyclonite": 117.0
-   },
-   "roles": [
-    "nobotany"
+    "short"
    ]
   },
   {
@@ -1492,16 +1527,14 @@
   {
    "casing": "RMC88mmRocketWarhead",
    "labels": [
-    "Peak damage",
-    "Every kill reachable without gated reagents"
+    "Peak damage"
    ],
    "mix": {
     "RMCANFO": 99.0,
     "RMCCyclonite": 81.0
    },
    "roles": [
-    "damage",
-    "nobotany"
+    "damage"
    ]
   },
   {
@@ -1547,14 +1580,14 @@
   {
    "casing": "RMC88mmRocketWarhead",
    "labels": [
-    "66% of the reach-weighted kills for the least work"
+    "Best inside 4 reactions, the length of RMCANFO"
    ],
    "mix": {
     "RMCANFO": 171.0,
     "RMCLithium": 9.0
    },
    "roles": [
-    "practical"
+    "short"
    ]
   },
   {
@@ -1627,27 +1660,14 @@
   {
    "casing": "RMC80mmMortarWarhead",
    "labels": [
-    "66% of the reach-weighted kills for the least work"
+    "Best inside 4 reactions, the length of RMCANFO"
    ],
    "mix": {
-    "RMCANFO": 168.0,
-    "RMCCyclonite": 72.0
-   },
-   "roles": [
-    "practical"
-   ]
-  },
-  {
-   "casing": "RMC80mmMortarWarhead",
-   "labels": [
-    "Every kill reachable without gated reagents"
-   ],
-   "mix": {
-    "RMCCyclonite": 228.0,
+    "RMCANFO": 228.0,
     "RMCLithium": 12.0
    },
    "roles": [
-    "nobotany"
+    "short"
    ]
   }
  ],

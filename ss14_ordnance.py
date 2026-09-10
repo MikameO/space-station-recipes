@@ -31,7 +31,6 @@ Run standalone:
 
 import io
 import json
-import math
 import os
 import re
 import sys
@@ -705,15 +704,31 @@ FIRE_BURN_SPAN = 0.2        # the share stacks are worth on top of that
 FIRE_TILE_DIVISOR = 3.0     # the tile term runs every third tick in the CM original
 FIRE_PAT_STACKS = 10.0      # FirePatterComponent.Stacks, and ResistStacks besides
 
-# Base inputs no dispenser hands out and no chem master makes: they come from a
-# garden, a kitchen or a canister. Octogen needs frost oil, nitroglycerin needs
-# corn oil, and "wait for a botanist" is not a price a recipe can quote. Welding
-# fuel is deliberately absent -- every fuel tank has it.
-GATED_BASES = {"RMCFrostOil", "RMCCornOil", "Frezon", "TeaPowder",
-               "PowderedJuiceLemon"}
-# The practical row aims for this share of what the casing can reach without
-# gated inputs, then spends as little as possible getting there.
-PRACTICAL_SHARE = 2 / 3
+# What makes a reagent hard is the length of the process, not the shopping list.
+# An earlier version scored scarcity by chasing every chain to a leaf and calling
+# the leaves that had no source "gated". That was an artefact of the extractor:
+# frost oil is marked unobtainable because nothing in the prototypes says where
+# it comes from, not because it needs a garden. The same recursion insisted that
+# oxygen is made from water and ice from frezon, when in play nobody does either
+# -- they press the dispenser button.
+#
+# So the count stops at anything the dispenser hands out, and what it measures is
+# the number of distinct reactions a mixture needs. That lines up with how the
+# work actually feels: ammonium nitrate is three, ANFO four, cyclonite six,
+# octogen eight.
+# The short-chain row answers a plain question: what is the best this casing can
+# do without a longer process than ANFO itself? A share-of-the-best rule was
+# tried first and failed, because the ceiling it measured against was set by
+# octogen, and two thirds of that is already out of reach for anything short.
+SHORT_CHAIN_REAGENT = "RMCANFO"
+# Accessibility tiers the practical rows will consider, taken from data.json
+# rather than invented here. Dropping cross-service and cross-botany keeps
+# another department's shift out of a grenade: Arnold Palmer is iced tea with
+# lemonade, ten reactions deep, and it kept winning on raw material. ANFO and
+# octogen both sit in "unknown" because the extractor cannot resolve welding
+# fuel or frost oil, so excluding that tier would throw out the best explosive
+# in the game along with the worst chore.
+PRACTICAL_TIERS = {"dispenser", "self-chem", "unknown"}
 # Targets destroyed, summed over these distances. Counting kills at the
 # epicentre alone rewards a concentrated charge and punishes reach: a grenade
 # that kills four things standing exactly on it at 3.4 tiles of blast is worse
@@ -795,9 +810,30 @@ def reagent_effort(rid: str, costs: dict) -> float:
     return sum(costs.get(rid, {}).values())
 
 
-def reagent_gated(rid: str, costs: dict) -> float:
-    """How much of that shopping list a dispenser cannot supply."""
-    return sum(a for b, a in costs.get(rid, {}).items() if b in GATED_BASES)
+def reagent_steps(rid: str, chem: dict, seen: set | None = None) -> set[str]:
+    """Every reaction that has to be run to end up holding this reagent.
+
+    The walk stops at dispenser chemicals. Oxygen and ice both have recipes and
+    nobody uses them, so counting those steps measures the prototype file rather
+    than the work.
+    """
+    seen = set() if seen is None else seen
+    spec = chem.get(rid) or {}
+    if rid in seen or spec.get("isDispenser") or not spec.get("recipe"):
+        return seen
+    seen.add(rid)
+    for sub, info in (spec["recipe"].get("reactants") or {}).items():
+        if info.get("catalyst"):
+            continue
+        reagent_steps(sub, chem, seen)
+    return seen
+
+
+def load_chem(path="data.json") -> dict:
+    src = SCRIPT_DIR / path
+    if not src.exists():
+        return {}
+    return json.loads(src.read_text(encoding="utf-8")).get("reagents", {})
 
 
 def fire_damage(st: dict, target: dict, distance: float, fire: dict,
@@ -850,7 +886,7 @@ def count_kills(st: dict, targets: list, formula: dict, fire: dict | None,
 
 def build_recipes(casings: dict, reagents: dict, formula: dict, costs: dict,
                   cost_base: str, targets: list | None = None,
-                  fires: dict | None = None) -> list[dict]:
+                  fires: dict | None = None, chem: dict | None = None) -> list[dict]:
     pool = [rid for rid, spec in reagents.items()
             if spec.get("obtainable")
             and (spec.get("explosive") or spec.get("i") or spec.get("d") or spec.get("r")
@@ -858,7 +894,14 @@ def build_recipes(casings: dict, reagents: dict, formula: dict, costs: dict,
     iron = formula["ironReagent"]
     out = []
     effort = {rid: reagent_effort(rid, costs) for rid in pool}
-    ungated = {rid for rid in pool if reagent_gated(rid, costs) <= 0}
+    chain = {rid: reagent_steps(rid, chem or {}) for rid in pool}
+    handy = {rid for rid in pool
+             if ((chem or {}).get(rid, {}).get("accessibility") or {}).get("tier")
+             in PRACTICAL_TIERS}
+    # Named step_cap, not cap: the per-casing loop below already binds cap to
+    # the casing volume, and the collision silently compared nine reactions
+    # against 180 units.
+    step_cap = len(reagent_steps(SHORT_CHAIN_REAGENT, chem or {})) or 4
     fire = (fires or {}).get(formula.get("defaultFire"))
 
     for casing_id, casing in casings.items():
@@ -870,8 +913,9 @@ def build_recipes(casings: dict, reagents: dict, formula: dict, costs: dict,
         # cheap row, which needs the whole frontier rather than just its peak.
         best = {key: None for key, _, _, _ in CATALOGUE_ROLES}
         radius_points = []
-        # kills -> (effort, mix), over mixtures a marine can build unaided.
-        reachable: dict[int, tuple] = {}
+        # The best score reachable inside a short chain, and the material it
+        # takes, so ties go to the cheaper mixture.
+        short: tuple | None = None
 
         for i, first in enumerate(pool):
             for second in pool[i:]:
@@ -904,14 +948,16 @@ def build_recipes(casings: dict, reagents: dict, formula: dict, costs: dict,
                         # The practical frontier. Judged with the burn window
                         # shut, so nothing here depends on a xeno politely
                         # standing in the flames.
-                        if targets and all(rid in ungated for rid in mix):
-                            k = sum(count_kills(st, targets, formula, fire, d)
-                                    for d in PRACTICAL_DISTANCES)
-                            if k:
-                                work = sum(effort[rid] * q for rid, q in mix.items())
-                                cur = reachable.get(k)
-                                if cur is None or work < cur[0] - 1e-9:
-                                    reachable[k] = (work, dict(mix))
+                        if targets and all(rid in handy for rid in mix):
+                            steps = len(set().union(*(chain[rid] for rid in mix)))
+                            if steps <= step_cap:
+                                k = sum(count_kills(st, targets, formula, fire, d)
+                                        for d in PRACTICAL_DISTANCES)
+                                work = round(sum(effort[rid] * q
+                                                 for rid, q in mix.items()), 3)
+                                rank = (k, -work)
+                                if k and (short is None or rank > short[0]):
+                                    short = (rank, dict(mix))
 
         # One mixture can be best at several roles at once; say so on one row
         # rather than printing it three times.
@@ -942,31 +988,21 @@ def build_recipes(casings: dict, reagents: dict, formula: dict, costs: dict,
                             "labels": [f"{int(CHEAP_SHARE * 100)}% of the radius for the least cost"],
                             "mix": mix})
 
-        # Two rows for the marine who cannot send a runner to the hydroponics
-        # bay: the most this casing reaches without gated inputs, and the far
-        # cheaper mixture that still does two thirds of that job. The gap
-        # between them is the whole argument for not overpaying.
-        if reachable:
-            ceiling = max(reachable)
-            wanted = max(1, math.ceil(ceiling * PRACTICAL_SHARE))
-            for key, label, floor in (
-                    ("practical", f"{int(PRACTICAL_SHARE * 100)}% of the reach-weighted kills for the least work", wanted),
-                    ("nobotany", "Every kill reachable without gated reagents", ceiling)):
-                good = [(w, m) for k, (w, m) in reachable.items() if k >= floor]
-                if not good:
-                    continue
-                work, mix = min(good, key=lambda x: x[0])
-                signature = tuple(sorted((rid, round(q, 3)) for rid, q in mix.items()))
-                same = next((r for r in out
-                             if r["casing"] == casing_id
-                             and tuple(sorted((i, round(q, 3)) for i, q in r["mix"].items())) == signature),
-                            None)
-                if same:
-                    same["roles"].append(key)
-                    same["labels"].append(label)
-                else:
-                    out.append({"casing": casing_id, "roles": [key], "labels": [label],
-                                "mix": mix})
+        # The row for the marine with one chem master and a shift to finish.
+        if short:
+            mix = short[1]
+            label = f"Best inside {step_cap} reactions, the length of {SHORT_CHAIN_REAGENT}"
+            signature = tuple(sorted((rid, round(q, 3)) for rid, q in mix.items()))
+            same = next((r for r in out
+                         if r["casing"] == casing_id
+                         and tuple(sorted((i, round(q, 3)) for i, q in r["mix"].items())) == signature),
+                        None)
+            if same:
+                same["roles"].append("short")
+                same["labels"].append(label)
+            else:
+                out.append({"casing": casing_id, "roles": ["short"], "labels": [label],
+                            "mix": mix})
     return out
 
 
@@ -996,6 +1032,7 @@ def build(fork_id: str, fconf: dict, fetch) -> dict:
     default_fire = conf.get("default_fire", "RMCTileFire")
     fires = build_fires(fire_files) if fire_files else {}
     costs = load_cost_model()
+    chem = load_chem()
 
     out_reagents = {}
     for rid, spec in reagents.items():
@@ -1029,8 +1066,11 @@ def build(fork_id: str, fconf: dict, fetch) -> dict:
         if spec.get("fireEntity") and spec["fireEntity"] != default_fire:
             entry["fireEntity"] = spec["fireEntity"]
         entry["effort"] = round(reagent_effort(rid, costs), 3)
-        if reagent_gated(rid, costs) > 0:
-            entry["gated"] = round(reagent_gated(rid, costs), 3)
+        # The reactions themselves, not just how many: two reagents sharing a
+        # chain cost one set of steps, not two.
+        chain = sorted(reagent_steps(rid, chem))
+        if chain:
+            entry["steps"] = chain
         if rid == iron:
             entry["shardsPerUnit"] = SHARDS_PER_UNIT
         # Explicit fields vs effect-derived ones, so the UI can explain a number
@@ -1082,7 +1122,7 @@ def build(fork_id: str, fconf: dict, fetch) -> dict:
         "firePatStacks": FIRE_PAT_STACKS,
     }
     recipes = build_recipes(out_casings, out_reagents, formula, costs, cost_base,
-                            targets, fires)
+                            targets, fires, chem)
     print(f"  catalogue: {len(recipes)} recipes")
     return {
         "schema": SCHEMA,
