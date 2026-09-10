@@ -26,13 +26,40 @@ jobs:
       - name: Collect static files
         run: |
           mkdir _site
-          cp index.html app.js i18n.js tutorial.js maps.js style.css data.json favicon.ico _site/
+          cp index.html app.js i18n.js tutorial.js maps.js ordnance.js style.css data.json favicon.ico _site/
           cp sw.js manifest.json robots.txt sitemap.xml _site/
           cp favicon.svg favicon-192.png favicon-512.png apple-touch-icon.png _site/
           cp -r sprites _site/sprites
           cp -r maps _site/maps
           cp -r ordnance _site/ordnance
           [ -f og-image.png ] && cp og-image.png _site/ || true
+
+      # Every asset index.html asks for has to exist in _site. Adding a new file
+      # and forgetting this cp list has shipped a broken page three times now
+      # (sw.js/manifest in 2c062f6, i18n.js in 3408bcd, ordnance.js here), and
+      # the failure is silent: the page loads and the feature simply never runs.
+      - name: Verify every referenced asset shipped
+        run: |
+          python - <<'PY'
+          import re, sys, pathlib
+          html = pathlib.Path('index.html').read_text(encoding='utf-8')
+          refs = re.findall(r'(?:src|href)="([^"]+)"', html)
+          missing = []
+          for ref in refs:
+              if re.match(r'(?:https?:)?//|data:|mailto:|#', ref):
+                  continue
+              path = ref.split('?')[0].split('#')[0].lstrip('./')
+              if not path:
+                  continue
+              if not (pathlib.Path('_site') / path).exists():
+                  missing.append(ref)
+          if missing:
+              print('Referenced by index.html but absent from _site:')
+              for m in sorted(set(missing)):
+                  print('  ' + m)
+              sys.exit(1)
+          print(f'{len(set(refs))} references checked, all present')
+          PY
 
       - uses: actions/configure-pages@v6
       - uses: actions/upload-pages-artifact@v5
