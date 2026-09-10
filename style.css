@@ -3135,3 +3135,6 @@ b.ord-bad { color: var(--red-alert); }
   font-family: 'Share Tech Mono', monospace; }
 .ord-xeno-dmg { font-size: 0.64rem; color: var(--amber); opacity: 0.85;
   font-family: 'Share Tech Mono', monospace; }
+.ord-xeno-fire { font-size: 0.64rem; color: #ff7a35;
+  font-family: 'Share Tech Mono', monospace; }
+.ord-xeno-noburn { color: var(--text-ghost); }

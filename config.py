@@ -569,6 +569,12 @@ FORK_REGISTRY = {
             "explosion_files": [
                 "Resources/Prototypes/_RMC14/explosion.yml",
             ],
+            # Прототипы тайлового огня. Без реагента, подменяющего fireEntity,
+            # любая смесь рождает RMCTileFire.
+            "fire_files": [
+                "Resources/Prototypes/_RMC14/Entities/Tiles/tile_fire.yml",
+            ],
+            "default_fire": "RMCTileFire",
             # Цели для оценки эффекта. Список — зеркало
             # DemolitionsSimulatorLists.Xenomorphs: тот же набор, что предлагает
             # внутриигровой симулятор подрывов, в том же порядке.

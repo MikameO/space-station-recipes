@@ -241,12 +241,219 @@
    "vol": 120.0
   }
  },
+ "fires": {
+  "RMCHijackPipeFire": {
+   "armorMultiplier": 1.0,
+   "bypass": false,
+   "contactHeat": 60.0,
+   "maxStacks": 20.0,
+   "tileHeat": 0.5
+  },
+  "RMCTileFire": {
+   "armorMultiplier": 1.0,
+   "bypass": false,
+   "contactHeat": 45.0,
+   "maxStacks": 20.0,
+   "tileHeat": 0.5
+  },
+  "RMCTileFireBanshee": {
+   "armorMultiplier": 1.0,
+   "bypass": false,
+   "contactHeat": 100.0,
+   "maxStacks": 15.0,
+   "tileHeat": 0.13
+  },
+  "RMCTileFireBlue": {
+   "armorMultiplier": 1.0,
+   "bypass": false,
+   "contactHeat": 45.0,
+   "maxStacks": 40.0,
+   "tileHeat": 0.5
+  },
+  "RMCTileFireBrute": {
+   "armorMultiplier": 1.0,
+   "bypass": false,
+   "contactHeat": 45.0,
+   "maxStacks": 1.0,
+   "tileHeat": 0.5
+  },
+  "RMCTileFireEthanol": {
+   "armorMultiplier": 1.0,
+   "bypass": false,
+   "contactHeat": 45.0,
+   "maxStacks": 20.0,
+   "tileHeat": 0.5
+  },
+  "RMCTileFireForever": {
+   "armorMultiplier": 1.0,
+   "bypass": false,
+   "contactHeat": 45.0,
+   "maxStacks": 20.0,
+   "tileHeat": 0.5
+  },
+  "RMCTileFireForeverNormal": {
+   "armorMultiplier": 1.0,
+   "bypass": false,
+   "contactHeat": 45.0,
+   "maxStacks": 20.0,
+   "tileHeat": 0.5
+  },
+  "RMCTileFireForeverNormalOrange": {
+   "armorMultiplier": 1.0,
+   "bypass": false,
+   "contactHeat": 45.0,
+   "maxStacks": 20.0,
+   "tileHeat": 0.5
+  },
+  "RMCTileFireForeverOrange": {
+   "armorMultiplier": 1.0,
+   "bypass": false,
+   "contactHeat": 45.0,
+   "maxStacks": 20.0,
+   "tileHeat": 0.5
+  },
+  "RMCTileFireForeverStrong": {
+   "armorMultiplier": 1.0,
+   "bypass": false,
+   "contactHeat": 45.0,
+   "maxStacks": 20.0,
+   "tileHeat": 0.5
+  },
+  "RMCTileFireForeverStrongOrange": {
+   "armorMultiplier": 1.0,
+   "bypass": false,
+   "contactHeat": 45.0,
+   "maxStacks": 20.0,
+   "tileHeat": 0.5
+  },
+  "RMCTileFireForeverWeak": {
+   "armorMultiplier": 1.0,
+   "bypass": false,
+   "contactHeat": 45.0,
+   "maxStacks": 20.0,
+   "tileHeat": 0.5
+  },
+  "RMCTileFireForeverWeakOrange": {
+   "armorMultiplier": 1.0,
+   "bypass": false,
+   "contactHeat": 45.0,
+   "maxStacks": 20.0,
+   "tileHeat": 0.5
+  },
+  "RMCTileFireGreen": {
+   "armorMultiplier": 0.5,
+   "bypass": false,
+   "contactHeat": 45.0,
+   "maxStacks": 10.0,
+   "tileHeat": 1.0
+  },
+  "RMCTileFireHCNapalm": {
+   "armorMultiplier": 1.0,
+   "bypass": false,
+   "contactHeat": 45.0,
+   "maxStacks": 20.0,
+   "tileHeat": 0.5
+  },
+  "RMCTileFireLaser": {
+   "armorMultiplier": 1.0,
+   "bypass": false,
+   "contactHeat": 100.0,
+   "maxStacks": 5.0,
+   "tileHeat": 0.13
+  },
+  "RMCTileFireMiniMike": {
+   "armorMultiplier": 1.0,
+   "bypass": false,
+   "contactHeat": 100.0,
+   "maxStacks": 25.0,
+   "tileHeat": 0.13
+  },
+  "RMCTileFireNapalm": {
+   "armorMultiplier": 1.0,
+   "bypass": false,
+   "contactHeat": 100.0,
+   "maxStacks": 60.0,
+   "tileHeat": 0.13
+  },
+  "RMCTileFireNapalmBase": {
+   "armorMultiplier": 1.0,
+   "bypass": false,
+   "contactHeat": 45.0,
+   "maxStacks": 20.0,
+   "tileHeat": 0.5
+  },
+  "RMCTileFireNapalmE": {
+   "armorMultiplier": 1.0,
+   "bypass": true,
+   "contactHeat": 45.0,
+   "maxStacks": 20.0,
+   "tileHeat": 0.5
+  },
+  "RMCTileFireNapalmEX": {
+   "armorMultiplier": 1.0,
+   "bypass": true,
+   "contactHeat": 45.0,
+   "maxStacks": 20.0,
+   "tileHeat": 0.5
+  },
+  "RMCTileFireOB": {
+   "armorMultiplier": 1.0,
+   "bypass": false,
+   "contactHeat": 45.0,
+   "maxStacks": 70.0,
+   "tileHeat": 0.5
+  },
+  "RMCTileFireOBAegis": {
+   "armorMultiplier": 1.0,
+   "bypass": true,
+   "contactHeat": 45.0,
+   "maxStacks": 20.0,
+   "tileHeat": 0.5
+  },
+  "RMCTileFireR189": {
+   "armorMultiplier": 1.0,
+   "bypass": true,
+   "contactHeat": 45.0,
+   "maxStacks": 20.0,
+   "tileHeat": 0.5
+  },
+  "RMCTileFireStickyNapalm": {
+   "armorMultiplier": 1.0,
+   "bypass": false,
+   "contactHeat": 45.0,
+   "maxStacks": 20.0,
+   "tileHeat": 0.5
+  },
+  "RMCTileFireThermobaric": {
+   "armorMultiplier": 1.0,
+   "bypass": false,
+   "contactHeat": 100.0,
+   "maxStacks": 25.0,
+   "tileHeat": 0.13
+  },
+  "RMCTileFireWeldingFuel": {
+   "armorMultiplier": 1.0,
+   "bypass": false,
+   "contactHeat": 45.0,
+   "maxStacks": 20.0,
+   "tileHeat": 0.5
+  }
+ },
  "fork": "stories_cm",
  "formula": {
   "armorBase": 1.1,
   "armorStep": 5.0,
   "costBase": "RMCPhoron",
   "damagePerIntensity": 10.0,
+  "defaultFire": "RMCTileFire",
+  "fireBurnDivisor": 2.0,
+  "fireBurnFloor": 0.8,
+  "fireBurnSpan": 0.2,
+  "fireMaxStacks": 45.0,
+  "firePatStacks": 10.0,
+  "fireStackDecay": 0.25,
+  "fireTick": 1.0,
+  "fireTileDivisor": 3.0,
   "intensityDivisor": 5.0,
   "ironReagent": "RMCIron",
   "minSlope": 0.1,
@@ -258,6 +465,7 @@
    "d": 0.2,
    "explosive": false,
    "falloff": 0.0,
+   "fireEntity": "RMCTileFireEthanol",
    "i": 0.2,
    "nameKey": "reagent-name-arnold-palmer",
    "obtainable": true,
@@ -292,6 +500,7 @@
    "d": 0.75,
    "explosive": false,
    "falloff": 0.0,
+   "fireEntity": "RMCTileFireGreen",
    "i": 0.45,
    "nameKey": "reagent-name-rmcbgel",
    "power": 0.0,
@@ -369,6 +578,7 @@
    "d": 0.2,
    "explosive": false,
    "falloff": 0.0,
+   "fireEntity": "RMCTileFireEthanol",
    "i": 0.2,
    "nameKey": "reagent-name-ethanol",
    "obtainable": true,
@@ -460,6 +670,7 @@
    "d": 0.75,
    "explosive": false,
    "falloff": 0.0,
+   "fireEntity": "RMCTileFireNapalmBase",
    "i": 0.45,
    "nameKey": "reagent-name-rmcnapalm",
    "obtainable": true,
@@ -486,6 +697,7 @@
    "d": 0.75,
    "explosive": false,
    "falloff": 0.0,
+   "fireEntity": "RMCTileFireGreen",
    "i": 0.45,
    "nameKey": "reagent-name-rmcnapalm-b",
    "obtainable": true,
@@ -512,6 +724,7 @@
    "d": 0.75,
    "explosive": false,
    "falloff": 0.0,
+   "fireEntity": "RMCTileFireNapalmE",
    "i": 0.45,
    "nameKey": "reagent-name-rmcnapalm-e",
    "obtainable": true,
@@ -539,6 +752,7 @@
    "d": 0.75,
    "explosive": false,
    "falloff": 0.0,
+   "fireEntity": "RMCTileFireNapalmEX",
    "i": 0.45,
    "nameKey": "reagent-name-rmcnapalm-ex",
    "penetrating": true,
@@ -565,6 +779,7 @@
    "d": -0.25,
    "explosive": false,
    "falloff": 0.0,
+   "fireEntity": "RMCTileFireHCNapalm",
    "i": -4.05,
    "nameKey": "reagent-name-rmcnapalm-hc",
    "obtainable": true,
@@ -591,6 +806,7 @@
    "d": -4.25,
    "explosive": false,
    "falloff": 0.0,
+   "fireEntity": "RMCTileFireStickyNapalm",
    "i": -1.05,
    "nameKey": "reagent-name-rmcnapalm-sticky",
    "obtainable": true,
@@ -693,6 +909,7 @@
    "d": 0.75,
    "explosive": false,
    "falloff": 0.0,
+   "fireEntity": "RMCTileFireBlue",
    "i": 0.45,
    "nameKey": "reagent-name-rmcrapalm-x",
    "power": 0.0,
@@ -796,6 +1013,7 @@
    "d": 0.75,
    "explosive": false,
    "falloff": 0.0,
+   "fireEntity": "RMCTileFireR189",
    "i": 0.45,
    "nameKey": "reagent-name-rmcr189",
    "penetrating": true,
@@ -910,8 +1128,8 @@
     "Burn time"
    ],
    "mix": {
-    "RMCCarbon": 24.0,
-    "RMCPhosphorus": 30.0
+    "RMCEthanol": 114.0,
+    "RMCNapalmUT": 6.0
    },
    "roles": [
     "fire",
@@ -977,8 +1195,7 @@
     "Burn time"
    ],
    "mix": {
-    "RMCCarbon": 36.0,
-    "RMCPhosphorus": 36.0
+    "RMCEthanol": 162.0
    },
    "roles": [
     "fire",
@@ -1032,8 +1249,8 @@
     "Burn time"
    ],
    "mix": {
-    "RMCCarbon": 18.0,
-    "RMCPhosphorus": 24.0
+    "RMCEthanol": 90.0,
+    "RMCPhosphorus": 6.0
    },
    "roles": [
     "fire",
@@ -1098,8 +1315,8 @@
     "Burn time"
    ],
    "mix": {
-    "RMCCarbon": 18.0,
-    "RMCPhosphorus": 54.0
+    "RMCEthanol": 90.0,
+    "RMCPhosphorus": 36.0
    },
    "roles": [
     "fire",
@@ -1164,8 +1381,8 @@
     "Burn time"
    ],
    "mix": {
-    "RMCCarbon": 36.0,
-    "RMCPhosphorus": 45.0
+    "RMCEthanol": 144.0,
+    "RMCNapalmUT": 36.0
    },
    "roles": [
     "fire",
@@ -1259,6 +1476,7 @@
    "coefficient": 2.0,
    "crit": 160.0,
    "dead": 160.0,
+   "fireHeat": 1.0,
    "hasCrit": false,
    "id": "CMXenoLesserDrone",
    "name": "Lesser Drone",
@@ -1285,6 +1503,7 @@
    "coefficient": 2.0,
    "crit": 500.0,
    "dead": 600.0,
+   "fireHeat": 1.0,
    "hasCrit": true,
    "id": "CMXenoDrone",
    "name": "Drone",
@@ -1311,6 +1530,7 @@
    "coefficient": 1.65289,
    "crit": 230.0,
    "dead": 330.0,
+   "fireHeat": 1.0,
    "hasCrit": true,
    "id": "CMXenoRunner",
    "name": "Runner",
@@ -1337,6 +1557,7 @@
    "coefficient": 0.52666,
    "crit": 500.0,
    "dead": 600.0,
+   "fireHeat": 1.0,
    "hasCrit": true,
    "id": "CMXenoDefender",
    "name": "Defender",
@@ -1363,6 +1584,7 @@
    "coefficient": 1.65289,
    "crit": 500.0,
    "dead": 600.0,
+   "fireHeat": 1.0,
    "hasCrit": true,
    "id": "CMXenoSentinel",
    "name": "Sentinel",
@@ -1389,6 +1611,7 @@
    "coefficient": 1.65289,
    "crit": 550.0,
    "dead": 650.0,
+   "fireHeat": 1.0,
    "hasCrit": true,
    "id": "CMXenoHivelord",
    "name": "Hivelord",
@@ -1415,6 +1638,7 @@
    "coefficient": 1.36603,
    "crit": 650.0,
    "dead": 750.0,
+   "fireHeat": 1.0,
    "hasCrit": true,
    "id": "CMXenoCarrier",
    "name": "Carrier",
@@ -1441,6 +1665,7 @@
    "coefficient": 0.93301,
    "crit": 500.0,
    "dead": 600.0,
+   "fireHeat": 1.0,
    "hasCrit": true,
    "id": "CMXenoBurrower",
    "name": "Burrower",
@@ -1467,6 +1692,7 @@
    "coefficient": 1.36603,
    "crit": 450.0,
    "dead": 550.0,
+   "fireHeat": 1.0,
    "hasCrit": true,
    "id": "CMXenoLurker",
    "name": "Lurker",
@@ -1493,6 +1719,7 @@
    "coefficient": 0.93301,
    "crit": 500.0,
    "dead": 600.0,
+   "fireHeat": 1.0,
    "hasCrit": true,
    "id": "CMXenoWarrior",
    "name": "Warrior",
@@ -1519,6 +1746,7 @@
    "coefficient": 1.36603,
    "crit": 550.0,
    "dead": 650.0,
+   "fireHeat": 1.0,
    "hasCrit": true,
    "id": "CMXenoSpitter",
    "name": "Spitter",
@@ -1545,6 +1773,8 @@
    "coefficient": 0.43526,
    "crit": 650.0,
    "dead": 750.0,
+   "fireHeat": 1.0,
+   "fireImmune": true,
    "hasCrit": true,
    "id": "CMXenoRavager",
    "name": "Ravager",
@@ -1571,6 +1801,7 @@
    "coefficient": 0.29729,
    "crit": 700.0,
    "dead": 800.0,
+   "fireHeat": 1.0,
    "hasCrit": true,
    "id": "RMCXenoCrusher",
    "name": "Crusher",
@@ -1597,6 +1828,7 @@
    "coefficient": 0.93301,
    "crit": 650.0,
    "dead": 750.0,
+   "fireHeat": 1.0,
    "hasCrit": true,
    "id": "CMXenoPraetorian",
    "name": "Praetorian",
@@ -1623,6 +1855,7 @@
    "coefficient": 1.36603,
    "crit": 650.0,
    "dead": 750.0,
+   "fireHeat": 3.0,
    "hasCrit": true,
    "id": "RMCXenoBoiler",
    "name": "Boiler",
@@ -1649,8 +1882,11 @@
    "coefficient": 0.29729,
    "crit": 500.0,
    "dead": 600.0,
+   "fireHeat": 1.0,
+   "fireImmune": true,
    "hasCrit": true,
    "id": "CMXenoQueen",
+   "igniteImmune": true,
    "name": "Queen",
    "rsi": "_Stories/Mobs/Xenos/Queen/queen.rsi",
    "sprites": {
@@ -1675,6 +1911,8 @@
    "coefficient": 0.52666,
    "crit": 1500.0,
    "dead": 1600.0,
+   "fireHeat": 1.0,
+   "fireImmune": true,
    "hasCrit": true,
    "id": "RMCXenoKing",
    "name": "King",

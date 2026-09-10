@@ -15,6 +15,10 @@ MIRRORED SOURCES (space-stories-cm14, verified 2026-09-10):
   Content.Shared/_Stories/Ordnance/OrdnanceCasingComponent.cs -> CASING_DEFAULTS
   Content.Shared/_RMC14/Xenonids/Damage/RMCXenoDamageVisualsSystem.cs
       OnVisualsDamageChanged -> the wound level in ordnance.js
+  Content.Server/Atmos/EntitySystems/FlammableSystem.cs
+      Update -> the burn tick in ordnance.js
+  Content.Shared/_RMC14/Atmos/SharedRMCFlammableSystem.cs
+      ApplyTileEffect, Ignite -> the fire model in ordnance.js
   Content.Shared/Rounding/ContentHelpers.cs
       RoundToEqualLevels -> roundToEqualLevels() in ordnance.js
 
@@ -469,6 +473,42 @@ def blast_damage_at(power: float, falloff: float, distance: float,
     return damage_per_intensity * max(0.0, max_intensity - slope * distance)
 
 
+def _heat(spec) -> float:
+    """The Heat entry of a DamageSpecifier, or zero."""
+    return float(((spec or {}).get("types") or {}).get("Heat") or 0)
+
+
+def build_fires(files: dict[str, str]) -> dict[str, dict]:
+    """Tile fire prototypes, resolved down the parent chain.
+
+    Ordnance never sets a fire's own intensity or duration -- the casing's
+    numbers overwrite both on spawn -- so what actually differs between
+    prototypes is the stack ceiling, the tile damage and the one-off hit on
+    contact. Those three are what a mixture inherits by picking a reagent that
+    overrides fireEntity.
+    """
+    protos = parse_entities(files)
+    out = {}
+    for pid in protos:
+        comp = resolve_entity(protos, pid)
+        ignite = comp.get("RMCIgniteOnCollide")
+        if ignite is None:
+            continue
+        collide = comp.get("DamageOnCollide") or {}
+        out[pid] = {
+            "maxStacks": float(ignite.get("maxStacks") or FIRE_MAX_STACKS),
+            "tileHeat": _heat(ignite.get("tileDamage")),
+            # A fire whose DamageOnCollide is flagged as fire is refused outright
+            # by anything holding RMCImmuneToFireTileDamage, contact hit included.
+            "contactHeat": _heat(collide.get("damage")) if collide.get("fire") else 0.0,
+            # Armour debuff while standing on the tile. It reaches Brute only, so
+            # for fire itself it changes nothing; it is carried for honesty.
+            "armorMultiplier": float(ignite.get("armorMultiplier") or 1),
+            "bypass": "RMCFireImmunityBypass" in comp,
+        }
+    return out
+
+
 def build_targets(conf: dict, files: dict[str, str]) -> list[dict]:
     protos = parse_entities(files)
     out = []
@@ -496,7 +536,17 @@ def build_targets(conf: dict, files: dict[str, str]) -> list[dict]:
             "armor": armour,
             "coefficient": round(explosion_coefficient(armour, base), 5),
             "rsi": comp.get("Sprite", {}).get("sprite"),
+            # Flammable.damage is per second and scales with stacks. Every caste
+            # burns at 1 Heat except the boiler, which burns at 3.
+            "fireHeat": _heat((comp.get("Flammable") or {}).get("damage")) or 1.0,
         })
+        # King, queen and ravager shrug off tile fire entirely, and the queen
+        # cannot even be lit. Only a fire carrying RMCFireImmunityBypass gets
+        # through, which no ordnance mixture can produce.
+        if "RMCImmuneToFireTileDamage" in comp:
+            out[-1]["fireImmune"] = True
+        if "RMCImmuneToIgnition" in comp:
+            out[-1]["igniteImmune"] = True
         # RMCXenoDamageVisualsComponent. The prefix is not the entity id --
         # a lesser drone draws "lesser_*" -- so it has to be read, not guessed.
         vis = comp.get("RMCXenoDamageVisuals") or {}
@@ -626,13 +676,34 @@ def fetch_target_sprites(fconf: dict, targets: list[dict], states: list[str]) ->
 # recipe from a technically-optimal dud — 204 iron with 36 welding fuel maxes the
 # mortar's shards at 4 power, where the same shards come with 72.
 _RADIUS = lambda s, c: s["blastRadius"] if s["hasBlast"] else 0.0
+# An incendiary load is bought for the area it sets alight. A one-tile flame is
+# a hot grenade, not a firebomb, so a fire recipe has to cover this much ground
+# before it counts as one at all.
+MIN_FIRE_REACH = 4
+_SPREADS = lambda s: s["reach"] >= MIN_FIRE_REACH
 CATALOGUE_ROLES = [
     ("radius", "Blast radius", _RADIUS, lambda s, c: s["power"]),
     ("damage", "Peak damage", lambda s, c: s["power"], _RADIUS),
     ("shrapnel", "Shrapnel", lambda s, c: s["shards"], lambda s, c: s["power"]),
-    ("fire", "Fire intensity", lambda s, c: s["fireIntensity"], lambda s, c: s["fireDuration"]),
-    ("burn", "Burn time", lambda s, c: s["fireDuration"], lambda s, c: s["fireIntensity"]),
+    ("fire", "Fire intensity", lambda s, c: s["fireIntensity"] if _SPREADS(s) else 0.0,
+     lambda s, c: s["fireDuration"]),
+    ("burn", "Burn time", lambda s, c: s["fireDuration"] if _SPREADS(s) else 0.0,
+     lambda s, c: s["fireIntensity"]),
 ]
+# Fire. FlammableSystem ticks once a second; a burning xeno takes
+#   intensity * (stacks / duration * 0.2 + 0.8) * heat / 2
+# and, while it is still standing in the flame, another intensity * tileHeat / 3.
+# Stacks land at the fire's duration, capped by the tile prototype, and bleed off
+# at a quarter per second unless something puts them out faster.
+FIRE_TICK = 1.0             # FlammableSystem.UpdateTime, seconds
+FIRE_STACK_DECAY = 0.25     # stacks shed per tick when nothing is done
+FIRE_MAX_STACKS = 45.0      # FlammableComponent.MaximumFireStacks
+FIRE_BURN_DIVISOR = 2.0
+FIRE_BURN_FLOOR = 0.8       # the share of intensity that lands with no stacks left
+FIRE_BURN_SPAN = 0.2        # the share stacks are worth on top of that
+FIRE_TILE_DIVISOR = 3.0     # the tile term runs every third tick in the CM original
+FIRE_PAT_STACKS = 10.0      # FirePatterComponent.Stacks, and ResistStacks besides
+
 CATALOGUE_STEPS = 20        # grid resolution as a fraction of the casing volume
 CHEAP_SHARE = 0.9           # the "cheap" row must still reach this much of the best
 
@@ -794,11 +865,14 @@ def build(fork_id: str, fconf: dict, fetch) -> dict:
     reagent_files = fetch(conf["reagent_files"], url, f"{fork_id}_ordnance")
     casing_files = fetch(conf["casing_files"], url, f"{fork_id}_ordnance")
     explosion_files = fetch(conf.get("explosion_files", []), url, f"{fork_id}_ordnance")
+    fire_files = fetch(conf.get("fire_files", []), url, f"{fork_id}_ordnance")
 
     reagents = resolve_all(parse_reagents(reagent_files))
     casings = resolve_all(parse_casings(casing_files))
     iron = conf.get("iron_reagent", "RMCIron")
     obtainable = load_obtainable()
+    default_fire = conf.get("default_fire", "RMCTileFire")
+    fires = build_fires(fire_files) if fire_files else {}
 
     out_reagents = {}
     for rid, spec in reagents.items():
@@ -827,6 +901,10 @@ def build(fork_id: str, fconf: dict, fetch) -> dict:
             entry["nameKey"] = spec["nameKey"]
         if rid in obtainable:
             entry["obtainable"] = True
+        # Only a handful of napalms swap the tile fire out; everything else
+        # burns as RMCTileFire.
+        if spec.get("fireEntity") and spec["fireEntity"] != default_fire:
+            entry["fireEntity"] = spec["fireEntity"]
         if rid == iron:
             entry["shardsPerUnit"] = SHARDS_PER_UNIT
         # Explicit fields vs effect-derived ones, so the UI can explain a number
@@ -868,6 +946,15 @@ def build(fork_id: str, fconf: dict, fetch) -> dict:
         "armorBase": ARMOR_BASE,
         "armorStep": ARMOR_STEP,
         "costBase": cost_base,
+        "defaultFire": default_fire,
+        "fireTick": FIRE_TICK,
+        "fireStackDecay": FIRE_STACK_DECAY,
+        "fireMaxStacks": FIRE_MAX_STACKS,
+        "fireBurnDivisor": FIRE_BURN_DIVISOR,
+        "fireBurnFloor": FIRE_BURN_FLOOR,
+        "fireBurnSpan": FIRE_BURN_SPAN,
+        "fireTileDivisor": FIRE_TILE_DIVISOR,
+        "firePatStacks": FIRE_PAT_STACKS,
     }
     recipes = build_recipes(out_casings, out_reagents, formula, costs, cost_base)
     print(f"  catalogue: {len(recipes)} recipes")
@@ -875,6 +962,7 @@ def build(fork_id: str, fconf: dict, fetch) -> dict:
         "schema": SCHEMA,
         "fork": fork_id,
         "formula": formula,
+        "fires": fires,
         "targets": targets,
         "recipes": recipes,
         "reagents": out_reagents,

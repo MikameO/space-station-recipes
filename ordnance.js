@@ -55,6 +55,10 @@
     reqs: [{ metric: 'shards', min: 20 }],   // opens on a real, useful example
     reqLadder: false, reqResult: undefined,
     galleryRange: 0,
+    // How long a xeno actually burns. The flame outlasts the target's
+    // patience: it runs out, and the hive pats it out at ten stacks a
+    // second, so the burn window is set here rather than assumed.
+    burnIn: 2, burnAfter: 3,
     masks: [], maskMode: 'off',
     costCache: new Map(),
   };
@@ -132,6 +136,9 @@
     'Burn time': 'Горение', 'Cheap': 'Дёшево',
     'destroyed': 'уничтожен', 'no effect': 'без эффекта',
     'at the centre': 'в эпицентре', 'for armour': 'по броне',
+    'on contact': 'при входе', 'in the flame': 'в пламени', 'after': 'после',
+    'shrugged off': 'не берёт', 'out of reach': 'не достаёт',
+    'no burn': 'не горит',
     'dies at': 'смерть при',
     'Nothing baked for this casing.': 'Для этого корпуса готовых рецептов нет.',
     'Target': 'Цель', 'Mixture': 'Смесь',
@@ -151,6 +158,7 @@
 
   // ── the formula (mirror of ss14_ordnance.compute_stats) ────────────────────
   function computeStats(mix, casing, dampener) {
+    let fireEntity = S.data.formula.defaultFire;
     const F = S.data.formula;
     let power = 0, falloff = casing.base, intensity = 0, duration = 0, radius = 0;
     let shards = 0, penetrating = false;
@@ -174,6 +182,9 @@
         if (rgb && w > 0) { cr += rgb[0] * w; cg += rgb[1] * w; cb += rgb[2] * w; cw += w; }
       }
       if (id === F.ironReagent) shards += Math.floor(qty * F.shardsPerUnit);
+      // OrdnanceExplosionSystem takes the last override it sees; everything
+      // else leaves the default tile fire in place.
+      if (spec.fireEntity) fireEntity = spec.fireEntity;
     }
 
     if (power <= 0) shards = 0;
@@ -193,7 +204,7 @@
     const ray = star ? Math.min(Math.round(radius * 1.5), casing.fr[1]) : 0;
     return {
       power, falloff, shards, fireIntensity: intensity, fireDuration: duration,
-      fireRadius: radius, firePenetrating: penetrating, star,
+      fireRadius: radius, firePenetrating: penetrating, star, fireEntity,
       reach: star ? ray : Math.floor(radius),
       blastRadius: eng.radius, hasBlast: eng.totalIntensity > 0,
       flame: cw > 0 ? rgbToHex(cr / cw, cg / cw, cb / cw) : null,
@@ -446,6 +457,12 @@
       track('ordnance_gallery_range', { range: S.galleryRange });
       renderGallery();
     };
+    const onBurn = () => {
+      track('ordnance_burn_window', { inFlame: S.burnIn, after: S.burnAfter });
+      renderGallery(); renderCatalogue();
+    };
+    $('ordBurnIn').onchange = e => { S.burnIn = +e.target.value; onBurn(); };
+    $('ordBurnAfter').onchange = e => { S.burnAfter = +e.target.value; onBurn(); };
     $('ordMaskMode').onchange = e => {
       S.maskMode = e.target.value; saveMasks(); renderHeat();
     };
@@ -1928,6 +1945,48 @@
   // simulator measures it by detonating a real one, so intensity is modelled as
   // linear from power / 5 at the centre to zero at the blast radius. Shrapnel and
   // fire are left out, which understates rather than flatters.
+  // ── fire ───────────────────────────────────────────────────────────────────
+  // FlammableSystem ticks once a second. A burning xeno takes
+  //   intensity x (stacks / duration x 0.2 + 0.8) x heat / 2
+  // and, while it is still standing in the flame, another
+  //   intensity x tileHeat / 3.
+  // Stacks arrive equal to the fire's duration, capped by the tile prototype at
+  // 20 for ordinary ordnance fire, and bleed off at a quarter per second.
+  //
+  // Nothing here meets armour. Explosion and fire damage both pass
+  // ignoreResistances, and xeno armour only covers the Brute group in any case,
+  // while fire is Heat and lives in Burn. That is why an incendiary load is the
+  // answer to a caste that shrugs off blast.
+  function fireOutcome(st, target, distance) {
+    const F = S.data.formula;
+    const none = { contact: 0, inside: 0, after: 0, total: 0, stacks: 0, caught: false };
+    if (st.fireIntensity <= 0 || distance > st.reach) return none;
+    const fires = S.data.fires || {};
+    const fire = fires[st.fireEntity] || fires[F.defaultFire];
+    if (!fire) return none;
+    // King, queen and ravager refuse tile fire outright, contact hit included.
+    if (target.fireImmune && !fire.bypass) return none;
+    const contact = fire.contactHeat || 0;
+    if (target.igniteImmune && !fire.bypass)
+      return Object.assign({}, none, { contact, total: contact, caught: true });
+
+    const I = st.fireIntensity, D = st.fireDuration;
+    const heat = target.fireHeat || 1;
+    const stacks = Math.min(D, fire.maxStacks, F.fireMaxStacks);
+    const rate = s => I * (s / D * F.fireBurnSpan + F.fireBurnFloor) * heat / F.fireBurnDivisor;
+    // Standing in it, every tick re-ignites, so the stack count holds. The
+    // flame cannot outlast its own duration.
+    const inside = Math.min(S.burnIn, D) * (rate(stacks) + I * (fire.tileHeat || 0) / F.fireTileDivisor);
+    // Once out, stacks bleed off and nothing tops them up.
+    let after = 0;
+    for (let s = 0; s < S.burnAfter; s++) {
+      const left = stacks - F.fireStackDecay * s;
+      if (left <= 0) break;
+      after += rate(left);
+    }
+    return { contact, inside, after, total: contact + inside + after, stacks, caught: true };
+  }
+
   function blastDamageAt(st, distance) {
     const F = S.data.formula;
     if (st.power <= 0 || st.falloff <= 0) return 0;
@@ -1937,11 +1996,13 @@
   }
 
   function targetOutcome(st, target, distance) {
-    const dealt = blastDamageAt(st, distance) * target.coefficient;
+    const blast = blastDamageAt(st, distance) * target.coefficient;
+    const fire = fireOutcome(st, target, distance);
+    const dealt = blast + fire.total;
     const state = dealt >= target.dead ? 'dead'
       : (target.hasCrit && dealt >= target.crit) ? 'crit' : 'alive';
     return {
-      dealt,
+      dealt, blast, fire,
       state,
       left: Math.max(0, target.dead - dealt),
       share: clamp(1 - dealt / target.dead, 0, 1),
@@ -1990,12 +2051,23 @@
       const sprite = (t.sprites || {})[o.state === 'crit' ? 'crit' : o.state] || (t.sprites || {}).alive;
       const wound = woundFrame(t, o.dealt, o.state);
       const tier = t.tier ? 'T' + t.tier : '\u2014';
-      // The panel above prints raw blast damage; a xeno takes it multiplied.
-      // Without the chain on screen a 396 that destroys a 650 HP hivelord
-      // looks like a bug rather than a x1.65 explosion coefficient.
-      const tip = esc(round(raw, 0) + ' ' + tr('at the centre')
+      // The panel above prints raw blast damage; a xeno takes it multiplied,
+      // and then fire lands on top with no armour in the way. Without the whole
+      // chain somewhere on screen a 396 that destroys a 650 HP hivelord reads
+      // as a bug rather than as x1.65 plus a burn.
+      const lines = [tr('Blast') + ': ' + round(raw, 0) + ' ' + tr('at the centre')
         + ' \u00d7' + t.coefficient.toFixed(2) + ' ' + tr('for armour')
-        + ' = ' + round(o.dealt, 0) + ', ' + tr('dies at') + ' ' + round(t.dead, 0));
+        + ' = ' + round(o.blast, 0)];
+      if (st.fireIntensity > 0) {
+        lines.push(tr('Fire') + ': ' + (o.fire.caught
+          ? round(o.fire.contact, 0) + ' ' + tr('on contact')
+            + ' + ' + round(o.fire.inside, 0) + ' ' + tr('in the flame')
+            + ' + ' + round(o.fire.after, 0) + ' ' + tr('after')
+            + ' = ' + round(o.fire.total, 0)
+          : (t.fireImmune ? tr('shrugged off') : tr('out of reach'))));
+      }
+      lines.push(tr('dies at') + ' ' + round(t.dead, 0));
+      const tip = esc(lines.join('\n'));
       return `<div class="ord-xeno ord-xeno-${o.state}" title="${tip}">
         <div class="ord-xeno-art">
           ${sprite ? `<img src="sprites/xenos/${esc(sprite)}" alt="${esc(t.name)}" loading="lazy">` : ''}
@@ -2007,7 +2079,11 @@
         <div class="ord-xeno-num">${o.state === 'dead'
           ? esc(tr('destroyed'))
           : esc(round(o.left, 0)) + ' / ' + esc(round(t.dead, 0))}</div>
-        <div class="ord-xeno-dmg">${esc(round(o.dealt, 0))} \u00d7${esc(t.coefficient.toFixed(2))}</div>
+        <div class="ord-xeno-dmg">${esc(round(o.blast, 0))} \u00d7${esc(t.coefficient.toFixed(2))}</div>
+        ${o.fire.total > 0
+          ? `<div class="ord-xeno-fire">+${esc(round(o.fire.total, 0))} ${esc(tr('fire'))}</div>`
+          : (st.fireIntensity > 0 && t.fireImmune
+             ? `<div class="ord-xeno-fire ord-xeno-noburn">${esc(tr('no burn'))}</div>` : '')}
         <div class="ord-xeno-hits">${o.hits ? esc(o.hits) + ' \u00d7' : esc(tr('no effect'))}</div>
       </div>`;
     }).join('');
