@@ -44,12 +44,17 @@
     heatCAmount: 0,
     heatMetric: 'blastRadius', heatHeight: 'blastRadius',
     surfView: '3d', yaw: VIEW.yaw, pitch: VIEW.pitch, zoom: VIEW.zoom,
-    pick: null,                     // {i, j} cell the user clicked, or null
+    // The pinned point is a MIXTURE, never a grid cell. Cell coordinates mean a
+    // different mixture the moment an axis changes, so keeping those would move
+    // the marker under the user; keeping the mixture lets them hold one point in
+    // composition space and watch every other setting change around it.
+    pick: null,                     // { mix } or null
     surfCells: [],                  // screen polygons of the last surface draw
     costBase: null, paretoMetric: 'power',
     reqObjective: 'blastRadius', reqCostLimit: null,
     reqs: [{ metric: 'shards', min: 20 }],   // opens on a real, useful example
     reqResult: undefined,
+    masks: [], maskMode: 'off',
     costCache: new Map(),
   };
 
@@ -114,6 +119,15 @@
     'requirements not met': 'требования не выполнены',
     'Nothing in this casing can do that.': 'В этом корпусе такого не собрать.',
     'No requirements: the search just maximises.': 'Без требований поиск просто максимизирует.',
+    'Masks': 'Маски',
+    'Intersection of': 'Пересечение',
+    'of': 'из',
+    'mixtures clear every mask': 'смесей проходят все маски',
+    'No mixture here clears every mask.': 'Здесь ни одна смесь не проходит все маски.',
+    'Pinned': 'Закреплено',
+    'over the casing volume': 'больше объёма корпуса',
+    'casing not full': 'корпус не полон',
+    'No masks yet. Add one to highlight where a metric clears a threshold.': 'Масок пока нет. Добавьте маску, чтобы подсветить области, где метрика перешагивает порог.',
   };
   const tr = s => (window.I18N_LANG === 'ru' && RU[s]) || s;
   const mlabel = key => tr(METRICS[key].label);
@@ -264,6 +278,8 @@
       buildAddSelect();
       buildCostSelect();
       renderReqList();
+      loadMasks();
+      renderMaskList();
       presetMix();
       renderAll();
     } catch (e) {
@@ -374,10 +390,10 @@
     $('ordSweep').onchange = e => { S.sweepId = e.target.value; renderChart(); };
     $('ordBlendA').onchange = e => { S.blendA = e.target.value; renderChart(); };
     $('ordBlendB').onchange = e => { S.blendB = e.target.value; renderChart(); };
-    // Changing an axis invalidates the picked cell: the same (i, j) would name a
-    // different mixture, so drop it rather than show a stale readout.
+    // The pin survives every one of these: it is a mixture, and the whole point
+    // of pinning one is to watch the rest of the view change around it.
     const axis = (id, key) => {
-      $(id).onchange = e => { S[key] = e.target.value; S.pick = null; renderHeat(); };
+      $(id).onchange = e => { S[key] = e.target.value; renderHeat(); };
     };
     axis('ordHeatA', 'heatA');
     axis('ordHeatB', 'heatB');
@@ -385,27 +401,23 @@
     // one has to re-sync the control strip and not only redraw.
     $('ordHeatC').onchange = e => {
       S.heatC = e.target.value;
-      S.pick = null;
       syncChartControls();
       renderHeat();
     };
     $('ordHeatCMode').onchange = e => {
       S.heatCMode = e.target.value;
-      S.pick = null;
       syncChartControls();
       renderHeat();
     };
     $('ordHeatCAmount').oninput = e => {
       S.heatCAmount = +e.target.value;
       $('ordHeatCAmountOut').textContent = S.heatCAmount;
-      S.pick = null;
       renderHeat();
     };
     $('ordHeatHeight').onchange = e => { S.heatHeight = e.target.value; renderHeat(); };
     $('ordHeatMetric').onchange = e => { S.heatMetric = e.target.value; renderHeat(); };
     $('ordSurfView').onchange = e => {
       S.surfView = e.target.value;
-      S.pick = null;                       // grid resolution differs between views
       track('ordnance_surf_view', { view: S.surfView });
       syncChartControls();
       renderHeat();
@@ -416,6 +428,15 @@
     };
     $('ordCostBase').onchange = e => { S.costBase = e.target.value; renderPareto(); };
     $('ordParetoMetric').onchange = e => { S.paretoMetric = e.target.value; renderPareto(); };
+    $('ordMaskMode').onchange = e => {
+      S.maskMode = e.target.value; saveMasks(); renderHeat();
+    };
+    $('ordMaskAdd').onclick = () => { addMask(); track('ordnance_mask_add'); };
+    $('ordMaskClear').onclick = () => {
+      S.masks = []; S.maskMode = 'off'; saveMasks();
+      $('ordMaskMode').value = 'off';
+      renderMaskList(); renderHeat();
+    };
     $('ordReqObjective').onchange = e => { S.reqObjective = e.target.value; };
     $('ordReqCost').oninput = e => {
       const v = e.target.value.trim();
@@ -587,6 +608,10 @@
     $('ordSurfView').value = S.surfView;
     $('ordHeightWrap').hidden = S.surfView !== '3d';
     $('ordSurfReset').hidden = S.surfView !== '3d';
+    // Masks are a flat-map tool: stacking translucent regions on a shaded 3D
+    // surface reads as mud, and the point is to compare regions, not relief.
+    $('ordMaskBlock').hidden = S.surfView !== 'flat';
+    $('ordMaskMode').value = S.maskMode;
     $('ordSweepWrap').hidden = S.chartMode !== 'sweep';
     $('ordBlendWrap').hidden = S.chartMode !== 'blend';
   }
@@ -775,14 +800,8 @@
   function renderHeat() {
     if (!S.data) return;
     const g = surfaceGrid();
-    // A pick made on the curve chart has no cell coordinates; only a pick that
-    // claims to be a surface cell has to still exist in the current grid.
-    if (S.pick && S.pick.i != null && !g.cells[S.pick.i * g.N + S.pick.j]) S.pick = null;
-    if (S.pick && S.pick.i != null) {
-      const cell = g.cells[S.pick.i * g.N + S.pick.j];
-      if (cell) { S.pick.mix = cell.mix; S.pick.st = cell.st; }
-    }
     if (S.surfView === '3d') renderSurface3D(g); else renderFlat(g);
+    renderMaskRanges(g);
     renderScale(g);
     renderHeatNote(g);
     renderPick();
@@ -902,8 +921,9 @@
     }
 
     if (g.best) markPoint3D(ctx, g.best, g, o, cssVar('--amber') || '#ffb627', false);
-    if (S.pick) {
-      const cell = g.cells[S.pick.i * g.N + S.pick.j];
+    const pinned = pickCell(g);
+    if (pinned) {
+      const cell = g.cells[pinned.i * g.N + pinned.j];
       if (cell) markPoint3D(ctx, cell, g, o, cssVar('--text-bright') || '#e8ecf4', true);
     }
 
@@ -939,12 +959,26 @@
     const iw = w - pad.l - pad.r, ih = h - pad.t - pad.b;
     const cw = iw / N, ch = ih / N;
     S.surfCells = { pad, cw, ch, ih, N };
+    const useMasks = masksLive();
+    const ranges = useMasks ? maskRanges(g) : null;
+    // Cells that qualify for nothing must stay a shade above the page, or in
+    // intersection mode the domain vanishes and the surviving region floats with
+    // no frame of reference.
+    const miss = 'rgb(26,34,33)';
     for (let i = 0; i < N; i++) {
       for (let j = 0; j < N; j++) {
         const cell = g.cells[i * N + j];
         if (!cell) continue;
-        const rgb = rampRGB(g.flatColour ? 0.62 : (cell.cv - g.cLo) / (g.cHi - g.cLo));
-        ctx.fillStyle = 'rgb(' + rgb.join(',') + ')';
+        let fill;
+        if (useMasks) {
+          const rgb = maskColourFor(cell, g, ranges);
+          // Cells that qualify for nothing stay as a dim ghost, so the shape of
+          // the domain is still legible around the highlighted regions.
+          fill = rgb ? 'rgb(' + rgb.map(v => Math.round(v)).join(',') + ')' : miss;
+        } else {
+          fill = 'rgb(' + rampRGB(g.flatColour ? 0.62 : (cell.cv - g.cLo) / (g.cHi - g.cLo)).join(',') + ')';
+        }
+        ctx.fillStyle = fill;
         ctx.fillRect(pad.l + i * cw, pad.t + ih - (j + 1) * ch, cw + 0.5, ch + 0.5);
       }
     }
@@ -953,10 +987,8 @@
       ctx.strokeRect(pad.l + cell.i * cw - 1, pad.t + ih - (cell.j + 1) * ch - 1, cw + 2, ch + 2);
     };
     if (g.best) box(g.best, cssVar('--amber') || '#ffb627', 1.5);
-    if (S.pick) {
-      const cell = g.cells[S.pick.i * N + S.pick.j];
-      if (cell) box(cell, cssVar('--text-bright') || '#e8ecf4', 2);
-    }
+    const pinned = pickCell(g);
+    if (pinned) box({ i: pinned.i, j: pinned.j }, cssVar('--text-bright') || '#e8ecf4', 2);
     const muted = cssVar('--text-ghost') || '#6b7a93';
     ctx.fillStyle = muted; ctx.font = '11px system-ui, sans-serif';
     ctx.textAlign = 'center';
@@ -967,6 +999,168 @@
     ctx.restore();
   }
 
+  // ── value masks ────────────────────────────────────────────────────────────
+  // A mask is a metric with a threshold. Each gets its own hue and is drawn at an
+  // intensity proportional to how far past the threshold a cell sits, so a region
+  // reads as "good" rather than merely "passing". Drawn additively, overlapping
+  // masks brighten and blend, which is the picture of where several requirements
+  // hold at once. Intersection mode hides every cell that fails any of them.
+  const MASK_COLOURS = ['#39ff85', '#00e5ff', '#ffb627', '#c17aff', '#ff3d5a'];
+  const MASK_STORE = 'chemdb-ord-masks';
+
+  function loadMasks() {
+    try {
+      const raw = localStorage.getItem(MASK_STORE);
+      if (!raw) return;
+      const saved = JSON.parse(raw);
+      if (!Array.isArray(saved.masks)) return;
+      S.masks = saved.masks.filter(m => METRICS[m.metric]).slice(0, MASK_COLOURS.length);
+      if (['off', 'overlay', 'intersect'].includes(saved.mode)) S.maskMode = saved.mode;
+    } catch (e) { /* private mode, or a shape from an older build */ }
+  }
+  function saveMasks() {
+    try {
+      localStorage.setItem(MASK_STORE, JSON.stringify({ masks: S.masks, mode: S.maskMode }));
+    } catch (e) { /* storage blocked; masks just will not survive a reload */ }
+  }
+
+  const activeMasks = () => S.masks.filter(m => m.on !== false);
+  const masksLive = () => S.maskMode !== 'off' && S.surfView === 'flat' && activeMasks().length > 0;
+
+  // Range of each masked metric across the current domain, so a threshold can be
+  // read as a position between the worst and best mixture on screen.
+  function maskRanges(g) {
+    const F = S.data.formula;
+    const dmgPer = F.damagePerIntensity / F.intensityDivisor;
+    const out = {};
+    for (const m of S.masks) {
+      if (out[m.metric]) continue;
+      let lo = Infinity, hi = -Infinity;
+      for (const cell of g.cells) {
+        if (!cell) continue;
+        const v = METRICS[m.metric].get(cell.st, dmgPer);
+        if (v < lo) lo = v;
+        if (v > hi) hi = v;
+      }
+      out[m.metric] = isFinite(lo) ? [lo, hi] : [0, 1];
+    }
+    return out;
+  }
+
+  // 0 when the cell fails the mask, otherwise 0.35..1 by how far past it sits.
+  // The floor matters: a cell that only just qualifies still has to be visible.
+  function maskIntensity(mask, value, range) {
+    const [lo, hi] = range;
+    if (mask.op === 'lte') {
+      if (value > mask.value) return 0;
+      const span = Math.max(mask.value - lo, 1e-6);
+      return 0.35 + 0.65 * clamp((mask.value - value) / span, 0, 1);
+    }
+    if (value < mask.value) return 0;
+    const span = Math.max(hi - mask.value, 1e-6);
+    return 0.35 + 0.65 * clamp((value - mask.value) / span, 0, 1);
+  }
+
+  function maskColourFor(cell, g, ranges) {
+    const F = S.data.formula;
+    const dmgPer = F.damagePerIntensity / F.intensityDivisor;
+    let r = 0, gr = 0, b = 0, hits = 0;
+    for (const m of activeMasks()) {
+      const v = METRICS[m.metric].get(cell.st, dmgPer);
+      const k = maskIntensity(m, v, ranges[m.metric] || [0, 1]);
+      if (k <= 0) {
+        if (S.maskMode === 'intersect') return null;   // fails one, so it is out
+        continue;
+      }
+      hits++;
+      const rgb = hexToRgb(m.colour) || [255, 255, 255];
+      r += rgb[0] * k; gr += rgb[1] * k; b += rgb[2] * k;
+    }
+    if (!hits) return null;
+    return [Math.min(255, r), Math.min(255, gr), Math.min(255, b)];
+  }
+
+  function renderMaskList() {
+    const box = $('ordMaskList');
+    if (!S.masks.length) {
+      box.innerHTML = '<p class="ord-empty">'
+        + esc(tr('No masks yet. Add one to highlight where a metric clears a threshold.'))
+        + '</p>';
+      return;
+    }
+    const opts = sel => Object.keys(METRICS)
+      .map(k => `<option value="${esc(k)}"${k === sel ? ' selected' : ''}>${esc(mlabel(k))}</option>`)
+      .join('');
+    box.innerHTML = S.masks.map((m, idx) => `<div class="ord-mask-row" data-idx="${idx}">
+      <input type="checkbox" class="ord-mask-on"${m.on === false ? '' : ' checked'}
+             aria-label="Enable mask">
+      <span class="ord-mask-swatch" style="background:${esc(m.colour)}"></span>
+      <select class="ord-mask-metric" aria-label="Mask metric">${opts(m.metric)}</select>
+      <select class="ord-mask-op" aria-label="Mask comparison">
+        <option value="gte"${m.op === 'gte' ? ' selected' : ''}>&ge;</option>
+        <option value="lte"${m.op === 'lte' ? ' selected' : ''}>&le;</option>
+      </select>
+      <input type="number" class="ord-mask-value" step="0.1" value="${esc(m.value)}"
+             aria-label="Mask threshold">
+      <span class="ord-mask-range" data-metric="${esc(m.metric)}"></span>
+      <button class="ord-mask-del" aria-label="Remove mask">&times;</button>
+    </div>`).join('');
+
+    box.querySelectorAll('.ord-mask-row').forEach(row => {
+      const idx = +row.dataset.idx;
+      const touch = () => { saveMasks(); renderHeat(); };
+      row.querySelector('.ord-mask-on').onchange = e => { S.masks[idx].on = e.target.checked; touch(); };
+      row.querySelector('.ord-mask-metric').onchange = e => {
+        S.masks[idx].metric = e.target.value; touch(); renderMaskList();
+      };
+      row.querySelector('.ord-mask-op').onchange = e => { S.masks[idx].op = e.target.value; touch(); };
+      row.querySelector('.ord-mask-value').oninput = e => {
+        S.masks[idx].value = +e.target.value || 0; touch();
+      };
+      row.querySelector('.ord-mask-del').onclick = () => {
+        S.masks.splice(idx, 1); saveMasks(); renderMaskList(); renderHeat();
+      };
+    });
+  }
+
+  // Fill in the observed range beside each threshold, once the grid is known.
+  function renderMaskRanges(g) {
+    if (!S.masks.length) return;
+    const ranges = maskRanges(g);
+    $('ordMaskList').querySelectorAll('.ord-mask-range').forEach(el => {
+      const r = ranges[el.dataset.metric];
+      el.textContent = r ? round(r[0], 2) + ' \u2026 ' + round(r[1], 2) : '';
+    });
+  }
+
+  // A new mask opens at the midpoint of its metric's current range, which is a
+  // threshold that actually shows something instead of an empty screen.
+  function addMask() {
+    if (S.masks.length >= MASK_COLOURS.length) return;
+    const g = surfaceGrid();
+    const metric = S.heatMetric;
+    const ranges = maskRanges({ cells: g.cells });
+    const F = S.data.formula;
+    const dmgPer = F.damagePerIntensity / F.intensityDivisor;
+    let lo = Infinity, hi = -Infinity;
+    for (const cell of g.cells) {
+      if (!cell) continue;
+      const v = METRICS[metric].get(cell.st, dmgPer);
+      if (v < lo) lo = v;
+      if (v > hi) hi = v;
+    }
+    if (!isFinite(lo)) { lo = 0; hi = 1; }
+    S.masks.push({
+      metric, op: 'gte', value: round(lo + (hi - lo) * 0.6, 2),
+      colour: MASK_COLOURS[S.masks.length % MASK_COLOURS.length], on: true,
+    });
+    if (S.maskMode === 'off') S.maskMode = 'overlay';
+    $('ordMaskMode').value = S.maskMode;
+    saveMasks();
+    renderMaskList();
+    renderHeat();
+  }
+
   // The ramp is normalised to whatever the current view spans, so the same green
   // can mean 0 in one view and 8 in the next. Without this strip the colours are
   // not readable as values at all.
@@ -974,6 +1168,18 @@
     const box = $('ordScale');
     const colour = METRICS[S.heatMetric];
     const swatch = k => 'rgb(' + rampRGB(k).join(',') + ')';
+
+    if (masksLive()) {
+      box.innerHTML = '<div class="ord-scale-row"><span class="ord-scale-cap">'
+        + esc(tr(S.maskMode === 'intersect' ? 'Intersection of' : 'Masks')) + '</span></div>'
+        + '<div class="ord-mask-legend">'
+        + activeMasks().map(m => '<span class="ord-mask-key">'
+            + '<i style="background:' + esc(m.colour) + '"></i>'
+            + esc(mlabel(m.metric)) + ' ' + (m.op === 'lte' ? '\u2264' : '\u2265') + ' '
+            + esc(round(m.value, 2)) + '</span>').join('')
+        + '</div>';
+      return;
+    }
 
     if (g.flatColour) {
       box.innerHTML = '<div class="ord-scale-row">'
@@ -1012,6 +1218,9 @@
   }
 
   function renderHeatNote(g) {
+    // With masks up, the colour metric is not what is on screen, so reporting
+    // its best would name a mixture nowhere near the highlighted region.
+    if (masksLive()) { renderMaskNote(g); return; }
     const metric = METRICS[S.heatMetric];
     if (!g.best) { $('ordHeatNote').textContent = ''; return; }
     if (g.flatColour) {
@@ -1027,6 +1236,43 @@
     if (btn) btn.onclick = () => { S.mix = g.best.mix; track('ordnance_heat_use'); renderAll(); };
   }
 
+  // How much of the domain survives, and the single best mixture inside it. The
+  // ranking is the summed mask intensity, so the winner is the point that clears
+  // every threshold by the widest margin rather than one that scrapes past.
+  function renderMaskNote(g) {
+    const F = S.data.formula;
+    const dmgPer = F.damagePerIntensity / F.intensityDivisor;
+    const ranges = maskRanges(g);
+    const list = activeMasks();
+    let total = 0, kept = 0, best = null, bestScore = -1;
+    for (const cell of g.cells) {
+      if (!cell) continue;
+      total++;
+      let score = 0, all = true;
+      for (const m of list) {
+        const k = maskIntensity(m, METRICS[m.metric].get(cell.st, dmgPer), ranges[m.metric] || [0, 1]);
+        if (k <= 0) { all = false; break; }
+        score += k;
+      }
+      if (!all) continue;
+      kept++;
+      if (score > bestScore) { bestScore = score; best = cell; }
+    }
+    const share = total ? Math.round(kept / total * 100) : 0;
+    if (!kept) {
+      $('ordHeatNote').innerHTML = '<span class="ord-key-note">'
+        + esc(tr('No mixture here clears every mask.')) + '</span>';
+      return;
+    }
+    $('ordHeatNote').innerHTML = '<span class="ord-key-note">'
+      + esc(kept) + ' ' + esc(tr('of')) + ' ' + esc(total) + ' '
+      + esc(tr('mixtures clear every mask')) + ' (' + share + '%)</span> '
+      + esc(tr('Best')) + ': ' + esc(describeMix(best.mix))
+      + ' <button class="ord-chip" id="ordHeatUse">Load this mix</button>';
+    const btn = $('ordHeatUse');
+    if (btn) btn.onclick = () => { S.mix = best.mix; track('ordnance_mask_use'); renderAll(); };
+  }
+
   // ── click readout ──────────────────────────────────────────────────────────
   // The colour metric answers one question; a picked point should answer all of
   // them, so this lists every stat the detonation panel shows plus the cost.
@@ -1036,8 +1282,11 @@
       box.innerHTML = '<p class="ord-empty">Click a point on the surface to inspect that mixture.</p>';
       return;
     }
-    const { mix, st } = S.pick;
+    const mix = S.pick.mix;
     const c = casingOf();
+    // Recomputed on every render, so the pinned mixture tracks the casing, the
+    // dampener and the chosen metric instead of showing what it was when clicked.
+    const st = computeStats(mix, c, S.dampener);
     const F = S.data.formula;
     const dmg = st.power * F.damagePerIntensity / F.intensityDivisor;
     const colourMetric = METRICS[S.heatMetric];
@@ -1059,7 +1308,14 @@
       : '\u2014';
     rows.push([tr('Flame colour'), flame]);
 
-    box.innerHTML = '<div class="ord-pick-head">' + esc(describeMix(mix)) + '</div>'
+    const volume = Object.values(mix).reduce((a, b) => a + b, 0);
+    const notes = [];
+    if (volume > c.vol) notes.push(tr('over the casing volume'));
+    else if (volume < c.vol) notes.push(tr('casing not full'));
+    box.innerHTML = '<div class="ord-pick-bar"><span>' + esc(tr('Pinned')) + '</span>'
+      + '<button class="ord-pick-clear" id="ordPickClear" aria-label="Clear pin">&times;</button></div>'
+      + '<div class="ord-pick-head">' + esc(describeMix(mix)) + '</div>'
+      + (notes.length ? '<div class="ord-pick-note">' + esc(notes.join(' \u00b7 ')) + '</div>' : '')
       + '<div class="ord-pick-lead"><span>' + esc(mlabel(S.heatMetric)) + '</span><strong>'
       + esc(round(colourMetric.get(st, dmgPer), 2)) + '</strong></div>'
       + '<table class="ord-pick-table"><tbody>'
@@ -1068,10 +1324,34 @@
       + '<button class="ord-chip" id="ordPickUse">Load this mix</button>';
     const btn = $('ordPickUse');
     if (btn) btn.onclick = () => { S.mix = Object.assign({}, mix); track('ordnance_pick_use'); renderAll(); };
+    const clr = $('ordPickClear');
+    if (clr) clr.onclick = () => { S.pick = null; renderHeat(); };
   }
 
   function setPick(cell) {
-    S.pick = cell ? { i: cell.i, j: cell.j, mix: cell.mix, st: cell.st } : null;
+    S.pick = cell ? { mix: Object.assign({}, cell.mix) } : null;
+  }
+
+  // Where the pinned mixture sits on the current axes, or null when it cannot be
+  // drawn there: its reagents are off the current floor, or the third reagent no
+  // longer supplies what this mixture holds.
+  function pickCell(g) {
+    if (!S.pick) return null;
+    const mix = S.pick.mix;
+    const ids = Object.keys(mix).filter(id => mix[id] > 0);
+    const axes = new Set([S.heatA, S.heatB]);
+    if (S.heatC) axes.add(S.heatC);
+    if (ids.some(id => !axes.has(id))) return null;
+    const a = mix[S.heatA] || 0;
+    const b = S.heatB === S.heatA ? 0 : (mix[S.heatB] || 0);
+    if (S.heatC && S.heatC !== S.heatA && S.heatC !== S.heatB) {
+      const expect = S.heatCMode === 'fixed' ? S.heatCAmount : g.cap - a - b;
+      if (Math.abs((mix[S.heatC] || 0) - expect) > 1.5) return null;
+    }
+    const i = Math.round(a / g.cap * (g.N - 1));
+    const j = Math.round(b / g.cap * (g.N - 1));
+    if (i < 0 || j < 0 || i >= g.N || j >= g.N) return null;
+    return g.cells[i * g.N + j] ? { i, j } : null;
   }
 
   // ── surface interaction ────────────────────────────────────────────────────
@@ -1167,10 +1447,9 @@
       for (const pt of geom.pts) {
         if (Math.abs(pt.x - value) < Math.abs(nearest.x - value)) nearest = pt;
       }
-      S.pick = { i: null, j: null, mix: nearest.mix,
-                 st: computeStats(nearest.mix, casingOf(), S.dampener) };
+      S.pick = { mix: Object.assign({}, nearest.mix) };
       track('ordnance_pick', { view: 'curve' });
-      renderPick();
+      renderHeat();
     });
   }
 

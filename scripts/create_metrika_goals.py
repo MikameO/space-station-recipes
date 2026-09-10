@@ -96,6 +96,8 @@ GOALS: list[tuple[str, str]] = [
     ("ordnance_pick_use",   "Взрывчатка: смесь из разбора точки"),
     ("ordnance_req_search",  "Взрывчатка: поиск под задачу"),
     ("ordnance_req_use",     "Взрывчатка: смесь из поиска под задачу"),
+    ("ordnance_mask_add",    "Взрывчатка: добавлена маска"),
+    ("ordnance_mask_use",    "Взрывчатка: смесь из пересечения масок"),
 ]
 
 

@@ -3065,3 +3065,37 @@ body.antag-active .empty-state-chip:focus-visible {
 .ord-req-card tr.ord-ok td:last-child { color: var(--phosphor); }
 .ord-req-card tr.ord-bad td:last-child { color: var(--red-alert); }
 b.ord-bad { color: var(--red-alert); }
+
+/* Ordnance: value masks over the flat map */
+.ord-mask-block { border-top: 1px solid var(--border-subtle); padding-top: 10px; margin-bottom: 12px; }
+.ord-mask-head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 8px; }
+.ord-mask-head select { background: var(--panel-raised); color: var(--text-bright);
+  border: 1px solid var(--border-subtle); padding: 4px 8px; font-size: 0.78rem; }
+.ord-mask-list { display: flex; flex-direction: column; gap: 6px; }
+.ord-mask-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.ord-mask-row select { background: var(--panel-raised); color: var(--text-bright);
+  border: 1px solid var(--border-subtle); padding: 4px 7px; font-size: 0.78rem; }
+.ord-mask-swatch { width: 14px; height: 14px; border: 1px solid var(--border-active); flex-shrink: 0; }
+.ord-mask-value { background: var(--panel-raised); color: var(--text-bright);
+  border: 1px solid var(--border-subtle); padding: 4px 7px; width: 6rem; text-align: right;
+  font-family: 'Share Tech Mono', monospace; font-size: 0.78rem; }
+.ord-mask-range { color: var(--text-ghost); font-size: 0.72rem;
+  font-family: 'Share Tech Mono', monospace; }
+.ord-mask-del { background: none; border: 1px solid var(--border-subtle); color: var(--text-sub);
+  width: 22px; height: 22px; cursor: pointer; line-height: 1; }
+.ord-mask-del:hover { color: var(--red-alert); border-color: var(--red-alert); }
+.ord-mask-legend { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 4px; }
+.ord-mask-key { display: inline-flex; align-items: center; gap: 5px; font-size: 0.74rem;
+  color: var(--text-sub); font-family: 'Share Tech Mono', monospace; }
+.ord-mask-key i { width: 11px; height: 11px; display: inline-block; }
+
+/* Ordnance: pinned-point header */
+.ord-pick-bar { display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 6px; }
+.ord-pick-bar span { font-family: 'Share Tech Mono', monospace; font-size: 0.64rem;
+  letter-spacing: 0.1em; text-transform: uppercase; color: var(--amber); }
+.ord-pick-clear { background: none; border: 1px solid var(--border-subtle); color: var(--text-sub);
+  width: 20px; height: 20px; cursor: pointer; line-height: 1; }
+.ord-pick-clear:hover { color: var(--red-alert); border-color: var(--red-alert); }
+.ord-pick-note { font-size: 0.72rem; color: var(--amber); margin-bottom: 6px;
+  font-family: 'Share Tech Mono', monospace; }
