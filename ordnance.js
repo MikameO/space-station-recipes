@@ -33,10 +33,19 @@
     reach: { label: 'Fire reach', get: s => s.reach },
   };
 
+  const NONE = '';                  // "leave the rest of the casing empty"
+  const VIEW = { yaw: -0.7, pitch: 0.62, zoom: 1 };   // default camera
+
   const S = {
     inited: false, data: null, casing: null, mix: {}, dampener: false,
     chartMode: 'blend', sweepId: null, blendA: null, blendB: null,
-    heatA: null, heatB: null, heatMetric: 'blastRadius',
+    heatA: null, heatB: null, heatC: NONE,
+    heatCMode: 'fill',              // 'fill' = takes the remainder, 'fixed' = set amount
+    heatCAmount: 0,
+    heatMetric: 'blastRadius', heatHeight: 'blastRadius',
+    surfView: '3d', yaw: VIEW.yaw, pitch: VIEW.pitch, zoom: VIEW.zoom,
+    pick: null,                     // {i, j} cell the user clicked, or null
+    surfCells: [],                  // screen polygons of the last surface draw
     costBase: null, paretoMetric: 'power',
     costCache: new Map(),
   };
@@ -85,6 +94,7 @@
     'burn time': 'длительность горения',
     'fire intensity': 'интенсивность огня',
     'fire reach': 'охват огня',
+    'is the same across every mixture here': 'одинаков для всех смесей здесь',
   };
   const tr = s => (window.I18N_LANG === 'ru' && RU[s]) || s;
 
@@ -321,6 +331,8 @@
       renderAll();
     };
     $('ordDampener').onchange = e => { S.dampener = e.target.checked; renderAll(); };
+    // Casing capacity and dampening both reshape every cell, so the grid key
+    // covers them; nothing else here needs to touch the cache by hand.
     $('ordAdd').onchange = e => {
       const id = e.target.value;
       e.target.value = '';
@@ -341,11 +353,49 @@
     $('ordSweep').onchange = e => { S.sweepId = e.target.value; renderChart(); };
     $('ordBlendA').onchange = e => { S.blendA = e.target.value; renderChart(); };
     $('ordBlendB').onchange = e => { S.blendB = e.target.value; renderChart(); };
-    $('ordHeatA').onchange = e => { S.heatA = e.target.value; renderHeat(); };
-    $('ordHeatB').onchange = e => { S.heatB = e.target.value; renderHeat(); };
+    // Changing an axis invalidates the picked cell: the same (i, j) would name a
+    // different mixture, so drop it rather than show a stale readout.
+    const axis = (id, key) => {
+      $(id).onchange = e => { S[key] = e.target.value; S.pick = null; renderHeat(); };
+    };
+    axis('ordHeatA', 'heatA');
+    axis('ordHeatB', 'heatB');
+    // Picking a third reagent is what reveals the "supplied as" control, so this
+    // one has to re-sync the control strip and not only redraw.
+    $('ordHeatC').onchange = e => {
+      S.heatC = e.target.value;
+      S.pick = null;
+      syncChartControls();
+      renderHeat();
+    };
+    $('ordHeatCMode').onchange = e => {
+      S.heatCMode = e.target.value;
+      S.pick = null;
+      syncChartControls();
+      renderHeat();
+    };
+    $('ordHeatCAmount').oninput = e => {
+      S.heatCAmount = +e.target.value;
+      $('ordHeatCAmountOut').textContent = S.heatCAmount;
+      S.pick = null;
+      renderHeat();
+    };
+    $('ordHeatHeight').onchange = e => { S.heatHeight = e.target.value; renderHeat(); };
     $('ordHeatMetric').onchange = e => { S.heatMetric = e.target.value; renderHeat(); };
+    $('ordSurfView').onchange = e => {
+      S.surfView = e.target.value;
+      S.pick = null;                       // grid resolution differs between views
+      track('ordnance_surf_view', { view: S.surfView });
+      syncChartControls();
+      renderHeat();
+    };
+    $('ordSurfReset').onclick = () => {
+      S.yaw = VIEW.yaw; S.pitch = VIEW.pitch; S.zoom = VIEW.zoom;
+      renderHeat();
+    };
     $('ordCostBase').onchange = e => { S.costBase = e.target.value; renderPareto(); };
     $('ordParetoMetric').onchange = e => { S.paretoMetric = e.target.value; renderPareto(); };
+    setupSurfaceInput();
   }
 
   function track(goal, params) {
@@ -471,6 +521,30 @@
     S.blendB = fill('ordBlendB', S.blendB, inMix.length > 1 ? inMix[1] : 'RMCCyclonite');
     S.heatA = fill('ordHeatA', S.heatA, S.blendA);
     S.heatB = fill('ordHeatB', S.heatB, S.blendB);
+
+    // The third reagent takes whatever the first two leave, so "none" is a real
+    // choice: it turns the surface back into a two-reagent map with a part-empty
+    // casing, which is what the flat view showed before this existed.
+    const cSel = $('ordHeatC');
+    cSel.innerHTML = '<option value="">Leave empty</option>'
+      + ids.map(id => `<option value="${esc(id)}">${esc(rname(id))}</option>`).join('');
+    if (S.heatC && !ids.includes(S.heatC)) S.heatC = NONE;
+    cSel.value = S.heatC;
+
+    const cap = casingOf().vol;
+    const amt = $('ordHeatCAmount');
+    amt.max = cap;
+    if (S.heatCAmount > cap) S.heatCAmount = cap;
+    amt.value = S.heatCAmount;
+    $('ordHeatCAmountOut').textContent = S.heatCAmount;
+    $('ordHeatCModeWrap').hidden = !S.heatC;
+    $('ordHeatCAmountWrap').hidden = !S.heatC || S.heatCMode !== 'fixed';
+
+    $('ordHeatHeight').value = S.heatHeight;
+    $('ordHeatMetric').value = S.heatMetric;
+    $('ordSurfView').value = S.surfView;
+    $('ordHeightWrap').hidden = S.surfView !== '3d';
+    $('ordSurfReset').hidden = S.surfView !== '3d';
     $('ordSweepWrap').hidden = S.chartMode !== 'sweep';
     $('ordBlendWrap').hidden = S.chartMode !== 'blend';
   }
@@ -523,6 +597,7 @@
       ctx.beginPath(); ctx.moveTo(pad.l, y); ctx.lineTo(pad.l + iw, y); ctx.stroke();
     }
     const X = v => pad.l + iw * v / maxX;
+    S.chartGeom = { padL: pad.l, iw, maxX, pts };   // for click-to-inspect
     const Yp = v => pad.t + ih * (1 - v / maxP);
     const Yr = v => pad.t + ih * (1 - v / maxR);
 
@@ -577,79 +652,452 @@
       .map(id => mix[id] + ' ' + rname(id)).join(' + ') || tr('nothing');
   }
 
-  function renderHeat() {
-    if (!S.data) return;
-    const { ctx, w, h } = ctxOf('ordHeat');
+  // ── mixture surface ────────────────────────────────────────────────────────
+  // Two reagents span the floor (x = across, y = up) and a third fills whatever
+  // the pair leaves, so a three-part mixture is one point on a surface. The
+  // domain is the triangle a + b <= capacity; outside it there is no mixture.
+  // How much of the casing the floor axes may use. With the third reagent set to
+  // a fixed amount it reserves its share up front, so the accessible triangle
+  // shrinks as the slider rises — that shrinking IS the third dimension.
+  function floorLimit(cap) {
+    if (S.heatC && S.heatCMode === 'fixed') return Math.max(0, cap - S.heatCAmount);
+    return cap;
+  }
+
+  function mixAt(a, b, cap) {
+    const mix = {};
+    if (a > 0) mix[S.heatA] = (mix[S.heatA] || 0) + a;
+    if (b > 0) mix[S.heatB] = (mix[S.heatB] || 0) + b;
+    if (S.heatC) {
+      // Filling the remainder makes the amount a function of the floor position,
+      // which is why it cannot also be the height: c = cap - a - b is a plane.
+      const c = S.heatCMode === 'fixed' ? S.heatCAmount : cap - a - b;
+      if (c > 0) mix[S.heatC] = (mix[S.heatC] || 0) + c;
+    }
+    return mix;
+  }
+
+  function surfaceGrid() {
+    // Turning the camera does not change a single mixture, so the sampled grid
+    // is cached against everything that would: rotation then costs a projection
+    // and a sort instead of N*N runs of the formula.
+    const key = [S.casing, S.dampener, S.heatA, S.heatB, S.heatC,
+                 S.heatCMode, S.heatCAmount,
+                 S.heatMetric, S.heatHeight, S.surfView].join('|');
+    if (S.gridCache && S.gridCache.key === key) return S.gridCache.grid;
+    const grid = buildGrid();
+    S.gridCache = { key, grid };
+    return grid;
+  }
+
+  function buildGrid() {
     const c = casingOf(), cap = c.vol;
-    const N = 48, pad = { l: 40, r: 12, t: 10, b: 28 };
-    const iw = w - pad.l - pad.r, ih = h - pad.t - pad.b;
     const F = S.data.formula;
-    const metric = METRICS[S.heatMetric];
-    const grid = [];
-    let lo = Infinity, hi = -Infinity;
+    const dmgPer = F.damagePerIntensity / F.intensityDivisor;
+    // The 3D mesh can afford a fine grid because it is cached; the staircase
+    // along the a + b = capacity edge is what a square grid over a triangular
+    // domain looks like, and it stops reading as one at this density.
+    const N = S.surfView === '3d' ? 46 : 48;
+    const colour = METRICS[S.heatMetric], height = METRICS[S.heatHeight];
+    const cells = new Array(N * N).fill(null);
+    const limit = floorLimit(cap);
+    let cLo = Infinity, cHi = -Infinity, hLo = Infinity, hHi = -Infinity, best = null;
     for (let i = 0; i < N; i++) {
-      grid[i] = [];
       for (let j = 0; j < N; j++) {
+        // Sampled against the casing, not the limit, so the floor keeps a fixed
+        // scale and a rising third reagent visibly eats into it.
         const a = Math.round(cap * i / (N - 1)), b = Math.round(cap * j / (N - 1));
-        let v = NaN;
-        if (a + b <= cap) {
-          const mix = {};
-          if (a) mix[S.heatA] = a;
-          if (b) mix[S.heatB] = b;
-          v = metric.get(computeStats(mix, c, S.dampener), F.damagePerIntensity / F.intensityDivisor);
-          if (v < lo) lo = v;
-          if (v > hi) hi = v;
-        }
-        grid[i][j] = v;
+        if (a + b > limit) continue;
+        const mix = mixAt(a, b, cap);
+        const st = computeStats(mix, c, S.dampener);
+        const cv = colour.get(st, dmgPer), hv = height.get(st, dmgPer);
+        cells[i * N + j] = { i, j, a, b, mix, st, cv, hv };
+        if (cv < cLo) cLo = cv;
+        if (cv > cHi) cHi = cv;
+        if (hv < hLo) hLo = hv;
+        if (hv > hHi) hHi = hv;
+        if (!best || cv > best.cv) best = cells[i * N + j];
       }
     }
-    if (!isFinite(lo)) { lo = 0; hi = 1; }
-    if (hi === lo) hi = lo + 1;
-    const cw = iw / N, ch = ih / N;
-    let best = null;
-    for (let i = 0; i < N; i++) for (let j = 0; j < N; j++) {
-      const v = grid[i][j];
-      if (isNaN(v)) continue;
-      const t = (v - lo) / (hi - lo);
-      ctx.fillStyle = ramp(t);
-      ctx.fillRect(pad.l + i * cw, pad.t + ih - (j + 1) * ch, cw + 0.5, ch + 0.5);
-      if (!best || v > best.v) best = { v, i, j };
+    // A metric that is identical everywhere carries no shape. Say so, rather than
+    // normalising it to zero and painting the whole surface the darkest stop.
+    const flatColour = !isFinite(cLo) || cHi === cLo;
+    if (!isFinite(cLo)) { cLo = 0; cHi = 1; }
+    if (cHi === cLo) cHi = cLo + 1;
+    if (!isFinite(hLo)) { hLo = 0; hHi = 1; }
+    if (hHi === hLo) hHi = hLo + 1;
+    return { N, cells, cLo, cHi, hLo, hHi, cap, best, flatColour };
+  }
+
+  function renderHeat() {
+    if (!S.data) return;
+    const g = surfaceGrid();
+    // A pick made on the curve chart has no cell coordinates; only a pick that
+    // claims to be a surface cell has to still exist in the current grid.
+    if (S.pick && S.pick.i != null && !g.cells[S.pick.i * g.N + S.pick.j]) S.pick = null;
+    if (S.pick && S.pick.i != null) {
+      const cell = g.cells[S.pick.i * g.N + S.pick.j];
+      if (cell) { S.pick.mix = cell.mix; S.pick.st = cell.st; }
     }
-    if (best) {
-      ctx.strokeStyle = cssVar('--text-bright') || '#e8ecf4'; ctx.lineWidth = 1.5;
-      ctx.strokeRect(pad.l + best.i * cw - 1, pad.t + ih - (best.j + 1) * ch - 1, cw + 2, ch + 2);
+    if (S.surfView === '3d') renderSurface3D(g); else renderFlat(g);
+    renderHeatNote(g);
+    renderPick();
+  }
+
+  // Camera: yaw turns the floor, pitch tilts it. Screen up is (0, sin p, cos p)
+  // and depth runs along (0, cos p, -sin p), so quads sort back-to-front by
+  // descending depth — a painter's pass, which is enough for a height field.
+  // Fit the model's bounding box to the canvas for whatever the camera is doing
+  // right now. A fixed scale looks right at the default angle and then runs off
+  // the edge as soon as the surface is turned.
+  function projector(w, h, zoom) {
+    const cy = Math.cos(S.yaw), sy = Math.sin(S.yaw);
+    const cp = Math.cos(S.pitch), sp = Math.sin(S.pitch);
+    let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+    // Only three floor corners exist: a + b <= capacity rules the fourth out, and
+    // including it would shrink the drawing for a region with no mixtures in it.
+    for (const [x, y] of [[-0.5, -0.5], [0.5, -0.5], [-0.5, 0.5]]) {
+      for (const z of [0, ZH]) {
+        const px = x * cy - y * sy;
+        const py = -((x * sy + y * cy) * sp + z * cp);
+        if (px < minX) minX = px;
+        if (px > maxX) maxX = px;
+        if (py < minY) minY = py;
+        if (py > maxY) maxY = py;
+      }
+    }
+    // Axis labels hang below the floor, so the bottom margin is the larger one.
+    const padX = 30, padTop = 18, padBottom = 42;
+    const boxH = h - padTop - padBottom;
+    const s = Math.min((w - padX * 2) / Math.max(maxX - minX, 1e-3),
+                       boxH / Math.max(maxY - minY, 1e-3)) * zoom;
+    // project() computes screen y as cy + (-(ry*sp + z*cp)) * s, so the centring
+    // term is subtracted here exactly as it is for x.
+    return {
+      cx: w / 2 - (minX + maxX) / 2 * s,
+      cy: padTop + boxH / 2 - (minY + maxY) / 2 * s,
+      s,
+    };
+  }
+  function project(x, y, z, o) {
+    const cy = Math.cos(S.yaw), sy = Math.sin(S.yaw);
+    const rx = x * cy - y * sy, ry = x * sy + y * cy;
+    const cp = Math.cos(S.pitch), sp = Math.sin(S.pitch);
+    return {
+      x: o.cx + rx * o.s,
+      y: o.cy - (ry * sp + z * cp) * o.s,
+      depth: ry * cp - z * sp,
+    };
+  }
+
+  const ZH = 0.55;   // surface height as a fraction of the floor span
+  function modelOf(cell, g) {
+    return {
+      x: cell.a / g.cap - 0.5,
+      y: cell.b / g.cap - 0.5,
+      z: (cell.hv - g.hLo) / (g.hHi - g.hLo) * ZH,
+    };
+  }
+
+  function renderSurface3D(g) {
+    const { ctx, w, h } = ctxOf('ordHeat');
+    const o = projector(w, h, S.zoom);
+    const N = g.N;
+    const muted = cssVar('--text-ghost') || '#6b7a93';
+    const line = cssVar('--border-subtle') || '#1a2540';
+
+    // Floor: the triangle the mixtures actually live on.
+    const floor = [[-0.5, -0.5], [0.5, -0.5], [-0.5, 0.5]].map(pt => project(pt[0], pt[1], 0, o));
+    ctx.strokeStyle = line; ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(floor[0].x, floor[0].y);
+    ctx.lineTo(floor[1].x, floor[1].y);
+    ctx.lineTo(floor[2].x, floor[2].y);
+    ctx.closePath(); ctx.stroke();
+
+    const quads = [];
+    for (let i = 0; i < N - 1; i++) {
+      for (let j = 0; j < N - 1; j++) {
+        const c00 = g.cells[i * N + j], c10 = g.cells[(i + 1) * N + j];
+        const c11 = g.cells[(i + 1) * N + j + 1], c01 = g.cells[i * N + j + 1];
+        if (!c00 || !c10 || !c11 || !c01) continue;
+        const m = [c00, c10, c11, c01].map(c => modelOf(c, g));
+        const pr = m.map(v => project(v.x, v.y, v.z, o));
+        // Model-space normal for shading; the height axis is exaggerated by ZH
+        // so the relief stays readable on shallow surfaces.
+        const e1 = [m[1].x - m[0].x, m[1].y - m[0].y, m[1].z - m[0].z];
+        const e2 = [m[3].x - m[0].x, m[3].y - m[0].y, m[3].z - m[0].z];
+        let nx = e1[1] * e2[2] - e1[2] * e2[1];
+        let ny = e1[2] * e2[0] - e1[0] * e2[2];
+        let nz = e1[0] * e2[1] - e1[1] * e2[0];
+        const len = Math.hypot(nx, ny, nz) || 1;
+        nx /= len; ny /= len; nz /= len;
+        if (nz < 0) { nx = -nx; ny = -ny; nz = -nz; }
+        const lit = clamp(0.62 + 0.38 * (nx * -0.35 + ny * -0.45 + nz * 0.82), 0.5, 1.08);
+        quads.push({
+          pr, i, j,
+          depth: (pr[0].depth + pr[1].depth + pr[2].depth + pr[3].depth) / 4,
+          cv: (c00.cv + c10.cv + c11.cv + c01.cv) / 4,
+          lit,
+        });
+      }
+    }
+    quads.sort((a, b) => b.depth - a.depth);
+
+    S.surfCells = quads;
+    ctx.lineJoin = 'round';
+    for (const q of quads) {
+      const rgb = rampRGB(g.flatColour ? 0.62 : (q.cv - g.cLo) / (g.cHi - g.cLo));
+      ctx.fillStyle = 'rgb(' + rgb.map(v => Math.round(v * q.lit)).join(',') + ')';
+      ctx.beginPath();
+      ctx.moveTo(q.pr[0].x, q.pr[0].y);
+      for (let k = 1; k < 4; k++) ctx.lineTo(q.pr[k].x, q.pr[k].y);
+      ctx.closePath();
+      ctx.fill();
+      ctx.strokeStyle = ctx.fillStyle; ctx.lineWidth = 0.6; ctx.stroke();
+    }
+
+    if (g.best) markPoint3D(ctx, g.best, g, o, cssVar('--amber') || '#ffb627', false);
+    if (S.pick) {
+      const cell = g.cells[S.pick.i * g.N + S.pick.j];
+      if (cell) markPoint3D(ctx, cell, g, o, cssVar('--text-bright') || '#e8ecf4', true);
+    }
+
+    ctx.fillStyle = muted;
+    ctx.font = '11px system-ui, sans-serif';
+    ctx.textAlign = 'center';
+    label3D(ctx, project(0.5, -0.5, 0, o), rname(S.heatA));
+    label3D(ctx, project(-0.5, 0.5, 0, o), rname(S.heatB));
+    if (S.heatC) label3D(ctx, project(-0.5, -0.5, 0, o), rname(S.heatC));
+  }
+
+  function label3D(ctx, p, text) {
+    ctx.fillText(text, p.x, p.y + 14);
+  }
+
+  // A stem from the floor to the surface reads as a position in space far better
+  // than a dot floating on the shell.
+  function markPoint3D(ctx, cell, g, o, colour, big) {
+    const m = modelOf(cell, g);
+    const top = project(m.x, m.y, m.z, o);
+    const base = project(m.x, m.y, 0, o);
+    ctx.strokeStyle = colour; ctx.lineWidth = big ? 1.6 : 1;
+    ctx.setLineDash(big ? [] : [3, 3]);
+    ctx.beginPath(); ctx.moveTo(base.x, base.y); ctx.lineTo(top.x, top.y); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle = colour;
+    ctx.beginPath(); ctx.arc(top.x, top.y, big ? 5 : 3.5, 0, Math.PI * 2); ctx.fill();
+  }
+
+  function renderFlat(g) {
+    const { ctx, w, h } = ctxOf('ordHeat');
+    const N = g.N, pad = { l: 40, r: 12, t: 10, b: 28 };
+    const iw = w - pad.l - pad.r, ih = h - pad.t - pad.b;
+    const cw = iw / N, ch = ih / N;
+    S.surfCells = { pad, cw, ch, ih, N };
+    for (let i = 0; i < N; i++) {
+      for (let j = 0; j < N; j++) {
+        const cell = g.cells[i * N + j];
+        if (!cell) continue;
+        const rgb = rampRGB(g.flatColour ? 0.62 : (cell.cv - g.cLo) / (g.cHi - g.cLo));
+        ctx.fillStyle = 'rgb(' + rgb.join(',') + ')';
+        ctx.fillRect(pad.l + i * cw, pad.t + ih - (j + 1) * ch, cw + 0.5, ch + 0.5);
+      }
+    }
+    const box = (cell, colour, lw) => {
+      ctx.strokeStyle = colour; ctx.lineWidth = lw;
+      ctx.strokeRect(pad.l + cell.i * cw - 1, pad.t + ih - (cell.j + 1) * ch - 1, cw + 2, ch + 2);
+    };
+    if (g.best) box(g.best, cssVar('--amber') || '#ffb627', 1.5);
+    if (S.pick) {
+      const cell = g.cells[S.pick.i * N + S.pick.j];
+      if (cell) box(cell, cssVar('--text-bright') || '#e8ecf4', 2);
     }
     const muted = cssVar('--text-ghost') || '#6b7a93';
     ctx.fillStyle = muted; ctx.font = '11px system-ui, sans-serif';
     ctx.textAlign = 'center';
-    ctx.fillText(rname(S.heatA) + ' →', pad.l + iw / 2, h - 8);
+    ctx.fillText(rname(S.heatA) + ' \u2192', pad.l + iw / 2, h - 8);
     ctx.save();
     ctx.translate(12, pad.t + ih / 2); ctx.rotate(-Math.PI / 2); ctx.textAlign = 'center';
-    ctx.fillText(rname(S.heatB) + ' →', 0, 0);
+    ctx.fillText(rname(S.heatB) + ' \u2192', 0, 0);
     ctx.restore();
+  }
 
-    if (best) {
-      const a = Math.round(cap * best.i / (N - 1)), b = Math.round(cap * best.j / (N - 1));
-      const mix = {}; if (a) mix[S.heatA] = a; if (b) mix[S.heatB] = b;
-      $('ordHeatNote').innerHTML = tr('Best') + ' ' + esc(tr(metric.label.toLowerCase())) + ': '
-        + esc(round(best.v, 2)) + ' ' + tr('at') + ' ' + esc(describeMix(mix))
-        + ' <button class="ord-chip" id="ordHeatUse">Load this mix</button>';
-      const btn = $('ordHeatUse');
-      if (btn) btn.onclick = () => { S.mix = mix; track('ordnance_heat_use'); renderAll(); };
-    } else {
-      $('ordHeatNote').textContent = '';
+  function renderHeatNote(g) {
+    const metric = METRICS[S.heatMetric];
+    if (!g.best) { $('ordHeatNote').textContent = ''; return; }
+    if (g.flatColour) {
+      $('ordHeatNote').innerHTML = esc(metric.label) + ' '
+        + esc(tr('is the same across every mixture here')) + ': '
+        + esc(round(g.best.cv, 2));
+      return;
     }
+    $('ordHeatNote').innerHTML = tr('Best') + ' ' + esc(tr(metric.label.toLowerCase())) + ': '
+      + esc(round(g.best.cv, 2)) + ' ' + tr('at') + ' ' + esc(describeMix(g.best.mix))
+      + ' <button class="ord-chip" id="ordHeatUse">Load this mix</button>';
+    const btn = $('ordHeatUse');
+    if (btn) btn.onclick = () => { S.mix = g.best.mix; track('ordnance_heat_use'); renderAll(); };
+  }
+
+  // ── click readout ──────────────────────────────────────────────────────────
+  // The colour metric answers one question; a picked point should answer all of
+  // them, so this lists every stat the detonation panel shows plus the cost.
+  function renderPick() {
+    const box = $('ordPick');
+    if (!S.pick || !S.pick.mix) {
+      box.innerHTML = '<p class="ord-empty">Click a point on the surface to inspect that mixture.</p>';
+      return;
+    }
+    const { mix, st } = S.pick;
+    const c = casingOf();
+    const F = S.data.formula;
+    const dmg = st.power * F.damagePerIntensity / F.intensityDivisor;
+    const colourMetric = METRICS[S.heatMetric];
+    const dmgPer = F.damagePerIntensity / F.intensityDivisor;
+    const rows = [
+      [tr('power'), round(st.power, 1) + (st.power >= c.maxP ? ' \u2022 ' + tr('at casing ceiling') : '')],
+      [tr('falloff'), round(st.falloff, 1) + (st.falloff <= c.minF ? ' \u2022 ' + tr('at floor') : '')],
+      [tr('blast radius'), st.hasBlast ? round(st.blastRadius, 2) + ' ' + tr('tiles') : tr('no blast')],
+      [tr('peak damage'), round(dmg, 0)],
+      [tr('shrapnel'), st.shards + (st.shards >= c.shards ? ' \u2022 ' + tr('at casing cap') : '')],
+      [tr('fire intensity'), st.fireIntensity ? round(st.fireIntensity, 1) : '\u2014'],
+      [tr('fire reach'), st.fireIntensity ? st.reach + ' ' + tr('tiles')
+        + (st.star ? ' \u2022 ' + tr('star \u2014 rays') : ' \u2022 ' + tr('diamond')) : '\u2014'],
+      [tr('burn time'), st.fireDuration ? round(st.fireDuration, 0) + 's' : '\u2014'],
+      ['Logistics cost', round(mixCost(mix, S.costBase), 1) + ' ' + rname(S.costBase)],
+    ];
+    const flame = st.flame
+      ? '<span class="ord-flame" style="background:' + esc(st.flame) + '"></span>' + esc(st.flame)
+      : '\u2014';
+    rows.push([tr('Flame colour'), flame]);
+
+    box.innerHTML = '<div class="ord-pick-head">' + esc(describeMix(mix)) + '</div>'
+      + '<div class="ord-pick-lead"><span>' + esc(colourMetric.label) + '</span><strong>'
+      + esc(round(colourMetric.get(st, dmgPer), 2)) + '</strong></div>'
+      + '<table class="ord-pick-table"><tbody>'
+      + rows.map(r => '<tr><td>' + esc(r[0]) + '</td><td>' + r[1] + '</td></tr>').join('')
+      + '</tbody></table>'
+      + '<button class="ord-chip" id="ordPickUse">Load this mix</button>';
+    const btn = $('ordPickUse');
+    if (btn) btn.onclick = () => { S.mix = Object.assign({}, mix); track('ordnance_pick_use'); renderAll(); };
+  }
+
+  function setPick(cell) {
+    S.pick = cell ? { i: cell.i, j: cell.j, mix: cell.mix, st: cell.st } : null;
+  }
+
+  // ── surface interaction ────────────────────────────────────────────────────
+  function pointInQuad(px, py, pr) {
+    const sign = (ax, ay, bx, by, cx, cy) =>
+      (ax - cx) * (by - cy) - (bx - cx) * (ay - cy);
+    const tri = (a, b, c) => {
+      const d1 = sign(px, py, a.x, a.y, b.x, b.y);
+      const d2 = sign(px, py, b.x, b.y, c.x, c.y);
+      const d3 = sign(px, py, c.x, c.y, a.x, a.y);
+      const neg = (d1 < 0) || (d2 < 0) || (d3 < 0);
+      const pos = (d1 > 0) || (d2 > 0) || (d3 > 0);
+      return !(neg && pos);
+    };
+    return tri(pr[0], pr[1], pr[2]) || tri(pr[0], pr[2], pr[3]);
+  }
+
+  function pickAt(px, py) {
+    const g = surfaceGrid();
+    if (S.surfView === 'flat') {
+      const m = S.surfCells;
+      if (!m || !m.pad) return null;
+      const i = Math.floor((px - m.pad.l) / m.cw);
+      const j = Math.floor((m.pad.t + m.ih - py) / m.ch);
+      if (i < 0 || j < 0 || i >= m.N || j >= m.N) return null;
+      return g.cells[i * m.N + j] || null;
+    }
+    // Nearest first: the draw order was far-to-near, so walk it backwards.
+    const quads = S.surfCells;
+    if (!Array.isArray(quads)) return null;
+    for (let k = quads.length - 1; k >= 0; k--) {
+      if (pointInQuad(px, py, quads[k].pr)) {
+        return g.cells[quads[k].i * g.N + quads[k].j] || null;
+      }
+    }
+    return null;
+  }
+
+  function setupSurfaceInput() {
+    const cv = $('ordHeat');
+    // `dragged` is the distance of the gesture that just ended. Keeping it
+    // separate from the live counter means a click never inherits the travel of
+    // an earlier rotation, which silently swallowed the next pick.
+    let drag = null, moved = 0, dragged = 0;
+    cv.addEventListener('pointerdown', e => {
+      if (S.surfView !== '3d') return;
+      drag = { x: e.clientX, y: e.clientY };
+      moved = 0; dragged = 0;
+      cv.setPointerCapture(e.pointerId);
+    });
+    cv.addEventListener('pointermove', e => {
+      if (!drag) return;
+      const dx = e.clientX - drag.x, dy = e.clientY - drag.y;
+      moved += Math.abs(dx) + Math.abs(dy);
+      S.yaw += dx * 0.01;
+      // Stop just short of flat-on and straight-down: both make the surface
+      // unreadable and the floor triangle degenerate.
+      S.pitch = clamp(S.pitch + dy * 0.008, 0.08, 1.45);
+      drag = { x: e.clientX, y: e.clientY };
+      renderSurface3D(surfaceGrid());
+    });
+    const stop = () => { drag = null; dragged = moved; moved = 0; };
+    cv.addEventListener('pointerup', stop);
+    cv.addEventListener('pointercancel', stop);
+    cv.addEventListener('wheel', e => {
+      if (S.surfView !== '3d') return;
+      e.preventDefault();
+      S.zoom = clamp(S.zoom * (e.deltaY < 0 ? 1.12 : 0.89), 0.4, 3.5);
+      renderSurface3D(surfaceGrid());
+    }, { passive: false });
+    cv.addEventListener('click', e => {
+      const wasDrag = dragged > 6;
+      dragged = 0;
+      if (wasDrag) return;                    // that gesture was a rotation, not a pick
+      const r = cv.getBoundingClientRect();
+      const cell = pickAt(e.clientX - r.left, e.clientY - r.top);
+      if (!cell) return;
+      setPick(cell);
+      track('ordnance_pick', { view: S.surfView });
+      renderHeat();
+    });
+    cv.style.touchAction = 'none';
+
+    // The curve is the third place a mixture is visible, so it reads out too.
+    const chart = $('ordChart');
+    chart.style.cursor = 'crosshair';
+    chart.addEventListener('click', e => {
+      const geom = S.chartGeom;
+      if (!geom || !geom.pts.length) return;
+      const r = chart.getBoundingClientRect();
+      const value = (e.clientX - r.left - geom.padL) / geom.iw * geom.maxX;
+      let nearest = geom.pts[0];
+      for (const pt of geom.pts) {
+        if (Math.abs(pt.x - value) < Math.abs(nearest.x - value)) nearest = pt;
+      }
+      S.pick = { i: null, j: null, mix: nearest.mix,
+                 st: computeStats(nearest.mix, casingOf(), S.dampener) };
+      track('ordnance_pick', { view: 'curve' });
+      renderPick();
+    });
   }
 
   // Single-hue sequential ramp on the app's phosphor green: hull dark for the
   // low end, full phosphor at the top. Drawn on opaque cells, so it never picks
   // up the page surface behind it.
-  function ramp(t) {
+  function rampRGB(t) {
     t = clamp(t, 0, 1);
-    const stops = [[12, 16, 24], [16, 58, 40], [26, 122, 66], [45, 200, 108], [57, 255, 133]];
+    // The low stop has to stay clearly above the page background: on the 3D pass
+    // it is multiplied by a lighting factor, and a near-black bottom end turns
+    // whole facets into holes.
+    const stops = [[30, 48, 46], [24, 88, 62], [32, 140, 80], [46, 205, 112], [57, 255, 133]];
     const p = t * (stops.length - 1), i = Math.min(Math.floor(p), stops.length - 2), f = p - i;
     const a = stops[i], b = stops[i + 1];
-    return 'rgb(' + a.map((v, k) => Math.round(v + (b[k] - v) * f)).join(',') + ')';
+    return a.map((v, k) => Math.round(v + (b[k] - v) * f));
   }
 
   // ── Pareto: cheapest mixture that still reaches X% of the casing ceiling ───

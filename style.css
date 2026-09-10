@@ -2998,3 +2998,27 @@ body.antag-active .empty-state-chip:focus-visible {
    .ord-pair is flex), so the chart-mode controls need an explicit override —
    the same trap the sell-list panel hit in 4732473. */
 .ord-field[hidden], .ord-pair[hidden] { display: none !important; }
+
+/* Ordnance: surface + click readout (O6) */
+.ord-surface-row { display: grid; grid-template-columns: minmax(0, 1fr) 260px; gap: 14px; align-items: start; }
+.ord-surface-row .ord-canvas-wrap { height: 380px; max-width: none; }
+.ord-surface-row canvas { cursor: grab; }
+.ord-surface-row canvas:active { cursor: grabbing; }
+.ord-pick { background: var(--panel-raised); border: 1px solid var(--border-subtle); padding: 10px 12px; }
+.ord-pick-head { color: var(--text-bright); font-size: 0.82rem; line-height: 1.4; margin-bottom: 8px; }
+.ord-pick-lead { display: flex; justify-content: space-between; align-items: baseline; gap: 8px;
+  border-bottom: 1px solid var(--border-subtle); padding-bottom: 6px; margin-bottom: 6px; }
+.ord-pick-lead span { font-family: 'Share Tech Mono', monospace; font-size: 0.66rem;
+  letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-ghost); }
+.ord-pick-lead strong { color: var(--phosphor); font-family: 'Share Tech Mono', monospace; font-size: 1.15rem; }
+.ord-pick-table { width: 100%; border-collapse: collapse; font-size: 0.76rem;
+  font-family: 'Share Tech Mono', monospace; margin-bottom: 8px; }
+.ord-pick-table td { padding: 3px 0; vertical-align: top; }
+.ord-pick-table td:first-child { color: var(--text-ghost); padding-right: 8px; }
+.ord-pick-table td:last-child { color: var(--text-main); text-align: right; white-space: nowrap; }
+@media (max-width: 980px) { .ord-surface-row { grid-template-columns: minmax(0, 1fr); }
+  .ord-surface-row .ord-canvas-wrap { height: 320px; } }
+
+.ord-field-wide { min-width: 190px; }
+.ord-field-wide input[type=range] { width: 100%; accent-color: var(--phosphor); }
+.ord-field-wide b { color: var(--phosphor); font-family: 'Share Tech Mono', monospace; }

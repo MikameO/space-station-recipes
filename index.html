@@ -72,7 +72,7 @@
   "license": "https://github.com/MikameO/space-station-recipes/blob/main/LICENSE"
 }
 </script>
-<link rel="stylesheet" href="style.css?v=39">
+<link rel="stylesheet" href="style.css?v=41">
 <!-- Yandex.Metrika counter -->
 <script type="text/javascript">
     (function(m,e,t,r,i,k,a){
@@ -542,25 +542,58 @@
       </section>
 
       <section class="ord-panel">
-        <h3>Two-reagent map</h3>
-        <p class="ord-lede">Every combination of two reagents that fits the casing, coloured by
-          the metric you pick. The outlined cell is the best one.</p>
+        <h3>Mixture surface</h3>
+        <p class="ord-lede">Two reagents span the floor and a third supplies the rest, so a
+          three-part mixture becomes one surface. Drag to turn it, scroll to zoom, click any point
+          to read out everything that mixture does. Set the third reagent to a fixed amount and
+          sweep the slider to move through the third dimension one slice at a time.</p>
         <div class="ord-mix-controls">
+          <label class="ord-field"><span>View</span>
+            <select id="ordSurfView" aria-label="Surface view">
+              <option value="3d">3D surface</option>
+              <option value="flat">Flat map</option>
+            </select></label>
           <label class="ord-field"><span>Across</span>
-            <select id="ordHeatA" aria-label="Heatmap x axis"></select></label>
+            <select id="ordHeatA" aria-label="Surface x axis"></select></label>
           <label class="ord-field"><span>Up</span>
-            <select id="ordHeatB" aria-label="Heatmap y axis"></select></label>
-          <label class="ord-field"><span>Colour by</span>
-            <select id="ordHeatMetric" aria-label="Heatmap metric">
+            <select id="ordHeatB" aria-label="Surface y axis"></select></label>
+          <label class="ord-field"><span>Third reagent</span>
+            <select id="ordHeatC" aria-label="Third reagent"></select></label>
+          <label class="ord-field" id="ordHeatCModeWrap"><span>Supplied as</span>
+            <select id="ordHeatCMode" aria-label="How the third reagent is supplied">
+              <option value="fill">Fills the rest</option>
+              <option value="fixed">Fixed amount</option>
+            </select></label>
+          <label class="ord-field ord-field-wide" id="ordHeatCAmountWrap">
+            <span>Amount <b id="ordHeatCAmountOut">0</b></span>
+            <input type="range" id="ordHeatCAmount" min="0" max="180" step="1" value="0"
+                   aria-label="Third reagent amount"></label>
+          <label class="ord-field" id="ordHeightWrap"><span>Height by</span>
+            <select id="ordHeatHeight" aria-label="Surface height metric">
               <option value="blastRadius">Blast radius</option>
               <option value="power">Power</option>
               <option value="damage">Peak damage</option>
               <option value="shards">Shrapnel</option>
               <option value="fireIntensity">Fire intensity</option>
               <option value="fireDuration">Burn time</option>
+              <option value="reach">Fire reach</option>
             </select></label>
+          <label class="ord-field"><span>Colour by</span>
+            <select id="ordHeatMetric" aria-label="Surface colour metric">
+              <option value="blastRadius">Blast radius</option>
+              <option value="power">Power</option>
+              <option value="damage">Peak damage</option>
+              <option value="shards">Shrapnel</option>
+              <option value="fireIntensity">Fire intensity</option>
+              <option value="fireDuration">Burn time</option>
+              <option value="reach">Fire reach</option>
+            </select></label>
+          <button id="ordSurfReset" class="ord-chip">Reset view</button>
         </div>
-        <div class="ord-canvas-wrap ord-canvas-square"><canvas id="ordHeat"></canvas></div>
+        <div class="ord-surface-row">
+          <div class="ord-canvas-wrap ord-canvas-square"><canvas id="ordHeat"></canvas></div>
+          <div id="ordPick" class="ord-pick"></div>
+        </div>
         <div id="ordHeatNote" class="ord-legend"></div>
       </section>
 
@@ -604,10 +637,10 @@
 </div>
 
 <!-- i18n.js must load BEFORE app.js: it exposes applyRussianData for init() -->
-<script src="i18n.js?v=7"></script>
+<script src="i18n.js?v=9"></script>
 <script src="app.js?v=31"></script>
 <script defer src="tutorial.js?v=3"></script>
 <script src="maps.js?v=16" defer></script>
-<script src="ordnance.js?v=5" defer></script>
+<script src="ordnance.js?v=12" defer></script>
 </body>
 </html>
