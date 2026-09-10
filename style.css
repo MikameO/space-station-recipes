@@ -2986,7 +2986,10 @@ body.antag-active .empty-state-chip:focus-visible {
 .ord-table th.num, .ord-table td.num { text-align: right; }
 .ord-table td { padding: 6px 9px; border-bottom: 1px solid var(--border-subtle); color: var(--text-main); }
 .ord-table tbody tr:hover td { background: var(--panel-hover); color: var(--text-bright); }
-.ord-mix-cell { color: var(--text-bright); }
+/* Nine columns is a lot for one line, so the mixture gets room and the table
+   scrolls sideways rather than folding every recipe into three lines. */
+.ord-mix-cell { color: var(--text-bright); white-space: nowrap; }
+#ordCatalogue { overflow-x: auto; }
 
 @media (max-width: 820px) {
   .ord-grid { grid-template-columns: minmax(0, 1fr); }
@@ -3138,3 +3141,5 @@ b.ord-bad { color: var(--red-alert); }
 .ord-xeno-fire { font-size: 0.64rem; color: #ff7a35;
   font-family: 'Share Tech Mono', monospace; }
 .ord-xeno-noburn { color: var(--text-ghost); }
+/* Marks a catalogue row whose mixture needs a botany or kitchen product. */
+.ord-gated { color: var(--amber); font-size: 0.7em; vertical-align: middle; }

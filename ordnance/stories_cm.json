@@ -463,9 +463,11 @@
  "reagents": {
   "ArnoldPalmer": {
    "d": 0.2,
+   "effort": 0.912,
    "explosive": false,
    "falloff": 0.0,
    "fireEntity": "RMCTileFireEthanol",
+   "gated": 0.159,
    "i": 0.2,
    "nameKey": "reagent-name-arnold-palmer",
    "obtainable": true,
@@ -474,6 +476,7 @@
   },
   "RMCANFO": {
    "d": 0.0,
+   "effort": 1.667,
    "explosive": true,
    "falloff": -0.6,
    "i": 0.0,
@@ -486,6 +489,7 @@
    "color": "#ff9900",
    "colorWeight": 0.0,
    "d": -0.2,
+   "effort": 1.167,
    "explosive": true,
    "falloff": 1.5,
    "i": 0.5,
@@ -498,6 +502,7 @@
    "color": "#00dd00",
    "colorWeight": 0.0,
    "d": 0.75,
+   "effort": 1.0,
    "explosive": false,
    "falloff": 0.0,
    "fireEntity": "RMCTileFireGreen",
@@ -524,6 +529,7 @@
    "color": "#ff9300",
    "colorWeight": 0.0,
    "d": -0.9,
+   "effort": 2.333,
    "explosive": false,
    "falloff": 0.0,
    "i": 1.8,
@@ -542,6 +548,7 @@
    "color": "#ffd700",
    "colorWeight": 3.0,
    "d": 1.0,
+   "effort": 1.0,
    "explosive": false,
    "falloff": 0.0,
    "i": 0.0,
@@ -554,6 +561,7 @@
    "color": "#78be5a",
    "colorWeight": 4.0,
    "d": 0.0,
+   "effort": 1.0,
    "explosive": false,
    "falloff": 0.0,
    "i": 0.0,
@@ -564,6 +572,7 @@
   },
   "RMCCyclonite": {
    "d": 0.0,
+   "effort": 4.222,
    "explosive": true,
    "falloff": -0.4,
    "i": 0.0,
@@ -576,6 +585,7 @@
    "color": "#6897f7",
    "colorWeight": 2.0,
    "d": 0.2,
+   "effort": 1.0,
    "explosive": false,
    "falloff": 0.0,
    "fireEntity": "RMCTileFireEthanol",
@@ -589,6 +599,7 @@
    "color": "#ff9900",
    "colorWeight": 0.0,
    "d": 0.5,
+   "effort": 3.222,
    "explosive": false,
    "falloff": 0.0,
    "i": 0.0,
@@ -601,6 +612,7 @@
    "color": "#b6f8ff",
    "colorWeight": 2.0,
    "d": -0.5,
+   "effort": 1.0,
    "explosive": true,
    "falloff": 0.0,
    "i": -0.5,
@@ -611,6 +623,7 @@
   },
   "RMCIron": {
    "d": 0.0,
+   "effort": 1.0,
    "explosive": false,
    "falloff": 0.0,
    "i": 0.0,
@@ -624,6 +637,7 @@
    "color": "#ff356f",
    "colorWeight": 5.0,
    "d": -0.1,
+   "effort": 1.0,
    "explosive": false,
    "falloff": 0.0,
    "i": 0.35,
@@ -642,6 +656,7 @@
    "color": "#00a5ff",
    "colorWeight": 1.5,
    "d": 0.25,
+   "effort": 5.0,
    "explosive": true,
    "falloff": 0.0,
    "i": -0.35,
@@ -668,6 +683,7 @@
    "color": "#D05006",
    "colorWeight": 0.0,
    "d": 0.75,
+   "effort": 4.0,
    "explosive": false,
    "falloff": 0.0,
    "fireEntity": "RMCTileFireNapalmBase",
@@ -695,6 +711,7 @@
    "color": "#00dd00",
    "colorWeight": 0.0,
    "d": 0.75,
+   "effort": 8.167,
    "explosive": false,
    "falloff": 0.0,
    "fireEntity": "RMCTileFireGreen",
@@ -722,6 +739,7 @@
    "color": "#800080",
    "colorWeight": 0.0,
    "d": 0.75,
+   "effort": 4.167,
    "explosive": false,
    "falloff": 0.0,
    "fireEntity": "RMCTileFireNapalmE",
@@ -750,6 +768,7 @@
    "color": "#641dd6",
    "colorWeight": 0.0,
    "d": 0.75,
+   "effort": 1.0,
    "explosive": false,
    "falloff": 0.0,
    "fireEntity": "RMCTileFireNapalmEX",
@@ -777,6 +796,7 @@
    "color": "#c51c1c",
    "colorWeight": 0.0,
    "d": -0.25,
+   "effort": 3.167,
    "explosive": false,
    "falloff": 0.0,
    "fireEntity": "RMCTileFireHCNapalm",
@@ -804,6 +824,7 @@
    "color": "#f8e3b2",
    "colorWeight": 0.0,
    "d": -4.25,
+   "effort": 2.5,
    "explosive": false,
    "falloff": 0.0,
    "fireEntity": "RMCTileFireStickyNapalm",
@@ -831,6 +852,7 @@
    "color": "#EE6515",
    "colorWeight": 0.0,
    "d": 0.75,
+   "effort": 2.444,
    "explosive": false,
    "falloff": 0.0,
    "i": 0.45,
@@ -857,6 +879,7 @@
    "color": "#EE6515",
    "colorWeight": 0.0,
    "d": 0.75,
+   "effort": 1.0,
    "explosive": false,
    "falloff": 0.0,
    "i": 0.45,
@@ -882,6 +905,7 @@
    "color": "#EE6515",
    "colorWeight": 0.0,
    "d": 0.75,
+   "effort": 0,
    "explosive": false,
    "falloff": 0.0,
    "i": 0.45,
@@ -907,6 +931,7 @@
    "color": "#00b8ff",
    "colorWeight": 0.0,
    "d": 0.75,
+   "effort": 1.0,
    "explosive": false,
    "falloff": 0.0,
    "fireEntity": "RMCTileFireBlue",
@@ -931,8 +956,10 @@
   },
   "RMCNitroglycerin": {
    "d": 0.0,
+   "effort": 3.0,
    "explosive": true,
    "falloff": -0.5,
+   "gated": 1.5,
    "i": 0.0,
    "nameKey": "reagent-name-rmc-nitroglycerin",
    "obtainable": true,
@@ -941,8 +968,10 @@
   },
   "RMCOctogen": {
    "d": -0.2,
+   "effort": 4.361,
    "explosive": true,
    "falloff": -0.2,
+   "gated": 0.5,
    "i": 0.4,
    "nameKey": "reagent-name-rmc-octogen",
    "obtainable": true,
@@ -959,6 +988,7 @@
    "color": "#58daff",
    "colorWeight": 2.0,
    "d": -0.2,
+   "effort": 1.0,
    "explosive": false,
    "falloff": 0.0,
    "i": 1.15,
@@ -977,6 +1007,7 @@
    "color": "#e01e1e",
    "colorWeight": 3.0,
    "d": -0.8,
+   "effort": 1.0,
    "explosive": false,
    "falloff": 0.0,
    "i": 0.4,
@@ -989,6 +1020,7 @@
    "color": "#ffdba4",
    "colorWeight": 5.0,
    "d": 0.1,
+   "effort": 1.0,
    "explosive": false,
    "falloff": 0.0,
    "i": 1.0,
@@ -999,6 +1031,7 @@
   },
   "RMCPotassiumHydroxide": {
    "d": 0.0,
+   "effort": 2.0,
    "explosive": true,
    "falloff": 0.0,
    "i": 0.0,
@@ -1011,6 +1044,7 @@
    "color": "#ffe49c",
    "colorWeight": 0.0,
    "d": 0.75,
+   "effort": 1.0,
    "explosive": false,
    "falloff": 0.0,
    "fireEntity": "RMCTileFireR189",
@@ -1038,6 +1072,7 @@
    "color": "#ffff00",
    "colorWeight": 2.0,
    "d": 0.0,
+   "effort": 1.0,
    "explosive": false,
    "falloff": 0.0,
    "i": 0.1,
@@ -1049,6 +1084,7 @@
    "color": "#ff9900",
    "colorWeight": 0.0,
    "d": 0.7,
+   "effort": 1.0,
    "explosive": true,
    "falloff": -0.1,
    "i": 0.1,
@@ -1072,6 +1108,7 @@
   },
   "Water": {
    "d": 0.0,
+   "effort": 1.0,
    "explosive": false,
    "falloff": 0.0,
    "i": -3.0,
@@ -1150,6 +1187,32 @@
    ]
   },
   {
+   "casing": "RMCM40GrenadeCasing",
+   "labels": [
+    "66% of the reach-weighted kills for the least work"
+   ],
+   "mix": {
+    "RMCANFO": 114.0,
+    "RMCAmmoniumNitrate": 6.0
+   },
+   "roles": [
+    "practical"
+   ]
+  },
+  {
+   "casing": "RMCM40GrenadeCasing",
+   "labels": [
+    "Every kill reachable without gated reagents"
+   ],
+   "mix": {
+    "RMCCyclonite": 114.0,
+    "RMCLithium": 6.0
+   },
+   "roles": [
+    "nobotany"
+   ]
+  },
+  {
    "casing": "RMCM15GrenadeCasing",
    "labels": [
     "Blast radius"
@@ -1216,6 +1279,32 @@
    ]
   },
   {
+   "casing": "RMCM15GrenadeCasing",
+   "labels": [
+    "66% of the reach-weighted kills for the least work"
+   ],
+   "mix": {
+    "RMCANFO": 171.0,
+    "RMCLithium": 9.0
+   },
+   "roles": [
+    "practical"
+   ]
+  },
+  {
+   "casing": "RMCM15GrenadeCasing",
+   "labels": [
+    "Every kill reachable without gated reagents"
+   ],
+   "mix": {
+    "RMCANFO": 126.0,
+    "RMCCyclonite": 54.0
+   },
+   "roles": [
+    "nobotany"
+   ]
+  },
+  {
    "casing": "RMCM20MineCasing",
    "labels": [
     "Blast radius",
@@ -1267,6 +1356,32 @@
    },
    "roles": [
     "cheap"
+   ]
+  },
+  {
+   "casing": "RMCM20MineCasing",
+   "labels": [
+    "66% of the reach-weighted kills for the least work"
+   ],
+   "mix": {
+    "RMCANFO": 84.0,
+    "RMCAmmoniumNitrate": 6.0
+   },
+   "roles": [
+    "practical"
+   ]
+  },
+  {
+   "casing": "RMCM20MineCasing",
+   "labels": [
+    "Every kill reachable without gated reagents"
+   ],
+   "mix": {
+    "RMCANFO": 90.0,
+    "RMCLithium": 6.0
+   },
+   "roles": [
+    "nobotany"
    ]
   },
   {
@@ -1337,6 +1452,32 @@
    ]
   },
   {
+   "casing": "RMCC4PlasticCasing",
+   "labels": [
+    "66% of the reach-weighted kills for the least work"
+   ],
+   "mix": {
+    "RMCANFO": 144.0,
+    "RMCCyclonite": 36.0
+   },
+   "roles": [
+    "practical"
+   ]
+  },
+  {
+   "casing": "RMCC4PlasticCasing",
+   "labels": [
+    "Every kill reachable without gated reagents"
+   ],
+   "mix": {
+    "RMCANFO": 63.0,
+    "RMCCyclonite": 117.0
+   },
+   "roles": [
+    "nobotany"
+   ]
+  },
+  {
    "casing": "RMC88mmRocketWarhead",
    "labels": [
     "Blast radius"
@@ -1351,14 +1492,16 @@
   {
    "casing": "RMC88mmRocketWarhead",
    "labels": [
-    "Peak damage"
+    "Peak damage",
+    "Every kill reachable without gated reagents"
    ],
    "mix": {
     "RMCANFO": 99.0,
     "RMCCyclonite": 81.0
    },
    "roles": [
-    "damage"
+    "damage",
+    "nobotany"
    ]
   },
   {
@@ -1399,6 +1542,19 @@
    },
    "roles": [
     "cheap"
+   ]
+  },
+  {
+   "casing": "RMC88mmRocketWarhead",
+   "labels": [
+    "66% of the reach-weighted kills for the least work"
+   ],
+   "mix": {
+    "RMCANFO": 171.0,
+    "RMCLithium": 9.0
+   },
+   "roles": [
+    "practical"
    ]
   },
   {
@@ -1466,6 +1622,32 @@
    },
    "roles": [
     "cheap"
+   ]
+  },
+  {
+   "casing": "RMC80mmMortarWarhead",
+   "labels": [
+    "66% of the reach-weighted kills for the least work"
+   ],
+   "mix": {
+    "RMCANFO": 168.0,
+    "RMCCyclonite": 72.0
+   },
+   "roles": [
+    "practical"
+   ]
+  },
+  {
+   "casing": "RMC80mmMortarWarhead",
+   "labels": [
+    "Every kill reachable without gated reagents"
+   ],
+   "mix": {
+    "RMCCyclonite": 228.0,
+    "RMCLithium": 12.0
+   },
+   "roles": [
+    "nobotany"
    ]
   }
  ],

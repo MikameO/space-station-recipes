@@ -133,6 +133,9 @@
     'For': 'Зачем', 'Kills': 'Убивает',
     'Fire': 'Огонь',
     'Reach': 'Дальнобой', 'Damage': 'Урон',
+    'Practical': 'Практично', 'No botany': 'Без ботаники',
+    'Work': 'Труд',
+    'Needs a garden or a kitchen: ': 'Нужна грядка или кухня: ',
     'Burn time': 'Горение', 'Cheap': 'Дёшево',
     'destroyed': 'уничтожен', 'no effect': 'без эффекта',
     'at the centre': 'в эпицентре', 'for armour': 'по броне',
@@ -1906,7 +1909,17 @@
     const dmgPer = F.damagePerIntensity / F.intensityDivisor;
     const built = rows.map(r => {
       const st = computeStats(r.mix, c, S.dampener);
-      return { r, st, cost: mixCost(r.mix, S.costBase),
+      // Cost in phoron alone misled: octogen is light on phoron and heavy on
+      // everything else, because it needs frost oil out of a garden. Work is
+      // the whole shopping list, and gated says how much of it no dispenser
+      // will hand over.
+      let work = 0, gated = 0;
+      for (const [id, qty] of Object.entries(r.mix)) {
+        const spec = S.data.reagents[id] || {};
+        work += (spec.effort || 0) * qty;
+        gated += (spec.gated || 0) * qty;
+      }
+      return { r, st, cost: mixCost(r.mix, S.costBase), work, gated,
                dmg: st.power * dmgPer, kills: killCount(st) };
     });
     box.innerHTML = `<table class="ord-table">
@@ -1914,15 +1927,20 @@
         <th>${esc(tr('For'))}</th><th>${esc(tr('Mixture'))}</th>
         <th class="num">${esc(tr('Power'))}</th><th class="num">${esc(tr('Blast'))}</th>
         <th class="num">${esc(tr('Shrapnel'))}</th><th class="num">${esc(tr('Fire'))}</th>
-        <th class="num">${esc(rname(S.costBase))}</th><th class="num">${esc(tr('Kills'))}</th>
-      </tr></thead><tbody>${built.map(b => `<tr>
+        <th class="num">${esc(rname(S.costBase))}</th><th class="num">${esc(tr('Work'))}</th>
+        <th class="num">${esc(tr('Kills'))}</th>
+      </tr></thead><tbody>${built.map(b => `<tr title="${esc(tr('Work') + ' ' + round(b.work, 0)
+          + ', ' + rname(S.costBase) + ' ' + round(b.cost, 1)
+          + (b.gated > 0 ? '. ' + tr('Needs a garden or a kitchen: ') + round(b.gated, 0) : ''))}">
         <td>${esc(b.r.roles.map(k => tr(ROLE_LABEL[k] || k)).join(' + '))}</td>
-        <td class="ord-mix-cell">${esc(describeMix(b.r.mix))}</td>
+        <td class="ord-mix-cell">${esc(describeMix(b.r.mix))}${
+          b.gated > 0 ? ' <b class="ord-gated">\u25b2</b>' : ''}</td>
         <td class="num">${esc(round(b.st.power, 0))}</td>
         <td class="num">${b.st.hasBlast ? esc(round(b.st.blastRadius, 2)) : '\u2014'}</td>
         <td class="num">${b.st.shards || '\u2014'}</td>
         <td class="num">${b.st.fireIntensity ? esc(round(b.st.fireIntensity, 0)) + '/' + b.st.reach + '/' + esc(round(b.st.fireDuration, 0)) + 's' : '\u2014'}</td>
         <td class="num">${esc(round(b.cost, 1))}</td>
+        <td class="num">${esc(round(b.work, 0))}</td>
         <td class="num">${b.kills}/${(S.data.targets || []).length}</td>
       </tr>`).join('')}</tbody></table>`;
     box.querySelectorAll('tbody tr').forEach((tr_, i) => {
@@ -1938,6 +1956,7 @@
   const ROLE_LABEL = {
     radius: 'Reach', damage: 'Damage', shrapnel: 'Shrapnel',
     fire: 'Fire', burn: 'Burn time', cheap: 'Cheap',
+    practical: 'Practical', nobotany: 'No botany',
   };
 
   // ── what it does to them ───────────────────────────────────────────────────
