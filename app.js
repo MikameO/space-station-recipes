@@ -1821,11 +1821,11 @@ function renderTreeHTML(node, depth = 0, path = '0') {
       <span class="node-amount">${amt}</span>
       <span class="node-name clickable" onclick="openDetail('${node.id}')">${esc(name)}</span>
       ${badges}
-      ${node.children.length > 0 ? `<button class="tree-toggle" onclick="this.parentElement.nextElementSibling.classList.toggle('collapsed')">-</button>` : ''}
+      ${node.children.length > 0 ? `<button class="tree-toggle" data-path="${path}" aria-label="Collapse or expand">-</button>` : ''}
     </div>`;
 
   if (node.children.length > 0) {
-    html += `<ul class="tree-children">`;
+    html += `<ul class="tree-children" data-path="${path}">`;
     node.children.forEach((child, i) => {
       html += renderTreeHTML(child, depth + 1, `${path}.${i}`);
     });
@@ -1840,12 +1840,16 @@ let currentTreeReagentId = null;
 
 // A4: checked node paths — survives amount changes (same structure), resets on new reagent
 let treeChecks = new Set();
+// Folded branches, by the same path key. Changing the amount re-renders the
+// whole tree, and without this every branch sprang open again on each keystroke.
+let treeCollapsed = new Set();
 
 function saveTreeSession() {
   saveSession({
     treeTarget: currentTreeReagentId,
     treeAmount: document.getElementById('treeAmount')?.value || '1',
     treeChecks: [...treeChecks],
+    treeCollapsed: [...treeCollapsed],
   });
 }
 
@@ -1871,6 +1875,11 @@ function rebuildTree() {
       box.closest('.tree-node').classList.add('checked');
     }
   });
+  // And the folds, for the same reason: typing an amount rebuilds the tree, and
+  // a branch you deliberately closed should stay closed while you do it.
+  document.querySelectorAll('#treeOutput .tree-children').forEach(ul => {
+    if (treeCollapsed.has(ul.dataset.path)) ul.classList.add('collapsed');
+  });
   updateTreeProgress();
 }
 
@@ -1884,6 +1893,7 @@ function setupCraftTrees() {
     suggestions.classList.remove('open');
     currentTreeReagentId = id;
     treeChecks = new Set(); // A4: new tree = fresh checklist
+    treeCollapsed = new Set();
     track('tree_built', { reagent: id });
     rebuildTree();
     saveTreeSession();
@@ -1900,8 +1910,22 @@ function setupCraftTrees() {
     input.value = DATA.reagents[saved.treeTarget].name || saved.treeTarget;
     amountInput.value = saved.treeAmount || '1';
     treeChecks = new Set(saved.treeChecks || []);
+    treeCollapsed = new Set(saved.treeCollapsed || []);
     rebuildTree();
   };
+
+  // Folding is delegated for the same reason as the checklist: the tree HTML is
+  // thrown away and rebuilt on every amount change.
+  document.getElementById('treeOutput').addEventListener('click', e => {
+    const btn = e.target.closest('.tree-toggle');
+    if (!btn) return;
+    const ul = btn.parentElement.nextElementSibling;
+    if (!ul) return;
+    const folded = ul.classList.toggle('collapsed');
+    if (folded) treeCollapsed.add(btn.dataset.path);
+    else treeCollapsed.delete(btn.dataset.path);
+    saveTreeSession();
+  });
 
   // A4: checklist wiring (delegated — tree HTML re-renders often)
   document.getElementById('treeOutput').addEventListener('change', e => {
