@@ -3141,6 +3141,20 @@ def main():
     print("\n=== Phase 9: Extracting sprites from SS14 repo ===")
     fetch_and_extract_sprites()
 
+    # Phase 10: Ordnance layer (Series O). Kept out of the chem merge on purpose —
+    # the explosion fields live in fork copies of the parent layer that first-wins
+    # dedup drops, so this reads its own manifest into ordnance/<fork>.json.
+    print("\n=== Phase 10: Ordnance layer ===")
+    from ss14_ordnance import build_all as build_ordnance
+    written = build_ordnance(fetch_all_files)
+    if written:
+        from ordnance_reference import verify as verify_ordnance
+        if not verify_ordnance(written):
+            print("  WARNING: ordnance reference mixtures no longer reproduce — "
+                  "upstream balance drift, check ordnance_reference.py")
+    else:
+        print("  no fork declares an 'ordnance' manifest")
+
     print("\nDone!")
 
 

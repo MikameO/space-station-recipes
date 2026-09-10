@@ -479,6 +479,102 @@ FORK_REGISTRY = {
         ],
     },
 
+    # ── Space Stories — Marine Corps Core ──
+    # MetalSage/space-stories-cm14 — самостоятельный репозиторий (не GitHub-fork), который
+    # несёт внутри слой _RMC14 плюс свой _Stories. parent_fork "rmc14" даёт CM-химию;
+    # собственный вклад — ветка взрывчатки (циклонит/октоген/АНФО/селитра) и подсистема
+    # Ordnance. Собственные реагенты форка локализованы только на ru-RU — en-US для
+    # _Stories/reagents в репозитории нет, это не опечатка в манифесте.
+    # Должен регистрироваться ПОСЛЕ "rmc14", чтобы родитель собрался первым.
+    "stories_cm": {
+        "name": "Space Stories — Marine Corps Core",
+        "repo": "MetalSage/space-stories-cm14",
+        "branch": "master",
+        "custom_dir": "_Stories",
+        "color": "#c2410c",
+        "parent_fork": "rmc14",
+        # Same vanilla-category replacement as parent RMC14 (CM chem system)
+        "blocked_categories": {"Medicine", "Narcotics", "Cleaning", "Fun", "Chemicals", "Botany"},
+        "reagent_files": [
+            "Resources/Prototypes/_Stories/Reagents/explosives.yml",
+            "Resources/Prototypes/_Stories/Reagents/other.yml",
+            "Resources/Prototypes/_Stories/Reagents/toxic.yml",
+            "Resources/Prototypes/_Stories/Reagents/hunter_blood.yml",
+        ],
+        "reaction_files": [
+            "Resources/Prototypes/_Stories/Recipes/Reactions/explosives.yml",
+        ],
+        # Форк русский: собственных en-US файлов для _Stories/reagents не существует,
+        # поэтому EN-имена выводятся из ID, а RU — из родной локали.
+        "locale_files": [],
+        "locale_files_ru": [
+            "Resources/Locale/ru-RU/_Stories/reagents/explosives.ftl",
+            "Resources/Locale/ru-RU/_Stories/reagents/toxic.ftl",
+            "Resources/Locale/ru-RU/_Stories/reagents/meta/biological.ftl",
+            # Копии родительского слоя — RU для унаследованной CM-химии
+            "Resources/Locale/ru-RU/_RMC14/reagents/meta/elements.ftl",
+            "Resources/Locale/ru-RU/_RMC14/reagents/pyrotechnic.ftl",
+            "Resources/Locale/ru-RU/_RMC14/reagents/other.ftl",
+            "Resources/Locale/ru-RU/_RMC14/reagents/toxins.ftl",
+            "Resources/Locale/ru-RU/_RMC14/reagents/ingredients.ftl",
+            "Resources/Locale/ru-RU/_RMC14/reagents/flavors.ftl",
+            "Resources/Locale/ru-RU/_RMC14/medical/medicine.ftl",
+            "Resources/Locale/ru-RU/_RMC14/medical/narcotics.ftl",
+            "Resources/Locale/ru-RU/_RMC14/medical/toxins.ftl",
+            "Resources/Locale/ru-RU/_RMC14/medical/synth.ftl",
+        ],
+        "dispenser_chemicals": set(),  # CM dispenser chems already global via rmc14
+        "vanilla_override_reaction_files": VANILLA_REACTION_PATHS,
+        # Копии родительских _RMC14 файлов: форк правит их блоками
+        # "# Stories-Ordnance-Start/End" — автодифф помечает расхождения.
+        "parent_override_reagent_files": [
+            "Resources/Prototypes/_RMC14/Reagents/elements.yml",
+            "Resources/Prototypes/_RMC14/Reagents/pyrotechnic.yml",
+            "Resources/Prototypes/_RMC14/Reagents/medicine.yml",
+            "Resources/Prototypes/_RMC14/Reagents/narcotics.yml",
+            "Resources/Prototypes/_RMC14/Reagents/other.yml",
+            "Resources/Prototypes/_RMC14/Reagents/toxins.yml",
+        ],
+        "parent_override_reaction_files": [
+            "Resources/Prototypes/_RMC14/Recipes/Reactions/chemicals.yml",
+            "Resources/Prototypes/_RMC14/Recipes/Reactions/elements.yml",
+            "Resources/Prototypes/_RMC14/Recipes/Reactions/medicine.yml",
+            "Resources/Prototypes/_RMC14/Recipes/Reactions/narcotics.yml",
+            "Resources/Prototypes/_RMC14/Recipes/Reactions/other.yml",
+            "Resources/Prototypes/_RMC14/Recipes/Reactions/pyrotechnic.yml",
+            "Resources/Prototypes/_RMC14/Recipes/Reactions/toxins.yml",
+        ],
+        # ── Подсистема Ordnance (серия O) ──
+        # Собственный манифест: читается независимо от reagent_files, потому что
+        # ordnance-поля живут в копиях родительского слоя, которые first-wins дедуп
+        # отбрасывает при сборке химии. Выход — ordnance/<fork>.json.
+        "ordnance": {
+            "reagent_files": [
+                "Resources/Prototypes/_RMC14/Reagents/base_reagent.yml",
+                "Resources/Prototypes/_RMC14/Reagents/elements.yml",
+                "Resources/Prototypes/_RMC14/Reagents/pyrotechnic.yml",
+                "Resources/Prototypes/_RMC14/Reagents/other.yml",
+                "Resources/Prototypes/_RMC14/Reagents/toxins.yml",
+                "Resources/Prototypes/_RMC14/Reagents/Consumable/ingredients.yml",
+                "Resources/Prototypes/_Stories/Reagents/explosives.yml",
+                "Resources/Prototypes/_Stories/Reagents/other.yml",
+                "Resources/Prototypes/_Stories/Reagents/toxic.yml",
+                # Вода — ванильный прототип с intensityMod: -3 (гасит огонь)
+                "Resources/Prototypes/Reagents/Consumable/Drink/drinks.yml",
+                "Resources/Prototypes/Reagents/Consumable/Drink/base_drink.yml",
+            ],
+            "casing_files": [
+                "Resources/Prototypes/_RMC14/Entities/Objects/Misc/ordnancecasings.yml",
+            ],
+            "explosion_files": [
+                "Resources/Prototypes/_RMC14/explosion.yml",
+            ],
+            # Прототип взрыва, которым стреляет OrdnanceExplosionSystem
+            "explosion_proto": "RMC",
+            "iron_reagent": "RMCIron",
+        },
+    },
+
     # ── Goob Station ──
     "goob": {
         "name": "Goob Station",

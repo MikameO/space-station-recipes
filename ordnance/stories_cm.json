@@ -1,0 +1,838 @@
+{
+ "casings": {
+  "RMC80mmMortarCameraWarhead": {
+   "base": 130.0,
+   "cone": 60.0,
+   "fd": [
+    5.0,
+    48.0
+   ],
+   "fi": [
+    5.0,
+    45.0
+   ],
+   "fr": [
+    3.0,
+    8.0
+   ],
+   "fuel": null,
+   "fuelAmount": 60.0,
+   "maxP": 360.0,
+   "minF": 25.0,
+   "mode": "DualIgniter",
+   "shards": 50,
+   "star": true,
+   "vol": 180.0
+  },
+  "RMC80mmMortarShell": {
+   "base": 75.0,
+   "cone": 60.0,
+   "fd": [
+    3.0,
+    24.0
+   ],
+   "fi": [
+    3.0,
+    20.0
+   ],
+   "fr": [
+    1.0,
+    5.0
+   ],
+   "fuel": "RMCHydrogen",
+   "fuelAmount": 60.0,
+   "maxP": 175.0,
+   "minF": 25.0,
+   "mode": "Any",
+   "shards": 8,
+   "star": true,
+   "vol": 60.0
+  },
+  "RMC80mmMortarWarhead": {
+   "base": 130.0,
+   "cone": 60.0,
+   "fd": [
+    5.0,
+    48.0
+   ],
+   "fi": [
+    5.0,
+    45.0
+   ],
+   "fr": [
+    3.0,
+    8.0
+   ],
+   "fuel": null,
+   "fuelAmount": 60.0,
+   "maxP": 360.0,
+   "minF": 25.0,
+   "mode": "DualIgniter",
+   "shards": 50,
+   "star": true,
+   "vol": 240.0
+  },
+  "RMC88mmRocketTube": {
+   "base": 75.0,
+   "cone": 60.0,
+   "fd": [
+    3.0,
+    24.0
+   ],
+   "fi": [
+    3.0,
+    20.0
+   ],
+   "fr": [
+    1.0,
+    5.0
+   ],
+   "fuel": "RMCMethane",
+   "fuelAmount": 60.0,
+   "maxP": 175.0,
+   "minF": 25.0,
+   "mode": "Any",
+   "shards": 8,
+   "star": false,
+   "vol": 60.0
+  },
+  "RMC88mmRocketWarhead": {
+   "base": 160.0,
+   "cone": 60.0,
+   "fd": [
+    5.0,
+    36.0
+   ],
+   "fi": [
+    4.0,
+    45.0
+   ],
+   "fr": [
+    2.0,
+    4.0
+   ],
+   "fuel": null,
+   "fuelAmount": 60.0,
+   "maxP": 220.0,
+   "minF": 25.0,
+   "mode": "DualIgniter",
+   "shards": 20,
+   "star": false,
+   "vol": 180.0
+  },
+  "RMCC4PlasticCasing": {
+   "base": 120.0,
+   "cone": 60.0,
+   "fd": [
+    5.0,
+    20.0
+   ],
+   "fi": [
+    4.0,
+    50.0
+   ],
+   "fr": [
+    2.0,
+    4.0
+   ],
+   "fuel": null,
+   "fuelAmount": 60.0,
+   "maxP": 280.0,
+   "minF": 25.0,
+   "mode": "Plastic",
+   "shards": 25,
+   "star": true,
+   "vol": 180.0
+  },
+  "RMCCasingBase": {
+   "base": 75.0,
+   "cone": 60.0,
+   "fd": [
+    3.0,
+    24.0
+   ],
+   "fi": [
+    3.0,
+    20.0
+   ],
+   "fr": [
+    1.0,
+    5.0
+   ],
+   "fuel": null,
+   "fuelAmount": 60.0,
+   "maxP": 175.0,
+   "minF": 25.0,
+   "mode": "Any",
+   "shards": 32,
+   "star": true,
+   "vol": 1000.0
+  },
+  "RMCM15GrenadeCasing": {
+   "base": 120.0,
+   "cone": 60.0,
+   "fd": [
+    3.0,
+    32.0
+   ],
+   "fi": [
+    3.0,
+    30.0
+   ],
+   "fr": [
+    1.0,
+    6.0
+   ],
+   "fuel": null,
+   "fuelAmount": 60.0,
+   "maxP": 220.0,
+   "minF": 25.0,
+   "mode": "TimerIgniter",
+   "shards": 20,
+   "star": true,
+   "vol": 180.0
+  },
+  "RMCM20MineCasing": {
+   "base": 80.0,
+   "cone": 120.0,
+   "fd": [
+    3.0,
+    18.0
+   ],
+   "fi": [
+    3.0,
+    20.0
+   ],
+   "fr": [
+    2.0,
+    4.0
+   ],
+   "fuel": null,
+   "fuelAmount": 60.0,
+   "maxP": 100.0,
+   "minF": 25.0,
+   "mode": "Mine",
+   "shards": 10,
+   "star": true,
+   "vol": 120.0
+  },
+  "RMCM40GrenadeCasing": {
+   "base": 80.0,
+   "cone": 60.0,
+   "fd": [
+    3.0,
+    24.0
+   ],
+   "fi": [
+    3.0,
+    25.0
+   ],
+   "fr": [
+    1.0,
+    5.0
+   ],
+   "fuel": null,
+   "fuelAmount": 60.0,
+   "maxP": 180.0,
+   "minF": 25.0,
+   "mode": "TimerIgniter",
+   "shards": 10,
+   "star": true,
+   "vol": 120.0
+  }
+ },
+ "fork": "stories_cm",
+ "formula": {
+  "damagePerIntensity": 10.0,
+  "intensityDivisor": 5.0,
+  "ironReagent": "RMCIron",
+  "minSlope": 0.1,
+  "shardsPerUnit": 0.25,
+  "starIntensity": 30.0
+ },
+ "reagents": {
+  "ArnoldPalmer": {
+   "d": 0.2,
+   "explosive": false,
+   "falloff": 0.0,
+   "i": 0.2,
+   "nameKey": "reagent-name-arnold-palmer",
+   "power": 0.0,
+   "r": 0.1
+  },
+  "RMCANFO": {
+   "d": 0.0,
+   "explosive": true,
+   "falloff": -0.6,
+   "i": 0.0,
+   "nameKey": "reagent-name-rmc-anfo",
+   "power": 1.0,
+   "r": 0.0
+  },
+  "RMCAmmoniumNitrate": {
+   "color": "#ff9900",
+   "colorWeight": 0.0,
+   "d": -0.2,
+   "explosive": true,
+   "falloff": 1.5,
+   "i": 0.5,
+   "nameKey": "reagent-name-rmc-ammonium-nitrate",
+   "power": 0.4,
+   "r": 0.0
+  },
+  "RMCBGel": {
+   "color": "#00dd00",
+   "colorWeight": 0.0,
+   "d": 0.75,
+   "explosive": false,
+   "falloff": 0.0,
+   "i": 0.45,
+   "nameKey": "reagent-name-rmcbgel",
+   "power": 0.0,
+   "r": 0.06,
+   "via": [
+    {
+     "effect": "Oxidizing",
+     "potency": 6.0
+    },
+    {
+     "effect": "Fueling",
+     "potency": 7.0
+    },
+    {
+     "effect": "Flowing",
+     "potency": 1.0
+    }
+   ]
+  },
+  "RMCCLF3": {
+   "color": "#ff9300",
+   "colorWeight": 0.0,
+   "d": -0.9,
+   "explosive": false,
+   "falloff": 0.0,
+   "i": 1.8,
+   "nameKey": "reagent-name-rmcclf3",
+   "power": 0.0,
+   "r": -0.09,
+   "via": [
+    {
+     "effect": "Oxidizing",
+     "potency": 9.0
+    }
+   ]
+  },
+  "RMCCarbon": {
+   "color": "#ffd700",
+   "colorWeight": 3.0,
+   "d": 1.0,
+   "explosive": false,
+   "falloff": 0.0,
+   "i": 0.0,
+   "nameKey": "reagent-name-carbon",
+   "power": 0.0,
+   "r": 0.0
+  },
+  "RMCCopper": {
+   "color": "#78be5a",
+   "colorWeight": 4.0,
+   "d": 0.0,
+   "explosive": false,
+   "falloff": 0.0,
+   "i": 0.0,
+   "nameKey": "reagent-name-copper",
+   "power": 0.0,
+   "r": 0.0
+  },
+  "RMCCyclonite": {
+   "d": 0.0,
+   "explosive": true,
+   "falloff": -0.4,
+   "i": 0.0,
+   "nameKey": "reagent-name-rmc-cyclonite",
+   "power": 1.5,
+   "r": 0.0
+  },
+  "RMCEthanol": {
+   "color": "#6897f7",
+   "colorWeight": 2.0,
+   "d": 0.2,
+   "explosive": false,
+   "falloff": 0.0,
+   "i": 0.2,
+   "nameKey": "reagent-name-ethanol",
+   "power": 0.0,
+   "r": 0.1
+  },
+  "RMCHexamine": {
+   "color": "#ff9900",
+   "colorWeight": 0.0,
+   "d": 0.5,
+   "explosive": false,
+   "falloff": 0.0,
+   "i": 0.0,
+   "nameKey": "reagent-name-rmc-hexamine",
+   "power": 0.0,
+   "r": 0.0
+  },
+  "RMCHydrogen": {
+   "color": "#b6f8ff",
+   "colorWeight": 2.0,
+   "d": -0.5,
+   "explosive": true,
+   "falloff": 0.0,
+   "i": -0.5,
+   "nameKey": "reagent-name-hydrogen",
+   "power": 0.15,
+   "r": 0.2
+  },
+  "RMCIron": {
+   "d": 0.0,
+   "explosive": false,
+   "falloff": 0.0,
+   "i": 0.0,
+   "nameKey": "reagent-name-iron",
+   "power": 0.0,
+   "r": 0.0,
+   "shardsPerUnit": 0.25
+  },
+  "RMCLithium": {
+   "color": "#ff356f",
+   "colorWeight": 5.0,
+   "d": -0.1,
+   "explosive": false,
+   "falloff": 0.0,
+   "i": 0.35,
+   "nameKey": "reagent-name-lithium",
+   "power": 0.0,
+   "r": -0.01,
+   "via": [
+    {
+     "effect": "Oxidizing",
+     "potency": 1.0
+    }
+   ]
+  },
+  "RMCMethane": {
+   "color": "#00a5ff",
+   "colorWeight": 1.5,
+   "d": 0.25,
+   "explosive": true,
+   "falloff": 0.0,
+   "i": -0.35,
+   "nameKey": "reagent-name-rmcmethane",
+   "power": 0.15,
+   "r": 0.095,
+   "via": [
+    {
+     "effect": "Flowing",
+     "potency": 3.0
+    },
+    {
+     "effect": "Viscous",
+     "potency": 3.0
+    },
+    {
+     "effect": "Fueling",
+     "potency": 2.0
+    }
+   ]
+  },
+  "RMCNapalm": {
+   "color": "#D05006",
+   "colorWeight": 0.0,
+   "d": 0.75,
+   "explosive": false,
+   "falloff": 0.0,
+   "i": 0.45,
+   "nameKey": "reagent-name-rmcnapalm",
+   "power": 0.0,
+   "r": 0.06,
+   "via": [
+    {
+     "effect": "Oxidizing",
+     "potency": 6.0
+    },
+    {
+     "effect": "Fueling",
+     "potency": 7.0
+    },
+    {
+     "effect": "Flowing",
+     "potency": 1.0
+    }
+   ]
+  },
+  "RMCNapalmB": {
+   "color": "#00dd00",
+   "colorWeight": 0.0,
+   "d": 0.75,
+   "explosive": false,
+   "falloff": 0.0,
+   "i": 0.45,
+   "nameKey": "reagent-name-rmcnapalm-b",
+   "power": 0.0,
+   "r": 0.06,
+   "via": [
+    {
+     "effect": "Oxidizing",
+     "potency": 6.0
+    },
+    {
+     "effect": "Fueling",
+     "potency": 7.0
+    },
+    {
+     "effect": "Flowing",
+     "potency": 1.0
+    }
+   ]
+  },
+  "RMCNapalmE": {
+   "color": "#800080",
+   "colorWeight": 0.0,
+   "d": 0.75,
+   "explosive": false,
+   "falloff": 0.0,
+   "i": 0.45,
+   "nameKey": "reagent-name-rmcnapalm-e",
+   "penetrating": true,
+   "power": 0.0,
+   "r": 0.06,
+   "via": [
+    {
+     "effect": "Oxidizing",
+     "potency": 6.0
+    },
+    {
+     "effect": "Fueling",
+     "potency": 7.0
+    },
+    {
+     "effect": "Flowing",
+     "potency": 1.0
+    }
+   ]
+  },
+  "RMCNapalmEX": {
+   "color": "#641dd6",
+   "colorWeight": 0.0,
+   "d": 0.75,
+   "explosive": false,
+   "falloff": 0.0,
+   "i": 0.45,
+   "nameKey": "reagent-name-rmcnapalm-ex",
+   "penetrating": true,
+   "power": 0.0,
+   "r": 0.06,
+   "via": [
+    {
+     "effect": "Oxidizing",
+     "potency": 6.0
+    },
+    {
+     "effect": "Fueling",
+     "potency": 7.0
+    },
+    {
+     "effect": "Flowing",
+     "potency": 1.0
+    }
+   ]
+  },
+  "RMCNapalmHighCombustion": {
+   "color": "#c51c1c",
+   "colorWeight": 0.0,
+   "d": -0.25,
+   "explosive": false,
+   "falloff": 0.0,
+   "i": -4.05,
+   "nameKey": "reagent-name-rmcnapalm-hc",
+   "power": 0.0,
+   "r": -0.44,
+   "via": [
+    {
+     "effect": "Oxidizing",
+     "potency": 6.0
+    },
+    {
+     "effect": "Fueling",
+     "potency": 7.0
+    },
+    {
+     "effect": "Flowing",
+     "potency": 1.0
+    }
+   ]
+  },
+  "RMCNapalmSticky": {
+   "color": "#f8e3b2",
+   "colorWeight": 0.0,
+   "d": -4.25,
+   "explosive": false,
+   "falloff": 0.0,
+   "i": -1.05,
+   "nameKey": "reagent-name-rmcnapalm-sticky",
+   "power": 0.0,
+   "r": -0.44,
+   "via": [
+    {
+     "effect": "Oxidizing",
+     "potency": 6.0
+    },
+    {
+     "effect": "Fueling",
+     "potency": 7.0
+    },
+    {
+     "effect": "Flowing",
+     "potency": 1.0
+    }
+   ]
+  },
+  "RMCNapalmUT": {
+   "color": "#EE6515",
+   "colorWeight": 0.0,
+   "d": 0.75,
+   "explosive": false,
+   "falloff": 0.0,
+   "i": 0.45,
+   "nameKey": "reagent-name-rmcnapalm-ut",
+   "power": 0.0,
+   "r": 0.06,
+   "via": [
+    {
+     "effect": "Oxidizing",
+     "potency": 6.0
+    },
+    {
+     "effect": "Fueling",
+     "potency": 7.0
+    },
+    {
+     "effect": "Flowing",
+     "potency": 1.0
+    }
+   ]
+  },
+  "RMCNapalmUTTank": {
+   "color": "#EE6515",
+   "colorWeight": 0.0,
+   "d": 0.75,
+   "explosive": false,
+   "falloff": 0.0,
+   "i": 0.45,
+   "nameKey": "reagent-name-rmcnapalm-ut",
+   "power": 0.0,
+   "r": 0.06,
+   "via": [
+    {
+     "effect": "Oxidizing",
+     "potency": 6.0
+    },
+    {
+     "effect": "Fueling",
+     "potency": 7.0
+    },
+    {
+     "effect": "Flowing",
+     "potency": 1.0
+    }
+   ]
+  },
+  "RMCNapalmWeak": {
+   "color": "#EE6515",
+   "colorWeight": 0.0,
+   "d": 0.75,
+   "explosive": false,
+   "falloff": 0.0,
+   "i": 0.45,
+   "nameKey": "reagent-name-rmcnapalm-ut",
+   "power": 0.0,
+   "r": 0.06,
+   "via": [
+    {
+     "effect": "Oxidizing",
+     "potency": 6.0
+    },
+    {
+     "effect": "Fueling",
+     "potency": 7.0
+    },
+    {
+     "effect": "Flowing",
+     "potency": 1.0
+    }
+   ]
+  },
+  "RMCNapalmX": {
+   "color": "#00b8ff",
+   "colorWeight": 0.0,
+   "d": 0.75,
+   "explosive": false,
+   "falloff": 0.0,
+   "i": 0.45,
+   "nameKey": "reagent-name-rmcrapalm-x",
+   "power": 0.0,
+   "r": 0.06,
+   "via": [
+    {
+     "effect": "Oxidizing",
+     "potency": 6.0
+    },
+    {
+     "effect": "Fueling",
+     "potency": 7.0
+    },
+    {
+     "effect": "Flowing",
+     "potency": 1.0
+    }
+   ]
+  },
+  "RMCNitroglycerin": {
+   "d": 0.0,
+   "explosive": true,
+   "falloff": -0.5,
+   "i": 0.0,
+   "nameKey": "reagent-name-rmc-nitroglycerin",
+   "power": 1.0,
+   "r": 0.0
+  },
+  "RMCOctogen": {
+   "d": -0.2,
+   "explosive": true,
+   "falloff": -0.2,
+   "i": 0.4,
+   "nameKey": "reagent-name-rmc-octogen",
+   "power": 2.0,
+   "r": -0.02,
+   "via": [
+    {
+     "effect": "Oxidizing",
+     "potency": 2.0
+    }
+   ]
+  },
+  "RMCOxygen": {
+   "color": "#58daff",
+   "colorWeight": 2.0,
+   "d": -0.2,
+   "explosive": false,
+   "falloff": 0.0,
+   "i": 1.15,
+   "nameKey": "reagent-name-oxygen",
+   "power": 0.0,
+   "r": -0.1,
+   "via": [
+    {
+     "effect": "Oxidizing",
+     "potency": 2.0
+    }
+   ]
+  },
+  "RMCPhoron": {
+   "color": "#e01e1e",
+   "colorWeight": 3.0,
+   "d": -0.8,
+   "explosive": false,
+   "falloff": 0.0,
+   "i": 0.4,
+   "nameKey": "reagent-name-rmcphoron",
+   "power": 0.0,
+   "r": 0.05
+  },
+  "RMCPhosphorus": {
+   "color": "#ffdba4",
+   "colorWeight": 5.0,
+   "d": 0.1,
+   "explosive": false,
+   "falloff": 0.0,
+   "i": 1.0,
+   "nameKey": "reagent-name-phosphorus",
+   "power": 0.0,
+   "r": -0.12
+  },
+  "RMCPotassiumHydroxide": {
+   "d": 0.0,
+   "explosive": true,
+   "falloff": 0.0,
+   "i": 0.0,
+   "nameKey": "reagent-name-rmc-potassium-hydroxide",
+   "power": 0.5,
+   "r": 0.0
+  },
+  "RMCR189": {
+   "color": "#ffe49c",
+   "colorWeight": 0.0,
+   "d": 0.75,
+   "explosive": false,
+   "falloff": 0.0,
+   "i": 0.45,
+   "nameKey": "reagent-name-rmcr189",
+   "penetrating": true,
+   "power": 0.0,
+   "r": 0.06,
+   "via": [
+    {
+     "effect": "Oxidizing",
+     "potency": 6.0
+    },
+    {
+     "effect": "Fueling",
+     "potency": 7.0
+    },
+    {
+     "effect": "Flowing",
+     "potency": 1.0
+    }
+   ]
+  },
+  "RMCTableSalt": {
+   "color": "#ffff00",
+   "colorWeight": 2.0,
+   "d": 0.0,
+   "explosive": false,
+   "falloff": 0.0,
+   "i": 0.1,
+   "nameKey": "reagent-name-table-salt",
+   "power": 0.0,
+   "r": 0.0
+  },
+  "RMCWeldingFuel": {
+   "color": "#ff9900",
+   "colorWeight": 0.0,
+   "d": 0.7,
+   "explosive": true,
+   "falloff": -0.1,
+   "i": 0.1,
+   "nameKey": "reagent-name-rmc-fuel",
+   "power": 0.12,
+   "r": -0.08,
+   "via": [
+    {
+     "effect": "Fueling",
+     "potency": 5.0
+    },
+    {
+     "effect": "Oxidizing",
+     "potency": 3.0
+    },
+    {
+     "effect": "Viscous",
+     "potency": 4.0
+    }
+   ]
+  },
+  "Water": {
+   "d": 0.0,
+   "explosive": false,
+   "falloff": 0.0,
+   "i": -3.0,
+   "nameKey": "reagent-name-water",
+   "power": 0.0,
+   "r": 0.0
+  }
+ },
+ "schema": 1
+}

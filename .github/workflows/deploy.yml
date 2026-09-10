@@ -31,6 +31,7 @@ jobs:
           cp favicon.svg favicon-192.png favicon-512.png apple-touch-icon.png _site/
           cp -r sprites _site/sprites
           cp -r maps _site/maps
+          cp -r ordnance _site/ordnance
           [ -f og-image.png ] && cp og-image.png _site/ || true
 
       - uses: actions/configure-pages@v6

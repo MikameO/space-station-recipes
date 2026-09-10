@@ -1,7 +1,7 @@
 {
  "meta": {
   "schemaVersion": "3.10.0",
-  "generated": "2026-07-26T06:20:47",
+  "generated": "2026-09-10T18:26:36",
   "forks": {
    "vanilla": {
     "name": "Vanilla SS14",
@@ -28,6 +28,14 @@
     "color": "#9f1239",
     "reagentCount": 0,
     "parent": "cmu",
+    "totalConversion": true,
+    "renamedReagents": 20
+   },
+   "stories_cm": {
+    "name": "Space Stories — Marine Corps Core",
+    "color": "#c2410c",
+    "reagentCount": 18,
+    "parent": "rmc14",
     "totalConversion": true,
     "renamedReagents": 20
    },
@@ -118,7 +126,7 @@
     "reagentCount": 151
    }
   },
-  "reactionCount": 1092,
+  "reactionCount": 1104,
   "plantCount": 152,
   "sourceAttribution": {
    "total": 68,
@@ -17519,7 +17527,7 @@
    "boilingPoint": null,
    "meltingPoint": null,
    "nameRu": "Аритразин",
-   "descRu": "Стабилизированная версия диловена. Обладает ослабленными детоксикационными свойствами и имеет побочные эффекты, но не реагирует с другими соединениями с образованием токсинов.",
+   "descRu": "Стабилизированный вариант диловена. Его токсиноочищающие свойства ослаблены, имеются вредные побочные эффекты, но он не вступает в реакцию с другими соединениями для обр",
    "physicalDescRu": "облачное",
    "antagScore": 2
   },
@@ -17587,7 +17595,7 @@
    "boilingPoint": null,
    "meltingPoint": null,
    "nameRu": "Бикаридин",
-   "descRu": "Анальгетик для лечения тяжелых механических травм и стабилизации пациентов. Передозировка вызывает химические ожоги и интоксикацию.",
+   "descRu": "Бикаридин — обезболивающее лекарство, которое может использоваться для лечения тяжелых внешних тупых травм и стабилизации состояния пациентов. Передозировка бикаридина в",
    "physicalDescRu": "непрозрачное",
    "antagScore": 5
   },
@@ -17654,7 +17662,7 @@
    "boilingPoint": null,
    "meltingPoint": null,
    "nameRu": "Клонексадон",
-   "descRu": "Улучшенная версия криоксадона. Требует температуры ниже 170K.",
+   "descRu": "Передовой криогенный препарат, изготовленный на основе криоксадона. Лечит большинство видов повреждений тканей. Для правильного метаболизма требует температуры ниже 170 К.",
    "physicalDescRu": "шипучее",
    "plantEffects": [
     {
@@ -17744,7 +17752,7 @@
    "boilingPoint": null,
    "meltingPoint": null,
    "nameRu": "Криоксадон",
-   "descRu": "Промышленный криогенный препарат. Лечит большинство видов повреждений тканей. Для эффективного метаболизма требует температуры тела пациента ниже 170K.",
+   "descRu": "Промышленный криогенный препарат. Лечит большинство видов повреждений тканей. Его основное ограничение — температура тела пациента должна быть ниже 170 К для правильного",
    "physicalDescRu": "шипучее",
    "plantEffects": [
     {
@@ -17839,7 +17847,7 @@
    "boilingPoint": null,
    "meltingPoint": null,
    "nameRu": "Дермалин",
-   "descRu": "Препарат для лечения тяжелых ожогов. Позволяет организму восстанавливать даже сильно поврежденные ткани. Передозировка вызывает внутренние повреждения.",
+   "descRu": "Передовой препарат, используемый для лечения тяжелых ожоговых травм. Позволяет организму восстанавливать даже самые тяжелые ткани, поврежденные теплом. Передозировка дер",
    "physicalDescRu": "прозрачное",
    "antagScore": 5
   },
@@ -17903,7 +17911,7 @@
    "boilingPoint": null,
    "meltingPoint": null,
    "nameRu": "Дексалин",
-   "descRu": "Лечит кислородное голодание, доставляя кислород непосредственно в кровоток. Антидот при отравлении лексорином.",
+   "descRu": "Дексалин используется для лечения кислородного голодания путем подачи кислорода к красным кровяным тельцам непосредственно в кровоток. Используется в качестве антидота п",
    "physicalDescRu": "непрозрачное",
    "antagScore": 4
   },
@@ -17971,7 +17979,7 @@
    "boilingPoint": null,
    "meltingPoint": null,
    "nameRu": "Дексалин Плюс",
-   "descRu": "Улучшенная формула дексалина с добавлением железа и углерода для ускорения связывания кислорода с гемоглобином.",
+   "descRu": "Дексалин Плюс — это усовершенствованная форма Дексалина с добавлением железа и углерода для ускорения скорости связывания кислорода с гемоглобином в эритроцитах.",
    "physicalDescRu": "облачное",
    "antagScore": 4
   },
@@ -18044,7 +18052,7 @@
    "boilingPoint": null,
    "meltingPoint": null,
    "nameRu": "Диловен",
-   "descRu": "Универсальный антитоксин, нейтрализующий большинство ядов в кровотоке. Часто используется в составе сложных препаратов. Обладает слабым антигаллюциногенным эффектом и снижает усталость.",
+   "descRu": "Антитоксин общего применения, нейтрализующий большинство токсинов в кровотоке. Обычно используется во многих современных химических препаратах. Может использоваться как",
    "physicalDescRu": "прозрачное",
    "antagScore": 3,
    "plantEffects": [
@@ -18143,7 +18151,7 @@
    "boilingPoint": null,
    "meltingPoint": null,
    "nameRu": "Эпинефрин",
-   "descRu": "Природный стимулятор мышц и сердца. Используется для реанимации. Передозировка вызывает нагрузку на сердце.",
+   "descRu": "Естественный стимулятор работы мышц и сердца. Полезен для перезапуска сердца. Передозировка может привести к нагрузке на сердце и повреждению тканей.",
    "physicalDescRu": "не имеющее запаха",
    "antagScore": 5
   },
@@ -18206,8 +18214,8 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
-   "nameRu": "Этилредоксазин",
-   "descRu": "Нейтрализует эффекты алкоголя в крови путем его окисления в молекулы воды. Не предотвращает немедленного опьянения. В больших дозах токсичен из-за сильных окислительных свойств.",
+   "nameRu": "Этилредоксразин",
+   "descRu": "Нейтрализует действие алкоголя в кровотоке, окисляя его до молекул воды. Однако он не останавливает мгновенное опьянение. Будучи мощным окислителем, этилредоксразин стан",
    "physicalDescRu": "непрозрачное"
   },
   "CMImidazoline": {
@@ -18283,7 +18291,7 @@
    "boilingPoint": null,
    "meltingPoint": null,
    "nameRu": "Имидазолин",
-   "descRu": "Лечит травмы глаз (негенетические). Альтернатива хирургическому вмешательству.",
+   "descRu": "Используется для лечения негенетических травм глаза. Обычно назначается в качестве лечения большинства случаев травмы глаза вместо хирургической операции.",
    "physicalDescRu": "прозрачное",
    "antagScore": 5,
    "plantEffects": [
@@ -18370,7 +18378,7 @@
    "boilingPoint": null,
    "meltingPoint": null,
    "nameRu": "Инапровалин",
-   "descRu": "Кардиостимулятор для стабилизации пациентов. Поддерживает дыхание при остановке сердца. Слабый анальгетик. Передозировка опасна для сердца.",
+   "descRu": "Инапровалин — синаптический стимулятор и кардиостимулятор. Обычно используется для стабилизации состояния пациентов. Если легкие функционируют, инапровалин обеспечивает",
    "physicalDescRu": "непрозрачное",
    "metabolismRate": 0.1,
    "antagScore": 3
@@ -18435,7 +18443,7 @@
    "boilingPoint": null,
    "meltingPoint": null,
    "nameRu": "Келотан",
-   "descRu": "Лечит ожоги и химические повреждения. Передозировка вызывает внутренние повреждения.",
+   "descRu": "Распространенное лекарство, используемое для лечения ожогов, едких и коррозийных травм. Передозировка келотана может привести к повреждению внутренних тканей.",
    "physicalDescRu": "сильно пахнущее"
   },
   "CMLeporazine": {
@@ -18502,7 +18510,7 @@
    "boilingPoint": null,
    "meltingPoint": null,
    "nameRu": "Лепоразин",
-   "descRu": "Нормализует температуру тела. Несовместим с криогеникой. Передозировка вызывает сонливость.",
+   "descRu": "Препарат, используемый для лечения гипотермии и гипертермии. Стабилизирует температуру тела пациента. Предотвращает применение криогенных препаратов. Передозировка лепор",
    "physicalDescRu": "жгучее"
   },
   "CMMeralyne": {
@@ -18573,7 +18581,7 @@
    "boilingPoint": null,
    "meltingPoint": null,
    "nameRu": "Мералин",
-   "descRu": "Сильнодействующий анальгетик для критических травм. Передозировка разрушает клеточные мембраны.",
+   "descRu": "Передовой анальгетический препарат, используемый для лечения крайне тяжелых тупых травм. Позволяет организму быстро восстанавливать поврежденные ткани. Передозировка мералина может вызвать сильную коррозию клеточных мембран.",
    "physicalDescRu": "непрозрачное",
    "antagScore": 5
   },
@@ -19298,7 +19306,7 @@
    "boilingPoint": null,
    "meltingPoint": null,
    "nameRu": "Трикордразин",
-   "descRu": "Мощный стимулятор для лечения различных повреждений. Производное кордразина.",
+   "descRu": "Трикордразин — сильнодействующий стимулятор, первоначально полученный из кордразина. Может использоваться для лечения широкого спектра травм.",
    "physicalDescRu": "непрозрачное"
   },
   "CMUBiogenicMatrix": {
@@ -19427,8 +19435,8 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
-   "nameRu": "Черная слизь",
-   "descRu": "Странное вещество неизвестного происхождения. . .",
+   "nameRu": "Черная жижа",
+   "descRu": "Странная субстанция неизвестного происхождения...",
    "physicalDescRu": "неидентифицируемое",
    "metabolismRate": 4.0,
    "antagScore": 1
@@ -37439,8 +37447,8 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
-   "nameRu": "стрельба",
-   "descRu": "Поднимите бокал за смелых!",
+   "nameRu": "ганфайр",
+   "descRu": "Поднимем бокалы за смелых!",
    "physicalDescRu": "сладкое",
    "plantEffects": [
     {
@@ -40209,8 +40217,8 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
-   "nameRu": "ледяное кафе",
-   "descRu": "Кофейный напиток с чудесным ароматом.",
+   "nameRu": "айс-кофе",
+   "descRu": "Кофейный смузи с чудесным ароматом.",
    "physicalDescRu": "сладкое",
    "plantEffects": [
     {
@@ -48256,7 +48264,7 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
-   "nameRu": "манго агуа фреска",
+   "nameRu": "манговая вода",
    "descRu": "Идеально подходит для любого летнего дня.",
    "physicalDescRu": "сладкое",
    "plantEffects": [
@@ -48328,8 +48336,8 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
-   "nameRu": "холодильник для манго",
-   "descRu": "Напиток в летнюю ночь.",
+   "nameRu": "прохладительный напиток с манго",
+   "descRu": "Напиток для летнего вечера.",
    "physicalDescRu": "сладкое",
    "plantEffects": [
     {
@@ -63783,6 +63791,56 @@
    "metabolismRate": 3.0,
    "antagScore": 3
   },
+  "RMCANFO": {
+   "id": "RMCANFO",
+   "name": "RMCANFO",
+   "group": "",
+   "category": "Other",
+   "source": "stories_cm",
+   "color": "#E0E0E0",
+   "desc": "",
+   "physicalDesc": "grainy",
+   "flavor": "",
+   "isBase": false,
+   "isDispenser": false,
+   "effects": "",
+   "effectTags": [],
+   "metabolismPaths": [],
+   "overdose": null,
+   "criticalOverdose": null,
+   "recipe": {
+    "reactants": {
+     "RMCAmmoniumNitrate": {
+      "amount": 2,
+      "catalyst": false
+     },
+     "RMCWeldingFuel": {
+      "amount": 1,
+      "catalyst": false
+     }
+    },
+    "products": {
+     "RMCANFO": 2
+    },
+    "minTemp": null,
+    "maxTemp": null,
+    "mixer": []
+   },
+   "obtainSources": [
+    "Chemistry reaction"
+   ],
+   "accessibility": {
+    "tier": "unknown",
+    "weight": 5,
+    "reason": "Recipe exists but a deep-chain ingredient is unresolved by extractor (likely plant-mutation, mob-drop, or cooking product)"
+   },
+   "verifiedMechanics": [],
+   "boilingPoint": null,
+   "meltingPoint": null,
+   "nameRu": "АНФО",
+   "descRu": "Дешевое промышленное взрывчатое вещество, часто используемое в горнодобывающей промышленности и строительстве.",
+   "physicalDescRu": "зернистое"
+  },
   "RMCAluminum": {
    "id": "RMCAluminum",
    "name": "aluminum",
@@ -63819,10 +63877,136 @@
    "boilingPoint": null,
    "meltingPoint": null,
    "nameRu": "алюминий",
-   "descRu": "Серебристый, мягкий, немагнитный и пластичный металл.",
+   "descRu": "Серебристый, мягкий, немагнитный и ковкий металл.",
    "physicalDescRu": "металлическое",
    "metabolismRate": 0.1,
    "antagScore": 1
+  },
+  "RMCAmmonia": {
+   "id": "RMCAmmonia",
+   "name": "RMC Ammonia",
+   "group": "",
+   "category": "Other",
+   "source": "stories_cm",
+   "color": "#404030",
+   "desc": "",
+   "physicalDesc": "pungent",
+   "flavor": "",
+   "isBase": false,
+   "isDispenser": false,
+   "effects": "[Poison] Effect: Toxic; [Poison] Effect: Nutritious",
+   "effectTags": [],
+   "metabolismPaths": [
+    "Poison"
+   ],
+   "overdose": null,
+   "criticalOverdose": null,
+   "recipe": {
+    "reactants": {
+     "RMCHydrogen": {
+      "amount": 3,
+      "catalyst": false
+     },
+     "RMCNitrogen": {
+      "amount": 1,
+      "catalyst": false
+     }
+    },
+    "products": {
+     "RMCAmmonia": 3
+    },
+    "minTemp": null,
+    "maxTemp": null,
+    "mixer": []
+   },
+   "obtainSources": [
+    "Chemistry reaction"
+   ],
+   "accessibility": {
+    "tier": "self-chem",
+    "weight": 1,
+    "reason": "Chemistry reaction from dispenser base"
+   },
+   "verifiedMechanics": [
+    "[Poison] Effect: Toxic",
+    "[Poison] Effect: Nutritious"
+   ],
+   "boilingPoint": null,
+   "meltingPoint": null,
+   "nameRu": "аммиак",
+   "descRu": "Едкое вещество, обычно используемое в удобрениях и бытовых чистящих средствах.",
+   "physicalDescRu": "жгучее",
+   "metabolismRate": 0.1
+  },
+  "RMCAmmoniumNitrate": {
+   "id": "RMCAmmoniumNitrate",
+   "name": "RMC Ammonium Nitrate",
+   "group": "Pyrotechnic",
+   "category": "Pyrotechnic",
+   "source": "stories_cm",
+   "color": "#E5E5E5",
+   "desc": "",
+   "physicalDesc": "crystalline",
+   "flavor": "",
+   "isBase": false,
+   "isDispenser": false,
+   "effects": "",
+   "effectTags": [],
+   "metabolismPaths": [],
+   "overdose": null,
+   "criticalOverdose": null,
+   "recipe": {
+    "reactants": {
+     "RMCAmmonia": {
+      "amount": 1,
+      "catalyst": false
+     },
+     "RMCPolytrinicAcid": {
+      "amount": 1,
+      "catalyst": false
+     }
+    },
+    "products": {
+     "RMCAmmoniumNitrate": 2
+    },
+    "minTemp": null,
+    "maxTemp": null,
+    "mixer": []
+   },
+   "obtainSources": [
+    "Chemistry reaction"
+   ],
+   "accessibility": {
+    "tier": "self-chem",
+    "weight": 1,
+    "reason": "Chemistry reaction from dispenser base"
+   },
+   "verifiedMechanics": [
+    "On touch: Ignites target [Touch]"
+   ],
+   "boilingPoint": null,
+   "meltingPoint": null,
+   "nameRu": "аммиачная селитра",
+   "descRu": "Белое кристаллическое соединение, используемое в сельском хозяйстве как азотное удобрение. Сама по себе аммиачная селитра не взрывоопасна, но становится таковой при смешивании с мазутом или топливом.",
+   "physicalDescRu": "кристаллическое",
+   "plantEffects": [
+    {
+     "kind": "PlantAdjustWeeds",
+     "label": "Weeds",
+     "text": "Weeds -2",
+     "group": "weedpest",
+     "tone": "good",
+     "amount": -2
+    },
+    {
+     "kind": "PlantAdjustHealth",
+     "label": "Plant health",
+     "text": "Plant health -2",
+     "group": "care",
+     "tone": "bad",
+     "amount": -2
+    }
+   ]
   },
   "RMCAntiZed": {
    "id": "RMCAntiZed",
@@ -63861,8 +64045,8 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
-   "nameRu": "АнтиЗед",
-   "descRu": "Химическое вещество, разработанное для использования против агента A0-3959X.91–15, в просторечии известного как «Черная слизь».",
+   "nameRu": "Анти-Зед",
+   "descRu": "Химическое вещество, предназначенное для использования против агента A0-3959X.91–15, широко известного как \"Черная жижа\".",
    "physicalDescRu": "хрустящее"
   },
   "RMCBGel": {
@@ -63894,8 +64078,8 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
-   "nameRu": "Напалм B-гель",
-   "descRu": "В отличие от своих жидких современников, этот гелеобразный вариант напалма легко тушить, но он стреляет далеко и задерживается на земле в виде вязкой массы, вступая в реакцию с неорганическими материалами и воспламеняя их.",
+   "nameRu": "Напалм Б-Гель",
+   "descRu": "В отличие от своих жидких аналогов, этот гелеобразный вариант напалма легко тушится, но летит далеко и остаётся на земле вязкой массой, вступая в реакцию с неорганическими материалами и воспламеняя их.",
    "physicalDescRu": "блестящее",
    "plantEffects": [
     {
@@ -63980,7 +64164,7 @@
    "boilingPoint": null,
    "meltingPoint": null,
    "nameRu": "тесто",
-   "descRu": "Смесь муки и других элементов, таких как соль, яйцо и молоко.",
+   "descRu": "Смесь муки и других ингредиентов, таких как соль, яйцо и молоко.",
    "physicalDescRu": "сливочное",
    "plantEffects": [
     {
@@ -64026,8 +64210,8 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
-   "nameRu": "Черная слизь",
-   "descRu": "Странное вещество неизвестного происхождения. . .",
+   "nameRu": "Черная жижа",
+   "descRu": "Странная субстанция неизвестного происхождения...",
    "physicalDescRu": "неидентифицируемое"
   },
   "RMCCLF3": {
@@ -64089,7 +64273,7 @@
    "boilingPoint": null,
    "meltingPoint": null,
    "nameRu": "Трифторид хлора",
-   "descRu": "Высокореактивное межгалогенное соединение, способное к самовоспламенению. Очень сильный окислитель, чрезвычайно реакционноспособен с большинством органических и неорганических материалов.",
+   "descRu": "Высокореактивное интергалогенное соединение, способное к самовоспламенению. Очень сильный окислитель, чрезвычайно активно реагирующий с большинством органических и неорганических материалов.",
    "physicalDescRu": "блестящее",
    "metabolismRate": 0.1,
    "plantEffects": [
@@ -64210,7 +64394,7 @@
    "boilingPoint": null,
    "meltingPoint": null,
    "nameRu": "вишневое желе",
-   "descRu": "Сладкое желе из плодов вишни.",
+   "descRu": "Сладкое желе из вишни.",
    "physicalDescRu": "сладкое",
    "plantEffects": [
     {
@@ -64262,7 +64446,7 @@
    "boilingPoint": null,
    "meltingPoint": null,
    "nameRu": "Хлоралгидрат",
-   "descRu": "Хлоралгидрат был первым синтетическим седативно-снотворным средством. Это мощное успокаивающее средство, вызывающее почти мгновенную сонливость, но в больших дозах оно может быть смертельным. Часто используется вместе с другими анестетиками при хирургических процедурах.",
+   "descRu": "Хлоралгидрат был первым синтетически полученным седативно-снотворным препаратом. Это мощное седативное средство, вызывающее почти мгновенную сонливость, но в больших количествах оно может быть смертельным. Часто используется вместе с другими анестетиками при хирургических процедурах.",
    "physicalDescRu": "неописуемое",
    "metabolismRate": 0.05,
    "antagScore": 5
@@ -64400,7 +64584,7 @@
    "boilingPoint": null,
    "meltingPoint": null,
    "nameRu": "Циталопрам",
-   "descRu": "Циталопрам — препарат, используемый для лечения депрессии, обсессивно-компульсивного расстройства и панического расстройства. Он считается безопасным для употребления и широко доступен с 1998 года.",
+   "descRu": "Циталопрам — это препарат, используемый для лечения депрессии, обсессивно-компульсивного расстройства и панического расстройства. Считается безопасным для употребления и широко доступен с 1998 года.",
    "physicalDescRu": "кристаллическое",
    "metabolismRate": 0.01
   },
@@ -64485,6 +64669,42 @@
    "metabolismRate": 0.01,
    "antagScore": 1
   },
+  "RMCCornOil": {
+   "id": "RMCCornOil",
+   "name": "RMC Corn Oil",
+   "group": "Foods",
+   "category": "Other",
+   "source": "stories_cm",
+   "color": "#302000",
+   "desc": "",
+   "physicalDesc": "oily",
+   "flavor": "oily",
+   "isBase": true,
+   "isDispenser": false,
+   "effects": "[Food] Effect: Nutritious",
+   "effectTags": [],
+   "metabolismPaths": [
+    "Food"
+   ],
+   "overdose": null,
+   "criticalOverdose": null,
+   "recipe": null,
+   "obtainSources": [],
+   "accessibility": {
+    "tier": "unobtainable",
+    "weight": 999,
+    "reason": "No recipe, no plant, no dispenser source"
+   },
+   "verifiedMechanics": [
+    "[Food] Effect: Nutritious"
+   ],
+   "boilingPoint": null,
+   "meltingPoint": null,
+   "nameRu": "кукурузное масло",
+   "descRu": "Масло, получаемое из различных видов кукурузы.",
+   "physicalDescRu": "масляное",
+   "metabolismRate": 0.1
+  },
   "RMCCyanide": {
    "id": "RMCCyanide",
    "name": "Cyanide",
@@ -64520,10 +64740,68 @@
    "boilingPoint": null,
    "meltingPoint": null,
    "nameRu": "Цианид",
-   "descRu": "Цианид — это токсичное химическое вещество природного происхождения, которое веками использовалось в качестве средства убийства из-за его немедленного воздействия. Симптомы включают тошноту, слабость и затрудненное дыхание.",
+   "descRu": "Цианид — это токсичное химическое вещество природного происхождения, которое веками использовалось для убийства из-за его мгновенного воздействия. Симптомы включают тошноту, слабость и затрудненное дыхание.",
    "physicalDescRu": "жгучее",
    "metabolismRate": 0.2,
    "antagScore": 1
+  },
+  "RMCCyclonite": {
+   "id": "RMCCyclonite",
+   "name": "RMC Cyclonite",
+   "group": "",
+   "category": "Other",
+   "source": "stories_cm",
+   "color": "#E3E0BA",
+   "desc": "",
+   "physicalDesc": "crystalline",
+   "flavor": "",
+   "isBase": false,
+   "isDispenser": false,
+   "effects": "[Poison] Deals Poison 1",
+   "effectTags": [
+    "deals:poison"
+   ],
+   "metabolismPaths": [
+    "Poison"
+   ],
+   "overdose": null,
+   "criticalOverdose": null,
+   "recipe": {
+    "reactants": {
+     "RMCHexamine": {
+      "amount": 1,
+      "catalyst": false
+     },
+     "RMCPolytrinicAcid": {
+      "amount": 1,
+      "catalyst": false
+     }
+    },
+    "products": {
+     "RMCCyclonite": 1
+    },
+    "minTemp": null,
+    "maxTemp": null,
+    "mixer": []
+   },
+   "obtainSources": [
+    "Chemistry reaction"
+   ],
+   "accessibility": {
+    "tier": "self-chem",
+    "weight": 1,
+    "reason": "Chemistry reaction from dispenser base"
+   },
+   "verifiedMechanics": [
+    "[Poison] Deals Poison 1"
+   ],
+   "boilingPoint": null,
+   "meltingPoint": null,
+   "nameRu": "циклонит",
+   "descRu": "Малочувствительное мощное взрывчатое вещество, также известное как гексоген (RDX). Одно из самых энергетически ёмких военных взрывчатых веществ. Иногда используется гражданскими в качестве крысиного яда.",
+   "physicalDescRu": "кристаллическое",
+   "metabolismRate": 0.1,
+   "antagScore": 2
   },
   "RMCEthanol": {
    "id": "RMCEthanol",
@@ -64641,6 +64919,101 @@
    "metabolismRate": 0.1,
    "antagScore": 4
   },
+  "RMCFormaldehyde": {
+   "id": "RMCFormaldehyde",
+   "name": "RMC Formaldehyde",
+   "group": "",
+   "category": "Other",
+   "source": "stories_cm",
+   "color": "#808080cc",
+   "desc": "",
+   "physicalDesc": "strong smelling",
+   "flavor": "",
+   "isBase": false,
+   "isDispenser": false,
+   "effects": "[Poison] Effect: Toxic; [Poison] Effect: Carcinogenic",
+   "effectTags": [],
+   "metabolismPaths": [
+    "Poison"
+   ],
+   "overdose": null,
+   "criticalOverdose": null,
+   "recipe": {
+    "reactants": {
+     "RMCMethane": {
+      "amount": 1,
+      "catalyst": false
+     },
+     "RMCOxygen": {
+      "amount": 1,
+      "catalyst": false
+     },
+     "RMCPhoron": {
+      "amount": 1,
+      "catalyst": false
+     },
+     "RMCSilver": {
+      "amount": 5,
+      "catalyst": true
+     }
+    },
+    "products": {
+     "RMCFormaldehyde": 3
+    },
+    "minTemp": null,
+    "maxTemp": null,
+    "mixer": []
+   },
+   "obtainSources": [
+    "Chemistry reaction"
+   ],
+   "accessibility": {
+    "tier": "self-chem",
+    "weight": 1,
+    "reason": "Chemistry reaction from dispenser base"
+   },
+   "verifiedMechanics": [
+    "[Poison] Effect: Toxic",
+    "[Poison] Effect: Carcinogenic"
+   ],
+   "boilingPoint": null,
+   "meltingPoint": null,
+   "nameRu": "формальдегид",
+   "descRu": "Токсичный органический газ, в основном используемый при производстве смол, полимеров и взрывчатых веществ. Является известным природным канцерогеном.",
+   "physicalDescRu": "сильно пахнущее",
+   "metabolismRate": 0.1
+  },
+  "RMCFrostOil": {
+   "id": "RMCFrostOil",
+   "name": "RMC Frost Oil",
+   "group": "",
+   "category": "Other",
+   "source": "stories_cm",
+   "color": "#B31008",
+   "desc": "",
+   "physicalDesc": "frosty",
+   "flavor": "",
+   "isBase": true,
+   "isDispenser": false,
+   "effects": "",
+   "effectTags": [],
+   "metabolismPaths": [],
+   "overdose": null,
+   "criticalOverdose": null,
+   "recipe": null,
+   "obtainSources": [],
+   "accessibility": {
+    "tier": "unobtainable",
+    "weight": 999,
+    "reason": "No recipe, no plant, no dispenser source"
+   },
+   "verifiedMechanics": [],
+   "boilingPoint": null,
+   "meltingPoint": null,
+   "nameRu": "морозное масло",
+   "descRu": "Особое масло, которое заметно охлаждает тело. Добывается из ледяных перцев.",
+   "physicalDescRu": "морозное"
+  },
   "RMCGenericToxin": {
    "id": "RMCGenericToxin",
    "name": "Generic Toxin",
@@ -64672,9 +65045,63 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
-   "descRu": "Общая идентификация многих подобных токсинов, иногда образующихся как побочный продукт химических реакций.",
+   "nameRu": "Стандартный токсин",
+   "descRu": "Общая идентификация многих схожих токсинов, иногда образующихся в качестве побочного продукта в результате химических реакций.",
    "physicalDescRu": "жгучее",
    "metabolismRate": 0.05
+  },
+  "RMCGlycerol": {
+   "id": "RMCGlycerol",
+   "name": "RMC Glycerol",
+   "group": "",
+   "category": "Other",
+   "source": "stories_cm",
+   "color": "#808080",
+   "desc": "",
+   "physicalDesc": "syrupy",
+   "flavor": "",
+   "isBase": false,
+   "isDispenser": false,
+   "effects": "",
+   "effectTags": [],
+   "metabolismPaths": [
+    "Poison"
+   ],
+   "overdose": null,
+   "criticalOverdose": null,
+   "recipe": {
+    "reactants": {
+     "RMCCornOil": {
+      "amount": 3,
+      "catalyst": false
+     },
+     "RMCSulphuricAcid": {
+      "amount": 1,
+      "catalyst": false
+     }
+    },
+    "products": {
+     "RMCGlycerol": 1
+    },
+    "minTemp": null,
+    "maxTemp": null,
+    "mixer": []
+   },
+   "obtainSources": [
+    "Chemistry reaction"
+   ],
+   "accessibility": {
+    "tier": "unknown",
+    "weight": 5,
+    "reason": "Recipe exists but a deep-chain ingredient is unresolved by extractor (likely plant-mutation, mob-drop, or cooking product)"
+   },
+   "verifiedMechanics": [],
+   "boilingPoint": null,
+   "meltingPoint": null,
+   "nameRu": "глицерин",
+   "descRu": "Простое соединение полиола. Сладкое на вкус и малотоксичное, часто используется в медицине и напитках. Также применяется при производстве пластика, нитроглицерина и других взрывчатых веществ.",
+   "physicalDescRu": "сиропообразное",
+   "metabolismRate": 0.005
   },
   "RMCGold": {
    "id": "RMCGold",
@@ -64772,8 +65199,8 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
-   "nameRu": "виноградная сода",
-   "descRu": "Из винограда делают прекрасный напиток.",
+   "nameRu": "виноградная кола",
+   "descRu": "Из винограда получается прекрасный напиток.",
    "physicalDescRu": "сладкое",
    "plantEffects": [
     {
@@ -64783,6 +65210,76 @@
      "group": "care",
      "tone": "good",
      "amount": 1
+    }
+   ]
+  },
+  "RMCHexamine": {
+   "id": "RMCHexamine",
+   "name": "RMC Hexamine",
+   "group": "Pyrotechnic",
+   "category": "Pyrotechnic",
+   "source": "stories_cm",
+   "color": "#F0F0F0",
+   "desc": "",
+   "physicalDesc": "crystalline",
+   "flavor": "",
+   "isBase": false,
+   "isDispenser": false,
+   "effects": "",
+   "effectTags": [],
+   "metabolismPaths": [],
+   "overdose": null,
+   "criticalOverdose": null,
+   "recipe": {
+    "reactants": {
+     "RMCAmmonia": {
+      "amount": 2,
+      "catalyst": false
+     },
+     "RMCFormaldehyde": {
+      "amount": 3,
+      "catalyst": false
+     }
+    },
+    "products": {
+     "RMCHexamine": 3
+    },
+    "minTemp": null,
+    "maxTemp": null,
+    "mixer": []
+   },
+   "obtainSources": [
+    "Chemistry reaction"
+   ],
+   "accessibility": {
+    "tier": "self-chem",
+    "weight": 1,
+    "reason": "Chemistry reaction from dispenser base"
+   },
+   "verifiedMechanics": [
+    "On touch: Ignites target [Touch]"
+   ],
+   "boilingPoint": null,
+   "meltingPoint": null,
+   "nameRu": "гексамин",
+   "descRu": "Кристаллическое соединение, имеющее множество применений: от пищевых добавок, производства пластмасс и лечения инфекций до использования в качестве сухого горючего в армейских пайках и компонента взрывчатых веществ.",
+   "physicalDescRu": "кристаллическое",
+   "plantEffects": [
+    {
+     "kind": "PlantAdjustWeeds",
+     "label": "Weeds",
+     "text": "Weeds -2",
+     "group": "weedpest",
+     "tone": "good",
+     "amount": -2
+    },
+    {
+     "kind": "PlantAdjustHealth",
+     "label": "Plant health",
+     "text": "Plant health -2",
+     "group": "care",
+     "tone": "bad",
+     "amount": -2
     }
    ]
   },
@@ -64910,6 +65407,8 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "nameRu": "быстрорастворимый яблочный сок",
+   "descRu": "Приятный сладкий вкус яблок, теперь в жидком виде.",
    "physicalDescRu": "сладкое",
    "plantEffects": [
     {
@@ -64977,6 +65476,8 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "nameRu": "быстрорастворимый виноградный сок",
+   "descRu": "Это просто виногра-а-адно!",
    "physicalDescRu": "сладкое",
    "plantEffects": [
     {
@@ -65044,6 +65545,8 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "nameRu": "быстрорастворимый апельсиновый сок",
+   "descRu": "И вкусный, И богатый витамином C, что еще нужно?",
    "physicalDescRu": "сладкое",
    "plantEffects": [
     {
@@ -65111,6 +65614,8 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "nameRu": "быстрорастворимый ананасовый сок",
+   "descRu": "Освежающий, с приятным вкусом и цитрусовой кислинкой.",
    "physicalDescRu": "сладкое",
    "plantEffects": [
     {
@@ -65159,6 +65664,8 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "nameRu": "быстрорастворимый яблочный порошок",
+   "descRu": "Яблочный сок в виде порошка, готовый к смешиванию с водой. Пахнет, какой сюрприз, яблоками.",
    "physicalDescRu": "сладкое",
    "plantEffects": [
     {
@@ -65207,6 +65714,8 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "nameRu": "быстрорастворимый виноградный порошок",
+   "descRu": "Виноградный сок в виде порошка, готовый к смешиванию с водой. Пахнет, какой сюрприз, виноградом.",
    "physicalDescRu": "сладкое",
    "plantEffects": [
     {
@@ -65255,6 +65764,8 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "nameRu": "быстрорастворимый апельсиновый порошок",
+   "descRu": "Апельсиновый сок в виде порошка, готовый к смешиванию с водой. Пахнет, какой сюрприз, апельсинами.",
    "physicalDescRu": "сладкое",
    "plantEffects": [
     {
@@ -65303,6 +65814,8 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "nameRu": "быстрорастворимый ананасовый порошок",
+   "descRu": "Ананасовый сок в виде порошка, готовый к смешиванию с водой. Пахнет, какой сюрприз, апельсинами.",
    "physicalDescRu": "сладкое",
    "plantEffects": [
     {
@@ -65351,6 +65864,8 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "nameRu": "быстрорастворимый арбузный порошок",
+   "descRu": "Арбузный сок в виде порошка, готовый к смешиванию с водой. Пахнет, какой сюрприз, арбузом.",
    "physicalDescRu": "сладкое",
    "plantEffects": [
     {
@@ -65418,6 +65933,8 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
+   "nameRu": "быстрорастворимый арбузный сок",
+   "descRu": "Вкусный сок, приготовленный из арбуза.",
    "physicalDescRu": "сладкое",
    "plantEffects": [
     {
@@ -65618,7 +66135,7 @@
    "boilingPoint": null,
    "meltingPoint": null,
    "nameRu": "Лексорин",
-   "descRu": "Лексорин — чрезвычайно опасное соединение, которое повреждает ткани и парализует легкие, эффективно останавливая дыхание. Может быть смертельным даже в малых дозах. Лексорину эффективно противостоят варианты дексалина.",
+   "descRu": "Лексорин — чрезвычайно опасное вещество, которое повреждает ткани и парализует легкие, эффективно останавливая дыхание. Может быть смертельным даже в небольших дозах. Противоядием для Лексорина являются варианты дексалина.",
    "physicalDescRu": "жгучее",
    "antagScore": 5
   },
@@ -65681,7 +66198,7 @@
    "boilingPoint": null,
    "meltingPoint": null,
    "nameRu": "Липозин",
-   "descRu": "Снижает чувство насыщения и уменьшает массу тела за счет увеличения кетоза и скорости метаболизма жира. Используйте для лечения ожирения. Большие дозы могут вызвать чрезмерную потерю веса.",
+   "descRu": "Снижает чувство сытости и уменьшает массу тела за счет усиления кетоза и ускорения метаболизма жиров. Используется для лечения ожирения. Большие дозы могут привести к резкой потере веса.",
    "physicalDescRu": "масляное"
   },
   "RMCLithium": {
@@ -65820,7 +66337,7 @@
    "boilingPoint": null,
    "meltingPoint": null,
    "nameRu": "Метан",
-   "descRu": "Легковоспламеняющийся углеводород, который при правильных концентрациях может очень быстро распространить пожар, даже со взрывом. Он используется в основном в качестве топлива для производства тепла и света или производства органических химикатов.",
+   "descRu": "Легковоспламеняющийся углеводород, способный очень быстро распространять огонь, при нужной концентрации — даже со взрывом. Используется в основном как топливо для получения тепла и света или при производстве органических химикатов.",
    "physicalDescRu": "блестящее",
    "metabolismRate": 0.1,
    "plantEffects": [
@@ -65897,7 +66414,7 @@
    "boilingPoint": null,
    "meltingPoint": null,
    "nameRu": "Метилфенидат",
-   "descRu": "Часто назначаемый психостимулятор, повышающий активность центральной нервной системы. Часто используется для лечения синдрома дефицита внимания и гиперактивности (СДВГ) и нарколепсии. Этот препарат улучшает производительность, прежде всего, исполнительных функций префронтальной коры (рассуждение, сдерживающее поведение, организация, решение проблем, планирование и т. д.).",
+   "descRu": "Широко назначаемый психостимулятор, повышающий активность центральной нервной системы. Часто используется для лечения синдрома дефицита внимания и гиперактивности (СДВГ) и нарколепсии. Этот препарат улучшает производительность, в первую очередь, в исполнительной функции в префронтальной коре (рассуждение, подавление поведения, организация, решение проблем, планирование и т. д.).",
    "physicalDescRu": "кристаллическое",
    "metabolismRate": 0.01
   },
@@ -65958,8 +66475,8 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
-   "nameRu": "молочный коктейль",
-   "descRu": "Только молоко и мороженое. Так просто.",
+   "nameRu": "милкшейк",
+   "descRu": "Просто молоко и мороженое. Так просто.",
    "physicalDescRu": "сливочное",
    "plantEffects": [
     {
@@ -66039,8 +66556,8 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
-   "nameRu": "Токсин, разрушающий разум",
-   "descRu": "Мощное галлюциногенное соединение, запрещенное морским законодательством. Вызывает сильные галлюцинации и вызывает сильное привыкание. Ранее известный как ЛСД.",
+   "nameRu": "Токсин \"Разрушитель разума\"",
+   "descRu": "Мощный галлюциногенный препарат, запрещенный морским законодательством. Вызывает сильные галлюцинации и вызывает сильное привыкание. Ранее был известен как ЛСД.",
    "physicalDescRu": "непрозрачное",
    "antagScore": 4,
    "plantEffects": [
@@ -66088,7 +66605,7 @@
    "boilingPoint": null,
    "meltingPoint": null,
    "nameRu": "Разбавленная молекулярная кислота",
-   "descRu": "Кислота неизвестного состава, этот образец не столь опасен, как те, что встречаются в кровотоке ксенонидов.",
+   "descRu": "Кислота неизвестного состава, но этот образец, похоже, не так опасен, как те, что находят в крови ксеноморфов.",
    "physicalDescRu": "кислотное",
    "metabolismRate": 0.05
   },
@@ -66151,7 +66668,7 @@
    "boilingPoint": null,
    "meltingPoint": null,
    "nameRu": "Напалм",
-   "descRu": "Вероятно, это воспламенится прежде, чем вы прочтете это.",
+   "descRu": "Вероятно, он воспламенится раньше, чем вы успеете это прочитать.",
    "physicalDescRu": "блестящее",
    "plantEffects": [
     {
@@ -66229,7 +66746,7 @@
    "boilingPoint": null,
    "meltingPoint": null,
    "nameRu": "Напалм Б",
-   "descRu": "Особый вариант напалма, который не способен хорошо ни за что цепляться, но рассеивается на большой площади и медленно горит. Состав вступает в реакцию с неорганическими материалами, вызывая их воспламенение, вызывая серьезные повреждения.",
+   "descRu": "Особый вариант напалма, который плохо прилипает к поверхностям, но рассеивается по большой площади и медленно горит. Состав вступая в реакцию с неорганическими материалами, воспламеняя их и вызывая серьёзные повреждения.",
    "physicalDescRu": "блестящее",
    "plantEffects": [
     {
@@ -66302,8 +66819,8 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
-   "nameRu": "Напалм Е",
-   "descRu": "Липкий горючий жидкий химикат, проникающий в лучшие антипирены.",
+   "nameRu": "Напалм E",
+   "descRu": "Липкая горючая жидкость, пробивающая даже лучшую огнеупорную защиту.",
    "physicalDescRu": "блестящее",
    "plantEffects": [
     {
@@ -66354,7 +66871,7 @@
    "boilingPoint": null,
    "meltingPoint": null,
    "nameRu": "Напалм EX",
-   "descRu": "Липкое горючее жидкое химическое вещество, состоящее из комбинации редких и опасных реагентов, которое проникает в лучшие антипирены и чрезвычайно горячо горит.",
+   "descRu": "Липкая горючая жидкость, состоящая из комбинации редких и опасных реагентов. Пробивает лучшую огнеупорную защиту и горит при экстремально высокой температуре.",
    "physicalDescRu": "блестящее",
    "plantEffects": [
     {
@@ -66423,8 +66940,8 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
-   "nameRu": "Высокогорючее напалмовое топливо",
-   "descRu": "Специальная смесь напалма, более высокий урон, но не такая липкая.",
+   "nameRu": "Высокогорючий напалм",
+   "descRu": "Самодельная смесь напалма: наносит больше урона, но не такая липкая.",
    "physicalDescRu": "блестящее",
    "plantEffects": [
     {
@@ -66494,7 +67011,7 @@
    "boilingPoint": null,
    "meltingPoint": null,
    "nameRu": "Липкий напалм",
-   "descRu": "Специальная смесь напалма, более липкая, служит дольше, но наносит меньше урона.",
+   "descRu": "Самодельная смесь напалма: более липкая и горит дольше, но наносит меньше урона.",
    "physicalDescRu": "блестящее",
    "plantEffects": [
     {
@@ -66567,8 +67084,8 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
-   "nameRu": "УТ-Нафтал Топливо",
-   "descRu": "Известное как «Сверхгустое нафтальное топливо», липкое горючее жидкое химическое вещество, обычно используемое в огнеметах.",
+   "nameRu": "Топливо СГ-Нафталин",
+   "descRu": "Известно как сверхгустое нафталиновое топливо — липкая горючая жидкость, обычно используемая в огнеметах.",
    "physicalDescRu": "блестящее",
    "plantEffects": [
     {
@@ -66618,8 +67135,8 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
-   "nameRu": "УТ-Нафтал Топливо",
-   "descRu": "Известное как «Сверхгустое нафтальное топливо», липкое горючее жидкое химическое вещество, обычно используемое в огнеметах.",
+   "nameRu": "Топливо СГ-Нафталин",
+   "descRu": "Известно как сверхгустое нафталиновое топливо — липкая горючая жидкость, обычно используемая в огнеметах.",
    "physicalDescRu": "блестящее",
    "plantEffects": [
     {
@@ -66669,8 +67186,8 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
-   "nameRu": "Напалм Икс",
-   "descRu": "Липкое горючее жидкое химическое вещество, которое очень сильно горит.",
+   "nameRu": "Напалм X",
+   "descRu": "Липкая горючая жидкость, которая горит при экстремально высокой температуре.",
    "physicalDescRu": "блестящее",
    "plantEffects": [
     {
@@ -66731,6 +67248,145 @@
    "physicalDescRu": "газообразное",
    "metabolismRate": 0.01,
    "antagScore": 1
+  },
+  "RMCNitroglycerin": {
+   "id": "RMCNitroglycerin",
+   "name": "RMC Nitroglycerin",
+   "group": "",
+   "category": "Other",
+   "source": "stories_cm",
+   "color": "#808080",
+   "desc": "",
+   "physicalDesc": "volatile",
+   "flavor": "",
+   "isBase": false,
+   "isDispenser": false,
+   "effects": "",
+   "effectTags": [],
+   "metabolismPaths": [
+    "Poison"
+   ],
+   "overdose": null,
+   "criticalOverdose": null,
+   "recipe": {
+    "reactants": {
+     "RMCGlycerol": {
+      "amount": 1,
+      "catalyst": false
+     },
+     "RMCPolytrinicAcid": {
+      "amount": 1,
+      "catalyst": false
+     },
+     "RMCSulphuricAcid": {
+      "amount": 1,
+      "catalyst": false
+     }
+    },
+    "products": {
+     "RMCNitroglycerin": 2
+    },
+    "minTemp": null,
+    "maxTemp": null,
+    "mixer": []
+   },
+   "obtainSources": [
+    "Chemistry reaction"
+   ],
+   "accessibility": {
+    "tier": "unknown",
+    "weight": 5,
+    "reason": "Recipe requires unknown ingredient(s)"
+   },
+   "verifiedMechanics": [],
+   "boilingPoint": null,
+   "meltingPoint": null,
+   "nameRu": "нитроглицерин",
+   "descRu": "Тяжелая, бесцветная, маслянистая взрывоопасная жидкость, получаемая нитрованием глицерина. Несмотря на высокую нестабильность, находит применение в некоторых медицинских целях.",
+   "physicalDescRu": "нестабильное",
+   "metabolismRate": 0.005
+  },
+  "RMCOctogen": {
+   "id": "RMCOctogen",
+   "name": "RMC Octogen",
+   "group": "Pyrotechnic",
+   "category": "Pyrotechnic",
+   "source": "stories_cm",
+   "color": "#F5F5F5",
+   "desc": "",
+   "physicalDesc": "crystalline",
+   "flavor": "",
+   "isBase": false,
+   "isDispenser": false,
+   "effects": "[Poison] Effect: Oxidizing",
+   "effectTags": [],
+   "metabolismPaths": [
+    "Poison"
+   ],
+   "overdose": null,
+   "criticalOverdose": null,
+   "recipe": {
+    "reactants": {
+     "RMCParaformaldehyde": {
+      "amount": 1,
+      "catalyst": false
+     },
+     "RMCAmmoniumNitrate": {
+      "amount": 1,
+      "catalyst": false
+     },
+     "RMCHexamine": {
+      "amount": 1,
+      "catalyst": false
+     },
+     "RMCPolytrinicAcid": {
+      "amount": 1,
+      "catalyst": false
+     }
+    },
+    "products": {
+     "RMCOctogen": 2
+    },
+    "minTemp": null,
+    "maxTemp": null,
+    "mixer": []
+   },
+   "obtainSources": [
+    "Chemistry reaction"
+   ],
+   "accessibility": {
+    "tier": "unknown",
+    "weight": 5,
+    "reason": "Recipe requires unknown ingredient(s)"
+   },
+   "verifiedMechanics": [
+    "On touch: Ignites target [Touch]",
+    "[Poison] Effect: Oxidizing"
+   ],
+   "boilingPoint": null,
+   "meltingPoint": null,
+   "nameRu": "октоген",
+   "descRu": "Октоген, также известный как HMX (Her Majesty's Explosive) — мощное и относительно нечувствительное взрывчатое вещество. Одно из самых мощных доступных химических взрывчатых веществ, по мощности превосходящее даже циклонит.",
+   "physicalDescRu": "кристаллическое",
+   "metabolismRate": 0.1,
+   "plantEffects": [
+    {
+     "kind": "PlantAdjustWeeds",
+     "label": "Weeds",
+     "text": "Weeds -2",
+     "group": "weedpest",
+     "tone": "good",
+     "amount": -2
+    },
+    {
+     "kind": "PlantAdjustHealth",
+     "label": "Plant health",
+     "text": "Plant health -2",
+     "group": "care",
+     "tone": "bad",
+     "amount": -2
+    }
+   ]
   },
   "RMCOxygen": {
    "id": "RMCOxygen",
@@ -66801,6 +67457,61 @@
    "metabolismRate": 0.01,
    "antagScore": 1
   },
+  "RMCParaformaldehyde": {
+   "id": "RMCParaformaldehyde",
+   "name": "RMC Paraformaldehyde",
+   "group": "",
+   "category": "Other",
+   "source": "stories_cm",
+   "color": "#E0E0E0",
+   "desc": "",
+   "physicalDesc": "crystalline",
+   "flavor": "",
+   "isBase": false,
+   "isDispenser": false,
+   "effects": "[Poison] Effect: Toxic",
+   "effectTags": [],
+   "metabolismPaths": [
+    "Poison"
+   ],
+   "overdose": null,
+   "criticalOverdose": null,
+   "recipe": {
+    "reactants": {
+     "RMCFormaldehyde": {
+      "amount": 1,
+      "catalyst": false
+     },
+     "RMCFrostOil": {
+      "amount": 1,
+      "catalyst": false
+     }
+    },
+    "products": {
+     "RMCParaformaldehyde": 1
+    },
+    "minTemp": null,
+    "maxTemp": null,
+    "mixer": []
+   },
+   "obtainSources": [
+    "Chemistry reaction"
+   ],
+   "accessibility": {
+    "tier": "unknown",
+    "weight": 5,
+    "reason": "Recipe exists but a deep-chain ingredient is unresolved by extractor (likely plant-mutation, mob-drop, or cooking product)"
+   },
+   "verifiedMechanics": [
+    "[Poison] Effect: Toxic"
+   ],
+   "boilingPoint": null,
+   "meltingPoint": null,
+   "nameRu": "параформальдегид",
+   "descRu": "Полимеризованная форма формальдегида, которая медленно образуется в холодном водном растворе.",
+   "physicalDescRu": "кристаллическое",
+   "metabolismRate": 0.1
+  },
   "RMCParoxetine": {
    "id": "RMCParoxetine",
    "name": "Paroxetine",
@@ -66866,7 +67577,7 @@
    "boilingPoint": null,
    "meltingPoint": null,
    "nameRu": "Пароксетин",
-   "descRu": "Очень мощный антидепрессант, используемый для лечения: большого депрессивного расстройства (БДР), обсессивно-компульсивного расстройства (ОКР), социального тревожного расстройства (САР), панического расстройства, посттравматического стрессового расстройства (ПТСР), генерализованного тревожного расстройства (ГТР) и предменструального дисфорического расстройства (ПМДР). Длительное применение может иметь побочные эффекты.",
+   "descRu": "Очень мощный антидепрессант, используемый для лечения: большого депрессивного расстройства (БДР), обсессивно-компульсивного расстройства (ОКР), социального тревожного расстройства (СТР), панического расстройства, посттравматического стрессового расстройства (ПТСР), генерализованного тревожного расстройства (ГТР) и предменструального дисфорического расстройства (ПМДР). Длительное использование может иметь побочные эффекты.",
    "physicalDescRu": "кристаллическое",
    "metabolismRate": 0.01,
    "antagScore": 1
@@ -66907,8 +67618,8 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
-   "nameRu": "арахисовое масло",
-   "descRu": "Сливочное масло из арахиса.",
+   "nameRu": "арахисовая паста",
+   "descRu": "Нежная паста из арахиса.",
    "physicalDescRu": "сливочное",
    "plantEffects": [
     {
@@ -66980,7 +67691,7 @@
    "boilingPoint": null,
    "meltingPoint": null,
    "nameRu": "Форон",
-   "descRu": "Особая форма металлической плазмы, не встречающаяся на Земле.",
+   "descRu": "Особая форма металлической плазмы, которая не встречается на Земле. Хотя форон легко воспламеняется и чрезвычайно токсичен, его высокая плотность энергии делает его одной из лучших альтернатив твердому топливу. Жидкий форон часто используется в исследовательских целях и в медицинской промышленности в качестве катализатора для многих передовых химических веществ.",
    "physicalDescRu": "блестящее",
    "metabolismRate": 0.05,
    "antagScore": 4,
@@ -67077,6 +67788,60 @@
    "descRu": "Драгоценный металл серебристо-белого цвета, известный своей устойчивостью к коррозии и высокой температурой плавления.",
    "physicalDescRu": "значительно металлическое"
   },
+  "RMCPolytrinicAcid": {
+   "id": "RMCPolytrinicAcid",
+   "name": "RMC Polytrinic Acid",
+   "group": "",
+   "category": "Other",
+   "source": "stories_cm",
+   "color": "#8E18A9",
+   "desc": "",
+   "physicalDesc": "acidic",
+   "flavor": "",
+   "isBase": false,
+   "isDispenser": false,
+   "effects": "",
+   "effectTags": [],
+   "metabolismPaths": [],
+   "overdose": null,
+   "criticalOverdose": null,
+   "recipe": {
+    "reactants": {
+     "RMCSulphuricAcid": {
+      "amount": 1,
+      "catalyst": false
+     },
+     "RMCChlorine": {
+      "amount": 1,
+      "catalyst": false
+     },
+     "RMCPotassium": {
+      "amount": 1,
+      "catalyst": false
+     }
+    },
+    "products": {
+     "RMCPolytrinicAcid": 3
+    },
+    "minTemp": null,
+    "maxTemp": null,
+    "mixer": []
+   },
+   "obtainSources": [
+    "Chemistry reaction"
+   ],
+   "accessibility": {
+    "tier": "self-chem",
+    "weight": 1,
+    "reason": "Chemistry reaction from dispenser base"
+   },
+   "verifiedMechanics": [],
+   "boilingPoint": null,
+   "meltingPoint": null,
+   "nameRu": "политриновая кислота",
+   "descRu": "Крайне агрессивная кислота, способная быстро растворять широкий спектр материалов.",
+   "physicalDescRu": "кислотное"
+  },
   "RMCPotassium": {
    "id": "RMCPotassium",
    "name": "potassium",
@@ -67117,6 +67882,93 @@
    "physicalDescRu": "блестящее",
    "metabolismRate": 0.01,
    "antagScore": 1
+  },
+  "RMCPotassiumChlorophoride": {
+   "id": "RMCPotassiumChlorophoride",
+   "name": "RMC Potassium Chlorophoride",
+   "group": "",
+   "category": "Other",
+   "source": "stories_cm",
+   "color": "#FFFFFF",
+   "desc": "",
+   "physicalDesc": "crystalline",
+   "flavor": "",
+   "isBase": true,
+   "isDispenser": false,
+   "effects": "[Poison] Effect: Hypoxemic; [Poison] Effect: Toxic",
+   "effectTags": [],
+   "metabolismPaths": [
+    "Poison"
+   ],
+   "overdose": 20,
+   "criticalOverdose": null,
+   "recipe": null,
+   "obtainSources": [],
+   "accessibility": {
+    "tier": "unobtainable",
+    "weight": 999,
+    "reason": "No recipe, no plant, no dispenser source"
+   },
+   "verifiedMechanics": [
+    "[Poison] Effect: Hypoxemic",
+    "[Poison] Effect: Toxic"
+   ],
+   "boilingPoint": null,
+   "meltingPoint": null,
+   "nameRu": "хлорофорид калия",
+   "descRu": "Крайне опасное и токсичное химическое соединение.",
+   "physicalDescRu": "кристаллическое",
+   "metabolismRate": 0.1
+  },
+  "RMCPotassiumHydroxide": {
+   "id": "RMCPotassiumHydroxide",
+   "name": "RMC Potassium Hydroxide",
+   "group": "",
+   "category": "Other",
+   "source": "stories_cm",
+   "color": "#FFFFFF",
+   "desc": "",
+   "physicalDesc": "alkaline",
+   "flavor": "",
+   "isBase": false,
+   "isDispenser": false,
+   "effects": "",
+   "effectTags": [],
+   "metabolismPaths": [],
+   "overdose": null,
+   "criticalOverdose": null,
+   "recipe": {
+    "reactants": {
+     "Water": {
+      "amount": 1,
+      "catalyst": false
+     },
+     "RMCPotassium": {
+      "amount": 1,
+      "catalyst": false
+     }
+    },
+    "products": {
+     "RMCPotassiumHydroxide": 1
+    },
+    "minTemp": null,
+    "maxTemp": null,
+    "mixer": []
+   },
+   "obtainSources": [
+    "Chemistry reaction"
+   ],
+   "accessibility": {
+    "tier": "self-chem",
+    "weight": 1,
+    "reason": "Chemistry reaction from dispenser base"
+   },
+   "verifiedMechanics": [],
+   "boilingPoint": null,
+   "meltingPoint": null,
+   "nameRu": "гидроксид калия",
+   "descRu": "Вероятно, это взорвется до того, как вы успеете дочитать описание.",
+   "physicalDescRu": "щелочное"
   },
   "RMCPsilocybin": {
    "id": "RMCPsilocybin",
@@ -67159,7 +68011,7 @@
    "boilingPoint": null,
    "meltingPoint": null,
    "nameRu": "Псилоцибин",
-   "descRu": "Псилоцибин – это встречающееся в природе психоделическое пролекарство, вырабатываемое более чем 200 видами грибов, известных под общим названием псилоцибиновые грибы или волшебные грибы.",
+   "descRu": "Псилоцибин — это природное психоделическое пролекарство, вырабатываемое более чем 200 видами грибов, известных как псилоцибиновые грибы или волшебные грибы.",
    "physicalDescRu": "сиропообразное",
    "antagScore": 4
   },
@@ -67192,8 +68044,8 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
-   "nameRu": "R189",
-   "descRu": "Химическое вещество UPP горит при чрезвычайно высокой температуре и предназначено для плавления непосредственно через укрепленные позиции или бункеры.",
+   "nameRu": "Р189",
+   "descRu": "Химикат спецназначения (СПН), горящий при экстремально высокой температуре. Предназначен для проплавления укрепленных позиций или бункеров.",
    "physicalDescRu": "блестящее",
    "plantEffects": [
     {
@@ -67330,7 +68182,7 @@
    "boilingPoint": null,
    "meltingPoint": null,
    "nameRu": "Русский Красный",
-   "descRu": "Экстренная лучевая терапия. В список потенциальных побочных эффектов входят повреждение сетчатки и потеря сознания.",
+   "descRu": "Экстренное средство для лечения радиационного поражения. Список возможных побочных эффектов включает повреждение сетчатки и потерю сознания.",
    "physicalDescRu": "облачное",
    "antagScore": 2
   },
@@ -67565,7 +68417,7 @@
    "boilingPoint": null,
    "meltingPoint": null,
    "nameRu": "Космические наркотики",
-   "descRu": "Запрещенное соединение, вызывающее галлюцинации, зрительные артефакты и потерю равновесия.",
+   "descRu": "Запрещенное вещество, вызывающее галлюцинации, визуальные артефакты и потерю равновесия.",
    "physicalDescRu": "сиропообразное",
    "antagScore": 4
   },
@@ -67657,8 +68509,8 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
-   "nameRu": "окропляет",
-   "descRu": "Разноцветные кусочки сахара, которые обычно можно найти в пончиках. Любимый полицейскими.",
+   "nameRu": "посыпка",
+   "descRu": "Разноцветные маленькие кусочки сахара, которые часто можно увидеть на пончиках. Их очень любят полицейские.",
    "physicalDescRu": "сладкое",
    "metabolismRate": 0.1
   },
@@ -67798,7 +68650,7 @@
    "boilingPoint": null,
    "meltingPoint": null,
    "nameRu": "серная кислота",
-   "descRu": "Коррозионное химическое вещество.",
+   "descRu": "Едкий химикат. Держите подальше от лица.",
    "physicalDescRu": "масляное",
    "metabolismRate": 0.05
   },
@@ -67841,8 +68693,8 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
-   "nameRu": "Синтетическая кровь",
-   "descRu": "Разновидность белого латекса. Используется для охлаждения синтетических компонентов.",
+   "nameRu": "синтетическая кровь",
+   "descRu": "Форма белого латекса. Используется для охлаждения синтетических компонентов.",
    "physicalDescRu": "масляное",
    "antagScore": 2,
    "plantEffects": [
@@ -67855,6 +68707,37 @@
      "amount": 0.5
     }
    ]
+  },
+  "RMCTableSalt": {
+   "id": "RMCTableSalt",
+   "name": "table salt",
+   "group": "",
+   "category": "Other",
+   "source": "stories_cm",
+   "color": "#FFFFFF",
+   "desc": "Commonly known as salt, Sodium Chloride is often used to season food or kill borers instantly.",
+   "physicalDesc": "crystalline",
+   "flavor": "",
+   "isBase": true,
+   "isDispenser": false,
+   "effects": "",
+   "effectTags": [],
+   "metabolismPaths": [],
+   "overdose": null,
+   "criticalOverdose": null,
+   "recipe": null,
+   "obtainSources": [],
+   "accessibility": {
+    "tier": "unobtainable",
+    "weight": 999,
+    "reason": "No recipe, no plant, no dispenser source"
+   },
+   "verifiedMechanics": [],
+   "boilingPoint": null,
+   "meltingPoint": null,
+   "nameRu": "столовая соль",
+   "descRu": "Хлорид натрия, широко известный как соль, часто используется в качестве пищевой приправы или для мгновенного уничтожения мозговых червей.",
+   "physicalDescRu": "кристаллическое"
   },
   "RMCUltrazine": {
    "id": "RMCUltrazine",
@@ -67917,6 +68800,8 @@
    ],
    "boilingPoint": 212.0,
    "meltingPoint": 170.0,
+   "nameRu": "Ультразин",
+   "descRu": "Ультразин — сильнодействующий комбинированный стимулятор ЦНС и мышечной системы длительного действия. Вызывает крайне сильную зависимость.",
    "physicalDescRu": "заряжающее энергией",
    "antagScore": 3,
    "forkStatus": {
@@ -68013,10 +68898,68 @@
    ],
    "boilingPoint": null,
    "meltingPoint": null,
-   "nameRu": "Вирусная еда",
+   "nameRu": "еда для вируса",
    "descRu": "Смесь воды, молока и кислорода. Вирусные клетки могут использовать эту смесь для размножения.",
    "physicalDescRu": "непрозрачное",
    "metabolismRate": 0.1
+  },
+  "RMCWeldingFuel": {
+   "id": "RMCWeldingFuel",
+   "name": "RMC Welding Fuel",
+   "group": "Pyrotechnic",
+   "category": "Pyrotechnic",
+   "source": "stories_cm",
+   "color": "#660000",
+   "desc": "",
+   "physicalDesc": "oily",
+   "flavor": "",
+   "isBase": true,
+   "isDispenser": false,
+   "effects": "[Poison] Effect: Fueling; [Poison] Effect: Oxidizing; [Poison] Effect: Viscous; [Poison] Effect: Toxic",
+   "effectTags": [],
+   "metabolismPaths": [
+    "Poison"
+   ],
+   "overdose": null,
+   "criticalOverdose": null,
+   "recipe": null,
+   "obtainSources": [],
+   "accessibility": {
+    "tier": "unobtainable",
+    "weight": 999,
+    "reason": "No recipe, no plant, no dispenser source"
+   },
+   "verifiedMechanics": [
+    "On touch: Ignites target [Touch]",
+    "[Poison] Effect: Fueling",
+    "[Poison] Effect: Oxidizing",
+    "[Poison] Effect: Viscous",
+    "[Poison] Effect: Toxic"
+   ],
+   "boilingPoint": null,
+   "meltingPoint": null,
+   "nameRu": "сварочное топливо",
+   "descRu": "Жидкое топливо промышленного класса для паяльных ламп и сварки.",
+   "physicalDescRu": "масляное",
+   "metabolismRate": 0.1,
+   "plantEffects": [
+    {
+     "kind": "PlantAdjustWeeds",
+     "label": "Weeds",
+     "text": "Weeds -2",
+     "group": "weedpest",
+     "tone": "good",
+     "amount": -2
+    },
+    {
+     "kind": "PlantAdjustHealth",
+     "label": "Plant health",
+     "text": "Plant health -2",
+     "group": "care",
+     "tone": "bad",
+     "amount": -2
+    }
+   ]
   },
   "RMCXenoAlchBloodloss": {
    "id": "RMCXenoAlchBloodloss",
@@ -70804,6 +71747,60 @@
      "group": "care",
      "tone": "good",
      "amount": 0.7
+    }
+   ]
+  },
+  "STHunterBlood": {
+   "id": "STHunterBlood",
+   "name": "ST Hunter Blood",
+   "group": "Biological",
+   "category": "Biological",
+   "source": "stories_cm",
+   "color": "#5A934A",
+   "desc": "",
+   "physicalDesc": "st-reagent-physical-desc-hunter-blood",
+   "flavor": "acid",
+   "isBase": true,
+   "isDispenser": false,
+   "effects": "[Digestion] Thirst x1.0 (if MetabolizerTypeCondition); [Digestion] Heals Brute 3 (even) Heals Burn 1.25 (even) (if MetabolizerTypeCondition); [Bloodstream] Deals Poison 0.2",
+   "effectTags": [
+    "deals:poison",
+    "heals:brute",
+    "heals:burn",
+    "thirst"
+   ],
+   "metabolismPaths": [
+    "Digestion",
+    "Bloodstream"
+   ],
+   "overdose": null,
+   "criticalOverdose": null,
+   "recipe": null,
+   "obtainSources": [],
+   "accessibility": {
+    "tier": "unobtainable",
+    "weight": 999,
+    "reason": "No recipe, no plant, no dispenser source"
+   },
+   "verifiedMechanics": [
+    "[Digestion] Thirst x1.0 (if MetabolizerTypeCondition)",
+    "[Digestion] Heals Brute 3 (even) Heals Burn 1.25 (even) (if MetabolizerTypeCondition)",
+    "[Bloodstream] Deals Poison 0.2"
+   ],
+   "boilingPoint": null,
+   "meltingPoint": null,
+   "nameRu": "кровь охотника",
+   "descRu": "зеленая, светящаяся кровь.",
+   "physicalDescRu": "вязкая зеленая жидкость",
+   "antagScore": 2,
+   "plantEffects": [
+    {
+     "kind": "PlantAdjustWater",
+     "label": "Water",
+     "text": "Water +0.5",
+     "group": "care",
+     "tone": "good",
+     "amount": 0.5
     }
    ]
   },
@@ -77533,7 +78530,7 @@
    "boilingPoint": null,
    "meltingPoint": null,
    "nameRu": "швейцарский лимонад",
-   "descRu": "Забавно, но на самом деле это не швейцарское блюдо и в нем нет лимонов!",
+   "descRu": "Как ни странно, это на самом деле не швейцарский продукт, и в нём нет лимонов!",
    "physicalDescRu": "сладкое",
    "plantEffects": [
     {
@@ -89899,6 +90896,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "deltav": "modified",
     "funky": "modified"
    },
@@ -89931,7 +90929,8 @@
    "forkStatus": {
     "rmc14": "blocked",
     "cmu": "blocked",
-    "rucm": "blocked"
+    "rucm": "blocked",
+    "stories_cm": "blocked"
    }
   },
   "Admiralty": {
@@ -90105,6 +91104,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "monolith": "blocked",
     "misfits": "blocked"
    }
@@ -90133,7 +91133,8 @@
    "forkStatus": {
     "rmc14": "blocked",
     "cmu": "blocked",
-    "rucm": "blocked"
+    "rucm": "blocked",
+    "stories_cm": "blocked"
    }
   },
   "AlliesCocktail": {
@@ -90221,6 +91222,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "funky": "modified",
     "monolith": "modified",
     "adt": "modified",
@@ -90287,6 +91289,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "funky": "modified",
     "trauma": "modified",
     "monolith": "modified",
@@ -90386,6 +91389,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "misfits": "modified"
    },
    "forkNotes": {
@@ -90479,6 +91483,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "deadspace": "modified",
     "funky": "modified",
     "adt": "modified"
@@ -90834,6 +91839,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "frontier": "modified",
     "funky": "blocked",
     "misfits": "modified"
@@ -90868,6 +91874,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "goob": "modified",
     "starlight": "modified",
     "deltav": "modified",
@@ -90956,6 +91963,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "goob": "blocked",
     "starlight": "blocked",
     "deltav": "blocked",
@@ -90996,6 +92004,7 @@
     "rmc14": "modified",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "frontier": "modified",
     "funky": "modified",
     "omu": "modified",
@@ -91205,6 +92214,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "misfits": "modified"
    },
    "forkNotes": {
@@ -91433,7 +92443,8 @@
    "forkStatus": {
     "rmc14": "blocked",
     "cmu": "blocked",
-    "rucm": "blocked"
+    "rucm": "blocked",
+    "stories_cm": "blocked"
    }
   },
   "Antihol": {
@@ -91535,6 +92546,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "frontier": "blocked",
     "funky": "blocked",
     "omu": "blocked",
@@ -91593,7 +92605,8 @@
    "forkStatus": {
     "rmc14": "blocked",
     "cmu": "blocked",
-    "rucm": "blocked"
+    "rucm": "blocked",
+    "stories_cm": "blocked"
    }
   },
   "ArnoldPalmer": {
@@ -91620,7 +92633,8 @@
    "forkStatus": {
     "rmc14": "blocked",
     "cmu": "blocked",
-    "rucm": "blocked"
+    "rucm": "blocked",
+    "stories_cm": "blocked"
    }
   },
   "ArsonistsBrew": {
@@ -91682,6 +92696,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "funky": "blocked",
     "monolith": "blocked",
     "misfits": "blocked"
@@ -91738,6 +92753,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "misfits": "blocked"
    }
   },
@@ -91784,6 +92800,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "funky": "modified",
     "monolith": "modified",
     "misfits": "modified"
@@ -92039,6 +93056,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "goob": "modified",
     "starlight": "modified",
     "trauma": "modified",
@@ -92147,6 +93165,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "funky": "blocked",
     "monolith": "blocked",
     "misfits": "blocked"
@@ -92229,6 +93248,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "misfits": "modified"
    },
    "forkNotes": {
@@ -92258,7 +93278,8 @@
    "forkStatus": {
     "rmc14": "blocked",
     "cmu": "blocked",
-    "rucm": "blocked"
+    "rucm": "blocked",
+    "stories_cm": "blocked"
    }
   },
   "BananaHonk": {
@@ -92289,7 +93310,8 @@
    "forkStatus": {
     "rmc14": "blocked",
     "cmu": "blocked",
-    "rucm": "blocked"
+    "rucm": "blocked",
+    "stories_cm": "blocked"
    }
   },
   "BananaMilkshake": {
@@ -92432,6 +93454,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "funky": "blocked"
    }
   },
@@ -92642,6 +93665,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "misfits": "modified"
    },
    "forkNotes": {
@@ -92722,7 +93746,8 @@
    "forkStatus": {
     "rmc14": "blocked",
     "cmu": "blocked",
-    "rucm": "blocked"
+    "rucm": "blocked",
+    "stories_cm": "blocked"
    }
   },
   "BerryTea": {
@@ -92860,6 +93885,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "funky": "modified",
     "monolith": "blocked"
    },
@@ -92892,6 +93918,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "funky": "blocked",
     "monolith": "blocked"
    }
@@ -92921,6 +93948,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "funky": "blocked",
     "monolith": "blocked"
    }
@@ -92950,6 +93978,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "funky": "blocked"
    }
   },
@@ -93215,7 +94244,8 @@
    "forkStatus": {
     "rmc14": "blocked",
     "cmu": "blocked",
-    "rucm": "blocked"
+    "rucm": "blocked",
+    "stories_cm": "blocked"
    }
   },
   "BlankPaper": {
@@ -93317,7 +94347,8 @@
    "forkStatus": {
     "rmc14": "blocked",
     "cmu": "blocked",
-    "rucm": "blocked"
+    "rucm": "blocked",
+    "stories_cm": "blocked"
    }
   },
   "Blissifylovene": {
@@ -93373,6 +94404,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "frontier": "modified",
     "misfits": "modified"
    },
@@ -93432,6 +94464,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "sunrise": "blocked",
     "fish": "blocked"
    }
@@ -93495,6 +94528,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "misfits": "modified"
    },
    "forkNotes": {
@@ -93556,7 +94590,8 @@
    "impact": null,
    "forkStatus": {
     "cmu": "blocked",
-    "rucm": "blocked"
+    "rucm": "blocked",
+    "stories_cm": "blocked"
    }
   },
   "BlueFoam": {
@@ -93611,6 +94646,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "misfits": "modified"
    },
    "forkNotes": {
@@ -93705,7 +94741,8 @@
    "forkStatus": {
     "rmc14": "blocked",
     "cmu": "blocked",
-    "rucm": "blocked"
+    "rucm": "blocked",
+    "stories_cm": "blocked"
    }
   },
   "Bosozoku": {
@@ -93864,7 +94901,8 @@
    "forkStatus": {
     "rmc14": "blocked",
     "cmu": "blocked",
-    "rucm": "blocked"
+    "rucm": "blocked",
+    "stories_cm": "blocked"
    }
   },
   "Bronx": {
@@ -93898,6 +94936,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "monolith": "blocked",
     "misfits": "blocked"
    }
@@ -93959,6 +94998,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "funky": "modified",
     "misfits": "modified"
    },
@@ -93991,7 +95031,8 @@
    "forkStatus": {
     "rmc14": "blocked",
     "cmu": "blocked",
-    "rucm": "blocked"
+    "rucm": "blocked",
+    "stories_cm": "blocked"
    }
   },
   "BruizinePuncturase": {
@@ -94018,7 +95059,8 @@
    "forkStatus": {
     "rmc14": "blocked",
     "cmu": "blocked",
-    "rucm": "blocked"
+    "rucm": "blocked",
+    "stories_cm": "blocked"
    }
   },
   "Brutedon": {
@@ -94266,6 +95308,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "goob": "modified",
     "starlight": "modified",
     "deltav": "modified",
@@ -95202,7 +96245,8 @@
    "forkStatus": {
     "rmc14": "blocked",
     "cmu": "blocked",
-    "rucm": "blocked"
+    "rucm": "blocked",
+    "stories_cm": "blocked"
    }
   },
   "Caipirinha": {
@@ -95240,6 +96284,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "monolith": "blocked",
     "misfits": "blocked"
    }
@@ -95366,6 +96411,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "frontier": "blocked",
     "funky": "blocked",
     "omu": "blocked",
@@ -95399,6 +96445,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "frontier": "blocked",
     "funky": "blocked",
     "omu": "blocked",
@@ -95537,7 +96584,8 @@
    "forkStatus": {
     "rmc14": "blocked",
     "cmu": "blocked",
-    "rucm": "blocked"
+    "rucm": "blocked",
+    "stories_cm": "blocked"
    }
   },
   "CarribeanLovers": {
@@ -95847,7 +96895,8 @@
    "forkStatus": {
     "rmc14": "blocked",
     "cmu": "blocked",
-    "rucm": "blocked"
+    "rucm": "blocked",
+    "stories_cm": "blocked"
    }
   },
   "ChargedElectrovaeEmpExplosion": {
@@ -96073,6 +97122,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "deltav": "modified",
     "funky": "modified",
     "adt": "modified"
@@ -96108,7 +97158,8 @@
    "forkStatus": {
     "rmc14": "blocked",
     "cmu": "blocked",
-    "rucm": "blocked"
+    "rucm": "blocked",
+    "stories_cm": "blocked"
    }
   },
   "ChlorineTrifluorideDetonation": {
@@ -96454,7 +97505,8 @@
    "impact": null,
    "forkStatus": {
     "cmu": "blocked",
-    "rucm": "blocked"
+    "rucm": "blocked",
+    "stories_cm": "blocked"
    }
   },
   "CogChamp": {
@@ -96485,7 +97537,8 @@
    "forkStatus": {
     "rmc14": "blocked",
     "cmu": "blocked",
-    "rucm": "blocked"
+    "rucm": "blocked",
+    "stories_cm": "blocked"
    }
   },
   "Cognizine": {
@@ -96516,7 +97569,8 @@
    "forkStatus": {
     "rmc14": "blocked",
     "cmu": "blocked",
-    "rucm": "blocked"
+    "rucm": "blocked",
+    "stories_cm": "blocked"
    }
   },
   "Cola": {
@@ -96551,7 +97605,8 @@
    "forkStatus": {
     "rmc14": "blocked",
     "cmu": "blocked",
-    "rucm": "blocked"
+    "rucm": "blocked",
+    "stories_cm": "blocked"
    }
   },
   "Composting": {
@@ -96664,7 +97719,8 @@
    "forkStatus": {
     "rmc14": "blocked",
     "cmu": "blocked",
-    "rucm": "blocked"
+    "rucm": "blocked",
+    "stories_cm": "blocked"
    }
   },
   "CookingBechamel": {
@@ -96722,6 +97778,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "misfits": "blocked"
    }
   },
@@ -96753,7 +97810,8 @@
    "forkStatus": {
     "rmc14": "blocked",
     "cmu": "blocked",
-    "rucm": "blocked"
+    "rucm": "blocked",
+    "stories_cm": "blocked"
    }
   },
   "CookingKetchunaise": {
@@ -96780,7 +97838,8 @@
    "forkStatus": {
     "rmc14": "blocked",
     "cmu": "blocked",
-    "rucm": "blocked"
+    "rucm": "blocked",
+    "stories_cm": "blocked"
    }
   },
   "CookingKetchup": {
@@ -96807,7 +97866,8 @@
    "forkStatus": {
     "rmc14": "blocked",
     "cmu": "blocked",
-    "rucm": "blocked"
+    "rucm": "blocked",
+    "stories_cm": "blocked"
    }
   },
   "CookingMayoLemon": {
@@ -96839,6 +97899,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "frontier": "modified"
    },
    "forkNotes": {
@@ -96872,7 +97933,8 @@
    "impact": null,
    "forkStatus": {
     "cmu": "blocked",
-    "rucm": "blocked"
+    "rucm": "blocked",
+    "stories_cm": "blocked"
    }
   },
   "CookingMayoVinegar": {
@@ -96904,6 +97966,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "frontier": "modified"
    },
    "forkNotes": {
@@ -96934,7 +97997,8 @@
    "forkStatus": {
     "rmc14": "blocked",
     "cmu": "blocked",
-    "rucm": "blocked"
+    "rucm": "blocked",
+    "stories_cm": "blocked"
    }
   },
   "CookingPesto": {
@@ -96987,7 +98051,8 @@
    "forkStatus": {
     "rmc14": "blocked",
     "cmu": "blocked",
-    "rucm": "blocked"
+    "rucm": "blocked",
+    "stories_cm": "blocked"
    }
   },
   "CookingTomatoSauceCorn": {
@@ -97096,7 +98161,8 @@
    "forkStatus": {
     "rmc14": "blocked",
     "cmu": "blocked",
-    "rucm": "blocked"
+    "rucm": "blocked",
+    "stories_cm": "blocked"
    }
   },
   "CookingVinegar": {
@@ -97123,7 +98189,8 @@
    "forkStatus": {
     "rmc14": "blocked",
     "cmu": "blocked",
-    "rucm": "blocked"
+    "rucm": "blocked",
+    "stories_cm": "blocked"
    }
   },
   "Copium": {
@@ -97212,6 +98279,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "deltav": "blocked",
     "funky": "blocked",
     "monolith": "blocked",
@@ -97304,7 +98372,8 @@
    "forkStatus": {
     "rmc14": "blocked",
     "cmu": "blocked",
-    "rucm": "blocked"
+    "rucm": "blocked",
+    "stories_cm": "blocked"
    }
   },
   "Crabon": {
@@ -97407,7 +98476,8 @@
    "forkStatus": {
     "rmc14": "blocked",
     "cmu": "blocked",
-    "rucm": "blocked"
+    "rucm": "blocked",
+    "stories_cm": "blocked"
    }
   },
   "CreateBananaSoap": {
@@ -97457,6 +98527,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "goob": "modified",
     "starlight": "modified",
     "deltav": "modified",
@@ -97528,6 +98599,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "goob": "modified",
     "starlight": "modified",
     "deltav": "modified",
@@ -97582,7 +98654,8 @@
    "forkStatus": {
     "rmc14": "blocked",
     "cmu": "blocked",
-    "rucm": "blocked"
+    "rucm": "blocked",
+    "stories_cm": "blocked"
    }
   },
   "CreateCorgiPuppy": {
@@ -97632,6 +98705,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "misfits": "modified"
    },
    "forkNotes": {
@@ -97664,7 +98738,8 @@
    "forkStatus": {
     "rmc14": "blocked",
     "cmu": "blocked",
-    "rucm": "blocked"
+    "rucm": "blocked",
+    "stories_cm": "blocked"
    }
   },
   "CreateDispelCrystal": {
@@ -97710,6 +98785,7 @@
     "rmc14": "modified",
     "cmu": "modified",
     "rucm": "modified",
+    "stories_cm": "modified",
     "goob": "modified",
     "starlight": "modified",
     "deltav": "modified",
@@ -97727,6 +98803,7 @@
     "rmc14": "Flour amount 45->15; Water amount 15->10",
     "cmu": "Flour amount 45->15; Water amount 15->10",
     "rucm": "Flour amount 45->15; Water amount 15->10",
+    "stories_cm": "Flour amount 45->15; Water amount 15->10",
     "goob": "Flour amount 45->15; Water amount 15->10",
     "starlight": "Flour amount 45->15; Water amount 15->10",
     "deltav": "Flour amount 45->15; Water amount 15->10",
@@ -97768,6 +98845,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "goob": "modified",
     "starlight": "modified",
     "deltav": "modified",
@@ -97860,7 +98938,8 @@
    "impact": "Low",
    "forkStatus": {
     "cmu": "blocked",
-    "rucm": "blocked"
+    "rucm": "blocked",
+    "stories_cm": "blocked"
    }
   },
   "CreateMeatball": {
@@ -97918,6 +98997,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "goob": "modified",
     "starlight": "modified",
     "deltav": "modified",
@@ -98141,13 +99221,14 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "goob": "modified",
     "starlight": "modified",
     "deltav": "modified",
     "deadspace": "modified",
     "frontier": "modified",
     "funky": "blocked",
-    "omu": "blocked",
+    "omu": "modified",
     "monolith": "blocked",
     "adt": "modified",
     "sunrise": "modified",
@@ -98160,6 +99241,7 @@
     "deltav": "Fat amount 15->10; Lye amount 25->20; TableSalt amount 10->5",
     "deadspace": "Fat amount 15->10; Lye amount 25->20; TableSalt amount 10->5",
     "frontier": "Fat amount 15->10; Lye amount 25->20; TableSalt amount 10->5",
+    "omu": "Fat amount 15->10; Lye amount 25->20; TableSalt amount 10->5",
     "adt": "Fat amount 15->10; Lye amount 25->20; TableSalt amount 10->5",
     "sunrise": "Fat amount 15->10; Lye amount 25->20; TableSalt amount 10->5",
     "fish": "Fat amount 15->10; Lye amount 25->20; TableSalt amount 10->5"
@@ -98196,13 +99278,14 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "goob": "modified",
     "starlight": "modified",
     "deltav": "modified",
     "deadspace": "modified",
     "frontier": "modified",
     "funky": "blocked",
-    "omu": "blocked",
+    "omu": "modified",
     "monolith": "blocked",
     "adt": "modified",
     "sunrise": "modified",
@@ -98215,6 +99298,7 @@
     "deltav": "Lye amount 25->20; Oil amount 20->15; TableSalt amount 10->5",
     "deadspace": "Lye amount 25->20; Oil amount 20->15; TableSalt amount 10->5",
     "frontier": "Lye amount 25->20; Oil amount 20->15; TableSalt amount 10->5",
+    "omu": "Lye amount 25->20; Oil amount 20->15; TableSalt amount 10->5",
     "adt": "Lye amount 25->20; Oil amount 20->15; TableSalt amount 10->5",
     "sunrise": "Lye amount 25->20; Oil amount 20->15; TableSalt amount 10->5",
     "fish": "Lye amount 25->20; Oil amount 20->15; TableSalt amount 10->5"
@@ -98245,7 +99329,8 @@
    "impact": "Low",
    "forkStatus": {
     "cmu": "blocked",
-    "rucm": "blocked"
+    "rucm": "blocked",
+    "stories_cm": "blocked"
    }
   },
   "CreateSoapHomemadeLing": {
@@ -98301,15 +99386,15 @@
    "impact": "Low",
    "forkStatus": {
     "rmc14": "blocked",
-    "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "goob": "modified",
     "starlight": "modified",
     "deltav": "modified",
     "deadspace": "modified",
     "frontier": "modified",
     "funky": "blocked",
-    "omu": "blocked",
+    "omu": "modified",
     "monolith": "blocked",
     "adt": "modified",
     "sunrise": "modified",
@@ -98322,6 +99407,7 @@
     "deltav": "Lye amount 25->20; Oil amount 20->15; TableSalt amount 10->5",
     "deadspace": "Lye amount 25->20; Oil amount 20->15; TableSalt amount 10->5",
     "frontier": "Lye amount 25->20; Oil amount 20->15; TableSalt amount 10->5",
+    "omu": "Lye amount 25->20; Oil amount 20->15; TableSalt amount 10->5",
     "adt": "Lye amount 25->20; Oil amount 20->15; TableSalt amount 10->5",
     "sunrise": "Lye amount 25->20; Oil amount 20->15; TableSalt amount 10->5",
     "fish": "Lye amount 25->20; Oil amount 20->15; TableSalt amount 10->5"
@@ -98386,8 +99472,8 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "funky": "blocked",
-    "omu": "blocked",
     "monolith": "blocked",
     "misfits": "blocked"
    }
@@ -98418,15 +99504,15 @@
    "priority": -1,
    "forkStatus": {
     "rmc14": "blocked",
-    "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "goob": "modified",
     "starlight": "modified",
     "deltav": "modified",
     "deadspace": "modified",
     "frontier": "modified",
     "funky": "blocked",
-    "omu": "blocked",
+    "omu": "modified",
     "monolith": "blocked",
     "adt": "modified",
     "sunrise": "modified",
@@ -98439,6 +99525,7 @@
     "deltav": "Lye amount 30->15; Oil amount 20->10; TableSalt amount 10->5",
     "deadspace": "Lye amount 30->15; Oil amount 20->10; TableSalt amount 10->5",
     "frontier": "Lye amount 30->15; Oil amount 20->10; TableSalt amount 10->5; minTemp 373->383; Priority -1->None",
+    "omu": "Lye amount 30->15; Oil amount 20->10; TableSalt amount 10->5",
     "adt": "Lye amount 30->15; Oil amount 20->10; TableSalt amount 10->5",
     "sunrise": "Lye amount 30->15; Oil amount 20->10; TableSalt amount 10->5",
     "fish": "Lye amount 30->15; Oil amount 20->10; TableSalt amount 10->5"
@@ -98475,13 +99562,14 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "goob": "modified",
     "starlight": "modified",
     "deltav": "modified",
     "deadspace": "modified",
     "frontier": "modified",
     "funky": "blocked",
-    "omu": "blocked",
+    "omu": "modified",
     "monolith": "blocked",
     "adt": "modified",
     "sunrise": "modified",
@@ -98494,6 +99582,7 @@
     "deltav": "Lye amount 25->20; Oil amount 20->15; TableSalt amount 10->5",
     "deadspace": "Lye amount 25->20; Oil amount 20->15; TableSalt amount 10->5",
     "frontier": "Lye amount 25->20; Oil amount 20->15; TableSalt amount 10->5",
+    "omu": "Lye amount 25->20; Oil amount 20->15; TableSalt amount 10->5",
     "adt": "Lye amount 25->20; Oil amount 20->15; TableSalt amount 10->5",
     "sunrise": "Lye amount 25->20; Oil amount 20->15; TableSalt amount 10->5",
     "fish": "Lye amount 25->20; Oil amount 20->15; TableSalt amount 10->5"
@@ -98542,6 +99631,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "goob": "modified",
     "starlight": "modified",
     "deltav": "modified",
@@ -98616,7 +99706,8 @@
    "forkStatus": {
     "rmc14": "blocked",
     "cmu": "blocked",
-    "rucm": "blocked"
+    "rucm": "blocked",
+    "stories_cm": "blocked"
    }
   },
   "CreateZapCrystal": {
@@ -98688,6 +99779,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "monolith": "blocked",
     "misfits": "blocked"
    }
@@ -98811,6 +99903,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "adt": "modified"
    },
    "forkNotes": {
@@ -98845,7 +99938,8 @@
    "forkStatus": {
     "rmc14": "blocked",
     "cmu": "blocked",
-    "rucm": "blocked"
+    "rucm": "blocked",
+    "stories_cm": "blocked"
    }
   },
   "CrystalNormality": {
@@ -98905,6 +99999,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "trauma": "modified"
    },
    "forkNotes": {
@@ -98933,7 +100028,8 @@
    "forkStatus": {
     "rmc14": "blocked",
     "cmu": "blocked",
-    "rucm": "blocked"
+    "rucm": "blocked",
+    "stories_cm": "blocked"
    }
   },
   "CurdlingCurdCheese": {
@@ -99105,6 +100201,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "deltav": "blocked",
     "monolith": "blocked",
     "misfits": "blocked"
@@ -99347,6 +100444,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "misfits": "modified"
    },
    "forkNotes": {
@@ -99414,6 +100512,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "funky": "blocked"
    }
   },
@@ -99450,6 +100549,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "misfits": "blocked"
    }
   },
@@ -99510,6 +100610,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "misfits": "modified"
    },
    "forkNotes": {
@@ -99616,7 +100717,8 @@
    "forkStatus": {
     "rmc14": "blocked",
     "cmu": "blocked",
-    "rucm": "blocked"
+    "rucm": "blocked",
+    "stories_cm": "blocked"
    }
   },
   "DexalinPlus": {
@@ -99648,6 +100750,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "deltav": "blocked",
     "funky": "blocked"
    }
@@ -99676,7 +100779,8 @@
    "forkStatus": {
     "rmc14": "blocked",
     "cmu": "blocked",
-    "rucm": "blocked"
+    "rucm": "blocked",
+    "stories_cm": "blocked"
    }
   },
   "Diphenhydramine": {
@@ -99716,6 +100820,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "misfits": "modified"
    },
    "forkNotes": {
@@ -99751,6 +100856,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "deadspace": "modified"
    },
    "forkNotes": {
@@ -99931,6 +101037,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "misfits": "modified"
    },
    "forkNotes": {
@@ -99988,6 +101095,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "frontier": "modified",
     "monolith": "modified",
     "adt": "modified"
@@ -100111,6 +101219,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "funky": "blocked"
    }
   },
@@ -100142,7 +101251,8 @@
    "forkStatus": {
     "rmc14": "blocked",
     "cmu": "blocked",
-    "rucm": "blocked"
+    "rucm": "blocked",
+    "stories_cm": "blocked"
    }
   },
   "Ebifin": {
@@ -100231,6 +101341,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "frontier": "blocked",
     "funky": "blocked",
     "monolith": "blocked",
@@ -100268,6 +101379,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "monolith": "blocked",
     "misfits": "blocked"
    }
@@ -100347,6 +101459,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "monolith": "blocked",
     "misfits": "blocked"
    }
@@ -100384,6 +101497,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "misfits": "blocked"
    }
   },
@@ -100419,7 +101533,8 @@
    "forkStatus": {
     "rmc14": "blocked",
     "cmu": "blocked",
-    "rucm": "blocked"
+    "rucm": "blocked",
+    "stories_cm": "blocked"
    }
   },
   "Epoetine": {
@@ -100509,6 +101624,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "misfits": "modified"
    },
    "forkNotes": {
@@ -100542,6 +101658,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "monolith": "blocked",
     "misfits": "blocked"
    }
@@ -100570,7 +101687,8 @@
    "forkStatus": {
     "rmc14": "blocked",
     "cmu": "blocked",
-    "rucm": "blocked"
+    "rucm": "blocked",
+    "stories_cm": "blocked"
    }
   },
   "Ethyloxyephedrine": {
@@ -100598,6 +101716,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "goob": "modified",
     "trauma": "modified",
     "omu": "modified"
@@ -100637,6 +101756,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "funky": "modified"
    },
    "forkNotes": {
@@ -100727,7 +101847,8 @@
    "forkStatus": {
     "rmc14": "blocked",
     "cmu": "blocked",
-    "rucm": "blocked"
+    "rucm": "blocked",
+    "stories_cm": "blocked"
    }
   },
   "Felinase": {
@@ -100763,6 +101884,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "frontier": "blocked",
     "funky": "blocked",
     "omu": "blocked",
@@ -100869,7 +101991,8 @@
    "forkStatus": {
     "rmc14": "blocked",
     "cmu": "blocked",
-    "rucm": "blocked"
+    "rucm": "blocked",
+    "stories_cm": "blocked"
    }
   },
   "FeverDream": {
@@ -100927,7 +102050,8 @@
    "forkStatus": {
     "rmc14": "blocked",
     "cmu": "blocked",
-    "rucm": "blocked"
+    "rucm": "blocked",
+    "stories_cm": "blocked"
    }
   },
   "Firebolt": {
@@ -101082,6 +102206,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "misfits": "blocked"
    }
   },
@@ -101109,7 +102234,8 @@
    "forkStatus": {
     "rmc14": "blocked",
     "cmu": "blocked",
-    "rucm": "blocked"
+    "rucm": "blocked",
+    "stories_cm": "blocked"
    }
   },
   "FluorosulfuricAcid": {
@@ -101144,7 +102270,8 @@
    "forkStatus": {
     "rmc14": "blocked",
     "cmu": "blocked",
-    "rucm": "blocked"
+    "rucm": "blocked",
+    "stories_cm": "blocked"
    }
   },
   "Fluorosurfactant": {
@@ -101175,7 +102302,8 @@
    "forkStatus": {
     "rmc14": "blocked",
     "cmu": "blocked",
-    "rucm": "blocked"
+    "rucm": "blocked",
+    "stories_cm": "blocked"
    }
   },
   "Foam": {
@@ -101202,6 +102330,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "funky": "modified",
     "trauma": "modified",
     "monolith": "modified",
@@ -101238,7 +102367,8 @@
    "forkStatus": {
     "rmc14": "blocked",
     "cmu": "blocked",
-    "rucm": "blocked"
+    "rucm": "blocked",
+    "stories_cm": "blocked"
    }
   },
   "Formaldehyde": {
@@ -101322,7 +102452,8 @@
    "forkStatus": {
     "rmc14": "blocked",
     "cmu": "blocked",
-    "rucm": "blocked"
+    "rucm": "blocked",
+    "stories_cm": "blocked"
    }
   },
   "Fresium": {
@@ -101367,6 +102498,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "misfits": "modified"
    },
    "forkNotes": {
@@ -101502,6 +102634,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "misfits": "modified"
    },
    "forkNotes": {
@@ -101579,6 +102712,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "misfits": "modified"
    },
    "forkNotes": {
@@ -101638,6 +102772,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "deltav": "modified"
    },
    "forkNotes": {
@@ -101863,7 +102998,8 @@
    "impact": null,
    "forkStatus": {
     "cmu": "blocked",
-    "rucm": "blocked"
+    "rucm": "blocked",
+    "stories_cm": "blocked"
    }
   },
   "Grog": {
@@ -101895,6 +103031,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "deltav": "modified"
    },
    "forkNotes": {
@@ -102004,6 +103141,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "misfits": "blocked"
    }
   },
@@ -102093,7 +103231,8 @@
    "forkStatus": {
     "rmc14": "blocked",
     "cmu": "blocked",
-    "rucm": "blocked"
+    "rucm": "blocked",
+    "stories_cm": "blocked"
    }
   },
   "Happiness": {
@@ -102128,7 +103267,8 @@
    "forkStatus": {
     "rmc14": "blocked",
     "cmu": "blocked",
-    "rucm": "blocked"
+    "rucm": "blocked",
+    "stories_cm": "blocked"
    }
   },
   "HealiumRelease": {
@@ -102226,6 +103366,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "deltav": "modified",
     "funky": "modified",
     "adt": "modified"
@@ -102285,6 +103426,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "goob": "modified",
     "starlight": "modified",
     "deltav": "modified",
@@ -102333,6 +103475,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "goob": "blocked",
     "starlight": "blocked",
     "deltav": "blocked",
@@ -102439,7 +103582,8 @@
    "forkStatus": {
     "rmc14": "blocked",
     "cmu": "blocked",
-    "rucm": "blocked"
+    "rucm": "blocked",
+    "stories_cm": "blocked"
    }
   },
   "Holywater": {
@@ -102566,7 +103710,8 @@
    "forkStatus": {
     "rmc14": "blocked",
     "cmu": "blocked",
-    "rucm": "blocked"
+    "rucm": "blocked",
+    "stories_cm": "blocked"
    }
   },
   "HorsesNeck": {
@@ -102814,7 +103959,8 @@
    "forkStatus": {
     "rmc14": "blocked",
     "cmu": "blocked",
-    "rucm": "blocked"
+    "rucm": "blocked",
+    "stories_cm": "blocked"
    }
   },
   "HyperNobliumUERelease": {
@@ -102888,6 +104034,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "funky": "modified"
    },
    "forkNotes": {
@@ -102945,7 +104092,8 @@
    "impact": null,
    "forkStatus": {
     "cmu": "blocked",
-    "rucm": "blocked"
+    "rucm": "blocked",
+    "stories_cm": "blocked"
    }
   },
   "IceCream": {
@@ -102976,7 +104124,8 @@
    "forkStatus": {
     "rmc14": "blocked",
     "cmu": "blocked",
-    "rucm": "blocked"
+    "rucm": "blocked",
+    "stories_cm": "blocked"
    }
   },
   "IceCreamAppleCaramel": {
@@ -103537,7 +104686,8 @@
    "forkStatus": {
     "rmc14": "blocked",
     "cmu": "blocked",
-    "rucm": "blocked"
+    "rucm": "blocked",
+    "stories_cm": "blocked"
    }
   },
   "IcedBeerAlt": {
@@ -103592,7 +104742,8 @@
    "forkStatus": {
     "rmc14": "blocked",
     "cmu": "blocked",
-    "rucm": "blocked"
+    "rucm": "blocked",
+    "stories_cm": "blocked"
    }
   },
   "IcedGreenTea": {
@@ -103619,7 +104770,8 @@
    "forkStatus": {
     "rmc14": "blocked",
     "cmu": "blocked",
-    "rucm": "blocked"
+    "rucm": "blocked",
+    "stories_cm": "blocked"
    }
   },
   "IcedTea": {
@@ -103646,7 +104798,8 @@
    "forkStatus": {
     "rmc14": "blocked",
     "cmu": "blocked",
-    "rucm": "blocked"
+    "rucm": "blocked",
+    "stories_cm": "blocked"
    }
   },
   "Ichor": {
@@ -103738,6 +104891,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "fish": "modified"
    },
    "forkNotes": {
@@ -103772,7 +104926,8 @@
    "forkStatus": {
     "rmc14": "blocked",
     "cmu": "blocked",
-    "rucm": "blocked"
+    "rucm": "blocked",
+    "stories_cm": "blocked"
    }
   },
   "Inc": {
@@ -103893,6 +105048,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "funky": "modified"
    },
    "forkNotes": {
@@ -103949,7 +105105,8 @@
    "forkStatus": {
     "rmc14": "blocked",
     "cmu": "blocked",
-    "rucm": "blocked"
+    "rucm": "blocked",
+    "stories_cm": "blocked"
    }
   },
   "IrishBool": {
@@ -103977,6 +105134,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "goob": "modified",
     "starlight": "modified",
     "trauma": "modified",
@@ -104040,6 +105198,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "misfits": "modified"
    },
    "forkNotes": {
@@ -104070,7 +105229,8 @@
    "forkStatus": {
     "rmc14": "blocked",
     "cmu": "blocked",
-    "rucm": "blocked"
+    "rucm": "blocked",
+    "stories_cm": "blocked"
    }
   },
   "IrishSlammer": {
@@ -104098,6 +105258,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "goob": "blocked",
     "starlight": "blocked",
     "trauma": "blocked",
@@ -104133,6 +105294,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "funky": "modified",
     "trauma": "modified",
     "monolith": "modified",
@@ -104180,6 +105342,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "funky": "modified",
     "monolith": "blocked",
     "misfits": "blocked"
@@ -104389,6 +105552,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "monolith": "blocked",
     "misfits": "blocked"
    }
@@ -104418,6 +105582,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "monolith": "blocked",
     "misfits": "blocked"
    }
@@ -104447,6 +105612,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "funky": "blocked"
    }
   },
@@ -104517,7 +105683,8 @@
    "impact": null,
    "forkStatus": {
     "cmu": "blocked",
-    "rucm": "blocked"
+    "rucm": "blocked",
+    "stories_cm": "blocked"
    }
   },
   "LLB": {
@@ -104577,6 +105744,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "funky": "modified"
    },
    "forkNotes": {
@@ -104628,7 +105796,8 @@
    "forkStatus": {
     "rmc14": "blocked",
     "cmu": "blocked",
-    "rucm": "blocked"
+    "rucm": "blocked",
+    "stories_cm": "blocked"
    }
   },
   "Lean": {
@@ -104685,7 +105854,8 @@
    "forkStatus": {
     "rmc14": "blocked",
     "cmu": "blocked",
-    "rucm": "blocked"
+    "rucm": "blocked",
+    "stories_cm": "blocked"
    }
   },
   "LemonDrop": {
@@ -104745,6 +105915,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "misfits": "modified"
    },
    "forkNotes": {
@@ -104812,6 +105983,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "misfits": "modified"
    },
    "forkNotes": {
@@ -104900,7 +106072,8 @@
    "forkStatus": {
     "rmc14": "blocked",
     "cmu": "blocked",
-    "rucm": "blocked"
+    "rucm": "blocked",
+    "stories_cm": "blocked"
    }
   },
   "LeporazineInsu": {
@@ -105045,6 +106218,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "misfits": "modified"
    },
    "forkNotes": {
@@ -105102,6 +106276,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "goob": "modified",
     "frontier": "modified",
     "funky": "modified",
@@ -105146,7 +106321,8 @@
    "forkStatus": {
     "rmc14": "blocked",
     "cmu": "blocked",
-    "rucm": "blocked"
+    "rucm": "blocked",
+    "stories_cm": "blocked"
    }
   },
   "Lipozine": {
@@ -105177,7 +106353,8 @@
    "forkStatus": {
     "rmc14": "blocked",
     "cmu": "blocked",
-    "rucm": "blocked"
+    "rucm": "blocked",
+    "stories_cm": "blocked"
    }
   },
   "LongHaul": {
@@ -105249,6 +106426,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "misfits": "modified"
    },
    "forkNotes": {
@@ -105306,6 +106484,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "frontier": "blocked",
     "funky": "blocked",
     "omu": "blocked",
@@ -105372,7 +106551,8 @@
    "impact": null,
    "forkStatus": {
     "cmu": "blocked",
-    "rucm": "blocked"
+    "rucm": "blocked",
+    "stories_cm": "blocked"
    }
   },
   "MangoCooler": {
@@ -105402,7 +106582,8 @@
    "impact": null,
    "forkStatus": {
     "cmu": "blocked",
-    "rucm": "blocked"
+    "rucm": "blocked",
+    "stories_cm": "blocked"
    }
   },
   "Manhattan": {
@@ -105459,7 +106640,8 @@
    "forkStatus": {
     "rmc14": "blocked",
     "cmu": "blocked",
-    "rucm": "blocked"
+    "rucm": "blocked",
+    "stories_cm": "blocked"
    }
   },
   "ManlyDorf": {
@@ -105512,7 +106694,8 @@
    "forkStatus": {
     "rmc14": "blocked",
     "cmu": "blocked",
-    "rucm": "blocked"
+    "rucm": "blocked",
+    "stories_cm": "blocked"
    }
   },
   "Margarita": {
@@ -105540,6 +106723,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "funky": "modified"
    },
    "forkNotes": {
@@ -105717,6 +106901,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "monolith": "blocked",
     "misfits": "blocked"
    }
@@ -105746,6 +106931,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "frontier": "modified"
    },
    "forkNotes": {
@@ -105862,7 +107048,8 @@
    "forkStatus": {
     "rmc14": "blocked",
     "cmu": "blocked",
-    "rucm": "blocked"
+    "rucm": "blocked",
+    "stories_cm": "blocked"
    }
   },
   "MeatificationLing": {
@@ -105946,7 +107133,8 @@
    "impact": null,
    "forkStatus": {
     "cmu": "blocked",
-    "rucm": "blocked"
+    "rucm": "blocked",
+    "stories_cm": "blocked"
    }
   },
   "Mentats": {
@@ -106342,6 +107530,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "monolith": "blocked",
     "misfits": "blocked"
    }
@@ -106371,6 +107560,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "monolith": "blocked",
     "misfits": "blocked"
    }
@@ -106404,6 +107594,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "funky": "modified"
    },
    "forkNotes": {
@@ -106567,6 +107758,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "misfits": "modified"
    },
    "forkNotes": {
@@ -106638,6 +107830,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "monolith": "blocked",
     "misfits": "blocked"
    }
@@ -106751,6 +107944,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "monolith": "blocked",
     "misfits": "blocked"
    }
@@ -106898,6 +108092,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "goob": "modified",
     "starlight": "modified",
     "frontier": "modified",
@@ -107733,6 +108928,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "misfits": "modified"
    },
    "forkNotes": {
@@ -108220,6 +109416,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "goob": "modified",
     "trauma": "modified",
     "omu": "modified"
@@ -108254,7 +109451,8 @@
    "forkStatus": {
     "rmc14": "blocked",
     "cmu": "blocked",
-    "rucm": "blocked"
+    "rucm": "blocked",
+    "stories_cm": "blocked"
    }
   },
   "NotReadyVaccineFirst": {
@@ -108362,7 +109560,8 @@
    "forkStatus": {
     "rmc14": "blocked",
     "cmu": "blocked",
-    "rucm": "blocked"
+    "rucm": "blocked",
+    "stories_cm": "blocked"
    }
   },
   "NuclearColaBreakdown": {
@@ -108391,6 +109590,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "misfits": "blocked"
    }
   },
@@ -108452,7 +109652,8 @@
    "forkStatus": {
     "rmc14": "blocked",
     "cmu": "blocked",
-    "rucm": "blocked"
+    "rucm": "blocked",
+    "stories_cm": "blocked"
    }
   },
   "OasisCactus": {
@@ -108557,7 +109758,8 @@
    "forkStatus": {
     "rmc14": "blocked",
     "cmu": "blocked",
-    "rucm": "blocked"
+    "rucm": "blocked",
+    "stories_cm": "blocked"
    }
   },
   "OculineLing": {
@@ -108615,6 +109817,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "deltav": "modified",
     "funky": "modified"
    },
@@ -108735,6 +109938,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "goob": "modified",
     "funky": "modified",
     "trauma": "modified",
@@ -108810,6 +110014,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "frontier": "blocked",
     "omu": "blocked",
     "monolith": "blocked",
@@ -108971,6 +110176,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "misfits": "modified"
    },
    "forkNotes": {
@@ -109026,6 +110232,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "misfits": "modified"
    },
    "forkNotes": {
@@ -109061,6 +110268,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "sunrise": "modified",
     "fish": "modified"
    },
@@ -109254,6 +110462,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "goob": "blocked",
     "starlight": "blocked",
     "deltav": "blocked",
@@ -109325,7 +110534,8 @@
    "forkStatus": {
     "rmc14": "blocked",
     "cmu": "blocked",
-    "rucm": "blocked"
+    "rucm": "blocked",
+    "stories_cm": "blocked"
    }
   },
   "Phenol": {
@@ -109352,7 +110562,8 @@
    "forkStatus": {
     "rmc14": "blocked",
     "cmu": "blocked",
-    "rucm": "blocked"
+    "rucm": "blocked",
+    "stories_cm": "blocked"
    }
   },
   "Phenoxzine": {
@@ -109436,6 +110647,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "goob": "modified",
     "trauma": "modified",
     "omu": "modified",
@@ -109549,7 +110761,8 @@
    "forkStatus": {
     "rmc14": "blocked",
     "cmu": "blocked",
-    "rucm": "blocked"
+    "rucm": "blocked",
+    "stories_cm": "blocked"
    }
   },
   "PinaColada": {
@@ -109584,7 +110797,8 @@
    "forkStatus": {
     "rmc14": "blocked",
     "cmu": "blocked",
-    "rucm": "blocked"
+    "rucm": "blocked",
+    "stories_cm": "blocked"
    }
   },
   "PineappleBlast": {
@@ -109685,7 +110899,8 @@
    "forkStatus": {
     "rmc14": "blocked",
     "cmu": "blocked",
-    "rucm": "blocked"
+    "rucm": "blocked",
+    "stories_cm": "blocked"
    }
   },
   "PlasmaRelease": {
@@ -109755,6 +110970,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "goob": "modified",
     "omu": "modified"
    },
@@ -109831,7 +111047,8 @@
    "forkStatus": {
     "rmc14": "blocked",
     "cmu": "blocked",
-    "rucm": "blocked"
+    "rucm": "blocked",
+    "stories_cm": "blocked"
    }
   },
   "PopQuiz": {
@@ -109885,6 +111102,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "deltav": "modified"
    },
    "forkNotes": {
@@ -109940,7 +111158,8 @@
    "forkStatus": {
     "rmc14": "blocked",
     "cmu": "blocked",
-    "rucm": "blocked"
+    "rucm": "blocked",
+    "stories_cm": "blocked"
    }
   },
   "PotassiumIodide": {
@@ -109967,7 +111186,8 @@
    "forkStatus": {
     "rmc14": "blocked",
     "cmu": "blocked",
-    "rucm": "blocked"
+    "rucm": "blocked",
+    "stories_cm": "blocked"
    }
   },
   "Probital": {
@@ -110135,7 +111355,8 @@
    "forkStatus": {
     "rmc14": "blocked",
     "cmu": "blocked",
-    "rucm": "blocked"
+    "rucm": "blocked",
+    "stories_cm": "blocked"
    }
   },
   "ProteinCooking": {
@@ -110211,6 +111432,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "adt": "modified"
    },
    "forkNotes": {
@@ -110302,6 +111524,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "funky": "modified"
    },
    "forkNotes": {
@@ -110332,7 +111555,8 @@
    "forkStatus": {
     "rmc14": "blocked",
     "cmu": "blocked",
-    "rucm": "blocked"
+    "rucm": "blocked",
+    "stories_cm": "blocked"
    }
   },
   "Pyrazine": {
@@ -110364,6 +111588,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "funky": "modified"
    },
    "forkNotes": {
@@ -110490,6 +111715,28 @@
    "effects": "",
    "impact": null
   },
+  "RMCANFO": {
+   "id": "RMCANFO",
+   "source": "stories_cm",
+   "reactants": {
+    "RMCAmmoniumNitrate": {
+     "amount": 2,
+     "catalyst": false
+    },
+    "RMCWeldingFuel": {
+     "amount": 1,
+     "catalyst": false
+    }
+   },
+   "products": {
+    "RMCANFO": 2
+   },
+   "minTemp": null,
+   "maxTemp": null,
+   "mixer": [],
+   "effects": "Explosion",
+   "impact": null
+  },
   "RMCAluminiumMetalFoam": {
    "id": "RMCAluminiumMetalFoam",
    "source": "rmc14",
@@ -110516,8 +111763,53 @@
    "priority": 10,
    "forkStatus": {
     "cmu": "blocked",
-    "rucm": "blocked"
+    "rucm": "blocked",
+    "stories_cm": "blocked"
    }
+  },
+  "RMCAmmonia": {
+   "id": "RMCAmmonia",
+   "source": "stories_cm",
+   "reactants": {
+    "RMCHydrogen": {
+     "amount": 3,
+     "catalyst": false
+    },
+    "RMCNitrogen": {
+     "amount": 1,
+     "catalyst": false
+    }
+   },
+   "products": {
+    "RMCAmmonia": 3
+   },
+   "minTemp": null,
+   "maxTemp": null,
+   "mixer": [],
+   "effects": "",
+   "impact": null
+  },
+  "RMCAmmoniumNitrate": {
+   "id": "RMCAmmoniumNitrate",
+   "source": "stories_cm",
+   "reactants": {
+    "RMCAmmonia": {
+     "amount": 1,
+     "catalyst": false
+    },
+    "RMCPolytrinicAcid": {
+     "amount": 1,
+     "catalyst": false
+    }
+   },
+   "products": {
+    "RMCAmmoniumNitrate": 2
+   },
+   "minTemp": null,
+   "maxTemp": null,
+   "mixer": [],
+   "effects": "",
+   "impact": null
   },
   "RMCBatter": {
    "id": "RMCBatter",
@@ -110550,7 +111842,8 @@
    "impact": null,
    "forkStatus": {
     "cmu": "blocked",
-    "rucm": "blocked"
+    "rucm": "blocked",
+    "stories_cm": "blocked"
    }
   },
   "RMCCLF3": {
@@ -110632,7 +111925,8 @@
    "impact": null,
    "forkStatus": {
     "cmu": "blocked",
-    "rucm": "blocked"
+    "rucm": "blocked",
+    "stories_cm": "blocked"
    }
   },
   "RMCCitalopram": {
@@ -110689,6 +111983,28 @@
    "effects": "",
    "impact": null
   },
+  "RMCCyclonite": {
+   "id": "RMCCyclonite",
+   "source": "stories_cm",
+   "reactants": {
+    "RMCHexamine": {
+     "amount": 1,
+     "catalyst": false
+    },
+    "RMCPolytrinicAcid": {
+     "amount": 1,
+     "catalyst": false
+    }
+   },
+   "products": {
+    "RMCCyclonite": 1
+   },
+   "minTemp": null,
+   "maxTemp": null,
+   "mixer": [],
+   "effects": "",
+   "impact": null
+  },
   "RMCEthanoloxidation": {
    "id": "RMCEthanoloxidation",
    "source": "rmc14",
@@ -110734,8 +112050,62 @@
    "impact": null,
    "forkStatus": {
     "cmu": "blocked",
-    "rucm": "blocked"
+    "rucm": "blocked",
+    "stories_cm": "blocked"
    }
+  },
+  "RMCFormaldehyde": {
+   "id": "RMCFormaldehyde",
+   "source": "stories_cm",
+   "reactants": {
+    "RMCMethane": {
+     "amount": 1,
+     "catalyst": false
+    },
+    "RMCOxygen": {
+     "amount": 1,
+     "catalyst": false
+    },
+    "RMCPhoron": {
+     "amount": 1,
+     "catalyst": false
+    },
+    "RMCSilver": {
+     "amount": 5,
+     "catalyst": true
+    }
+   },
+   "products": {
+    "RMCFormaldehyde": 3
+   },
+   "minTemp": null,
+   "maxTemp": null,
+   "mixer": [],
+   "effects": "",
+   "impact": null,
+   "priority": 5
+  },
+  "RMCGlycerol": {
+   "id": "RMCGlycerol",
+   "source": "stories_cm",
+   "reactants": {
+    "RMCCornOil": {
+     "amount": 3,
+     "catalyst": false
+    },
+    "RMCSulphuricAcid": {
+     "amount": 1,
+     "catalyst": false
+    }
+   },
+   "products": {
+    "RMCGlycerol": 1
+   },
+   "minTemp": null,
+   "maxTemp": null,
+   "mixer": [],
+   "effects": "",
+   "impact": null
   },
   "RMCGrapeSoda": {
    "id": "RMCGrapeSoda",
@@ -110760,8 +112130,31 @@
    "impact": null,
    "forkStatus": {
     "cmu": "blocked",
-    "rucm": "blocked"
+    "rucm": "blocked",
+    "stories_cm": "blocked"
    }
+  },
+  "RMCHexamine": {
+   "id": "RMCHexamine",
+   "source": "stories_cm",
+   "reactants": {
+    "RMCAmmonia": {
+     "amount": 2,
+     "catalyst": false
+    },
+    "RMCFormaldehyde": {
+     "amount": 3,
+     "catalyst": false
+    }
+   },
+   "products": {
+    "RMCHexamine": 3
+   },
+   "minTemp": null,
+   "maxTemp": null,
+   "mixer": [],
+   "effects": "",
+   "impact": null
   },
   "RMCInstantApple": {
    "id": "RMCInstantApple",
@@ -110914,7 +112307,8 @@
    "priority": 10,
    "forkStatus": {
     "cmu": "blocked",
-    "rucm": "blocked"
+    "rucm": "blocked",
+    "stories_cm": "blocked"
    }
   },
   "RMCLexorin": {
@@ -110941,7 +112335,13 @@
    "maxTemp": null,
    "mixer": [],
    "effects": "",
-   "impact": null
+   "impact": null,
+   "forkStatus": {
+    "stories_cm": "modified"
+   },
+   "forkNotes": {
+    "stories_cm": "Priority None->5"
+   }
   },
   "RMCLipozine": {
    "id": "RMCLipozine",
@@ -111048,7 +112448,8 @@
    "impact": null,
    "forkStatus": {
     "cmu": "blocked",
-    "rucm": "blocked"
+    "rucm": "blocked",
+    "stories_cm": "blocked"
    }
   },
   "RMCMindbreakerToxin": {
@@ -111195,11 +112596,92 @@
    "effects": "",
    "impact": null,
    "forkStatus": {
-    "cmu": "modified"
+    "cmu": "modified",
+    "stories_cm": "modified"
    },
    "forkNotes": {
-    "cmu": "RMCNapalmSticky yield 2->1"
+    "cmu": "RMCNapalmSticky yield 2->1",
+    "stories_cm": "Added RMCWeldingFuel(1) reactant; Removed WeldingFuel reactant"
    }
+  },
+  "RMCNitroglycerin": {
+   "id": "RMCNitroglycerin",
+   "source": "stories_cm",
+   "reactants": {
+    "RMCGlycerol": {
+     "amount": 1,
+     "catalyst": false
+    },
+    "RMCPolytrinicAcid": {
+     "amount": 1,
+     "catalyst": false
+    },
+    "RMCSulphuricAcid": {
+     "amount": 1,
+     "catalyst": false
+    }
+   },
+   "products": {
+    "RMCNitroglycerin": 2
+   },
+   "minTemp": null,
+   "maxTemp": null,
+   "mixer": [],
+   "effects": "Explosion",
+   "impact": null
+  },
+  "RMCOctogen": {
+   "id": "RMCOctogen",
+   "source": "stories_cm",
+   "reactants": {
+    "RMCParaformaldehyde": {
+     "amount": 1,
+     "catalyst": false
+    },
+    "RMCAmmoniumNitrate": {
+     "amount": 1,
+     "catalyst": false
+    },
+    "RMCHexamine": {
+     "amount": 1,
+     "catalyst": false
+    },
+    "RMCPolytrinicAcid": {
+     "amount": 1,
+     "catalyst": false
+    }
+   },
+   "products": {
+    "RMCOctogen": 2
+   },
+   "minTemp": null,
+   "maxTemp": null,
+   "mixer": [],
+   "effects": "",
+   "impact": null,
+   "priority": 5
+  },
+  "RMCParaformaldehyde": {
+   "id": "RMCParaformaldehyde",
+   "source": "stories_cm",
+   "reactants": {
+    "RMCFormaldehyde": {
+     "amount": 1,
+     "catalyst": false
+    },
+    "RMCFrostOil": {
+     "amount": 1,
+     "catalyst": false
+    }
+   },
+   "products": {
+    "RMCParaformaldehyde": 1
+   },
+   "minTemp": null,
+   "maxTemp": null,
+   "mixer": [],
+   "effects": "",
+   "impact": null
   },
   "RMCParoxetine": {
    "id": "RMCParoxetine",
@@ -111237,6 +112719,32 @@
     "cmu": "Removed RMCBlackGoo reactant"
    }
   },
+  "RMCPolytrinicAcid": {
+   "id": "RMCPolytrinicAcid",
+   "source": "stories_cm",
+   "reactants": {
+    "RMCSulphuricAcid": {
+     "amount": 1,
+     "catalyst": false
+    },
+    "RMCChlorine": {
+     "amount": 1,
+     "catalyst": false
+    },
+    "RMCPotassium": {
+     "amount": 1,
+     "catalyst": false
+    }
+   },
+   "products": {
+    "RMCPolytrinicAcid": 3
+   },
+   "minTemp": null,
+   "maxTemp": null,
+   "mixer": [],
+   "effects": "",
+   "impact": null
+  },
   "RMCPotassiumExplosion": {
    "id": "RMCPotassiumExplosion",
    "source": "rmc14",
@@ -111257,6 +112765,28 @@
    "effects": "Explosion",
    "impact": "High",
    "priority": 20
+  },
+  "RMCPotassiumHydroxide": {
+   "id": "RMCPotassiumHydroxide",
+   "source": "stories_cm",
+   "reactants": {
+    "Water": {
+     "amount": 1,
+     "catalyst": false
+    },
+    "RMCPotassium": {
+     "amount": 1,
+     "catalyst": false
+    }
+   },
+   "products": {
+    "RMCPotassiumHydroxide": 1
+   },
+   "minTemp": null,
+   "maxTemp": null,
+   "mixer": [],
+   "effects": "Explosion",
+   "impact": null
   },
   "RMCSmoke": {
    "id": "RMCSmoke",
@@ -111372,7 +112902,13 @@
    "maxTemp": null,
    "mixer": [],
    "effects": "",
-   "impact": null
+   "impact": null,
+   "forkStatus": {
+    "stories_cm": "modified"
+   },
+   "forkNotes": {
+    "stories_cm": "Added product RMCTableSalt; Removed product TableSalt"
+   }
   },
   "RMCVirusFood": {
    "id": "RMCVirusFood",
@@ -111401,7 +112937,8 @@
    "impact": null,
    "forkStatus": {
     "cmu": "blocked",
-    "rucm": "blocked"
+    "rucm": "blocked",
+    "stories_cm": "blocked"
    }
   },
   "RMCVodka": {
@@ -111533,6 +113070,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "monolith": "blocked",
     "misfits": "blocked"
    }
@@ -111998,6 +113536,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "frontier": "modified",
     "funky": "modified",
     "omu": "modified",
@@ -112057,6 +113596,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "misfits": "blocked"
    }
   },
@@ -112139,7 +113679,8 @@
    "forkStatus": {
     "rmc14": "blocked",
     "cmu": "blocked",
-    "rucm": "blocked"
+    "rucm": "blocked",
+    "stories_cm": "blocked"
    }
   },
   "Rhigoxane": {
@@ -112246,7 +113787,8 @@
    "forkStatus": {
     "rmc14": "blocked",
     "cmu": "blocked",
-    "rucm": "blocked"
+    "rucm": "blocked",
+    "stories_cm": "blocked"
    }
   },
   "Romerol": {
@@ -112303,7 +113845,8 @@
    "forkStatus": {
     "rmc14": "blocked",
     "cmu": "blocked",
-    "rucm": "blocked"
+    "rucm": "blocked",
+    "stories_cm": "blocked"
    }
   },
   "RootMintBrew": {
@@ -112362,7 +113905,8 @@
    "forkStatus": {
     "rmc14": "blocked",
     "cmu": "blocked",
-    "rucm": "blocked"
+    "rucm": "blocked",
+    "stories_cm": "blocked"
    }
   },
   "Rubberneck": {
@@ -112393,7 +113937,8 @@
    "forkStatus": {
     "rmc14": "blocked",
     "cmu": "blocked",
-    "rucm": "blocked"
+    "rucm": "blocked",
+    "stories_cm": "blocked"
    }
   },
   "RumAndCoke": {
@@ -112535,6 +114080,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "misfits": "modified"
    },
    "forkNotes": {
@@ -112752,6 +114298,7 @@
     "rmc14": "modified",
     "cmu": "modified",
     "rucm": "modified",
+    "stories_cm": "modified",
     "frontier": "modified",
     "funky": "modified",
     "omu": "modified",
@@ -112762,6 +114309,7 @@
     "rmc14": "Removed mixer requirement",
     "cmu": "Removed mixer requirement",
     "rucm": "Removed mixer requirement",
+    "stories_cm": "Removed mixer requirement",
     "frontier": "Removed mixer requirement",
     "funky": "Removed mixer requirement",
     "omu": "Removed mixer requirement",
@@ -112844,6 +114392,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "misfits": "modified"
    },
    "forkNotes": {
@@ -112879,6 +114428,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "misfits": "blocked"
    }
   },
@@ -113011,7 +114561,8 @@
    "forkStatus": {
     "rmc14": "blocked",
     "cmu": "blocked",
-    "rucm": "blocked"
+    "rucm": "blocked",
+    "stories_cm": "blocked"
    }
   },
   "Sidecar": {
@@ -113041,7 +114592,8 @@
    "impact": null,
    "forkStatus": {
     "cmu": "blocked",
-    "rucm": "blocked"
+    "rucm": "blocked",
+    "stories_cm": "blocked"
    }
   },
   "Siderlac": {
@@ -113068,7 +114620,8 @@
    "forkStatus": {
     "rmc14": "blocked",
     "cmu": "blocked",
-    "rucm": "blocked"
+    "rucm": "blocked",
+    "stories_cm": "blocked"
    }
   },
   "Sievertadone": {
@@ -113138,6 +114691,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "funky": "modified"
    },
    "forkNotes": {
@@ -113172,7 +114726,8 @@
    "forkStatus": {
     "rmc14": "blocked",
     "cmu": "blocked",
-    "rucm": "blocked"
+    "rucm": "blocked",
+    "stories_cm": "blocked"
    }
   },
   "SilverSulfadiazine": {
@@ -113444,6 +114999,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "funky": "modified",
     "trauma": "modified",
     "monolith": "modified",
@@ -113480,7 +115036,8 @@
    "forkStatus": {
     "rmc14": "blocked",
     "cmu": "blocked",
-    "rucm": "blocked"
+    "rucm": "blocked",
+    "stories_cm": "blocked"
    }
   },
   "SodaWater": {
@@ -113616,7 +115173,8 @@
    "forkStatus": {
     "rmc14": "blocked",
     "cmu": "blocked",
-    "rucm": "blocked"
+    "rucm": "blocked",
+    "stories_cm": "blocked"
    }
   },
   "SodiumExplosion": {
@@ -113664,7 +115222,8 @@
    "forkStatus": {
     "rmc14": "blocked",
     "cmu": "blocked",
-    "rucm": "blocked"
+    "rucm": "blocked",
+    "stories_cm": "blocked"
    }
   },
   "SodiumPolyacrylate": {
@@ -113696,6 +115255,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "adt": "modified"
    },
    "forkNotes": {
@@ -113725,6 +115285,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "misfits": "modified"
    },
    "forkNotes": {
@@ -113774,6 +115335,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "misfits": "modified"
    },
    "forkNotes": {
@@ -113884,7 +115446,8 @@
    "forkStatus": {
     "rmc14": "blocked",
     "cmu": "blocked",
-    "rucm": "blocked"
+    "rucm": "blocked",
+    "stories_cm": "blocked"
    }
   },
   "SpaceCleaner": {
@@ -113912,6 +115475,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "misfits": "blocked"
    }
   },
@@ -113943,7 +115507,8 @@
    "forkStatus": {
     "rmc14": "blocked",
     "cmu": "blocked",
-    "rucm": "blocked"
+    "rucm": "blocked",
+    "stories_cm": "blocked"
    }
   },
   "SpaceGlue": {
@@ -113973,6 +115538,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "frontier": "modified",
     "funky": "modified",
     "omu": "modified",
@@ -114015,7 +115581,8 @@
    "forkStatus": {
     "rmc14": "blocked",
     "cmu": "blocked",
-    "rucm": "blocked"
+    "rucm": "blocked",
+    "stories_cm": "blocked"
    }
   },
   "Spaceacilin": {
@@ -114168,7 +115735,8 @@
    "forkStatus": {
     "rmc14": "blocked",
     "cmu": "blocked",
-    "rucm": "blocked"
+    "rucm": "blocked",
+    "stories_cm": "blocked"
    }
   },
   "StarsetSarsaparilla": {
@@ -114404,6 +115972,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "goob": "modified",
     "trauma": "modified",
     "omu": "modified",
@@ -114577,7 +116146,8 @@
    "forkStatus": {
     "rmc14": "blocked",
     "cmu": "blocked",
-    "rucm": "blocked"
+    "rucm": "blocked",
+    "stories_cm": "blocked"
    }
   },
   "SulfurBloodBreakdown": {
@@ -114607,6 +116177,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "goob": "blocked",
     "starlight": "blocked",
     "deltav": "blocked",
@@ -114647,7 +116218,8 @@
    "forkStatus": {
     "rmc14": "blocked",
     "cmu": "blocked",
-    "rucm": "blocked"
+    "rucm": "blocked",
+    "stories_cm": "blocked"
    }
   },
   "SunsetSoda": {
@@ -114791,7 +116363,8 @@
    "impact": null,
    "forkStatus": {
     "cmu": "blocked",
-    "rucm": "blocked"
+    "rucm": "blocked",
+    "stories_cm": "blocked"
    }
   },
   "Synaptizine": {
@@ -114822,7 +116395,8 @@
    "forkStatus": {
     "rmc14": "blocked",
     "cmu": "blocked",
-    "rucm": "blocked"
+    "rucm": "blocked",
+    "stories_cm": "blocked"
    }
   },
   "SyndicateBomb": {
@@ -114849,7 +116423,8 @@
    "forkStatus": {
     "rmc14": "blocked",
     "cmu": "blocked",
-    "rucm": "blocked"
+    "rucm": "blocked",
+    "stories_cm": "blocked"
    }
   },
   "SyndicateSpaceCleaner": {
@@ -115021,7 +116596,8 @@
    "forkStatus": {
     "rmc14": "blocked",
     "cmu": "blocked",
-    "rucm": "blocked"
+    "rucm": "blocked",
+    "stories_cm": "blocked"
    }
   },
   "TableSaltBreakdown": {
@@ -115102,6 +116678,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "goob": "modified",
     "trauma": "modified",
     "omu": "modified",
@@ -115367,6 +116944,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "goob": "blocked",
     "starlight": "blocked",
     "deltav": "blocked",
@@ -115516,7 +117094,8 @@
    "forkStatus": {
     "rmc14": "blocked",
     "cmu": "blocked",
-    "rucm": "blocked"
+    "rucm": "blocked",
+    "stories_cm": "blocked"
    }
   },
   "Tetracordrazine": {
@@ -115729,7 +117308,8 @@
    "forkStatus": {
     "rmc14": "blocked",
     "cmu": "blocked",
-    "rucm": "blocked"
+    "rucm": "blocked",
+    "stories_cm": "blocked"
    }
   },
   "TheSunAlsoRises": {
@@ -115757,6 +117337,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "monolith": "blocked",
     "misfits": "blocked"
    }
@@ -115818,6 +117399,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "adt": "modified"
    },
    "forkNotes": {
@@ -115874,7 +117456,8 @@
    "forkStatus": {
     "rmc14": "blocked",
     "cmu": "blocked",
-    "rucm": "blocked"
+    "rucm": "blocked",
+    "stories_cm": "blocked"
    }
   },
   "Tilenol": {
@@ -116006,6 +117589,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "monolith": "blocked",
     "misfits": "blocked"
    }
@@ -116098,7 +117682,8 @@
    "forkStatus": {
     "rmc14": "blocked",
     "cmu": "blocked",
-    "rucm": "blocked"
+    "rucm": "blocked",
+    "stories_cm": "blocked"
    }
   },
   "Tranquinase": {
@@ -116270,6 +117855,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "funky": "modified"
    },
    "forkNotes": {
@@ -116472,7 +118058,8 @@
    "forkStatus": {
     "rmc14": "blocked",
     "cmu": "blocked",
-    "rucm": "blocked"
+    "rucm": "blocked",
+    "stories_cm": "blocked"
    }
   },
   "Umbroxol": {
@@ -116526,7 +118113,8 @@
    "forkStatus": {
     "rmc14": "blocked",
     "cmu": "blocked",
-    "rucm": "blocked"
+    "rucm": "blocked",
+    "stories_cm": "blocked"
    }
   },
   "UnholyWater": {
@@ -116683,7 +118271,8 @@
    "forkStatus": {
     "rmc14": "blocked",
     "cmu": "blocked",
-    "rucm": "blocked"
+    "rucm": "blocked",
+    "stories_cm": "blocked"
    }
   },
   "UplinkDrink": {
@@ -116764,6 +118353,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "misfits": "blocked"
    }
   },
@@ -116943,6 +118533,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "monolith": "blocked",
     "misfits": "blocked"
    }
@@ -117061,7 +118652,8 @@
    "forkStatus": {
     "rmc14": "blocked",
     "cmu": "blocked",
-    "rucm": "blocked"
+    "rucm": "blocked",
+    "stories_cm": "blocked"
    }
   },
   "Vodka": {
@@ -117091,6 +118683,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "misfits": "blocked"
    }
   },
@@ -117394,7 +118987,8 @@
    "forkStatus": {
     "rmc14": "blocked",
     "cmu": "blocked",
-    "rucm": "blocked"
+    "rucm": "blocked",
+    "stories_cm": "blocked"
    }
   },
   "WatertoHolyWater": {
@@ -117420,6 +119014,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "sunrise": "blocked",
     "fish": "blocked",
     "misfits": "blocked"
@@ -117501,7 +119096,8 @@
    "forkStatus": {
     "rmc14": "blocked",
     "cmu": "blocked",
-    "rucm": "blocked"
+    "rucm": "blocked",
+    "stories_cm": "blocked"
    }
   },
   "WhiskeySoda": {
@@ -117561,6 +119157,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "monolith": "blocked",
     "misfits": "blocked"
    }
@@ -117589,7 +119186,8 @@
    "forkStatus": {
     "rmc14": "blocked",
     "cmu": "blocked",
-    "rucm": "blocked"
+    "rucm": "blocked",
+    "stories_cm": "blocked"
    }
   },
   "WhiteRussian": {
@@ -117617,6 +119215,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "misfits": "modified"
    },
    "forkNotes": {
@@ -117650,7 +119249,8 @@
    "impact": null,
    "forkStatus": {
     "cmu": "blocked",
-    "rucm": "blocked"
+    "rucm": "blocked",
+    "stories_cm": "blocked"
    }
   },
   "WizzFizz": {
@@ -117870,6 +119470,7 @@
     "rmc14": "blocked",
     "cmu": "blocked",
     "rucm": "blocked",
+    "stories_cm": "blocked",
     "misfits": "blocked"
    }
   },
@@ -118391,10 +119992,12 @@
   "RMCChocolateDrink",
   "RMCCocoMilk",
   "RMCCopper",
+  "RMCCornOil",
   "RMCCyanide",
   "RMCDrinkBase",
   "RMCEthanol",
   "RMCFluorine",
+  "RMCFrostOil",
   "RMCGenericToxin",
   "RMCGold",
   "RMCHydrochloricAcid",
@@ -118421,6 +120024,7 @@
   "RMCPhosphorus",
   "RMCPlatinum",
   "RMCPotassium",
+  "RMCPotassiumChlorophoride",
   "RMCPsilocybin",
   "RMCR189",
   "RMCRadium",
@@ -118436,10 +120040,12 @@
   "RMCSulfur",
   "RMCSulphuricAcid",
   "RMCSynthBlood",
+  "RMCTableSalt",
   "RMCTungsten",
   "RMCUltrazine",
   "RMCUranium",
   "RMCWater",
+  "RMCWeldingFuel",
   "RMCXenoAlchBloodloss",
   "RMCXenoAlchBrute",
   "RMCXenoAlchBurn",
@@ -118463,6 +120069,7 @@
   "Rororium",
   "RoyalJelly",
   "Rum",
+  "STHunterBlood",
   "SakuraJuice",
   "SanguinePerniculate",
   "Sap",
@@ -125508,6 +127115,216 @@
    "from": "RMCCLF3",
    "to": "RMCNapalmE",
    "reaction": "CMUNapalmE",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "Water",
+   "to": "RMCPotassiumHydroxide",
+   "reaction": "RMCPotassiumHydroxide",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "RMCPotassium",
+   "to": "RMCPotassiumHydroxide",
+   "reaction": "RMCPotassiumHydroxide",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "RMCHydrogen",
+   "to": "RMCAmmonia",
+   "reaction": "RMCAmmonia",
+   "amount": 3,
+   "catalyst": false
+  },
+  {
+   "from": "RMCNitrogen",
+   "to": "RMCAmmonia",
+   "reaction": "RMCAmmonia",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "RMCSulphuricAcid",
+   "to": "RMCPolytrinicAcid",
+   "reaction": "RMCPolytrinicAcid",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "RMCChlorine",
+   "to": "RMCPolytrinicAcid",
+   "reaction": "RMCPolytrinicAcid",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "RMCPotassium",
+   "to": "RMCPolytrinicAcid",
+   "reaction": "RMCPolytrinicAcid",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "RMCAmmonia",
+   "to": "RMCAmmoniumNitrate",
+   "reaction": "RMCAmmoniumNitrate",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "RMCPolytrinicAcid",
+   "to": "RMCAmmoniumNitrate",
+   "reaction": "RMCAmmoniumNitrate",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "RMCAmmoniumNitrate",
+   "to": "RMCANFO",
+   "reaction": "RMCANFO",
+   "amount": 2,
+   "catalyst": false
+  },
+  {
+   "from": "RMCWeldingFuel",
+   "to": "RMCANFO",
+   "reaction": "RMCANFO",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "RMCCornOil",
+   "to": "RMCGlycerol",
+   "reaction": "RMCGlycerol",
+   "amount": 3,
+   "catalyst": false
+  },
+  {
+   "from": "RMCSulphuricAcid",
+   "to": "RMCGlycerol",
+   "reaction": "RMCGlycerol",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "RMCGlycerol",
+   "to": "RMCNitroglycerin",
+   "reaction": "RMCNitroglycerin",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "RMCPolytrinicAcid",
+   "to": "RMCNitroglycerin",
+   "reaction": "RMCNitroglycerin",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "RMCSulphuricAcid",
+   "to": "RMCNitroglycerin",
+   "reaction": "RMCNitroglycerin",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "RMCMethane",
+   "to": "RMCFormaldehyde",
+   "reaction": "RMCFormaldehyde",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "RMCOxygen",
+   "to": "RMCFormaldehyde",
+   "reaction": "RMCFormaldehyde",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "RMCPhoron",
+   "to": "RMCFormaldehyde",
+   "reaction": "RMCFormaldehyde",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "RMCSilver",
+   "to": "RMCFormaldehyde",
+   "reaction": "RMCFormaldehyde",
+   "amount": 5,
+   "catalyst": true
+  },
+  {
+   "from": "RMCAmmonia",
+   "to": "RMCHexamine",
+   "reaction": "RMCHexamine",
+   "amount": 2,
+   "catalyst": false
+  },
+  {
+   "from": "RMCFormaldehyde",
+   "to": "RMCHexamine",
+   "reaction": "RMCHexamine",
+   "amount": 3,
+   "catalyst": false
+  },
+  {
+   "from": "RMCFormaldehyde",
+   "to": "RMCParaformaldehyde",
+   "reaction": "RMCParaformaldehyde",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "RMCFrostOil",
+   "to": "RMCParaformaldehyde",
+   "reaction": "RMCParaformaldehyde",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "RMCHexamine",
+   "to": "RMCCyclonite",
+   "reaction": "RMCCyclonite",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "RMCPolytrinicAcid",
+   "to": "RMCCyclonite",
+   "reaction": "RMCCyclonite",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "RMCParaformaldehyde",
+   "to": "RMCOctogen",
+   "reaction": "RMCOctogen",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "RMCAmmoniumNitrate",
+   "to": "RMCOctogen",
+   "reaction": "RMCOctogen",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "RMCHexamine",
+   "to": "RMCOctogen",
+   "reaction": "RMCOctogen",
+   "amount": 1,
+   "catalyst": false
+  },
+  {
+   "from": "RMCPolytrinicAcid",
+   "to": "RMCOctogen",
+   "reaction": "RMCOctogen",
    "amount": 1,
    "catalyst": false
   },
@@ -138693,6 +140510,33 @@
       "mismatch": true,
       "mismatchReason": "unobtainable ingredient present"
      },
+     "stories_cm": {
+      "tier": "impossible",
+      "effortScore": 2008,
+      "breakdown": {
+       "ingredients": [
+        {
+         "id": "ChloralHydrate",
+         "tier": "unobtainable",
+         "weight": 999,
+         "reason": "No recipe, no plant, no dispenser source"
+        },
+        {
+         "id": "Lexorin",
+         "tier": "unobtainable",
+         "weight": 999,
+         "reason": "No recipe, no plant, no dispenser source"
+        }
+       ],
+       "reactionDepth": 0,
+       "crossDepartmentPenalty": 0,
+       "temperatureConstraintPenalty": 0,
+       "unobtainablePenalty": 10
+      },
+      "authoredTier": "easy",
+      "mismatch": true,
+      "mismatchReason": "unobtainable ingredient present"
+     },
      "goob": {
       "tier": "hard",
       "effortScore": 10,
@@ -139288,6 +141132,39 @@
       "mismatchReason": "unobtainable ingredient present"
      },
      "rucm": {
+      "tier": "impossible",
+      "effortScore": 2008,
+      "breakdown": {
+       "ingredients": [
+        {
+         "id": "PolytrinicAcid",
+         "tier": "unobtainable",
+         "weight": 999,
+         "reason": "No recipe, no plant, no dispenser source"
+        },
+        {
+         "id": "Fluorosurfactant",
+         "tier": "unobtainable",
+         "weight": 999,
+         "reason": "No recipe, no plant, no dispenser source"
+        },
+        {
+         "id": "Water",
+         "tier": "dispenser",
+         "weight": 0,
+         "reason": "Chemical Dispenser"
+        }
+       ],
+       "reactionDepth": 0,
+       "crossDepartmentPenalty": 0,
+       "temperatureConstraintPenalty": 0,
+       "unobtainablePenalty": 10
+      },
+      "authoredTier": "medium",
+      "mismatch": true,
+      "mismatchReason": "unobtainable ingredient present"
+     },
+     "stories_cm": {
       "tier": "impossible",
       "effortScore": 2008,
       "breakdown": {
@@ -140009,6 +141886,33 @@
       "mismatch": true,
       "mismatchReason": ""
      },
+     "stories_cm": {
+      "tier": "trivial",
+      "effortScore": 0,
+      "breakdown": {
+       "ingredients": [
+        {
+         "id": "Potassium",
+         "tier": "dispenser",
+         "weight": 0,
+         "reason": "Chemical Dispenser"
+        },
+        {
+         "id": "Water",
+         "tier": "dispenser",
+         "weight": 0,
+         "reason": "Chemical Dispenser"
+        }
+       ],
+       "reactionDepth": 0,
+       "crossDepartmentPenalty": 0,
+       "temperatureConstraintPenalty": 0,
+       "unobtainablePenalty": 0
+      },
+      "authoredTier": "easy",
+      "mismatch": true,
+      "mismatchReason": ""
+     },
      "goob": {
       "tier": "trivial",
       "effortScore": 0,
@@ -140634,6 +142538,45 @@
       "mismatchReason": "unobtainable ingredient present"
      },
      "rucm": {
+      "tier": "impossible",
+      "effortScore": 1009,
+      "breakdown": {
+       "ingredients": [
+        {
+         "id": "Phosphorus",
+         "tier": "dispenser",
+         "weight": 0,
+         "reason": "Chemical Dispenser"
+        },
+        {
+         "id": "Potassium",
+         "tier": "dispenser",
+         "weight": 0,
+         "reason": "Chemical Dispenser"
+        },
+        {
+         "id": "Sugar",
+         "tier": "dispenser",
+         "weight": 0,
+         "reason": "Chemical Dispenser"
+        },
+        {
+         "id": "Lexorin",
+         "tier": "unobtainable",
+         "weight": 999,
+         "reason": "No recipe, no plant, no dispenser source"
+        }
+       ],
+       "reactionDepth": 0,
+       "crossDepartmentPenalty": 0,
+       "temperatureConstraintPenalty": 0,
+       "unobtainablePenalty": 10
+      },
+      "authoredTier": "medium",
+      "mismatch": true,
+      "mismatchReason": "unobtainable ingredient present"
+     },
+     "stories_cm": {
       "tier": "impossible",
       "effortScore": 1009,
       "breakdown": {
@@ -141491,6 +143434,39 @@
       "mismatch": true,
       "mismatchReason": "unobtainable ingredient present; cross-department ingredient(s)"
      },
+     "stories_cm": {
+      "tier": "impossible",
+      "effortScore": 1013,
+      "breakdown": {
+       "ingredients": [
+        {
+         "id": "Napalm",
+         "tier": "cross-botany",
+         "weight": 2,
+         "reason": "Requires Botany: lemonade (plant)"
+        },
+        {
+         "id": "Fluorosurfactant",
+         "tier": "unobtainable",
+         "weight": 999,
+         "reason": "No recipe, no plant, no dispenser source"
+        },
+        {
+         "id": "Water",
+         "tier": "dispenser",
+         "weight": 0,
+         "reason": "Chemical Dispenser"
+        }
+       ],
+       "reactionDepth": 0,
+       "crossDepartmentPenalty": 2,
+       "temperatureConstraintPenalty": 0,
+       "unobtainablePenalty": 10
+      },
+      "authoredTier": "hard",
+      "mismatch": true,
+      "mismatchReason": "unobtainable ingredient present; cross-department ingredient(s)"
+     },
      "goob": {
       "tier": "medium",
       "effortScore": 8,
@@ -142150,6 +144126,27 @@
       "mismatch": true,
       "mismatchReason": "cross-department ingredient(s)"
      },
+     "stories_cm": {
+      "tier": "easy",
+      "effortScore": 4,
+      "breakdown": {
+       "ingredients": [
+        {
+         "id": "Histamine",
+         "tier": "cross-botany",
+         "weight": 2,
+         "reason": "Requires Botany: nettle (plant)"
+        }
+       ],
+       "reactionDepth": 0,
+       "crossDepartmentPenalty": 2,
+       "temperatureConstraintPenalty": 0,
+       "unobtainablePenalty": 0
+      },
+      "authoredTier": "expert",
+      "mismatch": true,
+      "mismatchReason": "cross-department ingredient(s)"
+     },
      "goob": {
       "tier": "easy",
       "effortScore": 4,
@@ -142622,6 +144619,33 @@
       "mismatchReason": "unobtainable ingredient present"
      },
      "rucm": {
+      "tier": "impossible",
+      "effortScore": 2008,
+      "breakdown": {
+       "ingredients": [
+        {
+         "id": "ChloralHydrate",
+         "tier": "unobtainable",
+         "weight": 999,
+         "reason": "No recipe, no plant, no dispenser source"
+        },
+        {
+         "id": "Nocturine",
+         "tier": "unobtainable",
+         "weight": 999,
+         "reason": "No recipe, no plant, no dispenser source"
+        }
+       ],
+       "reactionDepth": 0,
+       "crossDepartmentPenalty": 0,
+       "temperatureConstraintPenalty": 0,
+       "unobtainablePenalty": 10
+      },
+      "authoredTier": "easy",
+      "mismatch": true,
+      "mismatchReason": "unobtainable ingredient present"
+     },
+     "stories_cm": {
       "tier": "impossible",
       "effortScore": 2008,
       "breakdown": {
@@ -143243,6 +145267,39 @@
       "mismatchReason": ""
      },
      "rucm": {
+      "tier": "trivial",
+      "effortScore": 0,
+      "breakdown": {
+       "ingredients": [
+        {
+         "id": "Aluminium",
+         "tier": "dispenser",
+         "weight": 0,
+         "reason": "Chemical Dispenser"
+        },
+        {
+         "id": "Potassium",
+         "tier": "dispenser",
+         "weight": 0,
+         "reason": "Chemical Dispenser"
+        },
+        {
+         "id": "Sulfur",
+         "tier": "dispenser",
+         "weight": 0,
+         "reason": "Chemical Dispenser"
+        }
+       ],
+       "reactionDepth": 0,
+       "crossDepartmentPenalty": 0,
+       "temperatureConstraintPenalty": 0,
+       "unobtainablePenalty": 0
+      },
+      "authoredTier": "easy",
+      "mismatch": true,
+      "mismatchReason": ""
+     },
+     "stories_cm": {
       "tier": "trivial",
       "effortScore": 0,
       "breakdown": {
@@ -143933,6 +145990,27 @@
       "mismatch": true,
       "mismatchReason": "cross-department ingredient(s)"
      },
+     "stories_cm": {
+      "tier": "easy",
+      "effortScore": 4,
+      "breakdown": {
+       "ingredients": [
+        {
+         "id": "ChlorineTrifluoride",
+         "tier": "cross-botany",
+         "weight": 2,
+         "reason": "Requires Botany: lemonade (plant)"
+        }
+       ],
+       "reactionDepth": 0,
+       "crossDepartmentPenalty": 2,
+       "temperatureConstraintPenalty": 0,
+       "unobtainablePenalty": 0
+      },
+      "authoredTier": "hard",
+      "mismatch": true,
+      "mismatchReason": "cross-department ingredient(s)"
+     },
      "goob": {
       "tier": "hard",
       "effortScore": 10,
@@ -144462,6 +146540,45 @@
       "mismatchReason": "unobtainable ingredient present"
      },
      "rucm": {
+      "tier": "impossible",
+      "effortScore": 1009,
+      "breakdown": {
+       "ingredients": [
+        {
+         "id": "Phosphorus",
+         "tier": "dispenser",
+         "weight": 0,
+         "reason": "Chemical Dispenser"
+        },
+        {
+         "id": "Potassium",
+         "tier": "dispenser",
+         "weight": 0,
+         "reason": "Chemical Dispenser"
+        },
+        {
+         "id": "Sugar",
+         "tier": "dispenser",
+         "weight": 0,
+         "reason": "Chemical Dispenser"
+        },
+        {
+         "id": "UnstableMutagen",
+         "tier": "unobtainable",
+         "weight": 999,
+         "reason": "No recipe, no plant, no dispenser source"
+        }
+       ],
+       "reactionDepth": 0,
+       "crossDepartmentPenalty": 0,
+       "temperatureConstraintPenalty": 0,
+       "unobtainablePenalty": 10
+      },
+      "authoredTier": "medium",
+      "mismatch": true,
+      "mismatchReason": "unobtainable ingredient present"
+     },
+     "stories_cm": {
       "tier": "impossible",
       "effortScore": 1009,
       "breakdown": {
@@ -145254,6 +147371,27 @@
       "mismatch": true,
       "mismatchReason": "cross-department ingredient(s)"
      },
+     "stories_cm": {
+      "tier": "easy",
+      "effortScore": 4,
+      "breakdown": {
+       "ingredients": [
+        {
+         "id": "ChlorineTrifluoride",
+         "tier": "cross-botany",
+         "weight": 2,
+         "reason": "Requires Botany: lemonade (plant)"
+        }
+       ],
+       "reactionDepth": 0,
+       "crossDepartmentPenalty": 2,
+       "temperatureConstraintPenalty": 0,
+       "unobtainablePenalty": 0
+      },
+      "authoredTier": "hard",
+      "mismatch": true,
+      "mismatchReason": "cross-department ingredient(s)"
+     },
      "goob": {
       "tier": "hard",
       "effortScore": 10,
@@ -145728,6 +147866,33 @@
       "mismatchReason": "unobtainable ingredient present; cross-department ingredient(s)"
      },
      "rucm": {
+      "tier": "impossible",
+      "effortScore": 1013,
+      "breakdown": {
+       "ingredients": [
+        {
+         "id": "MuteToxin",
+         "tier": "cross-botany",
+         "weight": 2,
+         "reason": "Requires Botany: mimana (plant)"
+        },
+        {
+         "id": "Lexorin",
+         "tier": "unobtainable",
+         "weight": 999,
+         "reason": "No recipe, no plant, no dispenser source"
+        }
+       ],
+       "reactionDepth": 0,
+       "crossDepartmentPenalty": 2,
+       "temperatureConstraintPenalty": 0,
+       "unobtainablePenalty": 10
+      },
+      "authoredTier": "medium",
+      "mismatch": true,
+      "mismatchReason": "unobtainable ingredient present; cross-department ingredient(s)"
+     },
+     "stories_cm": {
       "tier": "impossible",
       "effortScore": 1013,
       "breakdown": {
@@ -146314,6 +148479,27 @@
       "mismatch": true,
       "mismatchReason": "unobtainable ingredient present"
      },
+     "stories_cm": {
+      "tier": "impossible",
+      "effortScore": 1009,
+      "breakdown": {
+       "ingredients": [
+        {
+         "id": "Romerol",
+         "tier": "unobtainable",
+         "weight": 999,
+         "reason": "No recipe, no plant, no dispenser source"
+        }
+       ],
+       "reactionDepth": 0,
+       "crossDepartmentPenalty": 0,
+       "temperatureConstraintPenalty": 0,
+       "unobtainablePenalty": 10
+      },
+      "authoredTier": "hard",
+      "mismatch": true,
+      "mismatchReason": "unobtainable ingredient present"
+     },
      "goob": {
       "tier": "impossible",
       "effortScore": 1009,
@@ -146778,6 +148964,27 @@
       "mismatch": true,
       "mismatchReason": "unobtainable ingredient present"
      },
+     "stories_cm": {
+      "tier": "impossible",
+      "effortScore": 1009,
+      "breakdown": {
+       "ingredients": [
+        {
+         "id": "Hemorrhinol",
+         "tier": "unobtainable",
+         "weight": 999,
+         "reason": "No recipe, no plant, no dispenser source"
+        }
+       ],
+       "reactionDepth": 0,
+       "crossDepartmentPenalty": 0,
+       "temperatureConstraintPenalty": 0,
+       "unobtainablePenalty": 10
+      },
+      "authoredTier": "medium",
+      "mismatch": true,
+      "mismatchReason": "unobtainable ingredient present"
+     },
      "goob": {
       "tier": "hard",
       "effortScore": 10,
@@ -147221,6 +149428,27 @@
       "mismatchReason": "unobtainable ingredient present"
      },
      "rucm": {
+      "tier": "impossible",
+      "effortScore": 1009,
+      "breakdown": {
+       "ingredients": [
+        {
+         "id": "Tazinide",
+         "tier": "unobtainable",
+         "weight": 999,
+         "reason": "No recipe, no plant, no dispenser source"
+        }
+       ],
+       "reactionDepth": 0,
+       "crossDepartmentPenalty": 0,
+       "temperatureConstraintPenalty": 0,
+       "unobtainablePenalty": 10
+      },
+      "authoredTier": "expert",
+      "mismatch": true,
+      "mismatchReason": "unobtainable ingredient present"
+     },
+     "stories_cm": {
       "tier": "impossible",
       "effortScore": 1009,
       "breakdown": {
@@ -147741,6 +149969,39 @@
       "mismatchReason": "unobtainable ingredient present; cross-department ingredient(s)"
      },
      "rucm": {
+      "tier": "impossible",
+      "effortScore": 1015,
+      "breakdown": {
+       "ingredients": [
+        {
+         "id": "Stimulants",
+         "tier": "unobtainable",
+         "weight": 999,
+         "reason": "No recipe, no plant, no dispenser source"
+        },
+        {
+         "id": "Dexalin",
+         "tier": "cross-botany",
+         "weight": 2,
+         "reason": "Requires Botany: Mango (plant)"
+        },
+        {
+         "id": "Tricordrazine",
+         "tier": "cross-botany",
+         "weight": 2,
+         "reason": "Requires Botany: ambrosia nobilis (plant)"
+        }
+       ],
+       "reactionDepth": 0,
+       "crossDepartmentPenalty": 2,
+       "temperatureConstraintPenalty": 0,
+       "unobtainablePenalty": 10
+      },
+      "authoredTier": "medium",
+      "mismatch": true,
+      "mismatchReason": "unobtainable ingredient present; cross-department ingredient(s)"
+     },
+     "stories_cm": {
       "tier": "impossible",
       "effortScore": 1015,
       "breakdown": {
@@ -148493,6 +150754,45 @@
       "mismatchReason": "unobtainable ingredient present"
      },
      "rucm": {
+      "tier": "impossible",
+      "effortScore": 1009,
+      "breakdown": {
+       "ingredients": [
+        {
+         "id": "Phosphorus",
+         "tier": "dispenser",
+         "weight": 0,
+         "reason": "Chemical Dispenser"
+        },
+        {
+         "id": "Potassium",
+         "tier": "dispenser",
+         "weight": 0,
+         "reason": "Chemical Dispenser"
+        },
+        {
+         "id": "Sugar",
+         "tier": "dispenser",
+         "weight": 0,
+         "reason": "Chemical Dispenser"
+        },
+        {
+         "id": "TearGas",
+         "tier": "unobtainable",
+         "weight": 999,
+         "reason": "No recipe, no plant, no dispenser source"
+        }
+       ],
+       "reactionDepth": 0,
+       "crossDepartmentPenalty": 0,
+       "temperatureConstraintPenalty": 0,
+       "unobtainablePenalty": 10
+      },
+      "authoredTier": "medium",
+      "mismatch": true,
+      "mismatchReason": "unobtainable ingredient present"
+     },
+     "stories_cm": {
       "tier": "impossible",
       "effortScore": 1009,
       "breakdown": {
@@ -149317,6 +151617,33 @@
       "mismatch": true,
       "mismatchReason": "unobtainable ingredient present; cross-department ingredient(s)"
      },
+     "stories_cm": {
+      "tier": "impossible",
+      "effortScore": 1013,
+      "breakdown": {
+       "ingredients": [
+        {
+         "id": "Happiness",
+         "tier": "cross-botany",
+         "weight": 2,
+         "reason": "Requires Botany: rainbow cannabis (plant)"
+        },
+        {
+         "id": "Honk",
+         "tier": "unobtainable",
+         "weight": 999,
+         "reason": "No recipe, no plant, no dispenser source"
+        }
+       ],
+       "reactionDepth": 0,
+       "crossDepartmentPenalty": 2,
+       "temperatureConstraintPenalty": 0,
+       "unobtainablePenalty": 10
+      },
+      "authoredTier": "easy",
+      "mismatch": true,
+      "mismatchReason": "unobtainable ingredient present; cross-department ingredient(s)"
+     },
      "goob": {
       "tier": "expert",
       "effortScore": 16,
@@ -149910,6 +152237,33 @@
       "mismatch": true,
       "mismatchReason": "unobtainable ingredient present"
      },
+     "stories_cm": {
+      "tier": "impossible",
+      "effortScore": 2008,
+      "breakdown": {
+       "ingredients": [
+        {
+         "id": "Felinase",
+         "tier": "unobtainable",
+         "weight": 999,
+         "reason": "No recipe, no plant, no dispenser source"
+        },
+        {
+         "id": "Caninase",
+         "tier": "unobtainable",
+         "weight": 999,
+         "reason": "No recipe, no plant, no dispenser source"
+        }
+       ],
+       "reactionDepth": 0,
+       "crossDepartmentPenalty": 0,
+       "temperatureConstraintPenalty": 0,
+       "unobtainablePenalty": 10
+      },
+      "authoredTier": "expert",
+      "mismatch": true,
+      "mismatchReason": "unobtainable ingredient present"
+     },
      "goob": {
       "tier": "hard",
       "effortScore": 11,
@@ -150473,6 +152827,27 @@
       "mismatch": false,
       "mismatchReason": ""
      },
+     "stories_cm": {
+      "tier": "easy",
+      "effortScore": 4,
+      "breakdown": {
+       "ingredients": [
+        {
+         "id": "Thermite",
+         "tier": "cross-botany",
+         "weight": 2,
+         "reason": "Requires Botany: ghost pepper (plant)"
+        }
+       ],
+       "reactionDepth": 0,
+       "crossDepartmentPenalty": 2,
+       "temperatureConstraintPenalty": 0,
+       "unobtainablePenalty": 0
+      },
+      "authoredTier": "easy",
+      "mismatch": false,
+      "mismatchReason": ""
+     },
      "goob": {
       "tier": "medium",
       "effortScore": 5,
@@ -150940,6 +153315,27 @@
       "authoredTier": "easy",
       "mismatch": true,
       "mismatchReason": "cross-department ingredient(s)"
+     },
+     "stories_cm": {
+      "tier": "impossible",
+      "effortScore": 1009,
+      "breakdown": {
+       "ingredients": [
+        {
+         "id": "AU14DrugSpeedDemon",
+         "tier": "unobtainable",
+         "weight": 999,
+         "reason": "reagent 'AU14DrugSpeedDemon' not found in extractor data"
+        }
+       ],
+       "reactionDepth": 0,
+       "crossDepartmentPenalty": 0,
+       "temperatureConstraintPenalty": 0,
+       "unobtainablePenalty": 10
+      },
+      "authoredTier": "easy",
+      "mismatch": true,
+      "mismatchReason": "unobtainable ingredient present"
      },
      "goob": {
       "tier": "impossible",
