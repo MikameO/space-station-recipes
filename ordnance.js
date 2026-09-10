@@ -95,8 +95,18 @@
     'fire intensity': 'интенсивность огня',
     'fire reach': 'охват огня',
     'is the same across every mixture here': 'одинаков для всех смесей здесь',
+    'Colour': 'Цвет', 'Height': 'Высота',
+    'Power': 'Мощность',
+    'Blast radius': 'Радиус волны',
+    'Peak damage': 'Урон в эпицентре',
+    'Shrapnel': 'Осколки',
+    'Fire intensity': 'Интенсивность огня',
+    'Burn time': 'Длительность горения',
+    'Fire reach': 'Охват огня',
+    'same everywhere': 'одинаково везде',
   };
   const tr = s => (window.I18N_LANG === 'ru' && RU[s]) || s;
+  const mlabel = key => tr(METRICS[key].label);
 
   function casingOf() { return S.data.casings[S.casing]; }
   function volUsed() { return Object.values(S.mix).reduce((a, b) => a + b, 0); }
@@ -722,11 +732,12 @@
     // A metric that is identical everywhere carries no shape. Say so, rather than
     // normalising it to zero and painting the whole surface the darkest stop.
     const flatColour = !isFinite(cLo) || cHi === cLo;
+    const flatHeight = !isFinite(hLo) || hHi === hLo;
     if (!isFinite(cLo)) { cLo = 0; cHi = 1; }
     if (cHi === cLo) cHi = cLo + 1;
     if (!isFinite(hLo)) { hLo = 0; hHi = 1; }
     if (hHi === hLo) hHi = hLo + 1;
-    return { N, cells, cLo, cHi, hLo, hHi, cap, best, flatColour };
+    return { N, cells, cLo, cHi, hLo, hHi, cap, best, flatColour, flatHeight };
   }
 
   function renderHeat() {
@@ -740,6 +751,7 @@
       if (cell) { S.pick.mix = cell.mix; S.pick.st = cell.st; }
     }
     if (S.surfView === '3d') renderSurface3D(g); else renderFlat(g);
+    renderScale(g);
     renderHeatNote(g);
     renderPick();
   }
@@ -923,16 +935,60 @@
     ctx.restore();
   }
 
+  // The ramp is normalised to whatever the current view spans, so the same green
+  // can mean 0 in one view and 8 in the next. Without this strip the colours are
+  // not readable as values at all.
+  function renderScale(g) {
+    const box = $('ordScale');
+    const colour = METRICS[S.heatMetric];
+    const swatch = k => 'rgb(' + rampRGB(k).join(',') + ')';
+
+    if (g.flatColour) {
+      box.innerHTML = '<div class="ord-scale-row">'
+        + '<span class="ord-scale-cap">' + esc(tr('Colour')) + ' \u00b7 '
+        + esc(mlabel(S.heatMetric)) + '</span>'
+        + '<span class="ord-scale-flat" style="background:' + swatch(0.62) + '"></span>'
+        + '<span class="ord-scale-const">' + esc(tr('same everywhere')) + ': '
+        + esc(round(g.cLo, 2)) + '</span></div>' + heightRow(g);
+      return;
+    }
+    const stops = [];
+    for (let k = 0; k <= 8; k++) stops.push(swatch(k / 8) + ' ' + (k / 8 * 100).toFixed(0) + '%');
+    const mid = (g.cLo + g.cHi) / 2;
+    box.innerHTML = '<div class="ord-scale-row">'
+      + '<span class="ord-scale-cap">' + esc(tr('Colour')) + ' \u00b7 '
+      + esc(mlabel(S.heatMetric)) + '</span>'
+      + '<span class="ord-scale-bar" style="background:linear-gradient(to right,'
+      + stops.join(',') + ')"></span></div>'
+      + '<div class="ord-scale-ticks"><span>' + esc(round(g.cLo, 2)) + '</span>'
+      + '<span>' + esc(round(mid, 2)) + '</span>'
+      + '<span>' + esc(round(g.cHi, 2)) + '</span></div>'
+      + heightRow(g);
+  }
+
+  // In 3D the vertical axis is normalised the same way and deserves the same note.
+  function heightRow(g) {
+    if (S.surfView !== '3d') return '';
+    const height = METRICS[S.heatHeight];
+    return '<div class="ord-scale-row ord-scale-height">'
+      + '<span class="ord-scale-cap">' + esc(tr('Height')) + ' \u00b7 '
+      + esc(mlabel(S.heatHeight)) + '</span>'
+      + '<span class="ord-scale-range">'
+      + (g.flatHeight ? esc(tr('same everywhere')) + ': ' + esc(round(g.hLo, 2))
+                      : esc(round(g.hLo, 2)) + ' \u2026 ' + esc(round(g.hHi, 2)))
+      + '</span></div>';
+  }
+
   function renderHeatNote(g) {
     const metric = METRICS[S.heatMetric];
     if (!g.best) { $('ordHeatNote').textContent = ''; return; }
     if (g.flatColour) {
-      $('ordHeatNote').innerHTML = esc(metric.label) + ' '
+      $('ordHeatNote').innerHTML = esc(mlabel(S.heatMetric)) + ' '
         + esc(tr('is the same across every mixture here')) + ': '
         + esc(round(g.best.cv, 2));
       return;
     }
-    $('ordHeatNote').innerHTML = tr('Best') + ' ' + esc(tr(metric.label.toLowerCase())) + ': '
+    $('ordHeatNote').innerHTML = tr('Best') + ' ' + esc(tr(METRICS[S.heatMetric].label.toLowerCase())) + ': '
       + esc(round(g.best.cv, 2)) + ' ' + tr('at') + ' ' + esc(describeMix(g.best.mix))
       + ' <button class="ord-chip" id="ordHeatUse">Load this mix</button>';
     const btn = $('ordHeatUse');
@@ -972,7 +1028,7 @@
     rows.push([tr('Flame colour'), flame]);
 
     box.innerHTML = '<div class="ord-pick-head">' + esc(describeMix(mix)) + '</div>'
-      + '<div class="ord-pick-lead"><span>' + esc(colourMetric.label) + '</span><strong>'
+      + '<div class="ord-pick-lead"><span>' + esc(mlabel(S.heatMetric)) + '</span><strong>'
       + esc(round(colourMetric.get(st, dmgPer), 2)) + '</strong></div>'
       + '<table class="ord-pick-table"><tbody>'
       + rows.map(r => '<tr><td>' + esc(r[0]) + '</td><td>' + r[1] + '</td></tr>').join('')
@@ -1153,7 +1209,7 @@
     const unit = rname(S.costBase);
     $('ordPareto').innerHTML = `<table class="ord-table">
       <thead><tr>
-        <th>Target</th><th>Mixture</th><th class="num">${esc(metric.label)}</th>
+        <th>Target</th><th>Mixture</th><th class="num">${esc(mlabel(S.paretoMetric))}</th>
         <th class="num">Blast</th><th class="num">${esc(unit)}</th><th class="num">Saved</th>
       </tr></thead><tbody>${rows.map(r => `<tr>
         <td>${Math.round(r.frac * 100)}%</td>

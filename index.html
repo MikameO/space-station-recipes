@@ -72,7 +72,7 @@
   "license": "https://github.com/MikameO/space-station-recipes/blob/main/LICENSE"
 }
 </script>
-<link rel="stylesheet" href="style.css?v=41">
+<link rel="stylesheet" href="style.css?v=42">
 <!-- Yandex.Metrika counter -->
 <script type="text/javascript">
     (function(m,e,t,r,i,k,a){
@@ -591,7 +591,10 @@
           <button id="ordSurfReset" class="ord-chip">Reset view</button>
         </div>
         <div class="ord-surface-row">
-          <div class="ord-canvas-wrap ord-canvas-square"><canvas id="ordHeat"></canvas></div>
+          <div class="ord-surface-main">
+            <div class="ord-canvas-wrap ord-canvas-square"><canvas id="ordHeat"></canvas></div>
+            <div id="ordScale" class="ord-scale"></div>
+          </div>
           <div id="ordPick" class="ord-pick"></div>
         </div>
         <div id="ordHeatNote" class="ord-legend"></div>
@@ -637,10 +640,10 @@
 </div>
 
 <!-- i18n.js must load BEFORE app.js: it exposes applyRussianData for init() -->
-<script src="i18n.js?v=9"></script>
+<script src="i18n.js?v=10"></script>
 <script src="app.js?v=31"></script>
 <script defer src="tutorial.js?v=3"></script>
 <script src="maps.js?v=16" defer></script>
-<script src="ordnance.js?v=12" defer></script>
+<script src="ordnance.js?v=14" defer></script>
 </body>
 </html>

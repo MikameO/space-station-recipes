@@ -3022,3 +3022,19 @@ body.antag-active .empty-state-chip:focus-visible {
 .ord-field-wide { min-width: 190px; }
 .ord-field-wide input[type=range] { width: 100%; accent-color: var(--phosphor); }
 .ord-field-wide b { color: var(--phosphor); font-family: 'Share Tech Mono', monospace; }
+
+/* Ordnance: colour/height legend for the surface */
+.ord-surface-main { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.ord-scale { font-family: 'Share Tech Mono', monospace; }
+.ord-scale-row { display: flex; align-items: center; gap: 10px; }
+.ord-scale-cap { font-size: 0.66rem; letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--text-ghost); white-space: nowrap; }
+.ord-scale-bar { flex: 1; height: 10px; border: 1px solid var(--border-subtle); }
+.ord-scale-flat { width: 34px; height: 10px; border: 1px solid var(--border-subtle); }
+.ord-scale-const { font-size: 0.74rem; color: var(--text-main); }
+.ord-scale-ticks { display: flex; justify-content: space-between; font-size: 0.7rem;
+  color: var(--text-sub); margin-top: 2px; }
+.ord-scale-ticks span:nth-child(2) { transform: translateX(-50%); margin-left: 50%; position: absolute; }
+.ord-scale-ticks { position: relative; }
+.ord-scale-height { margin-top: 4px; }
+.ord-scale-range { font-size: 0.74rem; color: var(--text-main); }
