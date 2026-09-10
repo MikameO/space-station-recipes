@@ -1287,6 +1287,19 @@
   {
    "casing": "RMCM40GrenadeCasing",
    "labels": [
+    "Most burning ground per unit of material, 4 tiles or wider"
+   ],
+   "mix": {
+    "RMCCarbon": 12.0,
+    "RMCEthanol": 54.0
+   },
+   "roles": [
+    "denial"
+   ]
+  },
+  {
+   "casing": "RMCM40GrenadeCasing",
+   "labels": [
     "Best inside 4 reactions, the length of RMCANFO"
    ],
    "mix": {
@@ -1366,6 +1379,19 @@
   {
    "casing": "RMCM15GrenadeCasing",
    "labels": [
+    "Most burning ground per unit of material, 4 tiles or wider"
+   ],
+   "mix": {
+    "RMCCarbon": 18.0,
+    "RMCEthanol": 63.0
+   },
+   "roles": [
+    "denial"
+   ]
+  },
+  {
+   "casing": "RMCM15GrenadeCasing",
+   "labels": [
     "Best inside 4 reactions, the length of RMCANFO"
    ],
    "mix": {
@@ -1428,6 +1454,19 @@
    },
    "roles": [
     "cheap"
+   ]
+  },
+  {
+   "casing": "RMCM20MineCasing",
+   "labels": [
+    "Most burning ground per unit of material, 4 tiles or wider"
+   ],
+   "mix": {
+    "RMCCarbon": 12.0,
+    "RMCEthanol": 42.0
+   },
+   "roles": [
+    "denial"
    ]
   },
   {
@@ -1508,6 +1547,19 @@
    },
    "roles": [
     "cheap"
+   ]
+  },
+  {
+   "casing": "RMCC4PlasticCasing",
+   "labels": [
+    "Most burning ground per unit of material, 4 tiles or wider"
+   ],
+   "mix": {
+    "RMCCarbon": 9.0,
+    "RMCEthanol": 45.0
+   },
+   "roles": [
+    "denial"
    ]
   },
   {
@@ -1616,6 +1668,19 @@
   {
    "casing": "RMC88mmRocketWarhead",
    "labels": [
+    "Most burning ground per unit of material, 4 tiles or wider"
+   ],
+   "mix": {
+    "RMCCarbon": 27.0,
+    "RMCEthanol": 45.0
+   },
+   "roles": [
+    "denial"
+   ]
+  },
+  {
+   "casing": "RMC88mmRocketWarhead",
+   "labels": [
     "Best inside 4 reactions, the length of RMCANFO"
    ],
    "mix": {
@@ -1698,6 +1763,19 @@
   {
    "casing": "RMC80mmMortarWarhead",
    "labels": [
+    "Most burning ground per unit of material, 4 tiles or wider"
+   ],
+   "mix": {
+    "RMCCarbon": 36.0,
+    "RMCEthanol": 84.0
+   },
+   "roles": [
+    "denial"
+   ]
+  },
+  {
+   "casing": "RMC80mmMortarWarhead",
+   "labels": [
     "Best inside 4 reactions, the length of RMCANFO"
    ],
    "mix": {
@@ -1771,6 +1849,19 @@
    },
    "roles": [
     "cheap"
+   ]
+  },
+  {
+   "casing": "RMC80mmMortarCameraWarhead",
+   "labels": [
+    "Most burning ground per unit of material, 4 tiles or wider"
+   ],
+   "mix": {
+    "RMCCarbon": 36.0,
+    "RMCEthanol": 81.0
+   },
+   "roles": [
+    "denial"
    ]
   },
   {

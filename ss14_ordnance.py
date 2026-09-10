@@ -687,6 +687,19 @@ _RADIUS = lambda s, c: s["blastRadius"] if s["hasBlast"] else 0.0
 # a hot grenade, not a firebomb, so a fire recipe has to cover this much ground
 # before it counts as one at all.
 MIN_FIRE_REACH = 4
+
+
+def fire_area(st: dict) -> float:
+    """Tiles the flame covers.
+
+    SpawnFireDiamond fills a Manhattan diamond, which holds 2r^2 + 2r + 1 tiles.
+    Above the star threshold the casing throws eight rays instead, trading area
+    for length, so that shape is counted as 8r + 1.
+    """
+    r = st["reach"]
+    if r <= 0 or st["fireIntensity"] <= 0:
+        return 0.0
+    return 8 * r + 1 if st["star"] else 2 * r * r + 2 * r + 1
 _SPREADS = lambda s: s["reach"] >= MIN_FIRE_REACH
 CATALOGUE_ROLES = [
     ("radius", "Blast radius", _RADIUS, lambda s, c: s["power"]),
@@ -959,6 +972,10 @@ def build_recipes(casings: dict, reagents: dict, formula: dict, costs: dict,
         short: tuple | None = None
         # The best high-explosive round, judged the way one is actually used.
         he_best: tuple | None = None
+        # Ground held on fire per unit of material. A grenade is seen coming and
+        # stepped around, so what it buys is denied floor rather than a kill,
+        # and denied floor is bought by the crate.
+        denial_best: tuple | None = None
 
         for i, first in enumerate(pool):
             for second in pool[i:]:
@@ -993,6 +1010,17 @@ def build_recipes(casings: dict, reagents: dict, formula: dict, costs: dict,
                         # standing in the flames.
                         if targets and all(rid in handy for rid in mix):
                             steps = len(set().union(*(chain[rid] for rid in mix)))
+                            # Entering a flame costs a flat 45 heat whatever its
+                            # intensity, so what denies ground is area times
+                            # seconds, not how fiercely it burns.
+                            if st["reach"] >= MIN_FIRE_REACH and st["fireDuration"] > 0:
+                                work = round(sum(effort[rid] * q
+                                                 for rid, q in mix.items()), 3)
+                                if work > 0:
+                                    value = fire_area(st) * st["fireDuration"] / work
+                                    rank = (round(value, 4), -work)
+                                    if denial_best is None or rank > denial_best[0]:
+                                        denial_best = (rank, dict(mix))
                             dead, crit = he_effect(st, targets, formula, fire)
                             hit = dead * HE_DEAD_WEIGHT + crit * HE_CRIT_WEIGHT
                             if hit:
@@ -1037,6 +1065,21 @@ def build_recipes(casings: dict, reagents: dict, formula: dict, costs: dict,
                 cost, value, mix = min(good, key=lambda x: (x[0], -x[1]))
                 out.append({"casing": casing_id, "roles": ["cheap"],
                             "labels": [f"{int(CHEAP_SHARE * 100)}% of the radius for the least cost"],
+                            "mix": mix})
+
+        if denial_best:
+            mix = denial_best[1]
+            label = f"Most burning ground per unit of material, {MIN_FIRE_REACH} tiles or wider"
+            signature = tuple(sorted((rid, round(q, 3)) for rid, q in mix.items()))
+            same = next((r for r in out
+                         if r["casing"] == casing_id
+                         and tuple(sorted((i, round(q, 3)) for i, q in r["mix"].items())) == signature),
+                        None)
+            if same:
+                same["roles"].append("denial")
+                same["labels"].append(label)
+            else:
+                out.append({"casing": casing_id, "roles": ["denial"], "labels": [label],
                             "mix": mix})
 
         # A sticky charge deletes resin within a tile the moment it goes off,
