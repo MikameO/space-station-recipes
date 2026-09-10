@@ -50,10 +50,10 @@
     // composition space and watch every other setting change around it.
     pick: null,                     // { mix } or null
     surfCells: [],                  // screen polygons of the last surface draw
-    costBase: null, paretoMetric: 'power',
+    costBase: null,
     reqObjective: 'blastRadius', reqCostLimit: null,
     reqs: [{ metric: 'shards', min: 20 }],   // opens on a real, useful example
-    reqResult: undefined,
+    reqLadder: false, reqResult: undefined,
     masks: [], maskMode: 'off',
     costCache: new Map(),
   };
@@ -125,6 +125,8 @@
     'mixtures clear every mask': 'смесей проходят все маски',
     'No mixture here clears every mask.': 'Здесь ни одна смесь не проходит все маски.',
     'Pinned': 'Закреплено',
+    'Target': 'Цель', 'Mixture': 'Смесь',
+    'Blast': 'Волна', 'Saved': 'Экономия',
     'These numbers come from': 'Цифры взяты из форка',
     'Switch the app to it': 'Переключить приложение на него',
     'over the casing volume': 'больше объёма корпуса',
@@ -429,8 +431,7 @@
       S.yaw = VIEW.yaw; S.pitch = VIEW.pitch; S.zoom = VIEW.zoom;
       renderHeat();
     };
-    $('ordCostBase').onchange = e => { S.costBase = e.target.value; renderPareto(); };
-    $('ordParetoMetric').onchange = e => { S.paretoMetric = e.target.value; renderPareto(); };
+    $('ordCostBase').onchange = e => { S.costBase = e.target.value; renderHeat(); renderReqResult(); };
     $('ordMaskMode').onchange = e => {
       S.maskMode = e.target.value; saveMasks(); renderHeat();
     };
@@ -440,7 +441,14 @@
       $('ordMaskMode').value = 'off';
       renderMaskList(); renderHeat();
     };
-    $('ordReqObjective').onchange = e => { S.reqObjective = e.target.value; };
+    $('ordReqObjective').onchange = e => {
+      S.reqObjective = e.target.value;
+      // A ladder needs a metric to climb; "lowest cost" has no ceiling to divide.
+      const box = $('ordReqLadder');
+      box.disabled = S.reqObjective === 'lowestCost';
+      if (box.disabled) { box.checked = false; S.reqLadder = false; }
+    };
+    $('ordReqLadder').onchange = e => { S.reqLadder = e.target.checked; };
     $('ordReqCost').oninput = e => {
       const v = e.target.value.trim();
       S.reqCostLimit = v === '' ? null : Math.max(0, +v);
@@ -455,8 +463,9 @@
       btn.disabled = true;
       // One frame so the disabled state paints before the synchronous search.
       requestAnimationFrame(() => {
-        S.reqResult = reqSearch();
-        track('ordnance_req_search', { objective: S.reqObjective, reqs: S.reqs.length });
+        S.reqResult = S.reqLadder ? reqLadderRows() : reqSearch(liveSpec());
+        track('ordnance_req_search',
+              { objective: S.reqObjective, reqs: S.reqs.length, ladder: S.reqLadder ? 1 : 0 });
         renderReqResult();
         btn.disabled = false;
       });
@@ -469,7 +478,7 @@
   }
 
   // ── render ─────────────────────────────────────────────────────────────────
-  function renderAll() { renderMix(); renderStats(); syncChartControls(); renderChart(); renderHeat(); renderPareto(); }
+  function renderAll() { renderMix(); renderStats(); syncChartControls(); renderChart(); renderHeat(); }
 
   function renderMix() {
     const cap = casingOf().vol, used = volUsed();
@@ -508,7 +517,7 @@
         const other = volUsed() - S.mix[id];
         S.mix[id] = clamp(Math.round(v) || 0, 0, cap2 - other);
         num.value = S.mix[id]; rng.value = S.mix[id];
-        renderStats(); renderChart(); renderHeat(); renderPareto();
+        renderStats(); renderChart(); renderHeat();
         $('ordVolume').textContent = volUsed() + ' / ' + cap2 + 'u';
         $('ordVolumeBar').style.width = Math.min(100, volUsed() / cap2 * 100) + '%';
       };
@@ -1085,12 +1094,13 @@
 
   function renderMaskList() {
     const box = $('ordMaskList');
-    if (!S.masks.length) {
-      box.innerHTML = '<p class="ord-empty">'
-        + esc(tr('No masks yet. Add one to highlight where a metric clears a threshold.'))
-        + '</p>';
-      return;
-    }
+    // Nothing but the add button until there is something to show: the header,
+    // the mode picker and an empty-state paragraph were pure furniture.
+    const any = S.masks.length > 0;
+    $('ordMaskCap').hidden = !any;
+    $('ordMaskMode').hidden = !any;
+    $('ordMaskClear').hidden = !any;
+    if (!S.masks.length) { box.innerHTML = ''; return; }
     const opts = sel => Object.keys(METRICS)
       .map(k => `<option value="${esc(k)}"${k === sel ? ' selected' : ''}>${esc(mlabel(k))}</option>`)
       .join('');
@@ -1470,77 +1480,6 @@
     return a.map((v, k) => Math.round(v + (b[k] - v) * f));
   }
 
-  // ── Pareto: cheapest mixture that still reaches X% of the casing ceiling ───
-  function renderPareto() {
-    if (!S.data) return;
-    const c = casingOf(), cap = c.vol;
-    const F = S.data.formula;
-    const metric = METRICS[S.paretoMetric];
-    const dmgPer = F.damagePerIntensity / F.intensityDivisor;
-    // Search over pairs of the reagents currently in the mix, falling back to
-    // every explosive when the casing is empty. Pairs keep the grid honest:
-    // a full n-dimensional sweep would be slow and unreadable.
-    let pool = Object.keys(S.mix);
-    if (pool.length < 2) {
-      pool = Object.keys(S.data.reagents).filter(id => S.data.reagents[id].explosive
-        || S.data.reagents[id].i || id === F.ironReagent);
-    }
-    pool = pool.slice(0, 8);
-    const rows = [];
-    let bestVal = 0;
-    const candidates = [];
-    for (let ai = 0; ai < pool.length; ai++) {
-      for (let bi = ai; bi < pool.length; bi++) {
-        const A = pool[ai], B = pool[bi];
-        const steps = 40;
-        for (let k = 0; k <= steps; k++) {
-          const b = Math.round(cap * k / steps);
-          const mix = {};
-          if (cap - b > 0) mix[A] = cap - b;
-          if (b > 0) mix[B] = (mix[B] || 0) + b;
-          if (A === B) { mix[A] = cap; }
-          const st = computeStats(mix, c, S.dampener);
-          const v = metric.get(st, dmgPer);
-          const cost = mixCost(mix, S.costBase);
-          candidates.push({ v, cost, mix, st });
-          if (v > bestVal) bestVal = v;
-          if (A === B) break;
-        }
-      }
-    }
-    if (!candidates.length || bestVal <= 0) {
-      $('ordPareto').innerHTML = '<p class="ord-empty">Nothing to optimise for this metric.</p>';
-      return;
-    }
-    const fullCost = Math.min(...candidates.filter(x => x.v >= bestVal - 1e-9).map(x => x.cost));
-    for (const frac of [0.75, 0.85, 0.9, 0.95, 1]) {
-      const target = bestVal * frac;
-      const ok = candidates.filter(x => x.v >= target - 1e-9);
-      if (!ok.length) continue;
-      const win = ok.reduce((a, b) => b.cost < a.cost ? b : a);
-      rows.push({ frac, ...win, save: fullCost > 0 ? 1 - win.cost / fullCost : 0 });
-    }
-    const unit = rname(S.costBase);
-    $('ordPareto').innerHTML = `<table class="ord-table">
-      <thead><tr>
-        <th>Target</th><th>Mixture</th><th class="num">${esc(mlabel(S.paretoMetric))}</th>
-        <th class="num">Blast</th><th class="num">${esc(unit)}</th><th class="num">Saved</th>
-      </tr></thead><tbody>${rows.map(r => `<tr>
-        <td>${Math.round(r.frac * 100)}%</td>
-        <td class="ord-mix-cell">${esc(describeMix(r.mix))}</td>
-        <td class="num">${esc(round(r.v, 1))}</td>
-        <td class="num">${r.st.hasBlast ? esc(round(r.st.blastRadius, 2)) : '—'}</td>
-        <td class="num">${esc(round(r.cost, 1))}</td>
-        <td class="num">${r.save > 0.005 ? esc(Math.round(r.save * 100)) + '%' : '—'}</td>
-      </tr>`).join('')}</tbody></table>`;
-
-    $('ordPareto').querySelectorAll('tr').forEach((tr, i) => {
-      if (!i) return;
-      tr.style.cursor = 'pointer';
-      tr.onclick = () => { S.mix = Object.assign({}, rows[i - 1].mix); track('ordnance_pareto_use'); renderAll(); };
-    });
-  }
-
   // ── build to a spec ────────────────────────────────────────────────────────
   // Every output of the formula is linear in the amounts (blast radius is a ratio
   // of two linear terms), so maximising ONE of them never needs more than two
@@ -1596,12 +1535,12 @@
   // of the reagent that serves it, light the fire if any fire requirement needs
   // it, and pour the remaining volume into whatever the objective wants. The
   // climb then refines it. This is the seed that finds the good answers.
-  function constructiveSeed(pool, cap) {
+  function constructiveSeed(pool, cap, spec) {
     const F = S.data.formula;
     const mix = {};
     let used = 0;
     let needsFire = false;
-    for (const req of S.reqs) {
+    for (const req of spec.reqs) {
       if (!req.metric || !(req.min > 0)) continue;
       if (req.metric === 'fireDuration' || req.metric === 'fireIntensity' || req.metric === 'reach') {
         needsFire = true;
@@ -1619,12 +1558,18 @@
       const already = Object.keys(mix).reduce((a, id) => a + mix[id] * perUnit('fireIntensity', id), 0);
       if (igniter && already <= 0 && used < cap) { mix[igniter] = (mix[igniter] || 0) + 1; used += 1; }
     }
-    const filler = bestReagentFor(S.reqObjective === 'lowestCost' ? 'power' : S.reqObjective, pool);
+    const filler = bestReagentFor(spec.objective === 'lowestCost' ? 'power' : spec.objective, pool);
     if (filler && used < cap) mix[filler] = (mix[filler] || 0) + (cap - used);
     return mix;
   }
 
-  function reqEvaluate(mix) {
+  // The spec is passed in rather than read off S, so the cost ladder can run the
+  // same search under a different objective without mutating the live controls.
+  function liveSpec() {
+    return { objective: S.reqObjective, reqs: S.reqs, costLimit: S.reqCostLimit };
+  }
+
+  function reqEvaluate(mix, spec) {
     const c = casingOf();
     const st = computeStats(mix, c, S.dampener);
     const F = S.data.formula;
@@ -1634,30 +1579,30 @@
     // Normalised shortfall per requirement, so one badly-scaled metric cannot
     // dominate the penalty and stall the climb.
     let miss = 0;
-    for (const req of S.reqs) {
+    for (const req of spec.reqs) {
       if (!req.metric || !(req.min > 0)) continue;
       const have = METRICS[req.metric].get(st, dmgPer);
       if (have < req.min) miss += (req.min - have) / req.min;
     }
-    if (S.reqCostLimit != null && cost > S.reqCostLimit) {
-      miss += (cost - S.reqCostLimit) / Math.max(S.reqCostLimit, 1);
+    if (spec.costLimit != null && cost > spec.costLimit) {
+      miss += (cost - spec.costLimit) / Math.max(spec.costLimit, 1);
     }
-    const objective = S.reqObjective === 'lowestCost'
+    const objective = spec.objective === 'lowestCost'
       ? -cost
-      : METRICS[S.reqObjective].get(st, dmgPer);
+      : METRICS[spec.objective].get(st, dmgPer);
     return { st, cost, miss, objective, score: objective - miss * 1000 };
   }
 
-  function reqClimb(start, pool, cap) {
+  function reqClimb(start, pool, cap, spec) {
     let mix = Object.assign({}, start);
-    let cur = reqEvaluate(mix);
+    let cur = reqEvaluate(mix, spec);
     for (let delta = Math.max(1, Math.round(cap / 8)); delta >= 1; delta = Math.floor(delta / 2)) {
       for (let step = 0; step < 26; step++) {
         let bestMix = null, bestEval = cur;
         const active = Object.keys(mix).filter(id => mix[id] > 0);
         const used = active.reduce((a, id) => a + mix[id], 0);
         const tryMix = candidate => {
-          const ev = reqEvaluate(candidate);
+          const ev = reqEvaluate(candidate, spec);
           if (ev.score > bestEval.score + 1e-9) { bestEval = ev; bestMix = candidate; }
         };
         for (const to of pool) {
@@ -1700,10 +1645,14 @@
     return { mix, ev: cur };
   }
 
-  function reqSearch() {
+  function reqSearch(spec) {
     const cap = casingOf().vol;
     const pool = reqPool();
     if (!pool.length) return null;
+
+    // A caller that already knows roughly where the answer lies can hand over
+    // its own starting points and skip generating a hundred of them.
+    if (spec.seeds) return climbFrom(spec.seeds, pool, cap, spec);
 
     // Seeds. Single reagents and pairs cover the faces a one-objective optimum
     // can sit on. On top of that, each requirement contributes the reagent that
@@ -1714,14 +1663,14 @@
     if (Object.keys(S.mix).length) seeds.push(Object.assign({}, S.mix));
     for (const id of pool) seeds.push({ [id]: cap });
 
-    seeds.push(constructiveSeed(pool, cap));
+    seeds.push(constructiveSeed(pool, cap, spec));
 
     const champions = [];
-    for (const req of S.reqs) {
+    for (const req of spec.reqs) {
       if (!req.metric || !(req.min > 0)) continue;
       champions.push(bestReagentFor(req.metric, pool));
     }
-    champions.push(bestReagentFor(S.reqObjective === 'lowestCost' ? 'power' : S.reqObjective, pool));
+    champions.push(bestReagentFor(spec.objective === 'lowestCost' ? 'power' : spec.objective, pool));
     champions.push(bestReagentFor('fireIntensity', pool));
     const key = [...new Set(champions.filter(Boolean))];
     if (key.length > 1) {
@@ -1743,9 +1692,13 @@
       }
     }
 
+    return climbFrom(seeds, pool, cap, spec);
+  }
+
+  function climbFrom(seeds, pool, cap, spec) {
     let best = null;
     for (const seed of seeds) {
-      const r = reqClimb(seed, pool, cap);
+      const r = reqClimb(seed, pool, cap, spec);
       if (!Object.keys(r.mix).length) continue;
       if (!best) { best = r; continue; }
       // Feasibility first, then the objective, then cost as the tie-break.
@@ -1757,6 +1710,75 @@
       if (better) best = r;
     }
     return best;
+  }
+
+  // The cost ladder: how much of the ceiling each level of spending buys. This
+  // replaces a separate pair-grid search that only ever considered two reagents
+  // from the current mixture, and therefore never tried octogen — it reported
+  // roughly double the true cost at every rung.
+  const LADDER = [0.75, 0.85, 0.9, 0.95, 1];
+
+  function reqLadderRows() {
+    const metric = S.reqObjective;
+    if (metric === 'lowestCost') return null;
+    const F = S.data.formula;
+    const dmgPer = F.damagePerIntensity / F.intensityDivisor;
+    const base = liveSpec();
+
+    const top = reqSearch(base);
+    if (!top) return null;
+    const ceiling = METRICS[metric].get(top.ev.st, dmgPer);
+    if (!(ceiling > 0)) return null;
+
+    // Walk down from the ceiling. Each rung is a relaxation of the one above, so
+    // the previous answer is already in the right region and the climb only has
+    // to shed a little cost. One full search plus five warm starts, instead of
+    // six full searches.
+    const rows = [];
+    let previous = top.mix;
+    for (const frac of [...LADDER].reverse()) {
+      const spec = {
+        objective: 'lowestCost',
+        reqs: base.reqs.concat([{ metric, min: ceiling * frac }]),
+        costLimit: base.costLimit,
+        seeds: [previous, constructiveSeed(reqPool(), casingOf().vol,
+                { objective: 'lowestCost', reqs: base.reqs.concat([{ metric, min: ceiling * frac }]) })],
+      };
+      const r = reqSearch(spec);
+      if (!r) continue;
+      previous = r.mix;
+      rows.unshift({ frac, mix: r.mix, ev: r.ev, value: METRICS[metric].get(r.ev.st, dmgPer) });
+    }
+    if (!rows.length) return null;
+    const full = rows[rows.length - 1].ev.cost;
+    for (const row of rows) row.save = full > 0 ? 1 - row.ev.cost / full : 0;
+    return { metric, ceiling, rows };
+  }
+
+  function renderLadder(box, ladder) {
+    const unit = rname(S.costBase);
+    box.innerHTML = `<table class="ord-table">
+      <thead><tr>
+        <th>${esc(tr('Target'))}</th><th>${esc(tr('Mixture'))}</th>
+        <th class="num">${esc(mlabel(ladder.metric))}</th>
+        <th class="num">${esc(tr('Blast'))}</th>
+        <th class="num">${esc(unit)}</th><th class="num">${esc(tr('Saved'))}</th>
+      </tr></thead><tbody>${ladder.rows.map(r => `<tr>
+        <td>${Math.round(r.frac * 100)}%</td>
+        <td class="ord-mix-cell">${esc(describeMix(r.mix))}</td>
+        <td class="num">${esc(round(r.value, 1))}</td>
+        <td class="num">${r.ev.st.hasBlast ? esc(round(r.ev.st.blastRadius, 2)) : '\u2014'}</td>
+        <td class="num">${esc(round(r.ev.cost, 1))}</td>
+        <td class="num">${r.save > 0.005 ? esc(Math.round(r.save * 100)) + '%' : '\u2014'}</td>
+      </tr>`).join('')}</tbody></table>`;
+    box.querySelectorAll('tbody tr').forEach((tr, i) => {
+      tr.style.cursor = 'pointer';
+      tr.onclick = () => {
+        S.mix = Object.assign({}, ladder.rows[i].mix);
+        track('ordnance_ladder_use');
+        renderAll();
+      };
+    });
   }
 
   function renderReqList() {
@@ -1783,6 +1805,7 @@
   function renderReqResult() {
     const box = $('ordReqOut');
     if (S.reqResult === undefined) { box.innerHTML = ''; return; }
+    if (S.reqResult && S.reqResult.rows) { renderLadder(box, S.reqResult); return; }
     if (!S.reqResult) {
       box.innerHTML = `<p class="ord-empty">${esc(tr('Nothing in this casing can do that.'))}</p>`;
       return;

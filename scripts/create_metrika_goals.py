@@ -90,7 +90,10 @@ GOALS: list[tuple[str, str]] = [
     ("ordnance_casing",     "Взрывчатка: выбран корпус"),
     ("ordnance_add",        "Взрывчатка: добавлен реагент"),
     ("ordnance_heat_use",   "Взрывчатка: смесь из теплокарты"),
-    ("ordnance_pareto_use", "Взрывчатка: смесь из Парето-таблицы"),
+    # ordnance_pareto_use retired with the section in O10; the counter goal stays
+    # so its history is not orphaned, following the A1.1 precedent.
+    ("ordnance_pareto_use", "Взрывчатка: смесь из Парето-таблицы (удалён)"),
+    ("ordnance_ladder_use",  "Взрывчатка: смесь из лестницы цены"),
     ("ordnance_surf_view",   "Взрывчатка: переключён вид поверхности"),
     ("ordnance_pick",       "Взрывчатка: точка разобрана кликом"),
     ("ordnance_pick_use",   "Взрывчатка: смесь из разбора точки"),

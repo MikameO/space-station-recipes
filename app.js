@@ -64,8 +64,9 @@ let antagFilterMethods      = new Set(); // subset of {inject, ingest, drink, fo
 // tutorial.js additionally sends: tutorial_start {auto} / tutorial_done /
 //   tutorial_skip {step}; maps.js sends: maps_map_select / maps_search /
 //   maps_sell_list / maps_multi_show; ordnance.js sends: ordnance_casing /
-//   ordnance_add / ordnance_heat_use / ordnance_pareto_use / ordnance_surf_view /
-//   ordnance_pick / ordnance_pick_use / ordnance_req_search / ordnance_req_use
+//   ordnance_add / ordnance_heat_use / ordnance_surf_view / ordnance_pick /
+//   ordnance_pick_use / ordnance_req_search / ordnance_req_use /
+//   ordnance_ladder_use / ordnance_mask_add / ordnance_mask_use
 
 const YM_COUNTER_ID = 108585248;
 function track(goal, params) {
