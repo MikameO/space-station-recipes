@@ -3,6 +3,43 @@
 `data.json` schema version is in `meta.schemaVersion`. Consumers reading this file
 should pin on a compatible range (semver: breaking changes bump major).
 
+## Series O — 2026-09-10 (Ordnance: casing mixture calculator; new fork, new data file)
+
+**Fork:** `MetalSage/space-stories-cm14` joins the registry as **fork #21**
+(Space Stories — Marine Corps Core, parent `rmc14`). Its own contribution is the
+explosives branch — cyclonite, octogen, ANFO, ammonium nitrate, hexamine,
+paraformaldehyde — **+18 reagents, +12 reactions**, all carrying Russian names
+from the fork's native ru-RU locale. The fork ships no en-US locale for its own
+reagents, so English names fall back to the prettified id. `data.json` schema is
+unchanged and the regen is purely additive (1369 → 1387 reagents, nothing lost).
+
+**New data file:** `ordnance/<fork>.json` (schema 1, ~13 KB), built by
+`ss14_ordnance.py`. It mirrors `OrdnanceExplosionSystem.CalculateExplosionStats`
+and `GetEngineExplosionParams`, the five `IExplosionModifierEffect` classes, and
+the `OrdnanceCasingComponent` defaults — 34 reagents with power / falloff / fire
+modifiers and flame colour, plus 10 casings with their ceilings. It reads its own
+manifest rather than the chem merge, because the explosion fields live in fork
+copies of the `_RMC14` layer that first-wins dedup discards.
+
+`ordnance_reference.py` locks 17 mixtures from the Marine Corps Core field guide;
+every regen replays them and warns on drift. **16 reproduce exactly**; the one
+outlier is welding fuel, whose effect potencies run at double the published
+values on the live server — documented drift, not a parser bug.
+
+**Frontend:** new **Ordnance** tab (`ordnance.js`), shown only on the fork that
+has an ordnance layer. Mixture builder with live detonation stats (power,
+falloff, blast radius, peak damage, shrapnel, fire, star, flame colour), a curve
+chart, a two-reagent heatmap, and a Pareto search for the cheapest mixture
+reaching a chosen share of the casing's best result. Cost is derived from the
+reaction graph in `data.json`, not hand-entered.
+
+**Why it matters:** falloff clamps at 25 before power reaches the casing ceiling,
+so blast radius peaks on a *cheaper* mixture than the strongest one. An M15 at
+90 % power reaches **7.92 tiles against the maximum mixture's 7.86** and costs
+**55 % less phoron**; the mortar case is starker — 90 % power buys 22 % more
+radius for 30 % less phoron. Spec:
+`docs/design/2026-09-10-ordnance-calculator.md`.
+
 ## UI A1.1 — 2026-07-28 (Metrika-verdict removals; frontend only, no schema change)
 
 Checkpoint-2 data (17 days of goal events, dev-noise days excluded) sentenced the
