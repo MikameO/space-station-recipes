@@ -6,7 +6,7 @@
       "runtimeExecutable": "python",
       "runtimeArgs": [
         "-c",
-        "import os, http.server; http.server.test(HandlerClass=http.server.SimpleHTTPRequestHandler, port=int(os.environ.get('PORT', '8090')))"
+        "import os, http.server; http.server.test(HandlerClass=http.server.SimpleHTTPRequestHandler, port=int(os.environ.get('PORT', '8090')), bind='127.0.0.1')"
       ],
       "autoPort": true,
       "port": 8090

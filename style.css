@@ -2904,3 +2904,92 @@ body.antag-active .empty-state-chip:focus-visible {
   .maps-canvas-wrap { min-height: 320px; }
 }
 
+
+/* ── Ordnance tab (Series O) ───────────────────────────────────────────────
+   Casing mixture calculator: mixture builder, live stats, curves, two-reagent
+   heatmap and the cheap-but-strong finder. */
+.ord-status { color: var(--amber); font-size: 0.85rem; padding: 4px 0; }
+.ord-toolbar { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 14px;
+  padding: 10px 0 14px; border-bottom: 1px solid var(--border-subtle); }
+.ord-field { display: flex; flex-direction: column; gap: 4px; }
+.ord-field > span { font-family: 'Share Tech Mono', monospace; font-size: 0.68rem;
+  letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-ghost); }
+.ord-field select { background: var(--panel); color: var(--text-bright);
+  border: 1px solid var(--border-subtle); padding: 5px 8px; font-size: 0.82rem; max-width: 22rem; }
+.ord-field select:focus-visible { outline: 2px solid var(--phosphor-dim); outline-offset: 1px; }
+.ord-check { display: flex; align-items: center; gap: 6px; color: var(--text-main);
+  font-size: 0.82rem; cursor: pointer; }
+.ord-vol { margin-left: auto; min-width: 160px; }
+.ord-vol > span { font-family: 'Share Tech Mono', monospace; font-size: 0.8rem; color: var(--text-bright); }
+.ord-vol > span.ord-over { color: var(--red-alert); }
+.ord-vol-track { height: 4px; background: var(--panel); border: 1px solid var(--border-subtle); margin-top: 4px; }
+.ord-vol-bar { height: 100%; background: var(--phosphor-dim); transition: width 0.12s linear; }
+
+.ord-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 14px; }
+.ord-panel { background: var(--panel); border: 1px solid var(--border-subtle);
+  padding: 12px 14px; margin-top: 14px; }
+.ord-grid .ord-panel { margin-top: 14px; }
+.ord-panel h3 { margin: 0 0 8px; font-size: 0.9rem; color: var(--text-bright);
+  font-family: 'Share Tech Mono', monospace; letter-spacing: 0.06em; text-transform: uppercase; }
+.ord-lede { margin: 0 0 10px; color: var(--text-sub); font-size: 0.82rem; max-width: 74ch; }
+.ord-empty { color: var(--text-ghost); font-size: 0.82rem; margin: 6px 0; }
+
+.ord-mix-controls { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 8px; margin-bottom: 10px; }
+.ord-mix-controls select { background: var(--panel-raised); color: var(--text-bright);
+  border: 1px solid var(--border-subtle); padding: 5px 8px; font-size: 0.8rem; max-width: 20rem; }
+.ord-pair { display: flex; gap: 8px; }
+.ord-chip { background: var(--panel-raised); color: var(--text-sub); border: 1px solid var(--border-subtle);
+  font-family: 'Share Tech Mono', monospace; font-size: 0.75rem; padding: 5px 10px; cursor: pointer; }
+.ord-chip:hover { color: var(--text-bright); border-color: var(--border-active); }
+
+.ord-row { border-top: 1px solid var(--border-subtle); padding: 8px 0; }
+.ord-row:first-child { border-top: none; }
+.ord-row-head { display: flex; align-items: center; gap: 8px; }
+.ord-row-name { flex: 1; color: var(--text-bright); font-size: 0.86rem; }
+.ord-qty { width: 5rem; background: var(--panel-raised); color: var(--text-bright);
+  border: 1px solid var(--border-subtle); padding: 3px 6px; font-family: 'Share Tech Mono', monospace;
+  font-size: 0.8rem; text-align: right; }
+.ord-del { background: none; border: 1px solid var(--border-subtle); color: var(--text-sub);
+  width: 24px; height: 24px; cursor: pointer; line-height: 1; }
+.ord-del:hover { color: var(--red-alert); border-color: var(--red-alert); }
+.ord-slider { width: 100%; margin: 6px 0 2px; accent-color: var(--phosphor); }
+.ord-row-note { color: var(--text-ghost); font-size: 0.72rem;
+  font-family: 'Share Tech Mono', monospace; }
+
+.ord-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 8px; }
+.ord-card { background: var(--panel-raised); border: 1px solid var(--border-subtle); padding: 8px 10px; }
+.ord-card-l { font-family: 'Share Tech Mono', monospace; font-size: 0.66rem;
+  letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-ghost); }
+.ord-card-v { font-size: 1.3rem; color: var(--phosphor); font-family: 'Share Tech Mono', monospace;
+  line-height: 1.3; }
+.ord-card-n { font-size: 0.7rem; color: var(--text-ghost); min-height: 1em; }
+.ord-foot { margin-top: 10px; display: flex; flex-wrap: wrap; gap: 14px; align-items: center;
+  border-top: 1px solid var(--border-subtle); padding-top: 8px; font-size: 0.8rem; color: var(--text-sub); }
+.ord-flame-row { display: flex; align-items: center; gap: 7px; }
+.ord-flame { width: 15px; height: 15px; border: 1px solid var(--border-active); display: inline-block; }
+.ord-cost-row strong { color: var(--amber); font-family: 'Share Tech Mono', monospace; }
+
+.ord-canvas-wrap { position: relative; height: 260px; }
+.ord-canvas-wrap canvas { width: 100%; height: 100%; display: block; }
+.ord-canvas-square { height: 340px; max-width: 460px; }
+.ord-legend { margin-top: 8px; display: flex; flex-wrap: wrap; gap: 14px; align-items: center;
+  font-size: 0.78rem; color: var(--text-sub); }
+.ord-key { display: inline-flex; align-items: center; gap: 6px; }
+.ord-key i { width: 14px; height: 3px; display: inline-block; }
+.ord-key i.ord-dash { height: 0; border-top: 3px dashed currentColor; background: none !important; }
+.ord-key-note { color: var(--phosphor); font-family: 'Share Tech Mono', monospace; font-size: 0.76rem; }
+
+.ord-table { width: 100%; border-collapse: collapse; font-size: 0.82rem;
+  font-family: 'Share Tech Mono', monospace; }
+.ord-table th { text-align: left; background: var(--panel-raised); color: var(--text-bright);
+  padding: 6px 9px; border-bottom: 1px solid var(--border-active); white-space: nowrap; }
+.ord-table th.num, .ord-table td.num { text-align: right; }
+.ord-table td { padding: 6px 9px; border-bottom: 1px solid var(--border-subtle); color: var(--text-main); }
+.ord-table tbody tr:hover td { background: var(--panel-hover); color: var(--text-bright); }
+.ord-mix-cell { color: var(--text-bright); }
+
+@media (max-width: 820px) {
+  .ord-grid { grid-template-columns: minmax(0, 1fr); }
+  .ord-vol { margin-left: 0; }
+  .ord-canvas-square { height: 300px; }
+}

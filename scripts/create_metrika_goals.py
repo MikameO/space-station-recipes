@@ -85,6 +85,12 @@ GOALS: list[tuple[str, str]] = [
     ("maps_search",         "Карты: поиск предмета"),
     ("maps_sell_list",      "Карты: открыт sell-list"),
     ("maps_multi_show",     "Карты: multi-show"),
+    # Series O — Ordnance tab
+    ("tab_ordnance",        "Открыт таб Взрывное дело"),
+    ("ordnance_casing",     "Взрывчатка: выбран корпус"),
+    ("ordnance_add",        "Взрывчатка: добавлен реагент"),
+    ("ordnance_heat_use",   "Взрывчатка: смесь из теплокарты"),
+    ("ordnance_pareto_use", "Взрывчатка: смесь из Парето-таблицы"),
 ]
 
 

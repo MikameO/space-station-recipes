@@ -63,7 +63,8 @@ let antagFilterMethods      = new Set(); // subset of {inject, ingest, drink, fo
 //   pin_callout_shown / pin_callout_dismiss {reason}
 // tutorial.js additionally sends: tutorial_start {auto} / tutorial_done /
 //   tutorial_skip {step}; maps.js sends: maps_map_select / maps_search /
-//   maps_sell_list / maps_multi_show
+//   maps_sell_list / maps_multi_show; ordnance.js sends: ordnance_casing /
+//   ordnance_add / ordnance_heat_use / ordnance_pareto_use
 
 const YM_COUNTER_ID = 108585248;
 function track(goal, params) {
@@ -424,6 +425,8 @@ function buildSourceFilters() {
       activeSource = radio.value;
       if (radio.value !== 'all') track('fork_select', { fork: radio.value });
       updateForkDisclaimer(radio.value);
+      // Series O: the Ordnance tab only exists for the fork that ships one.
+      if (window.ordnanceForkGate) window.ordnanceForkGate(radio.value);
       renderCurrentTab();
       rebuildTree(); // re-filter Trees tab if a tree is displayed
       // Re-render open detail panel with new fork context
@@ -2989,7 +2992,7 @@ function decodeURLState() {
 
   // Tab (whitelist)
   const tab = params.get('tab');
-  const validTabs = ['reagents','calculator','medbay','forkdiff','trees','antag','maps'];
+  const validTabs = ['reagents','calculator','medbay','forkdiff','trees','antag','maps','ordnance'];
   if (tab && validTabs.includes(tab)) {
     const btn = document.querySelector(`.tab-btn[data-tab="${CSS.escape(tab)}"]`);
     if (btn) btn.click();
@@ -3000,7 +3003,12 @@ function decodeURLState() {
   const validSources = ['all', ...Object.keys(DATA.meta?.forks || {})];
   if (src && validSources.includes(src)) {
     const radio = document.querySelector(`input[name="source"][value="${CSS.escape(src)}"]`);
-    if (radio) { radio.checked = true; activeSource = src; updateForkDisclaimer(src); }
+    if (radio) {
+      radio.checked = true; activeSource = src; updateForkDisclaimer(src);
+      // Runs after the tab whitelist above, so a ?tab=ordnance deep link keeps
+      // the panel when src matches and is bounced back to Reagents when it does not.
+      if (window.ordnanceForkGate) window.ordnanceForkGate(src);
+    }
   }
 
   // Base type (whitelist)
