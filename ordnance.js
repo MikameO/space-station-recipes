@@ -133,9 +133,12 @@
     'For': 'Зачем', 'Kills': 'Убивает',
     'Fire': 'Огонь',
     'Reach': 'Дальнобой', 'Damage': 'Урон',
-    'Short chain': 'Короткая цепь',
+    'Short chain': 'Короткая цепь', 'HE round': 'Фугасный',
+    'HE': 'Фугас',
     'Work': 'Материал', 'Steps': 'Реакций',
     'reactions to run: ': 'реакций провести: ',
+    'Against T2+ two or three tiles away: ': 'По T2+ в двух-трёх клетках: ',
+    'crippled': 'в крите',
     'Burn time': 'Горение', 'Cheap': 'Дёшево',
     'destroyed': 'уничтожен', 'no effect': 'без эффекта',
     'at the centre': 'в эпицентре', 'for armour': 'по броне',
@@ -1924,7 +1927,7 @@
         for (const s of spec.steps || []) steps.add(s);
       }
       return { r, st, cost: mixCost(r.mix, S.costBase), work, steps: steps.size,
-               dmg: st.power * dmgPer, kills: killCount(st) };
+               he: heEffect(st), dmg: st.power * dmgPer, kills: killCount(st) };
     });
     box.innerHTML = `<table class="ord-table">
       <thead><tr>
@@ -1933,9 +1936,12 @@
         <th class="num">${esc(tr('Shrapnel'))}</th><th class="num">${esc(tr('Fire'))}</th>
         <th class="num">${esc(rname(S.costBase))}</th><th class="num">${esc(tr('Work'))}</th>
         <th class="num">${esc(tr('Steps'))}</th><th class="num">${esc(tr('Kills'))}</th>
+        <th class="num">${esc(tr('HE'))}</th>
       </tr></thead><tbody>${built.map(b => `<tr title="${esc(tr('Work') + ' ' + round(b.work, 0)
           + ', ' + rname(S.costBase) + ' ' + round(b.cost, 1)
-          + ', ' + tr('reactions to run: ') + b.steps)}">
+          + ', ' + tr('reactions to run: ') + b.steps
+          + '. ' + tr('Against T2+ two or three tiles away: ')
+          + b.he.dead + ' ' + tr('destroyed') + ', ' + b.he.crit + ' ' + tr('crippled'))}">
         <td>${esc(b.r.roles.map(k => tr(ROLE_LABEL[k] || k)).join(' + '))}</td>
         <td class="ord-mix-cell">${esc(describeMix(b.r.mix))}</td>
         <td class="num">${esc(round(b.st.power, 0))}</td>
@@ -1946,6 +1952,9 @@
         <td class="num">${esc(round(b.work, 0))}</td>
         <td class="num">${b.steps}</td>
         <td class="num">${b.kills}/${(S.data.targets || []).length}</td>
+        <td class="num">${b.he.dead || b.he.crit
+          ? `<b class="ord-he-dead">${b.he.dead}</b>\u2620 ${b.he.crit}\u25b2`
+          : '\u2014'}</td>
       </tr>`).join('')}</tbody></table>`;
     box.querySelectorAll('tbody tr').forEach((tr_, i) => {
       tr_.style.cursor = 'pointer';
@@ -1960,7 +1969,7 @@
   const ROLE_LABEL = {
     radius: 'Reach', damage: 'Damage', shrapnel: 'Shrapnel',
     fire: 'Fire', burn: 'Burn time', cheap: 'Cheap',
-    short: 'Short chain',
+    short: 'Short chain', he: 'HE round',
   };
 
   // ── what it does to them ───────────────────────────────────────────────────
@@ -1980,7 +1989,9 @@
   // ignoreResistances, and xeno armour only covers the Brute group in any case,
   // while fire is Heat and lives in Burn. That is why an incendiary load is the
   // answer to a caste that shrugs off blast.
-  function fireOutcome(st, target, distance) {
+  function fireOutcome(st, target, distance, secIn, secAfter) {
+    if (secIn === undefined) secIn = S.burnIn;
+    if (secAfter === undefined) secAfter = S.burnAfter;
     const F = S.data.formula;
     const none = { contact: 0, inside: 0, after: 0, total: 0, stacks: 0, caught: false };
     if (st.fireIntensity <= 0 || distance > st.reach) return none;
@@ -1999,10 +2010,10 @@
     const rate = s => I * (s / D * F.fireBurnSpan + F.fireBurnFloor) * heat / F.fireBurnDivisor;
     // Standing in it, every tick re-ignites, so the stack count holds. The
     // flame cannot outlast its own duration.
-    const inside = Math.min(S.burnIn, D) * (rate(stacks) + I * (fire.tileHeat || 0) / F.fireTileDivisor);
+    const inside = Math.min(secIn, D) * (rate(stacks) + I * (fire.tileHeat || 0) / F.fireTileDivisor);
     // Once out, stacks bleed off and nothing tops them up.
     let after = 0;
-    for (let s = 0; s < S.burnAfter; s++) {
+    for (let s = 0; s < secAfter; s++) {
       const left = stacks - F.fireStackDecay * s;
       if (left <= 0) break;
       after += rate(left);
@@ -2055,6 +2066,27 @@
     // The dead frame is drawn wounded already, and stacking on top only muddies
     // it, so that one state is left alone.
     return state === 'crit' ? w.downed : null;
+  }
+
+  // High explosive, judged the way it is used: the round lands near a xeno
+  // rather than on one, and what holds a position is T2 and T3. A crit counts
+  // for less than a kill because the hive drags a crit back and heals it.
+  // The burn window is shut here on purpose.
+  function heEffect(st) {
+    const F = S.data.formula;
+    const dists = F.heDistances || [2, 3];
+    const minTier = F.heMinTier || 2;
+    let dead = 0, crit = 0;
+    for (const d of dists) {
+      const blast = blastDamageAt(st, d);
+      for (const t of S.data.targets || []) {
+        if ((t.tier || 0) < minTier) continue;
+        const g = blast * t.coefficient + fireOutcome(st, t, d, 0, 0).total;
+        if (g >= t.dead) dead++;
+        else if (t.hasCrit && g >= t.crit) crit++;
+      }
+    }
+    return { dead, crit };
   }
 
   function killCount(st) {

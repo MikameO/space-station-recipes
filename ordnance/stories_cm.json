@@ -454,6 +454,11 @@
   "fireStackDecay": 0.25,
   "fireTick": 1.0,
   "fireTileDivisor": 3.0,
+  "heDistances": [
+   2,
+   3
+  ],
+  "heMinTier": 2,
   "intensityDivisor": 5.0,
   "ironReagent": "RMCIron",
   "minSlope": 0.1,
@@ -1507,6 +1512,19 @@
   {
    "casing": "RMCC4PlasticCasing",
    "labels": [
+    "Best against T2+ at 2-3 tiles: 0 dead, 2 crit"
+   ],
+   "mix": {
+    "RMCANFO": 153.0,
+    "RMCOctogen": 27.0
+   },
+   "roles": [
+    "he"
+   ]
+  },
+  {
+   "casing": "RMCC4PlasticCasing",
+   "labels": [
     "Best inside 4 reactions, the length of RMCANFO"
    ],
    "mix": {
@@ -1598,14 +1616,16 @@
   {
    "casing": "RMC80mmMortarWarhead",
    "labels": [
-    "Blast radius"
+    "Blast radius",
+    "Best against T2+ at 2-3 tiles: 10 dead, 4 crit"
    ],
    "mix": {
     "RMCANFO": 144.0,
     "RMCOctogen": 96.0
    },
    "roles": [
-    "radius"
+    "radius",
+    "he"
    ]
   },
   {
@@ -1738,6 +1758,19 @@
    },
    "roles": [
     "cheap"
+   ]
+  },
+  {
+   "casing": "RMC80mmMortarCameraWarhead",
+   "labels": [
+    "Best against T2+ at 2-3 tiles: 0 dead, 2 crit"
+   ],
+   "mix": {
+    "RMCANFO": 90.0,
+    "RMCOctogen": 90.0
+   },
+   "roles": [
+    "he"
    ]
   },
   {

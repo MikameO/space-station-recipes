@@ -736,6 +736,17 @@ PRACTICAL_TIERS = {"dispenser", "self-chem", "unknown"}
 # distances the gallery offers, so a row can be checked against it.
 PRACTICAL_DISTANCES = (0, 1, 2, 3)
 
+# High explosive is judged the way it is used. A round lands near a xeno, not on
+# one, so the distances are two and three tiles. And a T1 does not hold a
+# position: what meets an assault is T2 and T3, which is what these count.
+# One round rarely kills a front-line caste outright, so a crit counts too --
+# at half, because the hive drags a crit back behind the line and heals it,
+# whereas a corpse stays a corpse.
+HE_DISTANCES = (2, 3)
+HE_MIN_TIER = 2
+HE_DEAD_WEIGHT = 2
+HE_CRIT_WEIGHT = 1
+
 CATALOGUE_STEPS = 20        # grid resolution as a fraction of the casing volume
 CHEAP_SHARE = 0.9           # the "cheap" row must still reach this much of the best
 
@@ -862,6 +873,29 @@ def fire_damage(st: dict, target: dict, distance: float, fire: dict,
     return total
 
 
+def he_effect(st: dict, targets: list, formula: dict, fire: dict | None) -> tuple[int, int]:
+    """Front-line castes destroyed and crippled by one indirect hit.
+
+    Counted with the burn window shut, so nothing here leans on a xeno standing
+    in flames it can walk out of.
+    """
+    dead = crit = 0
+    for distance in HE_DISTANCES:
+        blast = blast_damage_at(st["power"], st["falloff"], distance,
+                                formula["damagePerIntensity"])
+        for target in targets:
+            if (target.get("tier") or 0) < HE_MIN_TIER:
+                continue
+            dealt = blast * target["coefficient"]
+            if fire:
+                dealt += fire_damage(st, target, distance, fire, formula, 0, 0)
+            if dealt >= target["dead"]:
+                dead += 1
+            elif target.get("hasCrit") and dealt >= target["crit"]:
+                crit += 1
+    return dead, crit
+
+
 def count_kills(st: dict, targets: list, formula: dict, fire: dict | None,
                 distance: float = 0.0, seconds_in: float = 0.0,
                 seconds_after: float = 0.0) -> int:
@@ -916,6 +950,8 @@ def build_recipes(casings: dict, reagents: dict, formula: dict, costs: dict,
         # The best score reachable inside a short chain, and the material it
         # takes, so ties go to the cheaper mixture.
         short: tuple | None = None
+        # The best high-explosive round, judged the way one is actually used.
+        he_best: tuple | None = None
 
         for i, first in enumerate(pool):
             for second in pool[i:]:
@@ -950,6 +986,14 @@ def build_recipes(casings: dict, reagents: dict, formula: dict, costs: dict,
                         # standing in the flames.
                         if targets and all(rid in handy for rid in mix):
                             steps = len(set().union(*(chain[rid] for rid in mix)))
+                            dead, crit = he_effect(st, targets, formula, fire)
+                            hit = dead * HE_DEAD_WEIGHT + crit * HE_CRIT_WEIGHT
+                            if hit:
+                                work = round(sum(effort[rid] * q
+                                                 for rid, q in mix.items()), 3)
+                                rank = (hit, -work, -steps)
+                                if he_best is None or rank > he_best[0]:
+                                    he_best = (rank, dead, crit, dict(mix))
                             if steps <= step_cap:
                                 k = sum(count_kills(st, targets, formula, fire, d)
                                         for d in PRACTICAL_DISTANCES)
@@ -986,6 +1030,25 @@ def build_recipes(casings: dict, reagents: dict, formula: dict, costs: dict,
                 cost, value, mix = min(good, key=lambda x: (x[0], -x[1]))
                 out.append({"casing": casing_id, "roles": ["cheap"],
                             "labels": [f"{int(CHEAP_SHARE * 100)}% of the radius for the least cost"],
+                            "mix": mix})
+
+        # Only where a round can actually reach a front-line caste. For every
+        # grenade in the list it cannot, and printing an empty row would suggest
+        # otherwise.
+        if he_best:
+            _, dead, crit, mix = he_best
+            label = (f"Best against T{HE_MIN_TIER}+ at "
+                     f"{HE_DISTANCES[0]}-{HE_DISTANCES[-1]} tiles: {dead} dead, {crit} crit")
+            signature = tuple(sorted((rid, round(q, 3)) for rid, q in mix.items()))
+            same = next((r for r in out
+                         if r["casing"] == casing_id
+                         and tuple(sorted((i, round(q, 3)) for i, q in r["mix"].items())) == signature),
+                        None)
+            if same:
+                same["roles"].append("he")
+                same["labels"].append(label)
+            else:
+                out.append({"casing": casing_id, "roles": ["he"], "labels": [label],
                             "mix": mix})
 
         # The row for the marine with one chem master and a shift to finish.
@@ -1127,6 +1190,8 @@ def build(fork_id: str, fconf: dict, fetch) -> dict:
         "fireBurnSpan": FIRE_BURN_SPAN,
         "fireTileDivisor": FIRE_TILE_DIVISOR,
         "firePatStacks": FIRE_PAT_STACKS,
+        "heDistances": list(HE_DISTANCES),
+        "heMinTier": HE_MIN_TIER,
     }
     recipes = build_recipes(out_casings, out_reagents, formula, costs, cost_base,
                             targets, fires, chem)
