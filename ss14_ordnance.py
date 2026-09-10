@@ -905,7 +905,7 @@ def build_recipes(casings: dict, reagents: dict, formula: dict, costs: dict,
     fire = (fires or {}).get(formula.get("defaultFire"))
 
     for casing_id, casing in casings.items():
-        if casing_id not in CATALOGUE_CASINGS:
+        if casing_id in NON_FILLABLE_CASINGS or not casing.get("maxP"):
             continue
         cap = casing["vol"]
         unit = cap / CATALOGUE_STEPS
@@ -1008,9 +1008,16 @@ def build_recipes(casings: dict, reagents: dict, formula: dict, costs: dict,
 
 # Only the casings people actually build; the base prototype and the propellant
 # holders have no business in a catalogue.
-CATALOGUE_CASINGS = {
-    "RMCM40GrenadeCasing", "RMCM15GrenadeCasing", "RMCM20MineCasing",
-    "RMCC4PlasticCasing", "RMC88mmRocketWarhead", "RMC80mmMortarWarhead",
+# Prototypes that appear among the casings but cannot be loaded with a mixture:
+# the shared parent, and the launch tube and mortar shell, which only hold
+# propellant. Everything else with a power ceiling is fair game.
+#
+# This used to be an allow-list naming six casings by hand while the browser
+# built its dropdown from a deny-list. The two drifted, and the mortar camera
+# warhead ended up selectable with an empty catalogue. The list now ships in the
+# JSON so both sides read the same one.
+NON_FILLABLE_CASINGS = {
+    "RMCCasingBase", "RMC88mmRocketTube", "RMC80mmMortarShell",
 }
 
 
@@ -1129,6 +1136,7 @@ def build(fork_id: str, fconf: dict, fetch) -> dict:
         "fork": fork_id,
         "formula": formula,
         "fires": fires,
+        "nonFillable": sorted(NON_FILLABLE_CASINGS),
         "targets": targets,
         "recipes": recipes,
         "reagents": out_reagents,

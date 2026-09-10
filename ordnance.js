@@ -333,9 +333,11 @@
   function buildCasingSelect() {
     const sel = $('ordCasing');
     sel.innerHTML = '';
-    // RMCCasingBase is the shared parent prototype rather than a buildable casing,
-    // and the launch tube / mortar shell only hold propellant.
-    const skip = new Set(['RMCCasingBase', 'RMC88mmRocketTube', 'RMC80mmMortarShell']);
+    // Read from the payload rather than restated here. When this list lived in
+    // both places they drifted, and the mortar camera warhead became selectable
+    // with nothing baked for it.
+    const skip = new Set(S.data.nonFillable
+      || ['RMCCasingBase', 'RMC88mmRocketTube', 'RMC80mmMortarShell']);
     const ids = CASING_ORDER.filter(c => S.data.casings[c])
       .concat(Object.keys(S.data.casings).filter(c =>
         !CASING_ORDER.includes(c) && !skip.has(c) && S.data.casings[c].maxP));
