@@ -131,6 +131,8 @@
     'Reach': 'Дальнобой', 'Damage': 'Урон',
     'Burn time': 'Горение', 'Cheap': 'Дёшево',
     'destroyed': 'уничтожен', 'no effect': 'без эффекта',
+    'at the centre': 'в эпицентре', 'for armour': 'по броне',
+    'dies at': 'смерть при',
     'Nothing baked for this casing.': 'Для этого корпуса готовых рецептов нет.',
     'Target': 'Цель', 'Mixture': 'Смесь',
     'Blast': 'Волна', 'Saved': 'Экономия',
@@ -1947,6 +1949,30 @@
     };
   }
 
+  // RMCXenoDamageVisualsSystem + ContentHelpers.RoundToEqualLevels, mirrored.
+  // Wounds are measured against the incapacitation threshold, not death, so a
+  // xeno is fully cut up by the time it goes down. The helper floors, which is
+  // why nothing shows at all below a quarter of that threshold.
+  function woundFrame(target, dealt, state) {
+    const w = target.wounds;
+    if (!w) return null;
+    const n = target.woundStates || 3;
+    const incap = target.hasCrit ? target.crit : target.dead;
+    if (!(incap > 0)) return null;
+    let level;
+    if (dealt > incap) level = n + 1;          // past the threshold: worst frame
+    else if (dealt <= 0) level = 0;
+    else if (dealt >= incap) level = n;
+    else level = Math.floor((dealt / incap) * (n + 1));
+    if (level <= 0) return null;
+    // The client draws states - level + 1, so a higher level is a lower frame.
+    if (state === 'alive') return w.walk[n - level + 1];
+    // A crit xeno is always past the threshold, so it always wears downed_0.
+    // The dead frame is drawn wounded already, and stacking on top only muddies
+    // it, so that one state is left alone.
+    return state === 'crit' ? w.downed : null;
+  }
+
   function killCount(st) {
     return (S.data.targets || [])
       .filter(t => targetOutcome(st, t, 0).state === 'dead').length;
@@ -1958,13 +1984,22 @@
     if (!targets.length) { box.innerHTML = ''; return; }
     const st = computeStats(S.mix, casingOf(), S.dampener);
     const range = S.galleryRange;
+    const raw = blastDamageAt(st, range);
     box.innerHTML = targets.map(t => {
       const o = targetOutcome(st, t, range);
       const sprite = (t.sprites || {})[o.state === 'crit' ? 'crit' : o.state] || (t.sprites || {}).alive;
+      const wound = woundFrame(t, o.dealt, o.state);
       const tier = t.tier ? 'T' + t.tier : '\u2014';
-      return `<div class="ord-xeno ord-xeno-${o.state}">
+      // The panel above prints raw blast damage; a xeno takes it multiplied.
+      // Without the chain on screen a 396 that destroys a 650 HP hivelord
+      // looks like a bug rather than a x1.65 explosion coefficient.
+      const tip = esc(round(raw, 0) + ' ' + tr('at the centre')
+        + ' \u00d7' + t.coefficient.toFixed(2) + ' ' + tr('for armour')
+        + ' = ' + round(o.dealt, 0) + ', ' + tr('dies at') + ' ' + round(t.dead, 0));
+      return `<div class="ord-xeno ord-xeno-${o.state}" title="${tip}">
         <div class="ord-xeno-art">
           ${sprite ? `<img src="sprites/xenos/${esc(sprite)}" alt="${esc(t.name)}" loading="lazy">` : ''}
+          ${wound ? `<img class="ord-xeno-wound" src="sprites/xenos/${esc(wound)}" alt="" loading="lazy">` : ''}
           ${o.state === 'dead' ? '<span class="ord-xeno-skull">\u2620</span>' : ''}
         </div>
         <div class="ord-xeno-name">${esc(t.name)} <b>${esc(tier)}</b></div>
@@ -1972,6 +2007,7 @@
         <div class="ord-xeno-num">${o.state === 'dead'
           ? esc(tr('destroyed'))
           : esc(round(o.left, 0)) + ' / ' + esc(round(t.dead, 0))}</div>
+        <div class="ord-xeno-dmg">${esc(round(o.dealt, 0))} \u00d7${esc(t.coefficient.toFixed(2))}</div>
         <div class="ord-xeno-hits">${o.hits ? esc(o.hits) + ' \u00d7' : esc(tr('no effect'))}</div>
       </div>`;
     }).join('');

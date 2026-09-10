@@ -3116,6 +3116,9 @@ b.ord-bad { color: var(--red-alert); }
   justify-content: center; background: #1d2938; border: 1px solid var(--border-subtle); }
 .ord-xeno-art img { width: 56px; height: 56px; image-rendering: pixelated;
   filter: brightness(1.45) contrast(1.08); }
+/* Wounds are a second sprite layer in game, not a different base sprite, so
+   they stack rather than replace. Absolute centring because the plate is flex. */
+.ord-xeno-wound { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); }
 .ord-xeno-skull { position: absolute; right: 4px; top: 2px; color: var(--red-alert); font-size: 1.1rem; }
 .ord-xeno-name { font-size: 0.74rem; color: var(--text-main); margin-top: 4px;
   font-family: 'Share Tech Mono', monospace; }
@@ -3129,4 +3132,6 @@ b.ord-bad { color: var(--red-alert); }
   font-family: 'Share Tech Mono', monospace; }
 .ord-xeno-dead .ord-xeno-num { color: var(--red-alert); }
 .ord-xeno-hits { font-size: 0.66rem; color: var(--text-ghost);
+  font-family: 'Share Tech Mono', monospace; }
+.ord-xeno-dmg { font-size: 0.64rem; color: var(--amber); opacity: 0.85;
   font-family: 'Share Tech Mono', monospace; }

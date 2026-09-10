@@ -1268,7 +1268,17 @@
     "crit": "CMXenoLesserDrone-crit.png",
     "dead": "CMXenoLesserDrone-dead.png"
    },
-   "tier": 0
+   "tier": 0,
+   "woundStates": 3,
+   "wounds": {
+    "downed": "CMXenoLesserDrone-downed.png",
+    "walk": [
+     null,
+     "CMXenoLesserDrone-walk1.png",
+     "CMXenoLesserDrone-walk2.png",
+     "CMXenoLesserDrone-walk3.png"
+    ]
+   }
   },
   {
    "armor": 0.0,
@@ -1284,7 +1294,17 @@
     "crit": "CMXenoDrone-crit.png",
     "dead": "CMXenoDrone-dead.png"
    },
-   "tier": 1
+   "tier": 1,
+   "woundStates": 3,
+   "wounds": {
+    "downed": "CMXenoDrone-downed.png",
+    "walk": [
+     null,
+     "CMXenoDrone-walk1.png",
+     "CMXenoDrone-walk2.png",
+     "CMXenoDrone-walk3.png"
+    ]
+   }
   },
   {
    "armor": 10.0,
@@ -1300,7 +1320,17 @@
     "crit": "CMXenoRunner-crit.png",
     "dead": "CMXenoRunner-dead.png"
    },
-   "tier": 1
+   "tier": 1,
+   "woundStates": 3,
+   "wounds": {
+    "downed": "CMXenoRunner-downed.png",
+    "walk": [
+     null,
+     "CMXenoRunner-walk1.png",
+     "CMXenoRunner-walk2.png",
+     "CMXenoRunner-walk3.png"
+    ]
+   }
   },
   {
    "armor": 70.0,
@@ -1316,7 +1346,17 @@
     "crit": "CMXenoDefender-crit.png",
     "dead": "CMXenoDefender-dead.png"
    },
-   "tier": 1
+   "tier": 1,
+   "woundStates": 3,
+   "wounds": {
+    "downed": "CMXenoDefender-downed.png",
+    "walk": [
+     null,
+     "CMXenoDefender-walk1.png",
+     "CMXenoDefender-walk2.png",
+     "CMXenoDefender-walk3.png"
+    ]
+   }
   },
   {
    "armor": 10.0,
@@ -1332,7 +1372,17 @@
     "crit": "CMXenoSentinel-crit.png",
     "dead": "CMXenoSentinel-dead.png"
    },
-   "tier": 1
+   "tier": 1,
+   "woundStates": 3,
+   "wounds": {
+    "downed": "CMXenoSentinel-downed.png",
+    "walk": [
+     null,
+     "CMXenoSentinel-walk1.png",
+     "CMXenoSentinel-walk2.png",
+     "CMXenoSentinel-walk3.png"
+    ]
+   }
   },
   {
    "armor": 10.0,
@@ -1348,7 +1398,17 @@
     "crit": "CMXenoHivelord-crit.png",
     "dead": "CMXenoHivelord-dead.png"
    },
-   "tier": 2
+   "tier": 2,
+   "woundStates": 3,
+   "wounds": {
+    "downed": "CMXenoHivelord-downed.png",
+    "walk": [
+     null,
+     "CMXenoHivelord-walk1.png",
+     "CMXenoHivelord-walk2.png",
+     "CMXenoHivelord-walk3.png"
+    ]
+   }
   },
   {
    "armor": 20.0,
@@ -1364,7 +1424,17 @@
     "crit": "CMXenoCarrier-crit.png",
     "dead": "CMXenoCarrier-dead.png"
    },
-   "tier": 2
+   "tier": 2,
+   "woundStates": 3,
+   "wounds": {
+    "downed": "CMXenoCarrier-downed.png",
+    "walk": [
+     null,
+     "CMXenoCarrier-walk1.png",
+     "CMXenoCarrier-walk2.png",
+     "CMXenoCarrier-walk3.png"
+    ]
+   }
   },
   {
    "armor": 40.0,
@@ -1380,7 +1450,17 @@
     "crit": "CMXenoBurrower-crit.png",
     "dead": "CMXenoBurrower-dead.png"
    },
-   "tier": 2
+   "tier": 2,
+   "woundStates": 3,
+   "wounds": {
+    "downed": "CMXenoBurrower-downed.png",
+    "walk": [
+     null,
+     "CMXenoBurrower-walk1.png",
+     "CMXenoBurrower-walk2.png",
+     "CMXenoBurrower-walk3.png"
+    ]
+   }
   },
   {
    "armor": 20.0,
@@ -1396,7 +1476,17 @@
     "crit": "CMXenoLurker-crit.png",
     "dead": "CMXenoLurker-dead.png"
    },
-   "tier": 2
+   "tier": 2,
+   "woundStates": 3,
+   "wounds": {
+    "downed": "CMXenoLurker-downed.png",
+    "walk": [
+     null,
+     "CMXenoLurker-walk1.png",
+     "CMXenoLurker-walk2.png",
+     "CMXenoLurker-walk3.png"
+    ]
+   }
   },
   {
    "armor": 40.0,
@@ -1412,7 +1502,17 @@
     "crit": "CMXenoWarrior-crit.png",
     "dead": "CMXenoWarrior-dead.png"
    },
-   "tier": 2
+   "tier": 2,
+   "woundStates": 3,
+   "wounds": {
+    "downed": "CMXenoWarrior-downed.png",
+    "walk": [
+     null,
+     "CMXenoWarrior-walk1.png",
+     "CMXenoWarrior-walk2.png",
+     "CMXenoWarrior-walk3.png"
+    ]
+   }
   },
   {
    "armor": 20.0,
@@ -1428,7 +1528,17 @@
     "crit": "CMXenoSpitter-crit.png",
     "dead": "CMXenoSpitter-dead.png"
    },
-   "tier": 2
+   "tier": 2,
+   "woundStates": 3,
+   "wounds": {
+    "downed": "CMXenoSpitter-downed.png",
+    "walk": [
+     null,
+     "CMXenoSpitter-walk1.png",
+     "CMXenoSpitter-walk2.png",
+     "CMXenoSpitter-walk3.png"
+    ]
+   }
   },
   {
    "armor": 80.0,
@@ -1444,7 +1554,17 @@
     "crit": "CMXenoRavager-crit.png",
     "dead": "CMXenoRavager-dead.png"
    },
-   "tier": 3
+   "tier": 3,
+   "woundStates": 3,
+   "wounds": {
+    "downed": "CMXenoRavager-downed.png",
+    "walk": [
+     null,
+     "CMXenoRavager-walk1.png",
+     "CMXenoRavager-walk2.png",
+     "CMXenoRavager-walk3.png"
+    ]
+   }
   },
   {
    "armor": 100.0,
@@ -1460,7 +1580,17 @@
     "crit": "RMCXenoCrusher-crit.png",
     "dead": "RMCXenoCrusher-dead.png"
    },
-   "tier": 3
+   "tier": 3,
+   "woundStates": 3,
+   "wounds": {
+    "downed": "RMCXenoCrusher-downed.png",
+    "walk": [
+     null,
+     "RMCXenoCrusher-walk1.png",
+     "RMCXenoCrusher-walk2.png",
+     "RMCXenoCrusher-walk3.png"
+    ]
+   }
   },
   {
    "armor": 40.0,
@@ -1476,7 +1606,17 @@
     "crit": "CMXenoPraetorian-crit.png",
     "dead": "CMXenoPraetorian-dead.png"
    },
-   "tier": 3
+   "tier": 3,
+   "woundStates": 3,
+   "wounds": {
+    "downed": "CMXenoPraetorian-downed.png",
+    "walk": [
+     null,
+     "CMXenoPraetorian-walk1.png",
+     "CMXenoPraetorian-walk2.png",
+     "CMXenoPraetorian-walk3.png"
+    ]
+   }
   },
   {
    "armor": 20.0,
@@ -1492,7 +1632,17 @@
     "crit": "RMCXenoBoiler-crit.png",
     "dead": "RMCXenoBoiler-dead.png"
    },
-   "tier": 3
+   "tier": 3,
+   "woundStates": 3,
+   "wounds": {
+    "downed": "RMCXenoBoiler-downed.png",
+    "walk": [
+     null,
+     "RMCXenoBoiler-walk1.png",
+     "RMCXenoBoiler-walk2.png",
+     "RMCXenoBoiler-walk3.png"
+    ]
+   }
   },
   {
    "armor": 100.0,
@@ -1508,7 +1658,17 @@
     "crit": "CMXenoQueen-crit.png",
     "dead": "CMXenoQueen-dead.png"
    },
-   "tier": 0
+   "tier": 0,
+   "woundStates": 3,
+   "wounds": {
+    "downed": "CMXenoQueen-downed.png",
+    "walk": [
+     null,
+     "CMXenoQueen-walk1.png",
+     "CMXenoQueen-walk2.png",
+     "CMXenoQueen-walk3.png"
+    ]
+   }
   },
   {
    "armor": 70.0,
@@ -1524,7 +1684,17 @@
     "crit": "RMCXenoKing-crit.png",
     "dead": "RMCXenoKing-dead.png"
    },
-   "tier": 0
+   "tier": 0,
+   "woundStates": 3,
+   "wounds": {
+    "downed": "RMCXenoKing-downed.png",
+    "walk": [
+     null,
+     "RMCXenoKing-walk1.png",
+     "RMCXenoKing-walk2.png",
+     "RMCXenoKing-walk3.png"
+    ]
+   }
   }
  ]
 }

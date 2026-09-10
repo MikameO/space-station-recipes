@@ -184,7 +184,7 @@
     '2 tiles': '2 клетки',
     '3 tiles': '3 клетки',
     'The best mixture this casing can hold for each job, found by an exhaustive sweep rather than a guess. Click a row to load it and start from there.': 'Лучшая смесь для каждой задачи в этом корпусе, найденная полным перебором, а не на глазок. Клик по строке загружает её в сборщик.',
-    'The roster the in-game demolitions simulator offers, showing what the mixture above leaves of each one. Blast damage only, so shrapnel and fire make the real thing worse than shown.': 'Тот же ростер, что у внутриигрового симулятора подрывов: что останется от каждого после смеси выше. Считается только волна, так что осколки и огонь сделают хуже, чем показано.',
+    'The roster the in-game demolitions simulator offers, showing what the mixture above leaves of each one. A xeno takes double damage from an explosion, less its explosion armour, so the figure on a card runs ahead of the epicentre damage above. Blast only, so shrapnel and fire make the real thing worse than shown.': 'Тот же ростер, что у внутриигрового симулятора подрывов: что останется от каждого после смеси выше. Ксенос получает от взрыва двойной урон за вычетом взрывной брони, поэтому число на карточке больше урона в эпицентре выше. Считается только волна, так что осколки и огонь сделают хуже, чем показано.',
     'Masks': 'Маски',
     'Masks off': 'Маски выключены',
     'Overlay masks': 'Наложить маски',

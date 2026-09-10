@@ -13,6 +13,10 @@ MIRRORED SOURCES (space-stories-cm14, verified 2026-09-10):
   Content.Shared/_Stories/Chemistry/Effects/{Explosive,Flowing,Fueling,
       Oxidizing,Viscous}.cs -> EFFECT_MODIFIERS
   Content.Shared/_Stories/Ordnance/OrdnanceCasingComponent.cs -> CASING_DEFAULTS
+  Content.Shared/_RMC14/Xenonids/Damage/RMCXenoDamageVisualsSystem.cs
+      OnVisualsDamageChanged -> the wound level in ordnance.js
+  Content.Shared/Rounding/ContentHelpers.cs
+      RoundToEqualLevels -> roundToEqualLevels() in ordnance.js
 
 Output: ordnance/<fork>.json (schema 1).
 
@@ -21,6 +25,7 @@ Run standalone:
     python ss14_ordnance.py --verify   # build, then check the reference mixtures
 """
 
+import io
 import json
 import os
 import re
@@ -492,41 +497,118 @@ def build_targets(conf: dict, files: dict[str, str]) -> list[dict]:
             "coefficient": round(explosion_coefficient(armour, base), 5),
             "rsi": comp.get("Sprite", {}).get("sprite"),
         })
+        # RMCXenoDamageVisualsComponent. The prefix is not the entity id --
+        # a lesser drone draws "lesser_*" -- so it has to be read, not guessed.
+        vis = comp.get("RMCXenoDamageVisuals") or {}
+        if vis.get("prefix"):
+            out[-1]["_wounds"] = (str(vis["prefix"]), int(vis.get("states") or 3))
     return out
 
 
+# RSI direction order, straight out of RsiDirection. A four-direction state is
+# one PNG holding every pose, so saving the file whole shows the sheet rather
+# than the creature. Index 2 is the side view, which reads far better at 56px
+# than the front pose: a xeno seen head-on is mostly silhouette.
+RSI_DIRECTIONS = ("South", "North", "East", "West")
+SIDE_DIRECTION = 2
+
+
+def _rsi_frame(sheet, meta: dict, state: str, direction: int):
+    """Crop one pose out of an RSI state sheet.
+
+    Frames sit in a near-square grid in reading order, ordered direction-major:
+    every delay of direction 0, then direction 1, and so on. Taking the column
+    count from the sheet width rather than assuming one keeps this correct for
+    animated states, whose grid is wider than four.
+    """
+    w, h = meta["size"]["x"], meta["size"]["y"]
+    spec = next((s for s in meta.get("states", []) if s.get("name") == state), None)
+    dirs = (spec or {}).get("directions", 1)
+    delays = (spec or {}).get("delays")
+    if dirs <= 1:
+        index = 0
+    else:
+        d = min(direction, dirs - 1)
+        index = sum(len(delays[k]) for k in range(d)) if delays else d
+    cols = max(1, sheet.width // w)
+    x, y = (index % cols) * w, (index // cols) * h
+    return sheet.crop((x, y, x + w, y + h))
+
+
 def fetch_target_sprites(fconf: dict, targets: list[dict], states: list[str]) -> int:
-    """Pull each target's alive / crit / dead frame into sprites/xenos/."""
+    """Pull each target's poses and wound overlays into sprites/xenos/.
+
+    Wounds are a second sprite layer in game, not a different base sprite, so
+    the overlay frames are saved separately and stacked in the browser.
+    """
     import urllib.error
+    from PIL import Image
     out_dir = SCRIPT_DIR / "sprites" / "xenos"
     out_dir.mkdir(parents=True, exist_ok=True)
     base = fconf["raw_url"]
     got = 0
     for target in targets:
         rsi = target.get("rsi")
+        wounds = target.pop("_wounds", None)
         if not rsi:
             print(f"  WARNING: {target['id']} has no sprite path")
             continue
+        meta_url = base.format(path=f"Resources/Textures/{rsi}/meta.json")
+        try:
+            with urllib.request.urlopen(meta_url, timeout=30) as resp:
+                meta = json.loads(resp.read())
+        except Exception as exc:
+            print(f"  WARNING: {target['id']} meta.json: {exc}")
+            continue
+        size = (meta["size"]["x"], meta["size"]["y"])
+
+        wanted = [(state, state) for state in states]
+        if wounds:
+            prefix, levels = wounds
+            # Only the overlay states a xeno can actually reach. The client
+            # draws states - level + 1, and level saturates at states + 1, so a
+            # standing xeno never goes past walk_1 and a downed one sits at
+            # downed_0 for as long as it is down.
+            for n in range(1, levels + 1):
+                wanted.append((f"{prefix}_walk_{n}", f"walk{n}"))
+            wanted.append((f"{prefix}_downed_0", "downed"))
+
         target["sprites"] = {}
-        for state in states:
-            dest = out_dir / f"{target['id']}-{state}.png"
-            if dest.exists():
-                target["sprites"][state] = dest.name
+        frames = {}
+        for state, key in wanted:
+            dest = out_dir / f"{target['id']}-{key}.png"
+            # Reuse only a file that is already a single pose. An earlier build
+            # saved whole sheets, and those must not survive a rebake.
+            if dest.exists() and Image.open(dest).size == size:
+                frames[key] = dest.name
                 got += 1
                 continue
             url = base.format(path=f"Resources/Textures/{rsi}/{state}.png")
             try:
                 with urllib.request.urlopen(url, timeout=30) as resp:
-                    dest.write_bytes(resp.read())
+                    sheet = Image.open(io.BytesIO(resp.read())).convert("RGBA")
             except urllib.error.HTTPError:
-                # Not every roster member draws all three states.
+                # Not every roster member draws every state.
                 print(f"  note: {target['id']} has no '{state}' frame")
                 continue
             except Exception as exc:
                 print(f"  WARNING: {target['id']} {state}: {exc}")
                 continue
-            target["sprites"][state] = dest.name
+            _rsi_frame(sheet, meta, state, SIDE_DIRECTION).save(dest)
+            frames[key] = dest.name
             got += 1
+
+        for state in states:
+            if state in frames:
+                target["sprites"][state] = frames[state]
+        if wounds:
+            # Index 0 is deliberately empty: walk_0 needs a level past the
+            # incapacitation threshold, and a xeno that far gone is drawn
+            # downed rather than standing, so the frame is never reachable.
+            walk = [None] + [frames.get(f"walk{n}") for n in range(1, wounds[1] + 1)]
+            if any(walk):
+                target["wounds"] = {"walk": walk, "downed": frames.get("downed")}
+                target["woundStates"] = wounds[1]
     return got
 
 
