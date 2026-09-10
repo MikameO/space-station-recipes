@@ -910,7 +910,12 @@
         if (nz < 0) { nx = -nx; ny = -ny; nz = -nz; }
         const lit = clamp(0.62 + 0.38 * (nx * -0.35 + ny * -0.45 + nz * 0.82), 0.5, 1.08);
         quads.push({
-          pr, i, j,
+          pr,
+          // All four corners in the same order as pr. A quad is a facet between
+          // four mixtures, so a click has to resolve to the nearest of them; the
+          // origin corner alone always lands on the low side of a rising slope,
+          // which put every pick at the foot of a peak instead of its top.
+          ij: [[i, j], [i + 1, j], [i + 1, j + 1], [i, j + 1]],
           depth: (pr[0].depth + pr[1].depth + pr[2].depth + pr[3].depth) / 4,
           cv: (c00.cv + c10.cv + c11.cv + c01.cv) / 4,
           lit,
@@ -1396,9 +1401,15 @@
     const quads = S.surfCells;
     if (!Array.isArray(quads)) return null;
     for (let k = quads.length - 1; k >= 0; k--) {
-      if (pointInQuad(px, py, quads[k].pr)) {
-        return g.cells[quads[k].i * g.N + quads[k].j] || null;
+      const q = quads[k];
+      if (!pointInQuad(px, py, q.pr)) continue;
+      let best = null, bestD = Infinity;
+      for (let c = 0; c < 4; c++) {
+        const d = (q.pr[c].x - px) ** 2 + (q.pr[c].y - py) ** 2;
+        const cell = g.cells[q.ij[c][0] * g.N + q.ij[c][1]];
+        if (cell && d < bestD) { bestD = d; best = cell; }
       }
+      return best;
     }
     return null;
   }

@@ -191,7 +191,7 @@
     'no limit': 'без ограничений',
     'Search': 'Искать',
     '+ Add requirement': '+ Добавить требование',
-    'State what the round has to do and the search finds a mixture that does it. This is where a third and fourth reagent finally earn their place: for any single target the best mixture never needs more than two.': 'Опишите, что должен делать боеприпас, и поиск подберёт смесь. Именно здесь третий и четвёртый реагент наконец окупаются: для одной цели лучшей смеси никогда не нужно больше двух.',
+    'State what the round has to do and the search finds a mixture that does it. This is where a third and fourth reagent finally earn their place: for any single target the best mixture never needs more than two. Tick the cost ladder to see how much of the ceiling each level of spending actually buys.': 'Опишите, что должен делать боеприпас, и поиск подберёт смесь. Именно здесь третий и четвёртый реагент наконец окупаются: для одной цели лучшей смеси никогда не нужно больше двух. Отметьте лестницу цены, чтобы увидеть, сколько от потолка даёт каждый уровень трат.',
     'Cost in': 'Цена в',
     'Target': 'Цель',
     'Saved': 'Экономия',
