@@ -2993,3 +2993,8 @@ body.antag-active .empty-state-chip:focus-visible {
   .ord-vol { margin-left: 0; }
   .ord-canvas-square { height: 300px; }
 }
+
+/* [hidden] loses to the author display rules above (.ord-field is flex,
+   .ord-pair is flex), so the chart-mode controls need an explicit override —
+   the same trap the sell-list panel hit in 4732473. */
+.ord-field[hidden], .ord-pair[hidden] { display: none !important; }
