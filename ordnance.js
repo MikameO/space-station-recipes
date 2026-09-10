@@ -125,6 +125,8 @@
     'mixtures clear every mask': 'смесей проходят все маски',
     'No mixture here clears every mask.': 'Здесь ни одна смесь не проходит все маски.',
     'Pinned': 'Закреплено',
+    'These numbers come from': 'Цифры взяты из форка',
+    'Switch the app to it': 'Переключить приложение на него',
     'over the casing volume': 'больше объёма корпуса',
     'casing not full': 'корпус не полон',
     'No masks yet. Add one to highlight where a metric clears a threshold.': 'Масок пока нет. Добавьте маску, чтобы подсветить области, где метрика перешагивает порог.',
@@ -280,6 +282,7 @@
       renderReqList();
       loadMasks();
       renderMaskList();
+      if (typeof activeSource !== 'undefined') window.ordnanceForkGate(activeSource);
       presetMix();
       renderAll();
     } catch (e) {
@@ -1819,15 +1822,24 @@
   }
 
   // Only the fork that actually has an ordnance layer gets the tab.
+  // The tab used to hide itself unless the Space Stories fork was selected, which
+  // made it unreachable: nothing on the page told anyone that picking a fork in
+  // the sidebar would reveal a whole tab. It is always in the bar now, and says
+  // which fork the numbers come from when the rest of the app is set elsewhere.
   window.ordnanceForkGate = function (source) {
-    const btn = document.querySelector('.tab-btn[data-tab="ordnance"]');
-    if (!btn) return;
-    const on = source === FORK;
-    btn.style.display = on ? '' : 'none';
-    if (!on && document.getElementById('btn-ordnance').classList.contains('active')) {
-      const back = document.querySelector('.tab-btn[data-tab="reagents"]');
-      if (back) back.click();
-    }
+    const note = $('ordForkNote');
+    if (!note || !S.data) return;
+    if (source === FORK) { note.hidden = true; return; }
+    const meta = (chem() && chem().meta && chem().meta.forks && chem().meta.forks[FORK]) || {};
+    note.hidden = false;
+    note.innerHTML = esc(tr('These numbers come from')) + ' <b>' + esc(meta.name || FORK)
+      + '</b>. <button class="ord-chip" id="ordForkSwitch">'
+      + esc(tr('Switch the app to it')) + '</button>';
+    const btn = $('ordForkSwitch');
+    if (btn) btn.onclick = () => {
+      const radio = document.querySelector('input[name="source"][value="' + FORK + '"]');
+      if (radio) radio.click();
+    };
   };
 
   const tabBtn = document.getElementById('btn-ordnance');

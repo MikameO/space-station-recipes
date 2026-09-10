@@ -3099,3 +3099,10 @@ b.ord-bad { color: var(--red-alert); }
 .ord-pick-clear:hover { color: var(--red-alert); border-color: var(--red-alert); }
 .ord-pick-note { font-size: 0.72rem; color: var(--amber); margin-bottom: 6px;
   font-family: 'Share Tech Mono', monospace; }
+
+/* Ordnance: which fork the numbers belong to */
+.ord-fork-note { display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  background: var(--panel-raised); border: 1px solid var(--border-subtle);
+  border-left: 3px solid var(--amber); padding: 7px 12px; margin-bottom: 10px;
+  font-size: 0.8rem; color: var(--text-sub); }
+.ord-fork-note b { color: var(--text-bright); }

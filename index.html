@@ -72,7 +72,7 @@
   "license": "https://github.com/MikameO/space-station-recipes/blob/main/LICENSE"
 }
 </script>
-<link rel="stylesheet" href="style.css?v=45">
+<link rel="stylesheet" href="style.css?v=46">
 <!-- Yandex.Metrika counter -->
 <script type="text/javascript">
     (function(m,e,t,r,i,k,a){
@@ -191,7 +191,7 @@
       <button class="tab-btn" id="btn-trees" data-tab="trees" role="tab" aria-selected="false" aria-controls="tab-trees">Craft Trees</button>
       <button class="tab-btn" id="btn-botany" data-tab="botany" role="tab" aria-selected="false" aria-controls="tab-botany">Botany</button>
       <button class="tab-btn" id="btn-maps" data-tab="maps" role="tab" aria-selected="false" aria-controls="tab-maps">Maps</button>
-      <button class="tab-btn" id="btn-ordnance" data-tab="ordnance" role="tab" aria-selected="false" aria-controls="tab-ordnance" style="display:none">Ordnance</button>
+      <button class="tab-btn" id="btn-ordnance" data-tab="ordnance" role="tab" aria-selected="false" aria-controls="tab-ordnance">Ordnance</button>
       <!-- A1.1 (2026-07-28): Stats/Graph/Reactions removed by Metrika verdict; Fork Diff promoted from the retired Advanced dropdown -->
       <button class="tab-btn" id="btn-forkdiff" data-tab="forkdiff" role="tab" aria-selected="false" aria-controls="tab-forkdiff">Fork Diff</button>
       <button class="tab-btn tab-btn-antag" id="btn-antag" data-tab="antag" role="tab" aria-selected="false" aria-controls="tab-antag" style="display:none">&#9760; Antag Strategies</button>
@@ -486,6 +486,7 @@
 
     <div class="tab-panel" id="tab-ordnance" role="tabpanel" aria-labelledby="btn-ordnance">
       <div id="ordStatus" class="ord-status"></div>
+      <div id="ordForkNote" class="ord-fork-note" hidden></div>
 
       <div class="ord-toolbar">
         <label class="ord-field"><span>Casing</span>
@@ -685,6 +686,6 @@
 <script src="app.js?v=31"></script>
 <script defer src="tutorial.js?v=3"></script>
 <script src="maps.js?v=16" defer></script>
-<script src="ordnance.js?v=21" defer></script>
+<script src="ordnance.js?v=22" defer></script>
 </body>
 </html>
