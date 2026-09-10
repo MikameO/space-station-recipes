@@ -133,7 +133,7 @@
     'For': 'Зачем', 'Kills': 'Убивает',
     'Fire': 'Огонь',
     'Reach': 'Дальнобой', 'Damage': 'Урон',
-    'Short chain': 'Короткая цепь', 'HE round': 'Фугасный',
+    'Short chain': 'Короткая цепь', 'HE round': 'Фугасный', 'Breach': 'Пролом',
     'HE': 'Фугас',
     'Work': 'Материал', 'Steps': 'Реакций',
     'reactions to run: ': 'реакций провести: ',
@@ -1969,7 +1969,7 @@
   const ROLE_LABEL = {
     radius: 'Reach', damage: 'Damage', shrapnel: 'Shrapnel',
     fire: 'Fire', burn: 'Burn time', cheap: 'Cheap',
-    short: 'Short chain', he: 'HE round',
+    short: 'Short chain', he: 'HE round', breach: 'Breach',
   };
 
   // ── what it does to them ───────────────────────────────────────────────────

@@ -15,6 +15,8 @@ MIRRORED SOURCES (space-stories-cm14, verified 2026-09-10):
   Content.Shared/_Stories/Ordnance/OrdnanceCasingComponent.cs -> CASING_DEFAULTS
   Content.Shared/_RMC14/Xenonids/Damage/RMCXenoDamageVisualsSystem.cs
       OnVisualsDamageChanged -> the wound level in ordnance.js
+  Content.Server/_Stories/Ordnance/Explosion/OrdnanceExplosionSystem.cs
+      ExecuteExplosion, the sticky branch -> the breach row
   Content.Server/Atmos/EntitySystems/FlammableSystem.cs
       Update -> the burn tick in ordnance.js
   Content.Shared/_RMC14/Atmos/SharedRMCFlammableSystem.cs
@@ -229,6 +231,11 @@ def parse_casings(files: dict[str, str]) -> dict[str, dict]:
             if not cid or "OrdnanceCasing" not in block:
                 continue
             own = {"_parents": _parents(block), "_file": path}
+            # A sticky charge deletes every wall within a tile when it goes off,
+            # with no damage check at all, so whether a casing sticks is what
+            # decides whether it can breach.
+            if re.search(r"^\s+- type: Sticky\s*$", block, re.M):
+                own["sticky"] = True
             comp = block[block.index("OrdnanceCasing"):]
             comp = re.split(r"\n  - type: ", comp)[0]
             for yml, key in _CASING_FIELDS.items():
@@ -1032,6 +1039,40 @@ def build_recipes(casings: dict, reagents: dict, formula: dict, costs: dict,
                             "labels": [f"{int(CHEAP_SHARE * 100)}% of the radius for the least cost"],
                             "mix": mix})
 
+        # A sticky charge deletes resin within a tile the moment it goes off,
+        # regardless of power: OrdnanceExplosionSystem walks the walls in range
+        # and removes them. No casing can break a resin wall by damage -- the
+        # plain one needs 900 and the strongest ordnance intensity delivers 720
+        # -- so breaching is a stickiness question, and the right filling is
+        # whatever is cheapest that still detonates rather than fizzles.
+        if casing.get("sticky"):
+            cheapest = None
+            for rid in sorted(handy):
+                for steps_up in range(1, CATALOGUE_STEPS + 1):
+                    mix = {rid: steps_up * unit}
+                    st = compute_stats(mix, casing, reagents, iron=iron)
+                    if st["power"] <= 0 and st["fireRadius"] <= 0 and st["shards"] <= 0:
+                        continue
+                    work = round(effort[rid] * steps_up * unit, 3)
+                    rank = (work, len(chain[rid]))
+                    if cheapest is None or rank < cheapest[0]:
+                        cheapest = (rank, dict(mix))
+                    break
+            if cheapest:
+                mix = cheapest[1]
+                label = "Cheapest filling that still detonates, which is all a breach needs"
+                signature = tuple(sorted((rid, round(q, 3)) for rid, q in mix.items()))
+                same = next((r for r in out
+                             if r["casing"] == casing_id
+                             and tuple(sorted((i, round(q, 3)) for i, q in r["mix"].items())) == signature),
+                            None)
+                if same:
+                    same["roles"].append("breach")
+                    same["labels"].append(label)
+                else:
+                    out.append({"casing": casing_id, "roles": ["breach"],
+                                "labels": [label], "mix": mix})
+
         # Only where a round can actually reach a front-line caste. For every
         # grenade in the list it cannot, and printing an empty row would suggest
         # otherwise.
@@ -1156,6 +1197,7 @@ def build(fork_id: str, fconf: dict, fetch) -> dict:
         merged = {**CASING_DEFAULTS, **{k: v for k, v in spec.items() if not k.startswith("_")}}
         out_casings[cid] = {
             "vol": merged["vol"], "base": merged["base"], "minF": merged["minF"],
+            **({"sticky": True} if merged.get("sticky") else {}),
             "maxP": merged["maxP"], "shards": int(merged["shards"]),
             "fi": merged["fi"], "fd": merged["fd"], "fr": merged["fr"],
             "star": bool(merged["star"]), "mode": merged["mode"],

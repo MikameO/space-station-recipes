@@ -654,7 +654,11 @@
           a shift: ANFO is four, cyclonite six, octogen eight, and reagents sharing a chain share
           its steps. HE is what one indirect hit does to the castes that actually hold a line,
           T2 and up, two or three tiles away: destroyed, then crippled. A dash means the round
-          cannot reach them at all, which is true of every grenade here. Click a row to load it.</p>
+          cannot reach them at all, which is true of every grenade here. Resin walls are not on
+          that list because no casing can break one by damage: a plain wall takes 900 and the
+          strongest ordnance delivers 720. They fall to a sticky charge, which deletes them within
+          a tile whatever it is filled with, so the breach row holds the cheapest filling that
+          still goes off. Click a row to load it.</p>
         <div id="ordCatalogue"></div>
       </section>
 
@@ -673,6 +677,8 @@
               <option value="1">1 tile</option>
               <option value="2">2 tiles</option>
               <option value="3">3 tiles</option>
+              <option value="4">4 tiles</option>
+              <option value="5">5 tiles</option>
             </select></label>
           <label class="ord-field"><span>In the flame, s</span>
             <select id="ordBurnIn" aria-label="Seconds spent standing in the fire">
@@ -717,10 +723,10 @@
 </div>
 
 <!-- i18n.js must load BEFORE app.js: it exposes applyRussianData for init() -->
-<script src="i18n.js?v=20"></script>
+<script src="i18n.js?v=21"></script>
 <script src="app.js?v=31"></script>
 <script defer src="tutorial.js?v=3"></script>
 <script src="maps.js?v=16" defer></script>
-<script src="ordnance.js?v=34" defer></script>
+<script src="ordnance.js?v=35" defer></script>
 </body>
 </html>

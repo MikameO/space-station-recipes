@@ -142,6 +142,7 @@
    "mode": "Plastic",
    "shards": 25,
    "star": true,
+   "sticky": true,
    "vol": 180.0
   },
   "RMCCasingBase": {
@@ -1507,6 +1508,18 @@
    },
    "roles": [
     "cheap"
+   ]
+  },
+  {
+   "casing": "RMCC4PlasticCasing",
+   "labels": [
+    "Cheapest filling that still detonates, which is all a breach needs"
+   ],
+   "mix": {
+    "RMCEthanol": 9.0
+   },
+   "roles": [
+    "breach"
    ]
   },
   {
