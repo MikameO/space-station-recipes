@@ -60,6 +60,36 @@ CASES = [
 
 TOL = {"power": 0.6, "blast": 0.06}
 
+# ── target effect ────────────────────────────────────────────────────────────
+# Blast damage against the simulator roster, worked out by hand from the armour
+# formula so the check is not the implementation grading its own homework.
+#
+#   raw at the centre = damagePerIntensity * power / 5 = 2 * power
+#   coefficient       = 2 / 1.1 ** (explosionArmor / 5)
+#
+# "Осколочный максимум" is 80 iron + 100 octogen in an M15: power 200, so 400 raw.
+#   Drone    armour   0 -> 2.0000 -> 800 dealt, past its 600 dead threshold
+#   Warrior  armour  40 -> 0.9330 -> 373 dealt, short of 500 crit
+#   Ravager  armour  80 -> 0.4353 -> 174 dealt
+#   Queen    armour 100 -> 0.2973 -> 119 dealt
+#
+# name, casing, mix, target, distance, expected damage, expected state
+TARGET_CASES = [
+    ("Осколочный максимум vs Drone", M15, {FE: 80, O: 100}, "CMXenoDrone", 0, 800, "dead"),
+    ("Осколочный максимум vs Warrior", M15, {FE: 80, O: 100}, "CMXenoWarrior", 0, 373.2, "alive"),
+    ("Осколочный максимум vs Ravager", M15, {FE: 80, O: 100}, "CMXenoRavager", 0, 174.1, "alive"),
+    ("Осколочный максимум vs Queen", M15, {FE: 80, O: 100}, "CMXenoQueen", 0, 118.9, "alive"),
+    # Same grenade one tile out: intensity falls by the slope, 40 -> 20, so the
+    # drone takes 400 and walks away. Its critical threshold is 500, and standing
+    # one tile off the centre is the whole difference between dead and unhurt.
+    ("Осколочный максимум vs Drone, 1 tile", M15, {FE: 80, O: 100}, "CMXenoDrone", 1, 400, "alive"),
+    # The mortar ceiling: 240 cyclonite is power 360 with falloff clamped to 34.
+    ("Чистый гексоген vs Queen", MORTAR, {C: 240}, "CMXenoQueen", 0, 214.1, "alive"),
+    ("Чистый гексоген vs Drone", MORTAR, {C: 240}, "CMXenoDrone", 0, 1440, "dead"),
+    # A lesser drone has no critical stage at all: 160 alive, then dead.
+    ("Чистый гексоген vs Lesser Drone", MORTAR, {C: 240}, "CMXenoLesserDrone", 0, 1440, "dead"),
+]
+
 
 def verify(written: dict) -> bool:
     import json
@@ -113,4 +143,44 @@ def verify(written: dict) -> bool:
 
     print(f"  reference: {passed} passed, {drifted} known drift, {failed} failed "
           f"(of {len(CASES)})")
+    return verify_targets(payload) and failed == 0
+
+
+def verify_targets(payload) -> bool:
+    """Blast damage and the resulting state for each hand-worked case."""
+    from ss14_ordnance import compute_stats, blast_damage_at
+
+    targets = {t["id"]: t for t in payload.get("targets", [])}
+    if not targets:
+        print("  FAIL: no targets in the payload")
+        return False
+    reagents, casings = payload["reagents"], payload["casings"]
+    iron = payload["formula"]["ironReagent"]
+    dmg_per = payload["formula"]["damagePerIntensity"]
+
+    passed = failed = 0
+    for name, casing_id, mix, target_id, distance, want_damage, want_state in TARGET_CASES:
+        target = targets.get(target_id)
+        if target is None:
+            print(f"  FAIL {name}: target {target_id} missing")
+            failed += 1
+            continue
+        st = compute_stats(mix, casings[casing_id], reagents, iron=iron)
+        raw = blast_damage_at(st["power"], st["falloff"], distance, dmg_per)
+        dealt = raw * target["coefficient"]
+        state = ("dead" if dealt >= target["dead"]
+                 else "critical" if target["hasCrit"] and dealt >= target["crit"]
+                 else "alive")
+        problems = []
+        if abs(dealt - want_damage) > max(1.0, want_damage * 0.01):
+            problems.append(f"damage {dealt:.1f} != {want_damage}")
+        if state != want_state:
+            problems.append(f"state {state} != {want_state}")
+        if problems:
+            print(f"  FAIL  {name}: {'; '.join(problems)}")
+            failed += 1
+        else:
+            passed += 1
+
+    print(f"  targets: {passed} passed, {failed} failed (of {len(TARGET_CASES)})")
     return failed == 0

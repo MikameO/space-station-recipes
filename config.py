@@ -569,6 +569,37 @@ FORK_REGISTRY = {
             "explosion_files": [
                 "Resources/Prototypes/_RMC14/explosion.yml",
             ],
+            # Цели для оценки эффекта. Список — зеркало
+            # DemolitionsSimulatorLists.Xenomorphs: тот же набор, что предлагает
+            # внутриигровой симулятор подрывов, в том же порядке.
+            "target_files": [
+                "Resources/Prototypes/_RMC14/Entities/Mobs/Xeno/base_xeno.yml",
+                "Resources/Prototypes/_RMC14/Entities/Mobs/Xeno/boiler.yml",
+                "Resources/Prototypes/_RMC14/Entities/Mobs/Xeno/burrower.yml",
+                "Resources/Prototypes/_RMC14/Entities/Mobs/Xeno/carrier.yml",
+                "Resources/Prototypes/_RMC14/Entities/Mobs/Xeno/crusher.yml",
+                "Resources/Prototypes/_RMC14/Entities/Mobs/Xeno/defender.yml",
+                "Resources/Prototypes/_RMC14/Entities/Mobs/Xeno/drone.yml",
+                "Resources/Prototypes/_RMC14/Entities/Mobs/Xeno/hivelord.yml",
+                "Resources/Prototypes/_RMC14/Entities/Mobs/Xeno/king.yml",
+                "Resources/Prototypes/_RMC14/Entities/Mobs/Xeno/lesser_drone.yml",
+                "Resources/Prototypes/_RMC14/Entities/Mobs/Xeno/lurker.yml",
+                "Resources/Prototypes/_RMC14/Entities/Mobs/Xeno/praetorian.yml",
+                "Resources/Prototypes/_RMC14/Entities/Mobs/Xeno/queen.yml",
+                "Resources/Prototypes/_RMC14/Entities/Mobs/Xeno/ravager.yml",
+                "Resources/Prototypes/_RMC14/Entities/Mobs/Xeno/runner.yml",
+                "Resources/Prototypes/_RMC14/Entities/Mobs/Xeno/sentinel.yml",
+                "Resources/Prototypes/_RMC14/Entities/Mobs/Xeno/spitter.yml",
+                "Resources/Prototypes/_RMC14/Entities/Mobs/Xeno/warrior.yml",
+            ],
+            "targets": [
+                "CMXenoLesserDrone", "CMXenoDrone", "CMXenoRunner", "CMXenoDefender",
+                "CMXenoSentinel", "CMXenoHivelord", "CMXenoCarrier", "CMXenoBurrower",
+                "CMXenoLurker", "CMXenoWarrior", "CMXenoSpitter", "CMXenoRavager",
+                "RMCXenoCrusher", "CMXenoPraetorian", "RMCXenoBoiler", "CMXenoQueen",
+                "RMCXenoKing",
+            ],
+            "target_sprite_states": ["alive", "crit", "dead"],
             # Прототип взрыва, которым стреляет OrdnanceExplosionSystem
             "explosion_proto": "RMC",
             "iron_reagent": "RMCIron",

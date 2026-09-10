@@ -243,6 +243,8 @@
  },
  "fork": "stories_cm",
  "formula": {
+  "armorBase": 1.1,
+  "armorStep": 5.0,
   "damagePerIntensity": 10.0,
   "intensityDivisor": 5.0,
   "ironReagent": "RMCIron",
@@ -834,5 +836,279 @@
    "r": 0.0
   }
  },
- "schema": 1
+ "schema": 1,
+ "targets": [
+  {
+   "armor": 0.0,
+   "coefficient": 2.0,
+   "crit": 160.0,
+   "dead": 160.0,
+   "hasCrit": false,
+   "id": "CMXenoLesserDrone",
+   "name": "Lesser Drone",
+   "rsi": "_Stories/Mobs/Xenos/LesserDrone/lesser_drone.rsi",
+   "sprites": {
+    "alive": "CMXenoLesserDrone-alive.png",
+    "crit": "CMXenoLesserDrone-crit.png",
+    "dead": "CMXenoLesserDrone-dead.png"
+   },
+   "tier": 0
+  },
+  {
+   "armor": 0.0,
+   "coefficient": 2.0,
+   "crit": 500.0,
+   "dead": 600.0,
+   "hasCrit": true,
+   "id": "CMXenoDrone",
+   "name": "Drone",
+   "rsi": "_Stories/Mobs/Xenos/Drone/drone.rsi",
+   "sprites": {
+    "alive": "CMXenoDrone-alive.png",
+    "crit": "CMXenoDrone-crit.png",
+    "dead": "CMXenoDrone-dead.png"
+   },
+   "tier": 1
+  },
+  {
+   "armor": 10.0,
+   "coefficient": 1.65289,
+   "crit": 230.0,
+   "dead": 330.0,
+   "hasCrit": true,
+   "id": "CMXenoRunner",
+   "name": "Runner",
+   "rsi": "_Stories/Mobs/Xenos/Runner/runner.rsi",
+   "sprites": {
+    "alive": "CMXenoRunner-alive.png",
+    "crit": "CMXenoRunner-crit.png",
+    "dead": "CMXenoRunner-dead.png"
+   },
+   "tier": 1
+  },
+  {
+   "armor": 70.0,
+   "coefficient": 0.52666,
+   "crit": 500.0,
+   "dead": 600.0,
+   "hasCrit": true,
+   "id": "CMXenoDefender",
+   "name": "Defender",
+   "rsi": "_Stories/Mobs/Xenos/Defender/defender.rsi",
+   "sprites": {
+    "alive": "CMXenoDefender-alive.png",
+    "crit": "CMXenoDefender-crit.png",
+    "dead": "CMXenoDefender-dead.png"
+   },
+   "tier": 1
+  },
+  {
+   "armor": 10.0,
+   "coefficient": 1.65289,
+   "crit": 500.0,
+   "dead": 600.0,
+   "hasCrit": true,
+   "id": "CMXenoSentinel",
+   "name": "Sentinel",
+   "rsi": "_Stories/Mobs/Xenos/Sentinel/sentinel.rsi",
+   "sprites": {
+    "alive": "CMXenoSentinel-alive.png",
+    "crit": "CMXenoSentinel-crit.png",
+    "dead": "CMXenoSentinel-dead.png"
+   },
+   "tier": 1
+  },
+  {
+   "armor": 10.0,
+   "coefficient": 1.65289,
+   "crit": 550.0,
+   "dead": 650.0,
+   "hasCrit": true,
+   "id": "CMXenoHivelord",
+   "name": "Hivelord",
+   "rsi": "_Stories/Mobs/Xenos/Hivelord/hivelord.rsi",
+   "sprites": {
+    "alive": "CMXenoHivelord-alive.png",
+    "crit": "CMXenoHivelord-crit.png",
+    "dead": "CMXenoHivelord-dead.png"
+   },
+   "tier": 2
+  },
+  {
+   "armor": 20.0,
+   "coefficient": 1.36603,
+   "crit": 650.0,
+   "dead": 750.0,
+   "hasCrit": true,
+   "id": "CMXenoCarrier",
+   "name": "Carrier",
+   "rsi": "_Stories/Mobs/Xenos/Carrier/carrier.rsi",
+   "sprites": {
+    "alive": "CMXenoCarrier-alive.png",
+    "crit": "CMXenoCarrier-crit.png",
+    "dead": "CMXenoCarrier-dead.png"
+   },
+   "tier": 2
+  },
+  {
+   "armor": 40.0,
+   "coefficient": 0.93301,
+   "crit": 500.0,
+   "dead": 600.0,
+   "hasCrit": true,
+   "id": "CMXenoBurrower",
+   "name": "Burrower",
+   "rsi": "_Stories/Mobs/Xenos/Burrower/burrower.rsi",
+   "sprites": {
+    "alive": "CMXenoBurrower-alive.png",
+    "crit": "CMXenoBurrower-crit.png",
+    "dead": "CMXenoBurrower-dead.png"
+   },
+   "tier": 2
+  },
+  {
+   "armor": 20.0,
+   "coefficient": 1.36603,
+   "crit": 450.0,
+   "dead": 550.0,
+   "hasCrit": true,
+   "id": "CMXenoLurker",
+   "name": "Lurker",
+   "rsi": "_Stories/Mobs/Xenos/Lurker/lurker.rsi",
+   "sprites": {
+    "alive": "CMXenoLurker-alive.png",
+    "crit": "CMXenoLurker-crit.png",
+    "dead": "CMXenoLurker-dead.png"
+   },
+   "tier": 2
+  },
+  {
+   "armor": 40.0,
+   "coefficient": 0.93301,
+   "crit": 500.0,
+   "dead": 600.0,
+   "hasCrit": true,
+   "id": "CMXenoWarrior",
+   "name": "Warrior",
+   "rsi": "_Stories/Mobs/Xenos/Warrior/warrior.rsi",
+   "sprites": {
+    "alive": "CMXenoWarrior-alive.png",
+    "crit": "CMXenoWarrior-crit.png",
+    "dead": "CMXenoWarrior-dead.png"
+   },
+   "tier": 2
+  },
+  {
+   "armor": 20.0,
+   "coefficient": 1.36603,
+   "crit": 550.0,
+   "dead": 650.0,
+   "hasCrit": true,
+   "id": "CMXenoSpitter",
+   "name": "Spitter",
+   "rsi": "_Stories/Mobs/Xenos/Spitter/spitter.rsi",
+   "sprites": {
+    "alive": "CMXenoSpitter-alive.png",
+    "crit": "CMXenoSpitter-crit.png",
+    "dead": "CMXenoSpitter-dead.png"
+   },
+   "tier": 2
+  },
+  {
+   "armor": 80.0,
+   "coefficient": 0.43526,
+   "crit": 650.0,
+   "dead": 750.0,
+   "hasCrit": true,
+   "id": "CMXenoRavager",
+   "name": "Ravager",
+   "rsi": "_Stories/Mobs/Xenos/Ravager/ravager.rsi",
+   "sprites": {
+    "alive": "CMXenoRavager-alive.png",
+    "crit": "CMXenoRavager-crit.png",
+    "dead": "CMXenoRavager-dead.png"
+   },
+   "tier": 3
+  },
+  {
+   "armor": 100.0,
+   "coefficient": 0.29729,
+   "crit": 700.0,
+   "dead": 800.0,
+   "hasCrit": true,
+   "id": "RMCXenoCrusher",
+   "name": "Crusher",
+   "rsi": "_Stories/Mobs/Xenos/Crusher/crusher.rsi",
+   "sprites": {
+    "alive": "RMCXenoCrusher-alive.png",
+    "crit": "RMCXenoCrusher-crit.png",
+    "dead": "RMCXenoCrusher-dead.png"
+   },
+   "tier": 3
+  },
+  {
+   "armor": 40.0,
+   "coefficient": 0.93301,
+   "crit": 650.0,
+   "dead": 750.0,
+   "hasCrit": true,
+   "id": "CMXenoPraetorian",
+   "name": "Praetorian",
+   "rsi": "_Stories/Mobs/Xenos/Praetorian/praetorian.rsi",
+   "sprites": {
+    "alive": "CMXenoPraetorian-alive.png",
+    "crit": "CMXenoPraetorian-crit.png",
+    "dead": "CMXenoPraetorian-dead.png"
+   },
+   "tier": 3
+  },
+  {
+   "armor": 20.0,
+   "coefficient": 1.36603,
+   "crit": 650.0,
+   "dead": 750.0,
+   "hasCrit": true,
+   "id": "RMCXenoBoiler",
+   "name": "Boiler",
+   "rsi": "_Stories/Mobs/Xenos/Boiler/boiler.rsi",
+   "sprites": {
+    "alive": "RMCXenoBoiler-alive.png",
+    "crit": "RMCXenoBoiler-crit.png",
+    "dead": "RMCXenoBoiler-dead.png"
+   },
+   "tier": 3
+  },
+  {
+   "armor": 100.0,
+   "coefficient": 0.29729,
+   "crit": 500.0,
+   "dead": 600.0,
+   "hasCrit": true,
+   "id": "CMXenoQueen",
+   "name": "Queen",
+   "rsi": "_Stories/Mobs/Xenos/Queen/queen.rsi",
+   "sprites": {
+    "alive": "CMXenoQueen-alive.png",
+    "crit": "CMXenoQueen-crit.png",
+    "dead": "CMXenoQueen-dead.png"
+   },
+   "tier": 0
+  },
+  {
+   "armor": 70.0,
+   "coefficient": 0.52666,
+   "crit": 1500.0,
+   "dead": 1600.0,
+   "hasCrit": true,
+   "id": "RMCXenoKing",
+   "name": "King",
+   "rsi": "_Stories/Mobs/Xenos/King/king.rsi",
+   "sprites": {
+    "alive": "RMCXenoKing-alive.png",
+    "crit": "RMCXenoKing-crit.png",
+    "dead": "RMCXenoKing-dead.png"
+   },
+   "tier": 0
+  }
+ ]
 }

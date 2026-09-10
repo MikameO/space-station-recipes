@@ -63,6 +63,13 @@ CASING_DEFAULTS = {
     "fuelAmount": 60.0,
 }
 
+# CMArmorSystem.OnGetExplosionResistance: resist = ARMOR_BASE ^ (armour / ARMOR_STEP),
+# and the incoming damage coefficient is divided by it. A xeno's own
+# ExplosionResistance component supplies the coefficient that gets divided, and
+# for xenos it is 2 — they take double explosion damage before armour.
+ARMOR_BASE = 1.1
+ARMOR_STEP = 5.0
+
 # ExecuteExplosion: star fire lines replace the diamond above this intensity.
 STAR_INTENSITY = 30.0
 # CalculateExplosionStats: iron -> shrapnel conversion.
@@ -375,6 +382,154 @@ def damage_per_intensity(explosion_files: dict[str, str], proto: str) -> float:
     return 0.0
 
 
+# ── Targets ──────────────────────────────────────────────────────────────────
+# What a mixture actually does to the things people aim it at. The roster is the
+# one the in-game demolitions simulator offers (DemolitionsSimulatorLists), so
+# the site and the machine on the Almayer talk about the same seventeen xenos.
+
+def parse_entities(files: dict[str, str]) -> dict[str, dict]:
+    """Entity prototypes by id. The chem extractor's loader handles !type: tags."""
+    import yaml
+    from ss14_chem_extractor import SS14Loader
+    protos = {}
+    for path, text in files.items():
+        try:
+            docs = yaml.load(text, Loader=SS14Loader)
+        except Exception as exc:                      # a malformed upstream file
+            print(f"  WARNING: cannot parse {path}: {exc}")
+            continue
+        for doc in docs or []:
+            if isinstance(doc, dict) and doc.get("type") == "entity" and doc.get("id"):
+                protos.setdefault(doc["id"], doc)
+    return protos
+
+
+def resolve_entity(protos: dict[str, dict], pid: str, seen=None) -> dict:
+    """Flatten an entity's components down its parent chain.
+
+    Components merge by type rather than replacing wholesale, which is what lets
+    a child override one field of MobThresholds without restating the rest.
+    """
+    seen = seen or set()
+    if pid in seen or pid not in protos:
+        return {}
+    seen.add(pid)
+    doc = protos[pid]
+    parents = doc.get("parent") or []
+    if isinstance(parents, str):
+        parents = [parents]
+    merged: dict = {}
+    for parent in parents:
+        merged.update(resolve_entity(protos, parent, seen))
+    for comp in doc.get("components") or []:
+        if not isinstance(comp, dict) or "type" not in comp:
+            continue
+        base = dict(merged.get(comp["type"], {}))
+        base.update({k: v for k, v in comp.items() if k != "type"})
+        merged[comp["type"]] = base
+    if doc.get("name"):
+        merged["_name"] = doc["name"]
+    return merged
+
+
+def _threshold(thresholds: dict, state: str):
+    """The health value at which a mob enters `state`, or None if it never does."""
+    for value, name in (thresholds or {}).items():
+        if str(name) == state:
+            return float(value)
+    return None
+
+
+def explosion_coefficient(armour: float, base: float) -> float:
+    """CMArmorSystem: the incoming coefficient divided by 1.1 ** (armour / 5)."""
+    if armour <= 0:
+        return base
+    return base / (ARMOR_BASE ** (armour / ARMOR_STEP))
+
+
+def blast_damage_at(power: float, falloff: float, distance: float,
+                    damage_per_intensity: float) -> float:
+    """Raw explosion damage this far from the centre.
+
+    The engine spreads an explosion by flood fill and the simulator measures the
+    result by detonating a real one, so there is no closed form to mirror. This
+    is the linear model the numbers imply: intensity falls from power / 5 at the
+    centre to zero exactly at the blast radius. It reproduces the known centre
+    value of 2 x power and is stated as a model, not as an engine mirror.
+    """
+    if power <= 0 or falloff <= 0:
+        return 0.0
+    max_intensity = power / INTENSITY_DIVISOR
+    slope = max(falloff / INTENSITY_DIVISOR, MIN_SLOPE)
+    return damage_per_intensity * max(0.0, max_intensity - slope * distance)
+
+
+def build_targets(conf: dict, files: dict[str, str]) -> list[dict]:
+    protos = parse_entities(files)
+    out = []
+    for tid in conf.get("targets", []):
+        if tid not in protos:
+            print(f"  WARNING: target prototype {tid} not found")
+            continue
+        comp = resolve_entity(protos, tid)
+        thresholds = comp.get("MobThresholds", {}).get("thresholds", {})
+        crit = _threshold(thresholds, "Critical")
+        dead = _threshold(thresholds, "Dead")
+        if dead is None:
+            print(f"  WARNING: {tid} has no Dead threshold, skipped")
+            continue
+        armour = float(comp.get("CMArmor", {}).get("explosionArmor") or 0)
+        base = float(comp.get("ExplosionResistance", {}).get("damageCoefficient") or 1)
+        out.append({
+            "id": tid,
+            "name": comp.get("_name") or tid,
+            "tier": comp.get("Xeno", {}).get("tier"),
+            # A lesser drone has no critical stage; it goes straight to dead.
+            "crit": crit if crit is not None else dead,
+            "hasCrit": crit is not None,
+            "dead": dead,
+            "armor": armour,
+            "coefficient": round(explosion_coefficient(armour, base), 5),
+            "rsi": comp.get("Sprite", {}).get("sprite"),
+        })
+    return out
+
+
+def fetch_target_sprites(fconf: dict, targets: list[dict], states: list[str]) -> int:
+    """Pull each target's alive / crit / dead frame into sprites/xenos/."""
+    import urllib.error
+    out_dir = SCRIPT_DIR / "sprites" / "xenos"
+    out_dir.mkdir(parents=True, exist_ok=True)
+    base = fconf["raw_url"]
+    got = 0
+    for target in targets:
+        rsi = target.get("rsi")
+        if not rsi:
+            print(f"  WARNING: {target['id']} has no sprite path")
+            continue
+        target["sprites"] = {}
+        for state in states:
+            dest = out_dir / f"{target['id']}-{state}.png"
+            if dest.exists():
+                target["sprites"][state] = dest.name
+                got += 1
+                continue
+            url = base.format(path=f"Resources/Textures/{rsi}/{state}.png")
+            try:
+                with urllib.request.urlopen(url, timeout=30) as resp:
+                    dest.write_bytes(resp.read())
+            except urllib.error.HTTPError:
+                # Not every roster member draws all three states.
+                print(f"  note: {target['id']} has no '{state}' frame")
+                continue
+            except Exception as exc:
+                print(f"  WARNING: {target['id']} {state}: {exc}")
+                continue
+            target["sprites"][state] = dest.name
+            got += 1
+    return got
+
+
 # ── Build ────────────────────────────────────────────────────────────────────
 
 def build(fork_id: str, fconf: dict, fetch) -> dict:
@@ -436,6 +591,12 @@ def build(fork_id: str, fconf: dict, fetch) -> dict:
             "fuel": merged.get("fuel"), "fuelAmount": merged.get("fuelAmount"),
         }
 
+    target_files = fetch(conf.get("target_files", []), url, f"{fork_id}_ordnance")
+    targets = build_targets(conf, target_files) if target_files else []
+    if targets:
+        n = fetch_target_sprites(fconf, targets, conf.get("target_sprite_states", []))
+        print(f"  targets: {len(targets)} with {n} sprite frames")
+
     dmg = damage_per_intensity(explosion_files, conf.get("explosion_proto", "RMC"))
     return {
         "schema": SCHEMA,
@@ -447,7 +608,10 @@ def build(fork_id: str, fconf: dict, fetch) -> dict:
             "starIntensity": STAR_INTENSITY,
             "shardsPerUnit": SHARDS_PER_UNIT,
             "ironReagent": iron,
+            "armorBase": ARMOR_BASE,
+            "armorStep": ARMOR_STEP,
         },
+        "targets": targets,
         "reagents": out_reagents,
         "casings": out_casings,
     }
@@ -471,7 +635,7 @@ def build_all(fetch) -> dict[str, Path]:
         path = write(fork_id, payload)
         written[fork_id] = path
         print(f"  ordnance/{fork_id}.json: {len(payload['reagents'])} reagents, "
-              f"{len(payload['casings'])} casings")
+              f"{len(payload['casings'])} casings, {len(payload['targets'])} targets")
     return written
 
 
