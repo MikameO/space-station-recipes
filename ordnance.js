@@ -54,6 +54,7 @@
     reqObjective: 'blastRadius', reqCostLimit: null,
     reqs: [{ metric: 'shards', min: 20 }],   // opens on a real, useful example
     reqLadder: false, reqResult: undefined,
+    galleryRange: 0,
     masks: [], maskMode: 'off',
     costCache: new Map(),
   };
@@ -125,6 +126,12 @@
     'mixtures clear every mask': 'смесей проходят все маски',
     'No mixture here clears every mask.': 'Здесь ни одна смесь не проходит все маски.',
     'Pinned': 'Закреплено',
+    'For': 'Зачем', 'Kills': 'Убивает',
+    'Fire': 'Огонь',
+    'Reach': 'Дальнобой', 'Damage': 'Урон',
+    'Burn time': 'Горение', 'Cheap': 'Дёшево',
+    'destroyed': 'уничтожен', 'no effect': 'без эффекта',
+    'Nothing baked for this casing.': 'Для этого корпуса готовых рецептов нет.',
     'Target': 'Цель', 'Mixture': 'Смесь',
     'Blast': 'Волна', 'Saved': 'Экономия',
     'These numbers come from': 'Цифры взяты из форка',
@@ -432,6 +439,11 @@
       renderHeat();
     };
     $('ordCostBase').onchange = e => { S.costBase = e.target.value; renderHeat(); renderReqResult(); };
+    $('ordGalleryRange').onchange = e => {
+      S.galleryRange = +e.target.value;
+      track('ordnance_gallery_range', { range: S.galleryRange });
+      renderGallery();
+    };
     $('ordMaskMode').onchange = e => {
       S.maskMode = e.target.value; saveMasks(); renderHeat();
     };
@@ -478,7 +490,10 @@
   }
 
   // ── render ─────────────────────────────────────────────────────────────────
-  function renderAll() { renderMix(); renderStats(); syncChartControls(); renderChart(); renderHeat(); }
+  function renderAll() {
+    renderMix(); renderStats(); syncChartControls(); renderChart(); renderHeat();
+    renderCatalogue(); renderGallery();
+  }
 
   function renderMix() {
     const cap = casingOf().vol, used = volUsed();
@@ -517,7 +532,7 @@
         const other = volUsed() - S.mix[id];
         S.mix[id] = clamp(Math.round(v) || 0, 0, cap2 - other);
         num.value = S.mix[id]; rng.value = S.mix[id];
-        renderStats(); renderChart(); renderHeat();
+        renderStats(); renderChart(); renderHeat(); renderGallery();
         $('ordVolume').textContent = volUsed() + ' / ' + cap2 + 'u';
         $('ordVolumeBar').style.width = Math.min(100, volUsed() / cap2 * 100) + '%';
       };
@@ -1506,6 +1521,10 @@
     const F = S.data.formula;
     return Object.keys(S.data.reagents).filter(id => {
       const r = S.data.reagents[id];
+      // Only what a player can actually obtain. Tank napalms and research
+      // variants have no reaction and no dispenser slot, so proposing one is
+      // proposing a mixture nobody can build.
+      if (!r.obtainable) return false;
       return r.explosive || r.i || r.d || r.r || id === F.ironReagent;
     });
   }
@@ -1853,6 +1872,109 @@
       track('ordnance_req_use');
       renderAll();
     };
+  }
+
+  // ── ready recipes ──────────────────────────────────────────────────────────
+  // Baked by ss14_ordnance.py with an exhaustive pair sweep, which is exact here:
+  // every output is linear in the amounts and blast radius is a ratio of two
+  // linear terms, so a single-objective optimum never needs a third reagent.
+  function renderCatalogue() {
+    const box = $('ordCatalogue');
+    const rows = (S.data.recipes || []).filter(r => r.casing === S.casing);
+    if (!rows.length) { box.innerHTML = '<p class="ord-empty">' + esc(tr('Nothing baked for this casing.')) + '</p>'; return; }
+    const c = casingOf();
+    const F = S.data.formula;
+    const dmgPer = F.damagePerIntensity / F.intensityDivisor;
+    const built = rows.map(r => {
+      const st = computeStats(r.mix, c, S.dampener);
+      return { r, st, cost: mixCost(r.mix, S.costBase),
+               dmg: st.power * dmgPer, kills: killCount(st) };
+    });
+    box.innerHTML = `<table class="ord-table">
+      <thead><tr>
+        <th>${esc(tr('For'))}</th><th>${esc(tr('Mixture'))}</th>
+        <th class="num">${esc(tr('Power'))}</th><th class="num">${esc(tr('Blast'))}</th>
+        <th class="num">${esc(tr('Shrapnel'))}</th><th class="num">${esc(tr('Fire'))}</th>
+        <th class="num">${esc(rname(S.costBase))}</th><th class="num">${esc(tr('Kills'))}</th>
+      </tr></thead><tbody>${built.map(b => `<tr>
+        <td>${esc(b.r.roles.map(k => tr(ROLE_LABEL[k] || k)).join(' + '))}</td>
+        <td class="ord-mix-cell">${esc(describeMix(b.r.mix))}</td>
+        <td class="num">${esc(round(b.st.power, 0))}</td>
+        <td class="num">${b.st.hasBlast ? esc(round(b.st.blastRadius, 2)) : '\u2014'}</td>
+        <td class="num">${b.st.shards || '\u2014'}</td>
+        <td class="num">${b.st.fireIntensity ? esc(round(b.st.fireIntensity, 0)) + '/' + b.st.reach + '/' + esc(round(b.st.fireDuration, 0)) + 's' : '\u2014'}</td>
+        <td class="num">${esc(round(b.cost, 1))}</td>
+        <td class="num">${b.kills}/${(S.data.targets || []).length}</td>
+      </tr>`).join('')}</tbody></table>`;
+    box.querySelectorAll('tbody tr').forEach((tr_, i) => {
+      tr_.style.cursor = 'pointer';
+      tr_.onclick = () => {
+        S.mix = Object.assign({}, built[i].r.mix);
+        track('ordnance_recipe_use', { role: built[i].r.roles.join('+') });
+        renderAll();
+      };
+    });
+  }
+
+  const ROLE_LABEL = {
+    radius: 'Reach', damage: 'Damage', shrapnel: 'Shrapnel',
+    fire: 'Fire', burn: 'Burn time', cheap: 'Cheap',
+  };
+
+  // ── what it does to them ───────────────────────────────────────────────────
+  // Blast only. The engine floods an explosion across tiles and the in-game
+  // simulator measures it by detonating a real one, so intensity is modelled as
+  // linear from power / 5 at the centre to zero at the blast radius. Shrapnel and
+  // fire are left out, which understates rather than flatters.
+  function blastDamageAt(st, distance) {
+    const F = S.data.formula;
+    if (st.power <= 0 || st.falloff <= 0) return 0;
+    const maxIntensity = st.power / F.intensityDivisor;
+    const slope = Math.max(st.falloff / F.intensityDivisor, F.minSlope);
+    return F.damagePerIntensity * Math.max(0, maxIntensity - slope * distance);
+  }
+
+  function targetOutcome(st, target, distance) {
+    const dealt = blastDamageAt(st, distance) * target.coefficient;
+    const state = dealt >= target.dead ? 'dead'
+      : (target.hasCrit && dealt >= target.crit) ? 'crit' : 'alive';
+    return {
+      dealt,
+      state,
+      left: Math.max(0, target.dead - dealt),
+      share: clamp(1 - dealt / target.dead, 0, 1),
+      hits: dealt > 0 ? Math.ceil(target.dead / dealt) : null,
+    };
+  }
+
+  function killCount(st) {
+    return (S.data.targets || [])
+      .filter(t => targetOutcome(st, t, 0).state === 'dead').length;
+  }
+
+  function renderGallery() {
+    const box = $('ordGallery');
+    const targets = S.data.targets || [];
+    if (!targets.length) { box.innerHTML = ''; return; }
+    const st = computeStats(S.mix, casingOf(), S.dampener);
+    const range = S.galleryRange;
+    box.innerHTML = targets.map(t => {
+      const o = targetOutcome(st, t, range);
+      const sprite = (t.sprites || {})[o.state === 'crit' ? 'crit' : o.state] || (t.sprites || {}).alive;
+      const tier = t.tier ? 'T' + t.tier : '\u2014';
+      return `<div class="ord-xeno ord-xeno-${o.state}">
+        <div class="ord-xeno-art">
+          ${sprite ? `<img src="sprites/xenos/${esc(sprite)}" alt="${esc(t.name)}" loading="lazy">` : ''}
+          ${o.state === 'dead' ? '<span class="ord-xeno-skull">\u2620</span>' : ''}
+        </div>
+        <div class="ord-xeno-name">${esc(t.name)} <b>${esc(tier)}</b></div>
+        <div class="ord-xeno-bar"><i style="width:${(o.share * 100).toFixed(1)}%"></i></div>
+        <div class="ord-xeno-num">${o.state === 'dead'
+          ? esc(tr('destroyed'))
+          : esc(round(o.left, 0)) + ' / ' + esc(round(t.dead, 0))}</div>
+        <div class="ord-xeno-hits">${o.hits ? esc(o.hits) + ' \u00d7' : esc(tr('no effect'))}</div>
+      </div>`;
+    }).join('');
   }
 
   // Only the fork that actually has an ordnance layer gets the tab.

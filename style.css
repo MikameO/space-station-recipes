@@ -3106,3 +3106,27 @@ b.ord-bad { color: var(--red-alert); }
   border-left: 3px solid var(--amber); padding: 7px 12px; margin-bottom: 10px;
   font-size: 0.8rem; color: var(--text-sub); }
 .ord-fork-note b { color: var(--text-bright); }
+
+/* Ordnance: ready recipes and the target gallery */
+.ord-gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(118px, 1fr)); gap: 10px; }
+.ord-xeno { background: var(--panel-raised); border: 1px solid var(--border-subtle); padding: 8px 6px; text-align: center; }
+/* Xeno sprites are near-black silhouettes: mean luminance 42 against a card at
+   30, so they vanish without a lighter plate and a brightness lift. */
+.ord-xeno-art { position: relative; height: 64px; display: flex; align-items: center;
+  justify-content: center; background: #1d2938; border: 1px solid var(--border-subtle); }
+.ord-xeno-art img { width: 56px; height: 56px; image-rendering: pixelated;
+  filter: brightness(1.45) contrast(1.08); }
+.ord-xeno-skull { position: absolute; right: 4px; top: 2px; color: var(--red-alert); font-size: 1.1rem; }
+.ord-xeno-name { font-size: 0.74rem; color: var(--text-main); margin-top: 4px;
+  font-family: 'Share Tech Mono', monospace; }
+.ord-xeno-name b { color: var(--text-ghost); font-weight: 400; }
+.ord-xeno-bar { height: 5px; background: var(--panel); border: 1px solid var(--border-subtle); margin: 5px 0 3px; }
+.ord-xeno-bar i { display: block; height: 100%; background: var(--phosphor); }
+.ord-xeno-crit .ord-xeno-bar i { background: var(--red-alert); }
+.ord-xeno-dead .ord-xeno-bar i { background: none; }
+.ord-xeno-dead .ord-xeno-art img { opacity: 0.55; }
+.ord-xeno-num { font-size: 0.68rem; color: var(--text-sub);
+  font-family: 'Share Tech Mono', monospace; }
+.ord-xeno-dead .ord-xeno-num { color: var(--red-alert); }
+.ord-xeno-hits { font-size: 0.66rem; color: var(--text-ghost);
+  font-family: 'Share Tech Mono', monospace; }

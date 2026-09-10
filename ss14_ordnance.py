@@ -530,6 +530,179 @@ def fetch_target_sprites(fconf: dict, targets: list[dict], states: list[str]) ->
     return got
 
 
+# ── Catalogue ────────────────────────────────────────────────────────────────
+# Ready mixtures, one per casing and role. The search is an exhaustive sweep over
+# PAIRS rather than a hill climb, and that is not a shortcut: every output of the
+# formula is linear in the amounts and blast radius is a ratio of two linear
+# terms, so a single-objective optimum always sits on a vertex or an edge of the
+# composition simplex. Two reagents are provably enough, so the sweep is exact.
+
+# Each role names what it maximises and what breaks a tie. Ties are the normal
+# case, not the exception: power clamps at the casing ceiling, fire clamps at its
+# cap and shrapnel at the shard limit, so most of the search space is flat at the
+# top. A tie-break of "whatever else still hurts" is what separates a usable
+# recipe from a technically-optimal dud — 204 iron with 36 welding fuel maxes the
+# mortar's shards at 4 power, where the same shards come with 72.
+_RADIUS = lambda s, c: s["blastRadius"] if s["hasBlast"] else 0.0
+CATALOGUE_ROLES = [
+    ("radius", "Blast radius", _RADIUS, lambda s, c: s["power"]),
+    ("damage", "Peak damage", lambda s, c: s["power"], _RADIUS),
+    ("shrapnel", "Shrapnel", lambda s, c: s["shards"], lambda s, c: s["power"]),
+    ("fire", "Fire intensity", lambda s, c: s["fireIntensity"], lambda s, c: s["fireDuration"]),
+    ("burn", "Burn time", lambda s, c: s["fireDuration"], lambda s, c: s["fireIntensity"]),
+]
+CATALOGUE_STEPS = 20        # grid resolution as a fraction of the casing volume
+CHEAP_SHARE = 0.9           # the "cheap" row must still reach this much of the best
+
+
+def load_obtainable(path="data.json") -> set[str]:
+    """Reagents a player can actually get hold of.
+
+    A reagent with neither a reaction nor a dispenser slot exists only inside
+    something the game hands out pre-filled — the flamer tank napalms and the
+    research variants. They belong in the calculator, because modelling one is
+    fair, but never in a recommendation: the catalogue kept proposing
+    RMCNapalmUTTank, which no one can pour into a casing.
+    """
+    src = SCRIPT_DIR / path
+    if not src.exists():
+        return set()
+    data = json.loads(src.read_text(encoding="utf-8"))
+    out = set()
+    for rid, spec in data.get("reagents", {}).items():
+        if spec.get("isDispenser") or spec.get("recipe"):
+            out.add(rid)
+    return out
+
+
+def load_cost_model(path="data.json"):
+    """Units of each base reagent needed per unit of a product.
+
+    Read from the chemistry the site already ships rather than restated here, so
+    a recipe change upstream moves the catalogue's costs with it. Catalysts are
+    skipped because they are not consumed.
+    """
+    src = SCRIPT_DIR / path
+    if not src.exists():
+        print(f"  note: {path} absent, catalogue costs unavailable")
+        return {}
+    data = json.loads(src.read_text(encoding="utf-8"))
+    reagents = data.get("reagents", {})
+    memo: dict[str, dict[str, float]] = {}
+
+    def cost_of(rid, seen=frozenset()):
+        if rid in memo:
+            return memo[rid]
+        spec = reagents.get(rid)
+        if not spec or spec.get("isBase") or not spec.get("recipe") or rid in seen:
+            return {rid: 1.0}
+        recipe = spec["recipe"]
+        yield_ = (recipe.get("products") or {}).get(rid) or 1
+        out: dict[str, float] = {}
+        for sub, info in (recipe.get("reactants") or {}).items():
+            if info.get("catalyst"):
+                continue
+            per = info["amount"] / yield_
+            for base, amount in cost_of(sub, seen | {rid}).items():
+                out[base] = out.get(base, 0.0) + amount * per
+        result = out or {rid: 1.0}
+        memo[rid] = result
+        return result
+
+    return {rid: cost_of(rid) for rid in reagents}
+
+
+def mix_cost(mix: dict, costs: dict, base: str) -> float:
+    return sum(costs.get(rid, {}).get(base, 0.0) * qty for rid, qty in mix.items())
+
+
+def build_recipes(casings: dict, reagents: dict, formula: dict, costs: dict,
+                  cost_base: str) -> list[dict]:
+    pool = [rid for rid, spec in reagents.items()
+            if spec.get("obtainable")
+            and (spec.get("explosive") or spec.get("i") or spec.get("d") or spec.get("r")
+                 or rid == formula["ironReagent"])]
+    iron = formula["ironReagent"]
+    out = []
+
+    for casing_id, casing in casings.items():
+        if casing_id not in CATALOGUE_CASINGS:
+            continue
+        cap = casing["vol"]
+        unit = cap / CATALOGUE_STEPS
+        # value -> (score, mix) per role, plus every evaluated point for the
+        # cheap row, which needs the whole frontier rather than just its peak.
+        best = {key: None for key, _, _, _ in CATALOGUE_ROLES}
+        radius_points = []
+
+        for i, first in enumerate(pool):
+            for second in pool[i:]:
+                for a in range(CATALOGUE_STEPS + 1):
+                    for b in range(CATALOGUE_STEPS + 1 - a):
+                        if a == 0 and b == 0:
+                            continue
+                        if first == second and b:
+                            continue
+                        mix = {}
+                        if a:
+                            mix[first] = a * unit
+                        if b:
+                            mix[second] = mix.get(second, 0) + b * unit
+                        st = compute_stats(mix, casing, reagents, iron=iron)
+                        volume = sum(mix.values())
+                        cost = mix_cost(mix, costs, cost_base) if costs else 0.0
+                        for key, _, score, tiebreak in CATALOGUE_ROLES:
+                            value = score(st, casing)
+                            if value <= 0:
+                                continue
+                            # Role first, then its own tie-break, then cheapest,
+                            # then least material for the same result.
+                            rank = (round(value, 6), round(tiebreak(st, casing), 6),
+                                    -round(cost, 4), -volume)
+                            if best[key] is None or rank > best[key][0]:
+                                best[key] = (rank, value, dict(mix))
+                        if st["hasBlast"]:
+                            radius_points.append((st["blastRadius"], dict(mix)))
+
+        # One mixture can be best at several roles at once; say so on one row
+        # rather than printing it three times.
+        rows: dict[tuple, dict] = {}
+        for key, label, _, _tb in CATALOGUE_ROLES:
+            if best[key] is None:
+                continue
+            _, value, mix = best[key]
+            signature = tuple(sorted((rid, round(q, 3)) for rid, q in mix.items()))
+            if signature in rows:
+                rows[signature]["roles"].append(key)
+                rows[signature]["labels"].append(label)
+                continue
+            rows[signature] = {"casing": casing_id, "roles": [key], "labels": [label],
+                               "mix": mix}
+        out.extend(rows.values())
+
+        # The cheap row: least of the scarce reagent that still reaches most of
+        # the best radius. This is the finding the whole series turns on.
+        if radius_points and costs:
+            ceiling = max(v for v, _ in radius_points)
+            target = ceiling * CHEAP_SHARE
+            good = [(mix_cost(m, costs, cost_base), v, m)
+                    for v, m in radius_points if v >= target]
+            if good:
+                cost, value, mix = min(good, key=lambda x: (x[0], -x[1]))
+                out.append({"casing": casing_id, "roles": ["cheap"],
+                            "labels": [f"{int(CHEAP_SHARE * 100)}% of the radius for the least cost"],
+                            "mix": mix})
+    return out
+
+
+# Only the casings people actually build; the base prototype and the propellant
+# holders have no business in a catalogue.
+CATALOGUE_CASINGS = {
+    "RMCM40GrenadeCasing", "RMCM15GrenadeCasing", "RMCM20MineCasing",
+    "RMCC4PlasticCasing", "RMC88mmRocketWarhead", "RMC80mmMortarWarhead",
+}
+
+
 # ── Build ────────────────────────────────────────────────────────────────────
 
 def build(fork_id: str, fconf: dict, fetch) -> dict:
@@ -543,6 +716,7 @@ def build(fork_id: str, fconf: dict, fetch) -> dict:
     reagents = resolve_all(parse_reagents(reagent_files))
     casings = resolve_all(parse_casings(casing_files))
     iron = conf.get("iron_reagent", "RMCIron")
+    obtainable = load_obtainable()
 
     out_reagents = {}
     for rid, spec in reagents.items():
@@ -569,6 +743,8 @@ def build(fork_id: str, fconf: dict, fetch) -> dict:
             entry["penetrating"] = True
         if spec.get("nameKey"):
             entry["nameKey"] = spec["nameKey"]
+        if rid in obtainable:
+            entry["obtainable"] = True
         if rid == iron:
             entry["shardsPerUnit"] = SHARDS_PER_UNIT
         # Explicit fields vs effect-derived ones, so the UI can explain a number
@@ -597,21 +773,28 @@ def build(fork_id: str, fconf: dict, fetch) -> dict:
         n = fetch_target_sprites(fconf, targets, conf.get("target_sprite_states", []))
         print(f"  targets: {len(targets)} with {n} sprite frames")
 
+    costs = load_cost_model()
+    cost_base = conf.get("cost_base", "RMCPhoron")
     dmg = damage_per_intensity(explosion_files, conf.get("explosion_proto", "RMC"))
+    formula = {
+        "damagePerIntensity": dmg,
+        "intensityDivisor": INTENSITY_DIVISOR,
+        "minSlope": MIN_SLOPE,
+        "starIntensity": STAR_INTENSITY,
+        "shardsPerUnit": SHARDS_PER_UNIT,
+        "ironReagent": iron,
+        "armorBase": ARMOR_BASE,
+        "armorStep": ARMOR_STEP,
+        "costBase": cost_base,
+    }
+    recipes = build_recipes(out_casings, out_reagents, formula, costs, cost_base)
+    print(f"  catalogue: {len(recipes)} recipes")
     return {
         "schema": SCHEMA,
         "fork": fork_id,
-        "formula": {
-            "damagePerIntensity": dmg,
-            "intensityDivisor": INTENSITY_DIVISOR,
-            "minSlope": MIN_SLOPE,
-            "starIntensity": STAR_INTENSITY,
-            "shardsPerUnit": SHARDS_PER_UNIT,
-            "ironReagent": iron,
-            "armorBase": ARMOR_BASE,
-            "armorStep": ARMOR_STEP,
-        },
+        "formula": formula,
         "targets": targets,
+        "recipes": recipes,
         "reagents": out_reagents,
         "casings": out_casings,
     }
@@ -635,7 +818,8 @@ def build_all(fetch) -> dict[str, Path]:
         path = write(fork_id, payload)
         written[fork_id] = path
         print(f"  ordnance/{fork_id}.json: {len(payload['reagents'])} reagents, "
-              f"{len(payload['casings'])} casings, {len(payload['targets'])} targets")
+              f"{len(payload['casings'])} casings, {len(payload['targets'])} targets, "
+              f"{len(payload['recipes'])} recipes")
     return written
 
 

@@ -245,6 +245,7 @@
  "formula": {
   "armorBase": 1.1,
   "armorStep": 5.0,
+  "costBase": "RMCPhoron",
   "damagePerIntensity": 10.0,
   "intensityDivisor": 5.0,
   "ironReagent": "RMCIron",
@@ -259,6 +260,7 @@
    "falloff": 0.0,
    "i": 0.2,
    "nameKey": "reagent-name-arnold-palmer",
+   "obtainable": true,
    "power": 0.0,
    "r": 0.1
   },
@@ -268,6 +270,7 @@
    "falloff": -0.6,
    "i": 0.0,
    "nameKey": "reagent-name-rmc-anfo",
+   "obtainable": true,
    "power": 1.0,
    "r": 0.0
   },
@@ -279,6 +282,7 @@
    "falloff": 1.5,
    "i": 0.5,
    "nameKey": "reagent-name-rmc-ammonium-nitrate",
+   "obtainable": true,
    "power": 0.4,
    "r": 0.0
   },
@@ -315,6 +319,7 @@
    "falloff": 0.0,
    "i": 1.8,
    "nameKey": "reagent-name-rmcclf3",
+   "obtainable": true,
    "power": 0.0,
    "r": -0.09,
    "via": [
@@ -332,6 +337,7 @@
    "falloff": 0.0,
    "i": 0.0,
    "nameKey": "reagent-name-carbon",
+   "obtainable": true,
    "power": 0.0,
    "r": 0.0
   },
@@ -343,6 +349,7 @@
    "falloff": 0.0,
    "i": 0.0,
    "nameKey": "reagent-name-copper",
+   "obtainable": true,
    "power": 0.0,
    "r": 0.0
   },
@@ -352,6 +359,7 @@
    "falloff": -0.4,
    "i": 0.0,
    "nameKey": "reagent-name-rmc-cyclonite",
+   "obtainable": true,
    "power": 1.5,
    "r": 0.0
   },
@@ -363,6 +371,7 @@
    "falloff": 0.0,
    "i": 0.2,
    "nameKey": "reagent-name-ethanol",
+   "obtainable": true,
    "power": 0.0,
    "r": 0.1
   },
@@ -374,6 +383,7 @@
    "falloff": 0.0,
    "i": 0.0,
    "nameKey": "reagent-name-rmc-hexamine",
+   "obtainable": true,
    "power": 0.0,
    "r": 0.0
   },
@@ -385,6 +395,7 @@
    "falloff": 0.0,
    "i": -0.5,
    "nameKey": "reagent-name-hydrogen",
+   "obtainable": true,
    "power": 0.15,
    "r": 0.2
   },
@@ -394,6 +405,7 @@
    "falloff": 0.0,
    "i": 0.0,
    "nameKey": "reagent-name-iron",
+   "obtainable": true,
    "power": 0.0,
    "r": 0.0,
    "shardsPerUnit": 0.25
@@ -406,6 +418,7 @@
    "falloff": 0.0,
    "i": 0.35,
    "nameKey": "reagent-name-lithium",
+   "obtainable": true,
    "power": 0.0,
    "r": -0.01,
    "via": [
@@ -423,6 +436,7 @@
    "falloff": 0.0,
    "i": -0.35,
    "nameKey": "reagent-name-rmcmethane",
+   "obtainable": true,
    "power": 0.15,
    "r": 0.095,
    "via": [
@@ -448,6 +462,7 @@
    "falloff": 0.0,
    "i": 0.45,
    "nameKey": "reagent-name-rmcnapalm",
+   "obtainable": true,
    "power": 0.0,
    "r": 0.06,
    "via": [
@@ -473,6 +488,7 @@
    "falloff": 0.0,
    "i": 0.45,
    "nameKey": "reagent-name-rmcnapalm-b",
+   "obtainable": true,
    "power": 0.0,
    "r": 0.06,
    "via": [
@@ -498,6 +514,7 @@
    "falloff": 0.0,
    "i": 0.45,
    "nameKey": "reagent-name-rmcnapalm-e",
+   "obtainable": true,
    "penetrating": true,
    "power": 0.0,
    "r": 0.06,
@@ -550,6 +567,7 @@
    "falloff": 0.0,
    "i": -4.05,
    "nameKey": "reagent-name-rmcnapalm-hc",
+   "obtainable": true,
    "power": 0.0,
    "r": -0.44,
    "via": [
@@ -575,6 +593,7 @@
    "falloff": 0.0,
    "i": -1.05,
    "nameKey": "reagent-name-rmcnapalm-sticky",
+   "obtainable": true,
    "power": 0.0,
    "r": -0.44,
    "via": [
@@ -600,6 +619,7 @@
    "falloff": 0.0,
    "i": 0.45,
    "nameKey": "reagent-name-rmcnapalm-ut",
+   "obtainable": true,
    "power": 0.0,
    "r": 0.06,
    "via": [
@@ -698,6 +718,7 @@
    "falloff": -0.5,
    "i": 0.0,
    "nameKey": "reagent-name-rmc-nitroglycerin",
+   "obtainable": true,
    "power": 1.0,
    "r": 0.0
   },
@@ -707,6 +728,7 @@
    "falloff": -0.2,
    "i": 0.4,
    "nameKey": "reagent-name-rmc-octogen",
+   "obtainable": true,
    "power": 2.0,
    "r": -0.02,
    "via": [
@@ -724,6 +746,7 @@
    "falloff": 0.0,
    "i": 1.15,
    "nameKey": "reagent-name-oxygen",
+   "obtainable": true,
    "power": 0.0,
    "r": -0.1,
    "via": [
@@ -741,6 +764,7 @@
    "falloff": 0.0,
    "i": 0.4,
    "nameKey": "reagent-name-rmcphoron",
+   "obtainable": true,
    "power": 0.0,
    "r": 0.05
   },
@@ -752,6 +776,7 @@
    "falloff": 0.0,
    "i": 1.0,
    "nameKey": "reagent-name-phosphorus",
+   "obtainable": true,
    "power": 0.0,
    "r": -0.12
   },
@@ -761,6 +786,7 @@
    "falloff": 0.0,
    "i": 0.0,
    "nameKey": "reagent-name-rmc-potassium-hydroxide",
+   "obtainable": true,
    "power": 0.5,
    "r": 0.0
   },
@@ -832,10 +858,400 @@
    "falloff": 0.0,
    "i": -3.0,
    "nameKey": "reagent-name-water",
+   "obtainable": true,
    "power": 0.0,
    "r": 0.0
   }
  },
+ "recipes": [
+  {
+   "casing": "RMCM40GrenadeCasing",
+   "labels": [
+    "Blast radius"
+   ],
+   "mix": {
+    "RMCANFO": 78.0,
+    "RMCOctogen": 42.0
+   },
+   "roles": [
+    "radius"
+   ]
+  },
+  {
+   "casing": "RMCM40GrenadeCasing",
+   "labels": [
+    "Peak damage"
+   ],
+   "mix": {
+    "RMCANFO": 60.0,
+    "RMCOctogen": 60.0
+   },
+   "roles": [
+    "damage"
+   ]
+  },
+  {
+   "casing": "RMCM40GrenadeCasing",
+   "labels": [
+    "Shrapnel"
+   ],
+   "mix": {
+    "RMCIron": 42.0,
+    "RMCOctogen": 78.0
+   },
+   "roles": [
+    "shrapnel"
+   ]
+  },
+  {
+   "casing": "RMCM40GrenadeCasing",
+   "labels": [
+    "Fire intensity",
+    "Burn time"
+   ],
+   "mix": {
+    "RMCCarbon": 24.0,
+    "RMCPhosphorus": 30.0
+   },
+   "roles": [
+    "fire",
+    "burn"
+   ]
+  },
+  {
+   "casing": "RMCM40GrenadeCasing",
+   "labels": [
+    "90% of the radius for the least cost"
+   ],
+   "mix": {
+    "RMCANFO": 90.0,
+    "RMCOctogen": 30.0
+   },
+   "roles": [
+    "cheap"
+   ]
+  },
+  {
+   "casing": "RMCM15GrenadeCasing",
+   "labels": [
+    "Blast radius"
+   ],
+   "mix": {
+    "RMCANFO": 117.0,
+    "RMCCyclonite": 63.0
+   },
+   "roles": [
+    "radius"
+   ]
+  },
+  {
+   "casing": "RMCM15GrenadeCasing",
+   "labels": [
+    "Peak damage"
+   ],
+   "mix": {
+    "RMCANFO": 99.0,
+    "RMCCyclonite": 81.0
+   },
+   "roles": [
+    "damage"
+   ]
+  },
+  {
+   "casing": "RMCM15GrenadeCasing",
+   "labels": [
+    "Shrapnel"
+   ],
+   "mix": {
+    "RMCIron": 81.0,
+    "RMCOctogen": 99.0
+   },
+   "roles": [
+    "shrapnel"
+   ]
+  },
+  {
+   "casing": "RMCM15GrenadeCasing",
+   "labels": [
+    "Fire intensity",
+    "Burn time"
+   ],
+   "mix": {
+    "RMCCarbon": 36.0,
+    "RMCPhosphorus": 36.0
+   },
+   "roles": [
+    "fire",
+    "burn"
+   ]
+  },
+  {
+   "casing": "RMCM15GrenadeCasing",
+   "labels": [
+    "90% of the radius for the least cost"
+   ],
+   "mix": {
+    "RMCANFO": 162.0,
+    "RMCOctogen": 18.0
+   },
+   "roles": [
+    "cheap"
+   ]
+  },
+  {
+   "casing": "RMCM20MineCasing",
+   "labels": [
+    "Blast radius",
+    "Peak damage"
+   ],
+   "mix": {
+    "RMCANFO": 102.0
+   },
+   "roles": [
+    "radius",
+    "damage"
+   ]
+  },
+  {
+   "casing": "RMCM20MineCasing",
+   "labels": [
+    "Shrapnel"
+   ],
+   "mix": {
+    "RMCIron": 42.0,
+    "RMCOctogen": 54.0
+   },
+   "roles": [
+    "shrapnel"
+   ]
+  },
+  {
+   "casing": "RMCM20MineCasing",
+   "labels": [
+    "Fire intensity",
+    "Burn time"
+   ],
+   "mix": {
+    "RMCCarbon": 18.0,
+    "RMCPhosphorus": 24.0
+   },
+   "roles": [
+    "fire",
+    "burn"
+   ]
+  },
+  {
+   "casing": "RMCM20MineCasing",
+   "labels": [
+    "90% of the radius for the least cost"
+   ],
+   "mix": {
+    "RMCANFO": 102.0
+   },
+   "roles": [
+    "cheap"
+   ]
+  },
+  {
+   "casing": "RMCC4PlasticCasing",
+   "labels": [
+    "Blast radius"
+   ],
+   "mix": {
+    "RMCANFO": 117.0,
+    "RMCCyclonite": 63.0
+   },
+   "roles": [
+    "radius"
+   ]
+  },
+  {
+   "casing": "RMCC4PlasticCasing",
+   "labels": [
+    "Peak damage"
+   ],
+   "mix": {
+    "RMCCyclonite": 153.0,
+    "RMCOctogen": 27.0
+   },
+   "roles": [
+    "damage"
+   ]
+  },
+  {
+   "casing": "RMCC4PlasticCasing",
+   "labels": [
+    "Shrapnel"
+   ],
+   "mix": {
+    "RMCIron": 108.0,
+    "RMCOctogen": 72.0
+   },
+   "roles": [
+    "shrapnel"
+   ]
+  },
+  {
+   "casing": "RMCC4PlasticCasing",
+   "labels": [
+    "Fire intensity",
+    "Burn time"
+   ],
+   "mix": {
+    "RMCCarbon": 18.0,
+    "RMCPhosphorus": 54.0
+   },
+   "roles": [
+    "fire",
+    "burn"
+   ]
+  },
+  {
+   "casing": "RMCC4PlasticCasing",
+   "labels": [
+    "90% of the radius for the least cost"
+   ],
+   "mix": {
+    "RMCANFO": 162.0,
+    "RMCOctogen": 18.0
+   },
+   "roles": [
+    "cheap"
+   ]
+  },
+  {
+   "casing": "RMC88mmRocketWarhead",
+   "labels": [
+    "Blast radius"
+   ],
+   "mix": {
+    "RMCANFO": 180.0
+   },
+   "roles": [
+    "radius"
+   ]
+  },
+  {
+   "casing": "RMC88mmRocketWarhead",
+   "labels": [
+    "Peak damage"
+   ],
+   "mix": {
+    "RMCANFO": 99.0,
+    "RMCCyclonite": 81.0
+   },
+   "roles": [
+    "damage"
+   ]
+  },
+  {
+   "casing": "RMC88mmRocketWarhead",
+   "labels": [
+    "Shrapnel"
+   ],
+   "mix": {
+    "RMCIron": 81.0,
+    "RMCOctogen": 99.0
+   },
+   "roles": [
+    "shrapnel"
+   ]
+  },
+  {
+   "casing": "RMC88mmRocketWarhead",
+   "labels": [
+    "Fire intensity",
+    "Burn time"
+   ],
+   "mix": {
+    "RMCCarbon": 36.0,
+    "RMCPhosphorus": 45.0
+   },
+   "roles": [
+    "fire",
+    "burn"
+   ]
+  },
+  {
+   "casing": "RMC88mmRocketWarhead",
+   "labels": [
+    "90% of the radius for the least cost"
+   ],
+   "mix": {
+    "RMCANFO": 180.0
+   },
+   "roles": [
+    "cheap"
+   ]
+  },
+  {
+   "casing": "RMC80mmMortarWarhead",
+   "labels": [
+    "Blast radius"
+   ],
+   "mix": {
+    "RMCANFO": 144.0,
+    "RMCOctogen": 96.0
+   },
+   "roles": [
+    "radius"
+   ]
+  },
+  {
+   "casing": "RMC80mmMortarWarhead",
+   "labels": [
+    "Peak damage"
+   ],
+   "mix": {
+    "RMCANFO": 120.0,
+    "RMCOctogen": 120.0
+   },
+   "roles": [
+    "damage"
+   ]
+  },
+  {
+   "casing": "RMC80mmMortarWarhead",
+   "labels": [
+    "Shrapnel"
+   ],
+   "mix": {
+    "RMCIron": 204.0,
+    "RMCOctogen": 36.0
+   },
+   "roles": [
+    "shrapnel"
+   ]
+  },
+  {
+   "casing": "RMC80mmMortarWarhead",
+   "labels": [
+    "Fire intensity",
+    "Burn time"
+   ],
+   "mix": {
+    "RMCCarbon": 48.0,
+    "RMCPhosphorus": 48.0
+   },
+   "roles": [
+    "fire",
+    "burn"
+   ]
+  },
+  {
+   "casing": "RMC80mmMortarWarhead",
+   "labels": [
+    "90% of the radius for the least cost"
+   ],
+   "mix": {
+    "RMCANFO": 168.0,
+    "RMCOctogen": 72.0
+   },
+   "roles": [
+    "cheap"
+   ]
+  }
+ ],
  "schema": 1,
  "targets": [
   {
