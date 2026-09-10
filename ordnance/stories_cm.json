@@ -1274,7 +1274,7 @@
   {
    "casing": "RMCM40GrenadeCasing",
    "labels": [
-    "90% of the radius for the least cost"
+    "90% of the best radius for the least material"
    ],
    "mix": {
     "RMCANFO": 90.0,
@@ -1366,7 +1366,7 @@
   {
    "casing": "RMCM15GrenadeCasing",
    "labels": [
-    "90% of the radius for the least cost"
+    "90% of the best radius for the least material"
    ],
    "mix": {
     "RMCANFO": 162.0,
@@ -1447,10 +1447,10 @@
   {
    "casing": "RMCM20MineCasing",
    "labels": [
-    "90% of the radius for the least cost"
+    "90% of the best radius for the least material"
    ],
    "mix": {
-    "RMCANFO": 102.0
+    "RMCANFO": 96.0
    },
    "roles": [
     "cheap"
@@ -1539,7 +1539,7 @@
   {
    "casing": "RMCC4PlasticCasing",
    "labels": [
-    "90% of the radius for the least cost"
+    "90% of the best radius for the least material"
    ],
    "mix": {
     "RMCANFO": 162.0,
@@ -1656,7 +1656,7 @@
   {
    "casing": "RMC88mmRocketWarhead",
    "labels": [
-    "90% of the radius for the least cost"
+    "90% of the best radius for the least material"
    ],
    "mix": {
     "RMCANFO": 180.0
@@ -1750,7 +1750,7 @@
   {
    "casing": "RMC80mmMortarWarhead",
    "labels": [
-    "90% of the radius for the least cost"
+    "90% of the best radius for the least material"
    ],
    "mix": {
     "RMCANFO": 168.0,
@@ -1842,7 +1842,7 @@
   {
    "casing": "RMC80mmMortarCameraWarhead",
    "labels": [
-    "90% of the radius for the least cost"
+    "90% of the best radius for the least material"
    ],
    "mix": {
     "RMCANFO": 180.0

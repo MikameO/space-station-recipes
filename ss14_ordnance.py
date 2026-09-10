@@ -1054,17 +1054,25 @@ def build_recipes(casings: dict, reagents: dict, formula: dict, costs: dict,
                                "mix": mix}
         out.extend(rows.values())
 
-        # The cheap row: least of the scarce reagent that still reaches most of
-        # the best radius. This is the finding the whole series turns on.
-        if radius_points and costs:
+        # The cheapest route to nearly the best radius. Ranked by material and
+        # then by reactions, like everything else here; it used to be ranked by
+        # phoron, which is the measure that made octogen look cheap in the first
+        # place. Switching changed nothing, and that is the point: at ninety per
+        # cent of the peak radius there is no octogen-free answer, because the
+        # peak itself needs octogen. So the row is named for what it delivers,
+        # near-maximum reach, rather than promising a cheapness it cannot have.
+        # The genuinely cheap row is the short chain one.
+        if radius_points:
             ceiling = max(v for v, _ in radius_points)
             target = ceiling * CHEAP_SHARE
-            good = [(mix_cost(m, costs, cost_base), v, m)
+            good = [(round(sum(effort.get(rid, 0) * q for rid, q in m.items()), 3),
+                     len(set().union(*(chain[rid] for rid in m))), -v, m)
                     for v, m in radius_points if v >= target]
             if good:
-                cost, value, mix = min(good, key=lambda x: (x[0], -x[1]))
+                _, _, _, mix = min(good, key=lambda x: x[:3])
                 out.append({"casing": casing_id, "roles": ["cheap"],
-                            "labels": [f"{int(CHEAP_SHARE * 100)}% of the radius for the least cost"],
+                            "labels": [f"{int(CHEAP_SHARE * 100)}% of the best radius "
+                                       f"for the least material"],
                             "mix": mix})
 
         if denial_best:

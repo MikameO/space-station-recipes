@@ -145,7 +145,7 @@
     'reactions to run: ': 'реакций провести: ',
     'Against T2+ two or three tiles away: ': 'По T2+ в двух-трёх клетках: ',
     'crippled': 'в крите',
-    'Burn time': 'Горение', 'Cheap': 'Дёшево',
+    'Burn time': 'Горение', 'Near max reach': 'Почти максимум',
     'destroyed': 'уничтожен', 'no effect': 'без эффекта',
     'at the centre': 'в эпицентре', 'for armour': 'по броне',
     'on contact': 'при входе', 'in the flame': 'в пламени', 'after': 'после',
@@ -2044,7 +2044,7 @@
 
   const ROLE_LABEL = {
     radius: 'Reach', damage: 'Damage', shrapnel: 'Shrapnel',
-    fire: 'Fire', burn: 'Burn time', cheap: 'Cheap',
+    fire: 'Fire', burn: 'Burn time', cheap: 'Near max reach',
     short: 'Short chain', he: 'HE round', breach: 'Breach', denial: 'Denial',
   };
 
