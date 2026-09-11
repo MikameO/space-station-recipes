@@ -385,8 +385,14 @@ def engine_params(power: float, falloff: float) -> dict:
             "radius": radius}
 
 
-def damage_per_intensity(explosion_files: dict[str, str], proto: str) -> float:
-    """Sum of damagePerIntensity for the explosion prototype the casings use."""
+def damage_by_type(explosion_files: dict[str, str], proto: str) -> dict[str, float]:
+    """damagePerIntensity split by damage type for the casings' explosion.
+
+    The RMC blast is half Blunt and half Heat, which is what decides whether a
+    medic reaches for bruise packs or burn kits. The split survives the trip
+    intact: explosions are dealt with ignoreResistances, so no modifier set
+    rebalances it on the way in.
+    """
     for text in explosion_files.values():
         for block in _split_prototypes(text, "explosion"):
             if _top_field(block, "id", r"(\S+)") != proto:
@@ -394,8 +400,14 @@ def damage_per_intensity(explosion_files: dict[str, str], proto: str) -> float:
             m = re.search(r"damagePerIntensity:\s*\n\s+types:\s*\n((?:\s+\w+:\s*-?[\d.]+\n?)+)", block)
             if not m:
                 continue
-            return sum(float(v) for v in re.findall(r":\s*(-?[\d.]+)", m.group(1)))
-    return 0.0
+            return {k: float(v)
+                    for k, v in re.findall(r"(\w+):\s*(-?[\d.]+)", m.group(1))}
+    return {}
+
+
+def damage_per_intensity(explosion_files: dict[str, str], proto: str) -> float:
+    """Sum of damagePerIntensity for the explosion prototype the casings use."""
+    return sum(damage_by_type(explosion_files, proto).values())
 
 
 # ── Targets ──────────────────────────────────────────────────────────────────
@@ -1410,8 +1422,10 @@ def build(fork_id: str, fconf: dict, fetch) -> dict:
 
     cost_base = conf.get("cost_base", "RMCPhoron")
     dmg = damage_per_intensity(explosion_files, conf.get("explosion_proto", "RMC"))
+    dmg_types = damage_by_type(explosion_files, conf.get("explosion_proto", "RMC"))
     formula = {
         "damagePerIntensity": dmg,
+        "damageTypes": dmg_types,
         "intensityDivisor": INTENSITY_DIVISOR,
         "minSlope": MIN_SLOPE,
         "starIntensity": STAR_INTENSITY,

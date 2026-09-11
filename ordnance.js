@@ -161,6 +161,7 @@
     'Burn time': 'Горение', 'Near max reach': 'Почти максимум',
     'destroyed': 'уничтожен', 'no effect': 'без эффекта',
     'killed': 'убит', 'down': 'в крите',
+    'brute': 'ушиб', 'burn': 'ожог',
     'Light armour': 'Лёгкая', 'Medium armour': 'Средняя',
     'Heavy armour': 'Тяжёлая',
     'at the centre': 'в эпицентре', 'for armour': 'по броне',
@@ -2386,6 +2387,33 @@
   // What the same round does to the people who threw it. Blast only: a marine
   // burns through a different branch of FlammableSystem than a xeno, with fire
   // protection from the suit on top, and none of that is mirrored here.
+  // The RMC blast is dealt half as Blunt and half as Heat, and explosions pass
+  // ignoreResistances, so nothing rebalances the split on the way in. Which
+  // half is which decides whether a medic reaches for bruise packs or burn kits.
+  const DAMAGE_GROUP = {
+    Blunt: 'brute', Slash: 'brute', Piercing: 'brute',
+    Heat: 'burn', Shock: 'burn', Cold: 'burn',
+  };
+
+  function damageSplit(total) {
+    const types = (S.data.formula || {}).damageTypes;
+    if (!types) return null;
+    const sum = Object.values(types).reduce((a, b) => a + b, 0);
+    if (!(sum > 0)) return null;
+    const out = {};
+    for (const [type, per] of Object.entries(types)) {
+      const group = DAMAGE_GROUP[type] || type;
+      out[group] = (out[group] || 0) + total * per / sum;
+    }
+    return out;
+  }
+
+  function splitLine(total) {
+    const split = damageSplit(total);
+    if (!split) return '';
+    return Object.keys(split).map(g => round(split[g], 0) + ' ' + tr(g)).join(' + ');
+  }
+
   function renderMarines() {
     const box = $('ordMarines');
     if (!box) return;
@@ -2412,6 +2440,7 @@
         <div class="ord-xeno-num">${state === 'dead' ? esc(tr('killed'))
           : esc(round(left, 0)) + ' / ' + esc(round(m.dead, 0))}</div>
         <div class="ord-xeno-dmg">${esc(round(dealt, 0))} \u00d7${esc(m.coefficient.toFixed(2))}</div>
+        <div class="ord-xeno-split">${esc(splitLine(dealt)) || '\u00a0'}</div>
         <div class="ord-xeno-hits">${state === 'crit' ? esc(tr('down')) : '\u00a0'}</div>
       </div>`;
     }).join('');

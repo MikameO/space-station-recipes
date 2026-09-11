@@ -474,6 +474,10 @@
   "armorStep": 5.0,
   "costBase": "RMCPhoron",
   "damagePerIntensity": 10.0,
+  "damageTypes": {
+   "Blunt": 5.0,
+   "Heat": 5.0
+  },
   "defaultFire": "RMCTileFire",
   "fireBurnDivisor": 2.0,
   "fireBurnFloor": 0.8,

@@ -3183,6 +3183,8 @@ b.ord-bad { color: var(--red-alert); }
   gap: 10px; margin-bottom: 14px; }
 .ord-marine .ord-xeno-art { background: #2a2418; }
 .ord-marine .ord-xeno-art img { filter: none; }
+.ord-xeno-split { font-size: 0.62rem; color: var(--text-sub);
+  font-family: 'Share Tech Mono', monospace; }
 .ord-he-dead { color: var(--red-alert); font-weight: 400; }
 .ord-xeno-fire { font-size: 0.64rem; color: #ff7a35;
   font-family: 'Share Tech Mono', monospace; }
