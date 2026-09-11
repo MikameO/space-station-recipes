@@ -505,6 +505,7 @@
    "nameKey": "reagent-name-rmc-anfo",
    "obtainable": true,
    "power": 1.0,
+   "quick": true,
    "r": 0.0,
    "steps": [
     "RMCANFO",
@@ -524,6 +525,7 @@
    "nameKey": "reagent-name-rmc-ammonium-nitrate",
    "obtainable": true,
    "power": 0.4,
+   "quick": true,
    "r": 0.0,
    "steps": [
     "RMCAmmonia",
@@ -591,6 +593,7 @@
    "nameKey": "reagent-name-carbon",
    "obtainable": true,
    "power": 0.0,
+   "quick": true,
    "r": 0.0
   },
   "RMCCopper": {
@@ -615,6 +618,7 @@
    "nameKey": "reagent-name-rmc-cyclonite",
    "obtainable": true,
    "power": 1.5,
+   "quick": true,
    "r": 0.0,
    "steps": [
     "RMCAmmonia",
@@ -637,6 +641,7 @@
    "nameKey": "reagent-name-ethanol",
    "obtainable": true,
    "power": 0.0,
+   "quick": true,
    "r": 0.1
   },
   "RMCHexamine": {
@@ -650,6 +655,7 @@
    "nameKey": "reagent-name-rmc-hexamine",
    "obtainable": true,
    "power": 0.0,
+   "quick": true,
    "r": 0.0,
    "steps": [
     "RMCAmmonia",
@@ -669,6 +675,7 @@
    "nameKey": "reagent-name-hydrogen",
    "obtainable": true,
    "power": 0.15,
+   "quick": true,
    "r": 0.2
   },
   "RMCIron": {
@@ -680,6 +687,7 @@
    "nameKey": "reagent-name-iron",
    "obtainable": true,
    "power": 0.0,
+   "quick": true,
    "r": 0.0,
    "shardsPerUnit": 0.25
   },
@@ -713,6 +721,7 @@
    "nameKey": "reagent-name-rmcmethane",
    "obtainable": true,
    "power": 0.15,
+   "quick": true,
    "r": 0.095,
    "steps": [
     "RMCMethane"
@@ -1090,6 +1099,7 @@
    "nameKey": "reagent-name-oxygen",
    "obtainable": true,
    "power": 0.0,
+   "quick": true,
    "r": -0.1,
    "via": [
     {
@@ -1109,6 +1119,7 @@
    "nameKey": "reagent-name-rmcphoron",
    "obtainable": true,
    "power": 0.0,
+   "quick": true,
    "r": 0.05
   },
   "RMCPhosphorus": {
@@ -1122,6 +1133,7 @@
    "nameKey": "reagent-name-phosphorus",
    "obtainable": true,
    "power": 0.0,
+   "quick": true,
    "r": -0.12
   },
   "RMCPotassiumHydroxide": {
@@ -1133,6 +1145,7 @@
    "nameKey": "reagent-name-rmc-potassium-hydroxide",
    "obtainable": true,
    "power": 0.5,
+   "quick": true,
    "r": 0.0,
    "steps": [
     "RMCPotassiumHydroxide"
@@ -1213,6 +1226,7 @@
    "nameKey": "reagent-name-water",
    "obtainable": true,
    "power": 0.0,
+   "quick": true,
    "r": 0.0
   }
  },

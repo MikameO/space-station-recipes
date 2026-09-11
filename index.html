@@ -535,13 +535,13 @@
               <option value="fireIntensity">Fire intensity</option>
               <option value="fireDuration">Burn time</option>
               <option value="reach">Fire reach</option>
-              <option value="lowestCost">Lowest cost</option>
+              <option value="lowestCost">Least material</option>
             </select></label>
-          <label class="ord-field"><span>Cost in</span>
-            <select id="ordCostBase" aria-label="Cost basis"></select></label>
-          <label class="ord-field"><span>Cost ceiling</span>
+          <label class="ord-field"><span>Show cost in</span>
+            <select id="ordCostBase" aria-label="Cost basis for the tables"></select></label>
+          <label class="ord-field"><span>Material ceiling</span>
             <input type="number" id="ordReqCost" min="0" step="1" placeholder="no limit"
-                   aria-label="Cost ceiling"></label>
+                   aria-label="Material ceiling"></label>
           <label class="ord-check"><input type="checkbox" id="ordReqLadder"> Cost ladder</label>
           <button id="ordReqRun" class="ord-chip ord-chip-go">Search</button>
         </div>
@@ -549,6 +549,7 @@
           <div class="ord-exclude-head">
             <span id="ordExcludeLabel">Without</span>
             <b id="ordExcludeCount"></b>
+            <button id="ordExcludeQuick" class="ord-chip">Quick only</button>
             <button id="ordExcludeClear" class="ord-chip">Clear</button>
           </div>
           <div id="ordReqExclude" class="ord-exclude-chips"></div>
@@ -755,10 +756,10 @@
 </div>
 
 <!-- i18n.js must load BEFORE app.js: it exposes applyRussianData for init() -->
-<script src="i18n.js?v=26"></script>
+<script src="i18n.js?v=27"></script>
 <script src="app.js?v=33"></script>
 <script defer src="tutorial.js?v=3"></script>
 <script src="maps.js?v=16" defer></script>
-<script src="ordnance.js?v=41" defer></script>
+<script src="ordnance.js?v=42" defer></script>
 </body>
 </html>

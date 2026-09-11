@@ -54,9 +54,9 @@
     reqObjective: 'blastRadius', reqCostLimit: null,
     reqs: [{ metric: 'shards', min: 20 }],   // opens on a real, useful example
     reqLadder: false, reqResult: undefined,
-    // Reagents the spec search may not touch. Octogen is buildable and
-    // still a chore, so being able to say "anything but that" is worth
-    // more than any weighting I could invent for it.
+    // Reagents the spec search may not touch. It starts holding everything
+    // that is not quick to make, because a recipe you cannot mix before the
+    // push leaves is not an answer. One tap puts any of them back.
     reqExclude: [],
     // Which metric each axis of the curve carries. Defaults reproduce what
     // the panel drew before it had a choice.
@@ -142,6 +142,7 @@
     'Fire': 'Огонь',
     'Reach': 'Дальнобой', 'Damage': 'Урон',
     'Without': 'Без',
+    'Least material': 'Минимум материала',
     'Short chain': 'Короткая цепь', 'HE round': 'Фугасный', 'Breach': 'Пролом', 'Denial': 'Отсечение',
     'HE': 'Фугас',
     'Work': 'Материал', 'Steps': 'Реакций',
@@ -178,6 +179,18 @@
       chip.classList.toggle('active', on);
       chip.setAttribute('aria-pressed', String(on));
     }
+  }
+
+  // What a mixture costs to make, in units of base chemistry. This is the
+  // measure the search optimises, because the old one could not: cost in a
+  // single chosen reagent is zero whenever the mixture does not contain it,
+  // and a flat zero gives the climb no gradient and the ladder no rungs.
+  function mixWork(mix) {
+    let work = 0;
+    for (const [id, qty] of Object.entries(mix)) {
+      work += ((S.data.reagents[id] || {}).effort || 0) * qty;
+    }
+    return work;
   }
 
   function casingOf() { return S.data.casings[S.casing]; }
@@ -329,6 +342,7 @@
       buildCasingSelect();
       buildAddSelect();
       buildCostSelect();
+      banSlowReagents();
       buildExcludeSelect();
       renderReqList();
       loadMasks();
@@ -547,6 +561,10 @@
     });
     $('ordExcludeClear').onclick = () => {
       S.reqExclude = [];
+      buildExcludeSelect();
+    };
+    $('ordExcludeQuick').onclick = () => {
+      banSlowReagents();
       buildExcludeSelect();
     };
     $('ordReqCost').oninput = e => {
@@ -1666,14 +1684,23 @@
   // consider, so nothing in it is a no-op. Chips rather than a native multiple
   // select: that control needs a modifier key nobody discovers, and it hides
   // the choice inside a scrolling box.
+  // Everything the search could consider, quick or not.
+  function excludeCandidates() {
+    const F = S.data.formula;
+    return Object.keys(S.data.reagents).filter(id => {
+      const r = S.data.reagents[id];
+      return r.obtainable && (r.explosive || r.i || r.d || r.r || id === F.ironReagent);
+    });
+  }
+
+  function banSlowReagents() {
+    S.reqExclude = excludeCandidates().filter(id => !S.data.reagents[id].quick);
+  }
+
   function buildExcludeSelect() {
     const box = $('ordReqExclude');
     if (!box) return;
-    const F = S.data.formula;
-    const ids = Object.keys(S.data.reagents).filter(id => {
-      const r = S.data.reagents[id];
-      return r.obtainable && (r.explosive || r.i || r.d || r.r || id === F.ironReagent);
-    }).sort((a, b) => rname(a).localeCompare(rname(b)));
+    const ids = excludeCandidates().sort((a, b) => rname(a).localeCompare(rname(b)));
     box.innerHTML = ids.map(id => {
       const on = S.reqExclude.includes(id);
       return `<button type="button" class="diff-chip${on ? ' active' : ''}"
@@ -1764,7 +1791,7 @@
     const st = computeStats(mix, c, S.dampener);
     const F = S.data.formula;
     const dmgPer = F.damagePerIntensity / F.intensityDivisor;
-    const cost = mixCost(mix, S.costBase);
+    const cost = mixWork(mix);
 
     // Normalised shortfall per requirement, so one badly-scaled metric cannot
     // dominate the penalty and stall the climb.
@@ -1946,7 +1973,7 @@
   }
 
   function renderLadder(box, ladder) {
-    const unit = rname(S.costBase);
+    const unit = tr('Work');
     box.innerHTML = `<table class="ord-table">
       <thead><tr>
         <th>${esc(tr('Target'))}</th><th>${esc(tr('Mixture'))}</th>
@@ -2012,16 +2039,16 @@
         <td>${esc(round(have, 2))} ${ok ? '\u2713' : '\u2717'}</td></tr>`;
     }).join('');
     const objLabel = S.reqObjective === 'lowestCost'
-      ? tr('Lowest cost') : mlabel(S.reqObjective);
+      ? tr('Least material') : mlabel(S.reqObjective);
     const objValue = S.reqObjective === 'lowestCost'
-      ? round(ev.cost, 1) + ' ' + rname(S.costBase)
+      ? round(ev.cost, 0)
       : round(ev.objective, 2);
 
     box.innerHTML = `<div class="ord-req-card">
       <div class="ord-pick-lead"><span>${esc(objLabel)}</span><strong>${esc(objValue)}</strong></div>
       <div class="ord-pick-head">${esc(describeMix(mix))}</div>
       <div class="ord-req-sub">${esc(tr('Uses'))} ${Object.keys(mix).length} \u00b7
-        ${esc(tr('cost'))} ${esc(round(ev.cost, 1))} ${esc(rname(S.costBase))}
+        ${esc(tr('Work'))} ${esc(round(ev.cost, 0))}
         ${ev.miss > 1e-9 ? ' \u00b7 <b class="ord-bad">' + esc(tr('requirements not met')) + '</b>' : ''}</div>
       ${rows ? `<table class="ord-pick-table"><tbody>${rows}</tbody></table>` : ''}
       <button class="ord-chip" id="ordReqUse">Load this mix</button>
@@ -2052,12 +2079,10 @@
       // mixture needs, and that is what makes octogen a chore: eight against
       // ANFO's four. Reagents sharing a chain share its steps, so ANFO with
       // ammonium nitrate costs four, not seven.
-      let work = 0;
+      const work = mixWork(r.mix);
       const steps = new Set();
-      for (const [id, qty] of Object.entries(r.mix)) {
-        const spec = S.data.reagents[id] || {};
-        work += (spec.effort || 0) * qty;
-        for (const s of spec.steps || []) steps.add(s);
+      for (const id of Object.keys(r.mix)) {
+        for (const s of (S.data.reagents[id] || {}).steps || []) steps.add(s);
       }
       return { r, st, cost: mixCost(r.mix, S.costBase), work, steps: steps.size,
                he: heEffect(st), dmg: st.power * dmgPer, kills: killCount(st) };

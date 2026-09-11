@@ -575,6 +575,15 @@ FORK_REGISTRY = {
                 "Resources/Prototypes/_RMC14/Entities/Tiles/tile_fire.yml",
             ],
             "default_fire": "RMCTileFire",
+            # Реагенты, которые либо есть сразу, либо готовятся за полминуты.
+            # Список игровой, не выводимый из числа реакций: циклонит стоит
+            # шести шагов и всё равно быстрый, октоген восьми и долгий.
+            "quick_reagents": [
+                "RMCAmmoniumNitrate", "RMCANFO", "Water", "RMCHydrogen",
+                "RMCHexamine", "RMCPotassiumHydroxide", "RMCIron", "RMCOxygen",
+                "RMCMethane", "RMCCarbon", "RMCPhoron", "RMCPhosphorus",
+                "RMCCyclonite", "RMCEthanol",
+            ],
             # Цели для оценки эффекта. Список — зеркало
             # DemolitionsSimulatorLists.Xenomorphs: тот же набор, что предлагает
             # внутриигровой симулятор подрывов, в том же порядке.

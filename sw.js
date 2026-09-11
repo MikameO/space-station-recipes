@@ -3,7 +3,7 @@
 // network-first with cache fallback — fresh while online, functional offline.
 // data.json is requested with a ?v=Date.now() cache-buster, so fallback
 // matching ignores the query string to hit the cached copy.
-const CACHE = 'chemdb-v74';
+const CACHE = 'chemdb-v75';
 // Data lives in its own UNVERSIONED cache: shell-cache bumps must never
 // wipe the 3MB data.json — losing it right after an update + one flaky
 // network moment = hard "Failed to load" (user-reported on mobile).
@@ -12,11 +12,11 @@ const PRECACHE = [
   './',
   './index.html',
   './style.css?v=56',
-  './i18n.js?v=26',
+  './i18n.js?v=27',
   './app.js?v=33',
   './tutorial.js?v=3',
   './maps.js?v=16',
-  './ordnance.js?v=41',
+  './ordnance.js?v=42',
   './manifest.json',
 ];
 // Maps data (maps/index.json + per-map PNG/JSON) is NOT precached: one station's

@@ -1192,6 +1192,7 @@ def build(fork_id: str, fconf: dict, fetch) -> dict:
     iron = conf.get("iron_reagent", "RMCIron")
     obtainable = load_obtainable()
     default_fire = conf.get("default_fire", "RMCTileFire")
+    quick = set(conf.get("quick_reagents", []))
     fires = build_fires(fire_files) if fire_files else {}
     costs = load_cost_model()
     chem = load_chem()
@@ -1228,6 +1229,10 @@ def build(fork_id: str, fconf: dict, fetch) -> dict:
         if spec.get("fireEntity") and spec["fireEntity"] != default_fire:
             entry["fireEntity"] = spec["fireEntity"]
         entry["effort"] = round(reagent_effort(rid, costs), 3)
+        # On hand, or half a minute away. Not derivable from the reaction count:
+        # cyclonite is six steps and still quick, octogen eight and a chore.
+        if rid in quick:
+            entry["quick"] = True
         # The reactions themselves, not just how many: two reagents sharing a
         # chain cost one set of steps, not two.
         chain = sorted(reagent_steps(rid, chem))
