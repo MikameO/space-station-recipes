@@ -11,7 +11,7 @@
 ## 0. Правила выполнения (Definition of Done для каждого инкремента)
 
 1. **Верификация e2e в браузере** (preview): фича работает кликом, скриншот; для data-инкрементов — regen + спот-чек значений против YAML апстрима.
-2. **Cache-bust:** при правке `app.js`/`style.css` — bump `?v=N` в `index.html` (иначе preview отдаёт старый код).
+2. **Cache-bust:** при правке `app.js`/`style.css`/`i18n.js`/`maps.js`/`ordnance.js`/`tutorial.js` — bump `?v=N` в `index.html` **и** в `PRECACHE` в `sw.js`, плюс bump `CACHE` в `sw.js` (иначе preview и SW отдают старый код; уточнено аудитом 2026-09-11, B21).
 3. **Параллельные сессии:** перед правкой `app.js`/`config.py` — `git status` + mtime-чек; коммитить только свои файлы. Инкременты, трогающие `app.js`, вести последовательно, не в параллельных сессиях.
 4. **Коммит** после верификации (conventional commits), **CHANGELOG** при изменении схемы данных; push только по запросу.
 5. **M1 (сквозной, при каждом regen):** просмотреть warnings экстрактора; проверить переименования апстрима (Solution→entity #43192/#43194/#43384, EdibleComponent #40046, условия EntityEffects #38643, газы #39685 — ExudeGasses/ConsumeGasses были перепутаны). Дрейф схемы = тихая порча данных.
@@ -289,6 +289,46 @@ prices.json **схема v2**: интернированная таблица к�
 ### O19. Исключение реагента в поиске под задачу `[x]` — HAE 1h (frontend) — запрос пользователя
 Список «Без материала» убирает выбранные реагенты из пула поиска. Заодно поиск переведён с requestAnimationFrame на таймер: в фоновой вкладке кадр не наступает и кнопка залипала навсегда. DoD: бан октогена меняет ответ с 228 АНФО + 11 октогена на 220 АНФО + 20 циклонита.
 
+## Серия Q — «Аудит 2026-09-11: исправления» (план из [AUDIT.md](AUDIT.md), Часть VI)
+
+**Основание:** полный независимый аудит 2026-09-11 (8 агентов + R2 + self-check): 167 сведённых пунктов, **0 P0 / 52 P1 / 59 P2 / 6 P3**; приложения — [docs/audit/2026-09-11/](docs/audit/2026-09-11/). Нумерация находок (A/B/C/D-…) — из Части I отчёта. Инкременты сгруппированы «одна правка = один инцидент/когорта»; каждый закрывается по DoD §0 (e2e в браузере + скриншот, для данных — regen + спот-чек).
+
+### Q1. Однострочники и share-ссылки `[ ]` — HAE 1h (frontend)
+C1/C12 `.ord-fork-note[hidden], .ord-mask-modes[hidden]{display:none!important}` (style.css) · B47 `selectedReagentId = null` в `closeDetail()` · C17/B10 `botany` и `steps-asc` в whitelist'ы (лучше строить из DOM) · C16 `renderCurrentTab()` вместо `renderReagents()` после `decodeURLState()` · C8 `esc()` имени продукта (app.js:1222) и `'`→`&#39;` в `esc()`. Cache-bust `?v=` + PRECACHE + CACHE.
+**DoD:** плашка Ordnance скрыта на stories_cm (getComputedStyle), share с Botany/`#q=`/Fewest Steps восстанавливает состояние, Back после туториала не ведёт на 24 Volt Energy.
+
+### Q2. Корректность рецептов и формул `[ ]` — HAE 4h (frontend) — **зависит от Q1**
+C2 ранжирование по родословной в `getFilteredReactions` для «All» + та же выборка в панели деталей · C3 банковское округление в ordnance.js:232 + node-реплей `ordnance_reference.py` через `computeStats()` (D8) · C18/B9 реакции без продуктов и `reactionInFork` в reverse lookup, `reagentInFork` по `r.recipe`, blocked-цели → «нет рецепта в форке» · B7 дробные кратные и катализатор > 0 в стакане (+ поле `quantized` из экстрактора) · B8 катализаторы в списке покупок · B60 валидация чисел · B59 `Object.hasOwn` (openDetail/getFilteredReactions/maps.js:93/loadMasks) · C19 `S.loadSeq` в `loadMap` + мемо 3 карт.
+**DoD:** Siderlac 10u = 1 шаг; 30u Cryoxadone показывает Plasma в списке; свип 2 577 смесей JS == Python; Bagel→Box→Marathon за тик — консистентно.
+
+### Q3. Холодная загрузка и индекс `[ ]` — HAE 4h (frontend)
+B31/D16 preload или inline-fetch `data.json` в `<head>`; ленивые `maps.js`/`ordnance.js` по первому клику (остаются в PRECACHE) · B2 self-host трёх шрифтов в `fonts/` (+ cp-list, PRECACHE, bump CACHE), убрать `@import` · B32/D15 `byProduct: Map` + `baseChemicals: Set` в `buildSearchIndex` · B33 `insertAdjacentHTML('beforeend')` в `renderBatch` + делегированный listener на `#reagentGrid`.
+**DoD:** DevTools-трейс prod (Slow 3G, 4×): data.json стартует < 3 с, «Fewest Steps» < 300 мс, Load More #17 < 60 мс.
+
+### Q4. Мобиль и доступность P1 `[ ]` — HAE 6h (frontend) — **зависит от Q3**
+B38 `.header-right{flex-wrap:wrap}` или «⋯»-меню; `#langToggle` ≥ 44 px всегда виден; `#pipBtn` скрыт < 700 px · B36 `height:100dvh` · B37/D11 клавиатурный combobox (Enter/стрелки/точное имя/`aria-activedescendant`) + skip-link · B40 токены `--text-ghost #7b8aa6`, `--phosphor-text #2fa85f`, `.btn-primary`, antag-подписи · B39 фокус в панель и обратно, `inert` на закрытой, sticky-шапка панели · B41 `<button aria-expanded>` в 9 секциях · B42 sell list `th scope`+`aria-sort`+кнопки · B43 `aria-pressed` на 4 семействах чипов · B44 `aria-label` для `#mapsSearch`/`#mapsListFilter`/`#companionCollapse` · B25 28 aria-строк в i18n.js · B46/D13 `replaceState`/`pushState`/`popstate` + `lang` в хэше · B50/D12 «Open full version» в companion + проверка `window.open` · B48 чипы видов только с данными · B49 pin-callout после туториала + авто-скрытие · B35 `touch-action:pan-y` + pinch на картах, карточный sell list < 700 px.
+**DoD:** при 375 px все контролы шапки в viewport; Tab-тур: калькулятор считается без мыши; Lighthouse a11y без color-contrast; Back закрывает панель.
+
+### Q5. Preflight, наблюдаемость, self-check в temp `[ ]` — HAE 4h (ops)
+D1/B20/B21 `scripts/preflight.py` в deploy.yml: `?v=`↔PRECACHE↔CACHE, runtime-fetch'и ↔ cp-list, `track()`↔GOALS, meta-числа↔data.json, `node --check` ×6, PRECACHE ↔ `_site`; §0.2 ROADMAP уточнён · C10/D2 `window.onerror`/`unhandledrejection`/`sw_install_fail`/`data_load_fail` → Метрика (+ цели в реестре); `addAll` → per-URL; ежедневный smoke-workflow с auto-issue · C7 `--selfcheck` в temp-каталог с diff против коммита, `--verify` без записи · B6 forum-источники честно (deep-link или `maintainer-knowledge`), порог = 1 мёртвая ссылка, один issue с auto-close, без auto-commit и `contents: write`.
+**DoD:** намеренно убранный из cp-list `ordnance.js` → красный билд; `git status` чист после `--selfcheck`; js_error-цель видна в Метрике.
+
+### Q6. Пайплайн: дрейф апстрима, локали, валидация `[ ]` — HAE 6h (data) — **зависит от Q5**
+C6 парсер растений на entity-схему (`plants.yml`); `audit_fork_manifests.py` перед regen, abort при MISSING > 0; кэш 404 с датой · B3 различать 404 и сбой fetch; Phase 4b пропускает не-fetched файлы · B4 `locale_files` для goob/trauma/monolith/carpmosia/harmony · B14 `ModifyBleed`/`effectProto`/`ModifyKnockdown` в теги + счётчик generic-фолбэков с порогом · B17 подпись °C · B28/D3/C14/C15 `IgnoreTagLoader`, `meta.pipeline` (fetched/missing/collisions/parseErrors/head SHA), assertion products∈reagents, KNOWN_KEYS манифеста, валидация curated-id, `audit_dead_reactions.py` → Phase 4e · B11/B12 клиентская проверка `schemaVersion` + удаление `edges` и null-скаляров (schema minor bump, CHANGELOG) · B16/B15 реагентный Phase 4b, наследование диффов внукам, `recipe`/`obtainSources` по родословной · B23 requirements.txt с пинами, версия Python в CI = локальной.
+**DoD:** regen с чистого кэша == текущий data.json (кроме известных дрейфов, перечисленных в meta.pipeline); 0 vanilla без тега `bleed` → нормализовано; Goob: 0 пустых описаний.
+
+### Q7. Compliance и SEO `[ ]` — HAE 3h (ops/docs)
+C9 `webvisor:false, clickmap:false` (или opt-in до `ym()`) + строка Privacy в панели дисклеймера + `ym-disable-keys` на поиске · B5 блок форков NOTICES из `FORK_REGISTRY`, спрайты по `meta.json` апстрима · C11/D6 stamp meta-чисел при regen; `hreflang` en/ru/x-default + `og:locale:alternate`; inline `lang` в `<head>`; генерируемый sitemap · D5 `404.html` (+ cp-list) · B22 manifest `id`/`screenshots`/`shortcuts`/maskable, относительные `start_url`/`scope`; тост «доступна новая версия» · B13 карты в свой кэш с LRU + `put().catch()`; навигации по `pathname`.
+**DoD:** curl `/nope` → брендированный 404; `hreflang` в head; NOTICES 21/21; Метрика без webvisor.
+
+### Q8. Модель владения форков `[ ]` — war-room 2h + HAE 8h (data + frontend) — **зависит от Q2, Q6**
+C4/C5/D9: `/war-room` по вариантам (a) `forks:[…]`-множество на реагент/реакцию + `forkVisible` по членству; (b) single-owner + `alsoIn`/`modifiedIn` + `recipeByFork`; (c) per-fork снимки. Решение → `docs/decisions/YYYY-MM-DD_fork-membership-model.md`; реализация; закрыть issue #2 с объяснением. До решения — минимум (b): помечать переопределения дочерних форков как `modified`.
+**DoD:** Funky видит свой Oxandrolone; 170 скрытых пар → 0 (или все помечены); `Necrosol` виден на goob.
+
+### Q9. Рост и удержание `[ ]` — HAE 6h (frontend/data/docs) — **зависит от Q4, Q7**
+B64 «Relevance» по умолчанию при поиске, `type=search`, дедуп подсказок · B68 персистентный форк · B65 «только доступные» в What Heals? · B66 схема ботаники свёрнута при поиске · B67 вводная в Craft Trees · B69 «Ready recipes» под сборщик + тост · B71 прогресс загрузки · B72 header meta по форку · B52/B51/B53 мобильные блоки Ordnance/Fork Diff/What Heals?, корневой шрифт 16 px, floor 11 px, градиент таб-бара · B18/B70 снимок карт в index.json, ежемесячный бейк, предупреждение о размере · B24 репо-гигиена (worktrees, ветки, gc, promo/, orphan-SVG) · B26 docs sync (README/CHANGELOG/ROADMAP/design-doc) · B75 RU фаза 2 (микро-строки карточек).
+**DoD:** «bicaridine» первым в поиске; форк сохраняется после перезагрузки; 375 px без горизонтального overflow на всех табах.
+
 ## Backlog (кандидаты, не в работе)
 
 - **O4-монетизация:** Ko-fi/Boosty «поддержать» + страница support (ядро всегда free — SUMMARY §7). HAE 1h.
@@ -316,3 +356,4 @@ prices.json **схема v2**: интернированная таблица к�
 | 2026-07-26 | 1.9 | Серия L (русская локализация, фаза 1) — L1 закрыт: schema 3.10.0 (nameRu/descRu/physicalDescRu из родных ru-RU локалей 6 русских форков; 725/1369 реагентов, RU-форки 100%), i18n.js (переключатель RU/EN, swap данных до индексации, DOM-слой перевода UI с плюралами), двуязычный поиск. Решение: docs/decisions/2026-07-26_russian-localization.md. Backlog O11 частично закрыт |
 | 2026-07-27 | 2.0 | Серия S («Что продать») закрыта за сессию: S1 цены (зеркало PricingSystem, prices.json), S2 фронт ($ Sell list: сортировки имя/кол-во/цена/итого), S2.5 классы+гарантированность (запрос пользователя mid-series; схема v2), S3 раскатка 15/15 форков (~99.8k цен) + sw.js-фикс прекэша. Спека: docs/design/2026-07-27-sell-list-mode.md. Сокращённый аудит серии — в сессии (4 инкремента). Найден дрейф ванильных карт (перепечка меняет Bagel) — вынесен в отдельную задачу-чип |
 | 2026-09-10 | 2.1 | Серия O («Взрывное дело») закрыта за сессию: O1 форк #21 Space Stories (18 реагентов, 12 реакций, реген чисто аддитивен), O2 ordnance-слой экстрактора + эталон 17 смесей (16 совпадений, 1 известный дрейф), O3-O5 таб Ordnance: сборщик смеси, кривые, теплокарта, Парето-поиск. Спека: docs/design/2026-09-10-ordnance-calculator.md. Главный вывод: у М15 смесь на 90 % мощности даёт больший радиус, чем потолочная, и стоит на 55 % меньше форона |
+| 2026-09-11 | 2.2 | Полный независимый аудит ([AUDIT.md](AUDIT.md), приложения [docs/audit/2026-09-11/](docs/audit/2026-09-11/)): 8 агентов + R2 + self-check, 167 сведённых пунктов из 474 — 0 P0 / 52 P1 / 59 P2 / 6 P3; добавлена серия Q (Q1–Q9, план исправлений с зависимостями); §0.2 расширен на sw.js PRECACHE/CACHE. Инцидент аудита: `--selfcheck` перезаписал `maps/vanilla/Bagel.*` — восстановлено (C7) |
