@@ -576,6 +576,12 @@ FORK_REGISTRY = {
             ],
             "default_fire": "RMCTileFire",
             # Что лату тратит на сам корпус, помимо химии внутри него.
+            # Листы: сколько единиц материала в одном листе. У форка это не 100,
+            # как у ванильных материалов, а 3750 для металла и 2000 для пластика.
+            "sheet_files": [
+                "Resources/Prototypes/_RMC14/Entities/Objects/Materials/Sheets/metal.yml",
+                "Resources/Prototypes/_RMC14/Entities/Objects/Materials/Sheets/plastic.yml",
+            ],
             "lathe_files": [
                 "Resources/Prototypes/_RMC14/Entities/Structures/Machines/Lathe/armylathe_recipes.yml",
             ],

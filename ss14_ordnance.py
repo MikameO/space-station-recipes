@@ -485,6 +485,25 @@ def _heat(spec) -> float:
     return float(((spec or {}).get("types") or {}).get("Heat") or 0)
 
 
+def parse_sheets(files: dict[str, str]) -> dict[str, float]:
+    """How many material units make one sheet, per material.
+
+    Lathe costs are in engine units, which mean nothing to a player: the M15
+    shell reads as 8750 steel. Divided by the sheet it is two and a third,
+    which is a number someone can carry. The fork does not use the vanilla
+    hundred -- a sheet of its metal is 3750.
+    """
+    out: dict[str, float] = {}
+    for text in files.values():
+        for block in re.split(r"\n(?=- type: entity)", text.replace("\r\n", "\n")):
+            comp = re.search(r"materialComposition:\n((?:\s+\w+:\s*[\d.]+\n)+)", block)
+            if not comp:
+                continue
+            for m in re.finditer(r"^\s*(\w+):\s*([\d.]+)", comp.group(1), re.M):
+                out.setdefault(m.group(1), float(m.group(2)))
+    return out
+
+
 def parse_lathe(files: dict[str, str]) -> dict[str, dict]:
     """Material cost of printing a casing, by the entity the recipe produces.
 
@@ -1219,6 +1238,8 @@ def build(fork_id: str, fconf: dict, fetch) -> dict:
     fires = build_fires(fire_files) if fire_files else {}
     lathe_files = fetch(conf.get("lathe_files", []), url, f"{fork_id}_ordnance")
     lathe = parse_lathe(lathe_files) if lathe_files else {}
+    sheet_files = fetch(conf.get("sheet_files", []), url, f"{fork_id}_ordnance")
+    sheets = parse_sheets(sheet_files) if sheet_files else {}
     costs = load_cost_model()
     chem = load_chem()
 
@@ -1326,6 +1347,7 @@ def build(fork_id: str, fconf: dict, fetch) -> dict:
         "formula": formula,
         "fires": fires,
         "nonFillable": sorted(NON_FILLABLE_CASINGS),
+        "sheets": sheets,
         "targets": targets,
         "recipes": recipes,
         "reagents": out_reagents,

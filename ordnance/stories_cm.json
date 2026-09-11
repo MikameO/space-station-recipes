@@ -1934,6 +1934,11 @@
   }
  ],
  "schema": 1,
+ "sheets": {
+  "CMPlasteel": 3750.0,
+  "CMSteel": 3750.0,
+  "RMCPlastic": 2000.0
+ },
  "targets": [
   {
    "armor": 0.0,

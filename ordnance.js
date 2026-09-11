@@ -150,7 +150,7 @@
     'Shopping list': 'К закупке', 'catalyst': 'катализатор',
     'On hand, not consumed: ': 'Иметь при себе, не расходуется: ',
     'Casings themselves: ': 'На сами корпуса: ',
-    'steel': 'сталь', 'plastic': 'пластик',
+    'steel': 'сталь', 'plastic': 'пластик', 'sheets': 'листов',
     'Put something in the casing first.': 'Сначала положите что-нибудь в корпус.',
     'Short chain': 'Короткая цепь', 'HE round': 'Фугасный', 'Breach': 'Пролом', 'Denial': 'Отсечение',
     'HE': 'Фугас',
@@ -270,10 +270,17 @@
     }
     const mats = casingOf().materials;
     if (mats) {
-      // Raw engine material units. How many of them make a sheet is not stated
-      // anywhere this extractor reads, so no sheet count is invented here.
-      const list = Object.keys(mats).sort()
-        .map(m => matName(m) + ' ' + round(mats[m] * S.planCount, 0)).join(' + ');
+      // Sheets, because 70000 steel means nothing to anyone. The units per
+      // sheet come from the sheet entity itself, and this fork does not use
+      // the vanilla hundred: its metal sheet is 3750.
+      const sheets = S.data.sheets || {};
+      const list = Object.keys(mats).sort().map(m => {
+        const units = mats[m] * S.planCount;
+        const per = sheets[m];
+        return matName(m) + ' ' + (per
+          ? round(units / per, 1) + ' ' + tr('sheets')
+          : round(units, 0));
+      }).join(' + ');
       parts.push('<div class="ord-plan-sub">' + esc(tr('Casings themselves: ')) + esc(list) + '</div>');
     }
     foot.innerHTML = parts.join('');
