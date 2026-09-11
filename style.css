@@ -403,7 +403,7 @@ main {
   overflow-x: auto;
 }
 
-.tab-btn {
+.tab-btn, .tab-link {
   padding: 11px 20px;
   background: none;
   border: none;
@@ -420,7 +420,7 @@ main {
   position: relative;
 }
 
-.tab-btn:hover { color: var(--text-sub); }
+.tab-btn:hover, .tab-link:hover { color: var(--text-sub); }
 
 .tab-btn.active {
   color: var(--phosphor);
@@ -3189,3 +3189,143 @@ b.ord-bad { color: var(--red-alert); }
 .ord-xeno-fire { font-size: 0.64rem; color: #ff7a35;
   font-family: 'Share Tech Mono', monospace; }
 .ord-xeno-noburn { color: var(--text-ghost); }
+
+/* ═══════════════════════════════════════════════════════
+   Series G: document library (library.html)
+   The app shell is a fixed-height flex column with its own scrolling
+   panels; the library is an ordinary scrolling page, hence the body/main
+   overrides. .lib-sheet is the one light surface on the site on purpose —
+   the game draws paper light, and the documents' colours were picked for it.
+   ═══════════════════════════════════════════════════════ */
+.tab-link { text-decoration: none; display: inline-block; }
+
+body.lib-body { height: auto; min-height: 100vh; overflow: auto; }
+main.lib-layout {
+  display: grid;
+  grid-template-columns: 280px minmax(0, 1fr);
+  gap: 20px;
+  padding: 20px 24px;
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+  box-sizing: border-box;
+  overflow: visible;
+  flex: 1 0 auto;
+}
+.lib-home { color: inherit; text-decoration: none; display: inline-flex; align-items: center; }
+.lib-home:hover .accent { animation-duration: 1.5s; }
+.lib-page-name { text-transform: uppercase; }
+.lib-header-right { flex: 0 0 auto; }
+.lib-intro {
+  margin: 0;
+  padding: 10px 24px;
+  font-size: 0.8rem;
+  color: var(--text-sub);
+  background: var(--hull-plate);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.lib-list { display: flex; flex-direction: column; gap: 16px; align-self: start; position: sticky; top: 12px; }
+.lib-group-title {
+  font-family: 'Oxanium', sans-serif;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--text-ghost);
+  margin-bottom: 6px;
+}
+.lib-item {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: var(--panel);
+  border: 1px solid var(--border-subtle);
+  border-radius: 6px;
+  padding: 10px 12px;
+  color: var(--text-main);
+  cursor: pointer;
+  font: inherit;
+  transition: border-color 0.2s, background 0.2s;
+}
+.lib-item + .lib-item { margin-top: 8px; }
+.lib-item:hover { background: var(--panel-hover); border-color: var(--border-active); }
+.lib-item.active { border-color: var(--phosphor); color: var(--text-bright); box-shadow: 0 0 var(--glow-spread) var(--phosphor-glow); }
+.lib-item-title { display: block; font-size: 0.86rem; line-height: 1.3; }
+.lib-badge {
+  display: inline-block;
+  margin-top: 6px;
+  font-size: 0.64rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--cyan);
+  background: var(--cyan-dim);
+  border-radius: 3px;
+  padding: 2px 6px;
+}
+
+.lib-doc { min-width: 0; }
+.lib-title { margin: 0 0 6px; font-family: 'Oxanium', sans-serif; font-size: 1.15rem; color: var(--text-bright); }
+.lib-meta { margin: 0 0 12px; font-size: 0.78rem; color: var(--text-sub); line-height: 1.7; }
+.lib-meta-k { color: var(--text-ghost); text-transform: uppercase; font-size: 0.64rem; letter-spacing: 0.08em; }
+.lib-meta-sep { color: var(--border-active); }
+.lib-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-bottom: 12px; }
+.lib-views { display: flex; gap: 4px; }
+.lib-views .btn-small[aria-pressed="true"] { border-color: var(--phosphor); color: var(--phosphor); }
+.lib-count { font-size: 0.78rem; color: var(--text-sub); margin-left: auto; }
+.lib-count.lib-over { color: var(--red-alert); }
+.lib-status { font-size: 0.8rem; color: var(--amber); margin-bottom: 10px; }
+.lib-retry { margin-bottom: 10px; }
+.lib-status[hidden], .lib-retry[hidden], .lib-sheet[hidden], .lib-markup[hidden] { display: none; }
+
+.lib-sheet {
+  background: #efe9db;
+  color: #1e1e1e;
+  font-family: 'Noto Sans', 'Segoe UI', Arial, sans-serif;
+  font-size: 15px;
+  line-height: 1.45;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  padding: 28px 32px;
+  border-radius: 4px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.5);
+  max-width: 760px;
+}
+.lib-sheet .lib-b { font-weight: 700; }
+.lib-sheet .lib-i { font-style: italic; }
+.lib-sheet .lib-bi { font-weight: 700; font-style: italic; }
+.lib-sheet .lib-mono { font-family: 'Share Tech Mono', 'Consolas', monospace; }
+.lib-sheet .lib-h1 { font-size: 1.6em; font-weight: 700; }
+.lib-sheet .lib-h2 { font-size: 1.35em; font-weight: 700; }
+.lib-sheet .lib-h3 { font-size: 1.15em; font-weight: 700; }
+
+.lib-markup {
+  margin: 0;
+  background: var(--panel);
+  color: var(--text-main);
+  border: 1px solid var(--border-subtle);
+  border-radius: 4px;
+  padding: 16px;
+  font-family: 'Share Tech Mono', 'Consolas', monospace;
+  font-size: 0.78rem;
+  line-height: 1.45;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  max-width: 760px;
+}
+
+.lib-footer {
+  padding: 16px 24px;
+  font-size: 0.66rem;
+  color: var(--text-ghost);
+  border-top: 1px solid var(--border-subtle);
+  text-align: center;
+}
+.lib-footer a { color: var(--text-sub); }
+
+@media (max-width: 700px) {
+  main.lib-layout { grid-template-columns: 1fr; padding: 14px; gap: 14px; }
+  .lib-list { position: static; }
+  .lib-sheet { padding: 18px 14px; font-size: 14px; }
+  .lib-count { margin-left: 0; }
+}
