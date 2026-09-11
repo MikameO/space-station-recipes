@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "documents": [
+    {
+      "id": "rucm-staff-officer-doctrine",
+      "title": "Доктрина оперативного управления и штабной работы",
+      "role": { "en": "Staff Officer", "ru": "Офицер Штаба" },
+      "fork": "rucm",
+      "forkName": "Russian Marine Corps",
+      "lang": "ru",
+      "kind": "paper",
+      "file": "rucm-staff-officer-doctrine.paper.txt",
+      "author": "Штаб роты, RuCM",
+      "provenance": "Выдан командующим роты во время раунда за Офицера Штаба. Текст воспроизведён дословно.",
+      "received": "2026-09-10",
+      "notes": ""
+    }
+  ]
+}
