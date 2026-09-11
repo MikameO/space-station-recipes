@@ -3,6 +3,23 @@
 `data.json` schema version is in `meta.schemaVersion`. Consumers reading this file
 should pin on a compatible range (semver: breaking changes bump major).
 
+## Series G — 2026-09-11 (Document library: new page, new data folder)
+
+**New page:** `library.html` + `library.js` — in-game papers written by players
+(doctrines, field manuals, role memos), stored verbatim as SS14 paper markup
+under `library/` and rendered the way the game shows them (colour, bold,
+italic, headings, bullets, mono). A Markup view with a copy button and a
+`N / 10000` counter (`PaperComponent.ContentSize`, same in vanilla and RMC-14)
+lets a player issue the paper again in-game.
+
+**New data file:** `library/index.json` (schema 1) — one entry per document:
+`id`, `title`, `role {en, ru}`, `fork`, `forkName`, `lang`, `kind`, `file`,
+`author`, `provenance`, `received`, `notes`. First document:
+`rucm-staff-officer-doctrine` (Russian Marine Corps, Staff Officer doctrine,
+9549 chars). `data.json` schema is unchanged.
+
+Design: `docs/design/2026-09-11-document-library.md`.
+
 ## Series O — 2026-09-10 (Ordnance: casing mixture calculator; new fork, new data file)
 
 **Fork:** `MetalSage/space-stories-cm14` joins the registry as **fork #21**

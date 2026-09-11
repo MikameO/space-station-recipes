@@ -34,6 +34,7 @@ Search reagents, plan reactions, explore craft trees, and calculate batch recipe
 | **Antag** | Antag Mode | Curated strategies with lethality scores and delivery methods |
 | **Maps** | Item finder | Pick a station map, search any item — see where it spawns on a rendered schematic with locker/vendor/floor sources, grouped by nearest beacon |
 | **Ordnance** | Casing calculator | Space Stories fork: pick a casing, mix reagents, see power, blast radius, shrapnel and fire live — plus curves, a two-reagent heatmap, and the cheapest mixture that still hits a given share of the ceiling |
+| **Library** | In-game documents | Player-written doctrines, field manuals and role memos stored verbatim as SS14 paper markup — read them as in game, copy the markup to issue the paper again. Separate page: [library.html](https://mikameo.github.io/space-station-recipes/library.html) |
 | **Sell list** | Map price manifest | Every item on the selected map with count, sell price, and total — sortable columns, class chips (guns/melee/food/armor/…), guaranteed-vs-chance loot filter |
 | **Share** | Deep links | URL encodes filters and selection for easy sharing |
 | **RU** | Русская локализация | RU/EN toggle: reagent names & descriptions from the Russian forks' own ru-RU locales (Corvax ss14-ru, Sunrise, ADT, RuCM, Dead Space, Fish) + full Russian UI |

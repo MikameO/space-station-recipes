@@ -35,3 +35,14 @@ Each retains its original license and copyright.
    Source:   https://fonts.google.com/
    License:  SIL Open Font License 1.1
    Usage:    Loaded via Google Fonts CDN at runtime
+
+
+3. Community-authored in-game documents (library/)
+───────────────────────────────────────────────────
+   The texts under library/ — doctrines, field manuals, role memos — were
+   written by Space Station 14 players and handed out in-game. They are
+   reproduced verbatim as an archive; the attribution for each one is
+   recorded in library/index.json. They are not code and are not covered
+   by this project's GPL-3.0 license. An author who wants a text changed
+   or removed can say so at
+   https://github.com/MikameO/space-station-recipes/issues

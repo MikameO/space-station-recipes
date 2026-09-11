@@ -107,6 +107,9 @@ GOALS: list[tuple[str, str]] = [
     ("ordnance_surf_swap", "Взрывчатка: обмен высоты и цвета"),
     ("ordnance_req_exclude", "Взрывчатка: исключён реагент из поиска"),
     ("ordnance_plan_open",   "Взрывчатка: раскрыт шаг закупки"),
+    # Series G — document library (library.html)
+    ("library_doc_open",     "Библиотека: открыт документ"),
+    ("library_copy_markup",  "Библиотека: скопирована разметка"),
 ]
 
 
