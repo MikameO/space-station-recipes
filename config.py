@@ -578,6 +578,26 @@ FORK_REGISTRY = {
             # Что лату тратит на сам корпус, помимо химии внутри него.
             # Листы: сколько единиц материала в одном листе. У форка это не 100,
             # как у ванильных материалов, а 3750 для металла и 2000 для пластика.
+            # Морпехи: броня, шлем и пороги жизни, чтобы было видно цену ошибки.
+            "marine_files": [
+                "Resources/Prototypes/_RMC14/Entities/Clothing/OuterClothing/marine_armor.yml",
+                "Resources/Prototypes/_RMC14/Entities/Clothing/Head/Helmets/marine_helmets.yml",
+                "Resources/Prototypes/_RMC14/Entities/Mobs/Species/base.yml",
+            ],
+            "marine_body": ["Mobs/Species/Human/parts.rsi", "full"],
+            "marine_suit": [
+                "_RMC14/Objects/Clothing/Uniforms/Marine/standard/jungle.rsi",
+                "equipped-INNERCLOTHING",
+            ],
+            "marine_mob": "RMCBaseMobSpeciesOrganic",
+            "marines": [
+                {"id": "light",  "name": "Light armour",  "armor": "CMArmorM3Light",
+                 "helmet": "CMArmorHelmetM30"},
+                {"id": "medium", "name": "Medium armour", "armor": "CMArmorM3Medium",
+                 "helmet": "CMArmorHelmetM30"},
+                {"id": "heavy",  "name": "Heavy armour",  "armor": "CMArmorM3Heavy",
+                 "helmet": "CMArmorHelmetM30"},
+            ],
             "sheet_files": [
                 "Resources/Prototypes/_RMC14/Entities/Objects/Materials/Sheets/metal.yml",
                 "Resources/Prototypes/_RMC14/Entities/Objects/Materials/Sheets/plastic.yml",

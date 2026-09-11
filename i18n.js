@@ -204,6 +204,7 @@
     'Quick only': 'Только быстрые',
     'How much to brew': 'Сколько варить',
     'Rounds': 'Боеприпасов',
+    'Your own people at that range': 'Свои на той же дистанции',
     'Open every step': 'Раскрыть всё',
     'Fold all': 'Свернуть',
     'The mixture above, multiplied by the number of rounds you intend to build. Every reagent that has a reaction can be opened into what it is made from, and the total counts whatever is showing: leave ANFO folded and it asks for ANFO, open it and it asks for ammonium nitrate and welding fuel instead.': 'Смесь выше, умноженная на число боеприпасов, которое собираетесь собрать. Любой реагент с реакцией раскрывается в то, из чего его делают, а итог считает то, что показано: оставьте АНФО свёрнутым — список попросит АНФО, раскройте — попросит аммиачную селитру и сварочное топливо.',

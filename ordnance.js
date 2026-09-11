@@ -160,6 +160,9 @@
     'crippled': 'в крите',
     'Burn time': 'Горение', 'Near max reach': 'Почти максимум',
     'destroyed': 'уничтожен', 'no effect': 'без эффекта',
+    'killed': 'убит', 'down': 'в крите',
+    'Light armour': 'Лёгкая', 'Medium armour': 'Средняя',
+    'Heavy armour': 'Тяжёлая',
     'at the centre': 'в эпицентре', 'for armour': 'по броне',
     'on contact': 'при входе', 'in the flame': 'в пламени', 'after': 'после',
     'shrugged off': 'не берёт', 'out of reach': 'не достаёт',
@@ -642,7 +645,7 @@
     $('ordGalleryRange').onchange = e => {
       S.galleryRange = +e.target.value;
       track('ordnance_gallery_range', { range: S.galleryRange });
-      renderGallery();
+      renderGallery(); renderMarines();
     };
     const onBurn = () => {
       track('ordnance_burn_window', { inFlame: S.burnIn, after: S.burnAfter });
@@ -729,7 +732,7 @@
   // ── render ─────────────────────────────────────────────────────────────────
   function renderAll() {
     renderMix(); renderStats(); syncChartControls(); renderChart(); renderHeat();
-    renderCatalogue(); renderGallery(); renderPlan();
+    renderCatalogue(); renderGallery(); renderMarines(); renderPlan();
   }
 
   function renderMix() {
@@ -769,7 +772,7 @@
         const other = volUsed() - S.mix[id];
         S.mix[id] = clamp(Math.round(v) || 0, 0, cap2 - other);
         num.value = S.mix[id]; rng.value = S.mix[id];
-        renderStats(); renderChart(); renderHeat(); renderGallery();
+        renderStats(); renderChart(); renderHeat(); renderGallery(); renderMarines();
         $('ordVolume').textContent = volUsed() + ' / ' + cap2 + 'u';
         $('ordVolumeBar').style.width = Math.min(100, volUsed() / cap2 * 100) + '%';
       };
@@ -2378,6 +2381,40 @@
   function killCount(st) {
     return (S.data.targets || [])
       .filter(t => targetOutcome(st, t, 0).state === 'dead').length;
+  }
+
+  // What the same round does to the people who threw it. Blast only: a marine
+  // burns through a different branch of FlammableSystem than a xeno, with fire
+  // protection from the suit on top, and none of that is mirrored here.
+  function renderMarines() {
+    const box = $('ordMarines');
+    if (!box) return;
+    const crew = S.data.marines || [];
+    if (!crew.length) { box.innerHTML = ''; return; }
+    const st = computeStats(S.mix, casingOf(), S.dampener);
+    const raw = blastDamageAt(st, S.galleryRange);
+    box.innerHTML = crew.map(m => {
+      const dealt = raw * m.coefficient;
+      const state = dealt >= m.dead ? 'dead'
+        : (m.hasCrit && dealt >= m.crit) ? 'crit' : 'alive';
+      const left = Math.max(0, m.dead - dealt);
+      const share = clamp(1 - dealt / m.dead, 0, 1);
+      const tip = esc(round(raw, 0) + ' ' + tr('at the centre') + ' \u00d7'
+        + m.coefficient.toFixed(2) + ' ' + tr('for armour') + ' = ' + round(dealt, 0)
+        + ', ' + tr('dies at') + ' ' + round(m.dead, 0));
+      return `<div class="ord-xeno ord-marine ord-xeno-${state}" title="${tip}">
+        <div class="ord-xeno-art">
+          ${m.sprite ? `<img src="sprites/marines/${esc(m.sprite)}" alt="${esc(m.name)}" loading="lazy">` : ''}
+          ${state === 'dead' ? '<span class="ord-xeno-skull">\u2620</span>' : ''}
+        </div>
+        <div class="ord-xeno-name">${esc(tr(m.name))} <b>${esc(round(m.armor, 0))}</b></div>
+        <div class="ord-xeno-bar"><i style="width:${(share * 100).toFixed(1)}%"></i></div>
+        <div class="ord-xeno-num">${state === 'dead' ? esc(tr('killed'))
+          : esc(round(left, 0)) + ' / ' + esc(round(m.dead, 0))}</div>
+        <div class="ord-xeno-dmg">${esc(round(dealt, 0))} \u00d7${esc(m.coefficient.toFixed(2))}</div>
+        <div class="ord-xeno-hits">${state === 'crit' ? esc(tr('down')) : '\u00a0'}</div>
+      </div>`;
+    }).join('');
   }
 
   function renderGallery() {

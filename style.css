@@ -3175,6 +3175,14 @@ b.ord-bad { color: var(--red-alert); }
 .ord-plan-sum b { color: var(--text-bright); font-weight: 400; }
 .ord-plan-sub { margin-top: 4px; font-size: 0.76rem; color: var(--text-sub);
   font-family: 'Share Tech Mono', monospace; }
+/* Marines beside the xenos: same card, warmer plate, so the two rows read as
+   two sides rather than one list. */
+.ord-marine-head { font-size: 0.74rem; letter-spacing: 0.04em; text-transform: uppercase;
+  color: var(--text-sub); margin: 4px 0 6px; }
+.ord-marines { display: grid; grid-template-columns: repeat(auto-fill, minmax(118px, 1fr));
+  gap: 10px; margin-bottom: 14px; }
+.ord-marine .ord-xeno-art { background: #2a2418; }
+.ord-marine .ord-xeno-art img { filter: none; }
 .ord-he-dead { color: var(--red-alert); font-weight: 400; }
 .ord-xeno-fire { font-size: 0.64rem; color: #ff7a35;
   font-family: 'Share Tech Mono', monospace; }

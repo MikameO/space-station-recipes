@@ -494,6 +494,38 @@
   "shardsPerUnit": 0.25,
   "starIntensity": 30.0
  },
+ "marines": [
+  {
+   "armor": 30.0,
+   "coefficient": 0.56447,
+   "crit": 150.0,
+   "dead": 200.0,
+   "hasCrit": true,
+   "id": "light",
+   "name": "Light armour",
+   "sprite": "light.png"
+  },
+  {
+   "armor": 35.0,
+   "coefficient": 0.51316,
+   "crit": 150.0,
+   "dead": 200.0,
+   "hasCrit": true,
+   "id": "medium",
+   "name": "Medium armour",
+   "sprite": "medium.png"
+  },
+  {
+   "armor": 50.0,
+   "coefficient": 0.38554,
+   "crit": 150.0,
+   "dead": 200.0,
+   "hasCrit": true,
+   "id": "heavy",
+   "name": "Heavy armour",
+   "sprite": "heavy.png"
+  }
+ ],
  "nonFillable": [
   "RMC80mmMortarShell",
   "RMC88mmRocketTube",

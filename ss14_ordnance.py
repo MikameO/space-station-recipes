@@ -485,6 +485,95 @@ def _heat(spec) -> float:
     return float(((spec or {}).get("types") or {}).get("Heat") or 0)
 
 
+def build_marines(fconf: dict, conf: dict, files: dict[str, str]) -> list[dict]:
+    """The three marine loadouts, with what an explosion does to them.
+
+    Worn armour adds up: CMArmorSystem relays the event over the inventory, so
+    the vest and the helmet both count. A marine has no ExplosionResistance of
+    its own, so its coefficient starts at one rather than the xeno two -- and
+    then the same 1.1 ** (armour / 5) divides it.
+    """
+    protos = parse_entities(files)
+    mob = resolve_entity(protos, conf.get("marine_mob", ""))
+    thresholds = mob.get("MobThresholds", {}).get("thresholds", {})
+    crit = _threshold(thresholds, "Critical")
+    dead = _threshold(thresholds, "Dead")
+    out = []
+    for spec in conf.get("marines", []):
+        armour = 0.0
+        rsis = []
+        for slot in ("armor", "helmet"):
+            comp = resolve_entity(protos, spec[slot]) if spec.get(slot) in protos else {}
+            armour += float(comp.get("CMArmor", {}).get("explosionArmor") or 0)
+            sprite = comp.get("Sprite", {}).get("sprite")
+            if sprite:
+                rsis.append((sprite, "equipped-HELMET" if slot == "helmet"
+                             else "equipped-OUTERCLOTHING"))
+        out.append({
+            "id": spec["id"],
+            "name": spec.get("name", spec["id"]),
+            "armor": armour,
+            "coefficient": round(explosion_coefficient(armour, 1.0), 5),
+            "crit": crit if crit is not None else dead,
+            "hasCrit": crit is not None,
+            "dead": dead,
+            "_layers": rsis,
+        })
+    return out
+
+
+def fetch_marine_sprites(fconf: dict, conf: dict, marines: list[dict]) -> int:
+    """Stack the worn layers into one figure, the way the game draws them.
+
+    Body, then uniform, then vest, then helmet, all facing the viewer. A bare
+    body under the armour reads as a mistake, so the jumpsuit goes in between.
+    """
+    import urllib.error
+    from PIL import Image
+    out_dir = SCRIPT_DIR / "sprites" / "marines"
+    out_dir.mkdir(parents=True, exist_ok=True)
+    base = fconf["raw_url"]
+    cache: dict = {}
+
+    def layer(rsi, state):
+        key = (rsi, state)
+        if key in cache:
+            return cache[key]
+        root = f"Resources/Textures/{rsi}"
+        with urllib.request.urlopen(base.format(path=f"{root}/meta.json"), timeout=30) as r:
+            meta = json.loads(r.read())
+        with urllib.request.urlopen(base.format(path=f"{root}/{state}.png"), timeout=30) as r:
+            sheet = Image.open(io.BytesIO(r.read())).convert("RGBA")
+        # Facing the viewer, because the body sprite has only that one pose and
+        # a side-on helmet over a front-on body reads as a mistake.
+        cache[key] = _rsi_frame(sheet, meta, state, 0)
+        return cache[key]
+
+    got = 0
+    body_rsi, body_state = conf.get("marine_body", ["Mobs/Species/Human/parts.rsi", "full"])
+    suit = conf.get("marine_suit")
+    for marine in marines:
+        layers = marine.pop("_layers", [])
+        dest = out_dir / f"{marine['id']}.png"
+        if dest.exists():
+            marine["sprite"] = dest.name
+            got += 1
+            continue
+        try:
+            image = layer(body_rsi, body_state).copy()
+            if suit:
+                image.alpha_composite(layer(suit[0], suit[1]))
+            for rsi, state in layers:
+                image.alpha_composite(layer(rsi, state))
+        except Exception as exc:
+            print(f"  WARNING: marine {marine['id']}: {exc}")
+            continue
+        image.save(dest)
+        marine["sprite"] = dest.name
+        got += 1
+    return got
+
+
 def parse_sheets(files: dict[str, str]) -> dict[str, float]:
     """How many material units make one sheet, per material.
 
@@ -1238,6 +1327,11 @@ def build(fork_id: str, fconf: dict, fetch) -> dict:
     fires = build_fires(fire_files) if fire_files else {}
     lathe_files = fetch(conf.get("lathe_files", []), url, f"{fork_id}_ordnance")
     lathe = parse_lathe(lathe_files) if lathe_files else {}
+    marine_files = fetch(conf.get("marine_files", []), url, f"{fork_id}_ordnance")
+    marines = build_marines(fconf, conf, marine_files) if marine_files else []
+    if marines:
+        n = fetch_marine_sprites(fconf, conf, marines)
+        print(f"  marines: {len(marines)} with {n} sprites")
     sheet_files = fetch(conf.get("sheet_files", []), url, f"{fork_id}_ordnance")
     sheets = parse_sheets(sheet_files) if sheet_files else {}
     costs = load_cost_model()
@@ -1348,6 +1442,7 @@ def build(fork_id: str, fconf: dict, fetch) -> dict:
         "fires": fires,
         "nonFillable": sorted(NON_FILLABLE_CASINGS),
         "sheets": sheets,
+        "marines": marines,
         "targets": targets,
         "recipes": recipes,
         "reagents": out_reagents,
