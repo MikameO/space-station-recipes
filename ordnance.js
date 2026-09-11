@@ -153,6 +153,7 @@
     'steel': 'сталь', 'plastic': 'пластик', 'sheets': 'листов',
     'Put something in the casing first.': 'Сначала положите что-нибудь в корпус.',
     'Short chain': 'Короткая цепь', 'HE round': 'Фугасный', 'Breach': 'Пролом', 'Denial': 'Отсечение',
+    'Full flame, cheap': 'Макс огонь дёшево',
     'HE': 'Фугас',
     'Work': 'Материал', 'Steps': 'Реакций',
     'reactions to run: ': 'реакций провести: ',
@@ -2260,6 +2261,7 @@
     radius: 'Reach', damage: 'Damage', shrapnel: 'Shrapnel',
     fire: 'Fire', burn: 'Burn time', cheap: 'Near max reach',
     short: 'Short chain', he: 'HE round', breach: 'Breach', denial: 'Denial',
+    hot: 'Full flame, cheap',
   };
 
   // ── what it does to them ───────────────────────────────────────────────────

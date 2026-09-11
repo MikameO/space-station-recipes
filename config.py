@@ -608,11 +608,14 @@ FORK_REGISTRY = {
             # Реагенты, которые либо есть сразу, либо готовятся за полминуты.
             # Список игровой, не выводимый из числа реакций: циклонит стоит
             # шести шагов и всё равно быстрый, октоген восьми и долгий.
+            # Есть в каждом сварочнике и баке, но нет ни реакции, ни слота в раздатчике,
+            # поэтому общее правило доступности его теряло.
+            "pickup_reagents": ["RMCWeldingFuel"],
             "quick_reagents": [
                 "RMCAmmoniumNitrate", "RMCANFO", "Water", "RMCHydrogen",
                 "RMCHexamine", "RMCPotassiumHydroxide", "RMCIron", "RMCOxygen",
                 "RMCMethane", "RMCCarbon", "RMCPhoron", "RMCPhosphorus",
-                "RMCCyclonite", "RMCEthanol",
+                "RMCCyclonite", "RMCEthanol", "RMCWeldingFuel",
             ],
             # Цели для оценки эффекта. Список — зеркало
             # DemolitionsSimulatorLists.Xenomorphs: тот же набор, что предлагает

@@ -1264,7 +1264,9 @@
    "falloff": -0.1,
    "i": 0.1,
    "nameKey": "reagent-name-rmc-fuel",
+   "obtainable": true,
    "power": 0.12,
+   "quick": true,
    "r": -0.08,
    "via": [
     {
@@ -1365,6 +1367,20 @@
   {
    "casing": "RMCM40GrenadeCasing",
    "labels": [
+    "The most flame this casing can hold, out of the least filling, all of it off the shelf"
+   ],
+   "mix": {
+    "RMCCarbon": 14.0,
+    "RMCEthanol": 62.0,
+    "RMCOxygen": 12.0
+   },
+   "roles": [
+    "hot"
+   ]
+  },
+  {
+   "casing": "RMCM40GrenadeCasing",
+   "labels": [
     "Most burning ground per unit of material, 4 tiles or wider"
    ],
    "mix": {
@@ -1457,6 +1473,20 @@
   {
    "casing": "RMCM15GrenadeCasing",
    "labels": [
+    "The most flame this casing can hold, out of the least filling, all of it off the shelf"
+   ],
+   "mix": {
+    "RMCCarbon": 20.0,
+    "RMCEthanol": 74.0,
+    "RMCOxygen": 14.0
+   },
+   "roles": [
+    "hot"
+   ]
+  },
+  {
+   "casing": "RMCM15GrenadeCasing",
+   "labels": [
     "Most burning ground per unit of material, 4 tiles or wider"
    ],
    "mix": {
@@ -1532,6 +1562,20 @@
    },
    "roles": [
     "cheap"
+   ]
+  },
+  {
+   "casing": "RMCM20MineCasing",
+   "labels": [
+    "The most flame this casing can hold, out of the least filling, all of it off the shelf"
+   ],
+   "mix": {
+    "RMCCarbon": 10.0,
+    "RMCEthanol": 49.0,
+    "RMCOxygen": 9.0
+   },
+   "roles": [
+    "hot"
    ]
   },
   {
@@ -1625,6 +1669,20 @@
    },
    "roles": [
     "cheap"
+   ]
+  },
+  {
+   "casing": "RMCC4PlasticCasing",
+   "labels": [
+    "The most flame this casing can hold, out of the least filling, all of it off the shelf"
+   ],
+   "mix": {
+    "RMCCarbon": 3.0,
+    "RMCEthanol": 68.0,
+    "RMCPhosphorus": 37.0
+   },
+   "roles": [
+    "hot"
    ]
   },
   {
@@ -1746,6 +1804,20 @@
   {
    "casing": "RMC88mmRocketWarhead",
    "labels": [
+    "The most flame this casing can hold, out of the least filling, all of it off the shelf"
+   ],
+   "mix": {
+    "RMCCarbon": 18.0,
+    "RMCEthanol": 76.0,
+    "RMCPhosphorus": 30.0
+   },
+   "roles": [
+    "hot"
+   ]
+  },
+  {
+   "casing": "RMC88mmRocketWarhead",
+   "labels": [
     "Most burning ground per unit of material, 4 tiles or wider"
    ],
    "mix": {
@@ -1841,6 +1913,20 @@
   {
    "casing": "RMC80mmMortarWarhead",
    "labels": [
+    "The most flame this casing can hold, out of the least filling, all of it off the shelf"
+   ],
+   "mix": {
+    "RMCCarbon": 38.0,
+    "RMCEthanol": 76.0,
+    "RMCOxygen": 26.0
+   },
+   "roles": [
+    "hot"
+   ]
+  },
+  {
+   "casing": "RMC80mmMortarWarhead",
+   "labels": [
     "Most burning ground per unit of material, 4 tiles or wider"
    ],
    "mix": {
@@ -1927,6 +2013,20 @@
    },
    "roles": [
     "cheap"
+   ]
+  },
+  {
+   "casing": "RMC80mmMortarCameraWarhead",
+   "labels": [
+    "The most flame this casing can hold, out of the least filling, all of it off the shelf"
+   ],
+   "mix": {
+    "RMCCarbon": 38.0,
+    "RMCEthanol": 76.0,
+    "RMCOxygen": 26.0
+   },
+   "roles": [
+    "hot"
    ]
   },
   {

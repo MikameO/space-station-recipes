@@ -32,7 +32,9 @@ Run standalone:
 """
 
 import io
+import itertools
 import json
+import math
 import os
 import re
 import sys
@@ -891,7 +893,7 @@ SHORT_CHAIN_REAGENT = "RMCANFO"
 # octogen both sit in "unknown" because the extractor cannot resolve welding
 # fuel or frost oil, so excluding that tier would throw out the best explosive
 # in the game along with the worst chore.
-PRACTICAL_TIERS = {"dispenser", "self-chem", "unknown"}
+PRACTICAL_TIERS = {"dispenser", "self-chem", "unknown", "pickup"}
 # Targets destroyed, summed over these distances. Counting kills at the
 # epicentre alone rewards a concentrated charge and punishes reach: a grenade
 # that kills four things standing exactly on it at 3.4 tiles of blast is worse
@@ -1081,6 +1083,86 @@ def count_kills(st: dict, targets: list, formula: dict, fire: dict | None,
     return n
 
 
+def _solve(rows: list, rhs: list) -> list | None:
+    """Gaussian elimination on a square system; None if it has no single answer."""
+    n = len(rhs)
+    m = [list(row) + [b] for row, b in zip(rows, rhs)]
+    for col in range(n):
+        pivot = max(range(col, n), key=lambda r: abs(m[r][col]))
+        if abs(m[pivot][col]) < 1e-9:
+            return None
+        m[col], m[pivot] = m[pivot], m[col]
+        for r in range(n):
+            if r == col:
+                continue
+            f = m[r][col] / m[col][col]
+            for c in range(col, n + 1):
+                m[r][c] -= f * m[col][c]
+    return [m[r][n] / m[r][r] for r in range(n)]
+
+
+# A casing's fire is three clamps at once -- intensity, duration and radius --
+# and each of the three is a plain sum over the filling. Asking for all three is
+# a linear programme with three constraints, and such a programme puts its
+# optimum on a vertex where at most three quantities are nonzero. That is
+# exactly why the pair sweep above cannot reach the ceiling, and why every
+# hand-built load that does reach it names three reagents: one carries the
+# reach, one the burn time, one the heat. In the quick pool ethanol is nearly
+# the only source of radius, carbon the only pure source of duration, and
+# oxygen and phosphorus the strong sources of intensity -- no two of them cover
+# all three axes.
+#
+# Walking a grid instead of solving it costs real volume: at a twentieth of the
+# casing the M15 answer came out six units worse than one a player built by
+# hand. So the vertices are solved for directly and then checked by running the
+# result back through compute_stats, which is the only arbiter that matters.
+FLAME_AXES = ("intensity", "duration", "radius")
+
+
+def cheapest_flame(casing: dict, reagents: dict, pool: list, iron: str) -> dict | None:
+    """The casing's own fire ceiling, out of the least filling, off the shelf.
+
+    The fire row maximises intensity and the burn row maximises duration; both
+    stop at the first mixture to touch the clamp, so a cheaper mixture standing
+    at the same ceiling is never looked at. That is the row a player actually
+    wants -- 162 ethanol and 90 ethanol / 18 carbon / 18 phosphorus light the
+    same six tiles for the same thirty-two seconds, and one of them is two
+    thirds of a grenade.
+    """
+    top_i, top_d, top_r = casing["fi"][1], casing["fd"][1], casing["fr"][1]
+    if not (top_i and top_d and top_r):
+        return None
+    # A star casing throws rays half again as long as the fire radius, so it
+    # reaches the same tile count on less radius than a diamond needs. The 0.49
+    # rather than 0.5 keeps the boundary off Python's round-half-to-even.
+    star = bool(casing.get("star", True)) and top_i > STAR_INTENSITY
+    need_r = (top_r - 0.49) / 1.5 if star else top_r
+    want = {"intensity": top_i, "duration": top_d, "radius": need_r}
+    deltas = {rid: _reagent_deltas(reagents[rid]) for rid in pool}
+    best = None
+    for size in range(1, len(FLAME_AXES) + 1):
+        for combo in itertools.combinations(pool, size):
+            for axes in itertools.combinations(FLAME_AXES, size):
+                q = _solve([[deltas[rid][axis] for rid in combo] for axis in axes],
+                           [want[axis] for axis in axes])
+                if q is None or any(x < -1e-9 for x in q):
+                    continue
+                # Whole units: nobody dispenses a third of one, and rounding up
+                # can only help a mixture that is already at its ceiling.
+                mix = {rid: float(math.ceil(x - 1e-6)) for rid, x in zip(combo, q)
+                       if x > 1e-6}
+                total = sum(mix.values())
+                if not mix or total > casing["vol"]:
+                    continue
+                st = compute_stats(mix, casing, reagents, iron=iron)
+                if (st["fireIntensity"] < top_i or st["fireDuration"] < top_d
+                        or st["reach"] < top_r or st["reach"] < MIN_FIRE_REACH):
+                    continue
+                if best is None or total < best[0]:
+                    best = (total, mix)
+    return best[1] if best else None
+
+
 def build_recipes(casings: dict, reagents: dict, formula: dict, costs: dict,
                   cost_base: str, targets: list | None = None,
                   fires: dict | None = None, chem: dict | None = None) -> list[dict]:
@@ -1100,6 +1182,13 @@ def build_recipes(casings: dict, reagents: dict, formula: dict, costs: dict,
     # against 180 units.
     step_cap = len(reagent_steps(SHORT_CHAIN_REAGENT, chem or {})) or 4
     fire = (fires or {}).get(formula.get("defaultFire"))
+    # Off the shelf, and able to move the flame at all. A reagent with no fire
+    # deltas can only spend volume here, so leaving it out costs nothing and
+    # cuts the triple sweep by two thirds.
+    shelf = [rid for rid in pool
+             if reagents[rid].get("quick")
+             and any(_reagent_deltas(reagents[rid])[k]
+                     for k in ("intensity", "duration", "radius"))]
 
     for casing_id, casing in casings.items():
         if casing_id in NON_FILLABLE_CASINGS or not casing.get("maxP"):
@@ -1218,6 +1307,22 @@ def build_recipes(casings: dict, reagents: dict, formula: dict, costs: dict,
                                        f"for the least material"],
                             "mix": mix})
 
+        hot = cheapest_flame(casing, reagents, shelf, iron) if shelf else None
+        if hot:
+            label = ("The most flame this casing can hold, out of the least "
+                     "filling, all of it off the shelf")
+            signature = tuple(sorted((rid, round(q, 3)) for rid, q in hot.items()))
+            same = next((r for r in out
+                         if r["casing"] == casing_id
+                         and tuple(sorted((i, round(q, 3)) for i, q in r["mix"].items())) == signature),
+                        None)
+            if same:
+                same["roles"].append("hot")
+                same["labels"].append(label)
+            else:
+                out.append({"casing": casing_id, "roles": ["hot"], "labels": [label],
+                            "mix": hot})
+
         if denial_best:
             mix = denial_best[1]
             label = f"Most burning ground per unit of material, {MIN_FIRE_REACH} tiles or wider"
@@ -1334,6 +1439,12 @@ def build(fork_id: str, fconf: dict, fetch) -> dict:
     casings = resolve_all(parse_casings(casing_files))
     iron = conf.get("iron_reagent", "RMCIron")
     obtainable = load_obtainable()
+    # Things a marine picks up rather than makes. Welding fuel has neither a
+    # reaction nor a dispenser slot and sits in every welder, so the general
+    # rule loses it and the search never proposed the cheapest incendiary
+    # there is.
+    pickups = set(conf.get("pickup_reagents", []))
+    obtainable |= pickups
     default_fire = conf.get("default_fire", "RMCTileFire")
     quick = set(conf.get("quick_reagents", []))
     fires = build_fires(fire_files) if fire_files else {}
@@ -1446,6 +1557,13 @@ def build(fork_id: str, fconf: dict, fetch) -> dict:
         "heDistances": list(HE_DISTANCES),
         "heMinTier": HE_MIN_TIER,
     }
+    # data.json derives availability from "has a reaction or a dispenser slot",
+    # which is a question about chemistry rather than about the shift. Welding
+    # fuel fails it and still sits in every welder on the ship, so the search
+    # never saw the cheapest incendiary there is. Say so in the same vocabulary
+    # the rest of the model uses, rather than bolting a second flag beside it.
+    for rid in pickups:
+        chem.setdefault(rid, {}).setdefault("accessibility", {})["tier"] = "pickup"
     recipes = build_recipes(out_casings, out_reagents, formula, costs, cost_base,
                             targets, fires, chem)
     print(f"  catalogue: {len(recipes)} recipes")
