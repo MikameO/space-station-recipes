@@ -61,6 +61,10 @@
     // Which metric each axis of the curve carries. Defaults reproduce what
     // the panel drew before it had a choice.
     chartLeft: 'power', chartRight: 'blastRadius',
+    // The shopping list: how many rounds, and which steps of the chain are
+    // opened. The total counts the frontier, so folding a reagent asks for
+    // the reagent and opening it asks for what the reagent is made from.
+    planCount: 1, planOpen: [],
     galleryRange: 0,
     // How long a xeno actually burns. The flame outlasts the target's
     // patience: it runs out, and the hive pats it out at ten stacks a
@@ -143,6 +147,11 @@
     'Reach': 'Дальнобой', 'Damage': 'Урон',
     'Without': 'Без',
     'Least material': 'Минимум материала',
+    'Shopping list': 'К закупке', 'catalyst': 'катализатор',
+    'On hand, not consumed: ': 'Иметь при себе, не расходуется: ',
+    'Casings themselves: ': 'На сами корпуса: ',
+    'steel': 'сталь', 'plastic': 'пластик',
+    'Put something in the casing first.': 'Сначала положите что-нибудь в корпус.',
     'Short chain': 'Короткая цепь', 'HE round': 'Фугасный', 'Breach': 'Пролом', 'Denial': 'Отсечение',
     'HE': 'Фугас',
     'Work': 'Материал', 'Steps': 'Реакций',
@@ -192,6 +201,87 @@
     }
     return work;
   }
+
+  // ── shopping list ──────────────────────────────────────────────────────────
+  // One reaction step down from a reagent, scaled to how much of it is wanted.
+  // Yield matters: ANFO comes two at a time out of two nitrate and one fuel, so
+  // a unit of ANFO costs a unit of nitrate and half a unit of fuel.
+  function planChildren(id, qty, path, seen) {
+    const D = chem();
+    const spec = (D && D.reagents && D.reagents[id]) || {};
+    const recipe = spec.recipe;
+    // A dispenser chemical is a leaf: you press the button. Following its
+    // nominal recipe walks into fiction -- hydrogen "comes from" blood and
+    // slime -- and opening every step asked for a million units of murky blood.
+    if (!recipe || spec.isDispenser || seen.has(id)) return null;
+    const made = (recipe.products || {})[id] || 1;
+    const kids = [];
+    for (const [sub, info] of Object.entries(recipe.reactants || {})) {
+      kids.push({ id: sub, qty: qty * (info.amount || 0) / made,
+                  path: path + '>' + sub, catalyst: !!info.catalyst });
+    }
+    return kids.length ? kids : null;
+  }
+
+  function renderPlan() {
+    const box = $('ordPlanTree'), foot = $('ordPlanTotal');
+    if (!box || !foot) return;
+    const roots = Object.keys(S.mix).filter(id => S.mix[id] > 0)
+      .sort((a, b) => S.mix[b] - S.mix[a])
+      .map(id => ({ id, qty: S.mix[id] * S.planCount, path: id, catalyst: false }));
+    if (!roots.length) {
+      box.innerHTML = '<p class="ord-empty">' + esc(tr('Put something in the casing first.')) + '</p>';
+      foot.innerHTML = '';
+      return;
+    }
+    const totals = {}, catalysts = {};
+    const walk = (nodes, seen, depth) => {
+      let html = '<ul class="ord-plan-list">';
+      for (const n of nodes) {
+        // A depth cap and the seen set together stop a recipe that loops back
+        // on itself from recursing forever.
+        const kids = depth < 8 ? planChildren(n.id, n.qty, n.path, seen) : null;
+        const open = !!(kids && S.planOpen.includes(n.path));
+        if (n.catalyst) catalysts[n.id] = (catalysts[n.id] || 0) + n.qty;
+        else if (!open) totals[n.id] = (totals[n.id] || 0) + n.qty;
+        html += '<li><div class="ord-plan-row">'
+          + (kids
+            ? '<button class="tree-toggle" data-path="' + esc(n.path) + '" aria-expanded="'
+              + open + '">' + (open ? '\u2212' : '+') + '</button>'
+            : '<span class="ord-plan-leaf"></span>')
+          + '<b class="ord-plan-qty">' + esc(round(n.qty, 1)) + '</b>'
+          + '<span class="ord-plan-name">' + esc(rname(n.id)) + '</span>'
+          + (n.catalyst ? '<span class="ord-plan-cat">' + esc(tr('catalyst')) + '</span>' : '');
+        html += '</div>';
+        if (open) html += walk(kids, new Set([...seen, n.id]), depth + 1);
+        html += '</li>';
+      }
+      return html + '</ul>';
+    };
+    box.innerHTML = walk(roots, new Set(), 0);
+
+    const line = obj => Object.keys(obj).sort((a, b) => obj[b] - obj[a])
+      .map(id => round(obj[id], 1) + ' ' + rname(id)).join(' + ');
+    const parts = ['<div class="ord-plan-sum"><span>' + esc(tr('Shopping list')) + '</span><b>'
+      + esc(line(totals)) + '</b></div>'];
+    if (Object.keys(catalysts).length) {
+      parts.push('<div class="ord-plan-sub">' + esc(tr('On hand, not consumed: '))
+        + esc(line(catalysts)) + '</div>');
+    }
+    const mats = casingOf().materials;
+    if (mats) {
+      // Raw engine material units. How many of them make a sheet is not stated
+      // anywhere this extractor reads, so no sheet count is invented here.
+      const list = Object.keys(mats).sort()
+        .map(m => matName(m) + ' ' + round(mats[m] * S.planCount, 0)).join(' + ');
+      parts.push('<div class="ord-plan-sub">' + esc(tr('Casings themselves: ')) + esc(list) + '</div>');
+    }
+    foot.innerHTML = parts.join('');
+  }
+
+  // Lathe material ids are not reagents, so rname finds nothing for them.
+  const MATERIAL_NAMES = { CMSteel: 'steel', RMCPlastic: 'plastic' };
+  const matName = id => tr(MATERIAL_NAMES[id] || id);
 
   function casingOf() { return S.data.casings[S.casing]; }
   function volUsed() { return Object.values(S.mix).reduce((a, b) => a + b, 0); }
@@ -487,6 +577,37 @@
     // One surface answers two questions at once, and which metric belongs on
     // which channel is a matter of what you are looking for. Swapping beats
     // resetting both selects by hand.
+    $('ordPlanCount').oninput = e => {
+      S.planCount = Math.max(1, Math.min(500, Math.round(+e.target.value || 1)));
+      renderPlan();
+    };
+    $('ordPlanTree').addEventListener('click', e => {
+      const btn = e.target.closest('.tree-toggle');
+      if (!btn) return;
+      const path = btn.dataset.path;
+      S.planOpen = S.planOpen.includes(path)
+        ? S.planOpen.filter(p => p !== path) : S.planOpen.concat(path);
+      track('ordnance_plan_open', { depth: path.split('>').length });
+      renderPlan();
+    });
+    $('ordPlanFold').onclick = () => { S.planOpen = []; renderPlan(); };
+    // Opening every step by hand is a lot of clicks on a four-deep chain, and
+    // the fully expanded list is the one a chemist actually shops from.
+    $('ordPlanOpenAll').onclick = () => {
+      const open = [];
+      const walk = (nodes, seen, depth) => {
+        for (const n of nodes) {
+          const kids = depth < 8 ? planChildren(n.id, n.qty, n.path, seen) : null;
+          if (!kids) continue;
+          open.push(n.path);
+          walk(kids, new Set([...seen, n.id]), depth + 1);
+        }
+      };
+      walk(Object.keys(S.mix).filter(id => S.mix[id] > 0)
+        .map(id => ({ id, qty: S.mix[id] * S.planCount, path: id })), new Set(), 0);
+      S.planOpen = open;
+      renderPlan();
+    };
     $('ordChartLeft').onchange = e => { S.chartLeft = e.target.value; renderChart(); };
     $('ordChartRight').onchange = e => { S.chartRight = e.target.value; renderChart(); };
     $('ordSurfSwap').onclick = () => {
@@ -601,7 +722,7 @@
   // ── render ─────────────────────────────────────────────────────────────────
   function renderAll() {
     renderMix(); renderStats(); syncChartControls(); renderChart(); renderHeat();
-    renderCatalogue(); renderGallery();
+    renderCatalogue(); renderGallery(); renderPlan();
   }
 
   function renderMix() {

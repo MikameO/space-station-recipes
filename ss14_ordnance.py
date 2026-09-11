@@ -485,6 +485,29 @@ def _heat(spec) -> float:
     return float(((spec or {}).get("types") or {}).get("Heat") or 0)
 
 
+def parse_lathe(files: dict[str, str]) -> dict[str, dict]:
+    """Material cost of printing a casing, by the entity the recipe produces.
+
+    The chemistry is only half of what a grenade costs; the shell is steel off
+    an army lathe, and a C4 wants plastic besides. Amounts are the engine's
+    material units, where a sheet is one hundred.
+    """
+    out: dict[str, dict] = {}
+    for text in files.values():
+        for block in re.split(r"\n(?=- type: latheRecipe)", text.replace("\r\n", "\n")):
+            if "latheRecipe" not in block:
+                continue
+            result = re.search(r"^\s*result:\s*(\S+)", block, re.M)
+            mats = re.search(r"^\s*materials:\n((?:^\s+\w+:.*\n)+)", block, re.M)
+            if not result or not mats:
+                continue
+            amounts = {m.group(1): float(m.group(2))
+                       for m in re.finditer(r"^\s*(\w+):\s*([\d.]+)", mats.group(1), re.M)}
+            if amounts:
+                out[result.group(1)] = amounts
+    return out
+
+
 def build_fires(files: dict[str, str]) -> dict[str, dict]:
     """Tile fire prototypes, resolved down the parent chain.
 
@@ -1194,6 +1217,8 @@ def build(fork_id: str, fconf: dict, fetch) -> dict:
     default_fire = conf.get("default_fire", "RMCTileFire")
     quick = set(conf.get("quick_reagents", []))
     fires = build_fires(fire_files) if fire_files else {}
+    lathe_files = fetch(conf.get("lathe_files", []), url, f"{fork_id}_ordnance")
+    lathe = parse_lathe(lathe_files) if lathe_files else {}
     costs = load_cost_model()
     chem = load_chem()
 
@@ -1254,6 +1279,7 @@ def build(fork_id: str, fconf: dict, fetch) -> dict:
         out_casings[cid] = {
             "vol": merged["vol"], "base": merged["base"], "minF": merged["minF"],
             **({"sticky": True} if merged.get("sticky") else {}),
+            **({"materials": lathe[cid]} if cid in lathe else {}),
             "maxP": merged["maxP"], "shards": int(merged["shards"]),
             "fi": merged["fi"], "fd": merged["fd"], "fr": merged["fr"],
             "star": bool(merged["star"]), "mode": merged["mode"],

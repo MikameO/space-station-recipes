@@ -575,6 +575,10 @@ FORK_REGISTRY = {
                 "Resources/Prototypes/_RMC14/Entities/Tiles/tile_fire.yml",
             ],
             "default_fire": "RMCTileFire",
+            # Что лату тратит на сам корпус, помимо химии внутри него.
+            "lathe_files": [
+                "Resources/Prototypes/_RMC14/Entities/Structures/Machines/Lathe/armylathe_recipes.yml",
+            ],
             # Реагенты, которые либо есть сразу, либо готовятся за полминуты.
             # Список игровой, не выводимый из числа реакций: циклонит стоит
             # шести шагов и всё равно быстрый, октоген восьми и долгий.

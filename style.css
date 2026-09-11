@@ -3158,6 +3158,23 @@ b.ord-bad { color: var(--red-alert); }
   border-color: rgba(57,255,133,0.5); }
 .ord-exclude-chips .diff-chip.active {
   background: rgba(239,68,68,0.16); color: #fca5a5; border-color: rgba(248,113,113,0.55); }
+/* Shopping list. The tree reuses the craft-tree toggle so the two read alike. */
+.ord-plan-tree { font-family: 'Share Tech Mono', monospace; font-size: 0.8rem; }
+.ord-plan-list { list-style: none; margin: 0; padding-left: 16px; }
+.ord-plan-tree > .ord-plan-list { padding-left: 0; }
+.ord-plan-row { display: flex; align-items: center; gap: 7px; padding: 2px 0; }
+.ord-plan-leaf { width: 18px; display: inline-block; }
+.ord-plan-qty { color: var(--phosphor); font-weight: 400; min-width: 54px; text-align: right; }
+.ord-plan-name { color: var(--text-main); }
+.ord-plan-cat { color: var(--text-ghost); font-size: 0.9em; }
+.ord-plan-total { margin-top: 10px; border-top: 1px solid var(--border-subtle); padding-top: 8px; }
+.ord-plan-sum { display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap;
+  font-family: 'Share Tech Mono', monospace; font-size: 0.84rem; }
+.ord-plan-sum span { color: var(--text-sub); text-transform: uppercase;
+  letter-spacing: 0.04em; font-size: 0.74rem; }
+.ord-plan-sum b { color: var(--text-bright); font-weight: 400; }
+.ord-plan-sub { margin-top: 4px; font-size: 0.76rem; color: var(--text-sub);
+  font-family: 'Share Tech Mono', monospace; }
 .ord-he-dead { color: var(--red-alert); font-weight: 400; }
 .ord-xeno-fire { font-size: 0.64rem; color: #ff7a35;
   font-family: 'Share Tech Mono', monospace; }

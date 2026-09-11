@@ -17,6 +17,9 @@
    ],
    "fuel": null,
    "fuelAmount": 60.0,
+   "materials": {
+    "CMSteel": 18750.0
+   },
    "maxP": 360.0,
    "minF": 25.0,
    "mode": "DualIgniter",
@@ -41,6 +44,9 @@
    ],
    "fuel": "RMCHydrogen",
    "fuelAmount": 60.0,
+   "materials": {
+    "CMSteel": 23437.0
+   },
    "maxP": 175.0,
    "minF": 25.0,
    "mode": "Any",
@@ -65,6 +71,9 @@
    ],
    "fuel": null,
    "fuelAmount": 60.0,
+   "materials": {
+    "CMSteel": 14062.0
+   },
    "maxP": 360.0,
    "minF": 25.0,
    "mode": "DualIgniter",
@@ -89,6 +98,9 @@
    ],
    "fuel": "RMCMethane",
    "fuelAmount": 60.0,
+   "materials": {
+    "CMSteel": 9375.0
+   },
    "maxP": 175.0,
    "minF": 25.0,
    "mode": "Any",
@@ -113,6 +125,9 @@
    ],
    "fuel": null,
    "fuelAmount": 60.0,
+   "materials": {
+    "CMSteel": 14062.0
+   },
    "maxP": 220.0,
    "minF": 25.0,
    "mode": "DualIgniter",
@@ -137,6 +152,10 @@
    ],
    "fuel": null,
    "fuelAmount": 60.0,
+   "materials": {
+    "CMSteel": 9375.0,
+    "RMCPlastic": 2500.0
+   },
    "maxP": 280.0,
    "minF": 25.0,
    "mode": "Plastic",
@@ -186,6 +205,9 @@
    ],
    "fuel": null,
    "fuelAmount": 60.0,
+   "materials": {
+    "CMSteel": 8750.0
+   },
    "maxP": 220.0,
    "minF": 25.0,
    "mode": "TimerIgniter",
@@ -210,6 +232,9 @@
    ],
    "fuel": null,
    "fuelAmount": 60.0,
+   "materials": {
+    "CMSteel": 4687.0
+   },
    "maxP": 100.0,
    "minF": 25.0,
    "mode": "Mine",
@@ -234,6 +259,9 @@
    ],
    "fuel": null,
    "fuelAmount": 60.0,
+   "materials": {
+    "CMSteel": 5312.0
+   },
    "maxP": 180.0,
    "minF": 25.0,
    "mode": "TimerIgniter",
