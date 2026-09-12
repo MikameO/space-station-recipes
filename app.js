@@ -2430,6 +2430,11 @@ function planLeafAccess(id) {
   const r = DATA.reagents[id];
   if (!r) return null;
   if (DISPENSER_JUGS.has(id)) return null; // one of the twenty — nothing to say
+  // The twenty are vanilla's dispenser. A fork reagent flagged isDispenser got
+  // the flag from that fork's own dispenser list (RMC14's RMCOxygen, RMCSugar…),
+  // so the data is the authority there: judging it by the vanilla twenty tagged
+  // every CM ingredient «в раздатчике этого нет» (CMUSleen plan, 2026-09-12).
+  if (r.isDispenser && r.source && r.source !== 'vanilla') return null;
   const ru = planRu();
   const sources = (r.obtainSources || []).join(' | ');
   if (FETCHED_JUGS.has(id)) {

@@ -167,6 +167,17 @@ const cases = [
     return 'Oil' in plan.totalBase && /does not stock this/.test(w);
   })()],
 
+  // ── a fork's own dispenser: RMC14 stocks RMCOxygen, and the twenty are vanilla's ──
+  ['a fork dispenser chemical carries no tag', null, planLeafAccess('RMCOxygen')],
+  ['…nor one that also has a recipe (RMCHydrogen from water)', null, planLeafAccess('RMCHydrogen')],
+  ['the CMU Sleen plan does not call its RMC ingredients missing', false, (() => {
+    setSource('cmu');
+    const plan = planBrew([{ id: 'CMUSleen', amount: 1270 }], 500);
+    const w = g('renderPlanWarnings')(plan);
+    setSource('vanilla');
+    return 'RMCOxygen' in plan.totalBase && /does not stock this|not in the dispenser/.test(w);
+  })()],
+
   // ── names, not prototype ids ──
   ['the steps print display names, not ids', true, (() => {
     const plan = planBrew([{ id: 'SodiumCarbonate', amount: 50 }], 120);
