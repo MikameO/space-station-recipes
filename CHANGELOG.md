@@ -3,6 +3,31 @@
 `data.json` schema version is in `meta.schemaVersion`. Consumers reading this file
 should pin on a compatible range (semver: breaking changes bump major).
 
+## Series Q2 — 2026-09-12 (the recipe the calculator means)
+
+**Frontend fix — which reaction is "the recipe".** `getFilteredReactions`
+ranks a reagent's producers and `rxns[0]` feeds the calculator, the batch
+plan, the craft trees, "Fewest Steps" and now the detail panel (`pickRecipe`).
+Under Source = All it used to return data order, i.e. alphabetical reaction
+id, so Monolith's `FentanylSolidification` and ADT's `ADTOmnizineBreakdown`
+were the default Tricordrazine and Diphenhydramine recipes: 30u
+Diphenhydramine planned 62 steps and 1800u of mercury (Discord report
+2026-07-31, audit 2026-09-11 D1/C2). The ranking is now: a reaction that
+consumes as much of the target as it makes is dropped in every mode; a
+reaction named after the target, or with the target as its only product,
+beats byproducts and centrifuge breakdowns, ahead of lineage; then closest
+lineage (the fork on screen, its parents, vanilla; under All the reagent's
+own fork, then vanilla); then the extractor's `r.recipe`; then fewer
+reactants. 30u Diphenhydramine is 4 steps, 120u Tricordrazine 3 steps on
+Monolith as well, Siderlac 1. Mixing steps and the panel's Recipe heading
+carry a fork badge when the reaction is not vanilla, and the "+N alt recipes"
+count follows the Source filter. Regression suite: `node
+scripts/test_recipe_ranking.js`, 23 cases on the real `data.json` (21 failed
+on the previous code). `data.json` is unchanged; two reagents (Protein,
+Ipecac) carry an extractor `recipe` that is a byproduct pick — the app now
+shows the direct recipe, the data-side fix is filed under Q6. Cache-bust
+`app.js?v=40`, service worker `chemdb-v84`.
+
 ## Series P — 2026-09-12 (Botany: plant-healing group, Botany as a second category, value ranges)
 
 **Data fix — `plantEffects.group`.** `PlantAdjustHealth` used to land in the
