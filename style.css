@@ -1404,6 +1404,72 @@ body.antag-active .hint-chip:hover, body.antag-active .hint-chip:focus-visible {
 .step-temp { color: var(--cyan); font-size: 0.65rem; }
 .step-mixer { color: var(--violet); font-size: 0.65rem; }
 
+/* ── BREW PLAN (Серия R): rounding note, ingredient origin, batches ── */
+
+/* Why the plan asks for 540u when 500u was ordered. */
+.plan-note {
+  border: 1px solid var(--border-subtle);
+  border-left: 2px solid var(--amber);
+  background: rgba(255,176,0,0.05);
+  padding: 8px 12px;
+  margin-bottom: 12px;
+  grid-column: 1/-1;
+  font-size: 0.72rem;
+}
+.plan-note-title {
+  font-family: 'Oxanium', sans-serif;
+  font-size: 0.62rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--amber);
+  margin-bottom: 4px;
+}
+.plan-note-line { padding: 2px 0; }
+.plan-note-why { color: var(--text-ghost); font-size: 0.66rem; }
+
+/* Which vessel the steps were split for — reads as a caption on the heading. */
+.calc-section-cap {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.6rem;
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  text-transform: none;
+  color: var(--text-ghost);
+  text-shadow: none;
+  margin-left: 8px;
+}
+
+/* «Not in the dispenser» and friends: the shopping list says where a leaf
+   actually comes from, since 513 of 561 base chemicals are not dispensable. */
+.shop-tag {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 1px 5px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 2px;
+  font-size: 0.6rem;
+  letter-spacing: 0.04em;
+  color: var(--text-ghost);
+  cursor: help;
+}
+.shop-tag-bad { border-color: var(--red-alert); color: var(--red-alert); }
+.shopping-item-cat .shopping-amount { color: var(--violet); text-shadow: none; }
+
+/* How the step is poured when one mix does not fit the vessel. */
+.step-batches {
+  margin: 3px 0 0 22px;
+  font-size: 0.66rem;
+  color: var(--cyan);
+}
+.step-batches-total { color: var(--text-ghost); }
+.step-batches-bad { color: var(--red-alert); }
+
+/* The custom-capacity field sits under the select in the same group. */
+.calc-container-custom { margin-top: 6px; }
+/* Author display rules beat the UA [hidden] rule elsewhere in this file, so be
+   explicit here too (style.css trap, see .ord-field[hidden]). */
+.calc-container-custom[hidden] { display: none !important; }
+
 /* ══════════════════════════════════════════
    CRAFT TREES
    ══════════════════════════════════════════ */

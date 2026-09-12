@@ -161,6 +161,7 @@ async function init() {
   setupSearch();
   setupDetailPanel();
   setupCalculator();
+  setupContainerSelect(); // R4: vessel for both planners
   setupCraftTrees();
   setupReverseLookup();
   setupBatchPlanner();
@@ -2259,12 +2260,395 @@ function setupCalculator() {
   document.getElementById('calcBtn').addEventListener('click', () => {
     if (!selectedCalcId) return;
     const amount = parseFloat(document.getElementById('calcAmount').value) || 30;
-    track('calc_run', { target: selectedCalcId, amount });
-    const result = calculateIngredients(selectedCalcId, amount);
+    const cap = brewCapacity();
+    track('calc_run', { target: selectedCalcId, amount, cap });
+    const plan = planBrew([{ id: selectedCalcId, amount }], cap);
     document.getElementById('batchResults').innerHTML = '';
     document.getElementById('batchWarnings').innerHTML = '';
-    renderCalcResults(selectedCalcId, amount, result);
+    renderCalcResults(selectedCalcId, plan);
   });
+}
+
+// ─────────────────────────────────────────────
+// Brew plan (Серия R) — whole units, container batches, honest ingredients.
+// Decision: docs/decisions/2026-09-12_brew-plan-quantization.md
+// Player report 15.08.2026: «при плановой варке у тебя рецепты на доли идут и
+// на английском языке», «183 реагента A + 183 B + 183 C, а мензурка на 100/200
+// только — разделить бы», «масло как будто в раздатчике есть, хотя его варить
+// надо».
+// ─────────────────────────────────────────────
+
+// Amounts in data.json carry at most two decimals (97 reactions have fractional
+// reactants — BZ 2.1, UE 0.1, Lithium 0.9), so every quantum computation runs on
+// integer centiunits and no float tail reaches the DOM.
+const PLAN_CU = 100;
+const planCu = (n) => Math.round(n * PLAN_CU);
+// A dispenser pours in 5u clicks and SolutionTransfer cycles 5/10/25/50/100, so
+// a plan snapped to 5u is one you can actually pour between beakers.
+const PLAN_POUR_CU = 5 * PLAN_CU;
+// Past this the ladder stops being a plan anyone would follow — print exact
+// amounts instead of a quantum nobody can hold.
+const PLAN_QUANTUM_MAX_CU = 100000 * PLAN_CU;
+
+// Capacities verified against upstream Resources/Prototypes/Entities/Objects/
+// base_solution.yml (2026-09-12): Beaker←SolutionSmall 60u, LargeBeaker←
+// SolutionNormal 120u, Jug←SolutionLarge 240u, BluespaceBeaker←SolutionGinormous
+// 960u. DELIVERY_MECHANISMS in config.py still says 50/100/300 — stale, and
+// corrected separately because it needs a data regen (R7).
+const BREW_CONTAINERS = [
+  { cap: 60,  en: 'Beaker',           ru: 'Мензурка' },
+  { cap: 120, en: 'Large beaker',     ru: 'Большая мензурка' },
+  { cap: 240, en: 'Jug',              ru: 'Канистра' },
+  { cap: 960, en: 'Bluespace beaker', ru: 'Блюспейс-мензурка' },
+];
+const BREW_DEFAULT_CAP = 120;
+
+const planRu = () => window.I18N_LANG === 'ru';
+
+// 166.67000000000002 → "166.67", 180 → "180". mergeSteps adds up amounts that
+// were already rounded to two decimals, and that is where the float tails in the
+// user's screenshot came from.
+function fmtU(n) {
+  if (!isFinite(n)) return '0';
+  return String(Number((Math.round(n * PLAN_CU) / PLAN_CU).toFixed(2)));
+}
+
+function planGcd(a, b) { a = Math.abs(a); b = Math.abs(b); while (b) { const t = a % b; a = b; b = t; } return a || 1; }
+function planLcm(a, b) { return a / planGcd(a, b) * b; }
+
+// The smallest whole amount of `reagentId`, in centiunits, whose entire subtree
+// comes out in whole units under whole reaction runs:
+//
+//   q(leaf) = 1u                                  — a dispenser gives whole units
+//   q(x)    = lcm( produced · lcm_i( q_i / gcd(a_i, q_i) ),  1u )
+//
+// Returns null when the ladder explodes past PLAN_QUANTUM_MAX_CU (fractional
+// recipes can do that) — the caller then falls back to exact amounts.
+function planQuantumCu(reagentId, memo, stack) {
+  memo = memo || new Map();
+  stack = stack || new Set();
+  if (memo.has(reagentId)) return memo.get(reagentId);
+  if (stack.has(reagentId)) return PLAN_CU; // cycle: calculateIngredients treats it as a leaf
+  const rxns = DATA.baseChemicals.includes(reagentId) ? [] : getFilteredReactions(reagentId);
+  if (!rxns.length) return PLAN_CU;
+  const rxn = rxns[0];
+  const producedCu = planCu(rxn.products[reagentId]);
+  if (!producedCu) return null;
+
+  stack.add(reagentId);
+  let runMult = 1;
+  for (const [childId, info] of Object.entries(rxn.reactants)) {
+    const childQ = planQuantumCu(childId, memo, stack);
+    const aCu = planCu(info.amount);
+    if (childQ === null) { stack.delete(reagentId); return null; }
+    if (!aCu) continue;
+    runMult = planLcm(runMult, childQ / planGcd(aCu, childQ));
+    if (runMult * producedCu > PLAN_QUANTUM_MAX_CU) { stack.delete(reagentId); return null; }
+  }
+  stack.delete(reagentId);
+
+  const q = planLcm(producedCu * runMult, PLAN_CU);
+  memo.set(reagentId, q > PLAN_QUANTUM_MAX_CU ? null : q);
+  return memo.get(reagentId);
+}
+
+// Round the order up to an amount the whole tree can produce without leftovers.
+// Ladder: the 5u pour step first, then whole units, then exact math — with a
+// guard so a small order is never inflated by more than a quarter.
+function quantizeOrder(reagentId, requested) {
+  const reqCu = planCu(requested);
+  const qCu = reqCu > 0 ? planQuantumCu(reagentId) : null;
+  if (!qCu) return { ordered: requested, requested, quantum: 0, overshoot: 0, mode: 'exact' };
+
+  const pick = (stepCu, mode) => {
+    const orderedCu = Math.ceil(reqCu / stepCu) * stepCu;
+    return {
+      ordered: orderedCu / PLAN_CU, requested,
+      quantum: stepCu / PLAN_CU, overshoot: (orderedCu - reqCu) / PLAN_CU, mode,
+    };
+  };
+  // Never inflate an order by more than a quarter to buy round numbers: some
+  // trees (a fork drug made of four other fork drugs) only come out whole at
+  // three times the order, and multiplying what a medic asked for is worse than
+  // printing a fraction. The note then says what to order for clean numbers.
+  const fits = (q) => planCu(q.overshoot) <= Math.max(PLAN_POUR_CU, reqCu * 0.25);
+  const pour = pick(planLcm(qCu, PLAN_POUR_CU), 'pour');
+  if (fits(pour)) return pour;
+  const whole = pick(qCu, 'whole');
+  if (fits(whole)) return whole;
+  return { ordered: requested, requested, quantum: 0, overshoot: 0, mode: 'exact', cleanAt: whole.ordered };
+}
+
+// How a step is actually poured: one mix when it fits the vessel, otherwise N
+// batches of whole runs, kept on the 5u pour step where the recipe allows it.
+// The catalyst counts towards the volume — it sits in the beaker — but it is not
+// consumed, so the same dose carries from batch to batch.
+function planBatches(step, cap) {
+  const rxn = DATA.reactions && DATA.reactions[step.rxnId];
+  if (!rxn || !cap || !rxn.products || !rxn.products[step.reagentId]) return null;
+  const runs = step.amount / rxn.products[step.reagentId];
+  const entries = Object.entries(rxn.reactants || {});
+  const volPerRun = entries.reduce((s, [, i]) => s + i.amount, 0);
+  if (!volPerRun || !runs) return null;
+
+  const total = volPerRun * runs;
+  if (planCu(total) <= planCu(cap)) return { batches: 1, total, volPerRun };
+
+  const fit = Math.floor(planCu(cap) / planCu(volPerRun)); // whole runs per vessel
+  if (fit < 1) return { impossible: true, volPerRun, total };
+
+  let mult = 1; // keep every batch's reactant amounts on the pour step
+  for (const [, i] of entries) {
+    const aCu = planCu(i.amount);
+    if (aCu) mult = planLcm(mult, PLAN_POUR_CU / planGcd(aCu, PLAN_POUR_CU));
+  }
+  const per = Math.floor(fit / mult) * mult || fit;
+  const full = Math.floor(runs / per);
+  const rest = Math.round((runs - full * per) * PLAN_CU) / PLAN_CU;
+  return {
+    batches: full + (rest > 0 ? 1 : 0), full,
+    perVol: per * volPerRun, restVol: rest * volPerRun, total, volPerRun,
+  };
+}
+
+// What the shopping list owes the player beyond a name and a number: 513 of the
+// 561 "base" chemicals are not in any dispenser (identify_base_chemicals calls
+// everything without a producing reaction base), and the data already knows how
+// each one is really obtained.
+const PLAN_TIER_LABEL = {
+  'dispenser':     { en: 'dispenser',       ru: 'раздатчик' },
+  'cross-botany':  { en: 'grow it',         ru: 'через ботанику' },
+  'cross-service': { en: 'another dept.',   ru: 'другой отдел' },
+  'mob-drop':      { en: 'from a mob',      ru: 'с моба' },
+  'antag-only':    { en: 'antag only',      ru: 'только антаг' },
+  'unobtainable':  { en: 'no known source', ru: 'нет источника' },
+};
+
+function planLeafAccess(id) {
+  const r = DATA.reagents[id];
+  if (!r || r.isDispenser) return null; // the dispenser has it — nothing to say
+  const tier = r.accessibility && r.accessibility.tier;
+  const label = PLAN_TIER_LABEL[tier];
+  const sources = r.obtainSources || [];
+  return {
+    tier: tier || null,
+    label: label ? (planRu() ? label.ru : label.en) : (planRu() ? 'не в раздатчике' : 'not in the dispenser'),
+    hint: sources.join(' | ') || (r.accessibility && r.accessibility.reason) || '',
+    blocking: !sources.length,
+  };
+}
+
+function planName(id) {
+  const r = DATA.reagents[id];
+  return capName((r && r.name) || id);
+}
+
+// "5 порций" — Russian needs three forms and the planner counts batches out
+// loud, so it cannot dodge them. forms: [one, few, many] / [one, other].
+function planPlural(n, forms) {
+  const abs = Math.abs(Math.round(n));
+  if (forms.length < 3) return `${n} ${forms[abs === 1 ? 0 : 1]}`;
+  const mod10 = abs % 10, mod100 = abs % 100;
+  const form = (mod10 === 1 && mod100 !== 11) ? 0
+    : (mod10 >= 2 && mod10 <= 4 && (mod100 < 12 || mod100 > 14)) ? 1 : 2;
+  return `${n} ${forms[form]}`;
+}
+
+// One plan: the order quantized, the steps resolved, the catalysts accounted for
+// separately (a catalyst is needed per mix but never consumed, so the list asks
+// for the largest single dose, not the sum — audit B8).
+function planBrew(targets, cap) {
+  const totalBase = {};
+  const catalystNeeds = {};
+  const rawSteps = [];
+  const quants = [];
+
+  for (const { id, amount } of targets) {
+    const q = quantizeOrder(id, amount);
+    quants.push({ id, ...q });
+    const res = calculateIngredients(id, q.ordered);
+    for (const [rid, amt] of Object.entries(res.baseNeeds)) {
+      totalBase[rid] = (totalBase[rid] || 0) + amt;
+    }
+    rawSteps.push(...res.steps);
+  }
+
+  const steps = mergeSteps(rawSteps);
+  steps.sort((a, b) => b.depth - a.depth);
+
+  for (const step of steps) {
+    const b = planBatches(step, cap);
+    step.batchPlan = b;
+    for (const r of step.reactants) {
+      if (!r.catalyst) continue;
+      // Per mix, not per plan: one dose catalyses every batch, so the list needs
+      // the largest single batch. perVol/total is runsPerBatch/totalRuns.
+      const share = b && b.batches > 1 && !b.impossible && b.total ? b.perVol / b.total : 1;
+      catalystNeeds[r.id] = Math.max(catalystNeeds[r.id] || 0, r.amount * share);
+    }
+  }
+
+  return { totalBase, catalystNeeds, steps, quants, cap, targets };
+}
+
+function renderPlanNote(quants) {
+  const ru = planRu();
+  const changed = quants.filter(q => planCu(q.overshoot) > 0);
+  // An order the ladder refused to round: say what a clean one would cost, so
+  // the fraction is a choice rather than a surprise.
+  const exact = quants.filter(q => q.mode === 'exact' && q.cleanAt);
+  if (!changed.length && !exact.length) return '';
+  const exactLines = exact.map(q => `<div class="plan-note-line">${fmtU(q.requested)}u ${esc(planName(q.id))} ${ru
+    ? `<span class="plan-note-why">(в дробях: ближайший целый объём — ${fmtU(q.cleanAt)}u)</span>`
+    : `<span class="plan-note-why">(kept fractional: the nearest amount that brews clean is ${fmtU(q.cleanAt)}u)</span>`}</div>`).join('');
+  const lines = changed.map(q => {
+    const head = `${fmtU(q.requested)}u &rarr; <strong>${fmtU(q.ordered)}u</strong> ${esc(planName(q.id))}`;
+    const why = q.mode === 'pour'
+      ? (ru ? `кратно ${fmtU(q.quantum)}u — весь план в целых, всё кратно 5u`
+            : `in steps of ${fmtU(q.quantum)}u — whole numbers all the way down, every pour a multiple of 5u`)
+      : (ru ? `кратно ${fmtU(q.quantum)}u — весь план в целых`
+            : `in steps of ${fmtU(q.quantum)}u — whole numbers all the way down`);
+    return `<div class="plan-note-line">${head} <span class="plan-note-why">(${why})</span></div>`;
+  }).join('');
+  return `<div class="plan-note">
+    <div class="plan-note-title">${changed.length
+      ? (ru ? 'Округлено вверх до варимого объёма' : 'Rounded up to an amount that brews clean')
+      : (ru ? 'Целого объёма рядом нет' : 'No clean amount nearby')}</div>
+    ${lines}${exactLines}
+  </div>`;
+}
+
+function renderPlanShopping(baseNeeds, catalystNeeds) {
+  const ru = planRu();
+  const byName = (a, b) => planName(a[0]).localeCompare(planName(b[0]));
+  const rows = Object.entries(baseNeeds).sort(byName).map(([id, amt]) => {
+    const acc = planLeafAccess(id);
+    const tag = acc
+      ? ` <span class="shop-tag${acc.blocking ? ' shop-tag-bad' : ''}" title="${esc(acc.hint)}">${esc(acc.label)}</span>`
+      : '';
+    return `<div class="shopping-item">
+      <span>${esc(planName(id))}${tag}</span>
+      <span class="shopping-amount">${fmtU(amt)}u</span>
+    </div>`;
+  }).join('');
+  const cats = Object.entries(catalystNeeds || {}).sort(byName).map(([id, amt]) =>
+    `<div class="shopping-item shopping-item-cat">
+      <span>${esc(planName(id))} <span class="shop-tag" title="${ru ? 'Катализатор нужен в стакане для каждой порции, но не расходуется — одна доза работает на весь план' : 'A catalyst has to be in the beaker for every batch but is never consumed — one dose serves the whole plan'}">${ru ? 'катализатор' : 'catalyst'}</span></span>
+      <span class="shopping-amount">${fmtU(amt)}u</span>
+    </div>`).join('');
+  return rows + cats;
+}
+
+function renderPlanSteps(steps, cap) {
+  const ru = planRu();
+  return steps.map((step, i) => {
+    const reactants = step.reactants.map(r =>
+      `${fmtU(r.amount)}u ${planName(r.id)}${r.catalyst ? (ru ? ' (кат)' : ' (cat)') : ''}`).join(' + ');
+    let extra = '';
+    if (step.minTemp) extra += `<span class="step-temp"> [&gt;${step.minTemp}K]</span>`;
+    if (step.maxTemp) extra += `<span class="step-temp"> [&lt;${step.maxTemp}K]</span>`;
+    if (step.mixer && step.mixer.length) extra += `<span class="step-mixer"> [${esc(step.mixer.join(','))}]</span>`;
+    extra += stepForkBadge(step);
+
+    const b = step.batchPlan;
+    let batches = '';
+    if (b && b.impossible) {
+      batches = `<div class="step-batches step-batches-bad">${ru
+        ? `одна реакция занимает ${fmtU(b.volPerRun)}u — в ${fmtU(cap)}u не влезает`
+        : `a single run takes ${fmtU(b.volPerRun)}u — it does not fit ${fmtU(cap)}u`}</div>`;
+    } else if (b && b.batches > 1) {
+      const parts = b.full > 1 ? [`${b.full} &times; ${fmtU(b.perVol)}u`] : [`${fmtU(b.perVol)}u`];
+      if (b.restVol) parts.push(`${fmtU(b.restVol)}u`);
+      batches = `<div class="step-batches">${planPlural(b.batches, ru ? ['порция', 'порции', 'порций'] : ['batch', 'batches'])}: ${parts.join(' + ')} <span class="step-batches-total">(${ru ? 'всего' : 'total'} ${fmtU(b.total)}u)</span></div>`;
+    }
+
+    return `<div class="step-item">
+      <span class="step-num">${i + 1}.</span>
+      ${esc(reactants)} &rarr; <strong>${fmtU(step.amount)}u ${esc(planName(step.reagentId))}</strong>${extra}
+      ${batches}
+    </div>`;
+  }).join('');
+}
+
+// Leaves the plan cannot buy anywhere, and steps that do not fit the vessel.
+function renderPlanWarnings(plan) {
+  const ru = planRu();
+  const blocked = Object.keys(plan.totalBase)
+    .map(id => ({ id, acc: planLeafAccess(id) }))
+    .filter(x => x.acc && x.acc.blocking);
+  const offsite = Object.keys(plan.totalBase)
+    .map(id => ({ id, acc: planLeafAccess(id) }))
+    .filter(x => x.acc && !x.acc.blocking);
+  const tooBig = plan.steps.filter(s => s.batchPlan && s.batchPlan.impossible);
+  if (!blocked.length && !offsite.length && !tooBig.length) return '';
+
+  const items = [];
+  if (blocked.length) {
+    items.push(`<div class="warning-item"><span class="warning-icon">&#9888;</span> <span><strong>${esc(blocked.map(x => planName(x.id)).join(', '))}</strong>: ${ru
+      ? 'нет известного способа получить — план не сварить целиком'
+      : 'no known source — this plan cannot be completed as it stands'}</span></div>`);
+  }
+  if (offsite.length) {
+    items.push(`<div class="warning-item"><span class="warning-icon">&#8505;</span> <span><strong>${esc(offsite.map(x => planName(x.id)).join(', '))}</strong>: ${ru
+      ? 'нет в раздатчике — придётся добыть отдельно (наведите на метку в списке)'
+      : 'not in the dispenser — fetch it separately (hover the tag in the list)'}</span></div>`);
+  }
+  if (tooBig.length) {
+    items.push(`<div class="warning-item"><span class="warning-icon">&#9888;</span> <span><strong>${esc(tooBig.map(s => planName(s.reagentId)).join(', '))}</strong>: ${ru
+      ? `одна реакция не влезает в выбранную ёмкость (${fmtU(plan.cap)}u) — возьмите больше`
+      : `a single run does not fit the chosen container (${fmtU(plan.cap)}u) — take a bigger one`}</span></div>`);
+  }
+  return `<div class="warning-box" style="grid-column:1/-1">
+    <div class="warning-box-title">${ru ? 'Что учесть' : 'Worth knowing'}</div>
+    ${items.join('')}
+  </div>`;
+}
+
+// The capacity both planners obey. 0 = no limit.
+function brewCapacity() {
+  const sel = document.getElementById('calcContainer');
+  if (!sel) return BREW_DEFAULT_CAP;
+  if (sel.value === 'custom') {
+    return Math.max(0, parseFloat(document.getElementById('calcContainerCustom').value) || 0);
+  }
+  return Math.max(0, parseFloat(sel.value) || 0);
+}
+
+function brewCapacityLabel() {
+  const cap = brewCapacity();
+  const ru = planRu();
+  if (!cap) return ru ? 'без ограничения по объёму' : 'no volume limit';
+  const known = BREW_CONTAINERS.find(c => c.cap === cap);
+  const name = known ? (ru ? known.ru : known.en) : (ru ? 'ёмкость' : 'container');
+  return `${name} ${fmtU(cap)}u`;
+}
+
+function setupContainerSelect() {
+  const sel = document.getElementById('calcContainer');
+  const custom = document.getElementById('calcContainerCustom');
+  if (!sel) return;
+  const ru = planRu();
+  // Built here, not in the markup: every option carries a number, and a string
+  // with a number in it can never be matched by the i18n dictionary.
+  sel.innerHTML = BREW_CONTAINERS.map(c =>
+    `<option value="${c.cap}">${esc(ru ? c.ru : c.en)} — ${c.cap}u</option>`).join('')
+    + `<option value="0">${ru ? 'Без ограничения' : 'No limit'}</option>`
+    + `<option value="custom">${ru ? 'Своя ёмкость…' : 'Custom…'}</option>`;
+
+  const saved = loadSession().calcContainer;
+  sel.value = saved != null && [...sel.options].some(o => o.value === String(saved))
+    ? String(saved) : String(BREW_DEFAULT_CAP);
+  const syncCustom = () => { custom.hidden = sel.value !== 'custom'; };
+  syncCustom();
+
+  sel.addEventListener('change', () => {
+    syncCustom();
+    saveSession({ calcContainer: sel.value });
+    track('brew_container', { cap: brewCapacity() });
+  });
+  custom.addEventListener('input', () => saveSession({ calcContainerCustom: custom.value }));
+  const savedCustom = loadSession().calcContainerCustom;
+  if (savedCustom) custom.value = savedCustom;
 }
 
 function mergeSteps(steps) {
@@ -2339,42 +2723,25 @@ function calculateIngredients(targetId, targetAmount) {
   return { baseNeeds, steps: merged };
 }
 
-function renderCalcResults(targetId, amount, result) {
+// R1-R4: names come from the localized data, amounts through fmtU, volumes split
+// by the chosen vessel. Every heading here interpolates a number, so none of it
+// can be reached by the i18n dictionary — the strings are picked here.
+function renderCalcResults(targetId, plan) {
   const div = document.getElementById('calcResults');
-  const r = DATA.reagents[targetId];
-
-  const shoppingItems = Object.entries(result.baseNeeds)
-    .sort((a, b) => a[0].localeCompare(b[0]))
-    .map(([id, amt]) => `<div class="shopping-item">
-      <span>${esc(id)}</span>
-      <span class="shopping-amount">${Math.round(amt * 100) / 100}u</span>
-    </div>`).join('');
-
-  const stepItems = result.steps.map((step, i) => {
-    const reactants = step.reactants.map(r =>
-      `${r.amount}u ${r.id}${r.catalyst ? ' (cat)' : ''}`).join(' + ');
-    let extra = '';
-    if (step.minTemp) extra += `<span class="step-temp"> [&gt;${step.minTemp}K]</span>`;
-    if (step.maxTemp) extra += `<span class="step-temp"> [&lt;${step.maxTemp}K]</span>`;
-    if (step.mixer && step.mixer.length) extra += `<span class="step-mixer"> [${step.mixer.join(',')}]</span>`;
-    extra += stepForkBadge(step);
-
-    return `<div class="step-item">
-      <span class="step-num">${i + 1}.</span>
-      ${esc(reactants)} &rarr; <strong>${Math.round(step.amount * 100) / 100}u ${esc(step.reagentId)}</strong>
-      ${extra}
-    </div>`;
-  }).join('');
+  const ru = planRu();
+  const ordered = plan.quants[0] ? plan.quants[0].ordered : 0;
 
   div.innerHTML = `
-    ${checkCalcWarnings(result.baseNeeds, result.steps)}
+    ${checkCalcWarnings(plan.totalBase, plan.steps)}
+    ${renderPlanWarnings(plan)}
+    ${renderPlanNote(plan.quants)}
     <div class="calc-section">
-      <h3>Shopping List for ${Math.round(amount * 100) / 100}u ${esc(r?.name || targetId)}</h3>
-      ${shoppingItems || '<p style="color:var(--text-dim)">This is a base chemical</p>'}
+      <h3>${ru ? 'Список закупки' : 'Shopping List for'}${ru ? ': ' : ' '}${fmtU(ordered)}u ${esc(planName(targetId))}</h3>
+      ${renderPlanShopping(plan.totalBase, plan.catalystNeeds) || `<p style="color:var(--text-dim)">${ru ? 'Это базовый реагент' : 'This is a base chemical'}</p>`}
     </div>
     <div class="calc-section">
-      <h3>Mixing Steps (${result.steps.length})</h3>
-      ${stepItems || '<p style="color:var(--text-dim)">No mixing needed</p>'}
+      <h3>${ru ? 'Шаги смешивания' : 'Mixing Steps'} (${plan.steps.length}) <span class="calc-section-cap">${esc(brewCapacityLabel())}</span></h3>
+      ${renderPlanSteps(plan.steps, plan.cap) || `<p style="color:var(--text-dim)">${ru ? 'Смешивать нечего' : 'No mixing needed'}</p>`}
     </div>
   `;
 }
@@ -2693,11 +3060,13 @@ function checkCalcWarnings(baseNeeds, steps) {
     }
   }
   if (triggered.length === 0) return '';
+  // R1: the reagents of a warning are prototype ids in the data \u2014 print the
+  // names the rest of the plan uses. The prose stays as curated (English).
   return `<div class="warning-box" style="grid-column:1/-1">
-    <div class="warning-box-title">\u26a0 Danger Warnings</div>
+    <div class="warning-box-title">\u26a0 ${planRu() ? '\u041e\u043f\u0430\u0441\u043d\u044b\u0435 \u0441\u043e\u0447\u0435\u0442\u0430\u043d\u0438\u044f' : 'Danger Warnings'}</div>
     ${triggered.map(w => `<div class="warning-item">
       <span class="warning-icon">${w.severity === 'lethal' ? '\u2620' : '\u26a0'}</span>
-      <span><strong>${esc(w.reagents.join(' + '))}</strong>: ${esc(w.desc)}</span>
+      <span><strong>${esc(w.reagents.map(planName).join(' + '))}</strong>: ${esc(w.desc)}</span>
     </div>`).join('')}
   </div>`;
 }
@@ -2773,56 +3142,28 @@ function setupBatchPlanner() {
   };
 }
 
+// The shift plan runs through the same engine as the single recipe: each target
+// is quantized on its own, then the steps merge, so a merged step is still whole.
 function planBatch(targets) {
-  const totalBase = {};
-  const allRawSteps = [];
-
-  for (const { id, amount } of targets) {
-    const result = calculateIngredients(id, amount);
-    for (const [reagentId, amt] of Object.entries(result.baseNeeds)) {
-      totalBase[reagentId] = (totalBase[reagentId] || 0) + amt;
-    }
-    allRawSteps.push(...result.steps);
-  }
-
-  const allSteps = mergeSteps(allRawSteps);
-  allSteps.sort((a, b) => b.depth - a.depth);
-  return { totalBase, allSteps, targets };
+  return planBrew(targets, brewCapacity());
 }
 
-function renderBatchResults(result, div, warningsDiv) {
-  const shoppingItems = Object.entries(result.totalBase)
-    .sort((a, b) => a[0].localeCompare(b[0]))
-    .map(([id, amt]) => `<div class="shopping-item">
-      <span>${esc(capName(DATA.reagents[id]?.name || id))}</span>
-      <span class="shopping-amount">${Math.round(amt * 100) / 100}u</span>
-    </div>`).join('');
+function renderBatchResults(plan, div, warningsDiv) {
+  const ru = planRu();
+  const targetList = plan.quants
+    .map(q => `${fmtU(q.ordered)}u ${esc(planName(q.id))}`).join(', ');
 
-  const stepItems = result.allSteps.map((step, i) => {
-    const reactants = step.reactants.map(r => `${r.amount}u ${esc(r.id)}${r.catalyst ? ' (cat)' : ''}`).join(' + ');
-    let extra = '';
-    if (step.minTemp) extra += `<span class="step-temp"> [&gt;${step.minTemp}K]</span>`;
-    if (step.mixer?.length) extra += `<span class="step-mixer"> [${step.mixer.join(',')}]</span>`;
-    extra += stepForkBadge(step);
-    return `<div class="step-item">
-      <span class="step-num">${i + 1}.</span>
-      ${esc(reactants)} &rarr; <strong>${Math.round(step.amount * 100) / 100}u ${esc(step.reagentId)}</strong>${extra}
-    </div>`;
-  }).join('');
-
-  const targetList = result.targets.map(t => `${t.amount}u ${esc(t.name)}`).join(', ');
-
-  // Check warnings
-  warningsDiv.innerHTML = checkCalcWarnings(result.totalBase, result.allSteps);
+  warningsDiv.innerHTML = checkCalcWarnings(plan.totalBase, plan.steps) + renderPlanWarnings(plan);
 
   div.innerHTML = `
+    ${renderPlanNote(plan.quants)}
     <div class="calc-section">
-      <h3>Total Shopping List for: ${targetList}</h3>
-      ${shoppingItems}
+      <h3>${ru ? 'Общий список закупки: ' : 'Total Shopping List for: '}${targetList}</h3>
+      ${renderPlanShopping(plan.totalBase, plan.catalystNeeds)}
     </div>
     <div class="calc-section">
-      <h3>Mixing Steps (${result.allSteps.length})</h3>
-      ${stepItems || '<p style="color:var(--text-ghost)">All targets are base chemicals</p>'}
+      <h3>${ru ? 'Шаги смешивания' : 'Mixing Steps'} (${plan.steps.length}) <span class="calc-section-cap">${esc(brewCapacityLabel())}</span></h3>
+      ${renderPlanSteps(plan.steps, plan.cap) || `<p style="color:var(--text-ghost)">${ru ? 'Все цели — базовые реагенты' : 'All targets are base chemicals'}</p>`}
     </div>
   `;
 }
