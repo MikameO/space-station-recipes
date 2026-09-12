@@ -3,6 +3,84 @@
 `data.json` schema version is in `meta.schemaVersion`. Consumers reading this file
 should pin on a compatible range (semver: breaking changes bump major).
 
+## Series R — 2026-09-12 (a plan you can actually pour)
+
+A player wrote in on 15 August with seven points about the planners, and every
+one of them reproduced on the current build. The recipe calculator and the shift
+planner now share one engine that answers all of them.
+
+**The order is rounded up to an amount that brews clean.** Ask for 500u of
+Cryoxadone and the plan brews 540u — the nearest multiple of 45u, which is what
+this tree needs for every number under it to come out whole: 180u Dexalin + 180u
+Water + 180u Oxygen, and below that 120u Oxygen + 60u Plasma. The quantum is
+computed per reagent (`q(x) = lcm(produced · lcm_i(q_i / gcd(a_i, q_i)), 1u)`)
+in integer centiunits, because 97 reactions carry fractional reactants and a
+float would put `166.67000000000002u` on screen, exactly as the report showed.
+On top of whole units the plan snaps to 5u, the click a dispenser pours and the
+step `SolutionTransfer` cycles, so the numbers survive being poured between
+beakers. The ladder falls back to whole units and then to exact fractions, and
+it never inflates an order by more than a quarter to buy round numbers: some
+fork drugs only come out whole at three times the order, and multiplying what a
+medic asked for is worse than printing a fraction — the note then says which
+amount would have brewed clean.
+
+**Steps are split by the vessel you actually hold.** A new container selector
+governs both planners: beaker 60u, large beaker 120u, jug 240u, bluespace beaker
+960u — the upstream capacities from `base_solution.yml`, not the 50/100/300 that
+`config.py` still carries — plus "no limit" and a free number for forks. 540u of
+Cryoxadone is five batches in a large beaker (4 × 120u + 60u), nine in a plain
+one, a single mix in a bluespace beaker. The split counts whole reaction runs
+rather than dividing the volume, so batches stay whole and land on the pour step;
+a run that cannot fit the vessel is called impossible instead of being halved
+(`CMUCreateSludgeGC` mixes 64u and will never go into a 60u beaker).
+
+**The catalyst is on the shopping list, and asks for one mix.** It used to be
+missing entirely: the plan told you to mix 55.56u of plasma that nothing had
+told you to fetch. It is needed in the beaker for every batch and consumed by
+none of them, so the list asks for the largest single batch — 40u, not the 190u
+the batches add up to — and says so on hover.
+
+**Ingredients say where they come from.** `identify_base_chemicals` calls
+everything without a producing reaction "base", so butter sat in the shopping
+list as if a dispenser had it. Only 48 of the 561 base chemicals are dispenser
+chemicals, and the data already knew the rest: rows now carry their real route
+from `isDispenser` / `obtainSources` / `accessibility.tier` — butter reads
+"another dept." with "Vending: ChefVend — stick of butter (30u)" on hover — and
+the plan warns separately about leaves with no known source at all, because that
+plan cannot be finished.
+
+**Names, not prototype ids.** Steps printed `TableSalt` and `Oxygen` even with
+the interface in Russian, while the shopping list beside them was translated.
+Both now print the localized display name, and so do the danger warnings
+("Калий + Вода"). The strings are picked in `app.js` rather than added to the
+dictionary: the RU layer matches exact English text nodes, and an interpolated
+number makes every line unique — the entire planner output was landing in
+`window.__i18nMiss`, headings included.
+
+**And the header stops dropping controls.** The button row was capped at 560px
+with `flex-shrink: 0` on every button while its content measures 583px in English
+and 612px in Russian, so the overflow was structural: at 1280px English clipped
+the pin by 2px and Russian pushed it 52px outside the viewport, and below
+~1150px the whole row wrapped past the header's fixed 56px height and sat on top
+of the disclaimer bar. Reported as "no pin and no language button in Firefox
+desktop, both present in Firefox mobile" — the mobile header is a column, which
+is why it looked like a Firefox feature gap. The row now has room, may wrap, and
+the header grows with it. The language toggle also deleted `?lang` and called
+`location.replace()`, which targets a byte-identical URL once the app has written
+a hash — a fragment navigation, not a reload, so Gecko kept the old language
+until F5. It writes `?lang=<next>` instead.
+
+Verified in the preview at 1280/1024/820px in both languages, with the reported
+batch (Cryoxadone 500 + Tricordrazine 300 + Bicaridine 700 + Leporazine 300)
+coming out whole and divisible by 5 throughout. Regression:
+`node scripts/test_brew_plan.js` — 41 cases on the real `data.json`, including
+the float tail, the quantum by hand, batch arithmetic, catalyst reuse and the
+butter case. Decision record:
+`docs/decisions/2026-09-12_brew-plan-quantization.md`. Still open: the stale
+capacities in `config.py` (R6, needs a data regen) and 632 reagents without a
+Russian name, all of them from forks (R7). Cache-bust `style.css?v=67`,
+`i18n.js?v=41`, `app.js?v=44`, service worker `chemdb-v91`.
+
 ## Series D7 — 2026-09-12 (what stops potency, and where)
 
 **Frontend — two sections on the Botany tab.** "Random mutations" lists the
