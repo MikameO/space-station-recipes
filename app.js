@@ -637,6 +637,7 @@ function botanyRangeRowsHTML() {
   return BOTANY_RANGE_KINDS.filter(k => botanyRangeBounds[k]).map(kind => {
     const b = botanyRangeBounds[kind];
     const on = botanyRanges[kind];
+    const absent = !!(on && on.absent);
     // A kind with one distinct value (PlantAffectGrowth is always +1) has no
     // range to pick — the tick alone still means "must have this effect".
     const fixed = b.min === b.max;
@@ -659,6 +660,7 @@ function botanyRangeRowsHTML() {
             <input type="number" class="brange-max" value="${hi}" step="any" placeholder="${b.max}" aria-label="${esc(b.label)} maximum">
           </span>`}
       <span class="brange-bounds" title="Range present in the data for the selected source">${b.min} \u2026 ${b.max}</span>
+      <button type="button" class="brange-absent${absent ? ' active' : ''}" aria-pressed="${absent}" title="Also keep chemicals that carry no effect of this kind at all — how you ask for a mutagen that simply leaves the plant alone">+ none</button>
     </div>`;
   }).join('');
 }
@@ -691,29 +693,32 @@ function syncBotanyRangeRow(row) {
   // reads as "this inequality is off" and not as a value you forgot to type.
   row.classList.toggle('no-min', !!minEl && minEl.value.trim() === '');
   row.classList.toggle('no-max', !!maxEl && maxEl.value.trim() === '');
+  const absentBtn = row.querySelector('.brange-absent');
   botanyRanges[kind] = {
     min: readBotanyBound(minEl),
     max: readBotanyBound(maxEl),
+    absent: !!(absentBtn && absentBtn.classList.contains('active')),
   };
 }
 
 function matchesBotanyRanges(r) {
   for (const kind in botanyRanges) {
-    const { min, max } = botanyRanges[kind];
-    const lo = min === null ? -Infinity : min;
-    const hi = max === null ? Infinity : max;
-    const amounts = (r.plantEffects || [])
-      .filter(pe => pe.kind === kind)
-      .map(pe => Number(pe.amount))
-      .filter(Number.isFinite);
-    // A plant effect is an ADJUSTMENT, so carrying none of this kind is an
-    // adjustment of zero. That one rule serves both readings of a row:
-    // "mutation level >= 1" still returns only real mutagens (absent = 0
-    // fails it), while "plant health >= 0" also admits chemicals that leave
-    // the plant alone — which is how you ask for a mutagen that does not
-    // poison it. Kinds whose data never crosses zero (mutation modifier,
-    // growth) therefore still read as plain "must have this effect".
-    if (!amounts.length) amounts.push(0);
+    const cfg = botanyRanges[kind];
+    const lo = cfg.min === null ? -Infinity : cfg.min;
+    const hi = cfg.max === null ? Infinity : cfg.max;
+    const own = (r.plantEffects || []).filter(pe => pe.kind === kind);
+    // Carrying none of this kind fails the row unless it opted absence in.
+    // Treating absence as an implicit zero instead looked elegant and was
+    // wrong in practice: any range spanning zero — "pests 0..2", "weeds
+    // 0..10" — then matched every chemical that has no such effect at all,
+    // so ticking those rows appeared to filter nothing.
+    if (!own.length) {
+      if (!cfg.absent) return false;
+      continue;
+    }
+    const amounts = own.map(pe => Number(pe.amount)).filter(Number.isFinite);
+    // Carries it but unquantified (a flag-only entry): no number to judge.
+    if (!amounts.length) continue;
     if (!amounts.some(a => a >= lo && a <= hi)) return false;
   }
   return true;
@@ -743,6 +748,19 @@ function setupBotanyRanges() {
     // or clearing the first of two fields still switches the row on.
     const cb = row.querySelector('.brange-on');
     if (!cb.checked && e.target.value.trim() !== '') cb.checked = true;
+    syncBotanyRangeRow(row);
+    rerender();
+  });
+
+  host.addEventListener('click', (e) => {
+    const btn = e.target.closest('.brange-absent');
+    if (!btn) return;
+    const row = btn.closest('.brange-row');
+    btn.classList.toggle('active');
+    btn.setAttribute('aria-pressed', btn.classList.contains('active') ? 'true' : 'false');
+    // Opting absence in is intent to use the row, same as typing a bound.
+    const cb = row.querySelector('.brange-on');
+    if (!cb.checked) cb.checked = true;
     syncBotanyRangeRow(row);
     rerender();
   });
@@ -862,6 +880,18 @@ function renderSwabGuide() {
   </div>`;
 }
 
+// Zero results with several value rows ticked is almost always the rows, not
+// the search box: each one demands its effect be present, so ticking three
+// asks for a chemical carrying all three. Say so, and point at the way out.
+function botanyRangeHelpHTML() {
+  const n = Object.keys(botanyRanges).length;
+  if (!n) return '<span>Clear the search, effect chips, or sidebar filters.</span>';
+  const strict = Object.keys(botanyRanges).some(k => !botanyRanges[k].absent);
+  return `<span>${n} value condition${n === 1 ? '' : 's'} active, and every one must match.</span>`
+    + (strict ? ' <span>A chemical carrying no effect of a kind fails that row — press "+ none" on it to let those through.</span>' : '')
+    + ' <span>Or clear the search, chips, or sidebar filters.</span>';
+}
+
 function renderBotany(query = '') {
   // Bounds belong to the fork on screen; this is a no-op unless it moved.
   ensureBotanyRangeBounds();
@@ -883,7 +913,7 @@ function renderBotany(query = '') {
     grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1">
       <div class="empty-state-glyph">&#127793;</div>
       <div class="empty-state-headline">No plant-affecting chemicals match the current filters</div>
-      <div class="empty-state-help">Clear the search, effect chips, or sidebar filters.</div>
+      <div class="empty-state-help">${botanyRangeHelpHTML()}</div>
     </div>`;
     return;
   }

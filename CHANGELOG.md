@@ -52,6 +52,16 @@ prefilled: the bound lives in the placeholder, so grey means "this side is open,
 and it follows the fork" while black means "you typed this, and it survives the
 switch".
 
+**A ticked row requires its effect.** Treating "carries no effect of this kind"
+as an implicit zero read elegantly and was wrong in use: any range spanning zero
+— pests 0..2, weeds 0..10 — then matched every chemical that has no such effect
+at all, so ticking those rows appeared to filter nothing. A ticked row now means
+"this effect is present and inside the range", which also gives the tick alone a
+meaning it lacked: has this effect, any amount. The old reading survives as an
+explicit per-row "+ none" button, which is how you ask for a mutagen that leaves
+the plant alone. Zero results with rows ticked now explains itself: the empty
+state counts the active conditions and points at that button.
+
 **RU — plant effect chips.** The chips are composed at extract time as
 "<label> <signed amount>" (optionally a probability), so they could never be
 exact dictionary keys and stayed English on an otherwise Russian tab. Two regex
