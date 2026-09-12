@@ -465,23 +465,29 @@ In «Алгоритм распределения», step 4, replace «Без ц�
   // reaction, and the whole of its product. A hair is added to every amount
   // because simulateBeaker counts runs with Math.floor, and 90u of a
   // 0.9u-per-run reactant is 99.999… runs in floating point.
-  function simulate(contents, step) {
+  function simulate(contents, step, cache) {
     if (typeof simulateBeaker !== 'function') return { ok: true, extra: [] };
+    const key = cache && `${step.rxnId}|${stepTemp(step)}|${Object.keys(contents).sort().map(k => `${k}:${contents[k]}`).join(',')}`;
+    if (cache && cache.has(key)) return cache.get(key);
     const padded = {};
     for (const [id, amt] of Object.entries(contents)) padded[id] = amt + 1e-6;
     const res = simulateBeaker(padded, stepTemp(step));
     const ids = res.log.map(l => l.id);
     const extra = [...new Set(ids.filter(id => id !== step.rxnId))];
     const made = (res.final[step.reagentId] || 0) - (contents[step.reagentId] || 0);
-    return { ok: !extra.length && ids.includes(step.rxnId) && made + 0.01 >= step.amount, extra };
+    const out = { ok: !extra.length && ids.includes(step.rxnId) && made + 0.01 >= step.amount, extra };
+    if (cache) cache.set(key, out);
+    return out;
   }
 
-  // Lay plan.steps (leaves first, as planBrew sorts them) over the instances.
-  // opts.choose(stepIndex, options) picks among the options; the default takes
-  // the first, and the options are built in greedy order: chains, then fresh
-  // vessels by best fit, then a missing vessel only when nothing else exists.
-  function assign(plan, instances, opts) {
-    const choose = (opts && opts.choose) || ((i, options) => options[0]);
+  // Lay plan.steps (leaves first, as planBrew sorts them) over the instances,
+  // taking choose(stepIndex, options) at every step. Options come in base
+  // order: fresh vessels that take the step in one wave (best fit), then chains,
+  // then fresh vessels too small for one wave (largest first), then a missing
+  // vessel only when nothing else exists. A chain never saves a mix when a free
+  // vessel already takes the step in one wave, but it keeps a big vessel busy —
+  // CMClonexadone's 150u step chained into the tank its 1065u step needed.
+  function assignWith(plan, instances, choose, cache) {
     const vessels = (instances || []).map(inst => Object.assign({}, inst,
       { contents: {}, records: [], peak: 0, missing: null, virtual: false, mixer: false }));
     const extra = [];
@@ -595,6 +601,7 @@ In «Алгоритм распределения», step 4, replace «Без ц�
       if (isMixer(step)) {
         options.push({ type: 'mixer' });
       } else {
+        const chains = [];
         for (const r of step.reactants) {
           if (r.catalyst || !needBy[r.id] || !stock[r.id]) continue;
           const largest = needBy[r.id].reduce((a, b) => (b.amount > a.amount ? b : a));
@@ -612,8 +619,8 @@ In «Алгоритм распределения», step 4, replace «Без ц�
               if (x.catalyst) hypo[x.id] = Math.max(hypo[x.id] || 0, x.amount);
               else addTo(hypo, x.id, x.amount);
             }
-            const sim = simulate(hypo, step);
-            if (sim.ok) options.push({ type: 'chain', v, via: r.id, remainder, sim });
+            const sim = simulate(hypo, step, cache);
+            if (sim.ok) chains.push({ type: 'chain', v, via: r.id, remainder, sim });
           }
         }
         const vol = stepVolume(step);
@@ -624,7 +631,9 @@ In «Алгоритм распределения», step 4, replace «Без ц�
           if (!hot && a.heatable !== b.heatable) return a.heatable ? 1 : -1;
           return a.size - b.size;
         });
-        for (const v of fresh) options.push({ type: 'new', v });
+        for (const v of fresh.filter(x => x.size + EPS >= vol)) options.push({ type: 'new', v });
+        options.push(...chains);
+        for (const v of fresh.filter(x => x.size + EPS < vol)) options.push({ type: 'new', v });
         if (!options.length) options.push({ type: 'missing' });
       }
 
@@ -644,7 +653,7 @@ In «Алгоритм распределения», step 4, replace «Без ц�
 
       const pours = fill(step, v, chainedId);
       v.peak = Math.max(v.peak, volumeOf(v.contents));
-      if (!sim && !v.mixer) sim = simulate(v.contents, step);
+      if (!sim && !v.mixer) sim = simulate(v.contents, step, cache);
       let waves = 1;
       let batch = null;
       if (opt.type !== 'chain' && !v.mixer && typeof planBatches === 'function') {
@@ -668,6 +677,37 @@ In «Алгоритм распределения», step 4, replace «Без ц�
       },
       missing: used.filter(v => v.missing),
     };
+  }
+
+  // Fewest mixes, then fewest transfers, then fewest vessels.
+  const better = (a, b) => a.totals.mixes - b.totals.mixes || a.totals.transfers - b.totals.transfers || a.totals.vessels - b.totals.vessels;
+
+  // Plain greedy is myopic, and the brute-force oracle caught it: CMClonexadone
+  // chained its 150u Cryoxadone step into the tank, which then was not free for
+  // the 1065u step that followed (6 mixes where 4 were possible), and
+  // CMImidazoline gave its 150u first step the 300u beaker the 450u second step
+  // needed (5 instead of 4). So every step is a rollout: try each option, finish
+  // the plan greedily, keep the best. The greedy option is always among those
+  // tried, so this is never worse than greedy, and it stays polynomial.
+  // opts.choose bypasses it — the oracle drives assignWith directly.
+  function assign(plan, instances, opts) {
+    const cache = new Map();
+    if (opts && opts.choose) return assignWith(plan, instances, opts.choose, cache);
+    const prefix = [];
+    let best = null;
+    for (let i = 0; i < plan.steps.length; i++) {
+      let count = 1;
+      best = null;
+      for (let k = 0; k < count; k++) {
+        const res = assignWith(plan, instances, (j, options) => {
+          if (j === i) count = options.length;
+          return options[j < i ? prefix[j] : (j === i ? k : 0)];
+        }, cache);
+        if (!best || better(res, best.res) < 0) best = { k, res };
+      }
+      prefix.push(best.k);
+    }
+    return best ? best.res : assignWith(plan, instances, (j, options) => options[0], cache);
   }
 ```
 
