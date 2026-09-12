@@ -40,7 +40,8 @@ names the vessel to bring.
 
 **Rollout, because greedy lost.** Choosing locally — chains first, then the
 best-fitting vessel — looked right and passed every hand-made case. A
-brute-force oracle over all 83 RMC14 targets and three vessel sets found
+brute-force oracle over all 81 RMC14 targets (83 once the pending data regen
+lands) and three vessel sets found
 otherwise: CMClonexadone chained a 150u step into the tank its next, 1065u step
 needed (6 mixes where 4 were possible), and CMImidazoline gave a 150u first
 step the 300u beaker the 450u second step could have used (5 instead of 4). Every
@@ -55,7 +56,7 @@ catalyst left in the vessel, pours into other vessels and waves, and a totals
 line. Verified in the preview in both languages: the RMC14 Cryoxadone chain as
 two mixes in one tank, the red card for a hot step without a heating vessel, an
 empty set falling back to the flat list, 375px without horizontal scroll and
-44px steppers, no console errors. Tests: `node scripts/test_vessel_plan.js` (49
+44px steppers, no console errors. Tests: `node scripts/test_vessel_plan.js` (50
 cases including the oracle), `test_brew_plan.js` (52), `test_recipe_ranking.js`
 (27). Spec `docs/design/2026-09-12-vessel-planner.md`, plan
 `docs/superpowers/plans/2026-09-12-vessel-planner.md`. Cache-bust

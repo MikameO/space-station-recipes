@@ -396,10 +396,12 @@ setSource('rmc14');
 const oracleSets = { '1x300+tank': [HIGHCAP(), TANK()], '2x120': [LARGE(2)], '120+300': [LARGE(), HIGHCAP()] };
 const mismatches = [];
 let oracleRuns = 0;
+let oracleTargets = 0;
 for (const [id, r] of Object.entries(data.reagents)) {
   if (!g('reagentInActiveFork')(r)) continue;
   const plan = planBrew([{ id, amount: 300 }], 0);
   if (!plan.steps.length) continue;
+  oracleTargets++;
   for (const [name, rows] of Object.entries(oracleSets)) {
     const inst = V.expand(rows);
     const greedy = V.assign(plan, inst).totals.mixes;
@@ -410,7 +412,11 @@ for (const [id, r] of Object.entries(data.reagents)) {
 }
 setSource('vanilla');
 cases.push(
-  ['the oracle ran on every RMC14 target and vessel set', true, oracleRuns >= 83 * 3],
+  // The target count follows data.json (a regen adds or drops RMC14 recipes), so
+  // the check is that every target met every vessel set, not a fixed number.
+  ['the oracle ran on every RMC14 target and vessel set', true,
+    oracleTargets > 0 && oracleRuns === oracleTargets * Object.keys(oracleSets).length],
+  [`oracle coverage: ${oracleTargets} RMC14 targets × ${Object.keys(oracleSets).length} vessel sets`, true, oracleTargets > 0],
   ['greedy matches brute force on all of them', [], mismatches],
 );
 ```
