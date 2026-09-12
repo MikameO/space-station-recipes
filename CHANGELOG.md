@@ -49,6 +49,20 @@ from `isDispenser` / `obtainSources` / `accessibility.tier` — butter reads
 the plan warns separately about leaves with no known source at all, because that
 plan cannot be finished.
 
+**And the dispenser stocks twenty jugs, not twenty-five.** The oil in the
+report was not the butter case. `BASE_DISPENSER_CHEMICALS` lists Plasma, Silver,
+Water, WeldingFuel and Oil on top of the twenty jugs the upstream `ChemDispenser`
+actually spawns with, and upstream has no jug for plasma or oil at all — oil is
+brewed, or ground out of crudcoa, which is exactly what the player said. The
+planner now carries the verified list: those twenty say nothing, water, silver
+and welding fuel read "jug from storage" and stay out of the warning box (water
+is in half the recipes in the game), and a leaf our own data mislabels reads
+"brew it" with a warning that the plan stops there. The Med-Chem Starter preset
+was asking for 4u of oil with no hint where it comes from. Tree termination is
+left alone on purpose: water's own recipe is "20x Blood", so un-flagging these
+naively would have the calculator propose brewing water out of blood. The data
+fix and that question are R8.
+
 **Names, not prototype ids.** Steps printed `TableSalt` and `Oxygen` even with
 the interface in Russian, while the shopping list beside them was translated.
 Both now print the localized display name, and so do the danger warnings
