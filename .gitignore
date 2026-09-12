@@ -13,3 +13,6 @@ research/ss14-community-demand/raw/
 
 # Metrika Logs API raw dumps: visit-level rows (clientID, city, UA); never publish
 research/**/logs/
+
+# Card screenshot sources (re-shot by scripts/shoot_cards.mjs); only promo/cards/*.webp ships
+promo/cards-src/
