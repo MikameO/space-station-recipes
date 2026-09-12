@@ -13,6 +13,13 @@
  */
 (function () {
   'use strict';
+  // ordnance/<fork>.json carries no version of its own and Pages lets a browser
+  // keep it for ten minutes, so a deploy that changed the JSON together with
+  // this file handed the new code the old data (b0f1960: the carrier line
+  // stayed blank). The JSON rides on this script's own ?v= — bumping it in
+  // index.html refreshes both. currentScript is only set while this runs.
+  const ASSET_V = document.currentScript ? new URL(document.currentScript.src).searchParams.get('v') : null;
+  const versioned = p => ASSET_V ? p + '?v=' + ASSET_V : p;
 
   const FORK = 'stories_cm';        // the only fork carrying an ordnance layer today
   const CASING_ORDER = ['RMCM40GrenadeCasing', 'RMCM15GrenadeCasing', 'RMCM20MineCasing',
@@ -454,7 +461,7 @@
     const status = $('ordStatus');
     status.textContent = 'Loading ordnance data…';
     try {
-      const resp = await fetch('ordnance/' + FORK + '.json');
+      const resp = await fetch(versioned('ordnance/' + FORK + '.json'));
       if (!resp.ok) throw new Error('HTTP ' + resp.status);
       S.data = await resp.json();
       status.textContent = '';

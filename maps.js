@@ -2,6 +2,11 @@
 // Spec: docs/design/2026-07-12-map-item-finder.md. Loaded lazily on first tab open.
 (function () {
   'use strict';
+  // Map JSON, PNG and prices ride on this script's own ?v= (see ordnance.js):
+  // a bump in index.html must refresh the data the new code reads, and a map's
+  // PNG goes with its JSON because the coordinates index into that image.
+  const ASSET_V = document.currentScript ? new URL(document.currentScript.src).searchParams.get('v') : null;
+  const versioned = p => ASSET_V ? p + '?v=' + ASSET_V : p;
   const S = {
     index: null, mapMeta: null, mapData: null, img: null,
     scale: 1, ox: 0, oy: 0,        // canvas transform
@@ -32,7 +37,7 @@
     const status = document.getElementById('mapsStatus');
     status.textContent = 'Loading map index…';
     try {
-      const r = await fetch('maps/index.json');
+      const r = await fetch(versioned('maps/index.json'));
       if (!r.ok) throw new Error('HTTP ' + r.status);
       S.index = await r.json();
       status.textContent = '';
@@ -77,8 +82,8 @@
     document.getElementById('mapsListBtn').disabled = true;
     try {
       const [jr, img] = await Promise.all([
-        fetch('maps/' + file + '.json').then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); }),
-        new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = 'maps/' + file + '.png'; }),
+        fetch(versioned('maps/' + file + '.json')).then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); }),
+        new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = versioned('maps/' + file + '.png'); }),
       ]);
       S.mapData = jr; S.img = img;
       S.mapMeta = S.index.forks.flatMap(f => f.maps).find(m => m.file === file);
@@ -247,7 +252,7 @@
   // ── sell list: full map manifest with prices (spec: docs/design/2026-07-27-sell-list-mode.md) ──
   function loadPrices(fork) {
     if (!S.pricesReq[fork]) {
-      S.pricesReq[fork] = fetch('maps/' + fork + '/prices.json')
+      S.pricesReq[fork] = fetch(versioned('maps/' + fork + '/prices.json'))
         .then(r => r.ok ? r.json() : null)
         .then(j => {
           if (!j) { S.prices[fork] = null; S.classes[fork] = {}; S.sizesByPid[fork] = {}; return; }

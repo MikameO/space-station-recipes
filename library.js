@@ -92,6 +92,11 @@
   // ── page ─────────────────────────────────────────────────
   if (typeof document === 'undefined' || !document.getElementById('libList')) return;
 
+  // library/ files ride on this script's own ?v= (see ordnance.js), so a bump
+  // in library.html refreshes the index and documents the new code reads.
+  var ASSET_V = document.currentScript ? new URL(document.currentScript.src).searchParams.get('v') : null;
+  function versioned(p) { return ASSET_V ? p + '?v=' + ASSET_V : p; }
+
   var lang = window.I18N_LANG === 'ru' ? 'ru' : 'en';
   var $ = function (id) { return document.getElementById(id); };
   var S = { docs: [], current: null, raw: '' };
@@ -165,7 +170,7 @@
     $('libMarkup').textContent = '';
     $('libCount').textContent = '0';
     setStatus('');
-    fetch('library/' + d.file).then(function (r) {
+    fetch(versioned('library/' + d.file)).then(function (r) {
       if (!r.ok) throw new Error('HTTP ' + r.status);
       return r.text();
     }).then(function (text) {
@@ -220,7 +225,7 @@
   function loadIndex() {
     setStatus('');
     $('libRetry').hidden = true;
-    fetch('library/index.json').then(function (r) {
+    fetch(versioned('library/index.json')).then(function (r) {
       if (!r.ok) throw new Error('HTTP ' + r.status);
       return r.json();
     }).then(function (idx) {
