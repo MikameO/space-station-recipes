@@ -1,0 +1,160 @@
+<!doctype html>
+<!--
+  Source of og-image.png (1200x630 link preview for Discord / Steam / Twitter).
+  Numbers are hand-written from data.json meta (reagents, reactions, forks) and
+  maps/index.json (station maps): refresh them, then render:
+    1. open this file in Chrome at exactly 1200x630 CSS px (Google Fonts must load);
+    2. screenshot the viewport (a 1.25 DPR capture is 1500x788 - downscale with LANCZOS);
+    3. save as og-image.png and bump ?v=N on og:image / twitter:image in index.html
+       so Discord and Steam refetch the preview instead of serving their cache.
+  Last rendered 2026-09-12 (data.json schema 3.12.0).
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>og-image</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Chakra+Petch:wght@400;600;700&family=Oxanium:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --hull:#06090f; --plate:#0c1018; --panel:#0f1520; --raised:#141c2a;
+    --phosphor:#39ff85; --phosphor-dim:#1a7a42; --amber:#ffb627; --cyan:#00e5ff;
+    --red:#ff3d5a; --violet:#c17aff; --bright:#e8ecf4; --main:#a8b4c8; --sub:#8a99b3; --ghost:#6b7a93;
+    --border:#1a2540; --border-active:#2c5282;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:var(--hull);width:1200px;height:630px;overflow:hidden}
+  body{position:relative;color:var(--main);font-family:'Share Tech Mono',Consolas,monospace;
+       background:
+         radial-gradient(900px 400px at 85% 110%, rgba(57,255,133,.06), transparent 60%),
+         radial-gradient(600px 300px at 10% -10%, rgba(0,229,255,.05), transparent 60%),
+         repeating-linear-gradient(0deg, transparent 0 39px, rgba(26,37,64,.35) 39px 40px),
+         repeating-linear-gradient(90deg, transparent 0 39px, rgba(26,37,64,.35) 39px 40px),
+         var(--hull);}
+  .bar{position:absolute;left:0;top:0;right:0;height:46px;background:var(--plate);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 28px;gap:18px}
+  .corner{width:14px;height:14px;border-left:2px solid var(--phosphor);border-top:2px solid var(--phosphor)}
+  .brand{font-family:'Oxanium',sans-serif;font-weight:700;font-size:20px;letter-spacing:.06em;color:var(--bright)}
+  .brand em{font-style:normal;color:var(--phosphor)}
+  .bar .meta{margin-left:auto;font-size:13px;color:var(--ghost);letter-spacing:.04em}
+  .bar .meta b{color:var(--sub);font-weight:400}
+  .label{font-size:12px;letter-spacing:.18em;color:var(--phosphor-dim);text-transform:uppercase}
+  .label span{color:var(--phosphor)}
+
+  /* left: stats */
+  .stats{position:absolute;left:28px;top:64px;width:330px}
+  .stat{display:flex;align-items:baseline;gap:14px;margin-top:8px}
+  .stat .n{font-size:58px;line-height:1;color:var(--phosphor);text-shadow:0 0 18px rgba(57,255,133,.45)}
+  .stat .t{font-family:'Oxanium',sans-serif;font-size:16px;letter-spacing:.2em;color:var(--sub)}
+  .stat.small .n{font-size:40px}
+  .bars{margin-top:18px}
+  .bar-row{display:flex;align-items:center;gap:10px;font-size:12px;color:var(--sub);margin:5px 0}
+  .bar-row .k{width:78px;text-align:right}
+  .bar-row .b{height:7px;border-radius:4px;background:var(--phosphor)}
+  .bar-row .v{color:var(--ghost)}
+
+  /* middle: slanted card strip (top 46 → 575, slope 109px over 529px) */
+  .strip{position:absolute;left:360px;top:46px;width:440px;height:529px;clip-path:polygon(109px 0,440px 0,331px 529px,0 529px);background:linear-gradient(180deg,rgba(15,21,32,.95),rgba(12,16,24,.98))}
+  .edge{position:absolute;top:46px;height:529px;width:2px;background:linear-gradient(180deg,var(--phosphor),rgba(57,255,133,.15));transform-origin:top;transform:skewX(-11.64deg);box-shadow:0 0 12px rgba(57,255,133,.5)}
+  .edge.l{left:469px}.edge.r{left:800px}
+  .strip .head{position:absolute;left:130px;top:10px}
+  .card{position:absolute;left:0;width:440px;height:84px;background:var(--panel);border-bottom:1px solid var(--border);padding:12px 0 0 0}
+  .card .top{height:3px;width:100%;margin-top:-12px;margin-bottom:10px}
+  .card .name{font-family:'Oxanium',sans-serif;font-weight:700;font-size:17px;color:var(--bright)}
+  .card .chip{display:inline-block;margin-top:6px;font-family:'Chakra Petch',sans-serif;font-weight:600;font-size:10px;letter-spacing:.1em;padding:2px 6px;border:1px solid;border-radius:3px}
+  .card .desc{margin-top:6px;font-size:12px;color:var(--sub)}
+  .chip.med{color:var(--phosphor);border-color:var(--phosphor-dim)}
+  .chip.pyro{color:var(--amber);border-color:#8a5f14}
+  .chip.drink{color:var(--cyan);border-color:#0b6b78}
+  .chip.fork{color:var(--violet);border-color:#5a3a80}
+
+  /* right: preset + forks */
+  .right{position:absolute;left:836px;top:64px;width:336px}
+  .row{display:flex;justify-content:space-between;font-size:14px;color:var(--main);border-bottom:1px solid var(--border);padding:7px 0}
+  .row b{color:var(--cyan);font-weight:400}
+  .row .step{color:var(--ghost);font-size:12px}
+  .forks{margin-top:14px;display:flex;flex-wrap:wrap;gap:6px}
+  .fork{font-family:'Chakra Petch',sans-serif;font-size:11px;letter-spacing:.06em;color:var(--sub);border:1px solid var(--border);border-radius:3px;padding:3px 7px;background:var(--raised)}
+  .fork.ru{color:#ffd27a;border-color:#6b4f16}
+
+  /* bottom: features (top edge at 586) */
+  .features{position:absolute;left:28px;right:28px;bottom:16px;display:flex;gap:10px;align-items:center}
+  .feat{font-family:'Oxanium',sans-serif;font-weight:600;font-size:13px;letter-spacing:.08em;color:var(--bright);background:var(--raised);border:1px solid var(--border-active);border-radius:4px;padding:6px 11px}
+  .feat.ru{color:var(--phosphor);border-color:var(--phosphor-dim);background:rgba(57,255,133,.06)}
+</style>
+</head>
+<body>
+  <div class="bar">
+    <div class="corner"></div>
+    <div class="brand">NanoTrasen <em>ChemDB</em></div>
+    <div class="meta"><b>SS14 CHEMISTRY DATABASE</b> &nbsp;·&nbsp; 1387 reagents &nbsp;|&nbsp; 1104 reactions &nbsp;|&nbsp; 21 forks &nbsp;|&nbsp; 114 station maps</div>
+  </div>
+
+  <div class="stats">
+    <div class="label">// <span>stats</span></div>
+    <div class="stat"><div class="n">1387</div><div class="t">REAGENTS</div></div>
+    <div class="stat"><div class="n">1104</div><div class="t">REACTIONS</div></div>
+    <div class="stat small"><div class="n">21</div><div class="t">FORKS</div></div>
+    <div class="stat small"><div class="n">114</div><div class="t">STATION MAPS</div></div>
+    <div class="bars">
+      <div class="label">// <span>reagents per fork</span></div>
+      <div class="bar-row"><span class="k">Vanilla</span><span class="b" style="width:200px"></span><span class="v">407</span></div>
+      <div class="bar-row"><span class="k">Misfits</span><span class="b" style="width:74px;background:var(--red)"></span><span class="v">151</span></div>
+      <div class="bar-row"><span class="k">Delta-V</span><span class="b" style="width:61px;background:var(--cyan)"></span><span class="v">124</span></div>
+      <div class="bar-row"><span class="k">RMC14</span><span class="b" style="width:56px;background:var(--amber)"></span><span class="v">113</span></div>
+      <div class="bar-row"><span class="k">Funky</span><span class="b" style="width:51px;background:var(--violet)"></span><span class="v">103</span></div>
+      <div class="bar-row"><span class="k">ADT · Goob</span><span class="b" style="width:49px;background:#ffd27a"></span><span class="v">100</span></div>
+    </div>
+  </div>
+
+  <div class="strip">
+    <div class="head label">// <span>reagents</span></div>
+    <div class="card" style="top:36px"><div class="top" style="background:#ffaa00"></div>
+      <div class="name" style="padding-left:116px">Bicaridine</div>
+      <div style="padding-left:116px"><span class="chip med">MEDICINE</span></div>
+      <div class="desc" style="padding-left:116px">Treats brute damage · 90u starter kit</div></div>
+    <div class="card" style="top:120px"><div class="top" style="background:#bf3d19"></div>
+      <div class="name" style="padding-left:98px">Kelotane</div>
+      <div style="padding-left:98px"><span class="chip med">MEDICINE</span></div>
+      <div class="desc" style="padding-left:98px">Treats burn damage · overdose warning</div></div>
+    <div class="card" style="top:204px"><div class="top" style="background:#5a3fd6"></div>
+      <div class="name" style="padding-left:81px">Dylovene</div>
+      <div style="padding-left:81px"><span class="chip med">MEDICINE</span></div>
+      <div class="desc" style="padding-left:81px">Broad-spectrum anti-toxin</div></div>
+    <div class="card" style="top:288px"><div class="top" style="background:#D4872A"></div>
+      <div class="name" style="padding-left:64px">Phlogiston</div>
+      <div style="padding-left:64px"><span class="chip pyro">PYROTECHNIC</span></div>
+      <div class="desc" style="padding-left:64px">Ignites on contact · antag strategies</div></div>
+    <div class="card" style="top:372px"><div class="top" style="background:#a5e65d"></div>
+      <div class="name" style="padding-left:46px">24 Volt Energy</div>
+      <div style="padding-left:46px"><span class="chip drink">DRINKS</span> <span class="chip fork">FUNKY</span></div>
+      <div class="desc" style="padding-left:46px">Fork-only reagent, lanternfruit flavour</div></div>
+    <div class="label" style="position:absolute;left:26px;top:476px;color:var(--ghost);white-space:nowrap;letter-spacing:.1em">+ 1382 more · <span style="color:var(--sub)">source YAML linked</span></div>
+    <div class="label" style="position:absolute;left:16px;top:500px;color:var(--ghost);white-space:nowrap;letter-spacing:.1em">152 plants · 20 damage types</div>
+  </div>
+  <div class="edge l"></div>
+  <div class="edge r"></div>
+
+  <div class="right">
+    <div class="label">// <span>shift preset</span> · med-chem starter</div>
+    <div class="row"><span>Bicaridine</span><b>90u</b></div>
+    <div class="row"><span>Kelotane</span><b>90u</b></div>
+    <div class="row"><span>Dylovene</span><b>90u</b></div>
+    <div class="row"><span>Epinephrine</span><b>30u</b></div>
+    <div class="row"><span class="step">→ batch plan: full shopping list, step by step</span></div>
+    <div class="label" style="margin-top:18px">// <span>21 forks</span> · data from each repo</div>
+    <div class="forks">
+      <span class="fork">Vanilla</span><span class="fork">Goob</span><span class="fork">Delta-V</span><span class="fork">Frontier</span><span class="fork">Monolith</span><span class="fork">Funky</span><span class="fork">Trauma</span><span class="fork">Omu</span><span class="fork">Misfits</span><span class="fork">Starlight</span><span class="fork">Carpmosia</span><span class="fork">Harmony</span><span class="fork">RMC14</span><span class="fork">CMU</span><span class="fork ru">Dead Space</span><span class="fork ru">Corvax</span><span class="fork ru">ADT</span><span class="fork ru">Sunrise</span><span class="fork ru">Fish</span><span class="fork ru">RuCM</span><span class="fork ru">Space Stories</span>
+    </div>
+  </div>
+
+  <div class="features">
+    <span class="feat">BATCH CALCULATOR</span>
+    <span class="feat">WHAT HEALS?</span>
+    <span class="feat">CRAFT TREES</span>
+    <span class="feat">STATION MAPS</span>
+    <span class="feat">BOTANY</span>
+    <span class="feat">FORK DIFF</span>
+    <span class="feat ru">RU / EN · OFFLINE PWA</span>
+  </div>
+</body>
+</html>
