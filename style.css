@@ -98,7 +98,10 @@ header {
   align-items: center;
   justify-content: space-between;
   padding: 0 20px;
-  height: 56px;
+  /* R5: flex-wrap is on, so a fixed height meant the wrapped line was drawn
+     outside the box and over the disclaimer bar. min-height keeps the 56px bar
+     when everything fits and lets it grow when it does not. */
+  min-height: 56px;
   background: var(--hull-plate);
   border-bottom: 1px solid var(--border-subtle);
   position: relative;
@@ -161,10 +164,24 @@ header h1 {
   letter-spacing: 0.06em;
 }
 
-.header-right { display: flex; align-items: center; gap: 10px; flex: 1; max-width: 560px; }
+/* R5: the row used to be capped at 560px with flex-shrink:0 on every button,
+   while its content measures 583px in EN and 612px in RU — so the overflow was
+   structural, not a narrow-window edge case. At 1280px EN clipped 📌 by 2px and
+   RU pushed it 52px outside the viewport; below ~1150px the whole row wrapped
+   past header{height:56px} and sat on top of the disclaimer bar. Hence: room for
+   the RU labels, permission to wrap as a last resort, and a header that grows
+   with the wrap instead of spilling over what follows (user report 15.08.2026 —
+   "нет кнопок пина и переключения языка" in Firefox desktop). */
+.header-right { display: flex; align-items: center; justify-content: flex-end; flex-wrap: wrap; gap: 10px; row-gap: 6px; flex: 1; max-width: 640px; }
 /* C3.1: the search box must survive the button row growing (📌 pushed it
    to zero width — buttons don't shrink, the input was the only thing that could) */
-.header-right .search-input { min-width: 130px; }
+/* …and with wrapping on, the input's `width:100%` resolved to a 100%-wide
+   flex-basis, which claimed a whole row on its own and pushed every button to
+   a second line even when there was room. It shrinks instead. */
+.header-right .search-input { min-width: 130px; width: auto; flex: 1 1 130px; }
+/* The toggle is the control a RU visitor needs most and it sat next to the
+   overflow edge — keep it a real target at every width. */
+.lang-toggle { min-width: 36px; }
 
 /* ── SEARCH ── */
 .search-input {
@@ -2587,6 +2604,8 @@ body.antag-active .disclaimer-bar {
   .detail-close { width: 44px; height: 44px; font-size: 1.4rem; }
   header { flex-direction: column; align-items: stretch; height: auto; padding: 10px 14px; }
   .header-right { max-width: 100%; }
+  /* R5: touch target for the control a RU visitor reaches for first */
+  .lang-toggle { min-width: 44px; min-height: 44px; }
   .disclaimer-bar { font-size: 0.62rem; height: 28px; }
   .disclaimer-bar-icon { font-size: 0.7rem; }
   .disclaimer-bar-chevron { display: none; }

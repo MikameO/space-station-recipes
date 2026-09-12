@@ -53,9 +53,16 @@
     btn.addEventListener('click', function () {
       var next = lang === 'ru' ? 'en' : 'ru';
       try { localStorage.setItem('chemdb-lang', next); } catch (e) { /* private mode */ }
-      // Drop ?lang from the URL so localStorage is the single source on reload
+      // R5: write ?lang= instead of dropping it. Dropping it made the target URL
+      // byte-identical to the current one whenever the app had written a hash
+      // (#tab=… — it always has), and location.replace() to the same URL with a
+      // fragment is a fragment navigation, not a reload: Gecko honoured that and
+      // the page stayed in the old language until the user pressed F5
+      // (user report 15.08.2026, Firefox and Edge). A changed query is a real
+      // navigation on every engine. Share links are unaffected — setupShareButton
+      // builds origin + pathname + hash and never carries the query.
       var u = new URL(location.href);
-      u.searchParams.delete('lang');
+      u.searchParams.set('lang', next);
       location.replace(u.toString());
     });
   }
