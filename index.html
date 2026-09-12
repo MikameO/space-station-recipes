@@ -72,7 +72,7 @@
   "license": "https://github.com/MikameO/space-station-recipes/blob/main/LICENSE"
 }
 </script>
-<link rel="stylesheet" href="style.css?v=63">
+<link rel="stylesheet" href="style.css?v=64">
 <!-- Yandex.Metrika counter -->
 <script type="text/javascript">
     (function(m,e,t,r,i,k,a){
@@ -379,6 +379,35 @@
           <div id="plantEvolution"></div>
           <div id="swabGuide"></div>
         </div>
+      </div>
+
+      <!-- D7: random mutations (extracted per fork) + curated engine limits.
+           Spec: docs/design/2026-09-12-botany-mutations.md -->
+      <div class="batch-section" data-collapsible data-collapse-key="mutations">
+        <h3 class="reverse-title">
+          <span class="reverse-title-text">&#129516; Random mutations</span>
+          <button class="hint-chip" data-hint="What a mutagen can roll, and how likely each roll is. Odds are per 15-second growth cycle at the dose in the column header. The table follows the Source filter, because forks run different botany code." aria-label="Random mutations explained">?</button>
+          <span class="section-chevron">&#9660;</span>
+        </h3>
+        <div class="section-body">
+          <div id="plantMutations"></div>
+          <div class="batch-section mut-forks collapsed" data-collapsible data-collapse-key="mutForks">
+            <h3 class="reverse-title">
+              <span class="reverse-title-text">All forks</span>
+              <span class="section-chevron">&#9660;</span>
+            </h3>
+            <div class="section-body"><div id="mutationForks"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="batch-section" data-collapsible data-collapse-key="mechanics">
+        <h3 class="reverse-title">
+          <span class="reverse-title-text">&#9881; Mechanic limits</span>
+          <button class="hint-chip" data-hint="The caps that decide how far potency, health and yield can go. These constants live in the game's C# code, not in extractable YAML, so this block is curated — see Sources for the files and the date." aria-label="Mechanic limits explained">?</button>
+          <span class="section-chevron">&#9660;</span>
+        </h3>
+        <div class="section-body"><div id="botanyMechanics"></div></div>
       </div>
 
     </div>
@@ -794,10 +823,11 @@
 </div>
 
 <!-- i18n.js must load BEFORE app.js: it exposes applyRussianData for init() -->
-<script src="i18n.js?v=38"></script>
+<script src="i18n.js?v=39"></script>
 <script src="app.js?v=40"></script>
 <script defer src="tutorial.js?v=3"></script>
 <script src="maps.js?v=16" defer></script>
 <script src="ordnance.js?v=48" defer></script>
+<script src="botany.js?v=1" defer></script>
 </body>
 </html>

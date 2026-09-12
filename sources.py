@@ -303,6 +303,12 @@ SOURCES = {
         "date": "2026-07-12",
         "note": "Breathing gases and physiology quirks per playable species. Species/body prototypes are not part of the extraction manifest (yet) — unlike per-reagent organ conditions, which ARE extracted from reagent YAML. Corrections via PR encouraged.",
     },
+    "mk-botany-mechanics": {
+        "type": "maintainer-knowledge",
+        "title": "Botany engine constants read off upstream C# (D7)",
+        "date": "2026-09-12",
+        "note": "Robust Harvest limits, tick/cycle timing, the potency-to-chemical formula and the health/endurance rules live in C#, which the extractor does not fetch. Read on 2026-09-12 from RobustHarvestEntityEffectSystem.cs and RobustHarvest.cs (PotencyLimit 50, PotencyIncrease 3, PotencySeedlessThreshold 30, 10% yield loss above the limit), PlantHolderComponent.cs (UpdateDelay 3s, CycleDelay 15s, MaxMutationLevel 25, MaxMutationMod 3), PlantHolderSystem.UpdateReagents (1 unit consumed per reagent per tick), BasePlantAdjustAttributeEntityEffect.cs (effects do not scale with quantity), BotanySystem.Produce.cs (clamp(Min + Potency/Divisor, Min, Max)), PlantGrowthSystem/PlantHolderSystem.Update (regen, old age), PlantDiethylamineEntityEffectSystem.cs (10% +1 endurance and +1 lifespan, uncapped) and PlantCryoxadoneEntityEffectSystem.cs. Which era text applies is decided by extracted data, not by this entry.",
+    },
     "mk-botany-guide": {
         "type": "maintainer-knowledge",
         "title": "Cross-pollination / swab guide from maintainer's playtime",

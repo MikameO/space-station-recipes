@@ -149,7 +149,7 @@
 5. Регенерация офлайн из `cache/`.
 **DoD:** `ChangePotency`, `Unviable`, `ChangeYield` сверены с YAML глазами на одном `ladder`- и одном `range`-форке; misfits = 18 записей без `Sentient`/`Slippery`/`Kudzufication`, frontier = 25 без газовых; adt и sunrise не показывают ложных отличий по семейству `heat`; `EvilPlantMutations` не в основной таблице; regen ×2 байт-идентичен, M1 чист.
 
-### D7. Секции «Случайные мутации» и «Потолки механик» на вкладке Botany `[ ]` — HAE 3h (frontend + curation) — **зависит от D6**
+### D7. Секции «Случайные мутации» и «Потолки механик» на вкладке Botany `[x]` (2026-09-12) — HAE 3h (frontend + curation) — **зависит от D6**
 **Спека:** [docs/design/2026-09-12-botany-mutations.md](docs/design/2026-09-12-botany-mutations.md)
 **Зачем:** вероятности сами по себе ничего не решают, пока рядом нет потолков: Robust Harvest упирается в 50 и после этого ест урожай, потенция выше насыщения химии бесполезна, у мутаций свой разворот наверху. Плюс действующий `BOTANY_GUIDE` дезинформирует — «Robust Harvest boosts potency» без потолка 50, порога Seedless на 30 и потери урожая.
 **Шаги:**

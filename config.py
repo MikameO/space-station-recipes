@@ -2102,10 +2102,55 @@ BOTANY_GUIDE = {
         },
         {
             "h": "Practical loop",
-            "body": "1) Mutagen small doses until the species you want appears. 2) Stabilize: harvest, replant the mutated seeds. 3) Swab-breed your best specimens to stack potency/yield onto the new species. 4) Robust Harvest boosts potency; seedless traits need the clippers workaround.",
+            "body": "1) Mutagen small doses until the species you want appears. 2) Stabilize: harvest, replant the mutated seeds. 3) Swab-breed your best specimens to stack potency/yield onto the new species — crossing within one species avoids the seedless penalty that hybrids carry. 4) Robust Harvest raises potency to 50 and no further, and makes the plant seedless past 30; the numbers are under Mechanic limits.",
         },
     ],
 }
+
+# D7: engine constants the YAML does not carry. Everything here is read off
+# upstream C# (paths in sources.py, mk-botany-mechanics), so it is a curated
+# block, not an extracted one. `byModel` picks the text for the botany era the
+# selected fork runs — that era comes from extracted data (plantMutations),
+# not from a hardcoded fork list.
+BOTANY_MECHANICS = {
+    "title": "Mechanic limits — what stops potency, health and yield",
+    "tier": "community",
+    "sources": ["mk-botany-mechanics"],
+    "sections": [
+        {
+            "h": "Robust Harvest stops at 50",
+            "body": "Each tick adds 3 potency, but only up to 50 — past that the chemical does nothing for potency. Crossing 30 makes the plant seedless, so take your seeds before then or restore them later with Sedin (-3 potency a unit). At 50 and above every further dose instead has a 10% chance to drop yield by 1, down to a floor of 1: keep feeding a maxed plant and you are trading harvest size for nothing.",
+        },
+        {
+            "h": "Dosing: one unit is one tick",
+            "body": "The tray metabolises every 3 seconds and consumes 1 unit of each reagent per tick; the effect fires once and does NOT scale with how much you poured. Growth and mutation run on a slower 15-second cycle. So the amount in the tray sets the severity of the next mutation roll: N units of mutagen ≈ severity N. Severity caps at 25, and the mutation multiplier (Left4Zed, uranium) caps at 3.",
+            "byModel": {
+                "ladder": "Each mutation rolls once per growth cycle at min(odds × severity, 1) — at severity 25 anything above 4% odds is a coin flip you lose.",
+                "range": "The check repeats while odds × severity exceeds the triggers already fired, so at high severity a mutation does not just become likely, it fires several times in one cycle.",
+            },
+        },
+        {
+            "h": "How a potency roll moves",
+            "body": "Potency mutations do not drift upward; they are pulled toward the middle of their range and pushed back from the top.",
+            "byModel": {
+                "ladder": "The value snaps onto six rungs — 30, 44, 58, 72, 86, 100 — and steps one rung at a time, up with probability 1 − n/5 (n = current rung). From 86 that is a 20% chance of reaching 100, and at 100 the next potency roll always steps back down to 86. Lock a good roll in by harvesting and extracting seeds before the next cycle.",
+                "range": "The value moves ±15 with probability 1 − (P − 30)/70 of going up, so it settles around 65 and always steps down once it is at or above 100.",
+            },
+        },
+        {
+            "h": "Potency stops paying",
+            "body": "Produce carries clamp(Min + Potency / PotencyDivisor, Min, Max) of each chemical, so a plant saturates at (Max − Min) × PotencyDivisor potency and everything above that is wasted — Ambrosia Deus tops out at 70, poppy at 95. Two things keep scaling without a cap: gases the plant exudes, and composting the produce back into a tray (potency / 2.5 nutrients).",
+        },
+        {
+            "h": "Health, endurance, old age",
+            "body": "A watered and fed plant (water above 10, nutrition above 5) regenerates about 1 health a cycle — less than a single mutagen tick costs. Ammonia adds 0.5 health per tick, diethylamine 0.1 plus a 10% chance of +1 endurance AND +1 lifespan per tick, with no upper limit: it is the only uncapped way to raise the health ceiling. Cryoxadone rolls the plant's age back, which is what keeps a repeat-harvest plant alive past its lifespan (old age costs 3-5 health a cycle).",
+            "byModel": {
+                "ladder": "Pump endurance only after the mutagen is gone: an endurance mutation snaps the stat back inside 50…150 and throws the diethylamine work away.",
+            },
+        },
+    ],
+}
+
 
 # Pre-built antagonist strategies/combos
 ANTAG_STRATEGIES = [

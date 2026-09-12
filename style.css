@@ -3428,3 +3428,27 @@ main.lib-layout {
   .lib-sheet { padding: 18px 14px; font-size: 14px; }
   .lib-count { margin-left: 0; }
 }
+
+/* D7: random mutation table + fork summary (botany.js). Scrolls inside its own
+   wrapper — six columns will not fit a phone, and the page body must not be the
+   thing that scrolls sideways. */
+.mut-table-wrap { overflow-x: auto; margin: 8px 0 4px; }
+.mut-table { border-collapse: collapse; width: 100%; font-size: 13px; }
+.mut-table th, .mut-table td { padding: 4px 8px; text-align: left; border-bottom: 1px solid var(--border); white-space: nowrap; }
+.mut-table th { font-weight: 600; color: var(--text-dim); position: sticky; top: 0; background: var(--bg-card); }
+.mut-table td:nth-child(2) { white-space: normal; min-width: 220px; }
+.mut-table .mut-num { text-align: right; font-variant-numeric: tabular-nums; }
+.mut-table .mut-name { font-weight: 600; }
+.mut-table tr:hover td { background: var(--bg-hover, rgba(255,255,255,.03)); }
+.mut-row-active td { background: rgba(34, 197, 94, .10); }
+.mut-range { color: var(--text-dim); font-weight: 400; }
+.mut-flag { color: var(--text-dim); font-size: 11px; border: 1px solid var(--border); border-radius: 3px; padding: 0 4px; }
+.mut-note { color: var(--text-dim); }
+.badge-model { border-color: var(--accent, #22c55e); }
+.mut-era-note { margin-top: 4px; padding-left: 8px; border-left: 2px solid var(--accent, #22c55e); color: var(--text-dim); }
+.mut-forks { margin-top: 10px; }
+@media (max-width: 560px) {
+  .mut-table { font-size: 12px; }
+  .mut-table th, .mut-table td { padding: 3px 6px; }
+  .mut-table td:nth-child(2) { min-width: 160px; }
+}

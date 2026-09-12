@@ -3,6 +3,41 @@
 `data.json` schema version is in `meta.schemaVersion`. Consumers reading this file
 should pin on a compatible range (semver: breaking changes bump major).
 
+## Series D7 — 2026-09-12 (what stops potency, and where)
+
+**Frontend — two sections on the Botany tab.** "Random mutations" lists the
+table of the fork on screen: what each roll changes, the range it moves in, its
+step, whether rolling it again takes it back off, and the chance per 15-second
+growth cycle at 1u, 5u and 25u of mutagen in the tray — sorted by chance, so
+`Unviable` (11% at one unit) sits above `ChangePotency` (3.6%), which is the
+whole point. Under it, "All forks" names what actually differs: Frontier has no
+gas mutations, Misfits is down to 18, Carpmosia's Saltpetre and Trauma's Reaper
+Delight raise potency with no ceiling at all (vanilla's only potency reagent,
+Sedin, subtracts).
+
+**Curated — "Mechanic limits" (schema 3.12.0, `botanyMechanics`).** The caps
+the YAML cannot carry, read off upstream C# by hand and filed under
+`mk-botany-mechanics` with the file list and the date: Robust Harvest adds 3 a
+tick to a hard 50, makes the plant seedless past 30 and then trades yield at a
+10% chance a dose; a tray tick is 3 seconds and consumes 1 unit of each reagent
+whatever the amount poured, a growth cycle is 15, so the units sitting in the
+tray are the severity of the next roll; produce saturates at (Max − Min) ×
+PotencyDivisor potency, which is 70 for Ambrosia Deus; diethylamine is the only
+uncapped way to raise the health ceiling. Each section carries the text of the
+era the selected fork runs — the ladder's six rungs and its 1 − n/5 step, or the
+±15 of the current model — and that era comes from extracted data, not from a
+hardcoded list.
+
+The rendering lives in its own `botany.js` rather than in `app.js`, which is
+already 168 KB, and wires itself through `app:ready`, the tab button and the
+Source filter, the way `maps.js` and `ordnance.js` do. Verified in the browser:
+ADT flips the header and all three era notes to the ladder text and potency to
+3.6/18/90%, Misfits and Frontier show their differences while Sunrise shows
+none, RU translates section titles, headers, trait notes and the whole curated
+block, no console errors, and at 375 px the table scrolls inside its own
+wrapper with the page itself not scrolling sideways. Cache-bust
+`style.css?v=64`, `i18n.js?v=39`, `botany.js?v=1`, service worker `chemdb-v85`.
+
 ## Series D6 — 2026-09-12 (the rolls behind the evolution chart)
 
 **Data — the random mutation table, per fork.** The Botany tab knew which

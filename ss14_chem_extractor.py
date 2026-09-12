@@ -26,7 +26,7 @@ from config import (
     OTHER_REAGENT_SOURCES, DANGEROUS_INTERACTIONS,
     BASE_DISPENSER_CHEMICALS, CATEGORY_SHEET_MAP,
     ANTAG_DATA, ANTAG_STRATEGIES, DELIVERY_MECHANISMS, SYNDICATE_ITEMS,
-    SHIFT_PRESETS, BOTANY_GUIDE, SPECIES_DATA, SPECIES_GUIDE_SOURCES,
+    SHIFT_PRESETS, BOTANY_GUIDE, BOTANY_MECHANICS, SPECIES_DATA, SPECIES_GUIDE_SOURCES,
     MUTATION_FILES,
 )
 from sources import (
@@ -2509,6 +2509,9 @@ def export_json(reagents: dict, reactions: dict, locale: dict,
             # (Absinthe, Lead, ...) no longer render as unobtainable.
             # 3.6.1: species{} (curated physiology) + per-reagent
             # speciesEffects lifted from organ-conditional effect clauses.
+            # 3.12.0: botanyMechanics{} — curated engine constants
+            # (Robust Harvest caps, tick timing, potency saturation), with
+            # per-era text the frontend selects from plantMutations.
             # 3.11.0: plantMutations{} — the random mutation table per fork
             # (odds, targets, ranges) with the two botany eras kept apart.
             # 3.6.0: plants{} — seed prototypes as first-class entities
@@ -2516,7 +2519,7 @@ def export_json(reagents: dict, reactions: dict, locale: dict,
             # 3.5.0: legacy rmcStatus/rmcNote per-reaction fields and
             # vanillaReagentCount/rmcReagentCount meta removed — forkStatus/
             # forkNotes are the only fork-view fields since the multi-fork era.
-            "schemaVersion": "3.11.0",
+            "schemaVersion": "3.12.0",
             "generated": time.strftime("%Y-%m-%dT%H:%M:%S"),
             "forks": forks_meta,
             "reactionCount": len(reactions),
@@ -2842,6 +2845,9 @@ def export_json(reagents: dict, reactions: dict, locale: dict,
     # Plant entities (D1) — mutation graph + potency-scaled chemicals
     data["plants"] = plants or {}
     data["botanyGuide"] = BOTANY_GUIDE
+    # Engine constants the YAML does not carry (D7). Curated, and the frontend
+    # picks each section's `byModel` text from the fork's extracted era.
+    data["botanyMechanics"] = BOTANY_MECHANICS
 
     # Random mutations (D6) — per-era base plus per-fork delta. The UI rebuilds
     # a fork's table as base[model] minus `remove`, plus `add` and `override`.
@@ -2892,6 +2898,7 @@ def export_json(reagents: dict, reactions: dict, locale: dict,
     for p in presets_out:
         attribution_inputs.append((f"SHIFT_PRESETS:{p['id']}", p.get("sources", [])))
     attribution_inputs.append(("BOTANY_GUIDE", BOTANY_GUIDE.get("sources", [])))
+    attribution_inputs.append(("BOTANY_MECHANICS", BOTANY_MECHANICS.get("sources", [])))
     attribution_inputs.append(("SPECIES_DATA", SPECIES_GUIDE_SOURCES))
     for rid, robj in data["reagents"].items():
         if robj.get("antagTipsSources"):
