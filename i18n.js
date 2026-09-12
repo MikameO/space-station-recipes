@@ -256,11 +256,6 @@
     // Calculator
     'Target Reagent': 'Целевой реагент',
     'Amount (units)': 'Количество (юнитов)',
-    // R4: the option labels themselves carry numbers, so app.js builds them;
-    // only the static label and the aria-string live here.
-    'Container': 'Ёмкость',
-    'Mixing container': 'Ёмкость для смешивания',
-    'Custom container capacity in units': 'Своя ёмкость, юниты',
     'Type to search...': 'Начните вводить...',
     'Calculate': 'Рассчитать',
     'Batch / Shift Planner': 'Партия / план на смену',

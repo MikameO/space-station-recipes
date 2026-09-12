@@ -26,7 +26,7 @@ jobs:
       - name: Collect static files
         run: |
           mkdir _site
-          cp index.html library.html app.js i18n.js tutorial.js maps.js ordnance.js library.js botany.js style.css data.json favicon.ico _site/
+          cp index.html library.html app.js i18n.js tutorial.js maps.js ordnance.js library.js botany.js vessels.js style.css data.json favicon.ico _site/
           cp sw.js manifest.json robots.txt sitemap.xml _site/
           cp favicon.svg favicon-192.png favicon-512.png apple-touch-icon.png _site/
           cp -r sprites _site/sprites

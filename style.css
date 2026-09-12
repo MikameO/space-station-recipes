@@ -1427,18 +1427,6 @@ body.antag-active .hint-chip:hover, body.antag-active .hint-chip:focus-visible {
 .plan-note-line { padding: 2px 0; }
 .plan-note-why { color: var(--text-ghost); font-size: 0.66rem; }
 
-/* Which vessel the steps were split for — reads as a caption on the heading. */
-.calc-section-cap {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.6rem;
-  font-weight: 400;
-  letter-spacing: 0.04em;
-  text-transform: none;
-  color: var(--text-ghost);
-  text-shadow: none;
-  margin-left: 8px;
-}
-
 /* «Not in the dispenser» and friends: the shopping list says where a leaf
    actually comes from, since 513 of 561 base chemicals are not dispensable. */
 .shop-tag {
@@ -1464,11 +1452,37 @@ body.antag-active .hint-chip:hover, body.antag-active .hint-chip:focus-visible {
 .step-batches-total { color: var(--text-ghost); }
 .step-batches-bad { color: var(--red-alert); }
 
-/* The custom-capacity field sits under the select in the same group. */
-.calc-container-custom { margin-top: 6px; }
-/* Author display rules beat the UA [hidden] rule elsewhere in this file, so be
-   explicit here too (style.css trap, see .ord-field[hidden]). */
-.calc-container-custom[hidden] { display: none !important; }
+/* ── VESSEL PLANNER (Series R9–R11): the vessel set and per-vessel steps ── */
+.vessel-panel-host { margin: -8px 0 16px; }
+.vessel-panel { border: 1px solid var(--border-subtle); background: var(--hull); padding: 6px 10px; font-size: 0.72rem; }
+.vessel-panel > summary { cursor: pointer; color: var(--text-dim); }
+.vessel-panel-title { font-family: 'Oxanium', sans-serif; font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--phosphor); }
+.vessel-rows { display: flex; flex-direction: column; gap: 4px; margin: 8px 0; }
+.vessel-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.vessel-name { min-width: 170px; }
+.vessel-size input { width: 70px; margin-right: 2px; background: var(--hull-plate); border: 1px solid var(--border-subtle); color: inherit; padding: 2px 4px; }
+.vessel-heat { color: var(--text-ghost); }
+.vessel-stepper { display: inline-flex; align-items: center; gap: 6px; }
+.vessel-stepper button, .vessel-remove { min-width: 26px; height: 24px; background: none; border: 1px solid var(--border-subtle); border-radius: 2px; color: var(--text-dim); cursor: pointer; }
+.vessel-stepper button:hover, .vessel-remove:hover { border-color: var(--phosphor-dim); color: var(--phosphor); }
+.vessel-count { min-width: 18px; text-align: center; color: var(--phosphor); font-weight: bold; }
+.vessel-panel-foot { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.vessel-note { color: var(--text-ghost); font-size: 0.64rem; }
+.vessel-card { border: 1px solid var(--border-subtle); padding: 8px 10px; margin-bottom: 8px; }
+.vessel-card-title { font-size: 0.68rem; color: var(--cyan); margin-bottom: 4px; }
+.vessel-card-missing { border-color: var(--red-alert); }
+.vessel-card-missing .vessel-card-title, .vessel-missing-text { color: var(--red-alert); }
+.vessel-card-mixer .vessel-card-title { color: var(--violet); }
+.vessel-line { padding: 4px 0; font-size: 0.73rem; }
+.vessel-store, .vessel-transfer, .vessel-leftover { color: var(--text-ghost); font-size: 0.68rem; }
+.vessel-sim-ok { color: var(--phosphor); font-size: 0.62rem; }
+.vessel-sim-bad { color: var(--amber); font-size: 0.62rem; }
+.vessel-totals { margin-top: 6px; color: var(--amber); font-size: 0.7rem; }
+@media (max-width: 768px) {
+  .vessel-name { min-width: 0; flex: 1 1 100%; }
+  .vessel-stepper button, .vessel-remove { min-width: 44px; height: 44px; }
+}
+
 
 /* ══════════════════════════════════════════
    CRAFT TREES

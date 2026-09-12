@@ -161,7 +161,6 @@ async function init() {
   setupSearch();
   setupDetailPanel();
   setupCalculator();
-  setupContainerSelect(); // R4: vessel for both planners
   setupCraftTrees();
   setupReverseLookup();
   setupBatchPlanner();
@@ -2260,9 +2259,8 @@ function setupCalculator() {
   document.getElementById('calcBtn').addEventListener('click', () => {
     if (!selectedCalcId) return;
     const amount = parseFloat(document.getElementById('calcAmount').value) || 30;
-    const cap = brewCapacity();
-    track('calc_run', { target: selectedCalcId, amount, cap });
-    const plan = planBrew([{ id: selectedCalcId, amount }], cap);
+    track('calc_run', { target: selectedCalcId, amount });
+    const plan = planBrew([{ id: selectedCalcId, amount }], 0);
     document.getElementById('batchResults').innerHTML = '';
     document.getElementById('batchWarnings').innerHTML = '';
     renderCalcResults(selectedCalcId, plan);
@@ -2290,18 +2288,8 @@ const PLAN_POUR_CU = 5 * PLAN_CU;
 // amounts instead of a quantum nobody can hold.
 const PLAN_QUANTUM_MAX_CU = 100000 * PLAN_CU;
 
-// Capacities verified against upstream Resources/Prototypes/Entities/Objects/
-// base_solution.yml (2026-09-12): Beaker←SolutionSmall 60u, LargeBeaker←
-// SolutionNormal 120u, Jug←SolutionLarge 240u, BluespaceBeaker←SolutionGinormous
-// 960u. DELIVERY_MECHANISMS in config.py still says 50/100/300 — stale, and
-// corrected separately because it needs a data regen (R7).
-const BREW_CONTAINERS = [
-  { cap: 60,  en: 'Beaker',           ru: 'Мензурка' },
-  { cap: 120, en: 'Large beaker',     ru: 'Большая мензурка' },
-  { cap: 240, en: 'Jug',              ru: 'Канистра' },
-  { cap: 960, en: 'Bluespace beaker', ru: 'Блюспейс-мензурка' },
-];
-const BREW_DEFAULT_CAP = 120;
+// Vessel capacities and presets live in vessels.js (Series R9–R11): the R4
+// single-container select gave way to the player's own set of beakers and tanks.
 
 const planRu = () => window.I18N_LANG === 'ru';
 
@@ -2649,51 +2637,18 @@ function renderPlanWarnings(plan) {
   </div>`;
 }
 
-// The capacity both planners obey. 0 = no limit.
-function brewCapacity() {
-  const sel = document.getElementById('calcContainer');
-  if (!sel) return BREW_DEFAULT_CAP;
-  if (sel.value === 'custom') {
-    return Math.max(0, parseFloat(document.getElementById('calcContainerCustom').value) || 0);
-  }
-  return Math.max(0, parseFloat(sel.value) || 0);
-}
-
-function brewCapacityLabel() {
-  const cap = brewCapacity();
+// R9–R11: with vessels on the table the steps are laid out per vessel by
+// vessels.js; with an empty set (or before the module loads) the flat list of
+// R1–R3 stays, unsplit.
+function renderPlanStepsSection(plan, emptyText) {
   const ru = planRu();
-  if (!cap) return ru ? 'без ограничения по объёму' : 'no volume limit';
-  const known = BREW_CONTAINERS.find(c => c.cap === cap);
-  const name = known ? (ru ? known.ru : known.en) : (ru ? 'ёмкость' : 'container');
-  return `${name} ${fmtU(cap)}u`;
-}
-
-function setupContainerSelect() {
-  const sel = document.getElementById('calcContainer');
-  const custom = document.getElementById('calcContainerCustom');
-  if (!sel) return;
-  const ru = planRu();
-  // Built here, not in the markup: every option carries a number, and a string
-  // with a number in it can never be matched by the i18n dictionary.
-  sel.innerHTML = BREW_CONTAINERS.map(c =>
-    `<option value="${c.cap}">${esc(ru ? c.ru : c.en)} — ${c.cap}u</option>`).join('')
-    + `<option value="0">${ru ? 'Без ограничения' : 'No limit'}</option>`
-    + `<option value="custom">${ru ? 'Своя ёмкость…' : 'Custom…'}</option>`;
-
-  const saved = loadSession().calcContainer;
-  sel.value = saved != null && [...sel.options].some(o => o.value === String(saved))
-    ? String(saved) : String(BREW_DEFAULT_CAP);
-  const syncCustom = () => { custom.hidden = sel.value !== 'custom'; };
-  syncCustom();
-
-  sel.addEventListener('change', () => {
-    syncCustom();
-    saveSession({ calcContainer: sel.value });
-    track('brew_container', { cap: brewCapacity() });
-  });
-  custom.addEventListener('input', () => saveSession({ calcContainerCustom: custom.value }));
-  const savedCustom = loadSession().calcContainerCustom;
-  if (savedCustom) custom.value = savedCustom;
+  const V = window.ChemDBVessels;
+  const instances = V ? V.expand(V.inventory(activeSource)) : [];
+  if (V && V.renderSection && instances.length && plan.steps.length) return V.renderSection(plan, instances);
+  return `<div class="calc-section">
+      <h3>${ru ? 'Шаги смешивания' : 'Mixing Steps'} (${plan.steps.length})</h3>
+      ${renderPlanSteps(plan.steps, 0) || `<p style="color:var(--text-dim)">${emptyText}</p>`}
+    </div>`;
 }
 
 function mergeSteps(steps) {
@@ -2784,10 +2739,7 @@ function renderCalcResults(targetId, plan) {
       <h3>${ru ? 'Список закупки' : 'Shopping List for'}${ru ? ': ' : ' '}${fmtU(ordered)}u ${esc(planName(targetId))}</h3>
       ${renderPlanShopping(plan.totalBase, plan.catalystNeeds) || `<p style="color:var(--text-dim)">${ru ? 'Это базовый реагент' : 'This is a base chemical'}</p>`}
     </div>
-    <div class="calc-section">
-      <h3>${ru ? 'Шаги смешивания' : 'Mixing Steps'} (${plan.steps.length}) <span class="calc-section-cap">${esc(brewCapacityLabel())}</span></h3>
-      ${renderPlanSteps(plan.steps, plan.cap) || `<p style="color:var(--text-dim)">${ru ? 'Смешивать нечего' : 'No mixing needed'}</p>`}
-    </div>
+    ${renderPlanStepsSection(plan, ru ? 'Смешивать нечего' : 'No mixing needed')}
   `;
 }
 
@@ -3190,7 +3142,7 @@ function setupBatchPlanner() {
 // The shift plan runs through the same engine as the single recipe: each target
 // is quantized on its own, then the steps merge, so a merged step is still whole.
 function planBatch(targets) {
-  return planBrew(targets, brewCapacity());
+  return planBrew(targets, 0);
 }
 
 function renderBatchResults(plan, div, warningsDiv) {
@@ -3206,10 +3158,7 @@ function renderBatchResults(plan, div, warningsDiv) {
       <h3>${ru ? 'Общий список закупки: ' : 'Total Shopping List for: '}${targetList}</h3>
       ${renderPlanShopping(plan.totalBase, plan.catalystNeeds)}
     </div>
-    <div class="calc-section">
-      <h3>${ru ? 'Шаги смешивания' : 'Mixing Steps'} (${plan.steps.length}) <span class="calc-section-cap">${esc(brewCapacityLabel())}</span></h3>
-      ${renderPlanSteps(plan.steps, plan.cap) || `<p style="color:var(--text-ghost)">${ru ? 'Все цели — базовые реагенты' : 'All targets are base chemicals'}</p>`}
-    </div>
+    ${renderPlanStepsSection(plan, ru ? 'Все цели — базовые реагенты' : 'All targets are base chemicals')}
   `;
 }
 
