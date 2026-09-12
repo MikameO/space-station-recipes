@@ -3,6 +3,65 @@
 `data.json` schema version is in `meta.schemaVersion`. Consumers reading this file
 should pin on a compatible range (semver: breaking changes bump major).
 
+## Series R9–R11 — 2026-09-12 (brewing in the vessels you have)
+
+On CM servers a chemist measures three reagents 1:1:1 with a 300u beaker into a
+1000u reagent tank and gets 900u of product in one tank, then pours the next
+step on top. The planner used to cut every step into portions of one container
+picked from a select. It now lays the plan out over the vessels actually on the
+table.
+
+**A vessel set instead of a container select.** The calculator's new «Vessels»
+panel starts from a preset for the fork family on screen, read off the
+prototypes: RMC14, CMU, RuCM and Space Stories get 60u, 120u, 300u and 180u
+beakers, the 200u jug, Space Stories' 500u reagent jug and the 1000u reagent
+tank; vanilla-family forks get 60u, 120u, 240u and 960u and no tank, because
+vanilla storage tanks can be drained but not filled. The family comes from the
+fork's parent chain, so RuCM reaches RMC14 through CMU without a list to
+maintain. Sizes and counts are editable, custom vessels can be added, and the
+set is remembered per family. An empty set keeps the flat list of steps.
+
+**What a vessel can do decides where a step goes.** «Heats» means the prototype
+carries `FitsInDispenser`, which is exactly the hotplate's whitelist: the RMC
+jug does not have it, the Stories reagent jug inherits it from the
+high-capacity beaker, the tank is a structure and never heats. A hot step goes
+only into a vessel that heats. A mixer step leaves the set altogether — the
+electrolysis unit takes beakers, but the centrifuge only takes
+`CentrifugeCompatible` tubes.
+
+**The next step is poured onto the intermediate when the simulator agrees.** A
+chain is accepted only if the beaker simulator, run on what would be in the
+vessel, fires exactly that step's reaction; any extra reaction — including one
+on a catalyst left behind — sends the step to a fresh vessel instead. An
+intermediate that several steps need is chained into the biggest consumer and
+poured out for the rest. A step bigger than its vessel runs in waves of whole
+reaction runs on the 5u step, and a step with nowhere to go gets a red card that
+names the vessel to bring.
+
+**Rollout, because greedy lost.** Choosing locally — chains first, then the
+best-fitting vessel — looked right and passed every hand-made case. A
+brute-force oracle over all 83 RMC14 targets and three vessel sets found
+otherwise: CMClonexadone chained a 150u step into the tank its next, 1065u step
+needed (6 mixes where 4 were possible), and CMImidazoline gave a 150u first
+step the 300u beaker the 450u second step could have used (5 instead of 4). Every
+step is now a rollout — each option is tried and the plan finished greedily,
+keeping the fewest mixes, then transfers, then vessels — over a base order that
+puts vessels taking the step in one wave before chains. The oracle now reports
+0 mismatches, and chains still win whenever they tie on mixes, since they save a
+transfer.
+
+Output is one card per vessel with «↓ pour in», the simulator's tick, the
+catalyst left in the vessel, pours into other vessels and waves, and a totals
+line. Verified in the preview in both languages: the RMC14 Cryoxadone chain as
+two mixes in one tank, the red card for a hot step without a heating vessel, an
+empty set falling back to the flat list, 375px without horizontal scroll and
+44px steppers, no console errors. Tests: `node scripts/test_vessel_plan.js` (49
+cases including the oracle), `test_brew_plan.js` (52), `test_recipe_ranking.js`
+(27). Spec `docs/design/2026-09-12-vessel-planner.md`, plan
+`docs/superpowers/plans/2026-09-12-vessel-planner.md`. Cache-bust
+`app.js?v=48`, `style.css?v=70`, `i18n.js?v=42`, `vessels.js?v=1`, service
+worker `chemdb-v97`; `vessels.js` joins the deploy copy list and `PRECACHE`.
+
 ## Series R — 2026-09-12 (a plan you can actually pour)
 
 A player wrote in on 15 August with seven points about the planners, and every

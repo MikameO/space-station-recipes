@@ -55,6 +55,8 @@ Worked example, Cryoxadone 500u: `q(Dexalin) = 3`, `q(Cryoxadone) = 3 · lcm(3, 
 **Rationale.** Closes points 5–7 and audit B8 in one model. Splitting by runs (not by volume) keeps every batch's numbers whole, which is the whole point of Decision 1; splitting by volume would reintroduce fractions at the batch boundary.
 **Rejected.** Splitting by equal volumes (fractions return); asking the user for a batch count (they want the answer, not the arithmetic).
 
+**Superseded in part, same day (Series R9–R11).** The single capacity this decision chose — one container governing both planners — gave way to the player's own vessel set in [docs/design/2026-09-12-vessel-planner.md](../design/2026-09-12-vessel-planner.md): beakers that heat and tanks that do not, steps chained onto an intermediate when the beaker simulator confirms it, and a rollout over the options checked against brute force on every RMC14 target. What survives from here: splitting by whole runs, the 5u pour step and catalyst reuse — `planBatches` is now the wave calculator for one vessel of the set.
+
 ### Decision 3: capacity ladder from upstream, with a free numeric field
 **Chosen.** The selector ships the verified vanilla ladder — beaker 60u, large beaker 120u, jug 240u, bluespace beaker 960u — plus «no limit» and a free number, because 21 forks may set their own `maxVol`. The stale `DELIVERY_MECHANISMS` capacities in `config.py` (and the prose that quotes them) are corrected separately, since that needs a data regen.
 **Rationale.** Verify live samples before baking formats (the StorageFill→EntityTableContainerFill lesson); the numbers in our own data turned out to be wrong by 10–660 %.
