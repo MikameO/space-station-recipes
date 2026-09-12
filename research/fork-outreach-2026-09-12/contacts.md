@@ -7,7 +7,7 @@
 
 | fork_id | Сообщество | Язык | Онлайн | Discord | Вики / сайт / форум | Репо в реестре | Свои | Карт | Спрос | Приоритет | Статус |
 |---|---|---|---:|---|---|---|---|---:|---:|---|---|
-| deadspace | Мёртвый космос (Титан, Деймос, Фобос, Союз-1, Эрида, Колосс) | RU | 107 (+9, +6, +20) | discord.gg/ds14 · Эрида: discord.gg/FCGsMYtMKp · Колосс: discord.gg/sector-colossus | wiki.deadspace14.net | dead-space-server/dead-space-14 (хаб отдаёт …/space-station-14-fobos: проверить переезд) | 22 / 14 | 8 | 53 | база | **размещено 2026-07-27** в `#📒┆гайды` с разрешения модераторов; просить закреп + строку в вики; ссылку не менять |
+| deadspace | Мёртвый космос (Титан, Деймос, Фобос, Союз-1, Эрида, Колосс) | RU | 107 (+9, +6, +20) | discord.gg/ds14 · Эрида: discord.gg/FCGsMYtMKp · Колосс: discord.gg/sector-colossus | wiki.deadspace14.net | dead-space-server/dead-space-14 (хаб отдаёт …/space-station-14-fobos: проверить переезд) | 22 / 14 | 8 | 53 | база | **размещено 2026-07-27** в `#📒┆гайды` с разрешения модераторов; **обновление гайда готово** — [deadspace-guide-update.md](deadspace-guide-update.md) (новая ссылка с `?lang=ru` + UTM: старая открывала сайт на английском); просить закреп + строку в вики |
 | stories_cm | Space Stories — Marine Corps Core | RU | 128 | discord.gg/PUqaMx7ryn (hub) · discord.gg/space-stories-mc (README) | spacestories.club/Marine_Corps · forum.spacestories.club | MetalSage/space-stories-cm14 | 18 / 12 (TC поверх RMC14) | — | — | RU-2 | не начато; на этом форке построен Ordnance |
 | fish | Рыбья станция: Персей («помощь новичкам») | RU | 76 | discord.gg/fishstation | fish.station.wiki.shizainc.com · ss14.forum.shizainc.com · t.me/sunrise_ss14 | space-sunrise/fish-station | 10 / 11 (+ sunrise 37 / 46) | — | 7 | **RU-1 (пилот)** | не начато; сервер для новичков = лучшая аудитория для гайда по химии |
 | adt | Время Приключений (ADT) | RU | 70 | discord.gg/NY3KDNuH9r | wiki.adventurestation.ru · boosty.to/adventuretime | AdventureTimeSS14/space_station_ADT | 100 / 77 (+ corvax 8 / 8) | — | 10 | RU-2 | не начато; большая своя химия — сильный аргумент |
@@ -66,4 +66,5 @@ Spellward и Lust — самые крупные непокрытые аудит�
 
 | Дата | fork_id | Где | Кто разрешил | Ссылка (UTM) | Примечание |
 |---|---|---|---|---|---|
-| 2026-07-27 | deadspace | Discord `#📒┆гайды` | модераторы DS14 | `…#src=deadspace` (без UTM) | 133 юзера / 47 дней; не менять |
+| 2026-07-27 | deadspace | Discord `#📒┆гайды` | модераторы DS14 | `…#src=deadspace` (без UTM) | 133 юзера / 47 дней; заменяется обновлённым гайдом — дату замены записать сюда |
+| 2026-09-12 | deadspace | проверка ссылки (браузер сессии) | — | `?lang=ru&utm_source=deadspace&utm_medium=discord-guide&utm_campaign=outreach-2026-09#src=deadspace` | 1 тестовый визит, при замере вычесть |

@@ -552,7 +552,7 @@ Name clearance (Роспатент, USPTO/EUIPO, Steam, домен) → ново
 **Находки:** реестр Starlight смотрит на `fskx/starlight-ss14` (6★) при живом апстриме `ss14Starlight/space-station-14` (123★) — сверить до обращения; Sunrise ребрендирован в Stellar Stories; Corvax/ARCANE/Russian MC не отвечают на `/info` с нашего IP; крупные непокрытые аудитории — Spellward, Lust, ARCANE, SS220.
 
 ### J2. Предпосылки к волне `[ ]` — HAE 2h (ops) — параллельно с J3
-Ответить Aliasen (Discord, ждёт с 2026-07-31); закрыть issue #2 (Funky/Goob); обновить EN Steam-гайд (текст апреля, 304 читателя) с `utm_medium=steam-guide`; срез `utm` в `export_metrika_stats.py`; сверка репо Starlight. Желательно до волны — форма обратной связи на сайте (параллельная сессия).
+Ответить Aliasen (Discord, ждёт с 2026-07-31); закрыть issue #2 (Funky/Goob); **обновить гайд Dead Space** в Discord и RU Steam-гайд — текст готов в [deadspace-guide-update.md](research/fork-outreach-2026-09-12/deadspace-guide-update.md) (калькулятор и batch вместо симулятора, карты МК, ботаника, новая ссылка с `?lang=ru` + UTM: старая открывала сайт на английском для 97% RU-когорты); обновить EN Steam-гайд (текст апреля, 304 читателя) с `utm_medium=steam-guide`; предложение: `navigator.language` как источник языка первого визита (`i18n.js:21`, сейчас дефолт EN); срез `utm` в `export_metrika_stats.py`; сверка репо Starlight. Желательно до волны — форма обратной связи на сайте (параллельная сессия).
 **DoD:** ответ отправлен; гайд обновлён; `utm` в выгрузке чекпойнта; вердикт по Starlight записан в contacts.md.
 
 ### J3. Пилот: 3 сообщества, 14 дней `[ ]` — HAE 3h (outreach, владелец) — зависит от J1

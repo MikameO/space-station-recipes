@@ -8,6 +8,12 @@
 https://mikameo.github.io/space-station-recipes/?utm_source=<fork_id>&utm_medium=<placement>&utm_campaign=outreach-2026-09#src=<fork_id>
 ```
 
+Для **RU-сообществ** ссылка обязана начинаться с `?lang=ru&…`: интерфейс по умолчанию английский (`i18n.js:21`: `?lang=` → localStorage → `en`, язык браузера не учитывается), и без параметра 97% RU-когорты Dead Space видели английский сайт.
+
+```
+https://mikameo.github.io/space-station-recipes/?lang=ru&utm_source=<fork_id>&utm_medium=<placement>&utm_campaign=outreach-2026-09#src=<fork_id>
+```
+
 | Часть | Значения | Смысл |
 |---|---|---|
 | `utm_source` | `fork_id` из реестра (`misfits`, `goob`, `rucm`, …) | **кто** привёл: сообщество форка |
@@ -15,7 +21,7 @@ https://mikameo.github.io/space-station-recipes/?utm_source=<fork_id>&utm_medium
 | `utm_campaign` | `outreach-2026-09` | волна; следующая волна получит новое значение |
 | `#src=<fork_id>` | тот же `fork_id` | сайт сразу открывается с фильтром нужного форка |
 
-Query-параметры ставятся **до** `#`. Для Dead Space уже работающая ссылка `#src=deadspace` без UTM остаётся как есть: менять живое размещение ради метки не нужно, его вклад виден по `startURL`.
+Query-параметры ставятся **до** `#`. Ссылка Dead Space `#src=deadspace` (без UTM и без `lang`) заменяется вместе с обновлением гайда ([deadspace-guide-update.md](deadspace-guide-update.md)); до даты замены вклад считается по `startURL = …#src=deadspace`, после — по `utm_source=deadspace`. Дату замены записать в журнал [contacts.md](contacts.md) §5.
 
 Пример для Misfits в канале гайдов:
 
