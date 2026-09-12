@@ -627,31 +627,48 @@ function botanyRangeRowsHTML() {
       ${fixed
         ? `<span class="brange-fixed">= ${b.min}</span>`
         : `<span class="brange-inputs">
-            <span class="brange-cap">≥</span>
-            <input type="number" class="brange-min" value="${lo}" step="any" aria-label="${esc(b.label)} minimum">
-            <span class="brange-cap">≤</span>
-            <input type="number" class="brange-max" value="${hi}" step="any" aria-label="${esc(b.label)} maximum">
+            <span class="brange-cap brange-cap-min">≥</span>
+            <input type="number" class="brange-min" value="${lo}" step="any" placeholder="${b.min}" aria-label="${esc(b.label)} minimum">
+            <span class="brange-cap brange-cap-max">≤</span>
+            <input type="number" class="brange-max" value="${hi}" step="any" placeholder="${b.max}" aria-label="${esc(b.label)} maximum">
           </span>`}
       <span class="brange-bounds" title="Range present in the data">${b.min} \u2026 ${b.max}</span>
     </div>`;
   }).join('');
 }
 
+// Read one side of a row. An emptied field drops that inequality rather than
+// pinning it to zero: Number('') is 0, not NaN, so the obvious
+// `Number.isFinite(Number(el.value))` check silently turned a cleared max into
+// "<= 0". A half-typed "-" or "." falls back the same way, so the grid never
+// blanks out mid-keystroke.
+function readBotanyBound(el, fallback) {
+  if (!el) return fallback;
+  const raw = el.value.trim();
+  if (raw === '') return fallback;
+  const n = Number(raw);
+  return Number.isFinite(n) ? n : fallback;
+}
+
 function syncBotanyRangeRow(row) {
   const kind = row.dataset.kind;
   const on = row.querySelector('.brange-on').checked;
   row.classList.toggle('active', on);
-  if (!on) { delete botanyRanges[kind]; return; }
+  if (!on) {
+    row.classList.remove('no-min', 'no-max');
+    delete botanyRanges[kind];
+    return;
+  }
   const b = botanyRangeBounds[kind];
   const minEl = row.querySelector('.brange-min');
   const maxEl = row.querySelector('.brange-max');
-  // Blank or half-typed input ("-") falls back to the data bound, so the grid
-  // never blanks out mid-keystroke.
-  const min = minEl ? Number(minEl.value) : NaN;
-  const max = maxEl ? Number(maxEl.value) : NaN;
+  // Dim the glyph whose side is no longer constraining, so a cleared field
+  // reads as "this inequality is off" and not as a value you forgot to type.
+  row.classList.toggle('no-min', !!minEl && minEl.value.trim() === '');
+  row.classList.toggle('no-max', !!maxEl && maxEl.value.trim() === '');
   botanyRanges[kind] = {
-    min: Number.isFinite(min) ? min : b.min,
-    max: Number.isFinite(max) ? max : b.max,
+    min: readBotanyBound(minEl, b.min),
+    max: readBotanyBound(maxEl, b.max),
   };
 }
 
@@ -694,9 +711,12 @@ function setupBotanyRanges() {
   host.addEventListener('input', (e) => {
     if (!e.target.matches('.brange-min, .brange-max')) return;
     const row = e.target.closest('.brange-row');
-    // Typing a bound is intent to use it — tick the row for the user.
+    // Typing a bound is intent to use the row — tick it for the user. Clearing
+    // one is the opposite intent (drop that inequality), so it must never tick
+    // a row on: judge the field that was just edited, not the row as a whole,
+    // or clearing the first of two fields still switches the row on.
     const cb = row.querySelector('.brange-on');
-    if (!cb.checked) cb.checked = true;
+    if (!cb.checked && e.target.value.trim() !== '') cb.checked = true;
     syncBotanyRangeRow(row);
     rerender();
   });

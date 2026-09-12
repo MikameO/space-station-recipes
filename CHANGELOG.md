@@ -37,6 +37,9 @@ plant. Because a plant effect is an *adjustment*, carrying none of a kind counts
 as zero — one rule that keeps "mutation level ≥ 1" to real mutagens while
 letting "plant health ≥ 0" admit chemicals that leave the plant alone. Bounds
 are computed once over the whole dataset, so they do not shift while filtering.
+Clearing a bound drops that side of the inequality and the field shows the data
+bound as a placeholder with its glyph dimmed — `Number('')` is 0, not NaN, so
+the obvious finite-check silently pinned a cleared maximum to "≤ 0".
 
 **RU — plant effect chips.** The chips are composed at extract time as
 "<label> <signed amount>" (optionally a probability), so they could never be

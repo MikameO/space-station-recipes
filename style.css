@@ -2099,6 +2099,14 @@ body.antag-active .antag-toggle {
 .brange-min:focus, .brange-max:focus {
   outline: none; border-color: var(--border-active);
 }
+/* The placeholder is the data bound that takes over when the field is cleared,
+   and the glyph for that side dims — together they say "this inequality is
+   off" rather than "you forgot to type a number". */
+.brange-min::placeholder, .brange-max::placeholder {
+  color: var(--text-sub); opacity: 0.45;
+}
+.brange-row.no-min .brange-cap-min,
+.brange-row.no-max .brange-cap-max { opacity: 0.22; }
 .brange-fixed {
   font-family: 'Share Tech Mono', monospace;
   font-size: 0.72rem; color: var(--text-sub);
