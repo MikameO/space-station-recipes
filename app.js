@@ -230,8 +230,13 @@ function forkChain(forkId) {
 
 // Shared fork-lineage visibility: is this entity (reagent or reaction)
 // native-or-inherited under forkId and not blocked by it?
+// alsoIn lists forks whose own manifest carries a copy of an id another fork
+// registered first: first-wins keeps one owner, but the copying fork really has
+// the content (docs/decisions/2026-09-13_fork-copy-visibility.md).
 function forkVisible(entity, forkId) {
-  if (entity.source !== 'vanilla' && !forkChain(forkId).includes(entity.source)) return false;
+  const chain = forkChain(forkId);
+  if (entity.source !== 'vanilla' && !chain.includes(entity.source)
+      && !(entity.alsoIn && entity.alsoIn.some(f => chain.includes(f)))) return false;
   if (entity.forkStatus && entity.forkStatus[forkId] === 'blocked') return false;
   return true;
 }
@@ -2008,7 +2013,12 @@ function getFilteredReactions(reagentId) {
     rxns.push(rx);
   }
   const lineage = rx => {
-    if (chain) return rx.source === 'vanilla' ? chain.length : chain.indexOf(rx.source);
+    if (chain) {
+      if (rx.source === 'vanilla') return chain.length;
+      // visible through alsoIn: rank by the nearest fork in the chain that has it
+      const at = [rx.source, ...(rx.alsoIn || [])].map(f => chain.indexOf(f)).filter(i => i >= 0);
+      return at.length ? Math.min(...at) : chain.length;
+    }
     if (mode === 'all') return rx.source === (r && r.source) ? 0 : rx.source === 'vanilla' ? 1 : 2;
     return 0;
   };
