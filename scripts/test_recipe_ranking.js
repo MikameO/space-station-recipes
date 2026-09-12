@@ -66,6 +66,11 @@ const cases = [
   // The step carries its source so the mixing list can badge a fork recipe.
   ['RMC14: the Vodka step knows it came from rmc14', 'rmc14', (() => { setSource('rmc14'); const s = calculateIngredients('Vodka', 30).steps; return s.length ? s[s.length - 1].source : null; })()],
   ['All: the Vodka step is vanilla, no badge', 'vanilla', (() => { setSource('all'); const s = calculateIngredients('Vodka', 30).steps; return s.length ? s[s.length - 1].source : null; })()],
+  // The reagent cards ask the same question too (they used to print r.recipe whatever the fork).
+  ['RMC14: the Vodka card chips show the RMC recipe', true, (() => { setSource('rmc14'); const h = g('reagentCardHTML')(data.reagents.Vodka); return /reagent-recipe[^<]*Enzyme/.test(h) && !/reagent-recipe[^<]*Ethanol/.test(h); })()],
+  ['All: the Vodka card chips show the vanilla recipe', true, (() => { setSource('all'); const h = g('reagentCardHTML')(data.reagents.Vodka); return /reagent-recipe[^<]*Ethanol/.test(h); })()],
+  ['RMC14: the botany card for Vodka shows the RMC recipe', true, (() => { setSource('rmc14'); const h = g('botanyCardHTML')(data.reagents.Vodka); return /Enzyme/.test(h) && !/Ethanol/.test(h); })()],
+  ['All: a base chemical card keeps its r.recipe chip unchanged (Water: 20x Blood)', true, (() => { setSource('all'); return /<div class="reagent-recipe">20x Blood<\/div>/.test(g('reagentCardHTML')(data.reagents.Water)); })()],
   // The detail panel asks the same question.
   ['pickRecipe exists', true, typeof pickRecipe === 'function'],
   ['RMC14: pickRecipe(Vodka) is the RMC recipe', 'RMCVodka', pickRecipe ? (setSource('rmc14'), pickRecipe('Vodka') && pickRecipe('Vodka').id) : null],

@@ -803,7 +803,7 @@ function botanyCardHTML(r) {
   const accent = safeColor(r.color);
   const obtain = r.isBase
     ? (r.isDispenser ? 'Chemical Dispenser' : (r.obtainSources || []).join(' | '))
-    : (r.recipe ? Object.entries(r.recipe.reactants).map(([id, info]) => `${info.amount}x ${id}`).join(' + ') : '');
+    : ((pickRecipe(r.id) || r.recipe) ? Object.entries((pickRecipe(r.id) || r.recipe).reactants).map(([id, info]) => `${info.amount}x ${id}`).join(' + ') : '');
   return `<div class="reagent-card" data-id="${r.id}" tabindex="0" role="button" aria-label="${esc(capName(r.name || r.id))}" style="--card-accent:${accent}; border-top-color:${accent}">
     <div class="reagent-card-header">
       <span class="color-swatch" style="background:${accent}; box-shadow:0 0 6px ${accent}"></span>
@@ -1117,8 +1117,11 @@ function renderEmptyReagentState(query, grid) {
 // only asked there — ~81 sodas carry a -0.1 plant-health tick, so showing it
 // unconditionally would paint the whole grid green for no information.
 function reagentCardHTML(r) {
-  const recipe = r.recipe
-    ? Object.entries(r.recipe.reactants).map(([id, info]) =>
+  // The chip line answers the Source filter like the panel and the calculator
+  // do; a base chemical keeps the extractor's r.recipe (a breakdown, if any).
+  const rx = r.isBase ? r.recipe : (pickRecipe(r.id) || r.recipe);
+  const recipe = rx
+    ? Object.entries(rx.reactants).map(([id, info]) =>
         `${info.amount}x ${id}${info.catalyst ? ' (cat)' : ''}`).join(' + ')
     : '';
   const catColor = getCatColor(r.category);
