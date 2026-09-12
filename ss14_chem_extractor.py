@@ -522,7 +522,8 @@ def resolve_parents(reagents: dict) -> dict:
             merged = deep_merge(merged, parent_data)
 
         # These fields must NOT be inherited from parents
-        for no_inherit in ("abstract", "parent", "type", "id"):
+        # _also_in belongs to the id that was copied, not to reagents inheriting from it
+        for no_inherit in ("abstract", "parent", "type", "id", "_also_in"):
             merged.pop(no_inherit, None)
 
         # Child overrides parent, but keep _source_file/_fork from child
@@ -2519,7 +2520,7 @@ def export_json(reagents: dict, reactions: dict, locale: dict,
             # 3.5.0: legacy rmcStatus/rmcNote per-reaction fields and
             # vanillaReagentCount/rmcReagentCount meta removed — forkStatus/
             # forkNotes are the only fork-view fields since the multi-fork era.
-            "schemaVersion": "3.12.0",
+            "schemaVersion": "3.13.0",
             "generated": time.strftime("%Y-%m-%dT%H:%M:%S"),
             "forks": forks_meta,
             "reactionCount": len(reactions),
@@ -2621,6 +2622,7 @@ def export_json(reagents: dict, reactions: dict, locale: dict,
             "group": reagent.get("group", ""),
             "category": cat,
             "source": source,
+            **({"alsoIn": sorted(reagent["_also_in"])} if reagent.get("_also_in") else {}),
             "color": reagent.get("color", ""),
             "desc": resolve_desc(reagent, locale),
             "physicalDesc": locale.get(reagent.get("physicalDesc", ""), reagent.get("physicalDesc", "")),
@@ -2734,6 +2736,7 @@ def export_json(reagents: dict, reactions: dict, locale: dict,
         reaction_obj = {
             "id": rid,
             "source": source,
+            **({"alsoIn": sorted(rxn["_also_in"])} if rxn.get("_also_in") else {}),
             "reactants": reactants_obj,
             "products": rxn.get("products", {}),
             "minTemp": rxn.get("minTemp"),
@@ -3142,6 +3145,15 @@ def main():
     all_reactions = dict(parsed["vanilla"]["reactions"])
     collision_log = []
 
+    def note_copy(existing: dict, fork_id: str, owner: str, label: str):
+        # First-wins keeps one owner, but a fork whose OWN manifest carries the id
+        # really has it: record the fork so its view still shows the id
+        # (docs/decisions/2026-09-13_fork-copy-visibility.md). Harvested vanilla
+        # copies and ids an ancestor already owns need no note.
+        if label != "custom" or owner == "vanilla" or owner in fork_ancestry(fork_id):
+            return
+        existing.setdefault("_also_in", set()).add(fork_id)
+
     def merge_pass(key_reagents: str, key_reactions: str, label: str):
         for fork_id, pdata in parsed.items():
             if fork_id == "vanilla":
@@ -3150,12 +3162,14 @@ def main():
                 if rid in all_reagents:
                     owner = proto_fork(all_reagents[rid])
                     collision_log.append(f"reagent {rid}: {fork_id} {label} copy skipped (owned by {owner})")
+                    note_copy(all_reagents[rid], fork_id, owner, label)
                 else:
                     all_reagents[rid] = rdata
             for xid, xdata in pdata.get(key_reactions, {}).items():
                 if xid in all_reactions:
                     owner = proto_fork(all_reactions[xid])
                     collision_log.append(f"reaction {xid}: {fork_id} {label} copy skipped (owned by {owner})")
+                    note_copy(all_reactions[xid], fork_id, owner, label)
                 else:
                     all_reactions[xid] = xdata
 

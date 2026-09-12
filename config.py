@@ -304,11 +304,15 @@ FORK_REGISTRY = {
     # survive, and parent_override_* auto-diffs CMU's copy of the _RMC14 layer to
     # annotate recipes/reagents CMU changed or removed. Must be registered AFTER
     # "rmc14" so the parent builds first.
+    # Upstream 60b9be5fd (2026-08-30, "Organize CMU content under Content.CMU")
+    # moved Resources/Prototypes/_CMU14 and Resources/Locale/en-US/_CMU14|_AU14
+    # to Content.CMU/Resources/{Prototypes,Locale/en-US}/CMU14; RuCM merged it.
+    # custom_dir is "CMU14" so the path fallback matches both layouts.
     "cmu": {
         "name": "Colonial Marines Universe",
         "repo": "AU-14/ColonialMarinesUniverse",
         "branch": "master",
-        "custom_dir": "_CMU14",
+        "custom_dir": "CMU14",
         "color": "#7c3aed",
         "parent_fork": "rmc14",
         # Same vanilla-category replacement as parent RMC14 (CM chem system)
@@ -318,29 +322,34 @@ FORK_REGISTRY = {
             # additions; first-wins dedups the identical-ID copies vs rmc14.
             "Resources/Prototypes/_RMC14/Reagents/toxins.yml",
             # CMU-exclusive _CMU14 reagents
-            "Resources/Prototypes/_CMU14/Economy/Recipes/Reagents/drugs.yml",
-            "Resources/Prototypes/_CMU14/Economy/Recipes/Reagents/toxins.yml",
-            "Resources/Prototypes/_CMU14/Economy/Recipes/Reagents/properties.yml",
+            "Content.CMU/Resources/Prototypes/CMU14/Economy/Recipes/Reagents/drugs.yml",
+            "Content.CMU/Resources/Prototypes/CMU14/Economy/Recipes/Reagents/toxins.yml",
+            "Content.CMU/Resources/Prototypes/CMU14/Economy/Recipes/Reagents/properties.yml",
             # Medical reagents (painkillers incl. CMUSleen, organ-repair) were
             # missing from the manifest, so CMUSleen showed a reaction but no
             # reagent and was invisible. Correct path is Treatment/Reagents.
-            "Resources/Prototypes/_CMU14/Medical/Treatment/Reagents/painkillers.yml",
-            "Resources/Prototypes/_CMU14/Medical/Treatment/Reagents/organ_repair.yml",
-            "Resources/Prototypes/_CMU14/Threats/Abominations/reagents.yml",
-            "Resources/Prototypes/_CMU14/Threats/Yautja/Species/reagents.yml",
+            "Content.CMU/Resources/Prototypes/CMU14/Medical/Treatment/Reagents/painkillers.yml",
+            "Content.CMU/Resources/Prototypes/CMU14/Medical/Treatment/Reagents/organ_repair.yml",
+            "Content.CMU/Resources/Prototypes/CMU14/Threats/Abominations/reagents.yml",
+            "Content.CMU/Resources/Prototypes/CMU14/Threats/Yautja/Species/reagents.yml",
+            # manifest audit 2026-09-12: new upstream content
+            "Content.CMU/Resources/Prototypes/CMU14/Economy/Recipes/Reagents/botanical.yml",
+            "Content.CMU/Resources/Prototypes/CMU14/Economy/Recipes/Reagents/xeno_blood.yml",
         ],
         "reaction_files": [
             # CMU's copy of the parent-layer medicine reactions — new CM reactions
             # mixed in; first-wins dedups vs rmc14.
             "Resources/Prototypes/_RMC14/Recipes/Reactions/medicine.yml",
-            "Resources/Prototypes/_CMU14/Economy/Recipes/Reactions/other.yml",
-            "Resources/Prototypes/_CMU14/Economy/Recipes/Reactions/pyrotechnic.yml",
+            "Content.CMU/Resources/Prototypes/CMU14/Economy/Recipes/Reactions/other.yml",
+            "Content.CMU/Resources/Prototypes/CMU14/Economy/Recipes/Reactions/pyrotechnic.yml",
         ],
         "locale_files": [
-            "Resources/Locale/en-US/_AU14/drugs.ftl",
-            "Resources/Locale/en-US/_AU14/medicine.ftl",
-            "Resources/Locale/en-US/_CMU14/yautja/yautja.ftl",
-            "Resources/Locale/en-US/_CMU14/reagents/properties.ftl",
+            "Content.CMU/Resources/Locale/en-US/CMU14/drugs.ftl",
+            "Content.CMU/Resources/Locale/en-US/CMU14/medicine.ftl",
+            "Content.CMU/Resources/Locale/en-US/CMU14/yautja/yautja.ftl",
+            "Content.CMU/Resources/Locale/en-US/CMU14/reagents/properties.ftl",
+            # names for botanical.yml / xeno_blood.yml (manifest audit 2026-09-12)
+            "Content.CMU/Resources/Locale/en-US/CMU14/reagents/reagents.ftl",
         ],
         "dispenser_chemicals": set(),  # CM dispenser chems already global via rmc14
         "vanilla_override_reaction_files": VANILLA_REACTION_PATHS,
@@ -379,7 +388,7 @@ FORK_REGISTRY = {
         "name": "Russian Marine Corps",
         "repo": "flex5hybrid/RussianCM",
         "branch": "master",
-        "custom_dir": "_CMU14",
+        "custom_dir": "CMU14",
         "color": "#9f1239",
         "parent_fork": "cmu",
         # Same vanilla-category replacement as parent RMC14 (CM chem system)
@@ -387,25 +396,25 @@ FORK_REGISTRY = {
         "reagent_files": [
             # RuCM's copy of the parent-layer file — carries 7 new XenoAlch toxins
             "Resources/Prototypes/_RMC14/Reagents/toxins.yml",
-            "Resources/Prototypes/_CMU14/Economy/Recipes/Reagents/drugs.yml",
-            "Resources/Prototypes/_CMU14/Economy/Recipes/Reagents/toxins.yml",
+            "Content.CMU/Resources/Prototypes/CMU14/Economy/Recipes/Reagents/drugs.yml",
+            "Content.CMU/Resources/Prototypes/CMU14/Economy/Recipes/Reagents/toxins.yml",
             # Path is Medical/Treatment/Reagents (the Medical/reagents form was a
             # typo — silently 404'd, so RuCM lost CMUSleen & the organ-repair set)
-            "Resources/Prototypes/_CMU14/Medical/Treatment/Reagents/organ_repair.yml",
-            "Resources/Prototypes/_CMU14/Medical/Treatment/Reagents/painkillers.yml",
-            "Resources/Prototypes/_CMU14/Threats/Abominations/reagents.yml",
-            "Resources/Prototypes/_CMU14/Threats/Yautja/Species/reagents.yml",
+            "Content.CMU/Resources/Prototypes/CMU14/Medical/Treatment/Reagents/organ_repair.yml",
+            "Content.CMU/Resources/Prototypes/CMU14/Medical/Treatment/Reagents/painkillers.yml",
+            "Content.CMU/Resources/Prototypes/CMU14/Threats/Abominations/reagents.yml",
+            "Content.CMU/Resources/Prototypes/CMU14/Threats/Yautja/Species/reagents.yml",
         ],
         "reaction_files": [
             # RuCM's copy of the parent-layer file — carries 9 new CMU medicine reactions
             "Resources/Prototypes/_RMC14/Recipes/Reactions/medicine.yml",
-            "Resources/Prototypes/_CMU14/Economy/Recipes/Reactions/other.yml",
-            "Resources/Prototypes/_CMU14/Economy/Recipes/Reactions/pyrotechnic.yml",
+            "Content.CMU/Resources/Prototypes/CMU14/Economy/Recipes/Reactions/other.yml",
+            "Content.CMU/Resources/Prototypes/CMU14/Economy/Recipes/Reactions/pyrotechnic.yml",
         ],
         "locale_files": [
-            "Resources/Locale/en-US/_AU14/drugs.ftl",
-            "Resources/Locale/en-US/_CMU14/medical/reagents.ftl",
-            "Resources/Locale/en-US/_CMU14/yautja/yautja.ftl",
+            "Content.CMU/Resources/Locale/en-US/CMU14/drugs.ftl",
+            "Content.CMU/Resources/Locale/en-US/CMU14/medical/treatment/reagents.ftl",
+            "Content.CMU/Resources/Locale/en-US/CMU14/yautja/yautja.ftl",
             # RuCM's copy of the parent locale — adds XenoAlch names (pure additions)
             "Resources/Locale/en-US/_RMC14/medical/toxins.ftl",
         ],
@@ -431,6 +440,9 @@ FORK_REGISTRY = {
             "Resources/Locale/ru-RU/_RMC14/medical/toxins.ftl",
             "Resources/Locale/ru-RU/_RMC14/medical/synth.ftl",
             # CMU/AU14 layer
+            # Deleted upstream by 2026-09-12 (RuCM ships only the en-US Content.CMU
+            # locale now). Ids are unchanged, so the cached ru-RU snapshot is kept;
+            # a fresh machine without cache/ loses these RU names.
             "Resources/Locale/ru-RU/_CMU14/medical/reagents.ftl",
             "Resources/Locale/ru-RU/_CMU14/reagents/properties.ftl",
             "Resources/Locale/ru-RU/_CMU14/yautja/yautja.ftl",
@@ -782,6 +794,9 @@ FORK_REGISTRY = {
             # _Funkystation/gases.yml is deliberately NOT manifested: its
             # gas ids are owned by adt/frontier — the starlight copy would
             # steal them (collision check 2026-07-11).
+            # manifest audit 2026-09-12: new upstream content
+            "Resources/Prototypes/_Starlight/Reagents/gases.yml",
+            "Resources/Prototypes/_Starlight/Reagents/toxins.yml",
         ],
         "reaction_files": [
             "Resources/Prototypes/_Starlight/Recipes/Reactions/cleaning.yml",
@@ -790,12 +805,18 @@ FORK_REGISTRY = {
             "Resources/Prototypes/_Starlight/Recipes/Reactions/fun.yml",
             "Resources/Prototypes/_Starlight/Recipes/Reactions/medicine.yml",
             "Resources/Prototypes/_Starlight/Recipes/Reactions/xenobiology.yml",
+            # manifest audit 2026-09-12: new upstream content
+            "Resources/Prototypes/_Starlight/Recipes/Reactions/biological.yml",
+            "Resources/Prototypes/_Mono/Recipes/Reactions/phenylpiperidine.yml",
         ],
         "locale_files": [
             "Resources/Locale/en-US/_Starlight/reagents/meta/consumable/drink/alcohol.ftl",
             "Resources/Locale/en-US/_Starlight/reagents/meta/consumable/drink/juice.ftl",
             "Resources/Locale/en-US/_Starlight/reagents/meta/consumable/food/food.ftl",
             "Resources/Locale/en-US/_Starlight/seeds/seeds.ftl",
+            # manifest audit 2026-09-12: names for the new upstream content
+            "Resources/Locale/en-US/_Starlight/reagents/meta/gases.ftl",
+            "Resources/Locale/en-US/_Starlight/reagents/meta/toxins.ftl",
         ],
         "seed_files": ["Resources/Prototypes/_Starlight/Hydroponics/seeds.yml"],
         "blocked_reactions": {
@@ -851,6 +872,8 @@ FORK_REGISTRY = {
             "Resources/Prototypes/_Impstation/Reagents/toxins.yml",
             "Resources/Prototypes/_Impstation/reagents/pyrotechnic.yml",
             "Resources/Prototypes/_CD/Reagents/medicine.yml",
+            # manifest audit 2026-09-12: new upstream content
+            "Resources/Prototypes/Nyanotrasen/Reagents/Consumable/Food/food.yml",
         ],
         "reaction_files": [
             "Resources/Prototypes/_DV/Recipes/Reactions/drinks.yml",
@@ -928,13 +951,24 @@ FORK_REGISTRY = {
             # their ids are owned by corvax (registered later) — the
             # deadspace copy would steal them from Corvax's view.
             "Resources/Prototypes/_ADT/Reagents/Consumable/Drink/vodka_antivirus.yml",
+            # manifest audit 2026-09-12: new upstream content
+            # _DeadSpace/Reagents/gases.yml is NOT manifested: 3 new gases, but its other
+            # ids are owned by frontier/adt (registered later) - the copy would steal them.
+            "Resources/Prototypes/_DeadSpace/Reagents/psychotropic_drugs.yml",
+            "Resources/Prototypes/_DeadSpace/_Soyuz/Reagents/gases.yml",
         ],
         "reaction_files": [
             "Resources/Prototypes/_DeadSpace/Recipes/Reactions/chemicals.yml",
             "Resources/Prototypes/_DeadSpace/Recipes/Reactions/drinks.yml",
             "Resources/Prototypes/_DeadSpace/Recipes/Reactions/medicine.yml",
+            # manifest audit 2026-09-12: new upstream content
+            "Resources/Prototypes/_DeadSpace/Recipes/Reactions/psychotropic_drugs.yml",
         ],
-        "locale_files": [],
+        "locale_files": [
+            # manifest audit 2026-09-12: names for the new upstream content
+            "Resources/Locale/en-US/_deadspace/_Soyuz/reagents/meta/gases.ftl",
+            "Resources/Locale/en-US/_deadspace/reagents/meta/chemicals.ftl",
+        ],
         # RU localization (native ru-RU; Dead Space / Мёртвый Космос is a
         # Russian-first fork — its content has no en-US locale at all)
         "locale_files_ru": [
@@ -950,6 +984,8 @@ FORK_REGISTRY = {
             # Seeds (plant display names)
             "Resources/Locale/ru-RU/_deadspace/seeds/seeds.ftl",
             "Resources/Locale/ru-RU/_deadspace/prototypes/entities/objects/specific/hydroponics/seeds.ftl",
+            # manifest audit 2026-09-12: names for the new upstream content
+            "Resources/Locale/ru-RU/_deadspace/_Soyuz/reagents/meta/gases.ftl",
         ],
         "seed_files": ["Resources/Prototypes/_DeadSpace/Hydroponics/seeds.yml"],
         "vanilla_override_reaction_files": VANILLA_REACTION_PATHS,
@@ -1105,6 +1141,8 @@ FORK_REGISTRY = {
             "Resources/Prototypes/_Trauma/Reagents/toxins.yml",
             # audit_fork_manifests: untracked chem files
             "Resources/Prototypes/_Trauma/Reagents/medicine.yml",
+            # manifest audit 2026-09-12: new upstream content
+            "Resources/Prototypes/_Trauma/Reagents/blob.yml",
         ],
         "reaction_files": [
             "Resources/Prototypes/_Trauma/Recipes/Reactions/botany.yml",
@@ -1120,6 +1158,8 @@ FORK_REGISTRY = {
         ],
         "locale_files": [
             "Resources/Locale/en-US/_Trauma/botany/seeds.ftl",
+            # manifest audit 2026-09-12: names for the new upstream content
+            "Resources/Locale/en-US/_Trauma/reagents/meta/blob.ftl",
         ],
         "seed_files": ["Resources/Prototypes/_Trauma/Hydroponics/seeds.yml"],
         "vanilla_override_reaction_files": VANILLA_REACTION_PATHS,
@@ -1153,17 +1193,26 @@ FORK_REGISTRY = {
             # Gardenstation vendor layer (kelp/Thaven drinks + medicine)
             "Resources/Prototypes/_Gardenstation/Reagents/Consumable/Drink/alcohol.yml",
             "Resources/Prototypes/_Gardenstation/Reagents/medicine.yml",
+            # manifest audit 2026-09-12: new upstream content
+            "Resources/Prototypes/_Omu/Reagents/medicine.yml",
+            "Resources/Prototypes/_Omu/Reagents/narcotics.yml",
+            "Resources/Prototypes/_Impstation/Reagents/Drink/alcohol.yml",
         ],
         "reaction_files": [
             "Resources/Prototypes/_Omu/Recipes/Reactions/drinks.yml",
             "Resources/Prototypes/_Omu/Recipes/Reactions/fun.yml",
             "Resources/Prototypes/_Omu/Recipes/Reactions/single_reagent.yml",
             "Resources/Prototypes/_Gardenstation/Recipes/Reactions/drinks.yml",
+            # manifest audit 2026-09-12: new upstream content
+            "Resources/Prototypes/_Omu/Recipes/Reactions/medicine.yml",
         ],
         "locale_files": [
             "Resources/Locale/en-US/_Gardenstation/reagents/medicine.ftl",
             "Resources/Locale/en-US/_Gardenstation/reagents/meta/Consumable/Drinks/alcohol.ftl",
             "Resources/Locale/en-US/_Gardenstation/reagents/reagents.ftl",
+            # manifest audit 2026-09-12: names for the new upstream content
+            "Resources/Locale/en-US/_Omu/reagents/meta/medicine.ftl",
+            "Resources/Locale/en-US/_Omu/reagents/narcotics.ftl",
         ],
         "seed_files": ["Resources/Prototypes/_Gardenstation/Hydroponics/seeds.yml"],
         "vanilla_override_reaction_files": VANILLA_REACTION_PATHS,
@@ -1214,6 +1263,8 @@ FORK_REGISTRY = {
             # HotOilVegetableAndWater reaction); the three ids shared with
             # Frontier's copy are skipped by first-wins.
             "Resources/Prototypes/_NF/Reagents/Consumables/Food/ingredients.yml",
+            # manifest audit 2026-09-12: new upstream content
+            "Resources/Prototypes/_Mono/Reagents/economy.yml",
         ],
         "reaction_files": [
             "Resources/Prototypes/_Mono/Recipes/Reactions/drinks.yml",
@@ -1223,9 +1274,14 @@ FORK_REGISTRY = {
             "Resources/Prototypes/_Mono/Recipes/Reactions/technological.yml",
             # Monolith-only addition to its _NF layer copy (audit 2026-07-11)
             "Resources/Prototypes/_NF/Recipes/Reactions/pyrotechnic.yml",
+            # manifest audit 2026-09-12: new upstream content
+            "Resources/Prototypes/_Mono/Recipes/Reactions/economy.yml",
+            "Resources/Prototypes/_Mono/Recipes/Reactions/synthesis.yml",
         ],
         "locale_files": [
             "Resources/Locale/en-US/_NF/seeds/seeds.ftl",
+            # manifest audit 2026-09-12: names for the new upstream content
+            "Resources/Locale/en-US/_Mono/reagents/technological.ftl",
         ],
         # Monolith keeps its _NF seeds at the pre-move Entities path
         "seed_files": ["Resources/Prototypes/_NF/Entities/Objects/Specific/Hydroponics/seeds.yml"],
@@ -1355,6 +1411,11 @@ FORK_REGISTRY = {
             "Resources/Prototypes/ADT/Reagents/narcotics.yml",
             "Resources/Prototypes/ADT/Reagents/pyrotechnic.yml",
             "Resources/Prototypes/ADT/Reagents/toxins.yml",
+            # manifest audit 2026-09-12: new upstream content
+            "Resources/Prototypes/ADT/Reagents/Consumable/Food/lavaland_flora.yml",
+            "Resources/Prototypes/ADT/Reagents/addictions.yml",
+            "Resources/Prototypes/ADT/Reagents/adminordrazine.yml",
+            "Resources/Prototypes/ADT/Reagents/quantum_catalyst.yml",
         ],
         "reaction_files": [
             "Resources/Prototypes/ADT/Recipes/Reactions/biological.yml",
@@ -1367,6 +1428,9 @@ FORK_REGISTRY = {
             # ADT/Reactions/ (no Recipes/ segment) — separate dir the fork
             # started using for new content (manifest audit 2026-07-11)
             "Resources/Prototypes/ADT/Reactions/plastic.yml",
+            # manifest audit 2026-09-12: new upstream content
+            "Resources/Prototypes/ADT/Recipes/Reactions/addictions.yml",
+            "Resources/Prototypes/ADT/Recipes/Reactions/quantum_catalyst.yml",
         ],
         "locale_files": [
             "Resources/Locale/en-US/ADT/reagents/meta/toxins.ftl",
@@ -1392,6 +1456,10 @@ FORK_REGISTRY = {
             # Seeds (plant display names)
             "Resources/Locale/ru-RU/ADT/hydroponics/seeds.ftl",
             "Resources/Locale/ru-RU/ADT/prototypes/Entities/Objects/Specific/Hydroponics/seeds.ftl",
+            # manifest audit 2026-09-12: names for the new upstream content
+            "Resources/Locale/ru-RU/ADT/addictions.ftl",
+            "Resources/Locale/ru-RU/ADT/reagents/Consumable/Food/lavaland_flora.ftl",
+            "Resources/Locale/ru-RU/ADT/reagents/quantum-catalyst.ftl",
         ],
         "seed_files": ["Resources/Prototypes/ADT/Hydroponics/seeds.yml"],
         "vanilla_override_reaction_files": VANILLA_REACTION_PATHS,
@@ -1444,7 +1512,7 @@ FORK_REGISTRY = {
             "Resources/Prototypes/_Sunrise/Recipes/Reactions/drinks.yml",
             "Resources/Prototypes/_Sunrise/Recipes/Reactions/fun.yml",
             "Resources/Prototypes/_Sunrise/Recipes/Reactions/gas.yml",
-            "Resources/Prototypes/_Sunrise/Recipes/Reactions/gases.yml",
+            "Resources/Prototypes/_Sunrise/Recipes/Reactions/gas.yml",  # renamed from gases.yml upstream
             "Resources/Prototypes/_Sunrise/Recipes/Reactions/medicine.yml",
             "Resources/Prototypes/_Sunrise/Recipes/Reactions/special.yml",
         ],
@@ -1501,6 +1569,8 @@ FORK_REGISTRY = {
             "Resources/Prototypes/_Sunrise/Vaccine/Reagents/vaccine.yml",
             # audit_fork_manifests: untracked chem files
             "Resources/Prototypes/_Fish/Reagents/foxium.yml",
+            # manifest audit 2026-09-12: new upstream content
+            "Resources/Prototypes/_Fish/Reagents/gases.yml",
         ],
         "reaction_files": [
             "Resources/Prototypes/_Fish/Recipes/Reactions/medicine.yml",
@@ -1580,6 +1650,14 @@ FORK_REGISTRY = {
             # them). Ids shared with Delta-V's psionic files are skipped by
             # first-wins — deltav is registered earlier.
             "Resources/Prototypes/Reagents/psionic.yml",
+            # manifest audit 2026-09-12: new upstream content
+            "Resources/Prototypes/Corvax/Reagents/virus.yml",
+            "Resources/Prototypes/Nyanotrasen/Reagents/Consumable/Food/food.yml",
+            "Resources/Prototypes/_Misfits/Reagents/Consumable/drinks.yml",
+            "Resources/Prototypes/_Misfits/Reagents/cryogenics.yml",
+            "Resources/Prototypes/_Misfits/Reagents/medicine.yml",
+            "Resources/Prototypes/_Misfits/Reagents/psychic_pain.yml",
+            "Resources/Prototypes/_Misfits/Reagents/white_phosphorus.yml",
         ],
         "reaction_files": [
             "Resources/Prototypes/_Nuclear14/Recipes/Reactions/chems.yml",
@@ -1594,6 +1672,14 @@ FORK_REGISTRY = {
             "Resources/Prototypes/_Misfits/Recipes/Reactions/salvaged_chemicals.yml",
             "Resources/Prototypes/_Misfits/Recipes/Reactions/sterilewipe.yml",
             "Resources/Prototypes/_Misfits/Recipes/Reactions/uranium_emp.yml",
+            # manifest audit 2026-09-12: new upstream content
+            "Resources/Prototypes/Nyanotrasen/Recipes/Reactions/psionic.yml",
+            "Resources/Prototypes/Nyanotrasen/Recipes/Reactions/single_reagent.yml",
+            "Resources/Prototypes/_Misfits/Recipes/Reactions/cryogenics.yml",
+            "Resources/Prototypes/_Misfits/Recipes/Reactions/drinks.yml",
+            "Resources/Prototypes/_Misfits/Recipes/Reactions/medicine.yml",
+            "Resources/Prototypes/_Misfits/Recipes/Reactions/psychic_pain.yml",
+            "Resources/Prototypes/_Misfits/Recipes/Reactions/zoy.yml",
         ],
         "locale_files": [
             "Resources/Locale/en-US/_Nuclear14/reagents.ftl",
@@ -1603,10 +1689,17 @@ FORK_REGISTRY = {
             "Resources/Locale/en-US/_Misfits/medical/BlackGoo.ftl",
             # names for the vanilla-path psionic reagents above
             "Resources/Locale/en-US/reagents/psionic.ftl",
+            # manifest audit 2026-09-12: names for the new upstream content
+            "Resources/Locale/en-US/_Misfits/reagents.ftl",
+            "Resources/Locale/en-US/_Misfits/reagents/cryogenics.ftl",
+            "Resources/Locale/en-US/_Misfits/reagents/medicine.ftl",
+            "Resources/Locale/en-US/_Misfits/reagents/white-phosphorus.ftl",
         ],
         "seed_files": [
             "Resources/Prototypes/_Nuclear14/Hydroponics/seeds.yml",
             "Resources/Prototypes/_Misfits/Hydroponics/seeds.yml",
+            # manifest audit 2026-09-12: new upstream content
+            "Resources/Prototypes/Nyanotrasen/Hydroponics/seeds.yml",
         ],
         "vanilla_override_reaction_files": VANILLA_REACTION_PATHS,
         # D3c: fork item-fill channels (Nuka-Cola vendor, wasteland medkits)

@@ -202,6 +202,9 @@ MANIFEST_KEYS = (
     ("reaction_files", "reaction"),
     ("seed_files", "seed"),
     ("locale_files", "locale"),
+    # ru-RU was never audited: RuCM deleted its whole CMU-layer translation
+    # upstream and nothing noticed until a manual HEAD check (2026-09-12)
+    ("locale_files_ru", "locale-ru"),
     ("botany_locale_files", "botany-locale"),
     ("vanilla_override_reaction_files", "vanilla-override-rxn"),
     ("vanilla_override_reagent_files", "vanilla-override-reagent"),
@@ -226,13 +229,23 @@ def audit_fork(key: str, cfg: dict) -> dict:
         print("  ! Could not list Resources/Prototypes — skipping fork")
         return {"error": "no-prototypes-tree", "head": head}
 
-    repo_files = {**proto_tree, **locale_tree}
-
     # Manifest inventory: path -> category
     manifest: dict[str, str] = {}
     for cfg_key, label in MANIFEST_KEYS:
         for path in cfg.get(cfg_key) or []:
             manifest.setdefault(path, label)
+
+    # Content modules keep their own resource root (CMU moved everything to
+    # Content.CMU/Resources on 2026-08-30): list those subtrees as well, or every
+    # relocated path reads as MISSING and new files there are never found.
+    for root in sorted({p.split("/Resources/")[0] for p in manifest if p.startswith("Content.")}):
+        for sub in ("Prototypes", "Locale"):
+            extra, trunc = _get_subtree(repo, branch, f"{root}/Resources/{sub}")
+            if trunc:
+                print(f"  ! WARNING: {root}/Resources/{sub} listing truncated")
+            (proto_tree if sub == "Prototypes" else locale_tree).update(extra)
+
+    repo_files = {**proto_tree, **locale_tree}
 
     missing = sorted(
         (path, label) for path, label in manifest.items() if path not in repo_files
