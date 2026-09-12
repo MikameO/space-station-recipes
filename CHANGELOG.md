@@ -38,6 +38,14 @@ as zero — one rule that keeps "mutation level ≥ 1" to real mutagens while
 letting "plant health ≥ 0" admit chemicals that leave the plant alone. Bounds
 are computed once over the whole dataset, so they do not shift while filtering.
 
+**RU — plant effect chips.** The chips are composed at extract time as
+"<label> <signed amount>" (optionally a probability), so they could never be
+exact dictionary keys and stayed English on an otherwise Russian tab. Two regex
+rules now translate the label half and keep the number; all 101 distinct chips
+render in Russian. The probability-only rule has to sit after the amount one —
+a matching regex ends the lookup even when its handler declines, so the broader
+pattern would otherwise capture "Pests -1" as a label and stop the chain.
+
 ## Series G — 2026-09-11 (Document library: new page, new data folder)
 
 **New page:** `library.html` + `library.js` — in-game papers written by players

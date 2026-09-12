@@ -513,6 +513,9 @@
     // Botany extras
     'De-ages plant': 'Омолаживает растение',
     'Destroys seeds': 'Уничтожает семена',
+    'Restores seeds': 'Восстанавливает семена',
+    'Restores viability': 'Возвращает всхожесть',
+    'Removes kudzu': 'Убирает кудзу',
     'Mutates chemical contents': 'Мутирует химический состав',
     'Mutation level': 'Уровень мутаций',
     'Mutation modifier': 'Модификатор мутаций',
@@ -628,7 +631,39 @@
     if (n1 === 1) return one;
     return many;
   };
+  // Labels the extractor emits for numeric plantMetabolism effects
+  // (_PLANT_EFFECT_META in ss14_chem_extractor.py). Flag-only kinds such as
+  // "De-ages plant" carry no number and are plain dictionary keys already.
+  var PLANT_EFFECT_LABELS = [
+    'Nutrition', 'Water', 'Plant health', 'Growth', 'Potency',
+    'Potency (Robust Harvest)', 'Mutation level', 'Mutation modifier',
+    'Weeds', 'Pests', 'Plant toxins',
+  ];
+  // Flag-only plant effects — no amount, but they can carry a probability.
+  var PLANT_EFFECT_FLAGS = [
+    'De-ages plant', 'Destroys seeds', 'Restores seeds', 'Restores viability',
+    'Removes kudzu', 'Mutates chemical contents', 'Lifespan & yield',
+  ];
   var RX = [
+    // Plant effect chips are composed at extract time as "<label> <signed
+    // amount>" (optionally " (N%)"), so they can never be exact dictionary
+    // keys and stayed English on the Botany tab. Translate the label half and
+    // keep the number. Restricted to the known plant labels on purpose: a bare
+    // /(.+) ([+-]\d+)/ would also swallow unrelated badges like "Thirst +2".
+    // Returning null declines the match, which translateTextNode reads as
+    // "leave this node alone".
+    [/^(.+?) ([+-][\d.]+)((?: \(\d+(?:\.\d+)?%\))?)$/, function (m) {
+      if (PLANT_EFFECT_LABELS.indexOf(m[1]) === -1) return null;
+      return (T[m[1]] || m[1]) + ' ' + m[2] + m[3];
+    }],
+    // Flag-only effects carry no amount but may carry a probability:
+    // "Restores seeds (20%)". Must sit AFTER the amount rule above: a matching
+    // regex ends the lookup even when its handler declines, and this pattern
+    // would otherwise capture "Pests -1" as the label and kill the chain.
+    [/^(.+?) \((\d+(?:\.\d+)?%)\)$/, function (m) {
+      if (PLANT_EFFECT_FLAGS.indexOf(m[1]) === -1) return null;
+      return (T[m[1]] || m[1]) + ' (' + m[2] + ')';
+    }],
     [/^(\d+) reagents \| (\d+) reactions$/, function (m) {
       return m[1] + ' ' + plural(+m[1], 'реагент', 'реагента', 'реагентов') + ' | ' +
              m[2] + ' ' + plural(+m[2], 'реакция', 'реакции', 'реакций');
