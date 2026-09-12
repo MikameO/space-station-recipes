@@ -59,6 +59,14 @@ VANILLA_REAGENT_PATHS = [
     "Resources/Prototypes/Reagents/Materials/ores.yml",
 ]
 
+# D6: random plant mutations. Unlike seeds, this path is identical in every
+# fork — they all inherit it from upstream and drift in place rather than
+# moving it into a fork dir (checked across all 21 registry repos on
+# 2026-09-12). A fork may still override the list via a "mutation_files" key.
+MUTATION_FILES = [
+    "Resources/Prototypes/Hydroponics/randomMutations.yml",
+]
+
 FORK_REGISTRY = {
     # ── Vanilla SS14 (upstream) ──
     "vanilla": {

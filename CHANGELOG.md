@@ -3,6 +3,37 @@
 `data.json` schema version is in `meta.schemaVersion`. Consumers reading this file
 should pin on a compatible range (semver: breaking changes bump major).
 
+## Series D6 — 2026-09-12 (the rolls behind the evolution chart)
+
+**Data — the random mutation table, per fork.** The Botany tab knew which
+species turns into which and nothing about the rolls that get you there:
+`randomMutations.yml` was not extracted for any fork, so nothing on the site
+said that `Unviable` (odds 0.109) is three times likelier than `ChangePotency`
+(0.036) — that the mutagen ends a line more often than it improves one. The
+file now ships with every fork's manifest and lands in `data.json` as
+`plantMutations` (schema 3.11.0, 30 KB): 27 mutations with odds, target,
+range, step semantics, whether the effect persists, whether it reaches the
+produce, and whether it can be rolled back off.
+
+It exists at the same path in all 21 registry repos, but in two incompatible
+schemas — upstream rewrote botany on 2026-08-08 (#44576). The old one is a
+thermometer ladder (`minValue`/`maxValue`/`steps: 5`) that snaps potency onto
+30/44/58/72/86/100; the new one moves it by ±15 inside `applyRange`. Six forks
+run the new model (vanilla, corvax, cmu, rucm, deadspace, trauma), fifteen
+still run the old one, and which is which is read off the file's own shape, so
+a fork migrating upstream needs no change here. Deltas are therefore keyed per
+era, not against vanilla: a ladder fork diffed against the range-era base would
+mark every stat mutation as overridden by construction.
+
+Names drifted with the eras too — `ChangeIdealHeat` against
+`ChangeLow`/`ChangeHighHeatTolerance`, `ChangeLigneous` against
+`Lignification` — so the diff runs on families. Without that, thirteen forks
+report differences they do not have and the two real ones are buried: frontier
+dropped the gas mutations (25 entries), misfits is down to 18, having also
+dropped `Sentient`, `Slippery`, kudzu, heat and both pressure tolerances.
+Vanilla's second list (`EvilPlantMutations`, which no mutagen triggers) is
+kept out of the count and carried separately. Regen ×2 byte-identical.
+
 ## Series Q2 — 2026-09-12 (the recipe the calculator means)
 
 **Frontend fix — which reaction is "the recipe".** `getFilteredReactions`

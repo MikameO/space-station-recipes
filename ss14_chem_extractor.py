@@ -27,6 +27,7 @@ from config import (
     BASE_DISPENSER_CHEMICALS, CATEGORY_SHEET_MAP,
     ANTAG_DATA, ANTAG_STRATEGIES, DELIVERY_MECHANISMS, SYNDICATE_ITEMS,
     SHIFT_PRESETS, BOTANY_GUIDE, SPECIES_DATA, SPECIES_GUIDE_SOURCES,
+    MUTATION_FILES,
 )
 from sources import (
     SOURCES, AUTHORITY_WEIGHTS, ALLOWED_DOMAINS,
@@ -1444,6 +1445,182 @@ def parse_plants(fork_data: dict, loader, locale: dict | None = None,
 
 
 # ─────────────────────────────────────────────
+# Phase 8c: Random plant mutations (Increment D6)
+# ─────────────────────────────────────────────
+# `randomMutations.yml` sits at the same path in all 21 fork repos, but in two
+# incompatible schemas: upstream rewrote botany on 2026-08-08 (#44576). The old
+# one carries `targetValue` + `minValue/maxValue/steps` — a thermometer ladder
+# that snaps a stat onto `steps` rungs; the new one carries `targetComponent` /
+# `targetDataField` + `applyRange` with up/down effects that move it by a fixed
+# amount. Which model a fork runs is read off the file's own shape, never from a
+# hardcoded list, so a fork migrating upstream needs no change here.
+
+MAIN_MUTATION_TABLE = "RandomPlantMutations"
+
+# Era renames and splits. Comparing forks by raw mutation name would invent a
+# difference for every pre-refactor fork and bury the two real ones (frontier
+# dropped the gas mutations, misfits is down to 18 entries), so the diff runs on
+# families. `split` marks a family whose members do not map one-to-one across
+# eras — old "ideal heat + tolerance" against new "low + high tolerance".
+_MUTATION_FAMILIES = {
+    "ChangeIdealHeat": ("heat", True),
+    "ChangeHeatTolerance": ("heat", True),
+    "ChangeLowHeatTolerance": ("heat", True),
+    "ChangeHighHeatTolerance": ("heat", True),
+    "ChangeLigneous": ("ligneous", False),
+    "Lignification": ("ligneous", False),
+    "ChangeTurnIntoKudzu": ("kudzu", False),
+    "Kudzufication": ("kudzu", False),
+}
+
+# New-schema trait components against the seed fields the old schema flipped.
+# Normalising them keeps one label per trait across both eras.
+_TRAIT_TARGETS = {
+    "PlantTraitUnviable": "Viable",
+    "PlantTraitSeedless": "Seedless",
+    "PlantTraitLigneous": "Ligneous",
+    "PlantTraitKudzu": "TurnIntoKudzu",
+    "PlantTraitScream": "CanScream",
+}
+
+
+def _parse_mutation_entry(entry: dict) -> dict | None:
+    """One mutation record, canonical across both schemas."""
+    name = entry.get("name")
+    if not name:
+        return None
+    effect = entry.get("effect") if isinstance(entry.get("effect"), dict) else {}
+    etype = effect.get("_type", "")
+    family, split = _MUTATION_FAMILIES.get(name, (name, False))
+
+    rec = {
+        "name": name,
+        "family": family,
+        # Odds of firing at one point of mutation severity. The plant rolls this
+        # once per growth cycle against its accumulated level (capped at 25).
+        "odds": entry.get("baseOdds", 0),
+        "effect": etype,
+        "kind": "special",
+        # RandomPlantMutation.cs defaults: all three true.
+        "persists": bool(entry.get("persists", True)),
+        "appliesToPlant": bool(entry.get("appliesToPlant", True)),
+        "appliesToProduce": bool(entry.get("appliesToProduce", True)),
+    }
+    if split:
+        rec["split"] = True
+
+    if etype == "PlantChangeStat":
+        if "targetValue" in effect:  # old schema
+            rec["target"] = effect.get("targetValue")
+            if effect.get("steps") is not None:
+                rec["kind"] = "stat"
+                rec["range"] = [effect.get("minValue"), effect.get("maxValue")]
+                rec["step"] = {"model": "ladder", "steps": effect.get("steps")}
+            else:
+                # No range means the target is a bool the effect flips, which is
+                # how the old schema did Seedless/Viable/Ligneous.
+                rec["kind"] = "trait"
+                rec["reversible"] = True
+        else:  # new schema
+            rec["kind"] = "stat"
+            rec["target"] = effect.get("targetDataField")
+            rng = effect.get("applyRange") if isinstance(effect.get("applyRange"), dict) else {}
+            rec["range"] = [rng.get("min"), rng.get("max")]
+            up = effect.get("up") if isinstance(effect.get("up"), dict) else {}
+            down = effect.get("down") if isinstance(effect.get("down"), dict) else {}
+            rec["step"] = {"model": "range", "up": up.get("amount"), "down": down.get("amount")}
+    elif etype == "PlantChangeTraits":
+        trait = effect.get("trait", "")
+        rec["kind"] = "trait"
+        rec["target"] = _TRAIT_TARGETS.get(trait, trait)
+        # PlantChangeTraits.Type defaults to Toggle: the same mutation firing a
+        # second time takes the trait back off.
+        rec["reversible"] = effect.get("type", "Toggle") == "Toggle"
+
+    return rec
+
+
+def _mutation_sort_key(rec: dict):
+    return (-(rec.get("odds") or 0), rec["name"])
+
+
+def parse_plant_mutations(fork_mutation_files: dict, loader) -> dict:
+    """Parse randomMutations.yml per fork into a base-plus-delta structure (D6).
+
+    Deltas are keyed per era, not against vanilla: a ladder fork diffed against
+    the range-era base would mark every stat mutation as overridden, since the
+    step semantics differ by construction. Each era's base is the first fork in
+    FORK_REGISTRY order that runs it, which keeps regeneration deterministic.
+    Returns {} when no fork yielded a table."""
+    per_fork = {}   # fork_id -> {"model": str|None, "tables": {table_id: [rec]}}
+    missing = []
+
+    for fork_id, files in fork_mutation_files.items():
+        tables = {}
+        for path, content in (files or {}).items():
+            for entry in parse_yaml_content(content, path, loader):
+                if str(entry.get("type", "")).lower() != "randomplantmutationlist":
+                    continue
+                table_id = entry.get("id")
+                if not table_id:
+                    continue
+                recs = [r for r in (_parse_mutation_entry(m)
+                                    for m in entry.get("mutations") or []
+                                    if isinstance(m, dict)) if r]
+                tables[table_id] = sorted(recs, key=_mutation_sort_key)
+        if not tables.get(MAIN_MUTATION_TABLE):
+            missing.append(fork_id)
+            continue
+        models = {r["step"]["model"] for r in tables[MAIN_MUTATION_TABLE] if r.get("step")}
+        per_fork[fork_id] = {
+            "model": "range" if "range" in models else ("ladder" if "ladder" in models else None),
+            "tables": tables,
+        }
+
+    if not per_fork:
+        return {}
+
+    bases, base_source = {}, {}
+    for fork_id, fdata in per_fork.items():          # FORK_REGISTRY order
+        model = fdata["model"]
+        if model and model not in bases:
+            bases[model] = fdata["tables"][MAIN_MUTATION_TABLE]
+            base_source[model] = fork_id
+
+    forks = {}
+    for fork_id, fdata in per_fork.items():
+        model = fdata["model"]
+        mine = fdata["tables"][MAIN_MUTATION_TABLE]
+        base = bases.get(model, [])
+        base_by_family = {r["family"]: r for r in base}
+        mine_by_family = {r["family"]: r for r in mine}
+
+        entry = {
+            "model": model,
+            "count": len(mine),
+            "add": [r for r in mine if r["family"] not in base_by_family],
+            "remove": sorted(f for f in base_by_family if f not in mine_by_family),
+            "override": {r["name"]: r for r in mine
+                         if r["family"] in base_by_family
+                         and r != base_by_family[r["family"]]},
+        }
+        extra = {tid: recs for tid, recs in fdata["tables"].items()
+                 if tid != MAIN_MUTATION_TABLE}
+        if extra:
+            entry["extraTables"] = extra
+        forks[fork_id] = entry
+
+    return {
+        "schemaVersion": 1,
+        "mainTable": MAIN_MUTATION_TABLE,
+        "baseSource": base_source,
+        "bases": bases,
+        "forks": forks,
+        "missing": missing,
+    }
+
+
+# ─────────────────────────────────────────────
 # Phase 5c: Item-fill sources (Increment D3)
 # ─────────────────────────────────────────────
 # Reagents that ship pre-mixed inside spawnable items (Absinthe bottles in the
@@ -2279,7 +2456,8 @@ def export_json(reagents: dict, reactions: dict, locale: dict,
                 plants: dict | None = None,
                 item_sources: dict | None = None,
                 shadowed_by_fork: dict | None = None,
-                locale_ru: dict | None = None):
+                locale_ru: dict | None = None,
+                plant_mutations: dict | None = None):
     """Export all data as a JSON file for the web frontend.
     fork_diffs: {fork_id: (blocked_set, modified_dict)} from auto-diff.
     reagent_plants: {reagent_id: [plant_label...]} from parse_seed_sources;
@@ -2331,12 +2509,14 @@ def export_json(reagents: dict, reactions: dict, locale: dict,
             # (Absinthe, Lead, ...) no longer render as unobtainable.
             # 3.6.1: species{} (curated physiology) + per-reagent
             # speciesEffects lifted from organ-conditional effect clauses.
+            # 3.11.0: plantMutations{} — the random mutation table per fork
+            # (odds, targets, ranges) with the two botany eras kept apart.
             # 3.6.0: plants{} — seed prototypes as first-class entities
             # (mutation graph, potency-scaled chemicals, growth params).
             # 3.5.0: legacy rmcStatus/rmcNote per-reaction fields and
             # vanillaReagentCount/rmcReagentCount meta removed — forkStatus/
             # forkNotes are the only fork-view fields since the multi-fork era.
-            "schemaVersion": "3.10.0",
+            "schemaVersion": "3.11.0",
             "generated": time.strftime("%Y-%m-%dT%H:%M:%S"),
             "forks": forks_meta,
             "reactionCount": len(reactions),
@@ -2663,6 +2843,10 @@ def export_json(reagents: dict, reactions: dict, locale: dict,
     data["plants"] = plants or {}
     data["botanyGuide"] = BOTANY_GUIDE
 
+    # Random mutations (D6) — per-era base plus per-fork delta. The UI rebuilds
+    # a fork's table as base[model] minus `remove`, plus `add` and `override`.
+    data["plantMutations"] = plant_mutations or {}
+
     # Species layer (D2): curated physiology + auto-extracted per-reagent
     # organ conditions. The "(if organ: X)" clauses already live in the
     # humanized effects strings — lift them into a structured field so the
@@ -2787,6 +2971,14 @@ def main():
         if seed_files:
             print(f"  Fetched {len(seed_files)} seed files")
 
+        # D6: random mutation table. Same path in every repo, so a fork's copy
+        # caches next to its other vanilla-path files rather than in its own dir.
+        mutation_files = fetch_all_files(
+            fconf.get("mutation_files", MUTATION_FILES), url,
+            fork_id if fork_id == "vanilla" else f"{fork_id}_vanilla_overrides")
+        if mutation_files:
+            print(f"  Fetched {len(mutation_files)} mutation files")
+
         # D3: item-fill channel manifests (entities with solutions, vending
         # inventories, machine names, dispenser packs). Most forks: [].
         item_channel_files = {}
@@ -2804,6 +2996,7 @@ def main():
             "locale_files": locale_files,
             "locale_ru_files": locale_ru_files,
             "seed_files": seed_files,
+            "mutation_files": mutation_files,
             **item_channel_files,
         }
 
@@ -3136,12 +3329,23 @@ def main():
     mut_count = sum(1 for p in plants.values() if p["mutations"])
     print(f"  Plants: {len(plants)} entities ({mut_count} with mutation targets)")
 
+    plant_mutations = parse_plant_mutations(
+        {fid: fd.get("mutation_files", {}) for fid, fd in fork_data.items()}, loader)
+    if plant_mutations:
+        _eras = plant_mutations["baseSource"]
+        print(f"  Random mutations: {len(plant_mutations['forks'])} forks, "
+              f"eras {', '.join(f'{m}={f}' for m, f in sorted(_eras.items()))}")
+        for _fid in plant_mutations["missing"]:
+            print(f"  WARNING: no randomMutations.yml for {_fid} — fork left out of the table")
+    else:
+        print("  WARNING: no fork yielded a random mutation table")
+
     export_json(
         all_reagents, all_reactions, locale, reaction_lookup, base_set,
         all_sources, fork_diffs, reagent_plants=reagent_plants,
         fork_reagent_blocks=fork_reagent_blocks, plants=plants,
         item_sources=item_sources, shadowed_by_fork=shadowed_by_fork,
-        locale_ru=locale_ru,
+        locale_ru=locale_ru, plant_mutations=plant_mutations,
     )
 
     print("\n=== Phase 9: Extracting sprites from SS14 repo ===")

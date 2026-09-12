@@ -138,7 +138,7 @@
 
 ### D5. Мёртвые рецепты на тотальных конверсиях (RMC rename) `[x]` (2026-07-13, баг-репорт пользователя; schema 3.9.0; Tier-2, решение в docs/decisions/2026-07-12_rmc-renamed-reagents.md) — HAE 4h (data + frontend)
 **Баг:** Fluorosurfactant/Space Mirage показывают рецепт на Russian Marine Corps, но в игре не варятся. **Root cause** (systematic-debugging): RMC-14 переименовывает 20 базовых реагентов (Fluorine→RMCFluorine…), держит vanilla-слой в репо → тул показывает vanilla-рецепты на несуществующих в форке реагентах. **Fix:** экстрактор Phase 4e — rename-карта (locale-имя + base-фильтр + порог ≥5) → транзитивное замыкание мёртвых реакций → forkStatus=blocked (~275 на rmc14/rucm); meta.totalConversion → красный баннер. Аддитивные 16 форков не задеты. Верифицировано: Fluorosurfactant getFilteredReactions=0 на rucm / =1 на vanilla; баннер strong; regen ×2 байт-идентичен.
-### D6. Случайные мутации: таблица по каждому форку `[ ]` — HAE 2h (data)
+### D6. Случайные мутации: таблица по каждому форку `[x]` (2026-09-12) — HAE 2h (data)
 **Спека:** [docs/design/2026-09-12-botany-mutations.md](docs/design/2026-09-12-botany-mutations.md)
 **Спрос:** запрос пользователя 2026-09-12 после разбора механики — «нужен раздел с описанием мутаций, их вероятностей и ограничений в механиках, по каждому из форков». Расширяет D1: дерево эволюции показывает только переходы вида в вид (`mutationPrototypes`), а таблица случайных мутаций (потенция, урожай, выносливость, Unviable, Kudzu, Seedless) не извлекается ни для одного форка.
 **Шаги:**

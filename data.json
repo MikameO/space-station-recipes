@@ -1,7 +1,7 @@
 {
  "meta": {
-  "schemaVersion": "3.10.0",
-  "generated": "2026-09-12T09:00:32",
+  "schemaVersion": "3.11.0",
+  "generated": "2026-09-12T10:26:59",
   "forks": {
    "vanilla": {
     "name": "Vanilla SS14",
@@ -158758,6 +158758,1883 @@
     "body": "1) Mutagen small doses until the species you want appears. 2) Stabilize: harvest, replant the mutated seeds. 3) Swab-breed your best specimens to stack potency/yield onto the new species. 4) Robust Harvest boosts potency; seedless traits need the clippers workaround."
    }
   ]
+ },
+ "plantMutations": {
+  "schemaVersion": 1,
+  "mainTable": "RandomPlantMutations",
+  "baseSource": {
+   "range": "vanilla",
+   "ladder": "rmc14"
+  },
+  "bases": {
+   "range": [
+    {
+     "name": "Unviable",
+     "family": "Unviable",
+     "odds": 0.109,
+     "effect": "PlantChangeTraits",
+     "kind": "trait",
+     "persists": false,
+     "appliesToPlant": true,
+     "appliesToProduce": true,
+     "target": "Viable",
+     "reversible": true
+    },
+    {
+     "name": "ChangeChemicals",
+     "family": "ChangeChemicals",
+     "odds": 0.072,
+     "effect": "PlantMutateChemicals",
+     "kind": "special",
+     "persists": false,
+     "appliesToPlant": true,
+     "appliesToProduce": true
+    },
+    {
+     "name": "ChangeEndurance",
+     "family": "ChangeEndurance",
+     "odds": 0.036,
+     "effect": "PlantChangeStat",
+     "kind": "stat",
+     "persists": false,
+     "appliesToPlant": true,
+     "appliesToProduce": true,
+     "target": "Endurance",
+     "range": [
+      50,
+      150
+     ],
+     "step": {
+      "model": "range",
+      "up": 20,
+      "down": -20
+     }
+    },
+    {
+     "name": "ChangeHarvest",
+     "family": "ChangeHarvest",
+     "odds": 0.036,
+     "effect": "PlantMutateHarvest",
+     "kind": "special",
+     "persists": false,
+     "appliesToPlant": true,
+     "appliesToProduce": true
+    },
+    {
+     "name": "ChangeLifespan",
+     "family": "ChangeLifespan",
+     "odds": 0.036,
+     "effect": "PlantChangeStat",
+     "kind": "stat",
+     "persists": false,
+     "appliesToPlant": true,
+     "appliesToProduce": true,
+     "target": "Lifespan",
+     "range": [
+      10,
+      80
+     ],
+     "step": {
+      "model": "range",
+      "up": 15,
+      "down": -15
+     }
+    },
+    {
+     "name": "ChangeMaturation",
+     "family": "ChangeMaturation",
+     "odds": 0.036,
+     "effect": "PlantChangeStat",
+     "kind": "stat",
+     "persists": false,
+     "appliesToPlant": true,
+     "appliesToProduce": true,
+     "target": "Maturation",
+     "range": [
+      3,
+      8
+     ],
+     "step": {
+      "model": "range",
+      "up": 1,
+      "down": -1
+     }
+    },
+    {
+     "name": "ChangePotency",
+     "family": "ChangePotency",
+     "odds": 0.036,
+     "effect": "PlantChangeStat",
+     "kind": "stat",
+     "persists": false,
+     "appliesToPlant": true,
+     "appliesToProduce": true,
+     "target": "Potency",
+     "range": [
+      30,
+      100
+     ],
+     "step": {
+      "model": "range",
+      "up": 15,
+      "down": -15
+     }
+    },
+    {
+     "name": "ChangeProduction",
+     "family": "ChangeProduction",
+     "odds": 0.036,
+     "effect": "PlantChangeStat",
+     "kind": "stat",
+     "persists": false,
+     "appliesToPlant": true,
+     "appliesToProduce": true,
+     "target": "Production",
+     "range": [
+      1,
+      10
+     ],
+     "step": {
+      "model": "range",
+      "up": 2,
+      "down": -2
+     }
+    },
+    {
+     "name": "ChangeScreaming",
+     "family": "ChangeScreaming",
+     "odds": 0.036,
+     "effect": "PlantChangeTraits",
+     "kind": "trait",
+     "persists": false,
+     "appliesToPlant": true,
+     "appliesToProduce": true,
+     "target": "CanScream",
+     "reversible": true
+    },
+    {
+     "name": "ChangeSeedless",
+     "family": "ChangeSeedless",
+     "odds": 0.036,
+     "effect": "PlantChangeTraits",
+     "kind": "trait",
+     "persists": false,
+     "appliesToPlant": true,
+     "appliesToProduce": true,
+     "target": "Seedless",
+     "reversible": true
+    },
+    {
+     "name": "ChangeSpecies",
+     "family": "ChangeSpecies",
+     "odds": 0.036,
+     "effect": "PlantMutateSpeciesChange",
+     "kind": "special",
+     "persists": false,
+     "appliesToPlant": true,
+     "appliesToProduce": false
+    },
+    {
+     "name": "ChangeYield",
+     "family": "ChangeYield",
+     "odds": 0.036,
+     "effect": "PlantChangeStat",
+     "kind": "stat",
+     "persists": false,
+     "appliesToPlant": true,
+     "appliesToProduce": true,
+     "target": "Yield",
+     "range": [
+      4,
+      10
+     ],
+     "step": {
+      "model": "range",
+      "up": 1,
+      "down": -1
+     }
+    },
+    {
+     "name": "Kudzufication",
+     "family": "kudzu",
+     "odds": 0.036,
+     "effect": "PlantChangeTraits",
+     "kind": "trait",
+     "persists": false,
+     "appliesToPlant": true,
+     "appliesToProduce": true,
+     "target": "TurnIntoKudzu",
+     "reversible": true
+    },
+    {
+     "name": "Lignification",
+     "family": "ligneous",
+     "odds": 0.036,
+     "effect": "PlantChangeTraits",
+     "kind": "trait",
+     "persists": false,
+     "appliesToPlant": true,
+     "appliesToProduce": true,
+     "target": "Ligneous",
+     "reversible": true
+    },
+    {
+     "name": "Slippery",
+     "family": "Slippery",
+     "odds": 0.036,
+     "effect": "Slipify",
+     "kind": "special",
+     "persists": true,
+     "appliesToPlant": false,
+     "appliesToProduce": true
+    },
+    {
+     "name": "ChangeHighHeatTolerance",
+     "family": "heat",
+     "odds": 0.018,
+     "effect": "PlantChangeStat",
+     "kind": "stat",
+     "persists": false,
+     "appliesToPlant": true,
+     "appliesToProduce": true,
+     "split": true,
+     "target": "HighHeatTolerance",
+     "range": [
+      2,
+      25
+     ],
+     "step": {
+      "model": "range",
+      "up": 5,
+      "down": -5
+     }
+    },
+    {
+     "name": "ChangeHighPressureTolerance",
+     "family": "ChangeHighPressureTolerance",
+     "odds": 0.018,
+     "effect": "PlantChangeStat",
+     "kind": "stat",
+     "persists": false,
+     "appliesToPlant": true,
+     "appliesToProduce": true,
+     "target": "HighPressureTolerance",
+     "range": [
+      100,
+      140
+     ],
+     "step": {
+      "model": "range",
+      "up": 10,
+      "down": -10
+     }
+    },
+    {
+     "name": "ChangeLowHeatTolerance",
+     "family": "heat",
+     "odds": 0.018,
+     "effect": "PlantChangeStat",
+     "kind": "stat",
+     "persists": false,
+     "appliesToPlant": true,
+     "appliesToProduce": true,
+     "split": true,
+     "target": "LowHeatTolerance",
+     "range": [
+      2,
+      25
+     ],
+     "step": {
+      "model": "range",
+      "up": 5,
+      "down": -5
+     }
+    },
+    {
+     "name": "ChangeLowPressureTolerance",
+     "family": "ChangeLowPressureTolerance",
+     "odds": 0.018,
+     "effect": "PlantChangeStat",
+     "kind": "stat",
+     "persists": false,
+     "appliesToPlant": true,
+     "appliesToProduce": true,
+     "target": "LowPressureTolerance",
+     "range": [
+      60,
+      100
+     ],
+     "step": {
+      "model": "range",
+      "up": 10,
+      "down": -10
+     }
+    },
+    {
+     "name": "ChangeNutrientConsumption",
+     "family": "ChangeNutrientConsumption",
+     "odds": 0.018,
+     "effect": "PlantChangeStat",
+     "kind": "stat",
+     "persists": false,
+     "appliesToPlant": true,
+     "appliesToProduce": true,
+     "target": "NutrientConsumption",
+     "range": [
+      0.05,
+      1.2
+     ],
+     "step": {
+      "model": "range",
+      "up": 0.25,
+      "down": -0.25
+     }
+    },
+    {
+     "name": "ChangePestTolerance",
+     "family": "ChangePestTolerance",
+     "odds": 0.018,
+     "effect": "PlantChangeStat",
+     "kind": "stat",
+     "persists": false,
+     "appliesToPlant": true,
+     "appliesToProduce": true,
+     "target": "PestTolerance",
+     "range": [
+      0,
+      15
+     ],
+     "step": {
+      "model": "range",
+      "up": 3,
+      "down": -3
+     }
+    },
+    {
+     "name": "ChangeToxinsTolerance",
+     "family": "ChangeToxinsTolerance",
+     "odds": 0.018,
+     "effect": "PlantChangeStat",
+     "kind": "stat",
+     "persists": false,
+     "appliesToPlant": true,
+     "appliesToProduce": true,
+     "target": "ToxinsTolerance",
+     "range": [
+      1,
+      10
+     ],
+     "step": {
+      "model": "range",
+      "up": 2,
+      "down": -2
+     }
+    },
+    {
+     "name": "ChangeWaterConsumption",
+     "family": "ChangeWaterConsumption",
+     "odds": 0.018,
+     "effect": "PlantChangeStat",
+     "kind": "stat",
+     "persists": false,
+     "appliesToPlant": true,
+     "appliesToProduce": true,
+     "target": "WaterConsumption",
+     "range": [
+      0.3,
+      0.9
+     ],
+     "step": {
+      "model": "range",
+      "up": 0.1,
+      "down": -0.1
+     }
+    },
+    {
+     "name": "ChangeWeedTolerance",
+     "family": "ChangeWeedTolerance",
+     "odds": 0.018,
+     "effect": "PlantChangeStat",
+     "kind": "stat",
+     "persists": false,
+     "appliesToPlant": true,
+     "appliesToProduce": true,
+     "target": "WeedTolerance",
+     "range": [
+      0,
+      15
+     ],
+     "step": {
+      "model": "range",
+      "up": 3,
+      "down": -3
+     }
+    },
+    {
+     "name": "ChangeExudeGasses",
+     "family": "ChangeExudeGasses",
+     "odds": 0.0145,
+     "effect": "PlantMutateExudeGases",
+     "kind": "special",
+     "persists": false,
+     "appliesToPlant": true,
+     "appliesToProduce": true
+    },
+    {
+     "name": "Sentient",
+     "family": "Sentient",
+     "odds": 0.0072,
+     "effect": "MakeSentient",
+     "kind": "special",
+     "persists": false,
+     "appliesToPlant": true,
+     "appliesToProduce": false
+    },
+    {
+     "name": "ChangeConsumeGasses",
+     "family": "ChangeConsumeGasses",
+     "odds": 0.0036,
+     "effect": "PlantMutateConsumeGases",
+     "kind": "special",
+     "persists": false,
+     "appliesToPlant": true,
+     "appliesToProduce": true
+    }
+   ],
+   "ladder": [
+    {
+     "name": "Unviable",
+     "family": "Unviable",
+     "odds": 0.109,
+     "effect": "PlantChangeStat",
+     "kind": "trait",
+     "persists": false,
+     "appliesToPlant": true,
+     "appliesToProduce": true,
+     "target": "Viable",
+     "reversible": true
+    },
+    {
+     "name": "ChangeChemicals",
+     "family": "ChangeChemicals",
+     "odds": 0.072,
+     "effect": "PlantMutateChemicals",
+     "kind": "special",
+     "persists": false,
+     "appliesToPlant": true,
+     "appliesToProduce": true
+    },
+    {
+     "name": "ChangeEndurance",
+     "family": "ChangeEndurance",
+     "odds": 0.036,
+     "effect": "PlantChangeStat",
+     "kind": "stat",
+     "persists": false,
+     "appliesToPlant": true,
+     "appliesToProduce": true,
+     "target": "Endurance",
+     "range": [
+      50,
+      150
+     ],
+     "step": {
+      "model": "ladder",
+      "steps": 5
+     }
+    },
+    {
+     "name": "ChangeHarvest",
+     "family": "ChangeHarvest",
+     "odds": 0.036,
+     "effect": "PlantMutateHarvest",
+     "kind": "special",
+     "persists": false,
+     "appliesToPlant": true,
+     "appliesToProduce": true
+    },
+    {
+     "name": "ChangeLifespan",
+     "family": "ChangeLifespan",
+     "odds": 0.036,
+     "effect": "PlantChangeStat",
+     "kind": "stat",
+     "persists": false,
+     "appliesToPlant": true,
+     "appliesToProduce": true,
+     "target": "Lifespan",
+     "range": [
+      10,
+      80
+     ],
+     "step": {
+      "model": "ladder",
+      "steps": 5
+     }
+    },
+    {
+     "name": "ChangeMaturation",
+     "family": "ChangeMaturation",
+     "odds": 0.036,
+     "effect": "PlantChangeStat",
+     "kind": "stat",
+     "persists": false,
+     "appliesToPlant": true,
+     "appliesToProduce": true,
+     "target": "Maturation",
+     "range": [
+      3,
+      8
+     ],
+     "step": {
+      "model": "ladder",
+      "steps": 5
+     }
+    },
+    {
+     "name": "ChangePotency",
+     "family": "ChangePotency",
+     "odds": 0.036,
+     "effect": "PlantChangeStat",
+     "kind": "stat",
+     "persists": false,
+     "appliesToPlant": true,
+     "appliesToProduce": true,
+     "target": "Potency",
+     "range": [
+      30,
+      100
+     ],
+     "step": {
+      "model": "ladder",
+      "steps": 5
+     }
+    },
+    {
+     "name": "ChangeProduction",
+     "family": "ChangeProduction",
+     "odds": 0.036,
+     "effect": "PlantChangeStat",
+     "kind": "stat",
+     "persists": false,
+     "appliesToPlant": true,
+     "appliesToProduce": true,
+     "target": "Production",
+     "range": [
+      1,
+      10
+     ],
+     "step": {
+      "model": "ladder",
+      "steps": 5
+     }
+    },
+    {
+     "name": "ChangeScreaming",
+     "family": "ChangeScreaming",
+     "odds": 0.036,
+     "effect": "PlantChangeStat",
+     "kind": "trait",
+     "persists": false,
+     "appliesToPlant": true,
+     "appliesToProduce": true,
+     "target": "CanScream",
+     "reversible": true
+    },
+    {
+     "name": "ChangeSeedless",
+     "family": "ChangeSeedless",
+     "odds": 0.036,
+     "effect": "PlantChangeStat",
+     "kind": "trait",
+     "persists": false,
+     "appliesToPlant": true,
+     "appliesToProduce": true,
+     "target": "Seedless",
+     "reversible": true
+    },
+    {
+     "name": "ChangeSpecies",
+     "family": "ChangeSpecies",
+     "odds": 0.036,
+     "effect": "PlantSpeciesChange",
+     "kind": "special",
+     "persists": false,
+     "appliesToPlant": true,
+     "appliesToProduce": false
+    },
+    {
+     "name": "ChangeYield",
+     "family": "ChangeYield",
+     "odds": 0.036,
+     "effect": "PlantChangeStat",
+     "kind": "stat",
+     "persists": false,
+     "appliesToPlant": true,
+     "appliesToProduce": true,
+     "target": "Yield",
+     "range": [
+      3,
+      10
+     ],
+     "step": {
+      "model": "ladder",
+      "steps": 5
+     }
+    },
+    {
+     "name": "Kudzufication",
+     "family": "kudzu",
+     "odds": 0.036,
+     "effect": "PlantChangeStat",
+     "kind": "trait",
+     "persists": false,
+     "appliesToPlant": true,
+     "appliesToProduce": true,
+     "target": "TurnIntoKudzu",
+     "reversible": true
+    },
+    {
+     "name": "Lignification",
+     "family": "ligneous",
+     "odds": 0.036,
+     "effect": "PlantChangeStat",
+     "kind": "trait",
+     "persists": false,
+     "appliesToPlant": true,
+     "appliesToProduce": true,
+     "target": "Ligneous",
+     "reversible": true
+    },
+    {
+     "name": "Slippery",
+     "family": "Slippery",
+     "odds": 0.036,
+     "effect": "Slipify",
+     "kind": "special",
+     "persists": true,
+     "appliesToPlant": false,
+     "appliesToProduce": true
+    },
+    {
+     "name": "ChangeHeatTolerance",
+     "family": "heat",
+     "odds": 0.018,
+     "effect": "PlantChangeStat",
+     "kind": "stat",
+     "persists": false,
+     "appliesToPlant": true,
+     "appliesToProduce": true,
+     "split": true,
+     "target": "HeatTolerance",
+     "range": [
+      2,
+      25
+     ],
+     "step": {
+      "model": "ladder",
+      "steps": 5
+     }
+    },
+    {
+     "name": "ChangeHighPressureTolerance",
+     "family": "ChangeHighPressureTolerance",
+     "odds": 0.018,
+     "effect": "PlantChangeStat",
+     "kind": "stat",
+     "persists": false,
+     "appliesToPlant": true,
+     "appliesToProduce": true,
+     "target": "HighPressureTolerance",
+     "range": [
+      100,
+      140
+     ],
+     "step": {
+      "model": "ladder",
+      "steps": 5
+     }
+    },
+    {
+     "name": "ChangeIdealHeat",
+     "family": "heat",
+     "odds": 0.018,
+     "effect": "PlantChangeStat",
+     "kind": "stat",
+     "persists": false,
+     "appliesToPlant": true,
+     "appliesToProduce": true,
+     "split": true,
+     "target": "IdealHeat",
+     "range": [
+      263,
+      323
+     ],
+     "step": {
+      "model": "ladder",
+      "steps": 5
+     }
+    },
+    {
+     "name": "ChangeLowPressureTolerance",
+     "family": "ChangeLowPressureTolerance",
+     "odds": 0.018,
+     "effect": "PlantChangeStat",
+     "kind": "stat",
+     "persists": false,
+     "appliesToPlant": true,
+     "appliesToProduce": true,
+     "target": "LowPressureTolerance",
+     "range": [
+      60,
+      100
+     ],
+     "step": {
+      "model": "ladder",
+      "steps": 5
+     }
+    },
+    {
+     "name": "ChangeNutrientConsumption",
+     "family": "ChangeNutrientConsumption",
+     "odds": 0.018,
+     "effect": "PlantChangeStat",
+     "kind": "stat",
+     "persists": false,
+     "appliesToPlant": true,
+     "appliesToProduce": true,
+     "target": "NutrientConsumption",
+     "range": [
+      0.05,
+      1.2
+     ],
+     "step": {
+      "model": "ladder",
+      "steps": 5
+     }
+    },
+    {
+     "name": "ChangePestTolerance",
+     "family": "ChangePestTolerance",
+     "odds": 0.018,
+     "effect": "PlantChangeStat",
+     "kind": "stat",
+     "persists": false,
+     "appliesToPlant": true,
+     "appliesToProduce": true,
+     "target": "PestTolerance",
+     "range": [
+      0,
+      15
+     ],
+     "step": {
+      "model": "ladder",
+      "steps": 5
+     }
+    },
+    {
+     "name": "ChangeToxinsTolerance",
+     "family": "ChangeToxinsTolerance",
+     "odds": 0.018,
+     "effect": "PlantChangeStat",
+     "kind": "stat",
+     "persists": false,
+     "appliesToPlant": true,
+     "appliesToProduce": true,
+     "target": "ToxinsTolerance",
+     "range": [
+      1,
+      10
+     ],
+     "step": {
+      "model": "ladder",
+      "steps": 5
+     }
+    },
+    {
+     "name": "ChangeWaterConsumption",
+     "family": "ChangeWaterConsumption",
+     "odds": 0.018,
+     "effect": "PlantChangeStat",
+     "kind": "stat",
+     "persists": false,
+     "appliesToPlant": true,
+     "appliesToProduce": true,
+     "target": "WaterConsumption",
+     "range": [
+      0.3,
+      0.9
+     ],
+     "step": {
+      "model": "ladder",
+      "steps": 5
+     }
+    },
+    {
+     "name": "ChangeWeedTolerance",
+     "family": "ChangeWeedTolerance",
+     "odds": 0.018,
+     "effect": "PlantChangeStat",
+     "kind": "stat",
+     "persists": false,
+     "appliesToPlant": true,
+     "appliesToProduce": true,
+     "target": "WeedTolerance",
+     "range": [
+      0,
+      15
+     ],
+     "step": {
+      "model": "ladder",
+      "steps": 5
+     }
+    },
+    {
+     "name": "ChangeExudeGasses",
+     "family": "ChangeExudeGasses",
+     "odds": 0.0145,
+     "effect": "PlantMutateExudeGasses",
+     "kind": "special",
+     "persists": false,
+     "appliesToPlant": true,
+     "appliesToProduce": true
+    },
+    {
+     "name": "Sentient",
+     "family": "Sentient",
+     "odds": 0.0072,
+     "effect": "MakeSentient",
+     "kind": "special",
+     "persists": false,
+     "appliesToPlant": true,
+     "appliesToProduce": false
+    },
+    {
+     "name": "ChangeConsumeGasses",
+     "family": "ChangeConsumeGasses",
+     "odds": 0.0036,
+     "effect": "PlantMutateConsumeGasses",
+     "kind": "special",
+     "persists": false,
+     "appliesToPlant": true,
+     "appliesToProduce": true
+    }
+   ]
+  },
+  "forks": {
+   "vanilla": {
+    "model": "range",
+    "count": 27,
+    "add": [],
+    "remove": [],
+    "override": {
+     "ChangeHighHeatTolerance": {
+      "name": "ChangeHighHeatTolerance",
+      "family": "heat",
+      "odds": 0.018,
+      "effect": "PlantChangeStat",
+      "kind": "stat",
+      "persists": false,
+      "appliesToPlant": true,
+      "appliesToProduce": true,
+      "split": true,
+      "target": "HighHeatTolerance",
+      "range": [
+       2,
+       25
+      ],
+      "step": {
+       "model": "range",
+       "up": 5,
+       "down": -5
+      }
+     }
+    },
+    "extraTables": {
+     "EvilPlantMutations": [
+      {
+       "name": "MutateEvilChemicals",
+       "family": "MutateEvilChemicals",
+       "odds": 1,
+       "effect": "PlantMutateChemicals",
+       "kind": "special",
+       "persists": false,
+       "appliesToPlant": true,
+       "appliesToProduce": true
+      }
+     ]
+    }
+   },
+   "rmc14": {
+    "model": "ladder",
+    "count": 27,
+    "add": [],
+    "remove": [],
+    "override": {
+     "ChangeHeatTolerance": {
+      "name": "ChangeHeatTolerance",
+      "family": "heat",
+      "odds": 0.018,
+      "effect": "PlantChangeStat",
+      "kind": "stat",
+      "persists": false,
+      "appliesToPlant": true,
+      "appliesToProduce": true,
+      "split": true,
+      "target": "HeatTolerance",
+      "range": [
+       2,
+       25
+      ],
+      "step": {
+       "model": "ladder",
+       "steps": 5
+      }
+     }
+    }
+   },
+   "cmu": {
+    "model": "range",
+    "count": 27,
+    "add": [],
+    "remove": [],
+    "override": {
+     "ChangeYield": {
+      "name": "ChangeYield",
+      "family": "ChangeYield",
+      "odds": 0.036,
+      "effect": "PlantChangeStat",
+      "kind": "stat",
+      "persists": false,
+      "appliesToPlant": true,
+      "appliesToProduce": true,
+      "target": "Yield",
+      "range": [
+       3,
+       10
+      ],
+      "step": {
+       "model": "range",
+       "up": 1,
+       "down": -1
+      }
+     },
+     "ChangeHighHeatTolerance": {
+      "name": "ChangeHighHeatTolerance",
+      "family": "heat",
+      "odds": 0.018,
+      "effect": "PlantChangeStat",
+      "kind": "stat",
+      "persists": false,
+      "appliesToPlant": true,
+      "appliesToProduce": true,
+      "split": true,
+      "target": "HighHeatTolerance",
+      "range": [
+       2,
+       25
+      ],
+      "step": {
+       "model": "range",
+       "up": 5,
+       "down": -5
+      }
+     }
+    }
+   },
+   "rucm": {
+    "model": "range",
+    "count": 27,
+    "add": [],
+    "remove": [],
+    "override": {
+     "ChangeYield": {
+      "name": "ChangeYield",
+      "family": "ChangeYield",
+      "odds": 0.036,
+      "effect": "PlantChangeStat",
+      "kind": "stat",
+      "persists": false,
+      "appliesToPlant": true,
+      "appliesToProduce": true,
+      "target": "Yield",
+      "range": [
+       3,
+       10
+      ],
+      "step": {
+       "model": "range",
+       "up": 1,
+       "down": -1
+      }
+     },
+     "ChangeHighHeatTolerance": {
+      "name": "ChangeHighHeatTolerance",
+      "family": "heat",
+      "odds": 0.018,
+      "effect": "PlantChangeStat",
+      "kind": "stat",
+      "persists": false,
+      "appliesToPlant": true,
+      "appliesToProduce": true,
+      "split": true,
+      "target": "HighHeatTolerance",
+      "range": [
+       2,
+       25
+      ],
+      "step": {
+       "model": "range",
+       "up": 5,
+       "down": -5
+      }
+     }
+    }
+   },
+   "stories_cm": {
+    "model": "ladder",
+    "count": 27,
+    "add": [],
+    "remove": [],
+    "override": {
+     "ChangeHeatTolerance": {
+      "name": "ChangeHeatTolerance",
+      "family": "heat",
+      "odds": 0.018,
+      "effect": "PlantChangeStat",
+      "kind": "stat",
+      "persists": false,
+      "appliesToPlant": true,
+      "appliesToProduce": true,
+      "split": true,
+      "target": "HeatTolerance",
+      "range": [
+       2,
+       25
+      ],
+      "step": {
+       "model": "ladder",
+       "steps": 5
+      }
+     }
+    }
+   },
+   "goob": {
+    "model": "ladder",
+    "count": 27,
+    "add": [],
+    "remove": [],
+    "override": {
+     "ChangeSpecies": {
+      "name": "ChangeSpecies",
+      "family": "ChangeSpecies",
+      "odds": 0.036,
+      "effect": "PlantMutateSpeciesChange",
+      "kind": "special",
+      "persists": false,
+      "appliesToPlant": true,
+      "appliesToProduce": false
+     },
+     "ChangeHeatTolerance": {
+      "name": "ChangeHeatTolerance",
+      "family": "heat",
+      "odds": 0.018,
+      "effect": "PlantChangeStat",
+      "kind": "stat",
+      "persists": false,
+      "appliesToPlant": true,
+      "appliesToProduce": true,
+      "split": true,
+      "target": "HeatTolerance",
+      "range": [
+       2,
+       25
+      ],
+      "step": {
+       "model": "ladder",
+       "steps": 5
+      }
+     },
+     "ChangeExudeGasses": {
+      "name": "ChangeExudeGasses",
+      "family": "ChangeExudeGasses",
+      "odds": 0.0145,
+      "effect": "PlantMutateExudeGases",
+      "kind": "special",
+      "persists": false,
+      "appliesToPlant": true,
+      "appliesToProduce": true
+     },
+     "ChangeConsumeGasses": {
+      "name": "ChangeConsumeGasses",
+      "family": "ChangeConsumeGasses",
+      "odds": 0.0036,
+      "effect": "PlantMutateConsumeGases",
+      "kind": "special",
+      "persists": false,
+      "appliesToPlant": true,
+      "appliesToProduce": true
+     }
+    }
+   },
+   "starlight": {
+    "model": "ladder",
+    "count": 27,
+    "add": [],
+    "remove": [],
+    "override": {
+     "ChangeSpecies": {
+      "name": "ChangeSpecies",
+      "family": "ChangeSpecies",
+      "odds": 0.036,
+      "effect": "PlantMutateSpeciesChange",
+      "kind": "special",
+      "persists": false,
+      "appliesToPlant": true,
+      "appliesToProduce": false
+     },
+     "ChangeHeatTolerance": {
+      "name": "ChangeHeatTolerance",
+      "family": "heat",
+      "odds": 0.018,
+      "effect": "PlantChangeStat",
+      "kind": "stat",
+      "persists": false,
+      "appliesToPlant": true,
+      "appliesToProduce": true,
+      "split": true,
+      "target": "HeatTolerance",
+      "range": [
+       2,
+       25
+      ],
+      "step": {
+       "model": "ladder",
+       "steps": 5
+      }
+     },
+     "ChangeExudeGasses": {
+      "name": "ChangeExudeGasses",
+      "family": "ChangeExudeGasses",
+      "odds": 0.0145,
+      "effect": "PlantMutateExudeGases",
+      "kind": "special",
+      "persists": false,
+      "appliesToPlant": true,
+      "appliesToProduce": true
+     },
+     "ChangeConsumeGasses": {
+      "name": "ChangeConsumeGasses",
+      "family": "ChangeConsumeGasses",
+      "odds": 0.0036,
+      "effect": "PlantMutateConsumeGases",
+      "kind": "special",
+      "persists": false,
+      "appliesToPlant": true,
+      "appliesToProduce": true
+     }
+    }
+   },
+   "deltav": {
+    "model": "ladder",
+    "count": 27,
+    "add": [],
+    "remove": [],
+    "override": {
+     "ChangeSpecies": {
+      "name": "ChangeSpecies",
+      "family": "ChangeSpecies",
+      "odds": 0.036,
+      "effect": "PlantMutateSpeciesChange",
+      "kind": "special",
+      "persists": false,
+      "appliesToPlant": true,
+      "appliesToProduce": false
+     },
+     "ChangeHeatTolerance": {
+      "name": "ChangeHeatTolerance",
+      "family": "heat",
+      "odds": 0.018,
+      "effect": "PlantChangeStat",
+      "kind": "stat",
+      "persists": false,
+      "appliesToPlant": true,
+      "appliesToProduce": true,
+      "split": true,
+      "target": "HeatTolerance",
+      "range": [
+       2,
+       25
+      ],
+      "step": {
+       "model": "ladder",
+       "steps": 5
+      }
+     },
+     "ChangeExudeGasses": {
+      "name": "ChangeExudeGasses",
+      "family": "ChangeExudeGasses",
+      "odds": 0.0145,
+      "effect": "PlantMutateExudeGases",
+      "kind": "special",
+      "persists": false,
+      "appliesToPlant": true,
+      "appliesToProduce": true
+     },
+     "ChangeConsumeGasses": {
+      "name": "ChangeConsumeGasses",
+      "family": "ChangeConsumeGasses",
+      "odds": 0.0036,
+      "effect": "PlantMutateConsumeGases",
+      "kind": "special",
+      "persists": false,
+      "appliesToPlant": true,
+      "appliesToProduce": true
+     }
+    }
+   },
+   "deadspace": {
+    "model": "range",
+    "count": 27,
+    "add": [],
+    "remove": [],
+    "override": {
+     "ChangeYield": {
+      "name": "ChangeYield",
+      "family": "ChangeYield",
+      "odds": 0.036,
+      "effect": "PlantChangeStat",
+      "kind": "stat",
+      "persists": false,
+      "appliesToPlant": true,
+      "appliesToProduce": true,
+      "target": "Yield",
+      "range": [
+       3,
+       10
+      ],
+      "step": {
+       "model": "range",
+       "up": 1,
+       "down": -1
+      }
+     },
+     "ChangeHighHeatTolerance": {
+      "name": "ChangeHighHeatTolerance",
+      "family": "heat",
+      "odds": 0.018,
+      "effect": "PlantChangeStat",
+      "kind": "stat",
+      "persists": false,
+      "appliesToPlant": true,
+      "appliesToProduce": true,
+      "split": true,
+      "target": "HighHeatTolerance",
+      "range": [
+       2,
+       25
+      ],
+      "step": {
+       "model": "range",
+       "up": 5,
+       "down": -5
+      }
+     }
+    }
+   },
+   "frontier": {
+    "model": "ladder",
+    "count": 25,
+    "add": [],
+    "remove": [
+     "ChangeConsumeGasses",
+     "ChangeExudeGasses"
+    ],
+    "override": {
+     "ChangeHeatTolerance": {
+      "name": "ChangeHeatTolerance",
+      "family": "heat",
+      "odds": 0.018,
+      "effect": "PlantChangeStat",
+      "kind": "stat",
+      "persists": false,
+      "appliesToPlant": true,
+      "appliesToProduce": true,
+      "split": true,
+      "target": "HeatTolerance",
+      "range": [
+       2,
+       25
+      ],
+      "step": {
+       "model": "ladder",
+       "steps": 5
+      }
+     }
+    }
+   },
+   "funky": {
+    "model": "ladder",
+    "count": 27,
+    "add": [],
+    "remove": [],
+    "override": {
+     "ChangeLigneous": {
+      "name": "ChangeLigneous",
+      "family": "ligneous",
+      "odds": 0.036,
+      "effect": "PlantChangeStat",
+      "kind": "trait",
+      "persists": false,
+      "appliesToPlant": true,
+      "appliesToProduce": true,
+      "target": "Ligneous",
+      "reversible": true
+     },
+     "ChangeTurnIntoKudzu": {
+      "name": "ChangeTurnIntoKudzu",
+      "family": "kudzu",
+      "odds": 0.036,
+      "effect": "PlantChangeStat",
+      "kind": "trait",
+      "persists": false,
+      "appliesToPlant": true,
+      "appliesToProduce": true,
+      "target": "TurnIntoKudzu",
+      "reversible": true
+     },
+     "ChangeHeatTolerance": {
+      "name": "ChangeHeatTolerance",
+      "family": "heat",
+      "odds": 0.018,
+      "effect": "PlantChangeStat",
+      "kind": "stat",
+      "persists": false,
+      "appliesToPlant": true,
+      "appliesToProduce": true,
+      "split": true,
+      "target": "HeatTolerance",
+      "range": [
+       2,
+       25
+      ],
+      "step": {
+       "model": "ladder",
+       "steps": 5
+      }
+     }
+    }
+   },
+   "trauma": {
+    "model": "range",
+    "count": 27,
+    "add": [],
+    "remove": [],
+    "override": {
+     "ChangeHighHeatTolerance": {
+      "name": "ChangeHighHeatTolerance",
+      "family": "heat",
+      "odds": 0.018,
+      "effect": "PlantChangeStat",
+      "kind": "stat",
+      "persists": false,
+      "appliesToPlant": true,
+      "appliesToProduce": true,
+      "split": true,
+      "target": "HighHeatTolerance",
+      "range": [
+       2,
+       25
+      ],
+      "step": {
+       "model": "range",
+       "up": 5,
+       "down": -5
+      }
+     }
+    },
+    "extraTables": {
+     "EvilPlantMutations": [
+      {
+       "name": "MutateEvilChemicals",
+       "family": "MutateEvilChemicals",
+       "odds": 1,
+       "effect": "PlantMutateChemicals",
+       "kind": "special",
+       "persists": false,
+       "appliesToPlant": true,
+       "appliesToProduce": true
+      }
+     ]
+    }
+   },
+   "omu": {
+    "model": "ladder",
+    "count": 27,
+    "add": [],
+    "remove": [],
+    "override": {
+     "ChangeSpecies": {
+      "name": "ChangeSpecies",
+      "family": "ChangeSpecies",
+      "odds": 0.036,
+      "effect": "PlantMutateSpeciesChange",
+      "kind": "special",
+      "persists": false,
+      "appliesToPlant": true,
+      "appliesToProduce": false
+     },
+     "ChangeHeatTolerance": {
+      "name": "ChangeHeatTolerance",
+      "family": "heat",
+      "odds": 0.018,
+      "effect": "PlantChangeStat",
+      "kind": "stat",
+      "persists": false,
+      "appliesToPlant": true,
+      "appliesToProduce": true,
+      "split": true,
+      "target": "HeatTolerance",
+      "range": [
+       2,
+       25
+      ],
+      "step": {
+       "model": "ladder",
+       "steps": 5
+      }
+     },
+     "ChangeExudeGasses": {
+      "name": "ChangeExudeGasses",
+      "family": "ChangeExudeGasses",
+      "odds": 0.0145,
+      "effect": "PlantMutateExudeGases",
+      "kind": "special",
+      "persists": false,
+      "appliesToPlant": true,
+      "appliesToProduce": true
+     },
+     "ChangeConsumeGasses": {
+      "name": "ChangeConsumeGasses",
+      "family": "ChangeConsumeGasses",
+      "odds": 0.0036,
+      "effect": "PlantMutateConsumeGases",
+      "kind": "special",
+      "persists": false,
+      "appliesToPlant": true,
+      "appliesToProduce": true
+     }
+    }
+   },
+   "carpmosia": {
+    "model": "ladder",
+    "count": 27,
+    "add": [],
+    "remove": [],
+    "override": {
+     "ChangeSpecies": {
+      "name": "ChangeSpecies",
+      "family": "ChangeSpecies",
+      "odds": 0.036,
+      "effect": "PlantMutateSpeciesChange",
+      "kind": "special",
+      "persists": false,
+      "appliesToPlant": true,
+      "appliesToProduce": false
+     },
+     "ChangeHeatTolerance": {
+      "name": "ChangeHeatTolerance",
+      "family": "heat",
+      "odds": 0.018,
+      "effect": "PlantChangeStat",
+      "kind": "stat",
+      "persists": false,
+      "appliesToPlant": true,
+      "appliesToProduce": true,
+      "split": true,
+      "target": "HeatTolerance",
+      "range": [
+       2,
+       25
+      ],
+      "step": {
+       "model": "ladder",
+       "steps": 5
+      }
+     },
+     "ChangeExudeGasses": {
+      "name": "ChangeExudeGasses",
+      "family": "ChangeExudeGasses",
+      "odds": 0.0145,
+      "effect": "PlantMutateExudeGases",
+      "kind": "special",
+      "persists": false,
+      "appliesToPlant": true,
+      "appliesToProduce": true
+     },
+     "ChangeConsumeGasses": {
+      "name": "ChangeConsumeGasses",
+      "family": "ChangeConsumeGasses",
+      "odds": 0.0036,
+      "effect": "PlantMutateConsumeGases",
+      "kind": "special",
+      "persists": false,
+      "appliesToPlant": true,
+      "appliesToProduce": true
+     }
+    }
+   },
+   "monolith": {
+    "model": "ladder",
+    "count": 27,
+    "add": [],
+    "remove": [],
+    "override": {
+     "ChangeLigneous": {
+      "name": "ChangeLigneous",
+      "family": "ligneous",
+      "odds": 0.036,
+      "effect": "PlantChangeStat",
+      "kind": "trait",
+      "persists": false,
+      "appliesToPlant": true,
+      "appliesToProduce": true,
+      "target": "Ligneous",
+      "reversible": true
+     },
+     "ChangeTurnIntoKudzu": {
+      "name": "ChangeTurnIntoKudzu",
+      "family": "kudzu",
+      "odds": 0.036,
+      "effect": "PlantChangeStat",
+      "kind": "trait",
+      "persists": false,
+      "appliesToPlant": true,
+      "appliesToProduce": true,
+      "target": "TurnIntoKudzu",
+      "reversible": true
+     },
+     "ChangeHeatTolerance": {
+      "name": "ChangeHeatTolerance",
+      "family": "heat",
+      "odds": 0.018,
+      "effect": "PlantChangeStat",
+      "kind": "stat",
+      "persists": false,
+      "appliesToPlant": true,
+      "appliesToProduce": true,
+      "split": true,
+      "target": "HeatTolerance",
+      "range": [
+       2,
+       25
+      ],
+      "step": {
+       "model": "ladder",
+       "steps": 5
+      }
+     }
+    }
+   },
+   "harmony": {
+    "model": "ladder",
+    "count": 27,
+    "add": [],
+    "remove": [],
+    "override": {
+     "ChangeSpecies": {
+      "name": "ChangeSpecies",
+      "family": "ChangeSpecies",
+      "odds": 0.036,
+      "effect": "PlantMutateSpeciesChange",
+      "kind": "special",
+      "persists": false,
+      "appliesToPlant": true,
+      "appliesToProduce": false
+     },
+     "ChangeHeatTolerance": {
+      "name": "ChangeHeatTolerance",
+      "family": "heat",
+      "odds": 0.018,
+      "effect": "PlantChangeStat",
+      "kind": "stat",
+      "persists": false,
+      "appliesToPlant": true,
+      "appliesToProduce": true,
+      "split": true,
+      "target": "HeatTolerance",
+      "range": [
+       2,
+       25
+      ],
+      "step": {
+       "model": "ladder",
+       "steps": 5
+      }
+     },
+     "ChangeExudeGasses": {
+      "name": "ChangeExudeGasses",
+      "family": "ChangeExudeGasses",
+      "odds": 0.0145,
+      "effect": "PlantMutateExudeGases",
+      "kind": "special",
+      "persists": false,
+      "appliesToPlant": true,
+      "appliesToProduce": true
+     },
+     "ChangeConsumeGasses": {
+      "name": "ChangeConsumeGasses",
+      "family": "ChangeConsumeGasses",
+      "odds": 0.0036,
+      "effect": "PlantMutateConsumeGases",
+      "kind": "special",
+      "persists": false,
+      "appliesToPlant": true,
+      "appliesToProduce": true
+     }
+    }
+   },
+   "corvax": {
+    "model": "range",
+    "count": 27,
+    "add": [],
+    "remove": [],
+    "override": {
+     "ChangeYield": {
+      "name": "ChangeYield",
+      "family": "ChangeYield",
+      "odds": 0.036,
+      "effect": "PlantChangeStat",
+      "kind": "stat",
+      "persists": false,
+      "appliesToPlant": true,
+      "appliesToProduce": true,
+      "target": "Yield",
+      "range": [
+       3,
+       10
+      ],
+      "step": {
+       "model": "range",
+       "up": 1,
+       "down": -1
+      }
+     },
+     "ChangeHighHeatTolerance": {
+      "name": "ChangeHighHeatTolerance",
+      "family": "heat",
+      "odds": 0.018,
+      "effect": "PlantChangeStat",
+      "kind": "stat",
+      "persists": false,
+      "appliesToPlant": true,
+      "appliesToProduce": true,
+      "split": true,
+      "target": "HighHeatTolerance",
+      "range": [
+       2,
+       25
+      ],
+      "step": {
+       "model": "range",
+       "up": 5,
+       "down": -5
+      }
+     }
+    }
+   },
+   "adt": {
+    "model": "ladder",
+    "count": 27,
+    "add": [],
+    "remove": [],
+    "override": {
+     "ChangeSpecies": {
+      "name": "ChangeSpecies",
+      "family": "ChangeSpecies",
+      "odds": 0.036,
+      "effect": "PlantMutateSpeciesChange",
+      "kind": "special",
+      "persists": false,
+      "appliesToPlant": true,
+      "appliesToProduce": false
+     },
+     "ChangeHeatTolerance": {
+      "name": "ChangeHeatTolerance",
+      "family": "heat",
+      "odds": 0.018,
+      "effect": "PlantChangeStat",
+      "kind": "stat",
+      "persists": false,
+      "appliesToPlant": true,
+      "appliesToProduce": true,
+      "split": true,
+      "target": "HeatTolerance",
+      "range": [
+       2,
+       25
+      ],
+      "step": {
+       "model": "ladder",
+       "steps": 5
+      }
+     },
+     "ChangeExudeGasses": {
+      "name": "ChangeExudeGasses",
+      "family": "ChangeExudeGasses",
+      "odds": 0.0145,
+      "effect": "PlantMutateExudeGases",
+      "kind": "special",
+      "persists": false,
+      "appliesToPlant": true,
+      "appliesToProduce": true
+     },
+     "ChangeConsumeGasses": {
+      "name": "ChangeConsumeGasses",
+      "family": "ChangeConsumeGasses",
+      "odds": 0.0036,
+      "effect": "PlantMutateConsumeGases",
+      "kind": "special",
+      "persists": false,
+      "appliesToPlant": true,
+      "appliesToProduce": true
+     }
+    }
+   },
+   "sunrise": {
+    "model": "ladder",
+    "count": 27,
+    "add": [],
+    "remove": [],
+    "override": {
+     "ChangeSpecies": {
+      "name": "ChangeSpecies",
+      "family": "ChangeSpecies",
+      "odds": 0.036,
+      "effect": "PlantMutateSpeciesChange",
+      "kind": "special",
+      "persists": false,
+      "appliesToPlant": true,
+      "appliesToProduce": false
+     },
+     "ChangeHeatTolerance": {
+      "name": "ChangeHeatTolerance",
+      "family": "heat",
+      "odds": 0.018,
+      "effect": "PlantChangeStat",
+      "kind": "stat",
+      "persists": false,
+      "appliesToPlant": true,
+      "appliesToProduce": true,
+      "split": true,
+      "target": "HeatTolerance",
+      "range": [
+       2,
+       25
+      ],
+      "step": {
+       "model": "ladder",
+       "steps": 5
+      }
+     },
+     "ChangeExudeGasses": {
+      "name": "ChangeExudeGasses",
+      "family": "ChangeExudeGasses",
+      "odds": 0.0145,
+      "effect": "PlantMutateExudeGases",
+      "kind": "special",
+      "persists": false,
+      "appliesToPlant": true,
+      "appliesToProduce": true
+     },
+     "ChangeConsumeGasses": {
+      "name": "ChangeConsumeGasses",
+      "family": "ChangeConsumeGasses",
+      "odds": 0.0036,
+      "effect": "PlantMutateConsumeGases",
+      "kind": "special",
+      "persists": false,
+      "appliesToPlant": true,
+      "appliesToProduce": true
+     }
+    }
+   },
+   "fish": {
+    "model": "ladder",
+    "count": 27,
+    "add": [],
+    "remove": [],
+    "override": {
+     "ChangeSpecies": {
+      "name": "ChangeSpecies",
+      "family": "ChangeSpecies",
+      "odds": 0.036,
+      "effect": "PlantMutateSpeciesChange",
+      "kind": "special",
+      "persists": false,
+      "appliesToPlant": true,
+      "appliesToProduce": false
+     },
+     "ChangeHeatTolerance": {
+      "name": "ChangeHeatTolerance",
+      "family": "heat",
+      "odds": 0.018,
+      "effect": "PlantChangeStat",
+      "kind": "stat",
+      "persists": false,
+      "appliesToPlant": true,
+      "appliesToProduce": true,
+      "split": true,
+      "target": "HeatTolerance",
+      "range": [
+       2,
+       25
+      ],
+      "step": {
+       "model": "ladder",
+       "steps": 5
+      }
+     },
+     "ChangeExudeGasses": {
+      "name": "ChangeExudeGasses",
+      "family": "ChangeExudeGasses",
+      "odds": 0.0145,
+      "effect": "PlantMutateExudeGases",
+      "kind": "special",
+      "persists": false,
+      "appliesToPlant": true,
+      "appliesToProduce": true
+     },
+     "ChangeConsumeGasses": {
+      "name": "ChangeConsumeGasses",
+      "family": "ChangeConsumeGasses",
+      "odds": 0.0036,
+      "effect": "PlantMutateConsumeGases",
+      "kind": "special",
+      "persists": false,
+      "appliesToPlant": true,
+      "appliesToProduce": true
+     }
+    }
+   },
+   "misfits": {
+    "model": "ladder",
+    "count": 18,
+    "add": [],
+    "remove": [
+     "ChangeConsumeGasses",
+     "ChangeExudeGasses",
+     "ChangeHighPressureTolerance",
+     "ChangeLowPressureTolerance",
+     "Sentient",
+     "Slippery",
+     "heat",
+     "kudzu"
+    ],
+    "override": {}
+   }
+  },
+  "missing": []
  },
  "species": {
   "physiology": {
