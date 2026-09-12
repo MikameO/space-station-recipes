@@ -1435,8 +1435,9 @@ function openDetail(reagentId, pushHistory = true) {
   const content = document.getElementById('detailContent');
 
   let recipeHTML = '<p style="color:var(--text-dim)">Base chemical (no recipe)</p>';
-  if (r.recipe) {
-    recipeHTML = '<div>' + Object.entries(r.recipe.reactants).map(([id, info]) =>
+  const recipe = pickRecipe(reagentId) || r.recipe;   // fork-ranked; r.recipe only when the fork hides every producer
+  if (recipe) {
+    recipeHTML = '<div>' + Object.entries(recipe.reactants).map(([id, info]) =>
       `<div class="detail-recipe-item">
         <span class="detail-recipe-amount">${info.amount}x</span>
         <span class="detail-recipe-name" onclick="openDetail('${id}')">${esc(DATA.reagents[id]?.name || id)}</span>
@@ -1445,12 +1446,12 @@ function openDetail(reagentId, pushHistory = true) {
     ).join('') + '</div>';
 
     const tempParts = [];
-    if (r.recipe.minTemp) tempParts.push(`Min: ${r.recipe.minTemp}K`);
-    if (r.recipe.maxTemp) tempParts.push(`Max: ${r.recipe.maxTemp}K`);
+    if (recipe.minTemp) tempParts.push(`Min: ${recipe.minTemp}K`);
+    if (recipe.maxTemp) tempParts.push(`Max: ${recipe.maxTemp}K`);
     if (tempParts.length) recipeHTML += `<div style="margin-top:6px;font-size:0.72rem;color:var(--accent-cyan)">${tempParts.join(' | ')}</div>`;
-    if (r.recipe.mixer && r.recipe.mixer.length) recipeHTML += `<div style="font-size:0.72rem;color:var(--accent-purple)">Mixer: ${r.recipe.mixer.join(', ')}</div>`;
+    if (recipe.mixer && recipe.mixer.length) recipeHTML += `<div style="font-size:0.72rem;color:var(--accent-purple)">Mixer: ${recipe.mixer.join(', ')}</div>`;
 
-    const products = Object.entries(r.recipe.products).map(([id, amt]) => `${amt}x ${DATA.reagents[id]?.name || id}`).join(', ');
+    const products = Object.entries(recipe.products).map(([id, amt]) => `${amt}x ${DATA.reagents[id]?.name || id}`).join(', ');
     recipeHTML += `<div style="margin-top:6px;font-size:0.72rem;color:var(--accent-green)">Produces: ${products}</div>`;
   }
 
@@ -1508,8 +1509,8 @@ function openDetail(reagentId, pushHistory = true) {
 
     <div class="detail-section">
       <h4>Recipe${(() => {
-        const altCount = Object.values(DATA.reactions).filter(rx => rx.products[reagentId]).length;
-        return altCount > 1 ? ` <span style="color:var(--amber);font-size:0.55rem;font-weight:400">(+${altCount - 1} alt recipe${altCount > 2 ? 's' : ''})</span>` : '';
+        const altCount = getFilteredReactions(reagentId).length;
+        return stepForkBadge(recipe) + (altCount > 1 ? ` <span style="color:var(--amber);font-size:0.55rem;font-weight:400">(+${altCount - 1} alt recipe${altCount > 2 ? 's' : ''})</span>` : '');
       })()}</h4>
       ${recipeHTML}
     </div>
@@ -1972,23 +1973,77 @@ function renderHealResults() {
 // Craft Trees
 // ─────────────────────────────────────────────
 
-// Returns reactions producing reagentId, filtered by activeSource.
-// Fork-specific reactions are sorted first so rxns[0] picks the best match.
+// Producers of reagentId visible under activeSource, best first. rxns[0] is
+// what the calculator, the batch plan, the craft trees, "Fewest Steps" and the
+// detail panel call "the recipe", so this order is the product decision
+// (Discord report 2026-07-31, audit 2026-09-11 D1/C2, ROADMAP Q2):
+//   1. a reaction that eats as much of the target as it makes is not a recipe
+//      for it (Monolith FentanylSolidification: 1 Tricordrazine in, 1 out) —
+//      dropped, not demoted, so no mode ever plans 120 runs of it;
+//   2. a reaction named after the target, or whose only product is the target,
+//      beats one where the target is a byproduct or a centrifuge breakdown
+//      (ADT Omnizine → 4 chems, Goob Fentanyl → SpaceGlue) — ahead of lineage,
+//      because a fork's side effect is still not that fork's recipe;
+//   3. closest lineage: the fork on screen, its parents, then vanilla; under
+//      "All" the reagent's own fork, then vanilla, then everyone else. The old
+//      "All" branch returned data order, i.e. alphabetical id, which is why
+//      ADT… and Fentanyl… beat Diphenhydramine and Tricordrazine;
+//   4. the reaction the extractor picked as r.recipe, so the panel's Recipe
+//      and the tree under it agree;
+//   5. fewer reactants. Ties keep data order (sort is stable).
 function getFilteredReactions(reagentId) {
-  let rxns = Object.values(DATA.reactions).filter(rx => rx.products[reagentId]);
-  if (activeSource === 'all') return rxns;
-
-  if (activeSource === 'vanilla') {
-    return rxns.filter(rx => rx.source === 'vanilla');
+  const r = DATA.reagents[reagentId];
+  const mode = activeSource;
+  const chain = (mode === 'all' || mode === 'vanilla') ? null : forkChain(mode);
+  const rxns = [];
+  for (const rx of Object.values(DATA.reactions)) {
+    const out = rx.products[reagentId];
+    if (!out) continue;
+    if (mode === 'vanilla' ? rx.source !== 'vanilla' : (chain && !forkVisible(rx, mode))) continue;
+    const back = rx.reactants[reagentId];
+    if (back && !back.catalyst && back.amount >= out) continue;                        // 1
+    rxns.push(rx);
   }
+  const lineage = rx => {
+    if (chain) return rx.source === 'vanilla' ? chain.length : chain.indexOf(rx.source);
+    if (mode === 'all') return rx.source === (r && r.source) ? 0 : rx.source === 'vanilla' ? 1 : 2;
+    return 0;
+  };
+  const key = rx => [
+    (rx.id === reagentId || Object.keys(rx.products).length === 1) ? 0 : 1,          // 2
+    lineage(rx),                                                                      // 3
+    (r && r.recipe && sameRecipe(rx, r.recipe)) ? 0 : 1,                              // 4
+    Object.keys(rx.reactants).length,                                                 // 5
+  ];
+  return rxns
+    .map(rx => ({ rx, k: key(rx) }))
+    .sort((a, b) => { for (let i = 0; i < a.k.length; i++) { if (a.k[i] !== b.k[i]) return a.k[i] - b.k[i]; } return 0; })
+    .map(x => x.rx);
+}
 
-  const forkId = activeSource;
-  const chain = forkChain(forkId);
-  rxns = rxns.filter(rx => forkVisible(rx, forkId));
-  // Prefer the closest lineage match: self, then parent, ..., then vanilla
-  const rank = rx => rx.source === 'vanilla' ? chain.length : chain.indexOf(rx.source);
-  rxns.sort((a, b) => rank(a) - rank(b));
-  return rxns;
+// The extractor's r.recipe is a copy of one reaction's reactants and products;
+// equal on both means it is that reaction.
+function sameRecipe(rx, recipe) {
+  const same = (a, b, eq) => {
+    const ka = Object.keys(a || {}), kb = Object.keys(b || {});
+    return ka.length === kb.length && ka.every(k => k in b && eq(a[k], b[k]));
+  };
+  return same(rx.reactants, recipe.reactants, (x, y) => x.amount === y.amount && !!x.catalyst === !!y.catalyst)
+      && same(rx.products, recipe.products, (x, y) => x === y);
+}
+
+// The one reaction the app treats as the recipe under the current source, or
+// null. The detail panel shows this; the tree under it is built from it.
+function pickRecipe(reagentId) {
+  return getFilteredReactions(reagentId)[0] || null;
+}
+
+// A mixing step (or the panel's recipe) built from a fork's reaction says so —
+// the report that started Q2 was a chemist unable to tell a Monolith recipe
+// from a vanilla one.
+function stepForkBadge(step) {
+  const meta = step && step.source && step.source !== 'vanilla' ? DATA.meta?.forks?.[step.source] : null;
+  return meta ? ` <span class="badge badge-fork" style="border-color:${meta.color}">${esc(meta.name)}</span>` : '';
 }
 
 function buildCraftTree(reagentId, amount, visited = new Set()) {
@@ -2263,6 +2318,7 @@ function calculateIngredients(targetId, targetAmount) {
         id, amount: Math.round(info.amount * runs * 100) / 100, catalyst: info.catalyst || false,
       })),
       minTemp: rxn.minTemp, maxTemp: rxn.maxTemp, mixer: rxn.mixer,
+      source: rxn.source, rxnId: rxn.id,
     });
 
     for (const [reactId, info] of Object.entries(rxn.reactants)) {
@@ -2298,6 +2354,7 @@ function renderCalcResults(targetId, amount, result) {
     if (step.minTemp) extra += `<span class="step-temp"> [&gt;${step.minTemp}K]</span>`;
     if (step.maxTemp) extra += `<span class="step-temp"> [&lt;${step.maxTemp}K]</span>`;
     if (step.mixer && step.mixer.length) extra += `<span class="step-mixer"> [${step.mixer.join(',')}]</span>`;
+    extra += stepForkBadge(step);
 
     return `<div class="step-item">
       <span class="step-num">${i + 1}.</span>
@@ -2743,6 +2800,7 @@ function renderBatchResults(result, div, warningsDiv) {
     let extra = '';
     if (step.minTemp) extra += `<span class="step-temp"> [&gt;${step.minTemp}K]</span>`;
     if (step.mixer?.length) extra += `<span class="step-mixer"> [${step.mixer.join(',')}]</span>`;
+    extra += stepForkBadge(step);
     return `<div class="step-item">
       <span class="step-num">${i + 1}.</span>
       ${esc(reactants)} &rarr; <strong>${Math.round(step.amount * 100) / 100}u ${esc(step.reagentId)}</strong>${extra}
