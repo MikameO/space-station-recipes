@@ -3294,6 +3294,18 @@ b.ord-bad { color: var(--red-alert); }
   font-size: 0.8rem; color: var(--text-sub); }
 .ord-fork-note b { color: var(--text-bright); }
 
+/* What the casing needs besides chemicals: trigger and, for a warhead, the
+   carrier that holds the propellant. Author display:flex beats the UA [hidden]
+   rule, so hidden is restated (style.css trap, see .ord-field[hidden]). */
+/* A plain text line, not a flex row. Under flex each text run between the <b>
+   labels is its own anonymous item, so a narrow column breaks the sentence at
+   every label instead of wrapping it as prose. */
+.ord-casing-req { display: block; line-height: 1.5;
+  border-left: 3px solid var(--border-active); padding: 5px 12px; margin: -2px 0 10px;
+  font-size: 0.78rem; color: var(--text-sub); }
+.ord-casing-req b { color: var(--text-bright); font-weight: 600; }
+.ord-casing-req[hidden] { display: none !important; }
+
 /* Ordnance: ready recipes and the target gallery */
 .ord-gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(118px, 1fr)); gap: 10px; }
 .ord-xeno { background: var(--panel-raised); border: 1px solid var(--border-subtle); padding: 8px 6px; text-align: center; }

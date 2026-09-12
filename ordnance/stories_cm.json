@@ -25,9 +25,15 @@
    "mode": "DualIgniter",
    "shards": 50,
    "star": true,
+   "tags": [
+    "RMCWarhead80"
+   ],
    "vol": 180.0
   },
   "RMC80mmMortarShell": {
+   "accepts": [
+    "RMCWarhead80"
+   ],
    "base": 75.0,
    "cone": 60.0,
    "fd": [
@@ -52,6 +58,9 @@
    "mode": "Any",
    "shards": 8,
    "star": true,
+   "tags": [
+    "RMCLaunchTube"
+   ],
    "vol": 60.0
   },
   "RMC80mmMortarWarhead": {
@@ -79,9 +88,15 @@
    "mode": "DualIgniter",
    "shards": 50,
    "star": true,
+   "tags": [
+    "RMCWarhead80"
+   ],
    "vol": 240.0
   },
   "RMC88mmRocketTube": {
+   "accepts": [
+    "RMCWarhead88"
+   ],
    "base": 75.0,
    "cone": 60.0,
    "fd": [
@@ -106,6 +121,9 @@
    "mode": "Any",
    "shards": 8,
    "star": false,
+   "tags": [
+    "RMCLaunchTube"
+   ],
    "vol": 60.0
   },
   "RMC88mmRocketWarhead": {
@@ -133,6 +151,9 @@
    "mode": "DualIgniter",
    "shards": 20,
    "star": false,
+   "tags": [
+    "RMCWarhead88"
+   ],
    "vol": 180.0
   },
   "RMCC4PlasticCasing": {

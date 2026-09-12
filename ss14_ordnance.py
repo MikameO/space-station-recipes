@@ -225,6 +225,10 @@ def parse_reagents(files: dict[str, str]) -> dict[str, dict]:
     return protos
 
 
+def _tag_list(raw: str) -> list[str]:
+    return [t.strip().strip("\"'") for t in raw.split(",") if t.strip()]
+
+
 def parse_casings(files: dict[str, str]) -> dict[str, dict]:
     protos = {}
     for path, text in files.items():
@@ -238,6 +242,17 @@ def parse_casings(files: dict[str, str]) -> dict[str, dict]:
             # decides whether it can breach.
             if re.search(r"^\s+- type: Sticky\s*$", block, re.M):
                 own["sticky"] = True
+            # A warhead is inert on its own: it has to sit in the shell or tube
+            # that carries it, and the only link between the two is a tag the
+            # carrier's warhead slot whitelists. Without it the tab can never
+            # tell a player which propellant the thing they just filled needs.
+            tags = re.search(r"^\s+- type: Tag\s*\n\s+tags:\s*\[([^\]]*)\]", block, re.M)
+            if tags:
+                own["tags"] = _tag_list(tags.group(1))
+            slot = re.search(r"^\s+warhead_slot:\s*\n(?:.*\n)*?\s+tags:\s*\[([^\]]*)\]",
+                             block, re.M)
+            if slot:
+                own["accepts"] = _tag_list(slot.group(1))
             comp = block[block.index("OrdnanceCasing"):]
             comp = re.split(r"\n  - type: ", comp)[0]
             for yml, key in _CASING_FIELDS.items():
@@ -1523,6 +1538,8 @@ def build(fork_id: str, fconf: dict, fetch) -> dict:
             "star": bool(merged["star"]), "mode": merged["mode"],
             "cone": merged.get("dualCone") or merged["cone"],
             "fuel": merged.get("fuel"), "fuelAmount": merged.get("fuelAmount"),
+            **({"tags": merged["tags"]} if merged.get("tags") else {}),
+            **({"accepts": merged["accepts"]} if merged.get("accepts") else {}),
         }
 
     target_files = fetch(conf.get("target_files", []), url, f"{fork_id}_ordnance")

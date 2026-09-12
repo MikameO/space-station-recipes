@@ -22,6 +22,17 @@
     RMCM20MineCasing: 'M20 mine', RMCC4PlasticCasing: 'C4 charge',
     RMC88mmRocketWarhead: '84mm rocket warhead', RMC80mmMortarWarhead: '80mm mortar warhead',
     RMC80mmMortarCameraWarhead: '80mm mortar camera warhead',
+    RMC80mmMortarShell: '80mm mortar shell', RMC88mmRocketTube: '84mm rocket tube',
+  };
+  // SharedOrdnanceCasingSystem, the switch on RequiredAssemblyMode. A casing
+  // that fails it simply refuses the trigger, so this is the difference between
+  // a shell and a dud in your hands.
+  const ASSEMBLY = {
+    TimerIgniter: 'a timer and one igniter',
+    DualIgniter: 'two igniters',
+    Plastic: 'a timer, proximity sensor or signaller, plus one igniter',
+    Mine: 'a proximity sensor and one igniter, or two igniters',
+    Any: 'any trigger',
   };
   const METRICS = {
     power: { label: 'Power', get: s => s.power },
@@ -101,6 +112,18 @@
     'ceiling': 'потолок',
     'at casing ceiling': 'на потолке корпуса',
     'at floor': 'на нижнем пределе',
+    'Trigger': 'Взрыватель',
+    'Carrier': 'Носитель',
+    'a timer and one igniter': 'таймер и один воспламенитель',
+    'two igniters': 'два воспламенителя',
+    'a timer, proximity sensor or signaller, plus one igniter':
+      'таймер, датчик движения или сигналлер и один воспламенитель',
+    'a proximity sensor and one igniter, or two igniters':
+      'датчик движения и один воспламенитель либо два воспламенителя',
+    'any trigger': 'любой взрыватель',
+    'in the tail, separate from the mixture': 'в хвост, отдельно от смеси',
+    '80mm mortar shell': '80-мм миномётный снаряд',
+    '84mm rocket tube': '84-мм ракетная труба',
     'cap': 'предел',
     'at casing cap': 'на пределе корпуса',
     'star — rays': 'звезда — лучи',
@@ -733,8 +756,43 @@
 
   // ── render ─────────────────────────────────────────────────────────────────
   function renderAll() {
+    renderCasingReq();
     renderMix(); renderStats(); syncChartControls(); renderChart(); renderHeat();
     renderCatalogue(); renderGallery(); renderMarines(); renderPlan();
+  }
+
+  // What the casing needs besides chemicals. A warhead holds no trigger of its
+  // own and no propellant: both live in the shell or tube it is seated in, and
+  // a player who fills one without knowing that is holding an inert lump or,
+  // worse, sets it off in the workshop.
+  function carrierOf(id) {
+    const own = (S.data.casings[id] || {}).tags || [];
+    if (!own.length) return null;
+    for (const cid in S.data.casings) {
+      const accepts = S.data.casings[cid].accepts;
+      if (accepts && accepts.some(t => own.includes(t))) return cid;
+    }
+    return null;
+  }
+
+  function renderCasingReq() {
+    const box = $('ordCasingReq');
+    if (!box) return;
+    const c = casingOf();
+    const parts = [];
+    const mode = ASSEMBLY[c.mode];
+    if (mode) parts.push(`<b>${esc(tr('Trigger'))}:</b> ${esc(tr(mode))}`);
+    const carrier = carrierOf(S.casing);
+    if (carrier) {
+      const cc = S.data.casings[carrier];
+      let line = `<b>${esc(tr('Carrier'))}:</b> ${esc(tr(CASING_LABEL[carrier] || carrier))}`;
+      if (cc.fuel && cc.fuelAmount)
+        line += ` — ${cc.fuelAmount}u ${esc(rname(cc.fuel))}, `
+          + esc(tr('in the tail, separate from the mixture'));
+      parts.push(line);
+    }
+    box.innerHTML = parts.join(' · ');
+    box.hidden = !parts.length;
   }
 
   function renderMix() {
