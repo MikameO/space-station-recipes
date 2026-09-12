@@ -822,14 +822,14 @@ def metabolism_rate(metabolisms: dict):
 # plantMetabolism is a top-level reagent field (not under metabolisms), so the
 # effect summarizer above never sees it. Each entry becomes a structured chip:
 # {kind, label, text, group, tone, amount?, probability?}.
-#   group — UI filter bucket: care / yield / mutation / weedpest / harm / special
+#   group — UI filter bucket: care / health / yield / mutation / weedpest / harm / special
 #   tone  — chip color: good (helps the plant), bad (hurts it), neutral (mutagenic)
 
 # kind -> (short label, default group). Group may be overridden by sign logic.
 _PLANT_EFFECT_META = {
     "PlantAdjustNutrition":     ("Nutrition", "care"),
     "PlantAdjustWater":         ("Water", "care"),
-    "PlantAdjustHealth":        ("Plant health", "care"),
+    "PlantAdjustHealth":        ("Plant health", "health"),
     "PlantAffectGrowth":        ("Growth", "care"),
     "PlantCryoxadone":          ("De-ages plant", "care"),
     "PlantAdjustPotency":       ("Potency", "yield"),
@@ -910,6 +910,12 @@ def summarize_plant_effects(reagent: dict) -> list[dict]:
         # Weed/pest KILLERS are the useful gardening direction — keep them in
         # the weedpest filter bucket; weed/pest GROWERS belong with harmful.
         if kind in ("PlantAdjustWeeds", "PlantAdjustPests") and sign > 0:
+            group = "harm"
+        # Plant health splits the same way: a positive adjust is plant
+        # medicine, a negative one is plant poison. Without the split the
+        # "care" bucket was 145 poisons to 26 healers — useless for the
+        # "what do I feed a dying plant" question it is meant to answer.
+        if kind == "PlantAdjustHealth" and sign < 0:
             group = "harm"
 
         text = label

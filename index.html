@@ -72,7 +72,7 @@
   "license": "https://github.com/MikameO/space-station-recipes/blob/main/LICENSE"
 }
 </script>
-<link rel="stylesheet" href="style.css?v=60">
+<link rel="stylesheet" href="style.css?v=61">
 <!-- Yandex.Metrika counter -->
 <script type="text/javascript">
     (function(m,e,t,r,i,k,a){
@@ -340,6 +340,34 @@
         <span class="plant-chip plant-bad">red hurts it</span>
         <span class="plant-chip plant-neutral">purple mutates</span>
         — the global search and Source filter apply here too.</p>
+      <div class="botany-filter-chips" id="botanyFilterChips" role="group" aria-label="Filter by plant effect kind">
+        <button class="diff-chip" data-group="care" aria-pressed="false">Growth &amp; Care</button>
+        <button class="diff-chip" data-group="health" aria-pressed="false">Plant Healing</button>
+        <button class="diff-chip" data-group="yield" aria-pressed="false">Potency &amp; Yield</button>
+        <button class="diff-chip" data-group="mutation" aria-pressed="false">Mutation</button>
+        <button class="diff-chip" data-group="weedpest" aria-pressed="false">Weed &amp; Pest Killers</button>
+        <button class="diff-chip" data-group="harm" aria-pressed="false">Harmful</button>
+        <button class="diff-chip" data-group="special" aria-pressed="false">Special</button>
+        <button class="diff-chip active" id="botanyGenericToggle" aria-pressed="true" title="Nearly every drink and food waters or feeds a plant a little (inherited from the base drink prototype). Hidden by default so real fertilizers and weedkillers stand out.">hide generic drink/food hydration</button>
+      </div>
+
+      <!-- P2: value-range rows. The chips answer "does it mutate?"; the rows
+           answer "does it mutate by at least 1 while leaving the plant alive?".
+           Collapsed by default — ten rows would otherwise push the chemical
+           grid off-screen, which is the very problem P1 fixes. -->
+      <div class="filter-section botany-ranges collapsed" data-collapsible data-collapse-key="botanyRanges">
+        <h3>Value ranges
+          <button class="btn-small" id="botanyRangeReset">Clear</button>
+          <span class="section-chevron">&#9660;</span>
+        </h3>
+        <div class="section-body">
+          <p class="brange-hint">Tick an effect to constrain its value. Carrying no effect of that kind counts as 0, so "plant health ≥ 0" also admits chemicals that leave the plant alone. Several ticked effects must all match — that is how you ask for a mutagen that does not poison the plant.</p>
+          <div id="botanyRangeRows"></div>
+        </div>
+      </div>
+
+      <div class="reagent-grid" id="botanyGrid"></div>
+
       <!-- D1: plant evolution (mutation graph) + curated swab guide -->
       <div class="batch-section" data-collapsible data-collapse-key="evolution">
         <h3 class="reverse-title">
@@ -353,16 +381,6 @@
         </div>
       </div>
 
-      <div class="botany-filter-chips" id="botanyFilterChips" role="group" aria-label="Filter by plant effect kind">
-        <button class="diff-chip" data-group="care" aria-pressed="false">Growth &amp; Care</button>
-        <button class="diff-chip" data-group="yield" aria-pressed="false">Potency &amp; Yield</button>
-        <button class="diff-chip" data-group="mutation" aria-pressed="false">Mutation</button>
-        <button class="diff-chip" data-group="weedpest" aria-pressed="false">Weed &amp; Pest Killers</button>
-        <button class="diff-chip" data-group="harm" aria-pressed="false">Harmful</button>
-        <button class="diff-chip" data-group="special" aria-pressed="false">Special</button>
-        <button class="diff-chip active" id="botanyGenericToggle" aria-pressed="true" title="Nearly every drink and food waters or feeds a plant a little (inherited from the base drink prototype). Hidden by default so real fertilizers and weedkillers stand out.">hide generic drink/food hydration</button>
-      </div>
-      <div class="reagent-grid" id="botanyGrid"></div>
     </div>
 
     <!-- Antag Tab (visible only in Antag Mode) -->
@@ -776,8 +794,8 @@
 </div>
 
 <!-- i18n.js must load BEFORE app.js: it exposes applyRussianData for init() -->
-<script src="i18n.js?v=30"></script>
-<script src="app.js?v=33"></script>
+<script src="i18n.js?v=31"></script>
+<script src="app.js?v=34"></script>
 <script defer src="tutorial.js?v=3"></script>
 <script src="maps.js?v=16" defer></script>
 <script src="ordnance.js?v=48" defer></script>

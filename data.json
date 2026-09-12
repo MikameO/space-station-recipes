@@ -1,7 +1,7 @@
 {
  "meta": {
   "schemaVersion": "3.10.0",
-  "generated": "2026-09-10T18:26:36",
+  "generated": "2026-09-12T09:00:32",
   "forks": {
    "vanilla": {
     "name": "Vanilla SS14",
@@ -223,7 +223,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -0.1",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -0.1
     }
@@ -2848,7 +2848,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -5",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -5
     }
@@ -3016,7 +3016,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -5",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -5
     }
@@ -3098,7 +3098,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -10",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -10
     }
@@ -3177,7 +3177,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -5",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -5
     }
@@ -6964,7 +6964,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -8",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -8
     }
@@ -9179,7 +9179,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health +0.5",
-     "group": "care",
+     "group": "health",
      "tone": "good",
      "amount": 0.5
     }
@@ -9320,7 +9320,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -20",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -20
     }
@@ -9394,7 +9394,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health +0.5",
-     "group": "care",
+     "group": "health",
      "tone": "good",
      "amount": 0.5
     }
@@ -10477,7 +10477,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -10",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -10
     }
@@ -11707,7 +11707,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -5",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -5
     }
@@ -17677,7 +17677,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health +5",
-     "group": "care",
+     "group": "health",
      "tone": "good",
      "amount": 5
     },
@@ -17767,7 +17767,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health +5",
-     "group": "care",
+     "group": "health",
      "tone": "good",
      "amount": 5
     },
@@ -18068,7 +18068,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health +1",
-     "group": "care",
+     "group": "health",
      "tone": "good",
      "amount": 1
     }
@@ -18307,7 +18307,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health +1",
-     "group": "care",
+     "group": "health",
      "tone": "good",
      "amount": 1
     }
@@ -18645,7 +18645,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -0.1",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -0.1
     }
@@ -18711,7 +18711,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -0.1",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -0.1
     }
@@ -18777,7 +18777,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -0.1",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -0.1
     }
@@ -18843,7 +18843,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -0.1",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -0.1
     }
@@ -18909,7 +18909,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -0.1",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -0.1
     }
@@ -18975,7 +18975,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -0.1",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -0.1
     }
@@ -19041,7 +19041,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -0.1",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -0.1
     }
@@ -19107,7 +19107,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -0.1",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -0.1
     }
@@ -19173,7 +19173,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -0.1",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -0.1
     }
@@ -19239,7 +19239,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -0.1",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -0.1
     }
@@ -20911,7 +20911,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -50",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -50
     }
@@ -21451,7 +21451,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -5",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -5
     }
@@ -21804,7 +21804,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -5",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -5
     }
@@ -22395,7 +22395,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -0.1",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -0.1
     }
@@ -22486,7 +22486,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -0.1",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -0.1
     }
@@ -23091,7 +23091,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -1",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -1
     }
@@ -23187,7 +23187,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -2",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -2
     }
@@ -23932,7 +23932,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health +0.75",
-     "group": "care",
+     "group": "health",
      "tone": "good",
      "amount": 0.75
     }
@@ -24778,7 +24778,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -0.1",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -0.1
     }
@@ -24850,7 +24850,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -0.1",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -0.1
     }
@@ -26473,7 +26473,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health +5",
-     "group": "care",
+     "group": "health",
      "tone": "good",
      "amount": 5
     },
@@ -26908,7 +26908,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -2",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -2
     }
@@ -28664,7 +28664,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health +0.1",
-     "group": "care",
+     "group": "health",
      "tone": "good",
      "amount": 0.1
     },
@@ -29363,7 +29363,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -0.1",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -0.1
     }
@@ -29488,7 +29488,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -0.1",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -0.1
     }
@@ -29576,7 +29576,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -0.1",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -0.1
     }
@@ -29650,7 +29650,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -0.1",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -0.1
     }
@@ -30015,7 +30015,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health +1",
-     "group": "care",
+     "group": "health",
      "tone": "good",
      "amount": 1
     }
@@ -30222,7 +30222,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -2",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -2
     }
@@ -30715,7 +30715,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health +0.1",
-     "group": "care",
+     "group": "health",
      "tone": "good",
      "amount": 0.1
     },
@@ -30960,7 +30960,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -0.1",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -0.1
     }
@@ -31037,7 +31037,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -0.1",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -0.1
     }
@@ -32431,7 +32431,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -5",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -5
     }
@@ -33596,7 +33596,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health +0.1",
-     "group": "care",
+     "group": "health",
      "tone": "good",
      "amount": 0.1
     },
@@ -33894,7 +33894,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -5",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -5
     }
@@ -34328,7 +34328,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health +0.5",
-     "group": "care",
+     "group": "health",
      "tone": "good",
      "amount": 0.5
     }
@@ -34463,7 +34463,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -2",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -2
     }
@@ -34714,7 +34714,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -2",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -2
     }
@@ -34793,7 +34793,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -2",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -2
     }
@@ -35070,7 +35070,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -0.1",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -0.1
     }
@@ -35146,7 +35146,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -0.1",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -0.1
     }
@@ -35664,7 +35664,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -1.5",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -1.5
     }
@@ -35886,7 +35886,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -20",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -20
     }
@@ -36726,7 +36726,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -0.1",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -0.1
     }
@@ -37385,7 +37385,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health +1.5",
-     "group": "care",
+     "group": "health",
      "tone": "good",
      "amount": 1.5
     }
@@ -37746,7 +37746,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -0.1",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -0.1
     }
@@ -38605,7 +38605,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -10",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -10
     }
@@ -38684,7 +38684,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -8",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -8
     }
@@ -38965,7 +38965,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health +0.1",
-     "group": "care",
+     "group": "health",
      "tone": "good",
      "amount": 0.1
     }
@@ -39655,7 +39655,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health +0.75",
-     "group": "care",
+     "group": "health",
      "tone": "good",
      "amount": 0.75
     }
@@ -40077,7 +40077,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -10",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -10
     }
@@ -40314,7 +40314,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -0.1",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -0.1
     }
@@ -43434,7 +43434,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -0.1",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -0.1
     }
@@ -46090,7 +46090,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -0.75",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -0.75
     }
@@ -46464,7 +46464,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -0.5",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -0.5
     },
@@ -46641,7 +46641,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -0.1",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -0.1
     }
@@ -46787,7 +46787,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -0.1",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -0.1
     }
@@ -47425,7 +47425,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -5",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -5
     }
@@ -49539,7 +49539,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -0.1",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -0.1
     }
@@ -50397,7 +50397,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -1",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -1
     }
@@ -51594,7 +51594,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -10",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -10
     }
@@ -52072,7 +52072,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -2",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -2
     }
@@ -52492,7 +52492,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health +10",
-     "group": "care",
+     "group": "health",
      "tone": "good",
      "amount": 10
     }
@@ -53673,7 +53673,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -1.5",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -1.5
     },
@@ -54182,7 +54182,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -5",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -5
     }
@@ -54874,7 +54874,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -2",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -2
     }
@@ -55195,7 +55195,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health +5",
-     "group": "care",
+     "group": "health",
      "tone": "good",
      "amount": 5
     },
@@ -55752,7 +55752,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -5",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -5
     }
@@ -55874,7 +55874,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -5",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -5
     }
@@ -56011,7 +56011,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -5",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -5
     }
@@ -56106,7 +56106,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -2",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -2
     },
@@ -56710,7 +56710,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -0.1",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -0.1
     }
@@ -56783,7 +56783,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -0.1",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -0.1
     }
@@ -56857,7 +56857,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -0.1",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -0.1
     }
@@ -56929,7 +56929,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -0.1",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -0.1
     }
@@ -57003,7 +57003,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -0.1",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -0.1
     }
@@ -57077,7 +57077,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -0.1",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -0.1
     }
@@ -57154,7 +57154,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -0.1",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -0.1
     }
@@ -57231,7 +57231,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -0.1",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -0.1
     }
@@ -57308,7 +57308,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -0.1",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -0.1
     }
@@ -57380,7 +57380,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -0.1",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -0.1
     }
@@ -57452,7 +57452,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -0.1",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -0.1
     }
@@ -57579,7 +57579,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health +0.75",
-     "group": "care",
+     "group": "health",
      "tone": "good",
      "amount": 0.75
     }
@@ -57632,7 +57632,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health +0.75",
-     "group": "care",
+     "group": "health",
      "tone": "good",
      "amount": 0.75
     }
@@ -58580,7 +58580,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -8",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -8
     }
@@ -59957,7 +59957,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -2",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -2
     }
@@ -60998,7 +60998,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -20",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -20
     },
@@ -61407,7 +61407,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -8",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -8
     }
@@ -63193,7 +63193,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health +0.75",
-     "group": "care",
+     "group": "health",
      "tone": "good",
      "amount": 0.75
     }
@@ -63453,7 +63453,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -0.1",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -0.1
     }
@@ -63532,7 +63532,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -0.1",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -0.1
     }
@@ -64002,7 +64002,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -2",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -2
     }
@@ -64094,7 +64094,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -2",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -2
     }
@@ -64289,7 +64289,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -2",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -2
     }
@@ -65277,7 +65277,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -2",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -2
     }
@@ -66353,7 +66353,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -2",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -2
     }
@@ -66683,7 +66683,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -2",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -2
     }
@@ -66761,7 +66761,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -2",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -2
     }
@@ -66835,7 +66835,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -2",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -2
     }
@@ -66886,7 +66886,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -2",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -2
     }
@@ -66956,7 +66956,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -2",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -2
     }
@@ -67026,7 +67026,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -2",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -2
     }
@@ -67100,7 +67100,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -2",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -2
     }
@@ -67151,7 +67151,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -2",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -2
     }
@@ -67202,7 +67202,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -2",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -2
     }
@@ -67382,7 +67382,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -2",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -2
     }
@@ -67708,7 +67708,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -2",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -2
     }
@@ -68060,7 +68060,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -2",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -2
     }
@@ -68129,7 +68129,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -1.5",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -1.5
     },
@@ -68955,7 +68955,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -2",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -2
     }
@@ -69468,7 +69468,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -1.5",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -1.5
     },
@@ -69736,7 +69736,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -1.5",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -1.5
     },
@@ -69875,7 +69875,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -5",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -5
     },
@@ -71004,7 +71004,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -0.1",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -0.1
     }
@@ -71089,7 +71089,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -0.1",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -0.1
     }
@@ -71490,7 +71490,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -0.1",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -0.1
     }
@@ -72090,7 +72090,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -10",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -10
     }
@@ -72243,7 +72243,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health +0.8",
-     "group": "care",
+     "group": "health",
      "tone": "good",
      "amount": 0.8
     },
@@ -72924,7 +72924,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -2",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -2
     },
@@ -73322,7 +73322,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -0.1",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -0.1
     }
@@ -73395,7 +73395,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -0.1",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -0.1
     }
@@ -73551,7 +73551,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -0.1",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -0.1
     }
@@ -73678,7 +73678,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -1",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -1
     }
@@ -74258,7 +74258,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -20",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -20
     }
@@ -75424,7 +75424,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -0.1",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -0.1
     }
@@ -75498,7 +75498,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -0.1",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -0.1
     }
@@ -76149,7 +76149,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -0.1",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -0.1
     }
@@ -76223,7 +76223,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -0.1",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -0.1
     }
@@ -76294,7 +76294,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -0.1",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -0.1
     }
@@ -76374,7 +76374,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -0.1",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -0.1
     }
@@ -76880,7 +76880,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -0.1",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -0.1
     }
@@ -76954,7 +76954,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -0.1",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -0.1
     }
@@ -77108,7 +77108,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -0.1",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -0.1
     }
@@ -77300,7 +77300,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health +3",
-     "group": "care",
+     "group": "health",
      "tone": "good",
      "amount": 3
     }
@@ -77647,7 +77647,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -20",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -20
     }
@@ -77735,7 +77735,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -20",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -20
     }
@@ -78130,7 +78130,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -5",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -5
     }
@@ -78221,7 +78221,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -0.1",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -0.1
     }
@@ -78957,7 +78957,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health +8",
-     "group": "care",
+     "group": "health",
      "tone": "good",
      "amount": 8
     }
@@ -79007,7 +79007,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health +10",
-     "group": "care",
+     "group": "health",
      "tone": "good",
      "amount": 10
     }
@@ -79277,7 +79277,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -1",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -1
     }
@@ -79387,7 +79387,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -2",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -2
     }
@@ -81836,7 +81836,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -2",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -2
     }
@@ -81963,7 +81963,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -0.1",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -0.1
     }
@@ -82633,7 +82633,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -5",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -5
     }
@@ -84304,7 +84304,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -0.1",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -0.1
     }
@@ -84657,7 +84657,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -1.5",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -1.5
     },
@@ -85213,7 +85213,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -0.1",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -0.1
     }
@@ -85288,7 +85288,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -0.1",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -0.1
     }
@@ -85363,7 +85363,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -0.1",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -0.1
     }
@@ -85433,7 +85433,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -0.1",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -0.1
     }
@@ -85627,7 +85627,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health +1.5",
-     "group": "care",
+     "group": "health",
      "tone": "good",
      "amount": 1.5
     }
@@ -86731,7 +86731,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -2",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -2
     }
@@ -86957,7 +86957,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -2",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -2
     }
@@ -88203,7 +88203,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -1.5",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -1.5
     },
@@ -88783,7 +88783,7 @@
      "kind": "PlantAdjustHealth",
      "label": "Plant health",
      "text": "Plant health -1.5",
-     "group": "care",
+     "group": "harm",
      "tone": "bad",
      "amount": -1.5
     },
@@ -99386,7 +99386,6 @@
    "impact": "Low",
    "forkStatus": {
     "rmc14": "blocked",
-    "rucm": "blocked",
     "stories_cm": "blocked",
     "goob": "modified",
     "starlight": "modified",
@@ -99504,7 +99503,6 @@
    "priority": -1,
    "forkStatus": {
     "rmc14": "blocked",
-    "rucm": "blocked",
     "stories_cm": "blocked",
     "goob": "modified",
     "starlight": "modified",

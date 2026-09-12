@@ -249,7 +249,9 @@ function filterReagents(query) {
     if (activeBaseType === 'crafted' && r.isBase) return false;
     if (activeTaste === 'tasteless' && r.flavor) return false;
     if (activeTaste === 'has-taste' && !r.flavor) return false;
-    if (activeCategories.size > 0 && !activeCategories.has(r.category)) return false;
+    // Botany also matches the secondary tag — see botanyTagged().
+    if (activeCategories.size > 0 && !activeCategories.has(r.category) &&
+        !(activeCategories.has('Botany') && botanyTagged(r))) return false;
     if (activeEffectTags.size > 0 && !(r.effectTags || []).some(t => activeEffectTags.has(t))) return false;
     if (tokens.length > 0) {
       return tokens.every(t => entry.text.includes(t));
@@ -316,6 +318,9 @@ function buildSidebar() {
   const counts = {};
   for (const r of Object.values(DATA.reagents)) {
     counts[r.category] = (counts[r.category] || 0) + 1;
+    // Plant-affecting chemicals count toward Botany too, matching what the
+    // filter actually returns.
+    if (r.category !== 'Botany' && botanyTagged(r)) counts.Botany = (counts.Botany || 0) + 1;
   }
 
   // Use getCatColor() instead of static map — it handles fork categories dynamically
@@ -375,9 +380,9 @@ function buildSidebar() {
     const h3 = section.querySelector('h3');
     if (!h3) return;
     const key = section.dataset.collapseKey;
-    if (key && sessionStorage.getItem('collapse:' + key) === '1') {
-      section.classList.add('collapsed');
-    }
+    const stored = key ? sessionStorage.getItem('collapse:' + key) : null;
+    if (stored === '1') section.classList.add('collapsed');
+    else if (stored === '0') section.classList.remove('collapsed');
     h3.addEventListener('click', (e) => {
       // Don't collapse when clicking nested controls
       if (e.target.closest('.btn-small, .hint-chip')) return;
@@ -563,7 +568,149 @@ function isGenericHydration(r) {
     r.plantEffects.every(pe => GENERIC_PLANT_KINDS.has(pe.kind));
 }
 
+// Secondary "Botany" membership for the Categories filter.
+// A reagent's category mirrors the game's own `group` field, so UnstableMutagen
+// is a Toxin and Radium an Element even though both are standard hydroponics
+// tools — only 18 of the 221 plant-affecting chemicals actually sit in the
+// Botany category. Rather than lie about the category, Botany matches a second
+// way: anything this tab would show. One rule, two surfaces, no drift.
+function botanyTagged(r) {
+  return !!(r.plantEffects && r.plantEffects.length) && !isGenericHydration(r);
+}
+
+// ── Value ranges ──
+// The group chips answer "does it mutate?"; these rows answer "does it mutate
+// by at least 1 while leaving the plant alive?". Only kinds carrying a numeric
+// `amount` get a row — the eight flag-only kinds (RobustHarvest,
+// PlantRemoveKudzu, ...) have nothing to range over and stay chip-only.
+// Order is the reading order of the question, not the data's frequency.
+const BOTANY_RANGE_KINDS = [
+  'PlantAdjustMutationLevel', 'PlantAdjustHealth', 'PlantAdjustNutrition',
+  'PlantAdjustWater', 'PlantAdjustToxins', 'PlantAdjustWeeds',
+  'PlantAdjustPests', 'PlantAdjustMutationMod', 'PlantAdjustPotency',
+  'PlantAffectGrowth',
+];
+// kind -> {min, max, label}. Computed once over the whole dataset so the bounds
+// never shift under the user while they narrow a search.
+let botanyRangeBounds = {};
+// kind -> {min, max}, engaged rows only. Rows AND together (and with the chips).
+let botanyRanges = {};
+
+function computeBotanyRangeBounds() {
+  const acc = {};
+  for (const r of Object.values(DATA.reagents)) {
+    for (const pe of r.plantEffects || []) {
+      const amt = Number(pe.amount);
+      if (!Number.isFinite(amt)) continue;
+      const b = acc[pe.kind] || (acc[pe.kind] = { min: amt, max: amt, label: pe.label });
+      if (amt < b.min) b.min = amt;
+      if (amt > b.max) b.max = amt;
+    }
+  }
+  botanyRangeBounds = acc;
+}
+
+function botanyRangeRowsHTML() {
+  return BOTANY_RANGE_KINDS.filter(k => botanyRangeBounds[k]).map(kind => {
+    const b = botanyRangeBounds[kind];
+    const on = botanyRanges[kind];
+    // A kind with one distinct value (PlantAffectGrowth is always +1) has no
+    // range to pick — the tick alone still means "must have this effect".
+    const fixed = b.min === b.max;
+    const lo = on ? on.min : b.min;
+    const hi = on ? on.max : b.max;
+    return `<div class="brange-row${on ? ' active' : ''}" data-kind="${kind}">
+      <label class="brange-toggle">
+        <input type="checkbox" class="brange-on"${on ? ' checked' : ''}>
+        <span class="brange-label">${esc(b.label)}</span>
+      </label>
+      ${fixed
+        ? `<span class="brange-fixed">= ${b.min}</span>`
+        : `<span class="brange-inputs">
+            <span class="brange-cap">≥</span>
+            <input type="number" class="brange-min" value="${lo}" step="any" aria-label="${esc(b.label)} minimum">
+            <span class="brange-cap">≤</span>
+            <input type="number" class="brange-max" value="${hi}" step="any" aria-label="${esc(b.label)} maximum">
+          </span>`}
+      <span class="brange-bounds" title="Range present in the data">${b.min} \u2026 ${b.max}</span>
+    </div>`;
+  }).join('');
+}
+
+function syncBotanyRangeRow(row) {
+  const kind = row.dataset.kind;
+  const on = row.querySelector('.brange-on').checked;
+  row.classList.toggle('active', on);
+  if (!on) { delete botanyRanges[kind]; return; }
+  const b = botanyRangeBounds[kind];
+  const minEl = row.querySelector('.brange-min');
+  const maxEl = row.querySelector('.brange-max');
+  // Blank or half-typed input ("-") falls back to the data bound, so the grid
+  // never blanks out mid-keystroke.
+  const min = minEl ? Number(minEl.value) : NaN;
+  const max = maxEl ? Number(maxEl.value) : NaN;
+  botanyRanges[kind] = {
+    min: Number.isFinite(min) ? min : b.min,
+    max: Number.isFinite(max) ? max : b.max,
+  };
+}
+
+function matchesBotanyRanges(r) {
+  for (const kind in botanyRanges) {
+    const { min, max } = botanyRanges[kind];
+    const amounts = (r.plantEffects || [])
+      .filter(pe => pe.kind === kind)
+      .map(pe => Number(pe.amount))
+      .filter(Number.isFinite);
+    // A plant effect is an ADJUSTMENT, so carrying none of this kind is an
+    // adjustment of zero. That one rule serves both readings of a row:
+    // "mutation level >= 1" still returns only real mutagens (absent = 0
+    // fails it), while "plant health >= 0" also admits chemicals that leave
+    // the plant alone — which is how you ask for a mutagen that does not
+    // poison it. Kinds whose data never crosses zero (mutation modifier,
+    // growth) therefore still read as plain "must have this effect".
+    if (!amounts.length) amounts.push(0);
+    if (!amounts.some(a => a >= min && a <= max)) return false;
+  }
+  return true;
+}
+
+function setupBotanyRanges() {
+  const host = document.getElementById('botanyRangeRows');
+  if (!host) return;
+  computeBotanyRangeBounds();
+  host.innerHTML = botanyRangeRowsHTML();
+
+  const rerender = () => renderBotany(document.getElementById('searchInput').value);
+  // Bound captions are ≥ / ≤ rather than words: unambiguous in every
+  // language, so they need no dictionary entry, and narrower on a phone.
+  // Checkbox on `change`, number fields on `input` — disjoint guards, so a
+  // single edit never fires the render twice.
+  host.addEventListener('change', (e) => {
+    if (!e.target.matches('.brange-on')) return;
+    syncBotanyRangeRow(e.target.closest('.brange-row'));
+    rerender();
+  });
+  host.addEventListener('input', (e) => {
+    if (!e.target.matches('.brange-min, .brange-max')) return;
+    const row = e.target.closest('.brange-row');
+    // Typing a bound is intent to use it — tick the row for the user.
+    const cb = row.querySelector('.brange-on');
+    if (!cb.checked) cb.checked = true;
+    syncBotanyRangeRow(row);
+    rerender();
+  });
+
+  const reset = document.getElementById('botanyRangeReset');
+  if (reset) reset.addEventListener('click', () => {
+    botanyRanges = {};
+    host.innerHTML = botanyRangeRowsHTML();
+    rerender();
+  });
+}
+
 function setupBotanyFilters() {
+  setupBotanyRanges();
   const bar = document.getElementById('botanyFilterChips');
   if (!bar) return;
   bar.addEventListener('click', (e) => {
@@ -680,6 +827,7 @@ function renderBotany(query = '') {
   if (botanyFilterGroups.size > 0) {
     entries = entries.filter(e => e.reagent.plantEffects.some(pe => botanyFilterGroups.has(pe.group)));
   }
+  entries = entries.filter(e => matchesBotanyRanges(e.reagent));
   entries.sort((a, b) => (a.reagent.name || a.reagent.id).localeCompare(b.reagent.name || b.reagent.id));
   document.getElementById('resultCount').textContent = `${entries.length} botany chemicals`;
 
@@ -886,6 +1034,10 @@ function renderEmptyReagentState(query, grid) {
   });
 }
 
+// The secondary Botany badge appears only while the Botany category filter is
+// on. It exists to answer "why is a Toxin in this list?", and that question is
+// only asked there — ~81 sodas carry a -0.1 plant-health tick, so showing it
+// unconditionally would paint the whole grid green for no information.
 function reagentCardHTML(r) {
   const recipe = r.recipe
     ? Object.entries(r.recipe.reactants).map(([id, info]) =>
@@ -902,6 +1054,7 @@ function reagentCardHTML(r) {
     </div>
     <div class="reagent-badges">
       <span class="badge badge-cat" style="border-left-color:${catColor}">${esc(r.category)}</span>
+      ${activeCategories.has('Botany') && r.category !== 'Botany' && botanyTagged(r) ? `<span class="badge badge-cat badge-botany-tag" style="border-left-color:${getCatColor('Botany')}" title="Affects plants in a hydroponics tray \u2014 also matches the Botany category filter">Botany</span>` : ''}
       ${r.isBase ? `<span class="badge badge-base">${r.isDispenser ? 'DISPENSER' : 'BASE'}</span>` : ''}
       ${(!r.recipe && (!r.obtainSources || r.obtainSources.length === 0) && !r.isDispenser) ? `<span class="badge badge-unobtainable" title="No recipe, no plant, no dispenser source \u2014 unobtainable in vanilla play">UNOBTAINABLE</span>` : ''}
       ${r.overdose ? `<span class="badge badge-od">OD ${r.overdose}u</span>` : ''}

@@ -2049,6 +2049,81 @@ body.antag-active .antag-toggle {
   display: flex; flex-wrap: wrap; gap: 4px;
   margin: 4px 0;
 }
+
+/* Value-range rows (series P). One row per plant effect kind that carries a
+   numeric amount; ticking a row makes it a required condition, and several
+   ticked rows AND together. Flex-wrap keeps the inputs on their own line at
+   375 px instead of overflowing horizontally. */
+.botany-ranges { margin-bottom: 14px; }
+.brange-hint {
+  font-size: 0.72rem; color: var(--text-sub);
+  margin: 0 0 8px; max-width: 62ch; line-height: 1.45;
+}
+/* Grid, not flex: the tick, the inputs and the data bounds line up in three
+   columns down the whole list instead of drifting with label length. The body
+   is width-capped so the inputs stay next to their label on a wide screen
+   rather than stranded at the far edge. */
+.botany-ranges .section-body { max-width: 640px; }
+.brange-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center; gap: 12px;
+  padding: 3px 6px; border: 1px solid transparent; border-radius: 2px;
+}
+.brange-row + .brange-row { margin-top: 2px; }
+.brange-row:hover { border-color: var(--border-subtle); }
+.brange-row.active {
+  background: rgba(34,197,94,0.08);
+  border-color: rgba(74,222,128,0.35);
+}
+.brange-toggle {
+  display: flex; align-items: center; gap: 6px;
+  min-width: 0; cursor: pointer;
+}
+.brange-label {
+  font-size: 0.74rem; color: var(--text-sub);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.brange-row.active .brange-label { color: #4ade80; }
+.brange-inputs { display: flex; align-items: center; gap: 5px; }
+.brange-cap {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.64rem; color: var(--text-sub); opacity: 0.75;
+}
+.brange-min, .brange-max {
+  width: 66px; padding: 3px 5px;
+  background: var(--panel); color: var(--text-main);
+  border: 1px solid var(--border-subtle); border-radius: 2px;
+  font-family: 'Share Tech Mono', monospace; font-size: 0.72rem;
+}
+.brange-min:focus, .brange-max:focus {
+  outline: none; border-color: var(--border-active);
+}
+.brange-fixed {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.72rem; color: var(--text-sub);
+}
+/* The span of values actually present in the data \u2014 the reason the inputs
+   start where they do. */
+.brange-bounds {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.64rem; color: var(--text-sub); opacity: 0.62;
+  white-space: nowrap; text-align: right; min-width: 8ch;
+}
+/* Under ~560 px the three columns no longer fit: the inputs drop to their own
+   row under the label and the data bounds sit beside them. */
+@media (max-width: 560px) {
+  .brange-row { grid-template-columns: minmax(0, 1fr) auto; }
+  .brange-toggle { grid-column: 1 / -1; }
+  .brange-inputs { grid-column: 1; }
+  .brange-fixed  { grid-column: 1; }
+  .brange-bounds { grid-column: 2; }
+  .brange-min, .brange-max { width: 60px; }
+}
+/* Secondary category badge: a Toxin or Element that the Botany filter also
+   returns, so the row explains itself instead of looking like a bug. */
+.badge-botany-tag { opacity: 0.85; }
+
 .plant-chip {
   display: inline-flex; align-items: center;
   padding: 1px 7px; border-radius: 1px;

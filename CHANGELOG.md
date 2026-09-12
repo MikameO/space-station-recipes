@@ -3,6 +3,41 @@
 `data.json` schema version is in `meta.schemaVersion`. Consumers reading this file
 should pin on a compatible range (semver: breaking changes bump major).
 
+## Series P — 2026-09-12 (Botany: plant-healing group, Botany as a second category, value ranges)
+
+**Data fix — `plantEffects.group`.** `PlantAdjustHealth` used to land in the
+`care` ("Growth & Care") bucket whatever its sign, so that filter was 145 plant
+poisons to 26 healers — useless for "what do I feed a dying plant". The
+extractor now splits it the way it already splits weeds and pests: a positive
+adjust is the new `health` group, a negative one is `harm`. Across the 1387
+reagents this touched exactly the 171 carrying `PlantAdjustHealth` and nothing
+else; `care` 1182 → 1011, `harm` 78 → 223, `health` 0 → 26. `data.json`
+schema is unchanged — `health` is a new value of an existing field, so a
+consumer that does not know it simply sees an unfamiliar group string.
+
+**Botany is now a second category, not a replacement.** A reagent's category
+mirrors the game's own `group` field, which is why Unstable Mutagen is a Toxin
+and Radium an Element — only 18 of the 221 plant-affecting chemicals sit in the
+Botany category upstream. Rather than diverge from the game, the Categories
+filter matches Botany a second way: any reagent the Botany tab would list. The
+category shown on the card stays the game's own, with a secondary Botany badge
+while that filter is active. Botany goes from 19 to 222 matches, and of the 649
+reagents with no plant effect at all, none leak in.
+
+**Botany tab — filters above the fold.** The effect chips and the chemical grid
+now sit above the Plant Evolution forest instead of below it. The forest renders
+expanded by default and is tall enough that every filter control was off-screen,
+which is why the Mutation chip went unfound. New chip: Plant Healing.
+
+**New — value ranges.** A collapsed panel under the chips carries one row per
+plant effect kind that has a numeric amount (10 of the 18 kinds; the eight
+flag-only kinds stay chip-only). Tick a row and set its bounds; several ticked
+rows must all match, which is how you ask for a mutagen that does not poison the
+plant. Because a plant effect is an *adjustment*, carrying none of a kind counts
+as zero — one rule that keeps "mutation level ≥ 1" to real mutagens while
+letting "plant health ≥ 0" admit chemicals that leave the plant alone. Bounds
+are computed once over the whole dataset, so they do not shift while filtering.
+
 ## Series G — 2026-09-11 (Document library: new page, new data folder)
 
 **New page:** `library.html` + `library.js` — in-game papers written by players
