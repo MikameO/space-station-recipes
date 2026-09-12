@@ -41,6 +41,17 @@ Clearing a bound drops that side of the inequality and the field shows the data
 bound as a placeholder with its glyph dimmed — `Number('')` is 0, not NaN, so
 the obvious finite-check silently pinned a cleared maximum to "≤ 0".
 
+**Ranges follow the Source filter.** The bounds are computed over the reagents
+the fork filter lets through, so a vanilla view no longer offers a range only a
+fork can reach: mutation level reads 0.6…1 on vanilla rather than −1…3 (the
+−1 is funky's Mutadone, the +3 trauma's UnstableCompound). Six of the ten kinds
+change between "all" and vanilla. A kind the selected fork has none of loses its
+row, and its constraint is dropped with it — otherwise the grid would keep
+filtering on a control that is no longer on screen. Fields are no longer
+prefilled: the bound lives in the placeholder, so grey means "this side is open,
+and it follows the fork" while black means "you typed this, and it survives the
+switch".
+
 **RU — plant effect chips.** The chips are composed at extract time as
 "<label> <signed amount>" (optionally a probability), so they could never be
 exact dictionary keys and stayed English on an otherwise Russian tab. Two regex

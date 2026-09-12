@@ -590,15 +590,23 @@ const BOTANY_RANGE_KINDS = [
   'PlantAdjustPests', 'PlantAdjustMutationMod', 'PlantAdjustPotency',
   'PlantAffectGrowth',
 ];
-// kind -> {min, max, label}. Computed once over the whole dataset so the bounds
-// never shift under the user while they narrow a search.
+// kind -> {min, max, label}, computed over the reagents the Source filter lets
+// through: a vanilla-only view should not offer a bound that only exists in a
+// fork. Recomputed when the source changes and at no other time — the bounds
+// must not shift while the user is narrowing a search within one fork.
 let botanyRangeBounds = {};
-// kind -> {min, max}, engaged rows only. Rows AND together (and with the chips).
+// kind -> {min, max}, where null on a side means that inequality is off.
+// This stores what the user asked for, NOT resolved numbers: a stored bound has
+// to survive a source switch without being mistaken for a leftover of the
+// previous dataset. Engaged rows only; rows AND together (and with the chips).
 let botanyRanges = {};
+// Which source botanyRangeBounds was built from, so the refresh is idempotent.
+let botanyRangeBoundsSource = null;
 
 function computeBotanyRangeBounds() {
   const acc = {};
   for (const r of Object.values(DATA.reagents)) {
+    if (!reagentInActiveFork(r)) continue;
     for (const pe of r.plantEffects || []) {
       const amt = Number(pe.amount);
       if (!Number.isFinite(amt)) continue;
@@ -608,6 +616,21 @@ function computeBotanyRangeBounds() {
     }
   }
   botanyRangeBounds = acc;
+  // A kind this fork has none of loses its row. Dropping the constraint with it
+  // keeps the grid honest: otherwise it would filter on a control nobody can
+  // see and the result would sit at zero with no way back.
+  for (const kind in botanyRanges) if (!acc[kind]) delete botanyRanges[kind];
+}
+
+// Rebuild bounds and rows when the Source filter has moved. Called from
+// renderBotany so every route in — a radio click, a shared ?src= URL, a restored
+// session — lands on bounds that match the fork on screen.
+function ensureBotanyRangeBounds() {
+  if (botanyRangeBoundsSource === activeSource) return;
+  botanyRangeBoundsSource = activeSource;
+  computeBotanyRangeBounds();
+  const host = document.getElementById('botanyRangeRows');
+  if (host) host.innerHTML = botanyRangeRowsHTML();
 }
 
 function botanyRangeRowsHTML() {
@@ -617,8 +640,11 @@ function botanyRangeRowsHTML() {
     // A kind with one distinct value (PlantAffectGrowth is always +1) has no
     // range to pick — the tick alone still means "must have this effect".
     const fixed = b.min === b.max;
-    const lo = on ? on.min : b.min;
-    const hi = on ? on.max : b.max;
+    // Empty unless the user typed something. The bound lives in the placeholder,
+    // so grey reads as "this side is open" and black as "you set this" — and a
+    // source switch can refresh the grey half without touching the black one.
+    const lo = on && on.min !== null ? on.min : '';
+    const hi = on && on.max !== null ? on.max : '';
     return `<div class="brange-row${on ? ' active' : ''}" data-kind="${kind}">
       <label class="brange-toggle">
         <input type="checkbox" class="brange-on"${on ? ' checked' : ''}>
@@ -632,22 +658,22 @@ function botanyRangeRowsHTML() {
             <span class="brange-cap brange-cap-max">≤</span>
             <input type="number" class="brange-max" value="${hi}" step="any" placeholder="${b.max}" aria-label="${esc(b.label)} maximum">
           </span>`}
-      <span class="brange-bounds" title="Range present in the data">${b.min} \u2026 ${b.max}</span>
+      <span class="brange-bounds" title="Range present in the data for the selected source">${b.min} \u2026 ${b.max}</span>
     </div>`;
   }).join('');
 }
 
-// Read one side of a row. An emptied field drops that inequality rather than
-// pinning it to zero: Number('') is 0, not NaN, so the obvious
+// Read one side of a row; null means that inequality is off. An empty field is
+// the off state rather than a zero: Number('') is 0, not NaN, so the obvious
 // `Number.isFinite(Number(el.value))` check silently turned a cleared max into
-// "<= 0". A half-typed "-" or "." falls back the same way, so the grid never
-// blanks out mid-keystroke.
-function readBotanyBound(el, fallback) {
-  if (!el) return fallback;
+// "<= 0". A half-typed value reads as empty too (a number input reports '' for
+// anything it cannot parse), so the grid never blanks out mid-keystroke.
+function readBotanyBound(el) {
+  if (!el) return null;
   const raw = el.value.trim();
-  if (raw === '') return fallback;
+  if (raw === '') return null;
   const n = Number(raw);
-  return Number.isFinite(n) ? n : fallback;
+  return Number.isFinite(n) ? n : null;
 }
 
 function syncBotanyRangeRow(row) {
@@ -659,7 +685,6 @@ function syncBotanyRangeRow(row) {
     delete botanyRanges[kind];
     return;
   }
-  const b = botanyRangeBounds[kind];
   const minEl = row.querySelector('.brange-min');
   const maxEl = row.querySelector('.brange-max');
   // Dim the glyph whose side is no longer constraining, so a cleared field
@@ -667,14 +692,16 @@ function syncBotanyRangeRow(row) {
   row.classList.toggle('no-min', !!minEl && minEl.value.trim() === '');
   row.classList.toggle('no-max', !!maxEl && maxEl.value.trim() === '');
   botanyRanges[kind] = {
-    min: readBotanyBound(minEl, b.min),
-    max: readBotanyBound(maxEl, b.max),
+    min: readBotanyBound(minEl),
+    max: readBotanyBound(maxEl),
   };
 }
 
 function matchesBotanyRanges(r) {
   for (const kind in botanyRanges) {
     const { min, max } = botanyRanges[kind];
+    const lo = min === null ? -Infinity : min;
+    const hi = max === null ? Infinity : max;
     const amounts = (r.plantEffects || [])
       .filter(pe => pe.kind === kind)
       .map(pe => Number(pe.amount))
@@ -687,7 +714,7 @@ function matchesBotanyRanges(r) {
     // poison it. Kinds whose data never crosses zero (mutation modifier,
     // growth) therefore still read as plain "must have this effect".
     if (!amounts.length) amounts.push(0);
-    if (!amounts.some(a => a >= min && a <= max)) return false;
+    if (!amounts.some(a => a >= lo && a <= hi)) return false;
   }
   return true;
 }
@@ -695,8 +722,7 @@ function matchesBotanyRanges(r) {
 function setupBotanyRanges() {
   const host = document.getElementById('botanyRangeRows');
   if (!host) return;
-  computeBotanyRangeBounds();
-  host.innerHTML = botanyRangeRowsHTML();
+  ensureBotanyRangeBounds();
 
   const rerender = () => renderBotany(document.getElementById('searchInput').value);
   // Bound captions are ≥ / ≤ rather than words: unambiguous in every
@@ -837,6 +863,8 @@ function renderSwabGuide() {
 }
 
 function renderBotany(query = '') {
+  // Bounds belong to the fork on screen; this is a no-op unless it moved.
+  ensureBotanyRangeBounds();
   renderPlantEvolution();
   renderSwabGuide();
   const grid = document.getElementById('botanyGrid');
