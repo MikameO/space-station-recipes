@@ -1,0 +1,1214 @@
+{
+ "request": {
+  "ids": 108585248,
+  "metrics": "ym:s:visits,ym:s:users",
+  "date1": "2026-07-12",
+  "date2": "2026-09-12",
+  "limit": 50000,
+  "accuracy": "full",
+  "dimensions": "ym:s:paramsLevel1,ym:s:deviceCategory",
+  "sort": "-ym:s:visits",
+  "filters": "ym:s:startURL!@'localhost' AND ym:s:startURL!@'127.0.0.1'"
+ },
+ "response": {
+  "query": {
+   "ids": [
+    108585248
+   ],
+   "dimensions": [
+    "ym:s:paramsLevel1",
+    "ym:s:deviceCategory"
+   ],
+   "metrics": [
+    "ym:s:visits",
+    "ym:s:users"
+   ],
+   "sort": [
+    "-ym:s:visits"
+   ],
+   "date1": "2026-07-12",
+   "date2": "2026-09-12",
+   "filters": "ym:s:startURL!@'localhost' AND ym:s:startURL!@'127.0.0.1'",
+   "limit": 50000,
+   "offset": 1,
+   "group": "Week",
+   "benchmarks_version": "1788134400000",
+   "benchmarks_sub_industry": "false",
+   "auto_group_size": "1",
+   "exp_bucket_size": "100",
+   "attr_name": "",
+   "funnel_window": "",
+   "benchmarks_quantile": "50",
+   "time_interval": "1SECOND",
+   "intervals": "1",
+   "quantile": "50",
+   "offline_window": "21",
+   "attribution": "CROSS_DEVICE_LAST_SIGNIFICANT",
+   "currency": "RUB",
+   "benchmarks_attribution": "Automatic",
+   "adfox_event_id": "0",
+   "funnel_pattern": ""
+  },
+  "data": [
+   {
+    "dimensions": [
+     {
+      "name": "reagent"
+     },
+     {
+      "icon_id": "desktop",
+      "icon_type": "device",
+      "name": "PC",
+      "id": "desktop"
+     }
+    ],
+    "metrics": [
+     348.0,
+     152.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "tab"
+     },
+     {
+      "icon_id": "desktop",
+      "icon_type": "device",
+      "name": "PC",
+      "id": "desktop"
+     }
+    ],
+    "metrics": [
+     347.0,
+     155.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "auto"
+     },
+     {
+      "icon_id": "desktop",
+      "icon_type": "device",
+      "name": "PC",
+      "id": "desktop"
+     }
+    ],
+    "metrics": [
+     307.0,
+     246.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "fork"
+     },
+     {
+      "icon_id": "desktop",
+      "icon_type": "device",
+      "name": "PC",
+      "id": "desktop"
+     }
+    ],
+    "metrics": [
+     281.0,
+     123.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "q"
+     },
+     {
+      "icon_id": "desktop",
+      "icon_type": "device",
+      "name": "PC",
+      "id": "desktop"
+     }
+    ],
+    "metrics": [
+     194.0,
+     66.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "results"
+     },
+     {
+      "icon_id": "desktop",
+      "icon_type": "device",
+      "name": "PC",
+      "id": "desktop"
+     }
+    ],
+    "metrics": [
+     194.0,
+     66.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "reason"
+     },
+     {
+      "icon_id": "desktop",
+      "icon_type": "device",
+      "name": "PC",
+      "id": "desktop"
+     }
+    ],
+    "metrics": [
+     132.0,
+     130.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "step"
+     },
+     {
+      "icon_id": "desktop",
+      "icon_type": "device",
+      "name": "PC",
+      "id": "desktop"
+     }
+    ],
+    "metrics": [
+     80.0,
+     75.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "amount"
+     },
+     {
+      "icon_id": "desktop",
+      "icon_type": "device",
+      "name": "PC",
+      "id": "desktop"
+     }
+    ],
+    "metrics": [
+     71.0,
+     40.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "target"
+     },
+     {
+      "icon_id": "desktop",
+      "icon_type": "device",
+      "name": "PC",
+      "id": "desktop"
+     }
+    ],
+    "metrics": [
+     71.0,
+     40.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "type"
+     },
+     {
+      "icon_id": "desktop",
+      "icon_type": "device",
+      "name": "PC",
+      "id": "desktop"
+     }
+    ],
+    "metrics": [
+     67.0,
+     45.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "targets"
+     },
+     {
+      "icon_id": "desktop",
+      "icon_type": "device",
+      "name": "PC",
+      "id": "desktop"
+     }
+    ],
+    "metrics": [
+     61.0,
+     35.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "api"
+     },
+     {
+      "icon_id": "desktop",
+      "icon_type": "device",
+      "name": "PC",
+      "id": "desktop"
+     }
+    ],
+    "metrics": [
+     56.0,
+     34.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "auto"
+     },
+     {
+      "icon_id": "mobile",
+      "icon_type": "device",
+      "name": "Smartphones",
+      "id": "mobile"
+     }
+    ],
+    "metrics": [
+     48.0,
+     47.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "reagent"
+     },
+     {
+      "icon_id": "mobile",
+      "icon_type": "device",
+      "name": "Smartphones",
+      "id": "mobile"
+     }
+    ],
+    "metrics": [
+     48.0,
+     38.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "tab"
+     },
+     {
+      "icon_id": "mobile",
+      "icon_type": "device",
+      "name": "Smartphones",
+      "id": "mobile"
+     }
+    ],
+    "metrics": [
+     48.0,
+     39.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "preset"
+     },
+     {
+      "icon_id": "desktop",
+      "icon_type": "device",
+      "name": "PC",
+      "id": "desktop"
+     }
+    ],
+    "metrics": [
+     43.0,
+     34.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "from"
+     },
+     {
+      "icon_id": "desktop",
+      "icon_type": "device",
+      "name": "PC",
+      "id": "desktop"
+     }
+    ],
+    "metrics": [
+     39.0,
+     31.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "to"
+     },
+     {
+      "icon_id": "desktop",
+      "icon_type": "device",
+      "name": "PC",
+      "id": "desktop"
+     }
+    ],
+    "metrics": [
+     39.0,
+     31.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "reason"
+     },
+     {
+      "icon_id": "mobile",
+      "icon_type": "device",
+      "name": "Smartphones",
+      "id": "mobile"
+     }
+    ],
+    "metrics": [
+     31.0,
+     31.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "species"
+     },
+     {
+      "icon_id": "desktop",
+      "icon_type": "device",
+      "name": "PC",
+      "id": "desktop"
+     }
+    ],
+    "metrics": [
+     31.0,
+     27.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "step"
+     },
+     {
+      "icon_id": "mobile",
+      "icon_type": "device",
+      "name": "Smartphones",
+      "id": "mobile"
+     }
+    ],
+    "metrics": [
+     23.0,
+     23.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "open"
+     },
+     {
+      "icon_id": "desktop",
+      "icon_type": "device",
+      "name": "PC",
+      "id": "desktop"
+     }
+    ],
+    "metrics": [
+     21.0,
+     11.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "q"
+     },
+     {
+      "icon_id": "mobile",
+      "icon_type": "device",
+      "name": "Smartphones",
+      "id": "mobile"
+     }
+    ],
+    "metrics": [
+     20.0,
+     13.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "results"
+     },
+     {
+      "icon_id": "mobile",
+      "icon_type": "device",
+      "name": "Smartphones",
+      "id": "mobile"
+     }
+    ],
+    "metrics": [
+     20.0,
+     13.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "antag"
+     },
+     {
+      "icon_id": "desktop",
+      "icon_type": "device",
+      "name": "PC",
+      "id": "desktop"
+     }
+    ],
+    "metrics": [
+     10.0,
+     10.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "n"
+     },
+     {
+      "icon_id": "desktop",
+      "icon_type": "device",
+      "name": "PC",
+      "id": "desktop"
+     }
+    ],
+    "metrics": [
+     10.0,
+     8.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "tempK"
+     },
+     {
+      "icon_id": "desktop",
+      "icon_type": "device",
+      "name": "PC",
+      "id": "desktop"
+     }
+    ],
+    "metrics": [
+     10.0,
+     8.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "casing"
+     },
+     {
+      "icon_id": "desktop",
+      "icon_type": "device",
+      "name": "PC",
+      "id": "desktop"
+     }
+    ],
+    "metrics": [
+     9.0,
+     3.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "preset"
+     },
+     {
+      "icon_id": "mobile",
+      "icon_type": "device",
+      "name": "Smartphones",
+      "id": "mobile"
+     }
+    ],
+    "metrics": [
+     9.0,
+     8.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "targets"
+     },
+     {
+      "icon_id": "mobile",
+      "icon_type": "device",
+      "name": "Smartphones",
+      "id": "mobile"
+     }
+    ],
+    "metrics": [
+     9.0,
+     8.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "fork"
+     },
+     {
+      "icon_id": "mobile",
+      "icon_type": "device",
+      "name": "Smartphones",
+      "id": "mobile"
+     }
+    ],
+    "metrics": [
+     7.0,
+     6.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "api"
+     },
+     {
+      "icon_id": "mobile",
+      "icon_type": "device",
+      "name": "Smartphones",
+      "id": "mobile"
+     }
+    ],
+    "metrics": [
+     6.0,
+     5.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "collapsed"
+     },
+     {
+      "icon_id": "desktop",
+      "icon_type": "device",
+      "name": "PC",
+      "id": "desktop"
+     }
+    ],
+    "metrics": [
+     6.0,
+     6.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "ingredient"
+     },
+     {
+      "icon_id": "desktop",
+      "icon_type": "device",
+      "name": "PC",
+      "id": "desktop"
+     }
+    ],
+    "metrics": [
+     6.0,
+     5.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "ladder"
+     },
+     {
+      "icon_id": "desktop",
+      "icon_type": "device",
+      "name": "PC",
+      "id": "desktop"
+     }
+    ],
+    "metrics": [
+     6.0,
+     3.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "objective"
+     },
+     {
+      "icon_id": "desktop",
+      "icon_type": "device",
+      "name": "PC",
+      "id": "desktop"
+     }
+    ],
+    "metrics": [
+     6.0,
+     3.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "range"
+     },
+     {
+      "icon_id": "desktop",
+      "icon_type": "device",
+      "name": "PC",
+      "id": "desktop"
+     }
+    ],
+    "metrics": [
+     6.0,
+     3.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "reqs"
+     },
+     {
+      "icon_id": "desktop",
+      "icon_type": "device",
+      "name": "PC",
+      "id": "desktop"
+     }
+    ],
+    "metrics": [
+     6.0,
+     3.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "role"
+     },
+     {
+      "icon_id": "desktop",
+      "icon_type": "device",
+      "name": "PC",
+      "id": "desktop"
+     }
+    ],
+    "metrics": [
+     6.0,
+     3.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "view"
+     },
+     {
+      "icon_id": "desktop",
+      "icon_type": "device",
+      "name": "PC",
+      "id": "desktop"
+     }
+    ],
+    "metrics": [
+     6.0,
+     2.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "type"
+     },
+     {
+      "icon_id": "mobile",
+      "icon_type": "device",
+      "name": "Smartphones",
+      "id": "mobile"
+     }
+    ],
+    "metrics": [
+     5.0,
+     4.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "amount"
+     },
+     {
+      "icon_id": "mobile",
+      "icon_type": "device",
+      "name": "Smartphones",
+      "id": "mobile"
+     }
+    ],
+    "metrics": [
+     4.0,
+     3.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "count"
+     },
+     {
+      "icon_id": "desktop",
+      "icon_type": "device",
+      "name": "PC",
+      "id": "desktop"
+     }
+    ],
+    "metrics": [
+     4.0,
+     2.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "from"
+     },
+     {
+      "icon_id": "mobile",
+      "icon_type": "device",
+      "name": "Smartphones",
+      "id": "mobile"
+     }
+    ],
+    "metrics": [
+     4.0,
+     3.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "target"
+     },
+     {
+      "icon_id": "mobile",
+      "icon_type": "device",
+      "name": "Smartphones",
+      "id": "mobile"
+     }
+    ],
+    "metrics": [
+     4.0,
+     3.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "to"
+     },
+     {
+      "icon_id": "mobile",
+      "icon_type": "device",
+      "name": "Smartphones",
+      "id": "mobile"
+     }
+    ],
+    "metrics": [
+     4.0,
+     3.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "antag"
+     },
+     {
+      "icon_id": "mobile",
+      "icon_type": "device",
+      "name": "Smartphones",
+      "id": "mobile"
+     }
+    ],
+    "metrics": [
+     3.0,
+     3.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "open"
+     },
+     {
+      "icon_id": "mobile",
+      "icon_type": "device",
+      "name": "Smartphones",
+      "id": "mobile"
+     }
+    ],
+    "metrics": [
+     3.0,
+     3.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "after"
+     },
+     {
+      "icon_id": "desktop",
+      "icon_type": "device",
+      "name": "PC",
+      "id": "desktop"
+     }
+    ],
+    "metrics": [
+     2.0,
+     2.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "doc"
+     },
+     {
+      "icon_id": "desktop",
+      "icon_type": "device",
+      "name": "PC",
+      "id": "desktop"
+     }
+    ],
+    "metrics": [
+     2.0,
+     2.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "inFlame"
+     },
+     {
+      "icon_id": "desktop",
+      "icon_type": "device",
+      "name": "PC",
+      "id": "desktop"
+     }
+    ],
+    "metrics": [
+     2.0,
+     2.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "reagent"
+     },
+     {
+      "icon_id": "tablet",
+      "icon_type": "device",
+      "name": "Tablets",
+      "id": "tablet"
+     }
+    ],
+    "metrics": [
+     2.0,
+     2.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "reason"
+     },
+     {
+      "icon_id": "tablet",
+      "icon_type": "device",
+      "name": "Tablets",
+      "id": "tablet"
+     }
+    ],
+    "metrics": [
+     2.0,
+     2.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "species"
+     },
+     {
+      "icon_id": "mobile",
+      "icon_type": "device",
+      "name": "Smartphones",
+      "id": "mobile"
+     }
+    ],
+    "metrics": [
+     2.0,
+     2.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "tab"
+     },
+     {
+      "icon_id": "tablet",
+      "icon_type": "device",
+      "name": "Tablets",
+      "id": "tablet"
+     }
+    ],
+    "metrics": [
+     2.0,
+     2.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "auto"
+     },
+     {
+      "icon_id": "tablet",
+      "icon_type": "device",
+      "name": "Tablets",
+      "id": "tablet"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "collapsed"
+     },
+     {
+      "icon_id": "mobile",
+      "icon_type": "device",
+      "name": "Smartphones",
+      "id": "mobile"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "colour"
+     },
+     {
+      "icon_id": "desktop",
+      "icon_type": "device",
+      "name": "PC",
+      "id": "desktop"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "depth"
+     },
+     {
+      "icon_id": "desktop",
+      "icon_type": "device",
+      "name": "PC",
+      "id": "desktop"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "fork"
+     },
+     {
+      "icon_id": "tablet",
+      "icon_type": "device",
+      "name": "Tablets",
+      "id": "tablet"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "from"
+     },
+     {
+      "icon_id": "tablet",
+      "icon_type": "device",
+      "name": "Tablets",
+      "id": "tablet"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "height"
+     },
+     {
+      "icon_id": "desktop",
+      "icon_type": "device",
+      "name": "PC",
+      "id": "desktop"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "ingredient"
+     },
+     {
+      "icon_id": "mobile",
+      "icon_type": "device",
+      "name": "Smartphones",
+      "id": "mobile"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "q"
+     },
+     {
+      "icon_id": "tablet",
+      "icon_type": "device",
+      "name": "Tablets",
+      "id": "tablet"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "results"
+     },
+     {
+      "icon_id": "tablet",
+      "icon_type": "device",
+      "name": "Tablets",
+      "id": "tablet"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "to"
+     },
+     {
+      "icon_id": "tablet",
+      "icon_type": "device",
+      "name": "Tablets",
+      "id": "tablet"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   }
+  ],
+  "total_rows": 67,
+  "total_rows_rounded": false,
+  "sampled": false,
+  "contains_sensitive_data": false,
+  "sample_share": 1.0,
+  "sample_size": 1340,
+  "sample_space": 1340,
+  "data_lag": 0,
+  "totals": [
+   668.0,
+   326.0
+  ],
+  "min": [
+   1.0,
+   1.0
+  ],
+  "max": [
+   348.0,
+   246.0
+  ]
+ }
+}

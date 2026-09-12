@@ -1,0 +1,135 @@
+{
+ "request": {
+  "ids": 108585248,
+  "metrics": "ym:s:visits,ym:s:users,ym:s:pageviews,ym:s:bounceRate,ym:s:pageDepth,ym:s:avgVisitDurationSeconds",
+  "date1": "2026-07-28",
+  "date2": "2026-09-12",
+  "limit": 5000,
+  "accuracy": "full",
+  "dimensions": "ym:s:lastReferalSource",
+  "sort": "-ym:s:visits",
+  "filters": "ym:s:startURL!@'localhost' AND ym:s:startURL!@'127.0.0.1'"
+ },
+ "response": {
+  "query": {
+   "ids": [
+    108585248
+   ],
+   "dimensions": [
+    "ym:s:lastReferalSource"
+   ],
+   "metrics": [
+    "ym:s:visits",
+    "ym:s:users",
+    "ym:s:pageviews",
+    "ym:s:bounceRate",
+    "ym:s:pageDepth",
+    "ym:s:avgVisitDurationSeconds"
+   ],
+   "sort": [
+    "-ym:s:visits"
+   ],
+   "date1": "2026-07-28",
+   "date2": "2026-09-12",
+   "filters": "ym:s:startURL!@'localhost' AND ym:s:startURL!@'127.0.0.1'",
+   "limit": 5000,
+   "offset": 1,
+   "group": "Week",
+   "benchmarks_version": "1788134400000",
+   "benchmarks_sub_industry": "false",
+   "auto_group_size": "1",
+   "exp_bucket_size": "100",
+   "attr_name": "",
+   "funnel_window": "",
+   "benchmarks_quantile": "50",
+   "time_interval": "1SECOND",
+   "intervals": "1",
+   "quantile": "50",
+   "offline_window": "21",
+   "attribution": "CROSS_DEVICE_LAST_SIGNIFICANT",
+   "currency": "RUB",
+   "benchmarks_attribution": "Automatic",
+   "adfox_event_id": "0",
+   "funnel_pattern": ""
+  },
+  "data": [
+   {
+    "dimensions": [
+     {
+      "name": "steamcommunity.com"
+     }
+    ],
+    "metrics": [
+     71.0,
+     15.0,
+     79.0,
+     1.4084507,
+     1.11267606,
+     201.02816901
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "github.com"
+     }
+    ],
+    "metrics": [
+     10.0,
+     6.0,
+     11.0,
+     10.0,
+     1.1,
+     200.2
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "chatgpt.com"
+     }
+    ],
+    "metrics": [
+     2.0,
+     2.0,
+     4.0,
+     0.0,
+     2.0,
+     87.0
+    ]
+   }
+  ],
+  "total_rows": 3,
+  "total_rows_rounded": false,
+  "sampled": false,
+  "contains_sensitive_data": false,
+  "sample_share": 1.0,
+  "sample_size": 1070,
+  "sample_space": 1070,
+  "data_lag": 0,
+  "totals": [
+   83.0,
+   23.0,
+   94.0,
+   2.40963855,
+   1.13253012,
+   198.18072289
+  ],
+  "min": [
+   2.0,
+   2.0,
+   4.0,
+   0.0,
+   1.1,
+   87.0
+  ],
+  "max": [
+   71.0,
+   15.0,
+   79.0,
+   10.0,
+   2.0,
+   201.02816901
+  ]
+ }
+}

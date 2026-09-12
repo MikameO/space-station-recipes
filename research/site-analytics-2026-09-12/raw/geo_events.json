@@ -1,0 +1,599 @@
+{
+ "request": {
+  "ids": 108585248,
+  "metrics": "ym:s:visits,ym:s:users",
+  "date1": "2026-07-12",
+  "date2": "2026-09-12",
+  "limit": 1000,
+  "accuracy": "full",
+  "dimensions": "ym:s:regionCountry",
+  "sort": "-ym:s:visits",
+  "filters": "ym:s:startURL!@'localhost' AND ym:s:startURL!@'127.0.0.1'"
+ },
+ "response": {
+  "query": {
+   "ids": [
+    108585248
+   ],
+   "dimensions": [
+    "ym:s:regionCountry"
+   ],
+   "metrics": [
+    "ym:s:visits",
+    "ym:s:users"
+   ],
+   "sort": [
+    "-ym:s:visits"
+   ],
+   "date1": "2026-07-12",
+   "date2": "2026-09-12",
+   "filters": "ym:s:startURL!@'localhost' AND ym:s:startURL!@'127.0.0.1'",
+   "limit": 1000,
+   "offset": 1,
+   "group": "Week",
+   "benchmarks_version": "1788134400000",
+   "benchmarks_sub_industry": "false",
+   "auto_group_size": "1",
+   "exp_bucket_size": "100",
+   "attr_name": "",
+   "funnel_window": "",
+   "benchmarks_quantile": "50",
+   "time_interval": "1SECOND",
+   "intervals": "1",
+   "quantile": "50",
+   "offline_window": "21",
+   "attribution": "CROSS_DEVICE_LAST_SIGNIFICANT",
+   "currency": "RUB",
+   "benchmarks_attribution": "Automatic",
+   "adfox_event_id": "0",
+   "funnel_pattern": ""
+  },
+  "data": [
+   {
+    "dimensions": [
+     {
+      "icon_id": "225",
+      "icon_type": "country",
+      "iso_name": "RU",
+      "id": "225",
+      "name": "Russia"
+     }
+    ],
+    "metrics": [
+     521.0,
+     178.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "84",
+      "icon_type": "country",
+      "iso_name": "US",
+      "id": "84",
+      "name": "United States"
+     }
+    ],
+    "metrics": [
+     246.0,
+     77.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "96",
+      "icon_type": "country",
+      "iso_name": "DE",
+      "id": "96",
+      "name": "Germany"
+     }
+    ],
+    "metrics": [
+     169.0,
+     11.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "95",
+      "icon_type": "country",
+      "iso_name": "CA",
+      "id": "95",
+      "name": "Canada"
+     }
+    ],
+    "metrics": [
+     84.0,
+     12.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "102",
+      "icon_type": "country",
+      "iso_name": "GB",
+      "id": "102",
+      "name": "United Kingdom"
+     }
+    ],
+    "metrics": [
+     67.0,
+     13.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "94",
+      "icon_type": "country",
+      "iso_name": "BR",
+      "id": "94",
+      "name": "Brazil"
+     }
+    ],
+    "metrics": [
+     57.0,
+     5.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "211",
+      "icon_type": "country",
+      "iso_name": "AU",
+      "id": "211",
+      "name": "Australia"
+     }
+    ],
+    "metrics": [
+     45.0,
+     4.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "120",
+      "icon_type": "country",
+      "iso_name": "PL",
+      "id": "120",
+      "name": "Poland"
+     }
+    ],
+    "metrics": [
+     23.0,
+     9.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "983",
+      "icon_type": "country",
+      "iso_name": "TR",
+      "id": "983",
+      "name": "Turkey"
+     }
+    ],
+    "metrics": [
+     19.0,
+     3.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "124",
+      "icon_type": "country",
+      "iso_name": "FR",
+      "id": "124",
+      "name": "France"
+     }
+    ],
+    "metrics": [
+     13.0,
+     4.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "10093",
+      "icon_type": "country",
+      "iso_name": "VN",
+      "id": "10093",
+      "name": "Vietnam"
+     }
+    ],
+    "metrics": [
+     13.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "127",
+      "icon_type": "country",
+      "iso_name": "SE",
+      "id": "127",
+      "name": "Sweden"
+     }
+    ],
+    "metrics": [
+     12.0,
+     5.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "118",
+      "icon_type": "country",
+      "iso_name": "NL",
+      "id": "118",
+      "name": "Netherlands"
+     }
+    ],
+    "metrics": [
+     10.0,
+     8.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "125",
+      "icon_type": "country",
+      "iso_name": "CZ",
+      "id": "125",
+      "name": "Czech Republic"
+     }
+    ],
+    "metrics": [
+     8.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "205",
+      "icon_type": "country",
+      "iso_name": "IT",
+      "id": "205",
+      "name": "Italy"
+     }
+    ],
+    "metrics": [
+     6.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "210",
+      "icon_type": "country",
+      "iso_name": "AE",
+      "id": "210",
+      "name": "United Arab Emirates"
+     }
+    ],
+    "metrics": [
+     6.0,
+     2.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "20862",
+      "icon_type": "country",
+      "iso_name": "CL",
+      "id": "20862",
+      "name": "Chile"
+     }
+    ],
+    "metrics": [
+     5.0,
+     2.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "135",
+      "icon_type": "country",
+      "iso_name": "KR",
+      "id": "135",
+      "name": "Republic of Korea"
+     }
+    ],
+    "metrics": [
+     5.0,
+     3.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "137",
+      "icon_type": "country",
+      "iso_name": "JP",
+      "id": "137",
+      "name": "Japan"
+     }
+    ],
+    "metrics": [
+     3.0,
+     2.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "149",
+      "icon_type": "country",
+      "iso_name": "BY",
+      "id": "149",
+      "name": "Belarus"
+     }
+    ],
+    "metrics": [
+     2.0,
+     2.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "20274",
+      "icon_type": "country",
+      "iso_name": "BN",
+      "id": "20274",
+      "name": "Brunei"
+     }
+    ],
+    "metrics": [
+     2.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "117",
+      "icon_type": "country",
+      "iso_name": "LT",
+      "id": "117",
+      "name": "Lithuania"
+     }
+    ],
+    "metrics": [
+     2.0,
+     2.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "10074",
+      "icon_type": "country",
+      "iso_name": "PT",
+      "id": "10074",
+      "name": "Portugal"
+     }
+    ],
+    "metrics": [
+     2.0,
+     2.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "10105",
+      "icon_type": "country",
+      "iso_name": "SG",
+      "id": "10105",
+      "name": "Singapore"
+     }
+    ],
+    "metrics": [
+     2.0,
+     2.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "121",
+      "icon_type": "country",
+      "iso_name": "SK",
+      "id": "121",
+      "name": "Slovakia"
+     }
+    ],
+    "metrics": [
+     2.0,
+     2.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "10021",
+      "icon_type": "country",
+      "iso_name": "ZA",
+      "id": "10021",
+      "name": "South Africa"
+     }
+    ],
+    "metrics": [
+     2.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "168",
+      "icon_type": "country",
+      "iso_name": "AM",
+      "id": "168",
+      "name": "Armenia"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "10083",
+      "icon_type": "country",
+      "iso_name": "HR",
+      "id": "10083",
+      "name": "Croatia"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "1056",
+      "icon_type": "country",
+      "iso_name": "EG",
+      "id": "1056",
+      "name": "Egypt"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "246",
+      "icon_type": "country",
+      "iso_name": "GR",
+      "id": "246",
+      "name": "Greece"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "159",
+      "icon_type": "country",
+      "iso_name": "KZ",
+      "id": "159",
+      "name": "Kazakhstan"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "10537",
+      "icon_type": "country",
+      "iso_name": "KW",
+      "id": "10537",
+      "name": "Kuwait"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "10099",
+      "icon_type": "country",
+      "iso_name": "MN",
+      "id": "10099",
+      "name": "Mongolia"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "10108",
+      "icon_type": "country",
+      "iso_name": "PH",
+      "id": "10108",
+      "name": "Philippines"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "126",
+      "icon_type": "country",
+      "iso_name": "CH",
+      "id": "126",
+      "name": "Switzerland"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   }
+  ],
+  "total_rows": 35,
+  "total_rows_rounded": false,
+  "sampled": false,
+  "contains_sensitive_data": false,
+  "sample_share": 1.0,
+  "sample_size": 1339,
+  "sample_space": 1339,
+  "data_lag": 0,
+  "totals": [
+   1335.0,
+   352.0
+  ],
+  "min": [
+   1.0,
+   1.0
+  ],
+  "max": [
+   521.0,
+   178.0
+  ]
+ }
+}

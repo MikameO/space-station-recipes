@@ -1,0 +1,3133 @@
+{
+ "request": {
+  "ids": 108585248,
+  "metrics": "ym:s:visits,ym:s:users,ym:s:pageviews,ym:s:bounceRate,ym:s:pageDepth,ym:s:avgVisitDurationSeconds",
+  "date1": "2026-04-12",
+  "date2": "2026-09-12",
+  "limit": 5000,
+  "accuracy": "full",
+  "dimensions": "ym:s:regionArea",
+  "sort": "-ym:s:visits",
+  "filters": "ym:s:startURL!@'localhost' AND ym:s:startURL!@'127.0.0.1'"
+ },
+ "response": {
+  "query": {
+   "ids": [
+    108585248
+   ],
+   "dimensions": [
+    "ym:s:regionArea"
+   ],
+   "metrics": [
+    "ym:s:visits",
+    "ym:s:users",
+    "ym:s:pageviews",
+    "ym:s:bounceRate",
+    "ym:s:pageDepth",
+    "ym:s:avgVisitDurationSeconds"
+   ],
+   "sort": [
+    "-ym:s:visits"
+   ],
+   "date1": "2026-04-12",
+   "date2": "2026-09-12",
+   "filters": "ym:s:startURL!@'localhost' AND ym:s:startURL!@'127.0.0.1'",
+   "limit": 5000,
+   "offset": 1,
+   "group": "Week",
+   "benchmarks_version": "1788134400000",
+   "benchmarks_sub_industry": "false",
+   "auto_group_size": "1",
+   "exp_bucket_size": "100",
+   "attr_name": "",
+   "funnel_window": "",
+   "benchmarks_quantile": "50",
+   "time_interval": "1SECOND",
+   "intervals": "1",
+   "quantile": "50",
+   "offline_window": "21",
+   "attribution": "CROSS_DEVICE_LAST_SIGNIFICANT",
+   "currency": "RUB",
+   "benchmarks_attribution": "Automatic",
+   "adfox_event_id": "0",
+   "funnel_pattern": ""
+  },
+  "data": [
+   {
+    "dimensions": [
+     {
+      "iso_name": "RU-MOS",
+      "id": "1",
+      "name": "Moscow and Moscow Oblast"
+     }
+    ],
+    "metrics": [
+     231.0,
+     33.0,
+     326.0,
+     6.06060606,
+     1.41125541,
+     569.28571429
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "DE-NI",
+      "id": "103755",
+      "name": "Lower Saxony"
+     }
+    ],
+    "metrics": [
+     230.0,
+     6.0,
+     266.0,
+     3.91304348,
+     1.15652174,
+     104.6826087
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": null,
+      "id": "4294967295",
+      "name": "Not specified"
+     }
+    ],
+    "metrics": [
+     182.0,
+     72.0,
+     224.0,
+     17.03296703,
+     1.23076923,
+     247.09340659
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "DE-NW",
+      "id": "103756",
+      "name": "North Rhine-Westphalia"
+     }
+    ],
+    "metrics": [
+     165.0,
+     7.0,
+     175.0,
+     4.24242424,
+     1.06060606,
+     63.22424242
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "AU-WA",
+      "id": "21769",
+      "name": "Western Australia"
+     }
+    ],
+    "metrics": [
+     108.0,
+     2.0,
+     118.0,
+     2.77777778,
+     1.09259259,
+     78.02777778
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "RU-NVS",
+      "id": "11316",
+      "name": "Novosibirsk Oblast"
+     }
+    ],
+    "metrics": [
+     106.0,
+     97.0,
+     111.0,
+     0.0,
+     1.04716981,
+     23.14150943
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "BR-PR",
+      "id": "29306",
+      "name": "State of Paraná"
+     }
+    ],
+    "metrics": [
+     97.0,
+     3.0,
+     109.0,
+     5.15463918,
+     1.12371134,
+     68.30927835
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": null,
+      "id": "4294967294",
+      "name": "Область не определена"
+     }
+    ],
+    "metrics": [
+     88.0,
+     31.0,
+     101.0,
+     5.68181818,
+     1.14772727,
+     207.29545455
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "NL-DR",
+      "id": "104303",
+      "name": "Drenthe"
+     }
+    ],
+    "metrics": [
+     68.0,
+     1.0,
+     88.0,
+     0.0,
+     1.29411765,
+     158.41176471
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "RU-SVE",
+      "id": "11162",
+      "name": "Sverdlovsk Oblast"
+     }
+    ],
+    "metrics": [
+     68.0,
+     5.0,
+     80.0,
+     8.82352941,
+     1.17647059,
+     101.01470588
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "CH-ZH",
+      "id": "104396",
+      "name": "Canton of Zurich"
+     }
+    ],
+    "metrics": [
+     63.0,
+     2.0,
+     69.0,
+     0.0,
+     1.0952381,
+     68.03174603
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "US-TX",
+      "id": "29360",
+      "name": "State of Texas"
+     }
+    ],
+    "metrics": [
+     50.0,
+     21.0,
+     55.0,
+     26.0,
+     1.1,
+     122.2
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "GB-SRY",
+      "id": "104627",
+      "name": "Surrey County"
+     }
+    ],
+    "metrics": [
+     47.0,
+     3.0,
+     47.0,
+     27.65957447,
+     1.0,
+     19.63829787
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "CA-BC",
+      "id": "29368",
+      "name": "Province of British Columbia"
+     }
+    ],
+    "metrics": [
+     42.0,
+     7.0,
+     46.0,
+     7.14285714,
+     1.0952381,
+     1337.04761905
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "CA-NB",
+      "id": "29374",
+      "name": "Province of New Brunswick"
+     }
+    ],
+    "metrics": [
+     40.0,
+     2.0,
+     42.0,
+     0.0,
+     1.05,
+     24.575
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "NL-NH",
+      "id": "104308",
+      "name": "Noord-Holland"
+     }
+    ],
+    "metrics": [
+     39.0,
+     9.0,
+     46.0,
+     30.76923077,
+     1.17948718,
+     95.07692308
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "US-NJ",
+      "id": "29347",
+      "name": "State of New Jersey"
+     }
+    ],
+    "metrics": [
+     35.0,
+     6.0,
+     35.0,
+     8.57142857,
+     1.0,
+     122.71428571
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "US-IN",
+      "id": "29331",
+      "name": "State of Indiana"
+     }
+    ],
+    "metrics": [
+     33.0,
+     6.0,
+     43.0,
+     6.06060606,
+     1.3030303,
+     303.06060606
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "US-WA",
+      "id": "29364",
+      "name": "State of Washington"
+     }
+    ],
+    "metrics": [
+     33.0,
+     10.0,
+     37.0,
+     6.06060606,
+     1.12121212,
+     602.3030303
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "US-MN",
+      "id": "29340",
+      "name": "State of Minnesota"
+     }
+    ],
+    "metrics": [
+     32.0,
+     3.0,
+     33.0,
+     59.375,
+     1.03125,
+     49.625
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "RU-TUL",
+      "id": "10832",
+      "name": "Tula Oblast"
+     }
+    ],
+    "metrics": [
+     32.0,
+     1.0,
+     33.0,
+     3.125,
+     1.03125,
+     17.28125
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "US-TN",
+      "id": "29359",
+      "name": "State of Tennessee"
+     }
+    ],
+    "metrics": [
+     31.0,
+     6.0,
+     50.0,
+     0.0,
+     1.61290323,
+     255.03225806
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": null,
+      "id": "152847",
+      "name": "Tarn"
+     }
+    ],
+    "metrics": [
+     31.0,
+     1.0,
+     33.0,
+     6.4516129,
+     1.06451613,
+     90.16129032
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "PT-11",
+      "id": "104343",
+      "name": "Lisbon District"
+     }
+    ],
+    "metrics": [
+     29.0,
+     1.0,
+     29.0,
+     0.0,
+     1.0,
+     16.03448276
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "BR-BA",
+      "id": "29296",
+      "name": "State of Bahia"
+     }
+    ],
+    "metrics": [
+     29.0,
+     2.0,
+     31.0,
+     0.0,
+     1.06896552,
+     67.62068966
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "US-FL",
+      "id": "29326",
+      "name": "State of Florida"
+     }
+    ],
+    "metrics": [
+     28.0,
+     7.0,
+     33.0,
+     3.57142857,
+     1.17857143,
+     188.67857143
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "US-VA",
+      "id": "29363",
+      "name": "Commonwealth of Virginia"
+     }
+    ],
+    "metrics": [
+     27.0,
+     14.0,
+     36.0,
+     11.11111111,
+     1.33333333,
+     125.88888889
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "RU-KOS",
+      "id": "10699",
+      "name": "Kostroma Oblast"
+     }
+    ],
+    "metrics": [
+     27.0,
+     4.0,
+     42.0,
+     11.11111111,
+     1.55555556,
+     848.07407407
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "US-OR",
+      "id": "29354",
+      "name": "State of Oregon"
+     }
+    ],
+    "metrics": [
+     27.0,
+     5.0,
+     31.0,
+     14.81481481,
+     1.14814815,
+     153.66666667
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "NL-ZH",
+      "id": "104312",
+      "name": "Zuid-Holland"
+     }
+    ],
+    "metrics": [
+     25.0,
+     4.0,
+     27.0,
+     4.0,
+     1.08,
+     48.8
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "RU-KDA",
+      "id": "10995",
+      "name": "Krasnodar Krai"
+     }
+    ],
+    "metrics": [
+     24.0,
+     3.0,
+     37.0,
+     4.16666667,
+     1.54166667,
+     1364.625
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "US-CA",
+      "id": "29322",
+      "name": "State of California"
+     }
+    ],
+    "metrics": [
+     20.0,
+     12.0,
+     20.0,
+     5.0,
+     1.0,
+     169.45
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "US-MI",
+      "id": "29339",
+      "name": "State of Michigan"
+     }
+    ],
+    "metrics": [
+     18.0,
+     6.0,
+     20.0,
+     0.0,
+     1.11111111,
+     113.16666667
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "RU-LEN",
+      "id": "10174",
+      "name": "Saint-Petersburg and Leningrad Oblast"
+     }
+    ],
+    "metrics": [
+     17.0,
+     4.0,
+     20.0,
+     23.52941176,
+     1.17647059,
+     662.58823529
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "GB-HAM",
+      "id": "104628",
+      "name": "Hampshire County"
+     }
+    ],
+    "metrics": [
+     16.0,
+     2.0,
+     19.0,
+     6.25,
+     1.1875,
+     57.25
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "RU-KYA",
+      "id": "11309",
+      "name": "Krasnoyarsk Krai"
+     }
+    ],
+    "metrics": [
+     16.0,
+     4.0,
+     25.0,
+     12.5,
+     1.5625,
+     223.0625
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "US-NY",
+      "id": "29349",
+      "name": "State of New York"
+     }
+    ],
+    "metrics": [
+     16.0,
+     9.0,
+     19.0,
+     18.75,
+     1.1875,
+     76.9375
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "CA-SK",
+      "id": "29370",
+      "name": "Province of Saskatchewan"
+     }
+    ],
+    "metrics": [
+     15.0,
+     2.0,
+     22.0,
+     13.33333333,
+     1.46666667,
+     174.66666667
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "TR-34",
+      "id": "103728",
+      "name": "Istanbul"
+     }
+    ],
+    "metrics": [
+     14.0,
+     1.0,
+     14.0,
+     0.0,
+     1.0,
+     156.21428571
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "US-NC",
+      "id": "29350",
+      "name": "State of North Carolina"
+     }
+    ],
+    "metrics": [
+     14.0,
+     12.0,
+     17.0,
+     0.0,
+     1.21428571,
+     218.71428571
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "PL-MA",
+      "id": "104117",
+      "name": "Lesser Poland Voivodeship"
+     }
+    ],
+    "metrics": [
+     13.0,
+     1.0,
+     14.0,
+     7.69230769,
+     1.07692308,
+     192.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "US-OH",
+      "id": "29352",
+      "name": "State of Ohio"
+     }
+    ],
+    "metrics": [
+     13.0,
+     6.0,
+     21.0,
+     0.0,
+     1.61538462,
+     189.07692308
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "RU-VOR",
+      "id": "10672",
+      "name": "Voronezh Oblast"
+     }
+    ],
+    "metrics": [
+     13.0,
+     2.0,
+     17.0,
+     0.0,
+     1.30769231,
+     303.84615385
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "US-PA",
+      "id": "29355",
+      "name": "Commonwealth of Pennsylvania"
+     }
+    ],
+    "metrics": [
+     12.0,
+     7.0,
+     13.0,
+     25.0,
+     1.08333333,
+     230.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "DE-HE",
+      "id": "103753",
+      "name": "Hesse"
+     }
+    ],
+    "metrics": [
+     12.0,
+     3.0,
+     13.0,
+     8.33333333,
+     1.08333333,
+     126.41666667
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "PL-MZ",
+      "id": "104111",
+      "name": "Masovian Voivodeship"
+     }
+    ],
+    "metrics": [
+     12.0,
+     10.0,
+     17.0,
+     0.0,
+     1.41666667,
+     628.33333333
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "US-MO",
+      "id": "29342",
+      "name": "State of Missouri"
+     }
+    ],
+    "metrics": [
+     12.0,
+     2.0,
+     13.0,
+     0.0,
+     1.08333333,
+     273.83333333
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "US-UT",
+      "id": "29361",
+      "name": "State of Utah"
+     }
+    ],
+    "metrics": [
+     12.0,
+     4.0,
+     13.0,
+     8.33333333,
+     1.08333333,
+     52.33333333
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "DE-BW",
+      "id": "103749",
+      "name": "Baden-Wurttemberg"
+     }
+    ],
+    "metrics": [
+     11.0,
+     4.0,
+     11.0,
+     0.0,
+     1.0,
+     283.54545455
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "KZ-ZHA",
+      "id": "29409",
+      "name": "Zhambylsk District"
+     }
+    ],
+    "metrics": [
+     11.0,
+     2.0,
+     11.0,
+     0.0,
+     1.0,
+     19.09090909
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "US-IL",
+      "id": "29330",
+      "name": "State of Illinois"
+     }
+    ],
+    "metrics": [
+     10.0,
+     9.0,
+     12.0,
+     20.0,
+     1.2,
+     65.2
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "US-WI",
+      "id": "29366",
+      "name": "State of Wisconsin"
+     }
+    ],
+    "metrics": [
+     10.0,
+     3.0,
+     10.0,
+     10.0,
+     1.0,
+     375.5
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "US-MA",
+      "id": "29338",
+      "name": "Commonwealth of Massachusetts"
+     }
+    ],
+    "metrics": [
+     9.0,
+     3.0,
+     9.0,
+     22.22222222,
+     1.0,
+     31.33333333
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "AU-QLD",
+      "id": "21764",
+      "name": "Queensland"
+     }
+    ],
+    "metrics": [
+     8.0,
+     3.0,
+     10.0,
+     0.0,
+     1.25,
+     498.5
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "GB-SOM",
+      "id": "104630",
+      "name": "Somerset County"
+     }
+    ],
+    "metrics": [
+     8.0,
+     2.0,
+     8.0,
+     12.5,
+     1.0,
+     18.375
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "BR-RS",
+      "id": "29311",
+      "name": "State of Rio Grande do Sul"
+     }
+    ],
+    "metrics": [
+     8.0,
+     2.0,
+     9.0,
+     0.0,
+     1.125,
+     482.75
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "CA-ON",
+      "id": "29372",
+      "name": "Province of Ontario"
+     }
+    ],
+    "metrics": [
+     7.0,
+     4.0,
+     8.0,
+     0.0,
+     1.14285714,
+     51.85714286
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "US-GA",
+      "id": "29327",
+      "name": "State of Georgia"
+     }
+    ],
+    "metrics": [
+     7.0,
+     6.0,
+     7.0,
+     14.28571429,
+     1.0,
+     16.71428571
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "US-LA",
+      "id": "29335",
+      "name": "State of Louisiana"
+     }
+    ],
+    "metrics": [
+     7.0,
+     4.0,
+     7.0,
+     0.0,
+     1.0,
+     162.57142857
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": null,
+      "id": "121477",
+      "name": "Emirate of Abu Dhabi"
+     }
+    ],
+    "metrics": [
+     6.0,
+     2.0,
+     9.0,
+     16.66666667,
+     1.5,
+     907.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "RU-KIR",
+      "id": "11070",
+      "name": "Kirov Oblast"
+     }
+    ],
+    "metrics": [
+     6.0,
+     3.0,
+     14.0,
+     16.66666667,
+     2.33333333,
+     534.66666667
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "CA-NS",
+      "id": "29375",
+      "name": "Province of Nova Scotia"
+     }
+    ],
+    "metrics": [
+     6.0,
+     2.0,
+     14.0,
+     0.0,
+     2.33333333,
+     1423.66666667
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "DE-RP",
+      "id": "103757",
+      "name": "Rhineland-Palatinate"
+     }
+    ],
+    "metrics": [
+     6.0,
+     1.0,
+     6.0,
+     0.0,
+     1.0,
+     187.66666667
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "RU-TOM",
+      "id": "11353",
+      "name": "Tomsk District"
+     }
+    ],
+    "metrics": [
+     6.0,
+     1.0,
+     6.0,
+     0.0,
+     1.0,
+     22.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "AU-VIC",
+      "id": "21763",
+      "name": "Victoria"
+     }
+    ],
+    "metrics": [
+     6.0,
+     1.0,
+     9.0,
+     0.0,
+     1.5,
+     799.5
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "PL-LU",
+      "id": "104114",
+      "name": "Lublin Voivodeship"
+     }
+    ],
+    "metrics": [
+     5.0,
+     1.0,
+     6.0,
+     0.0,
+     1.2,
+     28.6
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "AU-NSW",
+      "id": "21761",
+      "name": "New South Wales"
+     }
+    ],
+    "metrics": [
+     5.0,
+     4.0,
+     8.0,
+     20.0,
+     1.6,
+     50.6
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "CA-AB",
+      "id": "29369",
+      "name": "Province of Alberta"
+     }
+    ],
+    "metrics": [
+     5.0,
+     4.0,
+     6.0,
+     40.0,
+     1.2,
+     72.8
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "RU-SA",
+      "id": "11443",
+      "name": "Sakha (Yakutia) Republic"
+     }
+    ],
+    "metrics": [
+     5.0,
+     4.0,
+     8.0,
+     0.0,
+     1.6,
+     389.8
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "US-SC",
+      "id": "29357",
+      "name": "State of South Carolina"
+     }
+    ],
+    "metrics": [
+     5.0,
+     4.0,
+     7.0,
+     40.0,
+     1.4,
+     34.8
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "IT-55",
+      "id": "104230",
+      "name": "Umbria"
+     }
+    ],
+    "metrics": [
+     5.0,
+     1.0,
+     5.0,
+     20.0,
+     1.0,
+     17.4
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "FI-18",
+      "id": "104357",
+      "name": "Uusimaa"
+     }
+    ],
+    "metrics": [
+     5.0,
+     3.0,
+     6.0,
+     0.0,
+     1.2,
+     86.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": null,
+      "id": "123315",
+      "name": "Valparaíso Region"
+     }
+    ],
+    "metrics": [
+     5.0,
+     2.0,
+     7.0,
+     0.0,
+     1.4,
+     2540.4
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "TR-09",
+      "id": "103671",
+      "name": "Aydin"
+     }
+    ],
+    "metrics": [
+     4.0,
+     1.0,
+     6.0,
+     0.0,
+     1.5,
+     30.75
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "DE-SN",
+      "id": "103759",
+      "name": "Saxony"
+     }
+    ],
+    "metrics": [
+     4.0,
+     1.0,
+     6.0,
+     0.0,
+     1.5,
+     1671.5
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "US-ME",
+      "id": "29336",
+      "name": "State of Maine"
+     }
+    ],
+    "metrics": [
+     4.0,
+     4.0,
+     7.0,
+     25.0,
+     1.75,
+     112.5
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": null,
+      "id": "121393",
+      "name": "Tokyo Prefecture"
+     }
+    ],
+    "metrics": [
+     4.0,
+     3.0,
+     4.0,
+     25.0,
+     1.0,
+     24.5
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "RO-BV",
+      "id": "105311",
+      "name": "Braşov County"
+     }
+    ],
+    "metrics": [
+     3.0,
+     2.0,
+     3.0,
+     33.33333333,
+     1.0,
+     113.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "GB-BKM",
+      "id": "104618",
+      "name": "Buckinghamshire County"
+     }
+    ],
+    "metrics": [
+     3.0,
+     1.0,
+     3.0,
+     0.0,
+     1.0,
+     11.33333333
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "RU-CHE",
+      "id": "11225",
+      "name": "Chelyabinsk Oblast"
+     }
+    ],
+    "metrics": [
+     3.0,
+     3.0,
+     4.0,
+     0.0,
+     1.33333333,
+     131.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "US-KY",
+      "id": "29334",
+      "name": "Commonwealth of Kentucky"
+     }
+    ],
+    "metrics": [
+     3.0,
+     3.0,
+     3.0,
+     0.0,
+     1.0,
+     15.33333333
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": null,
+      "id": "152842",
+      "name": "Gard"
+     }
+    ],
+    "metrics": [
+     3.0,
+     1.0,
+     3.0,
+     0.0,
+     1.0,
+     16.66666667
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": null,
+      "id": "116729",
+      "name": "Judea and Samaria District"
+     }
+    ],
+    "metrics": [
+     3.0,
+     2.0,
+     5.0,
+     0.0,
+     1.66666667,
+     441.66666667
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "PL-KP",
+      "id": "104113",
+      "name": "Kuyavian-Pomeranian Voivodeship"
+     }
+    ],
+    "metrics": [
+     3.0,
+     1.0,
+     4.0,
+     33.33333333,
+     1.33333333,
+     258.66666667
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "CA-QC",
+      "id": "29373",
+      "name": "Province of Quebec"
+     }
+    ],
+    "metrics": [
+     3.0,
+     2.0,
+     3.0,
+     0.0,
+     1.0,
+     17.66666667
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "RU-SAK",
+      "id": "11450",
+      "name": "Sakhalin District"
+     }
+    ],
+    "metrics": [
+     3.0,
+     1.0,
+     3.0,
+     0.0,
+     1.0,
+     16.33333333
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": null,
+      "id": "123323",
+      "name": "Santiago Metropolitan Region"
+     }
+    ],
+    "metrics": [
+     3.0,
+     2.0,
+     3.0,
+     0.0,
+     1.0,
+     16.33333333
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "RU-SAR",
+      "id": "11146",
+      "name": "Saratov Oblast"
+     }
+    ],
+    "metrics": [
+     3.0,
+     2.0,
+     4.0,
+     0.0,
+     1.33333333,
+     192.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "PT-15",
+      "id": "104347",
+      "name": "Setubal District"
+     }
+    ],
+    "metrics": [
+     3.0,
+     1.0,
+     3.0,
+     0.0,
+     1.0,
+     17.66666667
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "US-CT",
+      "id": "29324",
+      "name": "State of Connecticut"
+     }
+    ],
+    "metrics": [
+     3.0,
+     2.0,
+     3.0,
+     0.0,
+     1.0,
+     350.66666667
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "US-DE",
+      "id": "29325",
+      "name": "State of Delaware"
+     }
+    ],
+    "metrics": [
+     3.0,
+     2.0,
+     3.0,
+     0.0,
+     1.0,
+     19.33333333
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "BR-GO",
+      "id": "29299",
+      "name": "State of Goiás"
+     }
+    ],
+    "metrics": [
+     3.0,
+     2.0,
+     4.0,
+     0.0,
+     1.33333333,
+     82.66666667
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "MX-MIC",
+      "id": "105663",
+      "name": "State of Michoacan"
+     }
+    ],
+    "metrics": [
+     3.0,
+     1.0,
+     4.0,
+     0.0,
+     1.33333333,
+     44.33333333
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "US-OK",
+      "id": "29353",
+      "name": "State of Oklahoma"
+     }
+    ],
+    "metrics": [
+     3.0,
+     3.0,
+     4.0,
+     66.66666667,
+     1.33333333,
+     43.33333333
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "SE-AB",
+      "id": "104437",
+      "name": "Stockholm County"
+     }
+    ],
+    "metrics": [
+     3.0,
+     2.0,
+     3.0,
+     0.0,
+     1.0,
+     16.66666667
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "CZ-ZL",
+      "id": "104394",
+      "name": "Zlin Region"
+     }
+    ],
+    "metrics": [
+     3.0,
+     3.0,
+     3.0,
+     0.0,
+     1.0,
+     18.66666667
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": null,
+      "id": "104492",
+      "name": "Belgrade District"
+     }
+    ],
+    "metrics": [
+     2.0,
+     1.0,
+     3.0,
+     0.0,
+     1.5,
+     34.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "GB-DOR",
+      "id": "104629",
+      "name": "Dorset County"
+     }
+    ],
+    "metrics": [
+     2.0,
+     1.0,
+     2.0,
+     0.0,
+     1.0,
+     24.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "DE-BY",
+      "id": "103750",
+      "name": "Free State of Bavaria"
+     }
+    ],
+    "metrics": [
+     2.0,
+     2.0,
+     2.0,
+     50.0,
+     1.0,
+     8.5
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "BY-HO",
+      "id": "29631",
+      "name": "Gomel District"
+     }
+    ],
+    "metrics": [
+     2.0,
+     2.0,
+     4.0,
+     0.0,
+     2.0,
+     83.5
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "RU-KHA",
+      "id": "11457",
+      "name": "Khabarovsk Krai"
+     }
+    ],
+    "metrics": [
+     2.0,
+     2.0,
+     2.0,
+     0.0,
+     1.0,
+     17.5
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "GB-LEC",
+      "id": "104610",
+      "name": "Leicestershire County"
+     }
+    ],
+    "metrics": [
+     2.0,
+     2.0,
+     2.0,
+     0.0,
+     1.0,
+     120.5
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "AT-3",
+      "id": "104130",
+      "name": "Lower Austria"
+     }
+    ],
+    "metrics": [
+     2.0,
+     1.0,
+     2.0,
+     0.0,
+     1.0,
+     15.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "RU-NIZ",
+      "id": "11079",
+      "name": "Nizhny Novgorod Oblast"
+     }
+    ],
+    "metrics": [
+     2.0,
+     1.0,
+     3.0,
+     0.0,
+     1.5,
+     32.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": null,
+      "id": "144456",
+      "name": "Province of Davao del Sur"
+     }
+    ],
+    "metrics": [
+     2.0,
+     2.0,
+     2.0,
+     50.0,
+     1.0,
+     7.5
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "CA-NL",
+      "id": "29377",
+      "name": "Province of Newfoundland and Labrador"
+     }
+    ],
+    "metrics": [
+     2.0,
+     1.0,
+     2.0,
+     0.0,
+     1.0,
+     16.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "RU-TA",
+      "id": "11119",
+      "name": "Republic of Tatarstan"
+     }
+    ],
+    "metrics": [
+     2.0,
+     1.0,
+     2.0,
+     0.0,
+     1.0,
+     16.5
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "RU-ROS",
+      "id": "11029",
+      "name": "Rostov Oblast"
+     }
+    ],
+    "metrics": [
+     2.0,
+     1.0,
+     2.0,
+     0.0,
+     1.0,
+     171.5
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "SE-M",
+      "id": "104446",
+      "name": "Skane County"
+     }
+    ],
+    "metrics": [
+     2.0,
+     2.0,
+     3.0,
+     50.0,
+     1.5,
+     35.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "US-AZ",
+      "id": "29320",
+      "name": "State of Arizona"
+     }
+    ],
+    "metrics": [
+     2.0,
+     2.0,
+     2.0,
+     50.0,
+     1.0,
+     7.5
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "MX-BCN",
+      "id": "105666",
+      "name": "State of Baja California"
+     }
+    ],
+    "metrics": [
+     2.0,
+     1.0,
+     2.0,
+     0.0,
+     1.0,
+     20.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "US-CO",
+      "id": "29323",
+      "name": "State of Colorado"
+     }
+    ],
+    "metrics": [
+     2.0,
+     1.0,
+     2.0,
+     50.0,
+     1.0,
+     8.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "US-IA",
+      "id": "29332",
+      "name": "State of Iowa"
+     }
+    ],
+    "metrics": [
+     2.0,
+     2.0,
+     3.0,
+     50.0,
+     1.5,
+     63.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "US-MD",
+      "id": "29337",
+      "name": "State of Maryland"
+     }
+    ],
+    "metrics": [
+     2.0,
+     2.0,
+     2.0,
+     0.0,
+     1.0,
+     15.5
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "US-NE",
+      "id": "29344",
+      "name": "State of Nebraska"
+     }
+    ],
+    "metrics": [
+     2.0,
+     2.0,
+     2.0,
+     0.0,
+     1.0,
+     14.5
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "US-ND",
+      "id": "29351",
+      "name": "State of North Dakota"
+     }
+    ],
+    "metrics": [
+     2.0,
+     2.0,
+     3.0,
+     0.0,
+     1.5,
+     23.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "RU-STA",
+      "id": "11069",
+      "name": "Stavropol Krai"
+     }
+    ],
+    "metrics": [
+     2.0,
+     2.0,
+     2.0,
+     0.0,
+     1.0,
+     56.5
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "LT-VL",
+      "id": "104260",
+      "name": "Vilnius County"
+     }
+    ],
+    "metrics": [
+     2.0,
+     2.0,
+     2.0,
+     0.0,
+     1.0,
+     28.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "GB-WIL",
+      "id": "104622",
+      "name": "Wiltshire County"
+     }
+    ],
+    "metrics": [
+     2.0,
+     1.0,
+     2.0,
+     0.0,
+     1.0,
+     15.5
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "RU-ZAB",
+      "id": "21949",
+      "name": "Zabaykalsky Krai"
+     }
+    ],
+    "metrics": [
+     2.0,
+     1.0,
+     3.0,
+     0.0,
+     1.5,
+     202.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "KZ-ALM",
+      "id": "29406",
+      "name": "Alma-Ata District"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0,
+     1.0,
+     0.0,
+     1.0,
+     22.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "RU-BEL",
+      "id": "10645",
+      "name": "Belgorod Oblast"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0,
+     1.0,
+     0.0,
+     1.0,
+     258.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "GB-BGW",
+      "id": "104558",
+      "name": "Blaenau Gwent County Borough"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0,
+     2.0,
+     0.0,
+     2.0,
+     50.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": null,
+      "id": "121455",
+      "name": "Cairo Governorate"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0,
+     6.0,
+     0.0,
+     6.0,
+     328.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "GR-B",
+      "id": "104167",
+      "name": "Central Macedonia"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0,
+     1.0,
+     0.0,
+     1.0,
+     51.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "GB-CHW",
+      "id": "104605",
+      "name": "Cheshire County"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0,
+     1.0,
+     0.0,
+     1.0,
+     22.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "GB-DEV",
+      "id": "104631",
+      "name": "Devon County"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0,
+     1.0,
+     0.0,
+     1.0,
+     15.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "US-DC",
+      "id": "103666",
+      "name": "District of Columbia"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0,
+     1.0,
+     0.0,
+     1.0,
+     16.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "IE-D",
+      "id": "105237",
+      "name": "Dublin Region"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0,
+     1.0,
+     0.0,
+     1.0,
+     16.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "IT-45",
+      "id": "104232",
+      "name": "Emilia-Romagna"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0,
+     1.0,
+     0.0,
+     1.0,
+     15.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "GB-FIF",
+      "id": "104550",
+      "name": "Fife Council"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0,
+     1.0,
+     0.0,
+     1.0,
+     15.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "NL-FL",
+      "id": "104310",
+      "name": "Flevoland"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0,
+     1.0,
+     0.0,
+     1.0,
+     15.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "NL-GE",
+      "id": "104301",
+      "name": "Gelderland"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0,
+     1.0,
+     0.0,
+     1.0,
+     92.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "SE-I",
+      "id": "104444",
+      "name": "Gotland County"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0,
+     1.0,
+     0.0,
+     1.0,
+     17.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": null,
+      "id": "104603",
+      "name": "Greater Manchester County"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0,
+     1.0,
+     0.0,
+     1.0,
+     16.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "PL-WP",
+      "id": "104124",
+      "name": "Greater Poland Voivodeship"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0,
+     1.0,
+     0.0,
+     1.0,
+     19.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "BY-HR",
+      "id": "29634",
+      "name": "Grodno District"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0,
+     1.0,
+     0.0,
+     1.0,
+     26.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "TR-70",
+      "id": "103701",
+      "name": "Karaman"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0,
+     1.0,
+     0.0,
+     1.0,
+     16.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "LT-KU",
+      "id": "104261",
+      "name": "Kaunas County"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0,
+     3.0,
+     0.0,
+     3.0,
+     284.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "RU-KEM",
+      "id": "11282",
+      "name": "Kemerovo Oblast"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0,
+     1.0,
+     0.0,
+     1.0,
+     104.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "GB-KEN",
+      "id": "104624",
+      "name": "Kent County"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0,
+     1.0,
+     0.0,
+     1.0,
+     22.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "TR-41",
+      "id": "103706",
+      "name": "Kocaeli"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0,
+     1.0,
+     0.0,
+     1.0,
+     683.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "GB-LAN",
+      "id": "104596",
+      "name": "Lancashire County"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0,
+     1.0,
+     100.0,
+     1.0,
+     0.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "RU-ME",
+      "id": "11077",
+      "name": "Mari El Republic"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0,
+     2.0,
+     0.0,
+     2.0,
+     43.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "GB-MRY",
+      "id": "104544",
+      "name": "Moray Council"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0,
+     1.0,
+     0.0,
+     1.0,
+     311.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": null,
+      "id": "122005",
+      "name": "Phuket Province"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0,
+     1.0,
+     0.0,
+     1.0,
+     17.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "PT-13",
+      "id": "104345",
+      "name": "Porto District"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0,
+     2.0,
+     0.0,
+     2.0,
+     42.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "SK-PV",
+      "id": "104514",
+      "name": "Presov Region"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0,
+     2.0,
+     0.0,
+     2.0,
+     58.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "HR-08",
+      "id": "105479",
+      "name": "Primorje-Gorski Kotar County"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0,
+     1.0,
+     0.0,
+     1.0,
+     16.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "RU-PRI",
+      "id": "11409",
+      "name": "Primorsky Krai"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0,
+     2.0,
+     0.0,
+     2.0,
+     68.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "NL-GR",
+      "id": "104302",
+      "name": "Province of Groningen"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0,
+     2.0,
+     0.0,
+     2.0,
+     802.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "BE-WLG",
+      "id": "105779",
+      "name": "Province of Liège"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0,
+     1.0,
+     0.0,
+     1.0,
+     20.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "RU-PSK",
+      "id": "10926",
+      "name": "Pskov Oblast"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0,
+     2.0,
+     0.0,
+     2.0,
+     73.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "RU-BA",
+      "id": "11111",
+      "name": "Republic of Bashkortostan"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0,
+     1.0,
+     0.0,
+     1.0,
+     19.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "RU-DA",
+      "id": "11010",
+      "name": "Republic of Dagestan"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0,
+     1.0,
+     0.0,
+     1.0,
+     20.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "RU-RYA",
+      "id": "10776",
+      "name": "Ryazan Oblast"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0,
+     2.0,
+     0.0,
+     2.0,
+     137.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "RU-SAM",
+      "id": "11131",
+      "name": "Samara Oblast"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0,
+     2.0,
+     0.0,
+     2.0,
+     4753.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "FR-76",
+      "id": "152976",
+      "name": "Seine-Maritime"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0,
+     1.0,
+     0.0,
+     1.0,
+     19.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "LT-SA",
+      "id": "104268",
+      "name": "Shauljaj County"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0,
+     1.0,
+     0.0,
+     1.0,
+     16.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "RU-SMO",
+      "id": "10795",
+      "name": "Smolensk Oblast"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0,
+     1.0,
+     0.0,
+     1.0,
+     19.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "AU-SA",
+      "id": "21767",
+      "name": "South Australia"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0,
+     1.0,
+     0.0,
+     1.0,
+     22.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "CZ-JM",
+      "id": "104393",
+      "name": "South Moravian Region"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0,
+     1.0,
+     0.0,
+     1.0,
+     15.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": null,
+      "id": "104601",
+      "name": "South Yorkshire County"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0,
+     1.0,
+     0.0,
+     1.0,
+     16.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "GB-STS",
+      "id": "104607",
+      "name": "Staffordshire County"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0,
+     1.0,
+     0.0,
+     1.0,
+     15.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "BG-24",
+      "id": "104158",
+      "name": "Stara Zagora Province"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0,
+     2.0,
+     0.0,
+     2.0,
+     93.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "US-AL",
+      "id": "29318",
+      "name": "State of Alabama"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0,
+     1.0,
+     0.0,
+     1.0,
+     14.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "US-AK",
+      "id": "29319",
+      "name": "State of Alaska"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0,
+     2.0,
+     0.0,
+     2.0,
+     186.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "US-AR",
+      "id": "29321",
+      "name": "State of Arkansas"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0,
+     1.0,
+     100.0,
+     1.0,
+     0.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "BR-MG",
+      "id": "29303",
+      "name": "State of Minas Gerais"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0,
+     1.0,
+     0.0,
+     1.0,
+     21.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "US-MS",
+      "id": "29341",
+      "name": "State of Mississippi"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0,
+     1.0,
+     0.0,
+     1.0,
+     63.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "GB-SFK",
+      "id": "104614",
+      "name": "Suffolk County"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0,
+     1.0,
+     100.0,
+     1.0,
+     0.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "RO-TR",
+      "id": "105338",
+      "name": "Teleorman"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0,
+     1.0,
+     0.0,
+     1.0,
+     15.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "RU-UD",
+      "id": "11148",
+      "name": "Udmurt Republic"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0,
+     5.0,
+     0.0,
+     5.0,
+     75.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "AT-4",
+      "id": "104131",
+      "name": "Upper Austria"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0,
+     1.0,
+     100.0,
+     1.0,
+     0.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": null,
+      "id": "152698",
+      "name": "Var"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0,
+     1.0,
+     0.0,
+     1.0,
+     25.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": null,
+      "id": "152575",
+      "name": "Vienne"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0,
+     1.0,
+     0.0,
+     1.0,
+     16.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "RU-VLG",
+      "id": "10853",
+      "name": "Vologda Oblast"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0,
+     1.0,
+     100.0,
+     1.0,
+     0.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "RU-YAR",
+      "id": "10841",
+      "name": "Yaroslavl Oblast"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0,
+     2.0,
+     0.0,
+     2.0,
+     134.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "iso_name": "SK-ZI",
+      "id": "104511",
+      "name": "Zilina Region"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0,
+     1.0,
+     0.0,
+     1.0,
+     18.0
+    ]
+   }
+  ],
+  "total_rows": 179,
+  "total_rows_rounded": false,
+  "sampled": false,
+  "contains_sensitive_data": false,
+  "sample_share": 1.0,
+  "sample_size": 2678,
+  "sample_space": 2678,
+  "data_lag": 0,
+  "totals": [
+   2664.0,
+   617.0,
+   3169.0,
+   8.03303303,
+   1.18956456,
+   222.12162162
+  ],
+  "min": [
+   1.0,
+   1.0,
+   1.0,
+   0.0,
+   1.0,
+   0.0
+  ],
+  "max": [
+   231.0,
+   97.0,
+   326.0,
+   100.0,
+   6.0,
+   4753.0
+  ]
+ }
+}

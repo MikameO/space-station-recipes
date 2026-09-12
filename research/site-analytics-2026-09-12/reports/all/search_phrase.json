@@ -1,0 +1,73 @@
+{
+ "request": {
+  "ids": 108585248,
+  "metrics": "ym:s:visits,ym:s:users",
+  "date1": "2026-04-12",
+  "date2": "2026-09-12",
+  "limit": 5000,
+  "accuracy": "full",
+  "dimensions": "ym:s:searchPhrase",
+  "sort": "-ym:s:visits",
+  "filters": "ym:s:startURL!@'localhost' AND ym:s:startURL!@'127.0.0.1'"
+ },
+ "response": {
+  "query": {
+   "ids": [
+    108585248
+   ],
+   "dimensions": [
+    "ym:s:searchPhrase"
+   ],
+   "metrics": [
+    "ym:s:visits",
+    "ym:s:users"
+   ],
+   "sort": [
+    "-ym:s:visits"
+   ],
+   "date1": "2026-04-12",
+   "date2": "2026-09-12",
+   "filters": "ym:s:startURL!@'localhost' AND ym:s:startURL!@'127.0.0.1'",
+   "limit": 5000,
+   "offset": 1,
+   "group": "Week",
+   "benchmarks_version": "1788134400000",
+   "benchmarks_sub_industry": "false",
+   "auto_group_size": "1",
+   "exp_bucket_size": "100",
+   "attr_name": "",
+   "funnel_window": "",
+   "benchmarks_quantile": "50",
+   "time_interval": "1SECOND",
+   "intervals": "1",
+   "quantile": "50",
+   "offline_window": "21",
+   "attribution": "CROSS_DEVICE_LAST_SIGNIFICANT",
+   "currency": "RUB",
+   "benchmarks_attribution": "Automatic",
+   "adfox_event_id": "0",
+   "funnel_pattern": ""
+  },
+  "data": [],
+  "total_rows": 0,
+  "total_rows_rounded": false,
+  "sampled": false,
+  "contains_sensitive_data": true,
+  "sample_share": 1.0,
+  "sample_size": 2678,
+  "sample_space": 2678,
+  "data_lag": 0,
+  "totals": [
+   0.0,
+   0.0
+  ],
+  "min": [
+   0.0,
+   0.0
+  ],
+  "max": [
+   0.0,
+   0.0
+  ]
+ }
+}

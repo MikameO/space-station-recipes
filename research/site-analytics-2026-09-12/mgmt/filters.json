@@ -1,0 +1,13 @@
+{
+ "filters": [
+  {
+   "id": 67386116,
+   "attr": "url",
+   "type": "only_mirrors",
+   "value": "",
+   "action": "include",
+   "status": "active",
+   "with_subdomains": 0
+  }
+ ]
+}

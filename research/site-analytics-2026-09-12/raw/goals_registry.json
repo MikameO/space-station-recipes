@@ -1,0 +1,1086 @@
+{
+ "event_to_id": {
+  "tab_reactions": 581811867,
+  "tab_calculator": 581811868,
+  "tab_trees": 581811869,
+  "tab_graph": 581811870,
+  "tab_botany": 581811871,
+  "tab_stats": 581811872,
+  "tab_antag": 581811889,
+  "reagent_open": 581811890,
+  "fork_select": 581811907,
+  "search_used": 581811924,
+  "search_zero": 581811925,
+  "calc_run": 581811942,
+  "batch_plan": 581811943,
+  "reverse_used": 581811944,
+  "tree_built": 581811945,
+  "share_click": 581811946,
+  "antag_on": 581811947,
+  "strategy_to_batch": 581811948,
+  "tutorial_start": 581811981,
+  "tutorial_done": 581811982,
+  "tutorial_skip": 581811983,
+  "tab_medbay": 589718890,
+  "tab_maps": 589718891,
+  "tab_forkdiff": 589718892,
+  "whatheals_type": 589718893,
+  "whatheals_species": 589718894,
+  "beaker_sim": 589718895,
+  "tree_checklist_used": 589718896,
+  "preset_to_batch": 589718897,
+  "forkdiff_view": 589718898,
+  "pip_open": 589718899,
+  "pin_callout_shown": 589718900,
+  "pin_callout_dismiss": 589718917,
+  "companion_filters": 589718918,
+  "companion_collapse": 589718919,
+  "maps_map_select": 589718920,
+  "maps_search": 589718921,
+  "maps_sell_list": 589718922,
+  "maps_multi_show": 589718923,
+  "tab_ordnance": 612247774,
+  "ordnance_casing": 612248366,
+  "ordnance_add": 612248439,
+  "ordnance_heat_use": 612248440,
+  "ordnance_pareto_use": 612248453,
+  "ordnance_ladder_use": 612248454,
+  "ordnance_surf_view": 612248456,
+  "ordnance_pick": 612248457,
+  "ordnance_pick_use": 612248458,
+  "ordnance_req_search": 612248459,
+  "ordnance_req_use": 612248461,
+  "ordnance_mask_add": 612248766,
+  "ordnance_mask_use": 612248956,
+  "ordnance_recipe_use": 612248957,
+  "ordnance_gallery_range": 612248958,
+  "ordnance_burn_window": 612248959,
+  "ordnance_surf_swap": 612249189,
+  "ordnance_req_exclude": 612249348,
+  "ordnance_plan_open": 612249469,
+  "library_doc_open": 612249470,
+  "library_copy_markup": 612249472
+ },
+ "goals": [
+  {
+   "id": 581811867,
+   "name": "Вкладка: Reactions",
+   "type": "action",
+   "default_price": 0.0,
+   "is_retargeting": 0,
+   "goal_source": "user",
+   "is_favorite": 0,
+   "status": "Active",
+   "labels": [],
+   "conditions": [
+    {
+     "type": "exact",
+     "url": "tab_reactions"
+    }
+   ]
+  },
+  {
+   "id": 581811868,
+   "name": "Вкладка: Calculator",
+   "type": "action",
+   "default_price": 0.0,
+   "is_retargeting": 0,
+   "goal_source": "user",
+   "is_favorite": 0,
+   "status": "Active",
+   "labels": [],
+   "conditions": [
+    {
+     "type": "exact",
+     "url": "tab_calculator"
+    }
+   ]
+  },
+  {
+   "id": 581811869,
+   "name": "Вкладка: Craft Trees",
+   "type": "action",
+   "default_price": 0.0,
+   "is_retargeting": 0,
+   "goal_source": "user",
+   "is_favorite": 0,
+   "status": "Active",
+   "labels": [],
+   "conditions": [
+    {
+     "type": "exact",
+     "url": "tab_trees"
+    }
+   ]
+  },
+  {
+   "id": 581811870,
+   "name": "Вкладка: Graph",
+   "type": "action",
+   "default_price": 0.0,
+   "is_retargeting": 0,
+   "goal_source": "user",
+   "is_favorite": 0,
+   "status": "Active",
+   "labels": [],
+   "conditions": [
+    {
+     "type": "exact",
+     "url": "tab_graph"
+    }
+   ]
+  },
+  {
+   "id": 581811871,
+   "name": "Вкладка: Botany",
+   "type": "action",
+   "default_price": 0.0,
+   "is_retargeting": 0,
+   "goal_source": "user",
+   "is_favorite": 0,
+   "status": "Active",
+   "labels": [],
+   "conditions": [
+    {
+     "type": "exact",
+     "url": "tab_botany"
+    }
+   ]
+  },
+  {
+   "id": 581811872,
+   "name": "Вкладка: Stats",
+   "type": "action",
+   "default_price": 0.0,
+   "is_retargeting": 0,
+   "goal_source": "user",
+   "is_favorite": 0,
+   "status": "Active",
+   "labels": [],
+   "conditions": [
+    {
+     "type": "exact",
+     "url": "tab_stats"
+    }
+   ]
+  },
+  {
+   "id": 581811889,
+   "name": "Вкладка: Antag Strategies",
+   "type": "action",
+   "default_price": 0.0,
+   "is_retargeting": 0,
+   "goal_source": "user",
+   "is_favorite": 0,
+   "status": "Active",
+   "labels": [],
+   "conditions": [
+    {
+     "type": "exact",
+     "url": "tab_antag"
+    }
+   ]
+  },
+  {
+   "id": 581811890,
+   "name": "Открыта карточка реагента",
+   "type": "action",
+   "default_price": 0.0,
+   "is_retargeting": 0,
+   "goal_source": "user",
+   "is_favorite": 0,
+   "status": "Active",
+   "labels": [],
+   "conditions": [
+    {
+     "type": "exact",
+     "url": "reagent_open"
+    }
+   ]
+  },
+  {
+   "id": 581811907,
+   "name": "Выбран форк в Source-фильтре",
+   "type": "action",
+   "default_price": 0.0,
+   "is_retargeting": 0,
+   "goal_source": "user",
+   "is_favorite": 0,
+   "status": "Active",
+   "labels": [],
+   "conditions": [
+    {
+     "type": "exact",
+     "url": "fork_select"
+    }
+   ]
+  },
+  {
+   "id": 581811924,
+   "name": "Поиск: запрос с результатами",
+   "type": "action",
+   "default_price": 0.0,
+   "is_retargeting": 0,
+   "goal_source": "user",
+   "is_favorite": 0,
+   "status": "Active",
+   "labels": [],
+   "conditions": [
+    {
+     "type": "exact",
+     "url": "search_used"
+    }
+   ]
+  },
+  {
+   "id": 581811925,
+   "name": "Поиск: 0 результатов",
+   "type": "action",
+   "default_price": 0.0,
+   "is_retargeting": 0,
+   "goal_source": "user",
+   "is_favorite": 0,
+   "status": "Active",
+   "labels": [],
+   "conditions": [
+    {
+     "type": "exact",
+     "url": "search_zero"
+    }
+   ]
+  },
+  {
+   "id": 581811942,
+   "name": "Калькулятор: расчёт рецепта",
+   "type": "action",
+   "default_price": 0.0,
+   "is_retargeting": 0,
+   "goal_source": "user",
+   "is_favorite": 0,
+   "status": "Active",
+   "labels": [],
+   "conditions": [
+    {
+     "type": "exact",
+     "url": "calc_run"
+    }
+   ]
+  },
+  {
+   "id": 581811943,
+   "name": "Калькулятор: batch-план",
+   "type": "action",
+   "default_price": 0.0,
+   "is_retargeting": 0,
+   "goal_source": "user",
+   "is_favorite": 0,
+   "status": "Active",
+   "labels": [],
+   "conditions": [
+    {
+     "type": "exact",
+     "url": "batch_plan"
+    }
+   ]
+  },
+  {
+   "id": 581811944,
+   "name": "Калькулятор: reverse lookup",
+   "type": "action",
+   "default_price": 0.0,
+   "is_retargeting": 0,
+   "goal_source": "user",
+   "is_favorite": 0,
+   "status": "Active",
+   "labels": [],
+   "conditions": [
+    {
+     "type": "exact",
+     "url": "reverse_used"
+    }
+   ]
+  },
+  {
+   "id": 581811945,
+   "name": "Построено craft-дерево",
+   "type": "action",
+   "default_price": 0.0,
+   "is_retargeting": 0,
+   "goal_source": "user",
+   "is_favorite": 0,
+   "status": "Active",
+   "labels": [],
+   "conditions": [
+    {
+     "type": "exact",
+     "url": "tree_built"
+    }
+   ]
+  },
+  {
+   "id": 581811946,
+   "name": "Скопирована share-ссылка",
+   "type": "action",
+   "default_price": 0.0,
+   "is_retargeting": 0,
+   "goal_source": "user",
+   "is_favorite": 0,
+   "status": "Active",
+   "labels": [],
+   "conditions": [
+    {
+     "type": "exact",
+     "url": "share_click"
+    }
+   ]
+  },
+  {
+   "id": 581811947,
+   "name": "Включён antag-режим",
+   "type": "action",
+   "default_price": 0.0,
+   "is_retargeting": 0,
+   "goal_source": "user",
+   "is_favorite": 0,
+   "status": "Active",
+   "labels": [],
+   "conditions": [
+    {
+     "type": "exact",
+     "url": "antag_on"
+    }
+   ]
+  },
+  {
+   "id": 581811948,
+   "name": "Стратегия загружена в batch",
+   "type": "action",
+   "default_price": 0.0,
+   "is_retargeting": 0,
+   "goal_source": "user",
+   "is_favorite": 0,
+   "status": "Active",
+   "labels": [],
+   "conditions": [
+    {
+     "type": "exact",
+     "url": "strategy_to_batch"
+    }
+   ]
+  },
+  {
+   "id": 581811981,
+   "name": "Туториал: старт",
+   "type": "action",
+   "default_price": 0.0,
+   "is_retargeting": 0,
+   "goal_source": "user",
+   "is_favorite": 0,
+   "status": "Active",
+   "labels": [],
+   "conditions": [
+    {
+     "type": "exact",
+     "url": "tutorial_start"
+    }
+   ]
+  },
+  {
+   "id": 581811982,
+   "name": "Туториал: пройден до конца",
+   "type": "action",
+   "default_price": 0.0,
+   "is_retargeting": 0,
+   "goal_source": "user",
+   "is_favorite": 0,
+   "status": "Active",
+   "labels": [],
+   "conditions": [
+    {
+     "type": "exact",
+     "url": "tutorial_done"
+    }
+   ]
+  },
+  {
+   "id": 581811983,
+   "name": "Туториал: пропущен",
+   "type": "action",
+   "default_price": 0.0,
+   "is_retargeting": 0,
+   "goal_source": "user",
+   "is_favorite": 0,
+   "status": "Active",
+   "labels": [],
+   "conditions": [
+    {
+     "type": "exact",
+     "url": "tutorial_skip"
+    }
+   ]
+  },
+  {
+   "id": 589718890,
+   "name": "Вкладка: Medbay (Чем лечить)",
+   "type": "action",
+   "default_price": 0.0,
+   "is_retargeting": 0,
+   "goal_source": "user",
+   "is_favorite": 0,
+   "status": "Active",
+   "labels": [],
+   "conditions": [
+    {
+     "type": "exact",
+     "url": "tab_medbay"
+    }
+   ]
+  },
+  {
+   "id": 589718891,
+   "name": "Вкладка: Maps",
+   "type": "action",
+   "default_price": 0.0,
+   "is_retargeting": 0,
+   "goal_source": "user",
+   "is_favorite": 0,
+   "status": "Active",
+   "labels": [],
+   "conditions": [
+    {
+     "type": "exact",
+     "url": "tab_maps"
+    }
+   ]
+  },
+  {
+   "id": 589718892,
+   "name": "Вкладка: Fork Diff",
+   "type": "action",
+   "default_price": 0.0,
+   "is_retargeting": 0,
+   "goal_source": "user",
+   "is_favorite": 0,
+   "status": "Active",
+   "labels": [],
+   "conditions": [
+    {
+     "type": "exact",
+     "url": "tab_forkdiff"
+    }
+   ]
+  },
+  {
+   "id": 589718893,
+   "name": "Medbay: выбран тип урона",
+   "type": "action",
+   "default_price": 0.0,
+   "is_retargeting": 0,
+   "goal_source": "user",
+   "is_favorite": 0,
+   "status": "Active",
+   "labels": [],
+   "conditions": [
+    {
+     "type": "exact",
+     "url": "whatheals_type"
+    }
+   ]
+  },
+  {
+   "id": 589718894,
+   "name": "Medbay: выбран вид существа",
+   "type": "action",
+   "default_price": 0.0,
+   "is_retargeting": 0,
+   "goal_source": "user",
+   "is_favorite": 0,
+   "status": "Active",
+   "labels": [],
+   "conditions": [
+    {
+     "type": "exact",
+     "url": "whatheals_species"
+    }
+   ]
+  },
+  {
+   "id": 589718895,
+   "name": "Симулятор стакана: запуск",
+   "type": "action",
+   "default_price": 0.0,
+   "is_retargeting": 0,
+   "goal_source": "user",
+   "is_favorite": 0,
+   "status": "Active",
+   "labels": [],
+   "conditions": [
+    {
+     "type": "exact",
+     "url": "beaker_sim"
+    }
+   ]
+  },
+  {
+   "id": 589718896,
+   "name": "Дерево: чеклист использован",
+   "type": "action",
+   "default_price": 0.0,
+   "is_retargeting": 0,
+   "goal_source": "user",
+   "is_favorite": 0,
+   "status": "Active",
+   "labels": [],
+   "conditions": [
+    {
+     "type": "exact",
+     "url": "tree_checklist_used"
+    }
+   ]
+  },
+  {
+   "id": 589718897,
+   "name": "Пресет загружен в batch",
+   "type": "action",
+   "default_price": 0.0,
+   "is_retargeting": 0,
+   "goal_source": "user",
+   "is_favorite": 0,
+   "status": "Active",
+   "labels": [],
+   "conditions": [
+    {
+     "type": "exact",
+     "url": "preset_to_batch"
+    }
+   ]
+  },
+  {
+   "id": 589718898,
+   "name": "Fork Diff: просмотр пары форков",
+   "type": "action",
+   "default_price": 0.0,
+   "is_retargeting": 0,
+   "goal_source": "user",
+   "is_favorite": 0,
+   "status": "Active",
+   "labels": [],
+   "conditions": [
+    {
+     "type": "exact",
+     "url": "forkdiff_view"
+    }
+   ]
+  },
+  {
+   "id": 589718899,
+   "name": "Открыт PiP-режим",
+   "type": "action",
+   "default_price": 0.0,
+   "is_retargeting": 0,
+   "goal_source": "user",
+   "is_favorite": 0,
+   "status": "Active",
+   "labels": [],
+   "conditions": [
+    {
+     "type": "exact",
+     "url": "pip_open"
+    }
+   ]
+  },
+  {
+   "id": 589718900,
+   "name": "Pin-подсказка показана",
+   "type": "action",
+   "default_price": 0.0,
+   "is_retargeting": 0,
+   "goal_source": "user",
+   "is_favorite": 0,
+   "status": "Active",
+   "labels": [],
+   "conditions": [
+    {
+     "type": "exact",
+     "url": "pin_callout_shown"
+    }
+   ]
+  },
+  {
+   "id": 589718917,
+   "name": "Pin-подсказка закрыта",
+   "type": "action",
+   "default_price": 0.0,
+   "is_retargeting": 0,
+   "goal_source": "user",
+   "is_favorite": 0,
+   "status": "Active",
+   "labels": [],
+   "conditions": [
+    {
+     "type": "exact",
+     "url": "pin_callout_dismiss"
+    }
+   ]
+  },
+  {
+   "id": 589718918,
+   "name": "Companion: переключены фильтры",
+   "type": "action",
+   "default_price": 0.0,
+   "is_retargeting": 0,
+   "goal_source": "user",
+   "is_favorite": 0,
+   "status": "Active",
+   "labels": [],
+   "conditions": [
+    {
+     "type": "exact",
+     "url": "companion_filters"
+    }
+   ]
+  },
+  {
+   "id": 589718919,
+   "name": "Companion: панель свёрнута",
+   "type": "action",
+   "default_price": 0.0,
+   "is_retargeting": 0,
+   "goal_source": "user",
+   "is_favorite": 0,
+   "status": "Active",
+   "labels": [],
+   "conditions": [
+    {
+     "type": "exact",
+     "url": "companion_collapse"
+    }
+   ]
+  },
+  {
+   "id": 589718920,
+   "name": "Карты: выбрана станция",
+   "type": "action",
+   "default_price": 0.0,
+   "is_retargeting": 0,
+   "goal_source": "user",
+   "is_favorite": 0,
+   "status": "Active",
+   "labels": [],
+   "conditions": [
+    {
+     "type": "exact",
+     "url": "maps_map_select"
+    }
+   ]
+  },
+  {
+   "id": 589718921,
+   "name": "Карты: поиск предмета",
+   "type": "action",
+   "default_price": 0.0,
+   "is_retargeting": 0,
+   "goal_source": "user",
+   "is_favorite": 0,
+   "status": "Active",
+   "labels": [],
+   "conditions": [
+    {
+     "type": "exact",
+     "url": "maps_search"
+    }
+   ]
+  },
+  {
+   "id": 589718922,
+   "name": "Карты: открыт sell-list",
+   "type": "action",
+   "default_price": 0.0,
+   "is_retargeting": 0,
+   "goal_source": "user",
+   "is_favorite": 0,
+   "status": "Active",
+   "labels": [],
+   "conditions": [
+    {
+     "type": "exact",
+     "url": "maps_sell_list"
+    }
+   ]
+  },
+  {
+   "id": 589718923,
+   "name": "Карты: multi-show",
+   "type": "action",
+   "default_price": 0.0,
+   "is_retargeting": 0,
+   "goal_source": "user",
+   "is_favorite": 0,
+   "status": "Active",
+   "labels": [],
+   "conditions": [
+    {
+     "type": "exact",
+     "url": "maps_multi_show"
+    }
+   ]
+  },
+  {
+   "id": 612247774,
+   "name": "Открыт таб Взрывное дело",
+   "type": "action",
+   "default_price": 0.0,
+   "is_retargeting": 0,
+   "goal_source": "user",
+   "is_favorite": 0,
+   "status": "Active",
+   "labels": [],
+   "conditions": [
+    {
+     "type": "exact",
+     "url": "tab_ordnance"
+    }
+   ]
+  },
+  {
+   "id": 612248366,
+   "name": "Взрывчатка: выбран корпус",
+   "type": "action",
+   "default_price": 0.0,
+   "is_retargeting": 0,
+   "goal_source": "user",
+   "is_favorite": 0,
+   "status": "Active",
+   "labels": [],
+   "conditions": [
+    {
+     "type": "exact",
+     "url": "ordnance_casing"
+    }
+   ]
+  },
+  {
+   "id": 612248439,
+   "name": "Взрывчатка: добавлен реагент",
+   "type": "action",
+   "default_price": 0.0,
+   "is_retargeting": 0,
+   "goal_source": "user",
+   "is_favorite": 0,
+   "status": "Active",
+   "labels": [],
+   "conditions": [
+    {
+     "type": "exact",
+     "url": "ordnance_add"
+    }
+   ]
+  },
+  {
+   "id": 612248440,
+   "name": "Взрывчатка: смесь из теплокарты",
+   "type": "action",
+   "default_price": 0.0,
+   "is_retargeting": 0,
+   "goal_source": "user",
+   "is_favorite": 0,
+   "status": "Active",
+   "labels": [],
+   "conditions": [
+    {
+     "type": "exact",
+     "url": "ordnance_heat_use"
+    }
+   ]
+  },
+  {
+   "id": 612248453,
+   "name": "Взрывчатка: смесь из Парето-таблицы (удалён)",
+   "type": "action",
+   "default_price": 0.0,
+   "is_retargeting": 0,
+   "goal_source": "user",
+   "is_favorite": 0,
+   "status": "Active",
+   "labels": [],
+   "conditions": [
+    {
+     "type": "exact",
+     "url": "ordnance_pareto_use"
+    }
+   ]
+  },
+  {
+   "id": 612248454,
+   "name": "Взрывчатка: смесь из лестницы цены",
+   "type": "action",
+   "default_price": 0.0,
+   "is_retargeting": 0,
+   "goal_source": "user",
+   "is_favorite": 0,
+   "status": "Active",
+   "labels": [],
+   "conditions": [
+    {
+     "type": "exact",
+     "url": "ordnance_ladder_use"
+    }
+   ]
+  },
+  {
+   "id": 612248456,
+   "name": "Взрывчатка: переключён вид поверхности",
+   "type": "action",
+   "default_price": 0.0,
+   "is_retargeting": 0,
+   "goal_source": "user",
+   "is_favorite": 0,
+   "status": "Active",
+   "labels": [],
+   "conditions": [
+    {
+     "type": "exact",
+     "url": "ordnance_surf_view"
+    }
+   ]
+  },
+  {
+   "id": 612248457,
+   "name": "Взрывчатка: точка разобрана кликом",
+   "type": "action",
+   "default_price": 0.0,
+   "is_retargeting": 0,
+   "goal_source": "user",
+   "is_favorite": 0,
+   "status": "Active",
+   "labels": [],
+   "conditions": [
+    {
+     "type": "exact",
+     "url": "ordnance_pick"
+    }
+   ]
+  },
+  {
+   "id": 612248458,
+   "name": "Взрывчатка: смесь из разбора точки",
+   "type": "action",
+   "default_price": 0.0,
+   "is_retargeting": 0,
+   "goal_source": "user",
+   "is_favorite": 0,
+   "status": "Active",
+   "labels": [],
+   "conditions": [
+    {
+     "type": "exact",
+     "url": "ordnance_pick_use"
+    }
+   ]
+  },
+  {
+   "id": 612248459,
+   "name": "Взрывчатка: поиск под задачу",
+   "type": "action",
+   "default_price": 0.0,
+   "is_retargeting": 0,
+   "goal_source": "user",
+   "is_favorite": 0,
+   "status": "Active",
+   "labels": [],
+   "conditions": [
+    {
+     "type": "exact",
+     "url": "ordnance_req_search"
+    }
+   ]
+  },
+  {
+   "id": 612248461,
+   "name": "Взрывчатка: смесь из поиска под задачу",
+   "type": "action",
+   "default_price": 0.0,
+   "is_retargeting": 0,
+   "goal_source": "user",
+   "is_favorite": 0,
+   "status": "Active",
+   "labels": [],
+   "conditions": [
+    {
+     "type": "exact",
+     "url": "ordnance_req_use"
+    }
+   ]
+  },
+  {
+   "id": 612248766,
+   "name": "Взрывчатка: добавлена маска",
+   "type": "action",
+   "default_price": 0.0,
+   "is_retargeting": 0,
+   "goal_source": "user",
+   "is_favorite": 0,
+   "status": "Active",
+   "labels": [],
+   "conditions": [
+    {
+     "type": "exact",
+     "url": "ordnance_mask_add"
+    }
+   ]
+  },
+  {
+   "id": 612248956,
+   "name": "Взрывчатка: смесь из пересечения масок",
+   "type": "action",
+   "default_price": 0.0,
+   "is_retargeting": 0,
+   "goal_source": "user",
+   "is_favorite": 0,
+   "status": "Active",
+   "labels": [],
+   "conditions": [
+    {
+     "type": "exact",
+     "url": "ordnance_mask_use"
+    }
+   ]
+  },
+  {
+   "id": 612248957,
+   "name": "Взрывчатка: готовый рецепт загружен",
+   "type": "action",
+   "default_price": 0.0,
+   "is_retargeting": 0,
+   "goal_source": "user",
+   "is_favorite": 0,
+   "status": "Active",
+   "labels": [],
+   "conditions": [
+    {
+     "type": "exact",
+     "url": "ordnance_recipe_use"
+    }
+   ]
+  },
+  {
+   "id": 612248958,
+   "name": "Взрывчатка: дистанция в витрине",
+   "type": "action",
+   "default_price": 0.0,
+   "is_retargeting": 0,
+   "goal_source": "user",
+   "is_favorite": 0,
+   "status": "Active",
+   "labels": [],
+   "conditions": [
+    {
+     "type": "exact",
+     "url": "ordnance_gallery_range"
+    }
+   ]
+  },
+  {
+   "id": 612248959,
+   "name": "Взрывчатка: окно горения",
+   "type": "action",
+   "default_price": 0.0,
+   "is_retargeting": 0,
+   "goal_source": "user",
+   "is_favorite": 0,
+   "status": "Active",
+   "labels": [],
+   "conditions": [
+    {
+     "type": "exact",
+     "url": "ordnance_burn_window"
+    }
+   ]
+  },
+  {
+   "id": 612249189,
+   "name": "Взрывчатка: обмен высоты и цвета",
+   "type": "action",
+   "default_price": 0.0,
+   "is_retargeting": 0,
+   "goal_source": "user",
+   "is_favorite": 0,
+   "status": "Active",
+   "labels": [],
+   "conditions": [
+    {
+     "type": "exact",
+     "url": "ordnance_surf_swap"
+    }
+   ]
+  },
+  {
+   "id": 612249348,
+   "name": "Взрывчатка: исключён реагент из поиска",
+   "type": "action",
+   "default_price": 0.0,
+   "is_retargeting": 0,
+   "goal_source": "user",
+   "is_favorite": 0,
+   "status": "Active",
+   "labels": [],
+   "conditions": [
+    {
+     "type": "exact",
+     "url": "ordnance_req_exclude"
+    }
+   ]
+  },
+  {
+   "id": 612249469,
+   "name": "Взрывчатка: раскрыт шаг закупки",
+   "type": "action",
+   "default_price": 0.0,
+   "is_retargeting": 0,
+   "goal_source": "user",
+   "is_favorite": 0,
+   "status": "Active",
+   "labels": [],
+   "conditions": [
+    {
+     "type": "exact",
+     "url": "ordnance_plan_open"
+    }
+   ]
+  },
+  {
+   "id": 612249470,
+   "name": "Библиотека: открыт документ",
+   "type": "action",
+   "default_price": 0.0,
+   "is_retargeting": 0,
+   "goal_source": "user",
+   "is_favorite": 0,
+   "status": "Active",
+   "labels": [],
+   "conditions": [
+    {
+     "type": "exact",
+     "url": "library_doc_open"
+    }
+   ]
+  },
+  {
+   "id": 612249472,
+   "name": "Библиотека: скопирована разметка",
+   "type": "action",
+   "default_price": 0.0,
+   "is_retargeting": 0,
+   "goal_source": "user",
+   "is_favorite": 0,
+   "status": "Active",
+   "labels": [],
+   "conditions": [
+    {
+     "type": "exact",
+     "url": "library_copy_markup"
+    }
+   ]
+  }
+ ]
+}

@@ -10,3 +10,6 @@ Thumbs.db
 .gstack/
 # Community-demand research: raw scraped third-party UGC kept local (not republished)
 research/ss14-community-demand/raw/
+
+# Metrika Logs API raw dumps: visit-level rows (clientID, city, UA); never publish
+research/**/logs/

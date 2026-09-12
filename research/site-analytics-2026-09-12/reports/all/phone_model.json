@@ -1,0 +1,1329 @@
+{
+ "request": {
+  "ids": 108585248,
+  "metrics": "ym:s:visits,ym:s:users",
+  "date1": "2026-04-12",
+  "date2": "2026-09-12",
+  "limit": 5000,
+  "accuracy": "full",
+  "dimensions": "ym:s:mobilePhone,ym:s:mobilePhoneModel",
+  "sort": "-ym:s:visits",
+  "filters": "ym:s:startURL!@'localhost' AND ym:s:startURL!@'127.0.0.1'"
+ },
+ "response": {
+  "query": {
+   "ids": [
+    108585248
+   ],
+   "dimensions": [
+    "ym:s:mobilePhone",
+    "ym:s:mobilePhoneModel"
+   ],
+   "metrics": [
+    "ym:s:visits",
+    "ym:s:users"
+   ],
+   "sort": [
+    "-ym:s:visits"
+   ],
+   "date1": "2026-04-12",
+   "date2": "2026-09-12",
+   "filters": "ym:s:startURL!@'localhost' AND ym:s:startURL!@'127.0.0.1'",
+   "limit": 5000,
+   "offset": 1,
+   "group": "Week",
+   "benchmarks_version": "1788134400000",
+   "benchmarks_sub_industry": "false",
+   "auto_group_size": "1",
+   "exp_bucket_size": "100",
+   "attr_name": "",
+   "funnel_window": "",
+   "benchmarks_quantile": "50",
+   "time_interval": "1SECOND",
+   "intervals": "1",
+   "quantile": "50",
+   "offline_window": "21",
+   "attribution": "CROSS_DEVICE_LAST_SIGNIFICANT",
+   "currency": "RUB",
+   "benchmarks_attribution": "Automatic",
+   "adfox_event_id": "0",
+   "funnel_pattern": ""
+  },
+  "data": [
+   {
+    "dimensions": [
+     {
+      "icon_id": "1",
+      "icon_type": "mobile",
+      "name": "Apple",
+      "id": "1"
+     },
+     {
+      "icon_type": "mobile",
+      "name": "iPhone",
+      "icon_id": "1"
+     }
+    ],
+    "metrics": [
+     108.0,
+     66.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "7",
+      "icon_type": "mobile",
+      "name": "Samsung",
+      "id": "7"
+     },
+     {
+      "icon_type": "mobile",
+      "name": "sm-g991w",
+      "icon_id": "7"
+     }
+    ],
+    "metrics": [
+     13.0,
+     2.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "207",
+      "icon_type": "mobile",
+      "name": "Xiaomi",
+      "id": "207"
+     },
+     {
+      "icon_type": "mobile",
+      "name": "22111317pg",
+      "icon_id": "207"
+     }
+    ],
+    "metrics": [
+     10.0,
+     2.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "7",
+      "icon_type": "mobile",
+      "name": "Samsung",
+      "id": "7"
+     },
+     {
+      "icon_type": "mobile",
+      "name": "sm-p619",
+      "icon_id": "7"
+     }
+    ],
+    "metrics": [
+     8.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "1",
+      "icon_type": "mobile",
+      "name": "Apple",
+      "id": "1"
+     },
+     {
+      "icon_type": "mobile",
+      "name": "iPad",
+      "icon_id": "1"
+     }
+    ],
+    "metrics": [
+     7.0,
+     3.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "7",
+      "icon_type": "mobile",
+      "name": "Samsung",
+      "id": "7"
+     },
+     {
+      "icon_type": "mobile",
+      "name": "sm-s936b",
+      "icon_id": "7"
+     }
+    ],
+    "metrics": [
+     5.0,
+     2.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "7",
+      "icon_type": "mobile",
+      "name": "Samsung",
+      "id": "7"
+     },
+     {
+      "icon_type": "mobile",
+      "name": "sm-f936n",
+      "icon_id": "7"
+     }
+    ],
+    "metrics": [
+     4.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "207",
+      "icon_type": "mobile",
+      "name": "Xiaomi",
+      "id": "207"
+     },
+     {
+      "icon_type": "mobile",
+      "name": "2412dpc0ag",
+      "icon_id": "207"
+     }
+    ],
+    "metrics": [
+     4.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "7",
+      "icon_type": "mobile",
+      "name": "Samsung",
+      "id": "7"
+     },
+     {
+      "icon_type": "mobile",
+      "name": "sm-a336b",
+      "icon_id": "7"
+     }
+    ],
+    "metrics": [
+     3.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "7",
+      "icon_type": "mobile",
+      "name": "Samsung",
+      "id": "7"
+     },
+     {
+      "icon_type": "mobile",
+      "name": "sm-s928b",
+      "icon_id": "7"
+     }
+    ],
+    "metrics": [
+     3.0,
+     2.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "7",
+      "icon_type": "mobile",
+      "name": "Samsung",
+      "id": "7"
+     },
+     {
+      "icon_type": "mobile",
+      "name": "sm-s936u",
+      "icon_id": "7"
+     }
+    ],
+    "metrics": [
+     3.0,
+     3.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "7",
+      "icon_type": "mobile",
+      "name": "Samsung",
+      "id": "7"
+     },
+     {
+      "icon_type": "mobile",
+      "name": "sm-a032f",
+      "icon_id": "7"
+     }
+    ],
+    "metrics": [
+     2.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "7",
+      "icon_type": "mobile",
+      "name": "Samsung",
+      "id": "7"
+     },
+     {
+      "icon_type": "mobile",
+      "name": "sm-a256e",
+      "icon_id": "7"
+     }
+    ],
+    "metrics": [
+     2.0,
+     2.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "7",
+      "icon_type": "mobile",
+      "name": "Samsung",
+      "id": "7"
+     },
+     {
+      "icon_type": "mobile",
+      "name": "sm-s918u",
+      "icon_id": "7"
+     }
+    ],
+    "metrics": [
+     2.0,
+     2.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "7",
+      "icon_type": "mobile",
+      "name": "Samsung",
+      "id": "7"
+     },
+     {
+      "icon_type": "mobile",
+      "name": "sm-s931n",
+      "icon_id": "7"
+     }
+    ],
+    "metrics": [
+     2.0,
+     2.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "83",
+      "icon_type": "mobile",
+      "name": "Sony",
+      "id": "83"
+     },
+     {
+      "icon_type": "mobile",
+      "name": "i2407",
+      "icon_id": "83"
+     }
+    ],
+    "metrics": [
+     2.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "126",
+      "icon_type": "mobile",
+      "name": "Google",
+      "id": "126"
+     },
+     {
+      "icon_type": "mobile",
+      "name": "pixel 3a",
+      "icon_id": "126"
+     }
+    ],
+    "metrics": [
+     2.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "207",
+      "icon_type": "mobile",
+      "name": "Xiaomi",
+      "id": "207"
+     },
+     {
+      "icon_type": "mobile",
+      "name": "22101316g",
+      "icon_id": "207"
+     }
+    ],
+    "metrics": [
+     2.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "207",
+      "icon_type": "mobile",
+      "name": "Xiaomi",
+      "id": "207"
+     },
+     {
+      "icon_type": "mobile",
+      "name": "24116raccg",
+      "icon_id": "207"
+     }
+    ],
+    "metrics": [
+     2.0,
+     2.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "238",
+      "icon_type": "mobile",
+      "name": "Tecno",
+      "id": "238"
+     },
+     {
+      "icon_type": "mobile",
+      "name": "tecno ck9n",
+      "icon_id": "238"
+     }
+    ],
+    "metrics": [
+     2.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "238",
+      "icon_type": "mobile",
+      "name": "Tecno",
+      "id": "238"
+     },
+     {
+      "icon_type": "mobile",
+      "name": "tecno km6",
+      "icon_id": "238"
+     }
+    ],
+    "metrics": [
+     2.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "582",
+      "icon_type": "mobile",
+      "name": "HONOR",
+      "id": "582"
+     },
+     {
+      "icon_type": "mobile",
+      "name": "abr-nx1",
+      "icon_id": "582"
+     }
+    ],
+    "metrics": [
+     2.0,
+     2.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "1",
+      "icon_type": "mobile",
+      "name": "Apple",
+      "id": "1"
+     },
+     {
+      "icon_type": "mobile",
+      "name": "iphone",
+      "icon_id": "1"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "5",
+      "icon_type": "mobile",
+      "name": "Motorola",
+      "id": "5"
+     },
+     {
+      "icon_type": "mobile",
+      "name": "moto e40",
+      "icon_id": "5"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "5",
+      "icon_type": "mobile",
+      "name": "Motorola",
+      "id": "5"
+     },
+     {
+      "icon_type": "mobile",
+      "name": "moto g stylus 5g - 2023",
+      "icon_id": "5"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "5",
+      "icon_type": "mobile",
+      "name": "Motorola",
+      "id": "5"
+     },
+     {
+      "icon_type": "mobile",
+      "name": "motorola razr 2023",
+      "icon_id": "5"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "7",
+      "icon_type": "mobile",
+      "name": "Samsung",
+      "id": "7"
+     },
+     {
+      "icon_type": "mobile",
+      "name": "sm-a156u",
+      "icon_id": "7"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "7",
+      "icon_type": "mobile",
+      "name": "Samsung",
+      "id": "7"
+     },
+     {
+      "icon_type": "mobile",
+      "name": "sm-a376u",
+      "icon_id": "7"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "7",
+      "icon_type": "mobile",
+      "name": "Samsung",
+      "id": "7"
+     },
+     {
+      "icon_type": "mobile",
+      "name": "sm-a515f",
+      "icon_id": "7"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "7",
+      "icon_type": "mobile",
+      "name": "Samsung",
+      "id": "7"
+     },
+     {
+      "icon_type": "mobile",
+      "name": "sm-a705fn",
+      "icon_id": "7"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "7",
+      "icon_type": "mobile",
+      "name": "Samsung",
+      "id": "7"
+     },
+     {
+      "icon_type": "mobile",
+      "name": "sm-f741u",
+      "icon_id": "7"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "7",
+      "icon_type": "mobile",
+      "name": "Samsung",
+      "id": "7"
+     },
+     {
+      "icon_type": "mobile",
+      "name": "sm-g781u1",
+      "icon_id": "7"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "7",
+      "icon_type": "mobile",
+      "name": "Samsung",
+      "id": "7"
+     },
+     {
+      "icon_type": "mobile",
+      "name": "sm-g960u",
+      "icon_id": "7"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "7",
+      "icon_type": "mobile",
+      "name": "Samsung",
+      "id": "7"
+     },
+     {
+      "icon_type": "mobile",
+      "name": "sm-g970u",
+      "icon_id": "7"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "7",
+      "icon_type": "mobile",
+      "name": "Samsung",
+      "id": "7"
+     },
+     {
+      "icon_type": "mobile",
+      "name": "sm-g970u1",
+      "icon_id": "7"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "7",
+      "icon_type": "mobile",
+      "name": "Samsung",
+      "id": "7"
+     },
+     {
+      "icon_type": "mobile",
+      "name": "sm-p610",
+      "icon_id": "7"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "7",
+      "icon_type": "mobile",
+      "name": "Samsung",
+      "id": "7"
+     },
+     {
+      "icon_type": "mobile",
+      "name": "sm-s721b",
+      "icon_id": "7"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "7",
+      "icon_type": "mobile",
+      "name": "Samsung",
+      "id": "7"
+     },
+     {
+      "icon_type": "mobile",
+      "name": "sm-s901u1",
+      "icon_id": "7"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "7",
+      "icon_type": "mobile",
+      "name": "Samsung",
+      "id": "7"
+     },
+     {
+      "icon_type": "mobile",
+      "name": "sm-s931u",
+      "icon_id": "7"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "7",
+      "icon_type": "mobile",
+      "name": "Samsung",
+      "id": "7"
+     },
+     {
+      "icon_type": "mobile",
+      "name": "sm-s938b",
+      "icon_id": "7"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "7",
+      "icon_type": "mobile",
+      "name": "Samsung",
+      "id": "7"
+     },
+     {
+      "icon_type": "mobile",
+      "name": "sm-s938u",
+      "icon_id": "7"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "63",
+      "icon_type": "mobile",
+      "name": "Huawei",
+      "id": "63"
+     },
+     {
+      "icon_type": "mobile",
+      "name": "foa-lx9",
+      "icon_id": "63"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "89",
+      "icon_type": "mobile",
+      "name": "OPPO",
+      "id": "89"
+     },
+     {
+      "icon_type": "mobile",
+      "name": "cph2481",
+      "icon_id": "89"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "89",
+      "icon_type": "mobile",
+      "name": "OPPO",
+      "id": "89"
+     },
+     {
+      "icon_type": "mobile",
+      "name": "cph2655",
+      "icon_id": "89"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "89",
+      "icon_type": "mobile",
+      "name": "OPPO",
+      "id": "89"
+     },
+     {
+      "icon_type": "mobile",
+      "name": "cph2743",
+      "icon_id": "89"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "126",
+      "icon_type": "mobile",
+      "name": "Google",
+      "id": "126"
+     },
+     {
+      "icon_type": "mobile",
+      "name": "nexus 5",
+      "icon_id": "126"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "126",
+      "icon_type": "mobile",
+      "name": "Google",
+      "id": "126"
+     },
+     {
+      "icon_type": "mobile",
+      "name": "pixel 6",
+      "icon_id": "126"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "126",
+      "icon_type": "mobile",
+      "name": "Google",
+      "id": "126"
+     },
+     {
+      "icon_type": "mobile",
+      "name": "pixel 6a",
+      "icon_id": "126"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "126",
+      "icon_type": "mobile",
+      "name": "Google",
+      "id": "126"
+     },
+     {
+      "icon_type": "mobile",
+      "name": "pixel 8 pro",
+      "icon_id": "126"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "126",
+      "icon_type": "mobile",
+      "name": "Google",
+      "id": "126"
+     },
+     {
+      "icon_type": "mobile",
+      "name": "pixel 9a",
+      "icon_id": "126"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "163",
+      "icon_type": "mobile",
+      "name": "Infinix",
+      "id": "163"
+     },
+     {
+      "icon_type": "mobile",
+      "name": "infinix x669d",
+      "icon_id": "163"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "163",
+      "icon_type": "mobile",
+      "name": "Infinix",
+      "id": "163"
+     },
+     {
+      "icon_type": "mobile",
+      "name": "infinix x6716",
+      "icon_id": "163"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "207",
+      "icon_type": "mobile",
+      "name": "Xiaomi",
+      "id": "207"
+     },
+     {
+      "icon_type": "mobile",
+      "name": "2312dra50g",
+      "icon_id": "207"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "207",
+      "icon_type": "mobile",
+      "name": "Xiaomi",
+      "id": "207"
+     },
+     {
+      "icon_type": "mobile",
+      "name": "2404apc5fg",
+      "icon_id": "207"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "207",
+      "icon_type": "mobile",
+      "name": "Xiaomi",
+      "id": "207"
+     },
+     {
+      "icon_type": "mobile",
+      "name": "24115ra8eg",
+      "icon_id": "207"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "207",
+      "icon_type": "mobile",
+      "name": "Xiaomi",
+      "id": "207"
+     },
+     {
+      "icon_type": "mobile",
+      "name": "24129rt7cc",
+      "icon_id": "207"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "207",
+      "icon_type": "mobile",
+      "name": "Xiaomi",
+      "id": "207"
+     },
+     {
+      "icon_type": "mobile",
+      "name": "redmi 12",
+      "icon_id": "207"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "237",
+      "icon_type": "mobile",
+      "name": "Vivo",
+      "id": "237"
+     },
+     {
+      "icon_type": "mobile",
+      "name": "v2036",
+      "icon_id": "237"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "238",
+      "icon_type": "mobile",
+      "name": "Tecno",
+      "id": "238"
+     },
+     {
+      "icon_type": "mobile",
+      "name": "tecno ki7",
+      "icon_id": "238"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "238",
+      "icon_type": "mobile",
+      "name": "Tecno",
+      "id": "238"
+     },
+     {
+      "icon_type": "mobile",
+      "name": "tecno kj5n",
+      "icon_id": "238"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "285",
+      "icon_type": "mobile",
+      "name": "OnePlus",
+      "id": "285"
+     },
+     {
+      "icon_type": "mobile",
+      "name": "de2118",
+      "icon_id": "285"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "285",
+      "icon_type": "mobile",
+      "name": "OnePlus",
+      "id": "285"
+     },
+     {
+      "icon_type": "mobile",
+      "name": "gn2200",
+      "icon_id": "285"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "582",
+      "icon_type": "mobile",
+      "name": "HONOR",
+      "id": "582"
+     },
+     {
+      "icon_type": "mobile",
+      "name": "abr-lx1",
+      "icon_id": "582"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "582",
+      "icon_type": "mobile",
+      "name": "HONOR",
+      "id": "582"
+     },
+     {
+      "icon_type": "mobile",
+      "name": "brc-nx1",
+      "icon_id": "582"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "582",
+      "icon_type": "mobile",
+      "name": "HONOR",
+      "id": "582"
+     },
+     {
+      "icon_type": "mobile",
+      "name": "crt-nx1",
+      "icon_id": "582"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "582",
+      "icon_type": "mobile",
+      "name": "HONOR",
+      "id": "582"
+     },
+     {
+      "icon_type": "mobile",
+      "name": "nic-lx1",
+      "icon_id": "582"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   }
+  ],
+  "total_rows": 66,
+  "total_rows_rounded": false,
+  "sampled": false,
+  "contains_sensitive_data": false,
+  "sample_share": 1.0,
+  "sample_size": 2678,
+  "sample_space": 2678,
+  "data_lag": 0,
+  "totals": [
+   234.0,
+   144.0
+  ],
+  "min": [
+   1.0,
+   1.0
+  ],
+  "max": [
+   108.0,
+   66.0
+  ]
+ }
+}

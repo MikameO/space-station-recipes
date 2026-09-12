@@ -1,0 +1,168 @@
+{
+ "request": {
+  "ids": 108585248,
+  "metrics": "ym:s:visits,ym:s:users,ym:s:bounceRate",
+  "date1": "2026-04-12",
+  "date2": "2026-09-12",
+  "limit": 1000,
+  "accuracy": "full",
+  "dimensions": "ym:s:lastTrafficSource",
+  "sort": "-ym:s:visits",
+  "filters": "ym:s:startURL!@'localhost' AND ym:s:startURL!@'127.0.0.1'"
+ },
+ "response": {
+  "query": {
+   "ids": [
+    108585248
+   ],
+   "dimensions": [
+    "ym:s:lastTrafficSource"
+   ],
+   "metrics": [
+    "ym:s:visits",
+    "ym:s:users",
+    "ym:s:bounceRate"
+   ],
+   "sort": [
+    "-ym:s:visits"
+   ],
+   "date1": "2026-04-12",
+   "date2": "2026-09-12",
+   "filters": "ym:s:startURL!@'localhost' AND ym:s:startURL!@'127.0.0.1'",
+   "limit": 1000,
+   "offset": 1,
+   "group": "Week",
+   "benchmarks_version": "1788134400000",
+   "benchmarks_sub_industry": "false",
+   "auto_group_size": "1",
+   "exp_bucket_size": "100",
+   "attr_name": "",
+   "funnel_window": "",
+   "benchmarks_quantile": "50",
+   "time_interval": "1SECOND",
+   "intervals": "1",
+   "quantile": "50",
+   "offline_window": "21",
+   "attribution": "CROSS_DEVICE_LAST_SIGNIFICANT",
+   "currency": "RUB",
+   "benchmarks_attribution": "Automatic",
+   "adfox_event_id": "0",
+   "funnel_pattern": ""
+  },
+  "data": [
+   {
+    "dimensions": [
+     {
+      "icon_id": "0",
+      "icon_type": "traffic-source",
+      "name": "Direct traffic",
+      "id": "direct"
+     }
+    ],
+    "metrics": [
+     2324.0,
+     521.0,
+     8.43373494
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "1",
+      "icon_type": "traffic-source",
+      "name": "Link traffic",
+      "id": "referral"
+     }
+    ],
+    "metrics": [
+     290.0,
+     97.0,
+     4.48275862
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "8",
+      "icon_type": "traffic-source",
+      "name": "Social network traffic",
+      "id": "social"
+     }
+    ],
+    "metrics": [
+     29.0,
+     21.0,
+     10.34482759
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "-1",
+      "icon_type": "traffic-source",
+      "name": "Internal traffic",
+      "id": "internal"
+     }
+    ],
+    "metrics": [
+     11.0,
+     6.0,
+     9.09090909
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "2",
+      "icon_type": "traffic-source",
+      "name": "Search engine traffic",
+      "id": "organic"
+     }
+    ],
+    "metrics": [
+     7.0,
+     7.0,
+     14.28571429
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "4",
+      "icon_type": "traffic-source",
+      "name": "Cached page traffic",
+      "id": "saved"
+     }
+    ],
+    "metrics": [
+     2.0,
+     1.0,
+     0.0
+    ]
+   }
+  ],
+  "total_rows": 6,
+  "total_rows_rounded": false,
+  "sampled": false,
+  "contains_sensitive_data": false,
+  "sample_share": 1.0,
+  "sample_size": 2677,
+  "sample_space": 2677,
+  "data_lag": 0,
+  "totals": [
+   2663.0,
+   617.0,
+   8.03604957
+  ],
+  "min": [
+   2.0,
+   1.0,
+   0.0
+  ],
+  "max": [
+   2324.0,
+   521.0,
+   14.28571429
+  ]
+ }
+}

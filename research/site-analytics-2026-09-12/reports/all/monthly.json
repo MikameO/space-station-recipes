@@ -1,0 +1,200 @@
+{
+ "request": {
+  "ids": 108585248,
+  "metrics": "ym:s:visits,ym:s:users,ym:s:pageviews,ym:s:bounceRate,ym:s:pageDepth,ym:s:avgVisitDurationSeconds,ym:s:percentNewVisitors,ym:s:sumGoalReachesAny",
+  "date1": "2026-04-12",
+  "date2": "2026-09-12",
+  "limit": 1000,
+  "accuracy": "full",
+  "dimensions": "ym:s:startOfMonth",
+  "sort": "ym:s:startOfMonth",
+  "filters": "ym:s:startURL!@'localhost' AND ym:s:startURL!@'127.0.0.1'"
+ },
+ "response": {
+  "query": {
+   "ids": [
+    108585248
+   ],
+   "dimensions": [
+    "ym:s:startOfMonth"
+   ],
+   "metrics": [
+    "ym:s:visits",
+    "ym:s:users",
+    "ym:s:pageviews",
+    "ym:s:bounceRate",
+    "ym:s:pageDepth",
+    "ym:s:avgVisitDurationSeconds",
+    "ym:s:percentNewVisitors",
+    "ym:s:sumGoalReachesAny"
+   ],
+   "sort": [
+    "ym:s:startOfMonth"
+   ],
+   "date1": "2026-04-12",
+   "date2": "2026-09-12",
+   "filters": "ym:s:startURL!@'localhost' AND ym:s:startURL!@'127.0.0.1'",
+   "limit": 1000,
+   "offset": 1,
+   "group": "Week",
+   "benchmarks_version": "1788134400000",
+   "benchmarks_sub_industry": "false",
+   "auto_group_size": "1",
+   "exp_bucket_size": "100",
+   "attr_name": "",
+   "funnel_window": "",
+   "benchmarks_quantile": "50",
+   "time_interval": "1SECOND",
+   "intervals": "1",
+   "quantile": "50",
+   "offline_window": "21",
+   "attribution": "CROSS_DEVICE_LAST_SIGNIFICANT",
+   "currency": "RUB",
+   "benchmarks_attribution": "Automatic",
+   "adfox_event_id": "0",
+   "funnel_pattern": ""
+  },
+  "data": [
+   {
+    "dimensions": [
+     {
+      "name": "2026-04-01"
+     }
+    ],
+    "metrics": [
+     159.0,
+     58.0,
+     183.0,
+     4.40251572,
+     1.1509434,
+     70.31446541,
+     100.0,
+     0.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-05-01"
+     }
+    ],
+    "metrics": [
+     609.0,
+     173.0,
+     689.0,
+     12.47947455,
+     1.13136289,
+     67.22003284,
+     91.90751445,
+     0.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-06-01"
+     }
+    ],
+    "metrics": [
+     423.0,
+     93.0,
+     489.0,
+     10.87470449,
+     1.15602837,
+     87.37588652,
+     68.8172043,
+     0.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-07-01"
+     }
+    ],
+    "metrics": [
+     477.0,
+     134.0,
+     606.0,
+     7.33752621,
+     1.27044025,
+     310.01048218,
+     81.34328358,
+     2491.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-08-01"
+     }
+    ],
+    "metrics": [
+     722.0,
+     230.0,
+     847.0,
+     5.26315789,
+     1.17313019,
+     310.69944598,
+     84.7826087,
+     5159.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-09-01"
+     }
+    ],
+    "metrics": [
+     274.0,
+     71.0,
+     355.0,
+     4.37956204,
+     1.29562044,
+     476.11313869,
+     52.11267606,
+     2294.0
+    ]
+   }
+  ],
+  "total_rows": 6,
+  "total_rows_rounded": false,
+  "sampled": false,
+  "contains_sensitive_data": false,
+  "sample_share": 1.0,
+  "sample_size": 2678,
+  "sample_space": 2678,
+  "data_lag": 0,
+  "totals": [
+   2664.0,
+   617.0,
+   3169.0,
+   8.03303303,
+   1.18956456,
+   222.12162162,
+   100.0,
+   9944.0
+  ],
+  "min": [
+   159.0,
+   58.0,
+   183.0,
+   4.37956204,
+   1.13136289,
+   67.22003284,
+   52.11267606,
+   0.0
+  ],
+  "max": [
+   722.0,
+   230.0,
+   847.0,
+   12.47947455,
+   1.29562044,
+   476.11313869,
+   100.0,
+   5159.0
+  ]
+ }
+}

@@ -1,0 +1,1446 @@
+{
+ "counter": 108585248,
+ "date_to": "2026-09-12",
+ "windows": {
+  "all": [
+   "2026-04-12",
+   "2026-09-12"
+  ],
+  "events": [
+   "2026-07-12",
+   "2026-09-12"
+  ],
+  "cp3": [
+   "2026-07-28",
+   "2026-09-12"
+  ]
+ },
+ "blocks": [
+  "logs"
+ ],
+ "ok": 178,
+ "failed": 0,
+ "entries": [
+  {
+   "block": "goals",
+   "name": "goal_totals_1",
+   "window": "events",
+   "ok": true,
+   "rows": 1,
+   "file": "reports\\events\\goal_totals_1.json"
+  },
+  {
+   "block": "goals",
+   "name": "goal_totals_2",
+   "window": "events",
+   "ok": true,
+   "rows": 1,
+   "file": "reports\\events\\goal_totals_2.json"
+  },
+  {
+   "block": "goals",
+   "name": "goal_totals_3",
+   "window": "events",
+   "ok": true,
+   "rows": 1,
+   "file": "reports\\events\\goal_totals_3.json"
+  },
+  {
+   "block": "goals",
+   "name": "goal_totals_4",
+   "window": "events",
+   "ok": true,
+   "rows": 1,
+   "file": "reports\\events\\goal_totals_4.json"
+  },
+  {
+   "block": "goals",
+   "name": "goal_totals_5",
+   "window": "events",
+   "ok": true,
+   "rows": 1,
+   "file": "reports\\events\\goal_totals_5.json"
+  },
+  {
+   "block": "goals",
+   "name": "goal_totals_6",
+   "window": "events",
+   "ok": true,
+   "rows": 1,
+   "file": "reports\\events\\goal_totals_6.json"
+  },
+  {
+   "block": "goals",
+   "name": "goal_totals_7",
+   "window": "events",
+   "ok": true,
+   "rows": 1,
+   "file": "reports\\events\\goal_totals_7.json"
+  },
+  {
+   "block": "goals",
+   "name": "goal_totals_8",
+   "window": "events",
+   "ok": true,
+   "rows": 0,
+   "file": "reports\\events\\goal_totals_8.json"
+  },
+  {
+   "block": "goals",
+   "name": "goal_totals_9",
+   "window": "events",
+   "ok": true,
+   "rows": 0,
+   "file": "reports\\events\\goal_totals_9.json"
+  },
+  {
+   "block": "goals",
+   "name": "goal_totals_10",
+   "window": "events",
+   "ok": true,
+   "rows": 0,
+   "file": "reports\\events\\goal_totals_10.json"
+  },
+  {
+   "block": "goals",
+   "name": "goal_daily_1",
+   "window": "events",
+   "ok": true,
+   "rows": 63,
+   "file": "reports\\events\\goal_daily_1.json"
+  },
+  {
+   "block": "goals",
+   "name": "goal_daily_2",
+   "window": "events",
+   "ok": true,
+   "rows": 55,
+   "file": "reports\\events\\goal_daily_2.json"
+  },
+  {
+   "block": "goals",
+   "name": "goal_daily_3",
+   "window": "events",
+   "ok": true,
+   "rows": 0,
+   "file": "reports\\events\\goal_daily_3.json"
+  },
+  {
+   "block": "goals",
+   "name": "goal_by_source_1",
+   "window": "events",
+   "ok": true,
+   "rows": 6,
+   "file": "reports\\events\\goal_by_source_1.json"
+  },
+  {
+   "block": "goals",
+   "name": "goal_by_source_2",
+   "window": "events",
+   "ok": true,
+   "rows": 6,
+   "file": "reports\\events\\goal_by_source_2.json"
+  },
+  {
+   "block": "goals",
+   "name": "goal_by_source_3",
+   "window": "events",
+   "ok": true,
+   "rows": 0,
+   "file": "reports\\events\\goal_by_source_3.json"
+  },
+  {
+   "block": "goals",
+   "name": "goal_by_referal_1",
+   "window": "events",
+   "ok": true,
+   "rows": 4,
+   "file": "reports\\events\\goal_by_referal_1.json"
+  },
+  {
+   "block": "goals",
+   "name": "goal_by_referal_2",
+   "window": "events",
+   "ok": true,
+   "rows": 3,
+   "file": "reports\\events\\goal_by_referal_2.json"
+  },
+  {
+   "block": "goals",
+   "name": "goal_by_referal_3",
+   "window": "events",
+   "ok": true,
+   "rows": 0,
+   "file": "reports\\events\\goal_by_referal_3.json"
+  },
+  {
+   "block": "goals",
+   "name": "goal_by_country_1",
+   "window": "events",
+   "ok": true,
+   "rows": 30,
+   "file": "reports\\events\\goal_by_country_1.json"
+  },
+  {
+   "block": "goals",
+   "name": "goal_by_country_2",
+   "window": "events",
+   "ok": true,
+   "rows": 26,
+   "file": "reports\\events\\goal_by_country_2.json"
+  },
+  {
+   "block": "goals",
+   "name": "goal_by_country_3",
+   "window": "events",
+   "ok": true,
+   "rows": 0,
+   "file": "reports\\events\\goal_by_country_3.json"
+  },
+  {
+   "block": "goals",
+   "name": "goal_by_device_1",
+   "window": "events",
+   "ok": true,
+   "rows": 3,
+   "file": "reports\\events\\goal_by_device_1.json"
+  },
+  {
+   "block": "goals",
+   "name": "goal_by_device_2",
+   "window": "events",
+   "ok": true,
+   "rows": 3,
+   "file": "reports\\events\\goal_by_device_2.json"
+  },
+  {
+   "block": "goals",
+   "name": "goal_by_device_3",
+   "window": "events",
+   "ok": true,
+   "rows": 0,
+   "file": "reports\\events\\goal_by_device_3.json"
+  },
+  {
+   "block": "goals",
+   "name": "goal_by_newness_1",
+   "window": "events",
+   "ok": true,
+   "rows": 2,
+   "file": "reports\\events\\goal_by_newness_1.json"
+  },
+  {
+   "block": "goals",
+   "name": "goal_by_newness_2",
+   "window": "events",
+   "ok": true,
+   "rows": 2,
+   "file": "reports\\events\\goal_by_newness_2.json"
+  },
+  {
+   "block": "goals",
+   "name": "goal_by_newness_3",
+   "window": "events",
+   "ok": true,
+   "rows": 0,
+   "file": "reports\\events\\goal_by_newness_3.json"
+  },
+  {
+   "block": "goals",
+   "name": "goal_by_start_url_1",
+   "window": "events",
+   "ok": true,
+   "rows": 15,
+   "file": "reports\\events\\goal_by_start_url_1.json"
+  },
+  {
+   "block": "goals",
+   "name": "goal_by_start_url_2",
+   "window": "events",
+   "ok": true,
+   "rows": 12,
+   "file": "reports\\events\\goal_by_start_url_2.json"
+  },
+  {
+   "block": "goals",
+   "name": "goal_by_start_url_3",
+   "window": "events",
+   "ok": true,
+   "rows": 0,
+   "file": "reports\\events\\goal_by_start_url_3.json"
+  },
+  {
+   "block": "goals",
+   "name": "goal_totals_1",
+   "window": "cp3",
+   "ok": true,
+   "rows": 1,
+   "file": "reports\\cp3\\goal_totals_1.json"
+  },
+  {
+   "block": "goals",
+   "name": "goal_totals_2",
+   "window": "cp3",
+   "ok": true,
+   "rows": 1,
+   "file": "reports\\cp3\\goal_totals_2.json"
+  },
+  {
+   "block": "goals",
+   "name": "goal_totals_3",
+   "window": "cp3",
+   "ok": true,
+   "rows": 1,
+   "file": "reports\\cp3\\goal_totals_3.json"
+  },
+  {
+   "block": "goals",
+   "name": "goal_totals_4",
+   "window": "cp3",
+   "ok": true,
+   "rows": 1,
+   "file": "reports\\cp3\\goal_totals_4.json"
+  },
+  {
+   "block": "goals",
+   "name": "goal_totals_5",
+   "window": "cp3",
+   "ok": true,
+   "rows": 1,
+   "file": "reports\\cp3\\goal_totals_5.json"
+  },
+  {
+   "block": "goals",
+   "name": "goal_totals_6",
+   "window": "cp3",
+   "ok": true,
+   "rows": 1,
+   "file": "reports\\cp3\\goal_totals_6.json"
+  },
+  {
+   "block": "goals",
+   "name": "goal_totals_7",
+   "window": "cp3",
+   "ok": true,
+   "rows": 1,
+   "file": "reports\\cp3\\goal_totals_7.json"
+  },
+  {
+   "block": "goals",
+   "name": "goal_totals_8",
+   "window": "cp3",
+   "ok": true,
+   "rows": 0,
+   "file": "reports\\cp3\\goal_totals_8.json"
+  },
+  {
+   "block": "goals",
+   "name": "goal_totals_9",
+   "window": "cp3",
+   "ok": true,
+   "rows": 0,
+   "file": "reports\\cp3\\goal_totals_9.json"
+  },
+  {
+   "block": "goals",
+   "name": "goal_totals_10",
+   "window": "cp3",
+   "ok": true,
+   "rows": 0,
+   "file": "reports\\cp3\\goal_totals_10.json"
+  },
+  {
+   "block": "goals",
+   "name": "goal_daily_1",
+   "window": "cp3",
+   "ok": true,
+   "rows": 47,
+   "file": "reports\\cp3\\goal_daily_1.json"
+  },
+  {
+   "block": "goals",
+   "name": "goal_daily_2",
+   "window": "cp3",
+   "ok": true,
+   "rows": 47,
+   "file": "reports\\cp3\\goal_daily_2.json"
+  },
+  {
+   "block": "goals",
+   "name": "goal_daily_3",
+   "window": "cp3",
+   "ok": true,
+   "rows": 0,
+   "file": "reports\\cp3\\goal_daily_3.json"
+  },
+  {
+   "block": "goals",
+   "name": "goal_by_source_1",
+   "window": "cp3",
+   "ok": true,
+   "rows": 6,
+   "file": "reports\\cp3\\goal_by_source_1.json"
+  },
+  {
+   "block": "goals",
+   "name": "goal_by_source_2",
+   "window": "cp3",
+   "ok": true,
+   "rows": 6,
+   "file": "reports\\cp3\\goal_by_source_2.json"
+  },
+  {
+   "block": "goals",
+   "name": "goal_by_source_3",
+   "window": "cp3",
+   "ok": true,
+   "rows": 0,
+   "file": "reports\\cp3\\goal_by_source_3.json"
+  },
+  {
+   "block": "goals",
+   "name": "goal_by_referal_1",
+   "window": "cp3",
+   "ok": true,
+   "rows": 3,
+   "file": "reports\\cp3\\goal_by_referal_1.json"
+  },
+  {
+   "block": "goals",
+   "name": "goal_by_referal_2",
+   "window": "cp3",
+   "ok": true,
+   "rows": 3,
+   "file": "reports\\cp3\\goal_by_referal_2.json"
+  },
+  {
+   "block": "goals",
+   "name": "goal_by_referal_3",
+   "window": "cp3",
+   "ok": true,
+   "rows": 0,
+   "file": "reports\\cp3\\goal_by_referal_3.json"
+  },
+  {
+   "block": "goals",
+   "name": "goal_by_country_1",
+   "window": "cp3",
+   "ok": true,
+   "rows": 24,
+   "file": "reports\\cp3\\goal_by_country_1.json"
+  },
+  {
+   "block": "goals",
+   "name": "goal_by_country_2",
+   "window": "cp3",
+   "ok": true,
+   "rows": 24,
+   "file": "reports\\cp3\\goal_by_country_2.json"
+  },
+  {
+   "block": "goals",
+   "name": "goal_by_country_3",
+   "window": "cp3",
+   "ok": true,
+   "rows": 0,
+   "file": "reports\\cp3\\goal_by_country_3.json"
+  },
+  {
+   "block": "goals",
+   "name": "goal_by_device_1",
+   "window": "cp3",
+   "ok": true,
+   "rows": 3,
+   "file": "reports\\cp3\\goal_by_device_1.json"
+  },
+  {
+   "block": "goals",
+   "name": "goal_by_device_2",
+   "window": "cp3",
+   "ok": true,
+   "rows": 3,
+   "file": "reports\\cp3\\goal_by_device_2.json"
+  },
+  {
+   "block": "goals",
+   "name": "goal_by_device_3",
+   "window": "cp3",
+   "ok": true,
+   "rows": 0,
+   "file": "reports\\cp3\\goal_by_device_3.json"
+  },
+  {
+   "block": "goals",
+   "name": "goal_by_newness_1",
+   "window": "cp3",
+   "ok": true,
+   "rows": 2,
+   "file": "reports\\cp3\\goal_by_newness_1.json"
+  },
+  {
+   "block": "goals",
+   "name": "goal_by_newness_2",
+   "window": "cp3",
+   "ok": true,
+   "rows": 2,
+   "file": "reports\\cp3\\goal_by_newness_2.json"
+  },
+  {
+   "block": "goals",
+   "name": "goal_by_newness_3",
+   "window": "cp3",
+   "ok": true,
+   "rows": 0,
+   "file": "reports\\cp3\\goal_by_newness_3.json"
+  },
+  {
+   "block": "goals",
+   "name": "goal_by_start_url_1",
+   "window": "cp3",
+   "ok": true,
+   "rows": 10,
+   "file": "reports\\cp3\\goal_by_start_url_1.json"
+  },
+  {
+   "block": "goals",
+   "name": "goal_by_start_url_2",
+   "window": "cp3",
+   "ok": true,
+   "rows": 11,
+   "file": "reports\\cp3\\goal_by_start_url_2.json"
+  },
+  {
+   "block": "goals",
+   "name": "goal_by_start_url_3",
+   "window": "cp3",
+   "ok": true,
+   "rows": 0,
+   "file": "reports\\cp3\\goal_by_start_url_3.json"
+  },
+  {
+   "block": "goals",
+   "name": "any_goal_daily",
+   "window": "all",
+   "ok": true,
+   "rows": 149,
+   "file": "reports\\all\\any_goal_daily.json"
+  },
+  {
+   "block": "mgmt",
+   "name": "counter",
+   "window": "-",
+   "ok": true,
+   "file": "mgmt/counter.json"
+  },
+  {
+   "block": "mgmt",
+   "name": "goals",
+   "window": "-",
+   "ok": true,
+   "file": "mgmt/goals.json"
+  },
+  {
+   "block": "mgmt",
+   "name": "filters",
+   "window": "-",
+   "ok": true,
+   "file": "mgmt/filters.json"
+  },
+  {
+   "block": "mgmt",
+   "name": "operations",
+   "window": "-",
+   "ok": true,
+   "file": "mgmt/operations.json"
+  },
+  {
+   "block": "mgmt",
+   "name": "segments",
+   "window": "-",
+   "ok": true,
+   "file": "mgmt/segments.json"
+  },
+  {
+   "block": "mgmt",
+   "name": "chart_annotations",
+   "window": "-",
+   "ok": true,
+   "file": "mgmt/chart_annotations.json"
+  },
+  {
+   "block": "mgmt",
+   "name": "logrequests",
+   "window": "-",
+   "ok": true,
+   "file": "mgmt/logrequests.json"
+  },
+  {
+   "block": "reports",
+   "name": "daily",
+   "window": "all",
+   "ok": true,
+   "rows": 149,
+   "file": "reports\\all\\daily.json"
+  },
+  {
+   "block": "reports",
+   "name": "weekly",
+   "window": "all",
+   "ok": true,
+   "rows": 22,
+   "file": "reports\\all\\weekly.json"
+  },
+  {
+   "block": "reports",
+   "name": "monthly",
+   "window": "all",
+   "ok": true,
+   "rows": 6,
+   "file": "reports\\all\\monthly.json"
+  },
+  {
+   "block": "reports",
+   "name": "day_of_week",
+   "window": "all",
+   "ok": true,
+   "rows": 7,
+   "file": "reports\\all\\day_of_week.json"
+  },
+  {
+   "block": "reports",
+   "name": "day_of_week",
+   "window": "cp3",
+   "ok": true,
+   "rows": 7,
+   "file": "reports\\cp3\\day_of_week.json"
+  },
+  {
+   "block": "reports",
+   "name": "hour",
+   "window": "all",
+   "ok": true,
+   "rows": 24,
+   "file": "reports\\all\\hour.json"
+  },
+  {
+   "block": "reports",
+   "name": "hour",
+   "window": "cp3",
+   "ok": true,
+   "rows": 24,
+   "file": "reports\\cp3\\hour.json"
+  },
+  {
+   "block": "reports",
+   "name": "dow_hour",
+   "window": "all",
+   "ok": true,
+   "rows": 168,
+   "file": "reports\\all\\dow_hour.json"
+  },
+  {
+   "block": "reports",
+   "name": "traffic_source",
+   "window": "all",
+   "ok": true,
+   "rows": 6,
+   "file": "reports\\all\\traffic_source.json"
+  },
+  {
+   "block": "reports",
+   "name": "traffic_source",
+   "window": "events",
+   "ok": true,
+   "rows": 6,
+   "file": "reports\\events\\traffic_source.json"
+  },
+  {
+   "block": "reports",
+   "name": "traffic_source",
+   "window": "cp3",
+   "ok": true,
+   "rows": 6,
+   "file": "reports\\cp3\\traffic_source.json"
+  },
+  {
+   "block": "reports",
+   "name": "source_engine",
+   "window": "all",
+   "ok": true,
+   "rows": 3,
+   "file": "reports\\all\\source_engine.json"
+  },
+  {
+   "block": "reports",
+   "name": "source_engine",
+   "window": "cp3",
+   "ok": true,
+   "rows": 2,
+   "file": "reports\\cp3\\source_engine.json"
+  },
+  {
+   "block": "reports",
+   "name": "referal_source",
+   "window": "all",
+   "ok": true,
+   "rows": 6,
+   "file": "reports\\all\\referal_source.json"
+  },
+  {
+   "block": "reports",
+   "name": "referal_source",
+   "window": "cp3",
+   "ok": true,
+   "rows": 3,
+   "file": "reports\\cp3\\referal_source.json"
+  },
+  {
+   "block": "reports",
+   "name": "referer",
+   "window": "all",
+   "ok": true,
+   "rows": 17,
+   "file": "reports\\all\\referer.json"
+  },
+  {
+   "block": "reports",
+   "name": "search_engine",
+   "window": "all",
+   "ok": true,
+   "rows": 4,
+   "file": "reports\\all\\search_engine.json"
+  },
+  {
+   "block": "reports",
+   "name": "search_phrase",
+   "window": "all",
+   "ok": true,
+   "rows": 0,
+   "file": "reports\\all\\search_phrase.json"
+  },
+  {
+   "block": "reports",
+   "name": "social_network",
+   "window": "all",
+   "ok": true,
+   "rows": 2,
+   "file": "reports\\all\\social_network.json"
+  },
+  {
+   "block": "reports",
+   "name": "social_profile",
+   "window": "all",
+   "ok": true,
+   "rows": 1,
+   "file": "reports\\all\\social_profile.json"
+  },
+  {
+   "block": "reports",
+   "name": "messenger",
+   "window": "all",
+   "ok": true,
+   "rows": 0,
+   "file": "reports\\all\\messenger.json"
+  },
+  {
+   "block": "reports",
+   "name": "recommendation_system",
+   "window": "all",
+   "ok": true,
+   "rows": 0,
+   "file": "reports\\all\\recommendation_system.json"
+  },
+  {
+   "block": "reports",
+   "name": "utm",
+   "window": "all",
+   "ok": true,
+   "rows": 1,
+   "file": "reports\\all\\utm.json"
+  },
+  {
+   "block": "reports",
+   "name": "utm_content_term",
+   "window": "all",
+   "ok": true,
+   "rows": 0,
+   "file": "reports\\all\\utm_content_term.json"
+  },
+  {
+   "block": "reports",
+   "name": "from_tag",
+   "window": "all",
+   "ok": true,
+   "rows": 0,
+   "file": "reports\\all\\from_tag.json"
+  },
+  {
+   "block": "reports",
+   "name": "start_url",
+   "window": "all",
+   "ok": true,
+   "rows": 19,
+   "file": "reports\\all\\start_url.json"
+  },
+  {
+   "block": "reports",
+   "name": "start_url",
+   "window": "cp3",
+   "ok": true,
+   "rows": 11,
+   "file": "reports\\cp3\\start_url.json"
+  },
+  {
+   "block": "reports",
+   "name": "start_url_path",
+   "window": "all",
+   "ok": true,
+   "rows": 19,
+   "file": "reports\\all\\start_url_path.json"
+  },
+  {
+   "block": "reports",
+   "name": "end_url",
+   "window": "all",
+   "ok": true,
+   "rows": 21,
+   "file": "reports\\all\\end_url.json"
+  },
+  {
+   "block": "reports",
+   "name": "country",
+   "window": "all",
+   "ok": true,
+   "rows": 48,
+   "file": "reports\\all\\country.json"
+  },
+  {
+   "block": "reports",
+   "name": "country",
+   "window": "events",
+   "ok": true,
+   "rows": 35,
+   "file": "reports\\events\\country.json"
+  },
+  {
+   "block": "reports",
+   "name": "country",
+   "window": "cp3",
+   "ok": true,
+   "rows": 27,
+   "file": "reports\\cp3\\country.json"
+  },
+  {
+   "block": "reports",
+   "name": "region",
+   "window": "all",
+   "ok": true,
+   "rows": 179,
+   "file": "reports\\all\\region.json"
+  },
+  {
+   "block": "reports",
+   "name": "city",
+   "window": "all",
+   "ok": true,
+   "rows": 207,
+   "file": "reports\\all\\city.json"
+  },
+  {
+   "block": "reports",
+   "name": "city",
+   "window": "cp3",
+   "ok": true,
+   "rows": 95,
+   "file": "reports\\cp3\\city.json"
+  },
+  {
+   "block": "reports",
+   "name": "device",
+   "window": "all",
+   "ok": true,
+   "rows": 3,
+   "file": "reports\\all\\device.json"
+  },
+  {
+   "block": "reports",
+   "name": "device",
+   "window": "events",
+   "ok": true,
+   "rows": 3,
+   "file": "reports\\events\\device.json"
+  },
+  {
+   "block": "reports",
+   "name": "device",
+   "window": "cp3",
+   "ok": true,
+   "rows": 3,
+   "file": "reports\\cp3\\device.json"
+  },
+  {
+   "block": "reports",
+   "name": "os_root",
+   "window": "all",
+   "ok": true,
+   "rows": 6,
+   "file": "reports\\all\\os_root.json"
+  },
+  {
+   "block": "reports",
+   "name": "os",
+   "window": "all",
+   "ok": true,
+   "rows": 19,
+   "file": "reports\\all\\os.json"
+  },
+  {
+   "block": "reports",
+   "name": "device_os",
+   "window": "all",
+   "ok": true,
+   "rows": 8,
+   "file": "reports\\all\\device_os.json"
+  },
+  {
+   "block": "reports",
+   "name": "device_os",
+   "window": "cp3",
+   "ok": true,
+   "rows": 7,
+   "file": "reports\\cp3\\device_os.json"
+  },
+  {
+   "block": "reports",
+   "name": "browser",
+   "window": "all",
+   "ok": true,
+   "rows": 16,
+   "file": "reports\\all\\browser.json"
+  },
+  {
+   "block": "reports",
+   "name": "browser",
+   "window": "cp3",
+   "ok": true,
+   "rows": 12,
+   "file": "reports\\cp3\\browser.json"
+  },
+  {
+   "block": "reports",
+   "name": "browser_version",
+   "window": "all",
+   "ok": true,
+   "rows": 75,
+   "file": "reports\\all\\browser_version.json"
+  },
+  {
+   "block": "reports",
+   "name": "browser_engine",
+   "window": "all",
+   "ok": true,
+   "rows": 2,
+   "file": "reports\\all\\browser_engine.json"
+  },
+  {
+   "block": "reports",
+   "name": "phone_vendor",
+   "window": "all",
+   "ok": true,
+   "rows": 13,
+   "file": "reports\\all\\phone_vendor.json"
+  },
+  {
+   "block": "reports",
+   "name": "phone_model",
+   "window": "all",
+   "ok": true,
+   "rows": 66,
+   "file": "reports\\all\\phone_model.json"
+  },
+  {
+   "block": "reports",
+   "name": "screen_resolution",
+   "window": "all",
+   "ok": true,
+   "rows": 96,
+   "file": "reports\\all\\screen_resolution.json"
+  },
+  {
+   "block": "reports",
+   "name": "screen_width",
+   "window": "all",
+   "ok": true,
+   "rows": 52,
+   "file": "reports\\all\\screen_width.json"
+  },
+  {
+   "block": "reports",
+   "name": "screen_format",
+   "window": "all",
+   "ok": true,
+   "rows": 11,
+   "file": "reports\\all\\screen_format.json"
+  },
+  {
+   "block": "reports",
+   "name": "screen_orientation",
+   "window": "all",
+   "ok": true,
+   "rows": 2,
+   "file": "reports\\all\\screen_orientation.json"
+  },
+  {
+   "block": "reports",
+   "name": "window_area",
+   "window": "all",
+   "ok": true,
+   "rows": 577,
+   "file": "reports\\all\\window_area.json"
+  },
+  {
+   "block": "reports",
+   "name": "browser_language",
+   "window": "all",
+   "ok": true,
+   "rows": 18,
+   "file": "reports\\all\\browser_language.json"
+  },
+  {
+   "block": "reports",
+   "name": "browser_language",
+   "window": "cp3",
+   "ok": true,
+   "rows": 12,
+   "file": "reports\\cp3\\browser_language.json"
+  },
+  {
+   "block": "reports",
+   "name": "browser_country",
+   "window": "all",
+   "ok": true,
+   "rows": 22,
+   "file": "reports\\all\\browser_country.json"
+  },
+  {
+   "block": "reports",
+   "name": "timezone",
+   "window": "all",
+   "ok": true,
+   "rows": 19,
+   "file": "reports\\all\\timezone.json"
+  },
+  {
+   "block": "reports",
+   "name": "cookie_enabled",
+   "window": "all",
+   "ok": true,
+   "rows": 1,
+   "file": "reports\\all\\cookie_enabled.json"
+  },
+  {
+   "block": "reports",
+   "name": "javascript_enabled",
+   "window": "all",
+   "ok": true,
+   "rows": 1,
+   "file": "reports\\all\\javascript_enabled.json"
+  },
+  {
+   "block": "reports",
+   "name": "is_robot",
+   "window": "all",
+   "ok": true,
+   "rows": 2,
+   "file": "reports\\all\\is_robot.json"
+  },
+  {
+   "block": "reports",
+   "name": "new_returning",
+   "window": "all",
+   "ok": true,
+   "rows": 2,
+   "file": "reports\\all\\new_returning.json"
+  },
+  {
+   "block": "reports",
+   "name": "new_returning",
+   "window": "events",
+   "ok": true,
+   "rows": 2,
+   "file": "reports\\events\\new_returning.json"
+  },
+  {
+   "block": "reports",
+   "name": "new_returning",
+   "window": "cp3",
+   "ok": true,
+   "rows": 2,
+   "file": "reports\\cp3\\new_returning.json"
+  },
+  {
+   "block": "reports",
+   "name": "duration_interval",
+   "window": "all",
+   "ok": true,
+   "rows": 14,
+   "file": "reports\\all\\duration_interval.json"
+  },
+  {
+   "block": "reports",
+   "name": "duration_interval",
+   "window": "cp3",
+   "ok": true,
+   "rows": 14,
+   "file": "reports\\cp3\\duration_interval.json"
+  },
+  {
+   "block": "reports",
+   "name": "depth_interval",
+   "window": "all",
+   "ok": true,
+   "rows": 4,
+   "file": "reports\\all\\depth_interval.json"
+  },
+  {
+   "block": "reports",
+   "name": "depth_interval",
+   "window": "cp3",
+   "ok": true,
+   "rows": 4,
+   "file": "reports\\cp3\\depth_interval.json"
+  },
+  {
+   "block": "reports",
+   "name": "days_since_first_visit",
+   "window": "all",
+   "ok": true,
+   "rows": 9,
+   "file": "reports\\all\\days_since_first_visit.json"
+  },
+  {
+   "block": "reports",
+   "name": "days_since_first_visit",
+   "window": "cp3",
+   "ok": true,
+   "rows": 9,
+   "file": "reports\\cp3\\days_since_first_visit.json"
+  },
+  {
+   "block": "reports",
+   "name": "visits_per_user",
+   "window": "all",
+   "ok": true,
+   "rows": 7,
+   "file": "reports\\all\\visits_per_user.json"
+  },
+  {
+   "block": "reports",
+   "name": "visits_per_user",
+   "window": "cp3",
+   "ok": true,
+   "rows": 7,
+   "file": "reports\\cp3\\visits_per_user.json"
+  },
+  {
+   "block": "reports",
+   "name": "days_since_previous_visit",
+   "window": "all",
+   "ok": true,
+   "rows": 8,
+   "file": "reports\\all\\days_since_previous_visit.json"
+  },
+  {
+   "block": "reports",
+   "name": "first_visit_date",
+   "window": "all",
+   "ok": true,
+   "rows": 127,
+   "file": "reports\\all\\first_visit_date.json"
+  },
+  {
+   "block": "reports",
+   "name": "gender",
+   "window": "all",
+   "ok": true,
+   "rows": 2,
+   "file": "reports\\all\\gender.json"
+  },
+  {
+   "block": "reports",
+   "name": "age",
+   "window": "all",
+   "ok": true,
+   "rows": 3,
+   "file": "reports\\all\\age.json"
+  },
+  {
+   "block": "reports",
+   "name": "gender_age",
+   "window": "all",
+   "ok": true,
+   "rows": 3,
+   "file": "reports\\all\\gender_age.json"
+  },
+  {
+   "block": "reports",
+   "name": "interests",
+   "window": "all",
+   "ok": true,
+   "rows": 17,
+   "file": "reports\\all\\interests.json"
+  },
+  {
+   "block": "reports",
+   "name": "interests_legacy",
+   "window": "all",
+   "ok": true,
+   "rows": 10,
+   "file": "reports\\all\\interests_legacy.json"
+  },
+  {
+   "block": "reports",
+   "name": "pv_daily",
+   "window": "all",
+   "ok": true,
+   "rows": 149,
+   "file": "reports\\all\\pv_daily.json"
+  },
+  {
+   "block": "reports",
+   "name": "pv_url",
+   "window": "all",
+   "ok": true,
+   "rows": 44,
+   "file": "reports\\all\\pv_url.json"
+  },
+  {
+   "block": "reports",
+   "name": "pv_url",
+   "window": "cp3",
+   "ok": true,
+   "rows": 35,
+   "file": "reports\\cp3\\pv_url.json"
+  },
+  {
+   "block": "reports",
+   "name": "pv_url_path",
+   "window": "all",
+   "ok": true,
+   "rows": 44,
+   "file": "reports\\all\\pv_url_path.json"
+  },
+  {
+   "block": "reports",
+   "name": "pv_url_hash",
+   "window": "all",
+   "ok": true,
+   "rows": 44,
+   "file": "reports\\all\\pv_url_hash.json"
+  },
+  {
+   "block": "reports",
+   "name": "pv_title",
+   "window": "all",
+   "ok": true,
+   "rows": 2,
+   "file": "reports\\all\\pv_title.json"
+  },
+  {
+   "block": "reports",
+   "name": "pv_referer",
+   "window": "all",
+   "ok": true,
+   "rows": 30,
+   "file": "reports\\all\\pv_referer.json"
+  },
+  {
+   "block": "reports",
+   "name": "pv_hour",
+   "window": "all",
+   "ok": true,
+   "rows": 24,
+   "file": "reports\\all\\pv_hour.json"
+  },
+  {
+   "block": "reports",
+   "name": "pv_day_of_week",
+   "window": "all",
+   "ok": true,
+   "rows": 7,
+   "file": "reports\\all\\pv_day_of_week.json"
+  },
+  {
+   "block": "reports",
+   "name": "pv_device",
+   "window": "all",
+   "ok": true,
+   "rows": 3,
+   "file": "reports\\all\\pv_device.json"
+  },
+  {
+   "block": "reports",
+   "name": "external_links_url",
+   "window": "all",
+   "ok": true,
+   "rows": 12,
+   "file": "reports\\all\\external_links_url.json"
+  },
+  {
+   "block": "reports",
+   "name": "downloads_url",
+   "window": "all",
+   "ok": true,
+   "rows": 0,
+   "file": "reports\\all\\downloads_url.json"
+  },
+  {
+   "block": "params",
+   "name": "params_l1",
+   "window": "events",
+   "ok": true,
+   "rows": 37,
+   "file": "reports\\events\\params_l1.json"
+  },
+  {
+   "block": "params",
+   "name": "params_l2",
+   "window": "events",
+   "ok": true,
+   "rows": 1583,
+   "file": "reports\\events\\params_l2.json"
+  },
+  {
+   "block": "params",
+   "name": "params_l3",
+   "window": "events",
+   "ok": true,
+   "rows": 1583,
+   "file": "reports\\events\\params_l3.json"
+  },
+  {
+   "block": "params",
+   "name": "params_l4",
+   "window": "events",
+   "ok": true,
+   "rows": 1583,
+   "file": "reports\\events\\params_l4.json"
+  },
+  {
+   "block": "params",
+   "name": "params_l5",
+   "window": "events",
+   "ok": true,
+   "rows": 1583,
+   "file": "reports\\events\\params_l5.json"
+  },
+  {
+   "block": "params",
+   "name": "params_l1",
+   "window": "cp3",
+   "ok": true,
+   "rows": 37,
+   "file": "reports\\cp3\\params_l1.json"
+  },
+  {
+   "block": "params",
+   "name": "params_l2",
+   "window": "cp3",
+   "ok": true,
+   "rows": 1315,
+   "file": "reports\\cp3\\params_l2.json"
+  },
+  {
+   "block": "params",
+   "name": "params_l3",
+   "window": "cp3",
+   "ok": true,
+   "rows": 1315,
+   "file": "reports\\cp3\\params_l3.json"
+  },
+  {
+   "block": "params",
+   "name": "params_l4",
+   "window": "cp3",
+   "ok": true,
+   "rows": 1315,
+   "file": "reports\\cp3\\params_l4.json"
+  },
+  {
+   "block": "params",
+   "name": "params_l5",
+   "window": "cp3",
+   "ok": true,
+   "rows": 1315,
+   "file": "reports\\cp3\\params_l5.json"
+  },
+  {
+   "block": "params",
+   "name": "params_l1_daily",
+   "window": "events",
+   "ok": true,
+   "rows": 833,
+   "file": "reports\\events\\params_l1_daily.json"
+  },
+  {
+   "block": "params",
+   "name": "params_l2_daily",
+   "window": "events",
+   "ok": true,
+   "rows": 5239,
+   "file": "reports\\events\\params_l2_daily.json"
+  },
+  {
+   "block": "params",
+   "name": "params_l1_by_source",
+   "window": "events",
+   "ok": true,
+   "rows": 123,
+   "file": "reports\\events\\params_l1_by_source.json"
+  },
+  {
+   "block": "params",
+   "name": "params_l2_by_source",
+   "window": "events",
+   "ok": true,
+   "rows": 2149,
+   "file": "reports\\events\\params_l2_by_source.json"
+  },
+  {
+   "block": "params",
+   "name": "params_l1_by_device",
+   "window": "events",
+   "ok": true,
+   "rows": 67,
+   "file": "reports\\events\\params_l1_by_device.json"
+  },
+  {
+   "block": "params",
+   "name": "params_l1_by_country",
+   "window": "events",
+   "ok": true,
+   "rows": 335,
+   "file": "reports\\events\\params_l1_by_country.json"
+  },
+  {
+   "block": "logs",
+   "name": "visits_2026-04-12_2026-09-11",
+   "window": "-",
+   "ok": true,
+   "rows": 2651,
+   "parts": 1,
+   "request_id": 59991706,
+   "file": "logs/visits_2026-04-12_2026-09-11.tsv"
+  },
+  {
+   "block": "logs",
+   "name": "hits_2026-04-12_2026-09-11",
+   "window": "-",
+   "ok": true,
+   "rows": 19324,
+   "parts": 1,
+   "request_id": 59991801,
+   "file": "logs/hits_2026-04-12_2026-09-11.tsv"
+  }
+ ]
+}

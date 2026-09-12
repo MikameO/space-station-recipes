@@ -1,0 +1,1124 @@
+{
+ "request": {
+  "ids": 108585248,
+  "metrics": "ym:s:visits,ym:s:users",
+  "date1": "2026-04-12",
+  "date2": "2026-09-12",
+  "limit": 5000,
+  "accuracy": "full",
+  "dimensions": "ym:s:browserAndVersionMajor",
+  "sort": "-ym:s:visits",
+  "filters": "ym:s:startURL!@'localhost' AND ym:s:startURL!@'127.0.0.1'"
+ },
+ "response": {
+  "query": {
+   "ids": [
+    108585248
+   ],
+   "dimensions": [
+    "ym:s:browserAndVersionMajor"
+   ],
+   "metrics": [
+    "ym:s:visits",
+    "ym:s:users"
+   ],
+   "sort": [
+    "-ym:s:visits"
+   ],
+   "date1": "2026-04-12",
+   "date2": "2026-09-12",
+   "filters": "ym:s:startURL!@'localhost' AND ym:s:startURL!@'127.0.0.1'",
+   "limit": 5000,
+   "offset": 1,
+   "group": "Week",
+   "benchmarks_version": "1788134400000",
+   "benchmarks_sub_industry": "false",
+   "auto_group_size": "1",
+   "exp_bucket_size": "100",
+   "attr_name": "",
+   "funnel_window": "",
+   "benchmarks_quantile": "50",
+   "time_interval": "1SECOND",
+   "intervals": "1",
+   "quantile": "50",
+   "offline_window": "21",
+   "attribution": "CROSS_DEVICE_LAST_SIGNIFICANT",
+   "currency": "RUB",
+   "benchmarks_attribution": "Automatic",
+   "adfox_event_id": "0",
+   "funnel_pattern": ""
+  },
+  "data": [
+   {
+    "dimensions": [
+     {
+      "icon_type": "browser",
+      "name": "Opera 134",
+      "id": "2.134",
+      "icon_id": "2"
+     }
+    ],
+    "metrics": [
+     306.0,
+     55.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_type": "browser",
+      "name": "Opera 133",
+      "id": "2.133",
+      "icon_id": "2"
+     }
+    ],
+    "metrics": [
+     252.0,
+     82.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_type": "browser",
+      "name": "Opera 131",
+      "id": "2.131",
+      "icon_id": "2"
+     }
+    ],
+    "metrics": [
+     228.0,
+     25.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_type": "browser",
+      "name": "Opera 132",
+      "id": "2.132",
+      "icon_id": "2"
+     }
+    ],
+    "metrics": [
+     215.0,
+     19.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_type": "browser",
+      "name": "Opera 130",
+      "id": "2.130",
+      "icon_id": "2"
+     }
+    ],
+    "metrics": [
+     172.0,
+     25.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_type": "browser",
+      "name": "Yandex Browser 26",
+      "id": "70.26",
+      "icon_id": "70"
+     }
+    ],
+    "metrics": [
+     167.0,
+     21.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_type": "browser",
+      "name": "Google Chrome 150",
+      "id": "6.150",
+      "icon_id": "6"
+     }
+    ],
+    "metrics": [
+     162.0,
+     43.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_type": "browser",
+      "name": "Google Chrome 151",
+      "id": "6.151",
+      "icon_id": "6"
+     }
+    ],
+    "metrics": [
+     150.0,
+     37.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_type": "browser",
+      "name": "Google Chrome 148",
+      "id": "6.148",
+      "icon_id": "6"
+     }
+    ],
+    "metrics": [
+     113.0,
+     26.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_type": "browser",
+      "name": "Google Chrome 149",
+      "id": "6.149",
+      "icon_id": "6"
+     }
+    ],
+    "metrics": [
+     111.0,
+     23.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_type": "browser",
+      "name": "Google Chrome 147",
+      "id": "6.147",
+      "icon_id": "6"
+     }
+    ],
+    "metrics": [
+     105.0,
+     51.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_type": "browser",
+      "name": "Opera 135",
+      "id": "2.135",
+      "icon_id": "2"
+     }
+    ],
+    "metrics": [
+     75.0,
+     23.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_type": "browser",
+      "name": "Mobile Safari 26",
+      "id": "38.26",
+      "icon_id": "38"
+     }
+    ],
+    "metrics": [
+     53.0,
+     43.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_type": "browser",
+      "name": "Google Chrome 152",
+      "id": "6.152",
+      "icon_id": "6"
+     }
+    ],
+    "metrics": [
+     49.0,
+     17.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_type": "browser",
+      "name": "Edge 148",
+      "id": "135.148",
+      "icon_id": "135"
+     }
+    ],
+    "metrics": [
+     45.0,
+     9.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_type": "browser",
+      "name": "Edge 151",
+      "id": "135.151",
+      "icon_id": "135"
+     }
+    ],
+    "metrics": [
+     38.0,
+     14.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_type": "browser",
+      "name": "Firefox 153",
+      "id": "3.153",
+      "icon_id": "3"
+     }
+    ],
+    "metrics": [
+     35.0,
+     26.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_type": "browser",
+      "name": "Opera 129",
+      "id": "2.129",
+      "icon_id": "2"
+     }
+    ],
+    "metrics": [
+     33.0,
+     10.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_type": "browser",
+      "name": "Chrome Mobile 147",
+      "id": "83.147",
+      "icon_id": "83"
+     }
+    ],
+    "metrics": [
+     30.0,
+     23.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_type": "browser",
+      "name": "Edge 147",
+      "id": "135.147",
+      "icon_id": "135"
+     }
+    ],
+    "metrics": [
+     30.0,
+     14.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_type": "browser",
+      "name": "Chrome Mobile 149",
+      "id": "83.149",
+      "icon_id": "83"
+     }
+    ],
+    "metrics": [
+     29.0,
+     7.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_type": "browser",
+      "name": "Edge 152",
+      "id": "135.152",
+      "icon_id": "135"
+     }
+    ],
+    "metrics": [
+     29.0,
+     8.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_type": "browser",
+      "name": "Chrome Mobile 150",
+      "id": "83.150",
+      "icon_id": "83"
+     }
+    ],
+    "metrics": [
+     27.0,
+     15.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_type": "browser",
+      "name": "Chrome Mobile 148",
+      "id": "83.148",
+      "icon_id": "83"
+     }
+    ],
+    "metrics": [
+     20.0,
+     11.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_type": "browser",
+      "name": "Edge 150",
+      "id": "135.150",
+      "icon_id": "135"
+     }
+    ],
+    "metrics": [
+     18.0,
+     7.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_type": "browser",
+      "name": "Edge 149",
+      "id": "135.149",
+      "icon_id": "135"
+     }
+    ],
+    "metrics": [
+     15.0,
+     10.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_type": "browser",
+      "name": "Firefox 152",
+      "id": "3.152",
+      "icon_id": "3"
+     }
+    ],
+    "metrics": [
+     14.0,
+     12.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_type": "browser",
+      "name": "Firefox 154",
+      "id": "3.154",
+      "icon_id": "3"
+     }
+    ],
+    "metrics": [
+     14.0,
+     8.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_type": "browser",
+      "name": "Mobile Safari 18",
+      "id": "38.18",
+      "icon_id": "38"
+     }
+    ],
+    "metrics": [
+     14.0,
+     11.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_type": "browser",
+      "name": "Firefox 150",
+      "id": "3.150",
+      "icon_id": "3"
+     }
+    ],
+    "metrics": [
+     13.0,
+     7.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_type": "browser",
+      "name": "Chrome Mobile 151",
+      "id": "83.151",
+      "icon_id": "83"
+     }
+    ],
+    "metrics": [
+     13.0,
+     10.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_type": "browser",
+      "name": "Google Chrome 126",
+      "id": "6.126",
+      "icon_id": "6"
+     }
+    ],
+    "metrics": [
+     11.0,
+     9.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_type": "browser",
+      "name": "Edge 109",
+      "id": "135.109",
+      "icon_id": "135"
+     }
+    ],
+    "metrics": [
+     6.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_type": "browser",
+      "name": "Firefox 151",
+      "id": "3.151",
+      "icon_id": "3"
+     }
+    ],
+    "metrics": [
+     5.0,
+     5.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_type": "browser",
+      "name": "Firefox 149",
+      "id": "3.149",
+      "icon_id": "3"
+     }
+    ],
+    "metrics": [
+     4.0,
+     4.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_type": "browser",
+      "name": "Google Chrome 153",
+      "id": "6.153",
+      "icon_id": "6"
+     }
+    ],
+    "metrics": [
+     4.0,
+     2.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_type": "browser",
+      "name": "Firefox 147",
+      "id": "3.147",
+      "icon_id": "3"
+     }
+    ],
+    "metrics": [
+     3.0,
+     3.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_type": "browser",
+      "name": "Safari 26",
+      "id": "4.26",
+      "icon_id": "4"
+     }
+    ],
+    "metrics": [
+     3.0,
+     3.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_type": "browser",
+      "name": "Google Chrome 131",
+      "id": "6.131",
+      "icon_id": "6"
+     }
+    ],
+    "metrics": [
+     3.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_type": "browser",
+      "name": "Opera Mobile 100",
+      "id": "37.100",
+      "icon_id": "37"
+     }
+    ],
+    "metrics": [
+     3.0,
+     2.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_type": "browser",
+      "name": "Chrome Mobile 144",
+      "id": "83.144",
+      "icon_id": "83"
+     }
+    ],
+    "metrics": [
+     3.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_type": "browser",
+      "name": "Samsung Internet 29",
+      "id": "190.29",
+      "icon_id": "190"
+     }
+    ],
+    "metrics": [
+     3.0,
+     3.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_type": "browser",
+      "name": "Firefox 155",
+      "id": "3.155",
+      "icon_id": "3"
+     }
+    ],
+    "metrics": [
+     2.0,
+     2.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_type": "browser",
+      "name": "Safari 16",
+      "id": "4.16",
+      "icon_id": "4"
+     }
+    ],
+    "metrics": [
+     2.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_type": "browser",
+      "name": "Google Chrome 145",
+      "id": "6.145",
+      "icon_id": "6"
+     }
+    ],
+    "metrics": [
+     2.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_type": "browser",
+      "name": "Opera Mobile 101",
+      "id": "37.101",
+      "icon_id": "37"
+     }
+    ],
+    "metrics": [
+     2.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_type": "browser",
+      "name": "Yandex Browser 25",
+      "id": "70.25",
+      "icon_id": "70"
+     }
+    ],
+    "metrics": [
+     2.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_type": "browser",
+      "name": "Android Browser 16",
+      "id": "72.16",
+      "icon_id": "72"
+     }
+    ],
+    "metrics": [
+     2.0,
+     2.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_type": "browser",
+      "name": "Chrome Mobile 146",
+      "id": "83.146",
+      "icon_id": "83"
+     }
+    ],
+    "metrics": [
+     2.0,
+     2.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_type": "browser",
+      "name": "Edge 122",
+      "id": "135.122",
+      "icon_id": "135"
+     }
+    ],
+    "metrics": [
+     2.0,
+     2.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_type": "browser",
+      "name": "Opera 128",
+      "id": "2.128",
+      "icon_id": "2"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_type": "browser",
+      "name": "Firefox 109",
+      "id": "3.109",
+      "icon_id": "3"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_type": "browser",
+      "name": "Firefox 140",
+      "id": "3.140",
+      "icon_id": "3"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_type": "browser",
+      "name": "Firefox 143",
+      "id": "3.143",
+      "icon_id": "3"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_type": "browser",
+      "name": "Firefox 146",
+      "id": "3.146",
+      "icon_id": "3"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_type": "browser",
+      "name": "Safari 17",
+      "id": "4.17",
+      "icon_id": "4"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_type": "browser",
+      "name": "Google Chrome 79",
+      "id": "6.79",
+      "icon_id": "6"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_type": "browser",
+      "name": "Google Chrome 117",
+      "id": "6.117",
+      "icon_id": "6"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_type": "browser",
+      "name": "Google Chrome 140",
+      "id": "6.140",
+      "icon_id": "6"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_type": "browser",
+      "name": "Google Chrome 146",
+      "id": "6.146",
+      "icon_id": "6"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_type": "browser",
+      "name": "Mobile Safari (other or undetermined)",
+      "id": "38.0",
+      "icon_id": "38"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_type": "browser",
+      "name": "Mobile Safari 16",
+      "id": "38.16",
+      "icon_id": "38"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_type": "browser",
+      "name": "Mobile Safari 17",
+      "id": "38.17",
+      "icon_id": "38"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_type": "browser",
+      "name": "Firefox Mobile 130",
+      "id": "53.130",
+      "icon_id": "53"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_type": "browser",
+      "name": "Firefox Mobile 149",
+      "id": "53.149",
+      "icon_id": "53"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_type": "browser",
+      "name": "Firefox Mobile 152",
+      "id": "53.152",
+      "icon_id": "53"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_type": "browser",
+      "name": "Android Browser 15",
+      "id": "72.15",
+      "icon_id": "72"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_type": "browser",
+      "name": "Chrome Mobile 133",
+      "id": "83.133",
+      "icon_id": "83"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_type": "browser",
+      "name": "Chrome Mobile 134",
+      "id": "83.134",
+      "icon_id": "83"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_type": "browser",
+      "name": "Chrome Mobile 143",
+      "id": "83.143",
+      "icon_id": "83"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_type": "browser",
+      "name": "Google: mobile app 416",
+      "id": "120.416",
+      "icon_id": "120"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_type": "browser",
+      "name": "MIUI 14",
+      "id": "191.14",
+      "icon_id": "191"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_type": "browser",
+      "name": "MIUI 20",
+      "id": "191.20",
+      "icon_id": "191"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_type": "browser",
+      "name": "HeadlessChrome 141",
+      "id": "204.141",
+      "icon_id": "204"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_type": "browser",
+      "name": "Яндекс с Алисой: мобильное приложение 26",
+      "id": "205.26",
+      "icon_id": "205"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   }
+  ],
+  "total_rows": 75,
+  "total_rows_rounded": false,
+  "sampled": false,
+  "contains_sensitive_data": false,
+  "sample_share": 1.0,
+  "sample_size": 2678,
+  "sample_space": 2678,
+  "data_lag": 0,
+  "totals": [
+   2664.0,
+   617.0
+  ],
+  "min": [
+   1.0,
+   1.0
+  ],
+  "max": [
+   306.0,
+   82.0
+  ]
+ }
+}

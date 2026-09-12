@@ -1,0 +1,216 @@
+{
+ "request": {
+  "ids": 108585248,
+  "metrics": "ym:el:links,ym:el:users",
+  "date1": "2026-04-12",
+  "date2": "2026-09-12",
+  "limit": 5000,
+  "accuracy": "full",
+  "dimensions": "ym:el:URL",
+  "sort": "-ym:el:links"
+ },
+ "response": {
+  "query": {
+   "ids": [
+    108585248
+   ],
+   "dimensions": [
+    "ym:el:URL"
+   ],
+   "metrics": [
+    "ym:el:links",
+    "ym:el:users"
+   ],
+   "sort": [
+    "-ym:el:links"
+   ],
+   "date1": "2026-04-12",
+   "date2": "2026-09-12",
+   "limit": 5000,
+   "offset": 1,
+   "group": "Week",
+   "benchmarks_version": "1788134400000",
+   "benchmarks_sub_industry": "false",
+   "auto_group_size": "1",
+   "exp_bucket_size": "100",
+   "attr_name": "",
+   "funnel_window": "",
+   "benchmarks_quantile": "50",
+   "time_interval": "1SECOND",
+   "intervals": "1",
+   "quantile": "50",
+   "offline_window": "21",
+   "attribution": "CROSS_DEVICE_LAST_SIGNIFICANT",
+   "currency": "RUB",
+   "benchmarks_attribution": "Automatic",
+   "adfox_event_id": "0",
+   "funnel_pattern": ""
+  },
+  "data": [
+   {
+    "dimensions": [
+     {
+      "name": "https://github.com/MikameO/space-station-recipes/issues",
+      "favicon": "github.com"
+     }
+    ],
+    "metrics": [
+     37.0,
+     29.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "mailto:support@vojtajanda.eu?subject=ChemDB feedback&body=Hello,\n\nI have feedback about ChemDB.\n\nPage: http:%2F%2Flocalhost%2FSpaceStationRecepies%2F\n\nFeedback:\n",
+      "favicon": "support@vojtajanda.eu"
+     }
+    ],
+    "metrics": [
+     3.0,
+     2.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "https://forum.spacestation14.com/",
+      "favicon": "forum.spacestation14.com"
+     }
+    ],
+    "metrics": [
+     2.0,
+     2.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "https://github.com/MikameO/space-station-recipes",
+      "favicon": "github.com"
+     }
+    ],
+    "metrics": [
+     2.0,
+     2.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "https://github.com/space-wizards/space-station-14/blob/master/Resources/Prototypes/Recipes/Reactions/chemicals.yml",
+      "favicon": "github.com"
+     }
+    ],
+    "metrics": [
+     2.0,
+     2.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "https://github.com/space-wizards/space-station-14/blob/master/Resources/Prototypes/Recipes/Reactions/fun.yml",
+      "favicon": "github.com"
+     }
+    ],
+    "metrics": [
+     2.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "https://spacestation14.com/",
+      "favicon": "spacestation14.com"
+     }
+    ],
+    "metrics": [
+     2.0,
+     2.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "https://github.com/MikameO/space-station-recipes/issues/new?template=strategy-inaccuracy.yml&title=Strategy 'silent-kill' inaccuracy&strategy_id=silent-kill&fork=vanilla",
+      "favicon": "github.com"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "https://github.com/space-wizards/space-station-14/blob/master/Resources/Prototypes/Reagents/narcotics.yml#L400-L458",
+      "favicon": "github.com"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "https://github.com/space-wizards/space-station-14/blob/master/Resources/Prototypes/Reagents/toxins.yml#L573-L602",
+      "favicon": "github.com"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "mailto:support@vojtajanda.eu?subject=ChemDB feedback&body=Hello,\n\nI have feedback about ChemDB.\n\nPage: https:%2F%2Fvojtajanda.eu%2Fss14-chem%2F\n\nFeedback:\n",
+      "favicon": "support@vojtajanda.eu"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "mailto:support@vojtajanda.eu?subject=Possible ChemDB error&body=Hello,\n\nChemDB detected a possible problem:\nA required page resource failed to load: %2FSpaceStationRecepies%2Fmissing-test-file.js\n\nPage: http:%2F%2Flocalhost%2FSpaceStationRecepies%2F\n\nWhat I was doing:\n",
+      "favicon": "support@vojtajanda.eu"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   }
+  ],
+  "total_rows": 12,
+  "total_rows_rounded": false,
+  "sampled": false,
+  "contains_sensitive_data": false,
+  "sample_share": 1.0,
+  "sample_size": 3186,
+  "sample_space": 3186,
+  "data_lag": 0,
+  "totals": [
+   55.0,
+   36.0
+  ],
+  "min": [
+   1.0,
+   1.0
+  ],
+  "max": [
+   37.0,
+   29.0
+  ]
+ }
+}

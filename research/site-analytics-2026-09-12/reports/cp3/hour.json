@@ -1,0 +1,474 @@
+{
+ "request": {
+  "ids": 108585248,
+  "metrics": "ym:s:visits,ym:s:users,ym:s:pageviews,ym:s:bounceRate,ym:s:pageDepth,ym:s:avgVisitDurationSeconds",
+  "date1": "2026-07-28",
+  "date2": "2026-09-12",
+  "limit": 100,
+  "accuracy": "full",
+  "dimensions": "ym:s:hour",
+  "sort": "ym:s:hour",
+  "filters": "ym:s:startURL!@'localhost' AND ym:s:startURL!@'127.0.0.1'"
+ },
+ "response": {
+  "query": {
+   "ids": [
+    108585248
+   ],
+   "dimensions": [
+    "ym:s:hour"
+   ],
+   "metrics": [
+    "ym:s:visits",
+    "ym:s:users",
+    "ym:s:pageviews",
+    "ym:s:bounceRate",
+    "ym:s:pageDepth",
+    "ym:s:avgVisitDurationSeconds"
+   ],
+   "sort": [
+    "ym:s:hour"
+   ],
+   "date1": "2026-07-28",
+   "date2": "2026-09-12",
+   "filters": "ym:s:startURL!@'localhost' AND ym:s:startURL!@'127.0.0.1'",
+   "limit": 100,
+   "offset": 1,
+   "group": "Week",
+   "benchmarks_version": "1788134400000",
+   "benchmarks_sub_industry": "false",
+   "auto_group_size": "1",
+   "exp_bucket_size": "100",
+   "attr_name": "",
+   "funnel_window": "",
+   "benchmarks_quantile": "50",
+   "time_interval": "1SECOND",
+   "intervals": "1",
+   "quantile": "50",
+   "offline_window": "21",
+   "attribution": "CROSS_DEVICE_LAST_SIGNIFICANT",
+   "currency": "RUB",
+   "benchmarks_attribution": "Automatic",
+   "adfox_event_id": "0",
+   "funnel_pattern": ""
+  },
+  "data": [
+   {
+    "dimensions": [
+     {
+      "id": "0",
+      "name": "00:00"
+     }
+    ],
+    "metrics": [
+     52.0,
+     34.0,
+     80.0,
+     5.76923077,
+     1.53846154,
+     701.03846154
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "id": "1",
+      "name": "01:00"
+     }
+    ],
+    "metrics": [
+     52.0,
+     29.0,
+     57.0,
+     9.61538462,
+     1.09615385,
+     283.92307692
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "id": "2",
+      "name": "02:00"
+     }
+    ],
+    "metrics": [
+     43.0,
+     25.0,
+     53.0,
+     0.0,
+     1.23255814,
+     442.76744186
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "id": "3",
+      "name": "03:00"
+     }
+    ],
+    "metrics": [
+     37.0,
+     28.0,
+     41.0,
+     5.40540541,
+     1.10810811,
+     245.7027027
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "id": "4",
+      "name": "04:00"
+     }
+    ],
+    "metrics": [
+     44.0,
+     22.0,
+     49.0,
+     4.54545455,
+     1.11363636,
+     384.63636364
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "id": "5",
+      "name": "05:00"
+     }
+    ],
+    "metrics": [
+     59.0,
+     43.0,
+     66.0,
+     0.0,
+     1.11864407,
+     342.96610169
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "id": "6",
+      "name": "06:00"
+     }
+    ],
+    "metrics": [
+     37.0,
+     26.0,
+     42.0,
+     2.7027027,
+     1.13513514,
+     206.67567568
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "id": "7",
+      "name": "07:00"
+     }
+    ],
+    "metrics": [
+     41.0,
+     27.0,
+     46.0,
+     0.0,
+     1.12195122,
+     511.12195122
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "id": "8",
+      "name": "08:00"
+     }
+    ],
+    "metrics": [
+     32.0,
+     29.0,
+     39.0,
+     6.25,
+     1.21875,
+     381.40625
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "id": "9",
+      "name": "09:00"
+     }
+    ],
+    "metrics": [
+     45.0,
+     35.0,
+     59.0,
+     13.33333333,
+     1.31111111,
+     210.22222222
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "id": "10",
+      "name": "10:00"
+     }
+    ],
+    "metrics": [
+     43.0,
+     25.0,
+     49.0,
+     4.65116279,
+     1.13953488,
+     449.04651163
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "id": "11",
+      "name": "11:00"
+     }
+    ],
+    "metrics": [
+     32.0,
+     22.0,
+     37.0,
+     0.0,
+     1.15625,
+     246.53125
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "id": "12",
+      "name": "12:00"
+     }
+    ],
+    "metrics": [
+     35.0,
+     26.0,
+     44.0,
+     11.42857143,
+     1.25714286,
+     640.08571429
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "id": "13",
+      "name": "13:00"
+     }
+    ],
+    "metrics": [
+     47.0,
+     27.0,
+     53.0,
+     0.0,
+     1.12765957,
+     386.19148936
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "id": "14",
+      "name": "14:00"
+     }
+    ],
+    "metrics": [
+     37.0,
+     28.0,
+     45.0,
+     5.40540541,
+     1.21621622,
+     292.10810811
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "id": "15",
+      "name": "15:00"
+     }
+    ],
+    "metrics": [
+     49.0,
+     37.0,
+     61.0,
+     6.12244898,
+     1.24489796,
+     146.67346939
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "id": "16",
+      "name": "16:00"
+     }
+    ],
+    "metrics": [
+     61.0,
+     46.0,
+     74.0,
+     3.27868852,
+     1.21311475,
+     150.36065574
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "id": "17",
+      "name": "17:00"
+     }
+    ],
+    "metrics": [
+     41.0,
+     34.0,
+     49.0,
+     4.87804878,
+     1.19512195,
+     135.95121951
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "id": "18",
+      "name": "18:00"
+     }
+    ],
+    "metrics": [
+     52.0,
+     34.0,
+     71.0,
+     5.76923077,
+     1.36538462,
+     787.09615385
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "id": "19",
+      "name": "19:00"
+     }
+    ],
+    "metrics": [
+     41.0,
+     28.0,
+     45.0,
+     7.31707317,
+     1.09756098,
+     38.65853659
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "id": "20",
+      "name": "20:00"
+     }
+    ],
+    "metrics": [
+     43.0,
+     26.0,
+     51.0,
+     4.65116279,
+     1.18604651,
+     166.6744186
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "id": "21",
+      "name": "21:00"
+     }
+    ],
+    "metrics": [
+     45.0,
+     30.0,
+     57.0,
+     2.22222222,
+     1.26666667,
+     402.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "id": "22",
+      "name": "22:00"
+     }
+    ],
+    "metrics": [
+     50.0,
+     34.0,
+     59.0,
+     8.0,
+     1.18,
+     249.68
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "id": "23",
+      "name": "23:00"
+     }
+    ],
+    "metrics": [
+     51.0,
+     32.0,
+     64.0,
+     9.80392157,
+     1.25490196,
+     502.92156863
+    ]
+   }
+  ],
+  "total_rows": 24,
+  "total_rows_rounded": false,
+  "sampled": false,
+  "contains_sensitive_data": false,
+  "sample_share": 1.0,
+  "sample_size": 1070,
+  "sample_space": 1070,
+  "data_lag": 0,
+  "totals": [
+   1069.0,
+   292.0,
+   1291.0,
+   5.05144995,
+   1.20767072,
+   349.08512629
+  ],
+  "min": [
+   32.0,
+   22.0,
+   37.0,
+   0.0,
+   1.09615385,
+   38.65853659
+  ],
+  "max": [
+   61.0,
+   46.0,
+   80.0,
+   13.33333333,
+   1.53846154,
+   787.09615385
+  ]
+ }
+}

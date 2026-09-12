@@ -125,7 +125,7 @@ def api_request(url: str, token: str, payload: dict | None = None) -> dict:
         method="POST" if payload is not None else "GET",
     )
     try:
-        with urllib.request.urlopen(req, timeout=15) as resp:
+        with urllib.request.urlopen(req, timeout=60) as resp:
             return json.loads(resp.read().decode())
     except urllib.error.HTTPError as e:
         body = e.read().decode(errors="replace")
@@ -158,7 +158,7 @@ def main() -> int:
         return 1
 
     have = existing_js_event_ids(args.token, args.counter) if not args.dry_run else set()
-    created = skipped = 0
+    created = skipped = timed_out = 0
 
     for event_id, name in GOALS:
         if event_id in have:
@@ -174,13 +174,22 @@ def main() -> int:
             "type": "action",
             "conditions": [{"type": "exact", "url": event_id}],
         }}
-        api_request(API_BASE.format(cid=args.counter), args.token, payload)
+        try:
+            api_request(API_BASE.format(cid=args.counter), args.token, payload)
+        except (urllib.error.URLError, TimeoutError, OSError) as e:
+            # Metrika sometimes commits the goal and then stalls the response
+            # (seen 2026-09-12: every POST hit the read timeout, yet each goal
+            # appeared on the counter). Keep going; the next run's read step
+            # tells which ones actually landed.
+            print(f"  ? {event_id:<20} no response ({e}); re-run to verify")
+            timed_out += 1
+            continue
         print(f"  + {event_id:<20} created: {name}")
         created += 1
 
-    print(f"\nDone: {created} created, {skipped} already present "
+    print(f"\nDone: {created} created, {skipped} already present, {timed_out} unconfirmed "
           f"(counter {args.counter}, {len(GOALS)} total in registry).")
-    return 0
+    return 0 if not timed_out else 3
 
 
 if __name__ == "__main__":

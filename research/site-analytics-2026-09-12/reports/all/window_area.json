@@ -1,0 +1,6421 @@
+{
+ "request": {
+  "ids": 108585248,
+  "metrics": "ym:s:visits,ym:s:users",
+  "date1": "2026-04-12",
+  "date2": "2026-09-12",
+  "limit": 10000,
+  "accuracy": "full",
+  "dimensions": "ym:s:windowClientArea",
+  "sort": "-ym:s:visits",
+  "filters": "ym:s:startURL!@'localhost' AND ym:s:startURL!@'127.0.0.1'"
+ },
+ "response": {
+  "query": {
+   "ids": [
+    108585248
+   ],
+   "dimensions": [
+    "ym:s:windowClientArea"
+   ],
+   "metrics": [
+    "ym:s:visits",
+    "ym:s:users"
+   ],
+   "sort": [
+    "-ym:s:visits"
+   ],
+   "date1": "2026-04-12",
+   "date2": "2026-09-12",
+   "filters": "ym:s:startURL!@'localhost' AND ym:s:startURL!@'127.0.0.1'",
+   "limit": 10000,
+   "offset": 1,
+   "group": "Week",
+   "benchmarks_version": "1788134400000",
+   "benchmarks_sub_industry": "false",
+   "auto_group_size": "1",
+   "exp_bucket_size": "100",
+   "attr_name": "",
+   "funnel_window": "",
+   "benchmarks_quantile": "50",
+   "time_interval": "1SECOND",
+   "intervals": "1",
+   "quantile": "50",
+   "offline_window": "21",
+   "attribution": "CROSS_DEVICE_LAST_SIGNIFICANT",
+   "currency": "RUB",
+   "benchmarks_attribution": "Automatic",
+   "adfox_event_id": "0",
+   "funnel_pattern": ""
+  },
+  "data": [
+   {
+    "dimensions": [
+     {
+      "name": "1920x919"
+     }
+    ],
+    "metrics": [
+     98.0,
+     20.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1875x933"
+     }
+    ],
+    "metrics": [
+     86.0,
+     4.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2515x1318"
+     }
+    ],
+    "metrics": [
+     83.0,
+     3.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1920x909"
+     }
+    ],
+    "metrics": [
+     73.0,
+     2.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1875x966"
+     }
+    ],
+    "metrics": [
+     61.0,
+     2.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1878x956"
+     }
+    ],
+    "metrics": [
+     56.0,
+     5.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "715x714"
+     }
+    ],
+    "metrics": [
+     53.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1920x911"
+     }
+    ],
+    "metrics": [
+     53.0,
+     15.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1875x863"
+     }
+    ],
+    "metrics": [
+     52.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1878x931"
+     }
+    ],
+    "metrics": [
+     49.0,
+     4.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1875x958"
+     }
+    ],
+    "metrics": [
+     44.0,
+     7.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1352x676"
+     }
+    ],
+    "metrics": [
+     36.0,
+     2.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1840x940"
+     }
+    ],
+    "metrics": [
+     36.0,
+     36.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1878x923"
+     }
+    ],
+    "metrics": [
+     35.0,
+     3.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1920x957"
+     }
+    ],
+    "metrics": [
+     34.0,
+     4.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1096x1108"
+     }
+    ],
+    "metrics": [
+     31.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1872x970"
+     }
+    ],
+    "metrics": [
+     31.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1875x925"
+     }
+    ],
+    "metrics": [
+     30.0,
+     5.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1920x951"
+     }
+    ],
+    "metrics": [
+     27.0,
+     2.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1315x839"
+     }
+    ],
+    "metrics": [
+     26.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1488x744"
+     }
+    ],
+    "metrics": [
+     26.0,
+     2.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1838x940"
+     }
+    ],
+    "metrics": [
+     26.0,
+     26.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2515x1285"
+     }
+    ],
+    "metrics": [
+     26.0,
+     2.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "430x640"
+     }
+    ],
+    "metrics": [
+     25.0,
+     16.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1232x1315"
+     }
+    ],
+    "metrics": [
+     25.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1638x926"
+     }
+    ],
+    "metrics": [
+     25.0,
+     2.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1878x941"
+     }
+    ],
+    "metrics": [
+     24.0,
+     2.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1821x940"
+     }
+    ],
+    "metrics": [
+     23.0,
+     22.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1870x858"
+     }
+    ],
+    "metrics": [
+     22.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1920x945"
+     }
+    ],
+    "metrics": [
+     22.0,
+     16.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1920x1080"
+     }
+    ],
+    "metrics": [
+     22.0,
+     3.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1667x1002"
+     }
+    ],
+    "metrics": [
+     21.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1920x997"
+     }
+    ],
+    "metrics": [
+     21.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1396x676"
+     }
+    ],
+    "metrics": [
+     19.0,
+     2.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1491x805"
+     }
+    ],
+    "metrics": [
+     19.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1494x748"
+     }
+    ],
+    "metrics": [
+     19.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1491x745"
+     }
+    ],
+    "metrics": [
+     18.0,
+     2.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1536x695"
+     }
+    ],
+    "metrics": [
+     18.0,
+     3.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1912x922"
+     }
+    ],
+    "metrics": [
+     17.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1242x614"
+     }
+    ],
+    "metrics": [
+     15.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1920x947"
+     }
+    ],
+    "metrics": [
+     15.0,
+     8.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "360x669"
+     }
+    ],
+    "metrics": [
+     14.0,
+     2.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "416x592"
+     }
+    ],
+    "metrics": [
+     14.0,
+     3.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1528x740"
+     }
+    ],
+    "metrics": [
+     14.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "430x932"
+     }
+    ],
+    "metrics": [
+     13.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1440x739"
+     }
+    ],
+    "metrics": [
+     13.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1536x864"
+     }
+    ],
+    "metrics": [
+     13.0,
+     2.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1920x953"
+     }
+    ],
+    "metrics": [
+     13.0,
+     7.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1866x920"
+     }
+    ],
+    "metrics": [
+     12.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "995x723"
+     }
+    ],
+    "metrics": [
+     11.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2560x1351"
+     }
+    ],
+    "metrics": [
+     11.0,
+     2.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "392x683"
+     }
+    ],
+    "metrics": [
+     10.0,
+     2.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1665x803"
+     }
+    ],
+    "metrics": [
+     10.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1912x956"
+     }
+    ],
+    "metrics": [
+     10.0,
+     4.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2560x1305"
+     }
+    ],
+    "metrics": [
+     10.0,
+     8.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "390x667"
+     }
+    ],
+    "metrics": [
+     9.0,
+     9.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "390x669"
+     }
+    ],
+    "metrics": [
+     9.0,
+     5.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1144x1185"
+     }
+    ],
+    "metrics": [
+     9.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1487x642"
+     }
+    ],
+    "metrics": [
+     9.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1663x800"
+     }
+    ],
+    "metrics": [
+     9.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1872x860"
+     }
+    ],
+    "metrics": [
+     9.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1200x659"
+     }
+    ],
+    "metrics": [
+     8.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1608x766"
+     }
+    ],
+    "metrics": [
+     8.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1663x778"
+     }
+    ],
+    "metrics": [
+     8.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1706x896"
+     }
+    ],
+    "metrics": [
+     8.0,
+     7.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1920x925"
+     }
+    ],
+    "metrics": [
+     8.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1920x1032"
+     }
+    ],
+    "metrics": [
+     8.0,
+     2.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1272x554"
+     }
+    ],
+    "metrics": [
+     7.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1280x584"
+     }
+    ],
+    "metrics": [
+     7.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1352x759"
+     }
+    ],
+    "metrics": [
+     7.0,
+     2.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1360x639"
+     }
+    ],
+    "metrics": [
+     7.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1440x641"
+     }
+    ],
+    "metrics": [
+     7.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1494x715"
+     }
+    ],
+    "metrics": [
+     7.0,
+     2.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1495x873"
+     }
+    ],
+    "metrics": [
+     7.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1745x872"
+     }
+    ],
+    "metrics": [
+     7.0,
+     2.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1866x953"
+     }
+    ],
+    "metrics": [
+     7.0,
+     7.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1912x948"
+     }
+    ],
+    "metrics": [
+     7.0,
+     7.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2515x1326"
+     }
+    ],
+    "metrics": [
+     7.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "430x745"
+     }
+    ],
+    "metrics": [
+     6.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "600x832"
+     }
+    ],
+    "metrics": [
+     6.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "763x791"
+     }
+    ],
+    "metrics": [
+     6.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1280x585"
+     }
+    ],
+    "metrics": [
+     6.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1332x723"
+     }
+    ],
+    "metrics": [
+     6.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1440x674"
+     }
+    ],
+    "metrics": [
+     6.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1462x851"
+     }
+    ],
+    "metrics": [
+     6.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1488x835"
+     }
+    ],
+    "metrics": [
+     6.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1491x742"
+     }
+    ],
+    "metrics": [
+     6.0,
+     2.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1918x959"
+     }
+    ],
+    "metrics": [
+     6.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1920x1111"
+     }
+    ],
+    "metrics": [
+     6.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2048x1192"
+     }
+    ],
+    "metrics": [
+     6.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "390x661"
+     }
+    ],
+    "metrics": [
+     5.0,
+     4.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "414x721"
+     }
+    ],
+    "metrics": [
+     5.0,
+     3.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "992x815"
+     }
+    ],
+    "metrics": [
+     5.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1097x554"
+     }
+    ],
+    "metrics": [
+     5.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1180x680"
+     }
+    ],
+    "metrics": [
+     5.0,
+     2.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1232x562"
+     }
+    ],
+    "metrics": [
+     5.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1355x732"
+     }
+    ],
+    "metrics": [
+     5.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1440x812"
+     }
+    ],
+    "metrics": [
+     5.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1491x642"
+     }
+    ],
+    "metrics": [
+     5.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1491x717"
+     }
+    ],
+    "metrics": [
+     5.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1558x751"
+     }
+    ],
+    "metrics": [
+     5.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1812x999"
+     }
+    ],
+    "metrics": [
+     5.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1912x914"
+     }
+    ],
+    "metrics": [
+     5.0,
+     2.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1912x954"
+     }
+    ],
+    "metrics": [
+     5.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1920x917"
+     }
+    ],
+    "metrics": [
+     5.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1920x927"
+     }
+    ],
+    "metrics": [
+     5.0,
+     3.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2086x1062"
+     }
+    ],
+    "metrics": [
+     5.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2560x1271"
+     }
+    ],
+    "metrics": [
+     5.0,
+     2.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2560x1353"
+     }
+    ],
+    "metrics": [
+     5.0,
+     2.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "3395x1285"
+     }
+    ],
+    "metrics": [
+     5.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "430x743"
+     }
+    ],
+    "metrics": [
+     4.0,
+     4.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "440x764"
+     }
+    ],
+    "metrics": [
+     4.0,
+     3.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "662x567"
+     }
+    ],
+    "metrics": [
+     4.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "678x656"
+     }
+    ],
+    "metrics": [
+     4.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "936x906"
+     }
+    ],
+    "metrics": [
+     4.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1100x933"
+     }
+    ],
+    "metrics": [
+     4.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1124x638"
+     }
+    ],
+    "metrics": [
+     4.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1140x767"
+     }
+    ],
+    "metrics": [
+     4.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1227x1315"
+     }
+    ],
+    "metrics": [
+     4.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1242x958"
+     }
+    ],
+    "metrics": [
+     4.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1280x551"
+     }
+    ],
+    "metrics": [
+     4.0,
+     3.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1360x641"
+     }
+    ],
+    "metrics": [
+     4.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1366x768"
+     }
+    ],
+    "metrics": [
+     4.0,
+     4.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1494x645"
+     }
+    ],
+    "metrics": [
+     4.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1600x773"
+     }
+    ],
+    "metrics": [
+     4.0,
+     2.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1600x834"
+     }
+    ],
+    "metrics": [
+     4.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1764x922"
+     }
+    ],
+    "metrics": [
+     4.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1857x973"
+     }
+    ],
+    "metrics": [
+     4.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1920x961"
+     }
+    ],
+    "metrics": [
+     4.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2048x1019"
+     }
+    ],
+    "metrics": [
+     4.0,
+     3.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2552x1354"
+     }
+    ],
+    "metrics": [
+     4.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "344x745"
+     }
+    ],
+    "metrics": [
+     3.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "360x668"
+     }
+    ],
+    "metrics": [
+     3.0,
+     3.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "384x693"
+     }
+    ],
+    "metrics": [
+     3.0,
+     2.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "384x720"
+     }
+    ],
+    "metrics": [
+     3.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "384x731"
+     }
+    ],
+    "metrics": [
+     3.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "390x670"
+     }
+    ],
+    "metrics": [
+     3.0,
+     3.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "390x699"
+     }
+    ],
+    "metrics": [
+     3.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "390x844"
+     }
+    ],
+    "metrics": [
+     3.0,
+     3.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "402x682"
+     }
+    ],
+    "metrics": [
+     3.0,
+     3.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "428x737"
+     }
+    ],
+    "metrics": [
+     3.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "516x1034"
+     }
+    ],
+    "metrics": [
+     3.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "616x769"
+     }
+    ],
+    "metrics": [
+     3.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "632x486"
+     }
+    ],
+    "metrics": [
+     3.0,
+     3.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "652x620"
+     }
+    ],
+    "metrics": [
+     3.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1024x768"
+     }
+    ],
+    "metrics": [
+     3.0,
+     3.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1315x873"
+     }
+    ],
+    "metrics": [
+     3.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1360x702"
+     }
+    ],
+    "metrics": [
+     3.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1440x963"
+     }
+    ],
+    "metrics": [
+     3.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1440x2391"
+     }
+    ],
+    "metrics": [
+     3.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1487x704"
+     }
+    ],
+    "metrics": [
+     3.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1488x690"
+     }
+    ],
+    "metrics": [
+     3.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1536x776"
+     }
+    ],
+    "metrics": [
+     3.0,
+     2.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1555x745"
+     }
+    ],
+    "metrics": [
+     3.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1564x908"
+     }
+    ],
+    "metrics": [
+     3.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1564x909"
+     }
+    ],
+    "metrics": [
+     3.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1600x909"
+     }
+    ],
+    "metrics": [
+     3.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1608x960"
+     }
+    ],
+    "metrics": [
+     3.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1686x956"
+     }
+    ],
+    "metrics": [
+     3.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1707x931"
+     }
+    ],
+    "metrics": [
+     3.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1707x932"
+     }
+    ],
+    "metrics": [
+     3.0,
+     2.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1820x940"
+     }
+    ],
+    "metrics": [
+     3.0,
+     2.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1868x922"
+     }
+    ],
+    "metrics": [
+     3.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1870x947"
+     }
+    ],
+    "metrics": [
+     3.0,
+     3.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1872x908"
+     }
+    ],
+    "metrics": [
+     3.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1875x931"
+     }
+    ],
+    "metrics": [
+     3.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1875x971"
+     }
+    ],
+    "metrics": [
+     3.0,
+     2.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1912x994"
+     }
+    ],
+    "metrics": [
+     3.0,
+     3.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1918x912"
+     }
+    ],
+    "metrics": [
+     3.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1920x891"
+     }
+    ],
+    "metrics": [
+     3.0,
+     3.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1920x1040"
+     }
+    ],
+    "metrics": [
+     3.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2552x1308"
+     }
+    ],
+    "metrics": [
+     3.0,
+     3.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "360x616"
+     }
+    ],
+    "metrics": [
+     2.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "360x645"
+     }
+    ],
+    "metrics": [
+     2.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "360x665"
+     }
+    ],
+    "metrics": [
+     2.0,
+     2.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "360x666"
+     }
+    ],
+    "metrics": [
+     2.0,
+     2.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "360x700"
+     }
+    ],
+    "metrics": [
+     2.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "375x697"
+     }
+    ],
+    "metrics": [
+     2.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "375x753"
+     }
+    ],
+    "metrics": [
+     2.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "392x675"
+     }
+    ],
+    "metrics": [
+     2.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "393x653"
+     }
+    ],
+    "metrics": [
+     2.0,
+     2.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "393x657"
+     }
+    ],
+    "metrics": [
+     2.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "393x661"
+     }
+    ],
+    "metrics": [
+     2.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "393x663"
+     }
+    ],
+    "metrics": [
+     2.0,
+     2.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "393x695"
+     }
+    ],
+    "metrics": [
+     2.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "411x747"
+     }
+    ],
+    "metrics": [
+     2.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "411x749"
+     }
+    ],
+    "metrics": [
+     2.0,
+     2.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "411x759"
+     }
+    ],
+    "metrics": [
+     2.0,
+     2.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "414x696"
+     }
+    ],
+    "metrics": [
+     2.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "414x714"
+     }
+    ],
+    "metrics": [
+     2.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "430x746"
+     }
+    ],
+    "metrics": [
+     2.0,
+     2.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "440x796"
+     }
+    ],
+    "metrics": [
+     2.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "444x640"
+     }
+    ],
+    "metrics": [
+     2.0,
+     2.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "626x1315"
+     }
+    ],
+    "metrics": [
+     2.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "662x815"
+     }
+    ],
+    "metrics": [
+     2.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "840x707"
+     }
+    ],
+    "metrics": [
+     2.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "943x630"
+     }
+    ],
+    "metrics": [
+     2.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1008x904"
+     }
+    ],
+    "metrics": [
+     2.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1011x812"
+     }
+    ],
+    "metrics": [
+     2.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1022x1018"
+     }
+    ],
+    "metrics": [
+     2.0,
+     2.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1024x576"
+     }
+    ],
+    "metrics": [
+     2.0,
+     2.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1039x718"
+     }
+    ],
+    "metrics": [
+     2.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1040x718"
+     }
+    ],
+    "metrics": [
+     2.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1080x732"
+     }
+    ],
+    "metrics": [
+     2.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1111x812"
+     }
+    ],
+    "metrics": [
+     2.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1161x593"
+     }
+    ],
+    "metrics": [
+     2.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1180x724"
+     }
+    ],
+    "metrics": [
+     2.0,
+     2.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1235x565"
+     }
+    ],
+    "metrics": [
+     2.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1241x702"
+     }
+    ],
+    "metrics": [
+     2.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1242x738"
+     }
+    ],
+    "metrics": [
+     2.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1242x925"
+     }
+    ],
+    "metrics": [
+     2.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1280x720"
+     }
+    ],
+    "metrics": [
+     2.0,
+     2.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1280x800"
+     }
+    ],
+    "metrics": [
+     2.0,
+     2.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1293x693"
+     }
+    ],
+    "metrics": [
+     2.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1303x635"
+     }
+    ],
+    "metrics": [
+     2.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1310x738"
+     }
+    ],
+    "metrics": [
+     2.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1321x692"
+     }
+    ],
+    "metrics": [
+     2.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1321x694"
+     }
+    ],
+    "metrics": [
+     2.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1360x607"
+     }
+    ],
+    "metrics": [
+     2.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1389x832"
+     }
+    ],
+    "metrics": [
+     2.0,
+     2.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1427x832"
+     }
+    ],
+    "metrics": [
+     2.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1437x832"
+     }
+    ],
+    "metrics": [
+     2.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1440x778"
+     }
+    ],
+    "metrics": [
+     2.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1468x848"
+     }
+    ],
+    "metrics": [
+     2.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1468x849"
+     }
+    ],
+    "metrics": [
+     2.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1470x835"
+     }
+    ],
+    "metrics": [
+     2.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1482x739"
+     }
+    ],
+    "metrics": [
+     2.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1482x843"
+     }
+    ],
+    "metrics": [
+     2.0,
+     2.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1491x704"
+     }
+    ],
+    "metrics": [
+     2.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1536x690"
+     }
+    ],
+    "metrics": [
+     2.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1536x744"
+     }
+    ],
+    "metrics": [
+     2.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1536x825"
+     }
+    ],
+    "metrics": [
+     2.0,
+     2.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1600x900"
+     }
+    ],
+    "metrics": [
+     2.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1623x831"
+     }
+    ],
+    "metrics": [
+     2.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1633x921"
+     }
+    ],
+    "metrics": [
+     2.0,
+     2.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1651x323"
+     }
+    ],
+    "metrics": [
+     2.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1656x876"
+     }
+    ],
+    "metrics": [
+     2.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1656x1070"
+     }
+    ],
+    "metrics": [
+     2.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1665x802"
+     }
+    ],
+    "metrics": [
+     2.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1678x928"
+     }
+    ],
+    "metrics": [
+     2.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1680x991"
+     }
+    ],
+    "metrics": [
+     2.0,
+     2.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1707x898"
+     }
+    ],
+    "metrics": [
+     2.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1708x1297"
+     }
+    ],
+    "metrics": [
+     2.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1813x973"
+     }
+    ],
+    "metrics": [
+     2.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1870x920"
+     }
+    ],
+    "metrics": [
+     2.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1872x662"
+     }
+    ],
+    "metrics": [
+     2.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1875x938"
+     }
+    ],
+    "metrics": [
+     2.0,
+     2.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1875x1004"
+     }
+    ],
+    "metrics": [
+     2.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1878x939"
+     }
+    ],
+    "metrics": [
+     2.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1912x932"
+     }
+    ],
+    "metrics": [
+     2.0,
+     2.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1920x952"
+     }
+    ],
+    "metrics": [
+     2.0,
+     2.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1920x959"
+     }
+    ],
+    "metrics": [
+     2.0,
+     2.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1920x963"
+     }
+    ],
+    "metrics": [
+     2.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1974x1102"
+     }
+    ],
+    "metrics": [
+     2.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2048x991"
+     }
+    ],
+    "metrics": [
+     2.0,
+     2.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2510x1280"
+     }
+    ],
+    "metrics": [
+     2.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2518x1221"
+     }
+    ],
+    "metrics": [
+     2.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2518x1283"
+     }
+    ],
+    "metrics": [
+     2.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1x1"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "64x24"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "320x544"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "336x565"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "349x631"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "360x311"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "360x605"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "360x612"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "360x614"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "360x617"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "360x636"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "360x640"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "360x644"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "360x649"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "360x650"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "360x653"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "360x660"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "360x664"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "360x680"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "360x688"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "360x689"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "360x708"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "360x710"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "360x711"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "360x717"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "360x725"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "360x777"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "361x602"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "375x635"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "375x644"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "375x688"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "384x679"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "384x681"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "384x691"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "384x694"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "384x695"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "384x697"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "384x699"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "384x710"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "384x717"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "384x730"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "384x733"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "384x746"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "384x751"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "390x635"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "390x651"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "390x657"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "390x663"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "392x715"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "392x725"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "392x735"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "392x745"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "392x770"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "392x791"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "393x694"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "393x852"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "397x624"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "402x874"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "406x766"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "406x804"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "411x721"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "411x748"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "411x766"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "411x776"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "411x781"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "411x784"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "411x785"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "411x858"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "411x860"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "414x716"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "414x718"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "414x896"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "423x841"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "428x743"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "428x749"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "428x752"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "428x879"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "430x642"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "430x737"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "430x739"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "432x642"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "432x812"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "434x640"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "436x842"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "440x572"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "440x753"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "440x759"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "443x639"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "446x642"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "458x640"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "527x1010"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "600x928"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "612x1315"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "618x771"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "620x771"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "629x332"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "630x663"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "634x485"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "635x484"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "671x723"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "678x904"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "709x944"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "732x762"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "735x695"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "736x379"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "740x612"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "767x825"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "768x904"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "800x729"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "814x549"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "828x516"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "865x465"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "869x925"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "871x556"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "871x994"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "872x994"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "874x897"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "876x904"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "885x741"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "888x784"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "903x469"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "921x928"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "942x503"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "950x913"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "952x910"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "952x1326"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "956x612"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "957x947"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "957x958"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "958x945"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "958x946"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "975x732"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "979x843"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "979x897"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "986x747"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "987x748"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "988x749"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1000x432"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1021x1018"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1024x657"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1024x1024"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1026x565"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1034x798"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1049x573"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1050x1893"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1076x1282"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1080x746"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1080x1835"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1094x839"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1096x573"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1096x1046"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1107x444"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1107x503"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1118x663"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1121x732"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1130x741"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1131x843"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1143x910"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1152x622"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1157x721"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1160x590"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1168x609"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1177x688"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1180x601"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1180x734"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1200x880"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1203x635"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1228x595"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1231x594"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1235x584"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1238x563"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1246x1315"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1247x870"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1248x861"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1255x883"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1272x892"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1274x682"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1274x728"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1280x598"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1280x633"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1280x911"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1284x658"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1290x691"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1297x723"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1305x967"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1318x601"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1324x619"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1333x632"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1348x812"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1350x926"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1351x712"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1352x729"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1360x679"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1366x746"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1366x900"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1366x1366"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1384x669"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1386x766"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1386x767"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1388x832"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1392x833"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1400x900"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1402x702"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1412x958"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1432x734"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1434x846"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1437x923"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1440x767"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1440x774"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1442x846"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1449x1268"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1462x850"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1467x830"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1490x642"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1491x644"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1491x764"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1492x643"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1494x686"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1494x707"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1504x762"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1506x772"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1506x778"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1515x734"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1520x848"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1526x914"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1528x739"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1528x771"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1528x779"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1528x828"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1528x1256"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1532x733"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1532x816"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1535x743"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1536x676"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1536x682"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1536x729"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1536x737"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1536x740"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1536x743"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1536x747"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1536x791"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1536x816"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1555x958"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1600x731"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1600x1200"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1630x896"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1653x826"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1656x807"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1660x888"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1662x945"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1664x991"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1680x889"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1680x965"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1680x1050"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1685x792"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1688x944"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1699x828"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1699x836"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1701x752"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1703x865"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1706x993"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1707x939"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1708x890"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1712x772"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1718x1270"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1719x1297"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1747x911"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1841x959"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1860x962"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1866x912"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1866x918"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1866x955"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1868x949"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1870x919"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1874x1004"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1875x923"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1875x1053"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1878x907"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1878x909"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1878x929"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1878x951"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1878x954"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1878x955"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1878x971"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1890x953"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1910x1061"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1918x958"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1919x925"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1920x920"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1920x929"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1920x955"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1920x960"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1920x991"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1920x1035"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1920x1065"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1920x1113"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1920x1148"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "1936x1048"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2003x997"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2006x1170"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2054x1078"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2327x1354"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2386x1452"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2388x962"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2400x1181"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2510x969"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2512x1282"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2515x1223"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2518x1281"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2518x1282"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2518x1316"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2548x1297"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2552x1514"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2560x952"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2560x1307"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2560x1399"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "3390x1327"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "3432x1316"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "3840x2043"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   }
+  ],
+  "total_rows": 577,
+  "total_rows_rounded": false,
+  "sampled": false,
+  "contains_sensitive_data": false,
+  "sample_share": 1.0,
+  "sample_size": 2678,
+  "sample_space": 2678,
+  "data_lag": 0,
+  "totals": [
+   2659.0,
+   616.0
+  ],
+  "min": [
+   1.0,
+   1.0
+  ],
+  "max": [
+   98.0,
+   36.0
+  ]
+ }
+}

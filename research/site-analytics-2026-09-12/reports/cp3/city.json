@@ -1,0 +1,1975 @@
+{
+ "request": {
+  "ids": 108585248,
+  "metrics": "ym:s:visits,ym:s:users",
+  "date1": "2026-07-28",
+  "date2": "2026-09-12",
+  "limit": 10000,
+  "accuracy": "full",
+  "dimensions": "ym:s:regionCountry,ym:s:regionCity",
+  "sort": "-ym:s:visits",
+  "filters": "ym:s:startURL!@'localhost' AND ym:s:startURL!@'127.0.0.1'"
+ },
+ "response": {
+  "query": {
+   "ids": [
+    108585248
+   ],
+   "dimensions": [
+    "ym:s:regionCountry",
+    "ym:s:regionCity"
+   ],
+   "metrics": [
+    "ym:s:visits",
+    "ym:s:users"
+   ],
+   "sort": [
+    "-ym:s:visits"
+   ],
+   "date1": "2026-07-28",
+   "date2": "2026-09-12",
+   "filters": "ym:s:startURL!@'localhost' AND ym:s:startURL!@'127.0.0.1'",
+   "limit": 10000,
+   "offset": 1,
+   "group": "Week",
+   "benchmarks_version": "1788134400000",
+   "benchmarks_sub_industry": "false",
+   "auto_group_size": "1",
+   "exp_bucket_size": "100",
+   "attr_name": "",
+   "funnel_window": "",
+   "benchmarks_quantile": "50",
+   "time_interval": "1SECOND",
+   "intervals": "1",
+   "quantile": "50",
+   "offline_window": "21",
+   "attribution": "CROSS_DEVICE_LAST_SIGNIFICANT",
+   "currency": "RUB",
+   "benchmarks_attribution": "Automatic",
+   "adfox_event_id": "0",
+   "funnel_pattern": ""
+  },
+  "data": [
+   {
+    "dimensions": [
+     {
+      "icon_id": "84",
+      "icon_type": "country",
+      "iso_name": "US",
+      "id": "84",
+      "name": "United States"
+     },
+     {
+      "iso_name": null,
+      "id": null,
+      "name": null
+     }
+    ],
+    "metrics": [
+     207.0,
+     57.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "225",
+      "icon_type": "country",
+      "iso_name": "RU",
+      "id": "225",
+      "name": "Russia"
+     },
+     {
+      "iso_name": null,
+      "id": null,
+      "name": null
+     }
+    ],
+    "metrics": [
+     120.0,
+     68.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "225",
+      "icon_type": "country",
+      "iso_name": "RU",
+      "id": "225",
+      "name": "Russia"
+     },
+     {
+      "iso_name": "RU EKA",
+      "id": "54",
+      "name": "Yekaterinburg"
+     }
+    ],
+    "metrics": [
+     66.0,
+     5.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "225",
+      "icon_type": "country",
+      "iso_name": "RU",
+      "id": "225",
+      "name": "Russia"
+     },
+     {
+      "iso_name": "RU-MOW",
+      "id": "213",
+      "name": "Moscow"
+     }
+    ],
+    "metrics": [
+     55.0,
+     14.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "96",
+      "icon_type": "country",
+      "iso_name": "DE",
+      "id": "96",
+      "name": "Germany"
+     },
+     {
+      "iso_name": "DE NRB",
+      "id": "112436",
+      "name": "Neustadt am Rubenberge"
+     }
+    ],
+    "metrics": [
+     45.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "96",
+      "icon_type": "country",
+      "iso_name": "DE",
+      "id": "96",
+      "name": "Germany"
+     },
+     {
+      "iso_name": "DE CGN",
+      "id": "98",
+      "name": "Cologne"
+     }
+    ],
+    "metrics": [
+     41.0,
+     2.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "225",
+      "icon_type": "country",
+      "iso_name": "RU",
+      "id": "225",
+      "name": "Russia"
+     },
+     {
+      "iso_name": "RU OVB",
+      "id": "65",
+      "name": "Novosibirsk"
+     }
+    ],
+    "metrics": [
+     41.0,
+     41.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "94",
+      "icon_type": "country",
+      "iso_name": "BR",
+      "id": "94",
+      "name": "Brazil"
+     },
+     {
+      "iso_name": null,
+      "id": "219091",
+      "name": "Araucária"
+     }
+    ],
+    "metrics": [
+     39.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "225",
+      "icon_type": "country",
+      "iso_name": "RU",
+      "id": "225",
+      "name": "Russia"
+     },
+     {
+      "iso_name": "RU DOL",
+      "id": "214",
+      "name": "Dolgoprudniy"
+     }
+    ],
+    "metrics": [
+     34.0,
+     5.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "225",
+      "icon_type": "country",
+      "iso_name": "RU",
+      "id": "225",
+      "name": "Russia"
+     },
+     {
+      "iso_name": "RU TYA",
+      "id": "15",
+      "name": "Tula"
+     }
+    ],
+    "metrics": [
+     24.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "211",
+      "icon_type": "country",
+      "iso_name": "AU",
+      "id": "211",
+      "name": "Australia"
+     },
+     {
+      "iso_name": "AU PER",
+      "id": "21770",
+      "name": "Perth"
+     }
+    ],
+    "metrics": [
+     22.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "225",
+      "icon_type": "country",
+      "iso_name": "RU",
+      "id": "225",
+      "name": "Russia"
+     },
+     {
+      "iso_name": "RU KRR",
+      "id": "35",
+      "name": "Krasnodar"
+     }
+    ],
+    "metrics": [
+     22.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "95",
+      "icon_type": "country",
+      "iso_name": "CA",
+      "id": "95",
+      "name": "Canada"
+     },
+     {
+      "iso_name": "CA FRE",
+      "id": "20965",
+      "name": "Fredericton"
+     }
+    ],
+    "metrics": [
+     19.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "102",
+      "icon_type": "country",
+      "iso_name": "GB",
+      "id": "102",
+      "name": "United Kingdom"
+     },
+     {
+      "iso_name": null,
+      "id": null,
+      "name": null
+     }
+    ],
+    "metrics": [
+     19.0,
+     6.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "102",
+      "icon_type": "country",
+      "iso_name": "GB",
+      "id": "102",
+      "name": "United Kingdom"
+     },
+     {
+      "iso_name": "GB GDD",
+      "id": "109526",
+      "name": "Guildford"
+     }
+    ],
+    "metrics": [
+     17.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "102",
+      "icon_type": "country",
+      "iso_name": "GB",
+      "id": "102",
+      "name": "United Kingdom"
+     },
+     {
+      "iso_name": "GB GOS",
+      "id": "114662",
+      "name": "Gosport"
+     }
+    ],
+    "metrics": [
+     16.0,
+     2.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "225",
+      "icon_type": "country",
+      "iso_name": "RU",
+      "id": "225",
+      "name": "Russia"
+     },
+     {
+      "iso_name": "RU-SPE",
+      "id": "2",
+      "name": "Saint Petersburg"
+     }
+    ],
+    "metrics": [
+     15.0,
+     3.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "95",
+      "icon_type": "country",
+      "iso_name": "CA",
+      "id": "95",
+      "name": "Canada"
+     },
+     {
+      "iso_name": "CA RBC",
+      "id": "103609",
+      "name": "Richmond"
+     }
+    ],
+    "metrics": [
+     14.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "225",
+      "icon_type": "country",
+      "iso_name": "RU",
+      "id": "225",
+      "name": "Russia"
+     },
+     {
+      "iso_name": "RU KRA",
+      "id": "62",
+      "name": "Krasnoyarsk"
+     }
+    ],
+    "metrics": [
+     14.0,
+     4.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "983",
+      "icon_type": "country",
+      "iso_name": "TR",
+      "id": "983",
+      "name": "Turkey"
+     },
+     {
+      "iso_name": "TR IST",
+      "id": "11508",
+      "name": "Istanbul"
+     }
+    ],
+    "metrics": [
+     14.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "10093",
+      "icon_type": "country",
+      "iso_name": "VN",
+      "id": "10093",
+      "name": "Vietnam"
+     },
+     {
+      "iso_name": "VN HAN",
+      "id": "10552",
+      "name": "Hanoi"
+     }
+    ],
+    "metrics": [
+     13.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "127",
+      "icon_type": "country",
+      "iso_name": "SE",
+      "id": "127",
+      "name": "Sweden"
+     },
+     {
+      "iso_name": null,
+      "id": null,
+      "name": null
+     }
+    ],
+    "metrics": [
+     12.0,
+     5.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "95",
+      "icon_type": "country",
+      "iso_name": "CA",
+      "id": "95",
+      "name": "Canada"
+     },
+     {
+      "iso_name": "CA SAK",
+      "id": "20978",
+      "name": "Saskatoon"
+     }
+    ],
+    "metrics": [
+     10.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "120",
+      "icon_type": "country",
+      "iso_name": "PL",
+      "id": "120",
+      "name": "Poland"
+     },
+     {
+      "iso_name": "PL WRS",
+      "id": "10472",
+      "name": "Warsaw"
+     }
+    ],
+    "metrics": [
+     10.0,
+     8.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "94",
+      "icon_type": "country",
+      "iso_name": "BR",
+      "id": "94",
+      "name": "Brazil"
+     },
+     {
+      "iso_name": "BR PET",
+      "id": "111329",
+      "name": "Pelotas"
+     }
+    ],
+    "metrics": [
+     8.0,
+     2.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "125",
+      "icon_type": "country",
+      "iso_name": "CZ",
+      "id": "125",
+      "name": "Czech Republic"
+     },
+     {
+      "iso_name": "CZ-PR",
+      "id": "10511",
+      "name": "Prague"
+     }
+    ],
+    "metrics": [
+     8.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "96",
+      "icon_type": "country",
+      "iso_name": "DE",
+      "id": "96",
+      "name": "Germany"
+     },
+     {
+      "iso_name": "DE MHG",
+      "id": "103765",
+      "name": "Mannheim"
+     }
+    ],
+    "metrics": [
+     8.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "96",
+      "icon_type": "country",
+      "iso_name": "DE",
+      "id": "96",
+      "name": "Germany"
+     },
+     {
+      "iso_name": "DE NKL",
+      "id": "115188",
+      "name": "Niederkassel"
+     }
+    ],
+    "metrics": [
+     7.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "118",
+      "icon_type": "country",
+      "iso_name": "NL",
+      "id": "118",
+      "name": "Netherlands"
+     },
+     {
+      "iso_name": "NL AMS",
+      "id": "10466",
+      "name": "Amsterdam"
+     }
+    ],
+    "metrics": [
+     7.0,
+     5.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "120",
+      "icon_type": "country",
+      "iso_name": "PL",
+      "id": "120",
+      "name": "Poland"
+     },
+     {
+      "iso_name": "PL NWS",
+      "id": "104811",
+      "name": "Nowy Sacz"
+     }
+    ],
+    "metrics": [
+     7.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "211",
+      "icon_type": "country",
+      "iso_name": "AU",
+      "id": "211",
+      "name": "Australia"
+     },
+     {
+      "iso_name": "AU BNE",
+      "id": "21210",
+      "name": "Brisbane"
+     }
+    ],
+    "metrics": [
+     6.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "96",
+      "icon_type": "country",
+      "iso_name": "DE",
+      "id": "96",
+      "name": "Germany"
+     },
+     {
+      "iso_name": "DE BGL",
+      "id": "115182",
+      "name": "Bergisch Gladbach"
+     }
+    ],
+    "metrics": [
+     6.0,
+     2.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "96",
+      "icon_type": "country",
+      "iso_name": "DE",
+      "id": "96",
+      "name": "Germany"
+     },
+     {
+      "iso_name": "DE MAI",
+      "id": "103769",
+      "name": "Mainz"
+     }
+    ],
+    "metrics": [
+     6.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "225",
+      "icon_type": "country",
+      "iso_name": "RU",
+      "id": "225",
+      "name": "Russia"
+     },
+     {
+      "iso_name": "RU TOF",
+      "id": "67",
+      "name": "Tomsk"
+     }
+    ],
+    "metrics": [
+     6.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "210",
+      "icon_type": "country",
+      "iso_name": "AE",
+      "id": "210",
+      "name": "United Arab Emirates"
+     },
+     {
+      "iso_name": "AE AUH",
+      "id": "11498",
+      "name": "Abu Dhabi"
+     }
+    ],
+    "metrics": [
+     6.0,
+     2.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "96",
+      "icon_type": "country",
+      "iso_name": "DE",
+      "id": "96",
+      "name": "Germany"
+     },
+     {
+      "iso_name": null,
+      "id": null,
+      "name": null
+     }
+    ],
+    "metrics": [
+     5.0,
+     2.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "225",
+      "icon_type": "country",
+      "iso_name": "RU",
+      "id": "225",
+      "name": "Russia"
+     },
+     {
+      "iso_name": "RU KVX",
+      "id": "46",
+      "name": "Kirov"
+     }
+    ],
+    "metrics": [
+     5.0,
+     2.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "211",
+      "icon_type": "country",
+      "iso_name": "AU",
+      "id": "211",
+      "name": "Australia"
+     },
+     {
+      "iso_name": "AU MEL",
+      "id": "21265",
+      "name": "Melbourne"
+     }
+    ],
+    "metrics": [
+     4.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "124",
+      "icon_type": "country",
+      "iso_name": "FR",
+      "id": "124",
+      "name": "France"
+     },
+     {
+      "iso_name": null,
+      "id": null,
+      "name": null
+     }
+    ],
+    "metrics": [
+     4.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "96",
+      "icon_type": "country",
+      "iso_name": "DE",
+      "id": "96",
+      "name": "Germany"
+     },
+     {
+      "iso_name": "DE FRA",
+      "id": "100",
+      "name": "Frankfurt am Main"
+     }
+    ],
+    "metrics": [
+     4.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "95",
+      "icon_type": "country",
+      "iso_name": "CA",
+      "id": "95",
+      "name": "Canada"
+     },
+     {
+      "iso_name": null,
+      "id": null,
+      "name": null
+     }
+    ],
+    "metrics": [
+     3.0,
+     2.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "95",
+      "icon_type": "country",
+      "iso_name": "CA",
+      "id": "95",
+      "name": "Canada"
+     },
+     {
+      "iso_name": "CA HAM",
+      "id": "103572",
+      "name": "Hamilton"
+     }
+    ],
+    "metrics": [
+     3.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "95",
+      "icon_type": "country",
+      "iso_name": "CA",
+      "id": "95",
+      "name": "Canada"
+     },
+     {
+      "iso_name": "CA VAN",
+      "id": "21353",
+      "name": "Vancouver"
+     }
+    ],
+    "metrics": [
+     3.0,
+     3.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "205",
+      "icon_type": "country",
+      "iso_name": "IT",
+      "id": "205",
+      "name": "Italy"
+     },
+     {
+      "iso_name": null,
+      "id": null,
+      "name": null
+     }
+    ],
+    "metrics": [
+     3.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "225",
+      "icon_type": "country",
+      "iso_name": "RU",
+      "id": "225",
+      "name": "Russia"
+     },
+     {
+      "iso_name": "RU CEK",
+      "id": "56",
+      "name": "Chelyabinsk"
+     }
+    ],
+    "metrics": [
+     3.0,
+     3.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "225",
+      "icon_type": "country",
+      "iso_name": "RU",
+      "id": "225",
+      "name": "Russia"
+     },
+     {
+      "iso_name": "RU YKS",
+      "id": "74",
+      "name": "Yakutsk"
+     }
+    ],
+    "metrics": [
+     3.0,
+     2.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "983",
+      "icon_type": "country",
+      "iso_name": "TR",
+      "id": "983",
+      "name": "Turkey"
+     },
+     {
+      "iso_name": null,
+      "id": "198977",
+      "name": "Efeler"
+     }
+    ],
+    "metrics": [
+     3.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "20274",
+      "icon_type": "country",
+      "iso_name": "BN",
+      "id": "20274",
+      "name": "Brunei"
+     },
+     {
+      "iso_name": "BN BWN",
+      "id": "20275",
+      "name": "Bandar Seri Begawan"
+     }
+    ],
+    "metrics": [
+     2.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "20862",
+      "icon_type": "country",
+      "iso_name": "CL",
+      "id": "20862",
+      "name": "Chile"
+     },
+     {
+      "iso_name": "CL VAP",
+      "id": "21351",
+      "name": "Valparaiso"
+     }
+    ],
+    "metrics": [
+     2.0,
+     2.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "124",
+      "icon_type": "country",
+      "iso_name": "FR",
+      "id": "124",
+      "name": "France"
+     },
+     {
+      "iso_name": "FR PAR",
+      "id": "10502",
+      "name": "Paris"
+     }
+    ],
+    "metrics": [
+     2.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "225",
+      "icon_type": "country",
+      "iso_name": "RU",
+      "id": "225",
+      "name": "Russia"
+     },
+     {
+      "iso_name": null,
+      "id": "21623",
+      "name": "Ivanteevka"
+     }
+    ],
+    "metrics": [
+     2.0,
+     2.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "225",
+      "icon_type": "country",
+      "iso_name": "RU",
+      "id": "225",
+      "name": "Russia"
+     },
+     {
+      "iso_name": "RU KZN",
+      "id": "43",
+      "name": "Kazan"
+     }
+    ],
+    "metrics": [
+     2.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "10105",
+      "icon_type": "country",
+      "iso_name": "SG",
+      "id": "10105",
+      "name": "Singapore"
+     },
+     {
+      "iso_name": "SG SIN",
+      "id": "10619",
+      "name": "Singapore"
+     }
+    ],
+    "metrics": [
+     2.0,
+     2.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "10021",
+      "icon_type": "country",
+      "iso_name": "ZA",
+      "id": "10021",
+      "name": "South Africa"
+     },
+     {
+      "iso_name": "ZA KIM",
+      "id": "114218",
+      "name": "Kimberley"
+     }
+    ],
+    "metrics": [
+     2.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "983",
+      "icon_type": "country",
+      "iso_name": "TR",
+      "id": "983",
+      "name": "Turkey"
+     },
+     {
+      "iso_name": null,
+      "id": null,
+      "name": null
+     }
+    ],
+    "metrics": [
+     2.0,
+     2.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "102",
+      "icon_type": "country",
+      "iso_name": "GB",
+      "id": "102",
+      "name": "United Kingdom"
+     },
+     {
+      "iso_name": "GB HWY",
+      "id": "109535",
+      "name": "High Wycombe"
+     }
+    ],
+    "metrics": [
+     2.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "102",
+      "icon_type": "country",
+      "iso_name": "GB",
+      "id": "102",
+      "name": "United Kingdom"
+     },
+     {
+      "iso_name": "GB-LND",
+      "id": "10393",
+      "name": "London"
+     }
+    ],
+    "metrics": [
+     2.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "84",
+      "icon_type": "country",
+      "iso_name": "US",
+      "id": "84",
+      "name": "United States"
+     },
+     {
+      "iso_name": "US QAS",
+      "id": "102820",
+      "name": "Ashburn"
+     }
+    ],
+    "metrics": [
+     2.0,
+     2.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "84",
+      "icon_type": "country",
+      "iso_name": "US",
+      "id": "84",
+      "name": "United States"
+     },
+     {
+      "iso_name": "US MES",
+      "id": "21270",
+      "name": "Minneapolis"
+     }
+    ],
+    "metrics": [
+     2.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "84",
+      "icon_type": "country",
+      "iso_name": "US",
+      "id": "84",
+      "name": "United States"
+     },
+     {
+      "iso_name": "US NYC",
+      "id": "202",
+      "name": "New York"
+     }
+    ],
+    "metrics": [
+     2.0,
+     2.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "168",
+      "icon_type": "country",
+      "iso_name": "AM",
+      "id": "168",
+      "name": "Armenia"
+     },
+     {
+      "iso_name": "AM EVN",
+      "id": "10262",
+      "name": "Yerevan"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "211",
+      "icon_type": "country",
+      "iso_name": "AU",
+      "id": "211",
+      "name": "Australia"
+     },
+     {
+      "iso_name": "AU SYD",
+      "id": "10145",
+      "name": "Sydney"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "94",
+      "icon_type": "country",
+      "iso_name": "BR",
+      "id": "94",
+      "name": "Brazil"
+     },
+     {
+      "iso_name": null,
+      "id": null,
+      "name": null
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "10083",
+      "icon_type": "country",
+      "iso_name": "HR",
+      "id": "10083",
+      "name": "Croatia"
+     },
+     {
+      "iso_name": "HR RJK",
+      "id": "100517",
+      "name": "Rijeka"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "96",
+      "icon_type": "country",
+      "iso_name": "DE",
+      "id": "96",
+      "name": "Germany"
+     },
+     {
+      "iso_name": "DE BSO",
+      "id": "115497",
+      "name": "Bad Soden am Taunus"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "96",
+      "icon_type": "country",
+      "iso_name": "DE",
+      "id": "96",
+      "name": "Germany"
+     },
+     {
+      "iso_name": "DE DUS",
+      "id": "10408",
+      "name": "Dusseldorf"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "96",
+      "icon_type": "country",
+      "iso_name": "DE",
+      "id": "96",
+      "name": "Germany"
+     },
+     {
+      "iso_name": "DE ESC",
+      "id": "103775",
+      "name": "Eschborn"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "96",
+      "icon_type": "country",
+      "iso_name": "DE",
+      "id": "96",
+      "name": "Germany"
+     },
+     {
+      "iso_name": "DE REU",
+      "id": "115301",
+      "name": "Reutlingen"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "246",
+      "icon_type": "country",
+      "iso_name": "GR",
+      "id": "246",
+      "name": "Greece"
+     },
+     {
+      "iso_name": "GR SKG",
+      "id": "10424",
+      "name": "Thessaloniki"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "10099",
+      "icon_type": "country",
+      "iso_name": "MN",
+      "id": "10099",
+      "name": "Mongolia"
+     },
+     {
+      "iso_name": "MN ULN",
+      "id": "10606",
+      "name": "Ulan Bator"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "10108",
+      "icon_type": "country",
+      "iso_name": "PH",
+      "id": "10108",
+      "name": "Philippines"
+     },
+     {
+      "iso_name": "PH DVO",
+      "id": "10626",
+      "name": "Davao"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "135",
+      "icon_type": "country",
+      "iso_name": "KR",
+      "id": "135",
+      "name": "Republic of Korea"
+     },
+     {
+      "iso_name": "KR SEL",
+      "id": "10635",
+      "name": "Seoul"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "225",
+      "icon_type": "country",
+      "iso_name": "RU",
+      "id": "225",
+      "name": "Russia"
+     },
+     {
+      "iso_name": "RU BLA",
+      "id": "10716",
+      "name": "Balashiha"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "225",
+      "icon_type": "country",
+      "iso_name": "RU",
+      "id": "225",
+      "name": "Russia"
+     },
+     {
+      "iso_name": "RU EGO",
+      "id": "4",
+      "name": "Belgorod"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "225",
+      "icon_type": "country",
+      "iso_name": "RU",
+      "id": "225",
+      "name": "Russia"
+     },
+     {
+      "iso_name": null,
+      "id": "37118",
+      "name": "Chekalin"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "225",
+      "icon_type": "country",
+      "iso_name": "RU",
+      "id": "225",
+      "name": "Russia"
+     },
+     {
+      "iso_name": null,
+      "id": "10725",
+      "name": "Domodedovo"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "225",
+      "icon_type": "country",
+      "iso_name": "RU",
+      "id": "225",
+      "name": "Russia"
+     },
+     {
+      "iso_name": "RU KEJ",
+      "id": "64",
+      "name": "Kemerovo"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "225",
+      "icon_type": "country",
+      "iso_name": "RU",
+      "id": "225",
+      "name": "Russia"
+     },
+     {
+      "iso_name": "RU KHV",
+      "id": "76",
+      "name": "Khabarovsk"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "225",
+      "icon_type": "country",
+      "iso_name": "RU",
+      "id": "225",
+      "name": "Russia"
+     },
+     {
+      "iso_name": "RU MCX",
+      "id": "28",
+      "name": "Makhachkala"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "225",
+      "icon_type": "country",
+      "iso_name": "RU",
+      "id": "225",
+      "name": "Russia"
+     },
+     {
+      "iso_name": null,
+      "id": "101271",
+      "name": "Mikhaylovsk"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "225",
+      "icon_type": "country",
+      "iso_name": "RU",
+      "id": "225",
+      "name": "Russia"
+     },
+     {
+      "iso_name": null,
+      "id": "10878",
+      "name": "Otradnoe"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "225",
+      "icon_type": "country",
+      "iso_name": "RU",
+      "id": "225",
+      "name": "Russia"
+     },
+     {
+      "iso_name": "RU PKV",
+      "id": "25",
+      "name": "Pskov"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "225",
+      "icon_type": "country",
+      "iso_name": "RU",
+      "id": "225",
+      "name": "Russia"
+     },
+     {
+      "iso_name": "RU RND",
+      "id": "39",
+      "name": "Rostov-na-Donu"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "225",
+      "icon_type": "country",
+      "iso_name": "RU",
+      "id": "225",
+      "name": "Russia"
+     },
+     {
+      "iso_name": "RU RTW",
+      "id": "194",
+      "name": "Saratov"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "225",
+      "icon_type": "country",
+      "iso_name": "RU",
+      "id": "225",
+      "name": "Russia"
+     },
+     {
+      "iso_name": "RU SHV",
+      "id": "10754",
+      "name": "Serpuhov"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "225",
+      "icon_type": "country",
+      "iso_name": "RU",
+      "id": "225",
+      "name": "Russia"
+     },
+     {
+      "iso_name": "RU TTI",
+      "id": "240",
+      "name": "Togliatti"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "225",
+      "icon_type": "country",
+      "iso_name": "RU",
+      "id": "225",
+      "name": "Russia"
+     },
+     {
+      "iso_name": "RU VZH",
+      "id": "20721",
+      "name": "Volzhsk"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "225",
+      "icon_type": "country",
+      "iso_name": "RU",
+      "id": "225",
+      "name": "Russia"
+     },
+     {
+      "iso_name": "RU VOZ",
+      "id": "193",
+      "name": "Voronezh"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "121",
+      "icon_type": "country",
+      "iso_name": "SK",
+      "id": "121",
+      "name": "Slovakia"
+     },
+     {
+      "iso_name": null,
+      "id": null,
+      "name": null
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "121",
+      "icon_type": "country",
+      "iso_name": "SK",
+      "id": "121",
+      "name": "Slovakia"
+     },
+     {
+      "iso_name": "SK POV",
+      "id": "105430",
+      "name": "Prešov"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "102",
+      "icon_type": "country",
+      "iso_name": "GB",
+      "id": "102",
+      "name": "United Kingdom"
+     },
+     {
+      "iso_name": "GB-LCE",
+      "id": "100943",
+      "name": "Leicester"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "84",
+      "icon_type": "country",
+      "iso_name": "US",
+      "id": "84",
+      "name": "United States"
+     },
+     {
+      "iso_name": "US ANC",
+      "id": "21771",
+      "name": "Anchorage"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "84",
+      "icon_type": "country",
+      "iso_name": "US",
+      "id": "84",
+      "name": "United States"
+     },
+     {
+      "iso_name": "US ATL",
+      "id": "86",
+      "name": "Atlanta"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "84",
+      "icon_type": "country",
+      "iso_name": "US",
+      "id": "84",
+      "name": "United States"
+     },
+     {
+      "iso_name": "US MIJ",
+      "id": "103194",
+      "name": "Middletown"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "84",
+      "icon_type": "country",
+      "iso_name": "US",
+      "id": "84",
+      "name": "United States"
+     },
+     {
+      "iso_name": "US WAS",
+      "id": "87",
+      "name": "Washington"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   }
+  ],
+  "total_rows": 95,
+  "total_rows_rounded": false,
+  "sampled": false,
+  "contains_sensitive_data": false,
+  "sample_share": 1.0,
+  "sample_size": 1070,
+  "sample_space": 1070,
+  "data_lag": 0,
+  "totals": [
+   1068.0,
+   291.0
+  ],
+  "min": [
+   1.0,
+   1.0
+  ],
+  "max": [
+   207.0,
+   68.0
+  ]
+ }
+}

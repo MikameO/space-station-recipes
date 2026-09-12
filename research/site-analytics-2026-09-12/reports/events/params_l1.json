@@ -1,0 +1,481 @@
+{
+ "request": {
+  "ids": 108585248,
+  "metrics": "ym:s:visits,ym:s:users",
+  "date1": "2026-07-12",
+  "date2": "2026-09-12",
+  "limit": 50000,
+  "accuracy": "full",
+  "dimensions": "ym:s:paramsLevel1",
+  "sort": "-ym:s:visits",
+  "filters": "ym:s:startURL!@'localhost' AND ym:s:startURL!@'127.0.0.1'"
+ },
+ "response": {
+  "query": {
+   "ids": [
+    108585248
+   ],
+   "dimensions": [
+    "ym:s:paramsLevel1"
+   ],
+   "metrics": [
+    "ym:s:visits",
+    "ym:s:users"
+   ],
+   "sort": [
+    "-ym:s:visits"
+   ],
+   "date1": "2026-07-12",
+   "date2": "2026-09-12",
+   "filters": "ym:s:startURL!@'localhost' AND ym:s:startURL!@'127.0.0.1'",
+   "limit": 50000,
+   "offset": 1,
+   "group": "Week",
+   "benchmarks_version": "1788134400000",
+   "benchmarks_sub_industry": "false",
+   "auto_group_size": "1",
+   "exp_bucket_size": "100",
+   "attr_name": "",
+   "funnel_window": "",
+   "benchmarks_quantile": "50",
+   "time_interval": "1SECOND",
+   "intervals": "1",
+   "quantile": "50",
+   "offline_window": "21",
+   "attribution": "CROSS_DEVICE_LAST_SIGNIFICANT",
+   "currency": "RUB",
+   "benchmarks_attribution": "Automatic",
+   "adfox_event_id": "0",
+   "funnel_pattern": ""
+  },
+  "data": [
+   {
+    "dimensions": [
+     {
+      "name": "reagent"
+     }
+    ],
+    "metrics": [
+     398.0,
+     190.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "tab"
+     }
+    ],
+    "metrics": [
+     397.0,
+     194.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "auto"
+     }
+    ],
+    "metrics": [
+     356.0,
+     294.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "fork"
+     }
+    ],
+    "metrics": [
+     289.0,
+     130.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "q"
+     }
+    ],
+    "metrics": [
+     215.0,
+     78.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "results"
+     }
+    ],
+    "metrics": [
+     215.0,
+     78.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "reason"
+     }
+    ],
+    "metrics": [
+     165.0,
+     163.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "step"
+     }
+    ],
+    "metrics": [
+     103.0,
+     98.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "amount"
+     }
+    ],
+    "metrics": [
+     75.0,
+     43.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "target"
+     }
+    ],
+    "metrics": [
+     75.0,
+     43.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "type"
+     }
+    ],
+    "metrics": [
+     72.0,
+     49.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "targets"
+     }
+    ],
+    "metrics": [
+     70.0,
+     43.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "api"
+     }
+    ],
+    "metrics": [
+     62.0,
+     39.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "preset"
+     }
+    ],
+    "metrics": [
+     52.0,
+     42.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "from"
+     }
+    ],
+    "metrics": [
+     44.0,
+     35.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "to"
+     }
+    ],
+    "metrics": [
+     44.0,
+     35.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "species"
+     }
+    ],
+    "metrics": [
+     33.0,
+     29.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "open"
+     }
+    ],
+    "metrics": [
+     24.0,
+     14.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "antag"
+     }
+    ],
+    "metrics": [
+     13.0,
+     13.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "n"
+     }
+    ],
+    "metrics": [
+     10.0,
+     8.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "tempK"
+     }
+    ],
+    "metrics": [
+     10.0,
+     8.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "casing"
+     }
+    ],
+    "metrics": [
+     9.0,
+     3.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "collapsed"
+     }
+    ],
+    "metrics": [
+     7.0,
+     7.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "ingredient"
+     }
+    ],
+    "metrics": [
+     7.0,
+     6.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "ladder"
+     }
+    ],
+    "metrics": [
+     6.0,
+     3.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "objective"
+     }
+    ],
+    "metrics": [
+     6.0,
+     3.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "range"
+     }
+    ],
+    "metrics": [
+     6.0,
+     3.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "reqs"
+     }
+    ],
+    "metrics": [
+     6.0,
+     3.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "role"
+     }
+    ],
+    "metrics": [
+     6.0,
+     3.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "view"
+     }
+    ],
+    "metrics": [
+     6.0,
+     2.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "count"
+     }
+    ],
+    "metrics": [
+     4.0,
+     2.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "after"
+     }
+    ],
+    "metrics": [
+     2.0,
+     2.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "doc"
+     }
+    ],
+    "metrics": [
+     2.0,
+     2.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "inFlame"
+     }
+    ],
+    "metrics": [
+     2.0,
+     2.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "colour"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "depth"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "height"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   }
+  ],
+  "total_rows": 37,
+  "total_rows_rounded": false,
+  "sampled": false,
+  "contains_sensitive_data": false,
+  "sample_share": 1.0,
+  "sample_size": 1340,
+  "sample_space": 1340,
+  "data_lag": 0,
+  "totals": [
+   668.0,
+   326.0
+  ],
+  "min": [
+   1.0,
+   1.0
+  ],
+  "max": [
+   398.0,
+   294.0
+  ]
+ }
+}

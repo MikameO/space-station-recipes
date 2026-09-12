@@ -1,0 +1,2764 @@
+{
+ "request": {
+  "ids": 108585248,
+  "metrics": "ym:s:visits,ym:s:users",
+  "date1": "2026-04-12",
+  "date2": "2026-09-12",
+  "limit": 1000,
+  "accuracy": "full",
+  "dimensions": "ym:s:dayOfWeek,ym:s:hour",
+  "sort": "ym:s:dayOfWeek,ym:s:hour",
+  "filters": "ym:s:startURL!@'localhost' AND ym:s:startURL!@'127.0.0.1'"
+ },
+ "response": {
+  "query": {
+   "ids": [
+    108585248
+   ],
+   "dimensions": [
+    "ym:s:dayOfWeek",
+    "ym:s:hour"
+   ],
+   "metrics": [
+    "ym:s:visits",
+    "ym:s:users"
+   ],
+   "sort": [
+    "ym:s:dayOfWeek",
+    "ym:s:hour"
+   ],
+   "date1": "2026-04-12",
+   "date2": "2026-09-12",
+   "filters": "ym:s:startURL!@'localhost' AND ym:s:startURL!@'127.0.0.1'",
+   "limit": 1000,
+   "offset": 1,
+   "group": "Week",
+   "benchmarks_version": "1788134400000",
+   "benchmarks_sub_industry": "false",
+   "auto_group_size": "1",
+   "exp_bucket_size": "100",
+   "attr_name": "",
+   "funnel_window": "",
+   "benchmarks_quantile": "50",
+   "time_interval": "1SECOND",
+   "intervals": "1",
+   "quantile": "50",
+   "offline_window": "21",
+   "attribution": "CROSS_DEVICE_LAST_SIGNIFICANT",
+   "currency": "RUB",
+   "benchmarks_attribution": "Automatic",
+   "adfox_event_id": "0",
+   "funnel_pattern": ""
+  },
+  "data": [
+   {
+    "dimensions": [
+     {
+      "name": "Monday",
+      "id": "monday"
+     },
+     {
+      "id": "0",
+      "name": "00:00"
+     }
+    ],
+    "metrics": [
+     13.0,
+     11.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Monday",
+      "id": "monday"
+     },
+     {
+      "id": "1",
+      "name": "01:00"
+     }
+    ],
+    "metrics": [
+     22.0,
+     21.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Monday",
+      "id": "monday"
+     },
+     {
+      "id": "2",
+      "name": "02:00"
+     }
+    ],
+    "metrics": [
+     21.0,
+     19.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Monday",
+      "id": "monday"
+     },
+     {
+      "id": "3",
+      "name": "03:00"
+     }
+    ],
+    "metrics": [
+     14.0,
+     12.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Monday",
+      "id": "monday"
+     },
+     {
+      "id": "4",
+      "name": "04:00"
+     }
+    ],
+    "metrics": [
+     12.0,
+     10.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Monday",
+      "id": "monday"
+     },
+     {
+      "id": "5",
+      "name": "05:00"
+     }
+    ],
+    "metrics": [
+     10.0,
+     10.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Monday",
+      "id": "monday"
+     },
+     {
+      "id": "6",
+      "name": "06:00"
+     }
+    ],
+    "metrics": [
+     13.0,
+     12.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Monday",
+      "id": "monday"
+     },
+     {
+      "id": "7",
+      "name": "07:00"
+     }
+    ],
+    "metrics": [
+     11.0,
+     10.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Monday",
+      "id": "monday"
+     },
+     {
+      "id": "8",
+      "name": "08:00"
+     }
+    ],
+    "metrics": [
+     9.0,
+     8.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Monday",
+      "id": "monday"
+     },
+     {
+      "id": "9",
+      "name": "09:00"
+     }
+    ],
+    "metrics": [
+     16.0,
+     14.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Monday",
+      "id": "monday"
+     },
+     {
+      "id": "10",
+      "name": "10:00"
+     }
+    ],
+    "metrics": [
+     14.0,
+     14.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Monday",
+      "id": "monday"
+     },
+     {
+      "id": "11",
+      "name": "11:00"
+     }
+    ],
+    "metrics": [
+     17.0,
+     14.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Monday",
+      "id": "monday"
+     },
+     {
+      "id": "12",
+      "name": "12:00"
+     }
+    ],
+    "metrics": [
+     11.0,
+     11.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Monday",
+      "id": "monday"
+     },
+     {
+      "id": "13",
+      "name": "13:00"
+     }
+    ],
+    "metrics": [
+     26.0,
+     22.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Monday",
+      "id": "monday"
+     },
+     {
+      "id": "14",
+      "name": "14:00"
+     }
+    ],
+    "metrics": [
+     23.0,
+     22.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Monday",
+      "id": "monday"
+     },
+     {
+      "id": "15",
+      "name": "15:00"
+     }
+    ],
+    "metrics": [
+     11.0,
+     10.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Monday",
+      "id": "monday"
+     },
+     {
+      "id": "16",
+      "name": "16:00"
+     }
+    ],
+    "metrics": [
+     23.0,
+     18.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Monday",
+      "id": "monday"
+     },
+     {
+      "id": "17",
+      "name": "17:00"
+     }
+    ],
+    "metrics": [
+     19.0,
+     15.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Monday",
+      "id": "monday"
+     },
+     {
+      "id": "18",
+      "name": "18:00"
+     }
+    ],
+    "metrics": [
+     16.0,
+     12.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Monday",
+      "id": "monday"
+     },
+     {
+      "id": "19",
+      "name": "19:00"
+     }
+    ],
+    "metrics": [
+     15.0,
+     13.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Monday",
+      "id": "monday"
+     },
+     {
+      "id": "20",
+      "name": "20:00"
+     }
+    ],
+    "metrics": [
+     20.0,
+     16.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Monday",
+      "id": "monday"
+     },
+     {
+      "id": "21",
+      "name": "21:00"
+     }
+    ],
+    "metrics": [
+     17.0,
+     14.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Monday",
+      "id": "monday"
+     },
+     {
+      "id": "22",
+      "name": "22:00"
+     }
+    ],
+    "metrics": [
+     23.0,
+     22.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Monday",
+      "id": "monday"
+     },
+     {
+      "id": "23",
+      "name": "23:00"
+     }
+    ],
+    "metrics": [
+     17.0,
+     13.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Tuesday",
+      "id": "tuesday"
+     },
+     {
+      "id": "0",
+      "name": "00:00"
+     }
+    ],
+    "metrics": [
+     27.0,
+     22.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Tuesday",
+      "id": "tuesday"
+     },
+     {
+      "id": "1",
+      "name": "01:00"
+     }
+    ],
+    "metrics": [
+     17.0,
+     14.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Tuesday",
+      "id": "tuesday"
+     },
+     {
+      "id": "2",
+      "name": "02:00"
+     }
+    ],
+    "metrics": [
+     15.0,
+     14.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Tuesday",
+      "id": "tuesday"
+     },
+     {
+      "id": "3",
+      "name": "03:00"
+     }
+    ],
+    "metrics": [
+     6.0,
+     6.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Tuesday",
+      "id": "tuesday"
+     },
+     {
+      "id": "4",
+      "name": "04:00"
+     }
+    ],
+    "metrics": [
+     13.0,
+     12.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Tuesday",
+      "id": "tuesday"
+     },
+     {
+      "id": "5",
+      "name": "05:00"
+     }
+    ],
+    "metrics": [
+     22.0,
+     21.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Tuesday",
+      "id": "tuesday"
+     },
+     {
+      "id": "6",
+      "name": "06:00"
+     }
+    ],
+    "metrics": [
+     16.0,
+     16.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Tuesday",
+      "id": "tuesday"
+     },
+     {
+      "id": "7",
+      "name": "07:00"
+     }
+    ],
+    "metrics": [
+     14.0,
+     11.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Tuesday",
+      "id": "tuesday"
+     },
+     {
+      "id": "8",
+      "name": "08:00"
+     }
+    ],
+    "metrics": [
+     8.0,
+     7.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Tuesday",
+      "id": "tuesday"
+     },
+     {
+      "id": "9",
+      "name": "09:00"
+     }
+    ],
+    "metrics": [
+     14.0,
+     13.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Tuesday",
+      "id": "tuesday"
+     },
+     {
+      "id": "10",
+      "name": "10:00"
+     }
+    ],
+    "metrics": [
+     7.0,
+     6.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Tuesday",
+      "id": "tuesday"
+     },
+     {
+      "id": "11",
+      "name": "11:00"
+     }
+    ],
+    "metrics": [
+     5.0,
+     4.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Tuesday",
+      "id": "tuesday"
+     },
+     {
+      "id": "12",
+      "name": "12:00"
+     }
+    ],
+    "metrics": [
+     9.0,
+     9.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Tuesday",
+      "id": "tuesday"
+     },
+     {
+      "id": "13",
+      "name": "13:00"
+     }
+    ],
+    "metrics": [
+     19.0,
+     17.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Tuesday",
+      "id": "tuesday"
+     },
+     {
+      "id": "14",
+      "name": "14:00"
+     }
+    ],
+    "metrics": [
+     16.0,
+     15.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Tuesday",
+      "id": "tuesday"
+     },
+     {
+      "id": "15",
+      "name": "15:00"
+     }
+    ],
+    "metrics": [
+     16.0,
+     13.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Tuesday",
+      "id": "tuesday"
+     },
+     {
+      "id": "16",
+      "name": "16:00"
+     }
+    ],
+    "metrics": [
+     16.0,
+     14.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Tuesday",
+      "id": "tuesday"
+     },
+     {
+      "id": "17",
+      "name": "17:00"
+     }
+    ],
+    "metrics": [
+     15.0,
+     13.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Tuesday",
+      "id": "tuesday"
+     },
+     {
+      "id": "18",
+      "name": "18:00"
+     }
+    ],
+    "metrics": [
+     16.0,
+     15.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Tuesday",
+      "id": "tuesday"
+     },
+     {
+      "id": "19",
+      "name": "19:00"
+     }
+    ],
+    "metrics": [
+     23.0,
+     21.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Tuesday",
+      "id": "tuesday"
+     },
+     {
+      "id": "20",
+      "name": "20:00"
+     }
+    ],
+    "metrics": [
+     16.0,
+     16.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Tuesday",
+      "id": "tuesday"
+     },
+     {
+      "id": "21",
+      "name": "21:00"
+     }
+    ],
+    "metrics": [
+     18.0,
+     17.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Tuesday",
+      "id": "tuesday"
+     },
+     {
+      "id": "22",
+      "name": "22:00"
+     }
+    ],
+    "metrics": [
+     11.0,
+     9.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Tuesday",
+      "id": "tuesday"
+     },
+     {
+      "id": "23",
+      "name": "23:00"
+     }
+    ],
+    "metrics": [
+     24.0,
+     23.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Wednesday",
+      "id": "wednesday"
+     },
+     {
+      "id": "0",
+      "name": "00:00"
+     }
+    ],
+    "metrics": [
+     20.0,
+     15.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Wednesday",
+      "id": "wednesday"
+     },
+     {
+      "id": "1",
+      "name": "01:00"
+     }
+    ],
+    "metrics": [
+     19.0,
+     16.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Wednesday",
+      "id": "wednesday"
+     },
+     {
+      "id": "2",
+      "name": "02:00"
+     }
+    ],
+    "metrics": [
+     14.0,
+     13.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Wednesday",
+      "id": "wednesday"
+     },
+     {
+      "id": "3",
+      "name": "03:00"
+     }
+    ],
+    "metrics": [
+     14.0,
+     12.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Wednesday",
+      "id": "wednesday"
+     },
+     {
+      "id": "4",
+      "name": "04:00"
+     }
+    ],
+    "metrics": [
+     15.0,
+     14.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Wednesday",
+      "id": "wednesday"
+     },
+     {
+      "id": "5",
+      "name": "05:00"
+     }
+    ],
+    "metrics": [
+     14.0,
+     14.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Wednesday",
+      "id": "wednesday"
+     },
+     {
+      "id": "6",
+      "name": "06:00"
+     }
+    ],
+    "metrics": [
+     13.0,
+     12.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Wednesday",
+      "id": "wednesday"
+     },
+     {
+      "id": "7",
+      "name": "07:00"
+     }
+    ],
+    "metrics": [
+     5.0,
+     4.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Wednesday",
+      "id": "wednesday"
+     },
+     {
+      "id": "8",
+      "name": "08:00"
+     }
+    ],
+    "metrics": [
+     8.0,
+     8.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Wednesday",
+      "id": "wednesday"
+     },
+     {
+      "id": "9",
+      "name": "09:00"
+     }
+    ],
+    "metrics": [
+     7.0,
+     6.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Wednesday",
+      "id": "wednesday"
+     },
+     {
+      "id": "10",
+      "name": "10:00"
+     }
+    ],
+    "metrics": [
+     9.0,
+     7.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Wednesday",
+      "id": "wednesday"
+     },
+     {
+      "id": "11",
+      "name": "11:00"
+     }
+    ],
+    "metrics": [
+     9.0,
+     9.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Wednesday",
+      "id": "wednesday"
+     },
+     {
+      "id": "12",
+      "name": "12:00"
+     }
+    ],
+    "metrics": [
+     12.0,
+     10.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Wednesday",
+      "id": "wednesday"
+     },
+     {
+      "id": "13",
+      "name": "13:00"
+     }
+    ],
+    "metrics": [
+     17.0,
+     13.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Wednesday",
+      "id": "wednesday"
+     },
+     {
+      "id": "14",
+      "name": "14:00"
+     }
+    ],
+    "metrics": [
+     13.0,
+     10.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Wednesday",
+      "id": "wednesday"
+     },
+     {
+      "id": "15",
+      "name": "15:00"
+     }
+    ],
+    "metrics": [
+     13.0,
+     11.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Wednesday",
+      "id": "wednesday"
+     },
+     {
+      "id": "16",
+      "name": "16:00"
+     }
+    ],
+    "metrics": [
+     14.0,
+     13.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Wednesday",
+      "id": "wednesday"
+     },
+     {
+      "id": "17",
+      "name": "17:00"
+     }
+    ],
+    "metrics": [
+     20.0,
+     18.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Wednesday",
+      "id": "wednesday"
+     },
+     {
+      "id": "18",
+      "name": "18:00"
+     }
+    ],
+    "metrics": [
+     19.0,
+     15.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Wednesday",
+      "id": "wednesday"
+     },
+     {
+      "id": "19",
+      "name": "19:00"
+     }
+    ],
+    "metrics": [
+     21.0,
+     17.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Wednesday",
+      "id": "wednesday"
+     },
+     {
+      "id": "20",
+      "name": "20:00"
+     }
+    ],
+    "metrics": [
+     23.0,
+     17.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Wednesday",
+      "id": "wednesday"
+     },
+     {
+      "id": "21",
+      "name": "21:00"
+     }
+    ],
+    "metrics": [
+     14.0,
+     12.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Wednesday",
+      "id": "wednesday"
+     },
+     {
+      "id": "22",
+      "name": "22:00"
+     }
+    ],
+    "metrics": [
+     23.0,
+     21.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Wednesday",
+      "id": "wednesday"
+     },
+     {
+      "id": "23",
+      "name": "23:00"
+     }
+    ],
+    "metrics": [
+     19.0,
+     18.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Thursday",
+      "id": "thursday"
+     },
+     {
+      "id": "0",
+      "name": "00:00"
+     }
+    ],
+    "metrics": [
+     16.0,
+     14.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Thursday",
+      "id": "thursday"
+     },
+     {
+      "id": "1",
+      "name": "01:00"
+     }
+    ],
+    "metrics": [
+     16.0,
+     14.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Thursday",
+      "id": "thursday"
+     },
+     {
+      "id": "2",
+      "name": "02:00"
+     }
+    ],
+    "metrics": [
+     10.0,
+     10.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Thursday",
+      "id": "thursday"
+     },
+     {
+      "id": "3",
+      "name": "03:00"
+     }
+    ],
+    "metrics": [
+     17.0,
+     14.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Thursday",
+      "id": "thursday"
+     },
+     {
+      "id": "4",
+      "name": "04:00"
+     }
+    ],
+    "metrics": [
+     15.0,
+     13.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Thursday",
+      "id": "thursday"
+     },
+     {
+      "id": "5",
+      "name": "05:00"
+     }
+    ],
+    "metrics": [
+     13.0,
+     13.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Thursday",
+      "id": "thursday"
+     },
+     {
+      "id": "6",
+      "name": "06:00"
+     }
+    ],
+    "metrics": [
+     16.0,
+     14.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Thursday",
+      "id": "thursday"
+     },
+     {
+      "id": "7",
+      "name": "07:00"
+     }
+    ],
+    "metrics": [
+     12.0,
+     11.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Thursday",
+      "id": "thursday"
+     },
+     {
+      "id": "8",
+      "name": "08:00"
+     }
+    ],
+    "metrics": [
+     9.0,
+     9.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Thursday",
+      "id": "thursday"
+     },
+     {
+      "id": "9",
+      "name": "09:00"
+     }
+    ],
+    "metrics": [
+     9.0,
+     8.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Thursday",
+      "id": "thursday"
+     },
+     {
+      "id": "10",
+      "name": "10:00"
+     }
+    ],
+    "metrics": [
+     13.0,
+     10.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Thursday",
+      "id": "thursday"
+     },
+     {
+      "id": "11",
+      "name": "11:00"
+     }
+    ],
+    "metrics": [
+     11.0,
+     10.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Thursday",
+      "id": "thursday"
+     },
+     {
+      "id": "12",
+      "name": "12:00"
+     }
+    ],
+    "metrics": [
+     17.0,
+     14.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Thursday",
+      "id": "thursday"
+     },
+     {
+      "id": "13",
+      "name": "13:00"
+     }
+    ],
+    "metrics": [
+     17.0,
+     14.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Thursday",
+      "id": "thursday"
+     },
+     {
+      "id": "14",
+      "name": "14:00"
+     }
+    ],
+    "metrics": [
+     16.0,
+     16.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Thursday",
+      "id": "thursday"
+     },
+     {
+      "id": "15",
+      "name": "15:00"
+     }
+    ],
+    "metrics": [
+     10.0,
+     9.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Thursday",
+      "id": "thursday"
+     },
+     {
+      "id": "16",
+      "name": "16:00"
+     }
+    ],
+    "metrics": [
+     24.0,
+     21.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Thursday",
+      "id": "thursday"
+     },
+     {
+      "id": "17",
+      "name": "17:00"
+     }
+    ],
+    "metrics": [
+     13.0,
+     13.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Thursday",
+      "id": "thursday"
+     },
+     {
+      "id": "18",
+      "name": "18:00"
+     }
+    ],
+    "metrics": [
+     22.0,
+     20.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Thursday",
+      "id": "thursday"
+     },
+     {
+      "id": "19",
+      "name": "19:00"
+     }
+    ],
+    "metrics": [
+     13.0,
+     9.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Thursday",
+      "id": "thursday"
+     },
+     {
+      "id": "20",
+      "name": "20:00"
+     }
+    ],
+    "metrics": [
+     23.0,
+     21.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Thursday",
+      "id": "thursday"
+     },
+     {
+      "id": "21",
+      "name": "21:00"
+     }
+    ],
+    "metrics": [
+     19.0,
+     16.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Thursday",
+      "id": "thursday"
+     },
+     {
+      "id": "22",
+      "name": "22:00"
+     }
+    ],
+    "metrics": [
+     20.0,
+     19.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Thursday",
+      "id": "thursday"
+     },
+     {
+      "id": "23",
+      "name": "23:00"
+     }
+    ],
+    "metrics": [
+     16.0,
+     16.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Friday",
+      "id": "friday"
+     },
+     {
+      "id": "0",
+      "name": "00:00"
+     }
+    ],
+    "metrics": [
+     24.0,
+     17.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Friday",
+      "id": "friday"
+     },
+     {
+      "id": "1",
+      "name": "01:00"
+     }
+    ],
+    "metrics": [
+     14.0,
+     12.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Friday",
+      "id": "friday"
+     },
+     {
+      "id": "2",
+      "name": "02:00"
+     }
+    ],
+    "metrics": [
+     11.0,
+     10.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Friday",
+      "id": "friday"
+     },
+     {
+      "id": "3",
+      "name": "03:00"
+     }
+    ],
+    "metrics": [
+     11.0,
+     9.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Friday",
+      "id": "friday"
+     },
+     {
+      "id": "4",
+      "name": "04:00"
+     }
+    ],
+    "metrics": [
+     16.0,
+     15.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Friday",
+      "id": "friday"
+     },
+     {
+      "id": "5",
+      "name": "05:00"
+     }
+    ],
+    "metrics": [
+     12.0,
+     12.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Friday",
+      "id": "friday"
+     },
+     {
+      "id": "6",
+      "name": "06:00"
+     }
+    ],
+    "metrics": [
+     8.0,
+     8.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Friday",
+      "id": "friday"
+     },
+     {
+      "id": "7",
+      "name": "07:00"
+     }
+    ],
+    "metrics": [
+     9.0,
+     9.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Friday",
+      "id": "friday"
+     },
+     {
+      "id": "8",
+      "name": "08:00"
+     }
+    ],
+    "metrics": [
+     12.0,
+     12.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Friday",
+      "id": "friday"
+     },
+     {
+      "id": "9",
+      "name": "09:00"
+     }
+    ],
+    "metrics": [
+     15.0,
+     11.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Friday",
+      "id": "friday"
+     },
+     {
+      "id": "10",
+      "name": "10:00"
+     }
+    ],
+    "metrics": [
+     18.0,
+     15.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Friday",
+      "id": "friday"
+     },
+     {
+      "id": "11",
+      "name": "11:00"
+     }
+    ],
+    "metrics": [
+     11.0,
+     10.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Friday",
+      "id": "friday"
+     },
+     {
+      "id": "12",
+      "name": "12:00"
+     }
+    ],
+    "metrics": [
+     8.0,
+     6.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Friday",
+      "id": "friday"
+     },
+     {
+      "id": "13",
+      "name": "13:00"
+     }
+    ],
+    "metrics": [
+     24.0,
+     19.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Friday",
+      "id": "friday"
+     },
+     {
+      "id": "14",
+      "name": "14:00"
+     }
+    ],
+    "metrics": [
+     15.0,
+     13.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Friday",
+      "id": "friday"
+     },
+     {
+      "id": "15",
+      "name": "15:00"
+     }
+    ],
+    "metrics": [
+     25.0,
+     20.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Friday",
+      "id": "friday"
+     },
+     {
+      "id": "16",
+      "name": "16:00"
+     }
+    ],
+    "metrics": [
+     20.0,
+     18.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Friday",
+      "id": "friday"
+     },
+     {
+      "id": "17",
+      "name": "17:00"
+     }
+    ],
+    "metrics": [
+     14.0,
+     11.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Friday",
+      "id": "friday"
+     },
+     {
+      "id": "18",
+      "name": "18:00"
+     }
+    ],
+    "metrics": [
+     17.0,
+     16.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Friday",
+      "id": "friday"
+     },
+     {
+      "id": "19",
+      "name": "19:00"
+     }
+    ],
+    "metrics": [
+     16.0,
+     12.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Friday",
+      "id": "friday"
+     },
+     {
+      "id": "20",
+      "name": "20:00"
+     }
+    ],
+    "metrics": [
+     16.0,
+     12.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Friday",
+      "id": "friday"
+     },
+     {
+      "id": "21",
+      "name": "21:00"
+     }
+    ],
+    "metrics": [
+     14.0,
+     12.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Friday",
+      "id": "friday"
+     },
+     {
+      "id": "22",
+      "name": "22:00"
+     }
+    ],
+    "metrics": [
+     22.0,
+     18.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Friday",
+      "id": "friday"
+     },
+     {
+      "id": "23",
+      "name": "23:00"
+     }
+    ],
+    "metrics": [
+     17.0,
+     15.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Saturday",
+      "id": "saturday"
+     },
+     {
+      "id": "0",
+      "name": "00:00"
+     }
+    ],
+    "metrics": [
+     15.0,
+     13.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Saturday",
+      "id": "saturday"
+     },
+     {
+      "id": "1",
+      "name": "01:00"
+     }
+    ],
+    "metrics": [
+     21.0,
+     16.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Saturday",
+      "id": "saturday"
+     },
+     {
+      "id": "2",
+      "name": "02:00"
+     }
+    ],
+    "metrics": [
+     15.0,
+     13.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Saturday",
+      "id": "saturday"
+     },
+     {
+      "id": "3",
+      "name": "03:00"
+     }
+    ],
+    "metrics": [
+     12.0,
+     11.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Saturday",
+      "id": "saturday"
+     },
+     {
+      "id": "4",
+      "name": "04:00"
+     }
+    ],
+    "metrics": [
+     9.0,
+     9.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Saturday",
+      "id": "saturday"
+     },
+     {
+      "id": "5",
+      "name": "05:00"
+     }
+    ],
+    "metrics": [
+     10.0,
+     9.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Saturday",
+      "id": "saturday"
+     },
+     {
+      "id": "6",
+      "name": "06:00"
+     }
+    ],
+    "metrics": [
+     9.0,
+     8.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Saturday",
+      "id": "saturday"
+     },
+     {
+      "id": "7",
+      "name": "07:00"
+     }
+    ],
+    "metrics": [
+     14.0,
+     12.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Saturday",
+      "id": "saturday"
+     },
+     {
+      "id": "8",
+      "name": "08:00"
+     }
+    ],
+    "metrics": [
+     11.0,
+     9.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Saturday",
+      "id": "saturday"
+     },
+     {
+      "id": "9",
+      "name": "09:00"
+     }
+    ],
+    "metrics": [
+     21.0,
+     20.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Saturday",
+      "id": "saturday"
+     },
+     {
+      "id": "10",
+      "name": "10:00"
+     }
+    ],
+    "metrics": [
+     13.0,
+     13.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Saturday",
+      "id": "saturday"
+     },
+     {
+      "id": "11",
+      "name": "11:00"
+     }
+    ],
+    "metrics": [
+     10.0,
+     9.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Saturday",
+      "id": "saturday"
+     },
+     {
+      "id": "12",
+      "name": "12:00"
+     }
+    ],
+    "metrics": [
+     18.0,
+     13.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Saturday",
+      "id": "saturday"
+     },
+     {
+      "id": "13",
+      "name": "13:00"
+     }
+    ],
+    "metrics": [
+     10.0,
+     8.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Saturday",
+      "id": "saturday"
+     },
+     {
+      "id": "14",
+      "name": "14:00"
+     }
+    ],
+    "metrics": [
+     33.0,
+     24.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Saturday",
+      "id": "saturday"
+     },
+     {
+      "id": "15",
+      "name": "15:00"
+     }
+    ],
+    "metrics": [
+     21.0,
+     19.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Saturday",
+      "id": "saturday"
+     },
+     {
+      "id": "16",
+      "name": "16:00"
+     }
+    ],
+    "metrics": [
+     15.0,
+     11.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Saturday",
+      "id": "saturday"
+     },
+     {
+      "id": "17",
+      "name": "17:00"
+     }
+    ],
+    "metrics": [
+     20.0,
+     20.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Saturday",
+      "id": "saturday"
+     },
+     {
+      "id": "18",
+      "name": "18:00"
+     }
+    ],
+    "metrics": [
+     19.0,
+     16.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Saturday",
+      "id": "saturday"
+     },
+     {
+      "id": "19",
+      "name": "19:00"
+     }
+    ],
+    "metrics": [
+     17.0,
+     14.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Saturday",
+      "id": "saturday"
+     },
+     {
+      "id": "20",
+      "name": "20:00"
+     }
+    ],
+    "metrics": [
+     12.0,
+     11.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Saturday",
+      "id": "saturday"
+     },
+     {
+      "id": "21",
+      "name": "21:00"
+     }
+    ],
+    "metrics": [
+     19.0,
+     19.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Saturday",
+      "id": "saturday"
+     },
+     {
+      "id": "22",
+      "name": "22:00"
+     }
+    ],
+    "metrics": [
+     25.0,
+     23.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Saturday",
+      "id": "saturday"
+     },
+     {
+      "id": "23",
+      "name": "23:00"
+     }
+    ],
+    "metrics": [
+     16.0,
+     16.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Sunday",
+      "id": "sunday"
+     },
+     {
+      "id": "0",
+      "name": "00:00"
+     }
+    ],
+    "metrics": [
+     19.0,
+     17.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Sunday",
+      "id": "sunday"
+     },
+     {
+      "id": "1",
+      "name": "01:00"
+     }
+    ],
+    "metrics": [
+     18.0,
+     17.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Sunday",
+      "id": "sunday"
+     },
+     {
+      "id": "2",
+      "name": "02:00"
+     }
+    ],
+    "metrics": [
+     27.0,
+     25.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Sunday",
+      "id": "sunday"
+     },
+     {
+      "id": "3",
+      "name": "03:00"
+     }
+    ],
+    "metrics": [
+     17.0,
+     14.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Sunday",
+      "id": "sunday"
+     },
+     {
+      "id": "4",
+      "name": "04:00"
+     }
+    ],
+    "metrics": [
+     14.0,
+     14.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Sunday",
+      "id": "sunday"
+     },
+     {
+      "id": "5",
+      "name": "05:00"
+     }
+    ],
+    "metrics": [
+     13.0,
+     13.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Sunday",
+      "id": "sunday"
+     },
+     {
+      "id": "6",
+      "name": "06:00"
+     }
+    ],
+    "metrics": [
+     9.0,
+     9.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Sunday",
+      "id": "sunday"
+     },
+     {
+      "id": "7",
+      "name": "07:00"
+     }
+    ],
+    "metrics": [
+     9.0,
+     9.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Sunday",
+      "id": "sunday"
+     },
+     {
+      "id": "8",
+      "name": "08:00"
+     }
+    ],
+    "metrics": [
+     7.0,
+     6.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Sunday",
+      "id": "sunday"
+     },
+     {
+      "id": "9",
+      "name": "09:00"
+     }
+    ],
+    "metrics": [
+     7.0,
+     7.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Sunday",
+      "id": "sunday"
+     },
+     {
+      "id": "10",
+      "name": "10:00"
+     }
+    ],
+    "metrics": [
+     16.0,
+     16.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Sunday",
+      "id": "sunday"
+     },
+     {
+      "id": "11",
+      "name": "11:00"
+     }
+    ],
+    "metrics": [
+     9.0,
+     9.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Sunday",
+      "id": "sunday"
+     },
+     {
+      "id": "12",
+      "name": "12:00"
+     }
+    ],
+    "metrics": [
+     18.0,
+     17.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Sunday",
+      "id": "sunday"
+     },
+     {
+      "id": "13",
+      "name": "13:00"
+     }
+    ],
+    "metrics": [
+     20.0,
+     15.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Sunday",
+      "id": "sunday"
+     },
+     {
+      "id": "14",
+      "name": "14:00"
+     }
+    ],
+    "metrics": [
+     14.0,
+     10.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Sunday",
+      "id": "sunday"
+     },
+     {
+      "id": "15",
+      "name": "15:00"
+     }
+    ],
+    "metrics": [
+     19.0,
+     17.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Sunday",
+      "id": "sunday"
+     },
+     {
+      "id": "16",
+      "name": "16:00"
+     }
+    ],
+    "metrics": [
+     24.0,
+     21.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Sunday",
+      "id": "sunday"
+     },
+     {
+      "id": "17",
+      "name": "17:00"
+     }
+    ],
+    "metrics": [
+     25.0,
+     22.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Sunday",
+      "id": "sunday"
+     },
+     {
+      "id": "18",
+      "name": "18:00"
+     }
+    ],
+    "metrics": [
+     23.0,
+     18.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Sunday",
+      "id": "sunday"
+     },
+     {
+      "id": "19",
+      "name": "19:00"
+     }
+    ],
+    "metrics": [
+     25.0,
+     20.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Sunday",
+      "id": "sunday"
+     },
+     {
+      "id": "20",
+      "name": "20:00"
+     }
+    ],
+    "metrics": [
+     23.0,
+     18.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Sunday",
+      "id": "sunday"
+     },
+     {
+      "id": "21",
+      "name": "21:00"
+     }
+    ],
+    "metrics": [
+     23.0,
+     19.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Sunday",
+      "id": "sunday"
+     },
+     {
+      "id": "22",
+      "name": "22:00"
+     }
+    ],
+    "metrics": [
+     26.0,
+     26.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "Sunday",
+      "id": "sunday"
+     },
+     {
+      "id": "23",
+      "name": "23:00"
+     }
+    ],
+    "metrics": [
+     27.0,
+     23.0
+    ]
+   }
+  ],
+  "total_rows": 168,
+  "total_rows_rounded": false,
+  "sampled": false,
+  "contains_sensitive_data": false,
+  "sample_share": 1.0,
+  "sample_size": 2678,
+  "sample_space": 2678,
+  "data_lag": 0,
+  "totals": [
+   2664.0,
+   617.0
+  ],
+  "min": [
+   5.0,
+   4.0
+  ],
+  "max": [
+   33.0,
+   26.0
+  ]
+ }
+}

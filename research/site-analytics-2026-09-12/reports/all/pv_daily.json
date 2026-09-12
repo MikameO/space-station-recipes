@@ -1,0 +1,1713 @@
+{
+ "request": {
+  "ids": 108585248,
+  "metrics": "ym:pv:pageviews,ym:pv:users",
+  "date1": "2026-04-12",
+  "date2": "2026-09-12",
+  "limit": 10000,
+  "accuracy": "full",
+  "dimensions": "ym:pv:date",
+  "sort": "ym:pv:date",
+  "filters": "ym:pv:URL!@'localhost' AND ym:pv:URL!@'127.0.0.1'"
+ },
+ "response": {
+  "query": {
+   "ids": [
+    108585248
+   ],
+   "dimensions": [
+    "ym:pv:date"
+   ],
+   "metrics": [
+    "ym:pv:pageviews",
+    "ym:pv:users"
+   ],
+   "sort": [
+    "ym:pv:date"
+   ],
+   "date1": "2026-04-12",
+   "date2": "2026-09-12",
+   "filters": "ym:pv:URL!@'localhost' AND ym:pv:URL!@'127.0.0.1'",
+   "limit": 10000,
+   "offset": 1,
+   "group": "Week",
+   "benchmarks_version": "1788134400000",
+   "benchmarks_sub_industry": "false",
+   "auto_group_size": "1",
+   "exp_bucket_size": "100",
+   "attr_name": "",
+   "funnel_window": "",
+   "benchmarks_quantile": "50",
+   "time_interval": "1SECOND",
+   "intervals": "1",
+   "quantile": "50",
+   "offline_window": "21",
+   "attribution": "CROSS_DEVICE_LAST_SIGNIFICANT",
+   "currency": "RUB",
+   "benchmarks_attribution": "Automatic",
+   "adfox_event_id": "0",
+   "funnel_pattern": ""
+  },
+  "data": [
+   {
+    "dimensions": [
+     {
+      "name": "2026-04-17"
+     }
+    ],
+    "metrics": [
+     28.0,
+     15.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-04-18"
+     }
+    ],
+    "metrics": [
+     22.0,
+     17.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-04-19"
+     }
+    ],
+    "metrics": [
+     16.0,
+     10.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-04-20"
+     }
+    ],
+    "metrics": [
+     23.0,
+     12.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-04-21"
+     }
+    ],
+    "metrics": [
+     13.0,
+     8.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-04-22"
+     }
+    ],
+    "metrics": [
+     10.0,
+     8.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-04-23"
+     }
+    ],
+    "metrics": [
+     6.0,
+     3.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-04-24"
+     }
+    ],
+    "metrics": [
+     4.0,
+     3.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-04-25"
+     }
+    ],
+    "metrics": [
+     12.0,
+     8.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-04-26"
+     }
+    ],
+    "metrics": [
+     8.0,
+     4.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-04-27"
+     }
+    ],
+    "metrics": [
+     13.0,
+     9.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-04-28"
+     }
+    ],
+    "metrics": [
+     10.0,
+     7.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-04-29"
+     }
+    ],
+    "metrics": [
+     11.0,
+     6.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-04-30"
+     }
+    ],
+    "metrics": [
+     7.0,
+     4.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-05-01"
+     }
+    ],
+    "metrics": [
+     10.0,
+     5.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-05-02"
+     }
+    ],
+    "metrics": [
+     25.0,
+     18.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-05-03"
+     }
+    ],
+    "metrics": [
+     85.0,
+     57.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-05-04"
+     }
+    ],
+    "metrics": [
+     53.0,
+     33.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-05-05"
+     }
+    ],
+    "metrics": [
+     34.0,
+     25.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-05-06"
+     }
+    ],
+    "metrics": [
+     28.0,
+     21.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-05-07"
+     }
+    ],
+    "metrics": [
+     36.0,
+     26.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-05-08"
+     }
+    ],
+    "metrics": [
+     24.0,
+     14.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-05-09"
+     }
+    ],
+    "metrics": [
+     23.0,
+     15.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-05-10"
+     }
+    ],
+    "metrics": [
+     15.0,
+     10.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-05-11"
+     }
+    ],
+    "metrics": [
+     25.0,
+     17.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-05-12"
+     }
+    ],
+    "metrics": [
+     15.0,
+     13.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-05-13"
+     }
+    ],
+    "metrics": [
+     13.0,
+     11.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-05-14"
+     }
+    ],
+    "metrics": [
+     18.0,
+     11.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-05-15"
+     }
+    ],
+    "metrics": [
+     22.0,
+     16.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-05-16"
+     }
+    ],
+    "metrics": [
+     22.0,
+     12.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-05-17"
+     }
+    ],
+    "metrics": [
+     11.0,
+     8.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-05-18"
+     }
+    ],
+    "metrics": [
+     19.0,
+     11.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-05-19"
+     }
+    ],
+    "metrics": [
+     23.0,
+     15.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-05-20"
+     }
+    ],
+    "metrics": [
+     14.0,
+     10.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-05-21"
+     }
+    ],
+    "metrics": [
+     12.0,
+     10.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-05-22"
+     }
+    ],
+    "metrics": [
+     8.0,
+     8.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-05-23"
+     }
+    ],
+    "metrics": [
+     17.0,
+     13.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-05-24"
+     }
+    ],
+    "metrics": [
+     22.0,
+     8.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-05-25"
+     }
+    ],
+    "metrics": [
+     16.0,
+     8.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-05-26"
+     }
+    ],
+    "metrics": [
+     24.0,
+     11.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-05-27"
+     }
+    ],
+    "metrics": [
+     15.0,
+     5.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-05-28"
+     }
+    ],
+    "metrics": [
+     19.0,
+     8.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-05-29"
+     }
+    ],
+    "metrics": [
+     12.0,
+     7.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-05-30"
+     }
+    ],
+    "metrics": [
+     13.0,
+     8.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-05-31"
+     }
+    ],
+    "metrics": [
+     16.0,
+     10.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-06-01"
+     }
+    ],
+    "metrics": [
+     18.0,
+     8.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-06-02"
+     }
+    ],
+    "metrics": [
+     12.0,
+     9.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-06-03"
+     }
+    ],
+    "metrics": [
+     14.0,
+     9.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-06-04"
+     }
+    ],
+    "metrics": [
+     18.0,
+     10.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-06-05"
+     }
+    ],
+    "metrics": [
+     27.0,
+     17.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-06-06"
+     }
+    ],
+    "metrics": [
+     17.0,
+     10.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-06-07"
+     }
+    ],
+    "metrics": [
+     13.0,
+     8.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-06-08"
+     }
+    ],
+    "metrics": [
+     7.0,
+     6.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-06-09"
+     }
+    ],
+    "metrics": [
+     14.0,
+     7.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-06-10"
+     }
+    ],
+    "metrics": [
+     14.0,
+     9.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-06-11"
+     }
+    ],
+    "metrics": [
+     14.0,
+     8.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-06-12"
+     }
+    ],
+    "metrics": [
+     21.0,
+     11.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-06-13"
+     }
+    ],
+    "metrics": [
+     21.0,
+     11.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-06-14"
+     }
+    ],
+    "metrics": [
+     9.0,
+     3.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-06-15"
+     }
+    ],
+    "metrics": [
+     17.0,
+     8.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-06-16"
+     }
+    ],
+    "metrics": [
+     17.0,
+     10.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-06-17"
+     }
+    ],
+    "metrics": [
+     13.0,
+     8.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-06-18"
+     }
+    ],
+    "metrics": [
+     18.0,
+     14.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-06-19"
+     }
+    ],
+    "metrics": [
+     18.0,
+     9.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-06-20"
+     }
+    ],
+    "metrics": [
+     11.0,
+     7.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-06-21"
+     }
+    ],
+    "metrics": [
+     25.0,
+     10.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-06-22"
+     }
+    ],
+    "metrics": [
+     16.0,
+     8.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-06-23"
+     }
+    ],
+    "metrics": [
+     17.0,
+     9.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-06-24"
+     }
+    ],
+    "metrics": [
+     16.0,
+     10.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-06-25"
+     }
+    ],
+    "metrics": [
+     16.0,
+     9.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-06-26"
+     }
+    ],
+    "metrics": [
+     11.0,
+     8.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-06-27"
+     }
+    ],
+    "metrics": [
+     13.0,
+     9.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-06-28"
+     }
+    ],
+    "metrics": [
+     38.0,
+     20.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-06-29"
+     }
+    ],
+    "metrics": [
+     14.0,
+     10.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-06-30"
+     }
+    ],
+    "metrics": [
+     10.0,
+     9.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-07-01"
+     }
+    ],
+    "metrics": [
+     14.0,
+     11.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-07-02"
+     }
+    ],
+    "metrics": [
+     12.0,
+     10.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-07-03"
+     }
+    ],
+    "metrics": [
+     14.0,
+     7.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-07-04"
+     }
+    ],
+    "metrics": [
+     10.0,
+     7.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-07-05"
+     }
+    ],
+    "metrics": [
+     11.0,
+     6.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-07-06"
+     }
+    ],
+    "metrics": [
+     14.0,
+     7.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-07-07"
+     }
+    ],
+    "metrics": [
+     13.0,
+     6.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-07-08"
+     }
+    ],
+    "metrics": [
+     13.0,
+     9.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-07-09"
+     }
+    ],
+    "metrics": [
+     8.0,
+     7.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-07-10"
+     }
+    ],
+    "metrics": [
+     14.0,
+     9.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-07-11"
+     }
+    ],
+    "metrics": [
+     25.0,
+     16.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-07-12"
+     }
+    ],
+    "metrics": [
+     48.0,
+     14.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-07-13"
+     }
+    ],
+    "metrics": [
+     20.0,
+     9.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-07-14"
+     }
+    ],
+    "metrics": [
+     17.0,
+     12.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-07-15"
+     }
+    ],
+    "metrics": [
+     24.0,
+     10.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-07-16"
+     }
+    ],
+    "metrics": [
+     22.0,
+     10.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-07-17"
+     }
+    ],
+    "metrics": [
+     16.0,
+     9.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-07-18"
+     }
+    ],
+    "metrics": [
+     14.0,
+     8.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-07-19"
+     }
+    ],
+    "metrics": [
+     17.0,
+     10.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-07-20"
+     }
+    ],
+    "metrics": [
+     16.0,
+     5.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-07-21"
+     }
+    ],
+    "metrics": [
+     9.0,
+     5.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-07-22"
+     }
+    ],
+    "metrics": [
+     9.0,
+     5.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-07-23"
+     }
+    ],
+    "metrics": [
+     9.0,
+     6.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-07-24"
+     }
+    ],
+    "metrics": [
+     17.0,
+     12.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-07-25"
+     }
+    ],
+    "metrics": [
+     18.0,
+     12.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-07-26"
+     }
+    ],
+    "metrics": [
+     67.0,
+     28.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-07-27"
+     }
+    ],
+    "metrics": [
+     46.0,
+     19.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-07-28"
+     }
+    ],
+    "metrics": [
+     31.0,
+     17.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-07-29"
+     }
+    ],
+    "metrics": [
+     17.0,
+     14.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-07-30"
+     }
+    ],
+    "metrics": [
+     24.0,
+     14.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-07-31"
+     }
+    ],
+    "metrics": [
+     17.0,
+     12.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-08-01"
+     }
+    ],
+    "metrics": [
+     31.0,
+     17.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-08-02"
+     }
+    ],
+    "metrics": [
+     27.0,
+     13.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-08-03"
+     }
+    ],
+    "metrics": [
+     21.0,
+     15.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-08-04"
+     }
+    ],
+    "metrics": [
+     25.0,
+     17.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-08-05"
+     }
+    ],
+    "metrics": [
+     22.0,
+     16.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-08-06"
+     }
+    ],
+    "metrics": [
+     28.0,
+     16.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-08-07"
+     }
+    ],
+    "metrics": [
+     24.0,
+     17.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-08-08"
+     }
+    ],
+    "metrics": [
+     19.0,
+     11.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-08-09"
+     }
+    ],
+    "metrics": [
+     25.0,
+     16.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-08-10"
+     }
+    ],
+    "metrics": [
+     24.0,
+     16.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-08-11"
+     }
+    ],
+    "metrics": [
+     21.0,
+     17.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-08-12"
+     }
+    ],
+    "metrics": [
+     26.0,
+     18.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-08-13"
+     }
+    ],
+    "metrics": [
+     28.0,
+     21.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-08-14"
+     }
+    ],
+    "metrics": [
+     27.0,
+     16.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-08-15"
+     }
+    ],
+    "metrics": [
+     33.0,
+     22.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-08-16"
+     }
+    ],
+    "metrics": [
+     37.0,
+     20.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-08-17"
+     }
+    ],
+    "metrics": [
+     28.0,
+     17.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-08-18"
+     }
+    ],
+    "metrics": [
+     43.0,
+     23.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-08-19"
+     }
+    ],
+    "metrics": [
+     33.0,
+     18.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-08-20"
+     }
+    ],
+    "metrics": [
+     46.0,
+     27.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-08-21"
+     }
+    ],
+    "metrics": [
+     32.0,
+     19.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-08-22"
+     }
+    ],
+    "metrics": [
+     34.0,
+     19.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-08-23"
+     }
+    ],
+    "metrics": [
+     25.0,
+     15.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-08-24"
+     }
+    ],
+    "metrics": [
+     28.0,
+     16.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-08-25"
+     }
+    ],
+    "metrics": [
+     25.0,
+     19.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-08-26"
+     }
+    ],
+    "metrics": [
+     28.0,
+     21.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-08-27"
+     }
+    ],
+    "metrics": [
+     23.0,
+     18.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-08-28"
+     }
+    ],
+    "metrics": [
+     13.0,
+     10.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-08-29"
+     }
+    ],
+    "metrics": [
+     17.0,
+     14.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-08-30"
+     }
+    ],
+    "metrics": [
+     25.0,
+     18.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-08-31"
+     }
+    ],
+    "metrics": [
+     29.0,
+     18.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-09-01"
+     }
+    ],
+    "metrics": [
+     23.0,
+     17.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-09-02"
+     }
+    ],
+    "metrics": [
+     25.0,
+     16.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-09-03"
+     }
+    ],
+    "metrics": [
+     11.0,
+     9.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-09-04"
+     }
+    ],
+    "metrics": [
+     18.0,
+     12.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-09-05"
+     }
+    ],
+    "metrics": [
+     32.0,
+     20.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-09-06"
+     }
+    ],
+    "metrics": [
+     30.0,
+     15.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-09-07"
+     }
+    ],
+    "metrics": [
+     22.0,
+     15.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-09-08"
+     }
+    ],
+    "metrics": [
+     27.0,
+     15.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-09-09"
+     }
+    ],
+    "metrics": [
+     34.0,
+     17.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-09-10"
+     }
+    ],
+    "metrics": [
+     60.0,
+     23.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-09-11"
+     }
+    ],
+    "metrics": [
+     52.0,
+     21.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "name": "2026-09-12"
+     }
+    ],
+    "metrics": [
+     22.0,
+     11.0
+    ]
+   }
+  ],
+  "total_rows": 149,
+  "total_rows_rounded": false,
+  "sampled": false,
+  "contains_sensitive_data": false,
+  "sample_share": 1.0,
+  "sample_size": 3186,
+  "sample_space": 3186,
+  "data_lag": 0,
+  "totals": [
+   3170.0,
+   617.0
+  ],
+  "min": [
+   4.0,
+   3.0
+  ],
+  "max": [
+   85.0,
+   57.0
+  ]
+ }
+}

@@ -1,0 +1,646 @@
+{
+ "request": {
+  "ids": 108585248,
+  "metrics": "ym:pv:pageviews,ym:pv:users",
+  "date1": "2026-04-12",
+  "date2": "2026-09-12",
+  "limit": 10000,
+  "accuracy": "full",
+  "dimensions": "ym:pv:URLHash",
+  "sort": "-ym:pv:pageviews",
+  "filters": "ym:pv:URL!@'localhost' AND ym:pv:URL!@'127.0.0.1'"
+ },
+ "response": {
+  "query": {
+   "ids": [
+    108585248
+   ],
+   "dimensions": [
+    "ym:pv:URLHash"
+   ],
+   "metrics": [
+    "ym:pv:pageviews",
+    "ym:pv:users"
+   ],
+   "sort": [
+    "-ym:pv:pageviews"
+   ],
+   "date1": "2026-04-12",
+   "date2": "2026-09-12",
+   "filters": "ym:pv:URL!@'localhost' AND ym:pv:URL!@'127.0.0.1'",
+   "limit": 10000,
+   "offset": 1,
+   "group": "Week",
+   "benchmarks_version": "1788134400000",
+   "benchmarks_sub_industry": "false",
+   "auto_group_size": "1",
+   "exp_bucket_size": "100",
+   "attr_name": "",
+   "funnel_window": "",
+   "benchmarks_quantile": "50",
+   "time_interval": "1SECOND",
+   "intervals": "1",
+   "quantile": "50",
+   "offline_window": "21",
+   "attribution": "CROSS_DEVICE_LAST_SIGNIFICANT",
+   "currency": "RUB",
+   "benchmarks_attribution": "Automatic",
+   "adfox_event_id": "0",
+   "funnel_pattern": ""
+  },
+  "data": [
+   {
+    "dimensions": [
+     {
+      "id": "16542257270187542752",
+      "favicon": "mikameo.github.io",
+      "name": "https://mikameo.github.io/space-station-recipes/"
+     }
+    ],
+    "metrics": [
+     2757.0,
+     472.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "id": "8810453003646315600",
+      "favicon": "mikameo.github.io",
+      "name": "https://mikameo.github.io/space-station-recipes/#src=deadspace"
+     }
+    ],
+    "metrics": [
+     267.0,
+     154.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "id": "15445261169670406246",
+      "favicon": "mikameo.github.io",
+      "name": "https://mikameo.github.io/space-station-recipes/?mode=companion"
+     }
+    ],
+    "metrics": [
+     91.0,
+     37.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "id": "16799478957935490895",
+      "favicon": "mikameo.github.io",
+      "name": "https://mikameo.github.io/space-station-recipes/#tab=maps&map=vanilla/Bagel&item=Crowbar"
+     }
+    ],
+    "metrics": [
+     4.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "id": "3452175790111126662",
+      "favicon": "mikameo.github.io",
+      "name": "https://mikameo.github.io/space-station-recipes/?lang=ru"
+     }
+    ],
+    "metrics": [
+     3.0,
+     2.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "id": "4125689635757681378",
+      "favicon": "mikameo.github.io",
+      "name": "https://mikameo.github.io/space-station-recipes/?nocache=23"
+     }
+    ],
+    "metrics": [
+     3.0,
+     2.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "id": "3380721761623834225",
+      "favicon": "mikameo.github.io",
+      "name": "https://mikameo.github.io/space-station-recipes/?_ym_debug=1"
+     }
+    ],
+    "metrics": [
+     2.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "id": "6015986411281943604",
+      "favicon": "mikameo.github.io",
+      "name": "https://mikameo.github.io/space-station-recipes/?cb=12"
+     }
+    ],
+    "metrics": [
+     2.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "id": "7592293226910256846",
+      "favicon": "mikameo.github.io",
+      "name": "https://mikameo.github.io/space-station-recipes/?cb=15"
+     }
+    ],
+    "metrics": [
+     2.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "id": "15592866741898459410",
+      "favicon": "mikameo.github.io",
+      "name": "https://mikameo.github.io/space-station-recipes/?cb=9"
+     }
+    ],
+    "metrics": [
+     2.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "id": "7522582227228251255",
+      "favicon": "mikameo.github.io",
+      "name": "https://mikameo.github.io/space-station-recipes/?lang=ru&cb=2#tab=ordnance&src=stories_cm"
+     }
+    ],
+    "metrics": [
+     2.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "id": "13294405222662975431",
+      "favicon": "mikameo.github.io",
+      "name": "https://mikameo.github.io/space-station-recipes/?nocache=1"
+     }
+    ],
+    "metrics": [
+     2.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "id": "13884024365750721626",
+      "favicon": "mikameo.github.io",
+      "name": "https://mikameo.github.io/space-station-recipes/?nocache=25"
+     }
+    ],
+    "metrics": [
+     2.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "id": "3113648333237638399",
+      "favicon": "mikameo.github.io",
+      "name": "https://mikameo.github.io/space-station-recipes/#r=AbductorBlood"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "id": "14866479391381446192",
+      "favicon": "mikameo.github.io",
+      "name": "https://mikameo.github.io/space-station-recipes/#r=Absinthe&src=deadspace"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "id": "17136725209270825558",
+      "favicon": "mikameo.github.io",
+      "name": "https://mikameo.github.io/space-station-recipes/#tab=maps&map=deltav/Bagel&item=Crowbar"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "id": "16918840643821056481",
+      "favicon": "mikameo.github.io",
+      "name": "https://mikameo.github.io/space-station-recipes/#tab=ordnance&src=stories_cm"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "id": "7245324517739058202",
+      "favicon": "mikameo.github.io",
+      "name": "https://mikameo.github.io/space-station-recipes/?fbclid=IwZXh0bgNhZW0CMTEAc3J0YwZhcHBfaWQMMjU2MjgxMDQwNTU4AAEe3SxV39L5KpvYa_oszmEYAq7Nuafli4GP5V1LCxbLI3p-61qD7m9QKhDtXLs_aem_fIfp75JJ-sDrVJJ4uJdRUg"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "id": "10416133215780622694",
+      "favicon": "mikameo.github.io",
+      "name": "https://mikameo.github.io/space-station-recipes/?fresh=audit-orch-1"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "id": "6930809352496601576",
+      "favicon": "mikameo.github.io",
+      "name": "https://mikameo.github.io/space-station-recipes/?fresh=audit-orch-2"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "id": "6034433486240364082",
+      "favicon": "mikameo.github.io",
+      "name": "https://mikameo.github.io/space-station-recipes/?lang=ru#tab=ordnance&src=stories_cm"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "id": "10389152175065679845",
+      "favicon": "mikameo.github.io",
+      "name": "https://mikameo.github.io/space-station-recipes/?nc=10608"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "id": "783229538125292834",
+      "favicon": "mikameo.github.io",
+      "name": "https://mikameo.github.io/space-station-recipes/?nocache=11"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "id": "1144630091611446863",
+      "favicon": "mikameo.github.io",
+      "name": "https://mikameo.github.io/space-station-recipes/?nocache=13"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "id": "12937857725257913135",
+      "favicon": "mikameo.github.io",
+      "name": "https://mikameo.github.io/space-station-recipes/?nocache=15"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "id": "12266741682528353852",
+      "favicon": "mikameo.github.io",
+      "name": "https://mikameo.github.io/space-station-recipes/?nocache=17"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "id": "1056191798522715329",
+      "favicon": "mikameo.github.io",
+      "name": "https://mikameo.github.io/space-station-recipes/?nocache=19"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "id": "13724187707142171155",
+      "favicon": "mikameo.github.io",
+      "name": "https://mikameo.github.io/space-station-recipes/?nocache=21"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "id": "1261573993664910825",
+      "favicon": "mikameo.github.io",
+      "name": "https://mikameo.github.io/space-station-recipes/?nocache=28#tab=ordnance"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "id": "16581464958685485438",
+      "favicon": "mikameo.github.io",
+      "name": "https://mikameo.github.io/space-station-recipes/?nocache=31"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "id": "10412077125978107861",
+      "favicon": "mikameo.github.io",
+      "name": "https://mikameo.github.io/space-station-recipes/?nocache=33#tab=ordnance"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "id": "17429104604747844865",
+      "favicon": "mikameo.github.io",
+      "name": "https://mikameo.github.io/space-station-recipes/?nocache=37#tab=ordnance"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "id": "3500112557358633411",
+      "favicon": "mikameo.github.io",
+      "name": "https://mikameo.github.io/space-station-recipes/?nocache=4"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "id": "8382180950953688980",
+      "favicon": "mikameo.github.io",
+      "name": "https://mikameo.github.io/space-station-recipes/?nocache=42#tab=ordnance"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "id": "12130729146381147567",
+      "favicon": "mikameo.github.io",
+      "name": "https://mikameo.github.io/space-station-recipes/?nocache=45#tab=ordnance"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "id": "8900511063912168360",
+      "favicon": "mikameo.github.io",
+      "name": "https://mikameo.github.io/space-station-recipes/?nocache=47#tab=ordnance"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "id": "14565707602800964502",
+      "favicon": "mikameo.github.io",
+      "name": "https://mikameo.github.io/space-station-recipes/?nocache=7"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "id": "3704148720670894259",
+      "favicon": "mikameo.github.io",
+      "name": "https://mikameo.github.io/space-station-recipes/?nocache=9"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "id": "14951027544633662383",
+      "favicon": "mikameo.github.io",
+      "name": "https://mikameo.github.io/space-station-recipes/?perf=1"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "id": "5257326373002448249",
+      "favicon": "mikameo.github.io",
+      "name": "https://mikameo.github.io/space-station-recipes/?perf=2"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "id": "10678166509234850309",
+      "favicon": "mikameo.github.io",
+      "name": "https://mikameo.github.io/space-station-recipes/?prod=forks#tab=maps&map=deltav/Bagel&item=Crowbar"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "id": "18366204318393092761",
+      "favicon": "mikameo.github.io",
+      "name": "https://mikameo.github.io/space-station-recipes/?prodcheck=1#tab=maps&map=vanilla/Bagel&item=Crowbar"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "id": "3536469535248344589",
+      "favicon": "mikameo.github.io",
+      "name": "https://mikameo.github.io/space-station-recipes/library.html"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "id": "13414890529638504371",
+      "favicon": "mikameo.github.io",
+      "name": "https://mikameo.github.io/space-station-recipes/library.html#doc=rucm-staff-officer-doctrine"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0
+    ]
+   }
+  ],
+  "total_rows": 44,
+  "total_rows_rounded": false,
+  "sampled": false,
+  "contains_sensitive_data": false,
+  "sample_share": 1.0,
+  "sample_size": 3186,
+  "sample_space": 3186,
+  "data_lag": 0,
+  "totals": [
+   3170.0,
+   617.0
+  ],
+  "min": [
+   1.0,
+   1.0
+  ],
+  "max": [
+   2757.0,
+   472.0
+  ]
+ }
+}

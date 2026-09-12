@@ -1,0 +1,451 @@
+{
+ "request": {
+  "ids": 108585248,
+  "metrics": "ym:s:visits,ym:s:users,ym:s:pageviews,ym:s:bounceRate,ym:s:pageDepth,ym:s:avgVisitDurationSeconds",
+  "date1": "2026-04-12",
+  "date2": "2026-09-12",
+  "limit": 1000,
+  "accuracy": "full",
+  "dimensions": "ym:s:operatingSystem",
+  "sort": "-ym:s:visits",
+  "filters": "ym:s:startURL!@'localhost' AND ym:s:startURL!@'127.0.0.1'"
+ },
+ "response": {
+  "query": {
+   "ids": [
+    108585248
+   ],
+   "dimensions": [
+    "ym:s:operatingSystem"
+   ],
+   "metrics": [
+    "ym:s:visits",
+    "ym:s:users",
+    "ym:s:pageviews",
+    "ym:s:bounceRate",
+    "ym:s:pageDepth",
+    "ym:s:avgVisitDurationSeconds"
+   ],
+   "sort": [
+    "-ym:s:visits"
+   ],
+   "date1": "2026-04-12",
+   "date2": "2026-09-12",
+   "filters": "ym:s:startURL!@'localhost' AND ym:s:startURL!@'127.0.0.1'",
+   "limit": 1000,
+   "offset": 1,
+   "group": "Week",
+   "benchmarks_version": "1788134400000",
+   "benchmarks_sub_industry": "false",
+   "auto_group_size": "1",
+   "exp_bucket_size": "100",
+   "attr_name": "",
+   "funnel_window": "",
+   "benchmarks_quantile": "50",
+   "time_interval": "1SECOND",
+   "intervals": "1",
+   "quantile": "50",
+   "offline_window": "21",
+   "attribution": "CROSS_DEVICE_LAST_SIGNIFICANT",
+   "currency": "RUB",
+   "benchmarks_attribution": "Automatic",
+   "adfox_event_id": "0",
+   "funnel_pattern": ""
+  },
+  "data": [
+   {
+    "dimensions": [
+     {
+      "icon_id": "126",
+      "icon_type": "os",
+      "name": "Windows 11",
+      "id": "126",
+      "root": "100"
+     }
+    ],
+    "metrics": [
+     1315.0,
+     174.0,
+     1520.0,
+     5.70342205,
+     1.15589354,
+     194.89125475
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "225",
+      "icon_type": "os",
+      "name": "Windows 10 (и последующие)",
+      "id": "225",
+      "root": "100"
+     }
+    ],
+    "metrics": [
+     1036.0,
+     260.0,
+     1236.0,
+     7.52895753,
+     1.19305019,
+     289.89478764
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "115",
+      "icon_type": "os",
+      "name": "iOS 26",
+      "id": "115",
+      "root": "107"
+     }
+    ],
+    "metrics": [
+     95.0,
+     54.0,
+     126.0,
+     26.31578947,
+     1.32631579,
+     67.98947368
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "116",
+      "icon_type": "os",
+      "name": "Android 16",
+      "id": "116",
+      "root": "108"
+     }
+    ],
+    "metrics": [
+     45.0,
+     35.0,
+     71.0,
+     17.77777778,
+     1.57777778,
+     119.26666667
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "9",
+      "icon_type": "os",
+      "name": "Linux (другие или не определено)",
+      "id": "9",
+      "root": "101"
+     }
+    ],
+    "metrics": [
+     35.0,
+     24.0,
+     49.0,
+     20.0,
+     1.4,
+     149.14285714
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "131",
+      "icon_type": "os",
+      "name": "Android 14",
+      "id": "131",
+      "root": "108"
+     }
+    ],
+    "metrics": [
+     34.0,
+     7.0,
+     47.0,
+     14.70588235,
+     1.38235294,
+     187.29411765
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "132",
+      "icon_type": "os",
+      "name": "macOS Sonoma",
+      "id": "132",
+      "root": "103"
+     }
+    ],
+    "metrics": [
+     18.0,
+     2.0,
+     18.0,
+     5.55555556,
+     1.0,
+     30.11111111
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "134",
+      "icon_type": "os",
+      "name": "Android 15",
+      "id": "134",
+      "root": "108"
+     }
+    ],
+    "metrics": [
+     18.0,
+     14.0,
+     20.0,
+     33.33333333,
+     1.11111111,
+     36.72222222
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "133",
+      "icon_type": "os",
+      "name": "iOS 18",
+      "id": "133",
+      "root": "107"
+     }
+    ],
+    "metrics": [
+     17.0,
+     12.0,
+     20.0,
+     17.64705882,
+     1.17647059,
+     73.64705882
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "249",
+      "icon_type": "os",
+      "name": "macOS Catalina (и последующие)",
+      "id": "249",
+      "root": "103"
+     }
+    ],
+    "metrics": [
+     15.0,
+     9.0,
+     15.0,
+     20.0,
+     1.0,
+     65.66666667
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "128",
+      "icon_type": "os",
+      "name": "Android 13",
+      "id": "128",
+      "root": "108"
+     }
+    ],
+    "metrics": [
+     12.0,
+     10.0,
+     17.0,
+     8.33333333,
+     1.41666667,
+     218.33333333
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "125",
+      "icon_type": "os",
+      "name": "Android 12",
+      "id": "125",
+      "root": "108"
+     }
+    ],
+    "metrics": [
+     8.0,
+     7.0,
+     10.0,
+     12.5,
+     1.25,
+     43.25
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "215",
+      "icon_type": "os",
+      "name": "Windows 8.1",
+      "id": "215",
+      "root": "100"
+     }
+    ],
+    "metrics": [
+     6.0,
+     1.0,
+     9.0,
+     0.0,
+     1.5,
+     799.5
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "130",
+      "icon_type": "os",
+      "name": "iOS 17",
+      "id": "130",
+      "root": "107"
+     }
+    ],
+    "metrics": [
+     3.0,
+     3.0,
+     3.0,
+     33.33333333,
+     1.0,
+     14.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "250",
+      "icon_type": "os",
+      "name": "Google Android 10",
+      "id": "250",
+      "root": "108"
+     }
+    ],
+    "metrics": [
+     3.0,
+     3.0,
+     3.0,
+     0.0,
+     1.0,
+     19.33333333
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "69",
+      "icon_type": "os",
+      "name": "Google Chrome OS",
+      "id": "69",
+      "root": "69"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0,
+     1.0,
+     0.0,
+     1.0,
+     280.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "118",
+      "icon_type": "os",
+      "name": "macOS Monterey",
+      "id": "118",
+      "root": "103"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0,
+     1.0,
+     0.0,
+     1.0,
+     15.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "127",
+      "icon_type": "os",
+      "name": "iOS 16",
+      "id": "127",
+      "root": "107"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0,
+     1.0,
+     0.0,
+     1.0,
+     14.0
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "254",
+      "icon_type": "os",
+      "name": "Android 11",
+      "id": "254",
+      "root": "108"
+     }
+    ],
+    "metrics": [
+     1.0,
+     1.0,
+     2.0,
+     0.0,
+     2.0,
+     93.0
+    ]
+   }
+  ],
+  "total_rows": 19,
+  "total_rows_rounded": false,
+  "sampled": false,
+  "contains_sensitive_data": false,
+  "sample_share": 1.0,
+  "sample_size": 2678,
+  "sample_space": 2678,
+  "data_lag": 0,
+  "totals": [
+   2664.0,
+   617.0,
+   3169.0,
+   8.03303303,
+   1.18956456,
+   222.12162162
+  ],
+  "min": [
+   1.0,
+   1.0,
+   1.0,
+   0.0,
+   1.0,
+   14.0
+  ],
+  "max": [
+   1315.0,
+   260.0,
+   1520.0,
+   33.33333333,
+   2.0,
+   799.5
+  ]
+ }
+}

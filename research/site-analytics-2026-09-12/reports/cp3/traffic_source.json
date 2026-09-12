@@ -1,0 +1,198 @@
+{
+ "request": {
+  "ids": 108585248,
+  "metrics": "ym:s:visits,ym:s:users,ym:s:pageviews,ym:s:bounceRate,ym:s:pageDepth,ym:s:avgVisitDurationSeconds",
+  "date1": "2026-07-28",
+  "date2": "2026-09-12",
+  "limit": 1000,
+  "accuracy": "full",
+  "dimensions": "ym:s:lastTrafficSource",
+  "sort": "-ym:s:visits",
+  "filters": "ym:s:startURL!@'localhost' AND ym:s:startURL!@'127.0.0.1'"
+ },
+ "response": {
+  "query": {
+   "ids": [
+    108585248
+   ],
+   "dimensions": [
+    "ym:s:lastTrafficSource"
+   ],
+   "metrics": [
+    "ym:s:visits",
+    "ym:s:users",
+    "ym:s:pageviews",
+    "ym:s:bounceRate",
+    "ym:s:pageDepth",
+    "ym:s:avgVisitDurationSeconds"
+   ],
+   "sort": [
+    "-ym:s:visits"
+   ],
+   "date1": "2026-07-28",
+   "date2": "2026-09-12",
+   "filters": "ym:s:startURL!@'localhost' AND ym:s:startURL!@'127.0.0.1'",
+   "limit": 1000,
+   "offset": 1,
+   "group": "Week",
+   "benchmarks_version": "1788134400000",
+   "benchmarks_sub_industry": "false",
+   "auto_group_size": "1",
+   "exp_bucket_size": "100",
+   "attr_name": "",
+   "funnel_window": "",
+   "benchmarks_quantile": "50",
+   "time_interval": "1SECOND",
+   "intervals": "1",
+   "quantile": "50",
+   "offline_window": "21",
+   "attribution": "CROSS_DEVICE_LAST_SIGNIFICANT",
+   "currency": "RUB",
+   "benchmarks_attribution": "Automatic",
+   "adfox_event_id": "0",
+   "funnel_pattern": ""
+  },
+  "data": [
+   {
+    "dimensions": [
+     {
+      "icon_id": "0",
+      "icon_type": "traffic-source",
+      "name": "Direct traffic",
+      "id": "direct"
+     }
+    ],
+    "metrics": [
+     954.0,
+     262.0,
+     1145.0,
+     5.13626834,
+     1.20020964,
+     343.63207547
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "1",
+      "icon_type": "traffic-source",
+      "name": "Link traffic",
+      "id": "referral"
+     }
+    ],
+    "metrics": [
+     83.0,
+     23.0,
+     94.0,
+     2.40963855,
+     1.13253012,
+     198.18072289
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "8",
+      "icon_type": "traffic-source",
+      "name": "Social network traffic",
+      "id": "social"
+     }
+    ],
+    "metrics": [
+     17.0,
+     12.0,
+     18.0,
+     11.76470588,
+     1.05882353,
+     353.41176471
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "-1",
+      "icon_type": "traffic-source",
+      "name": "Internal traffic",
+      "id": "internal"
+     }
+    ],
+    "metrics": [
+     9.0,
+     4.0,
+     25.0,
+     11.11111111,
+     2.77777778,
+     2151.66666667
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "2",
+      "icon_type": "traffic-source",
+      "name": "Search engine traffic",
+      "id": "organic"
+     }
+    ],
+    "metrics": [
+     4.0,
+     4.0,
+     6.0,
+     0.0,
+     1.5,
+     332.5
+    ]
+   },
+   {
+    "dimensions": [
+     {
+      "icon_id": "4",
+      "icon_type": "traffic-source",
+      "name": "Cached page traffic",
+      "id": "saved"
+     }
+    ],
+    "metrics": [
+     2.0,
+     1.0,
+     3.0,
+     0.0,
+     1.5,
+     1097.5
+    ]
+   }
+  ],
+  "total_rows": 6,
+  "total_rows_rounded": false,
+  "sampled": false,
+  "contains_sensitive_data": false,
+  "sample_share": 1.0,
+  "sample_size": 1070,
+  "sample_space": 1070,
+  "data_lag": 0,
+  "totals": [
+   1069.0,
+   292.0,
+   1291.0,
+   5.05144995,
+   1.20767072,
+   349.08512629
+  ],
+  "min": [
+   2.0,
+   1.0,
+   3.0,
+   0.0,
+   1.05882353,
+   198.18072289
+  ],
+  "max": [
+   954.0,
+   262.0,
+   1145.0,
+   11.76470588,
+   2.77777778,
+   2151.66666667
+  ]
+ }
+}
