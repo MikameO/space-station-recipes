@@ -2424,17 +2424,49 @@ const PLAN_TIER_LABEL = {
   'unobtainable':  { en: 'no known source', ru: 'нет источника' },
 };
 
+// What the ChemDispenser actually spawns with: 20 jugs, verified against upstream
+// Entities/Structures/Dispensers/chem.yml (EntityTableContainerFill, 2026-09-12).
+const DISPENSER_JUGS = new Set([
+  'Aluminium', 'Carbon', 'Chlorine', 'Copper', 'Ethanol', 'Fluorine', 'Sugar',
+  'Hydrogen', 'Iodine', 'Iron', 'Lithium', 'Mercury', 'Nitrogen', 'Oxygen',
+  'Phosphorus', 'Potassium', 'Radium', 'Silicon', 'Sodium', 'Sulfur',
+]);
+// Not in that fill, but a jug entity exists, so chem storage can hand you one.
+const FETCHED_JUGS = new Set(['Water', 'Silver', 'WeldingFuel']);
+// BASE_DISPENSER_CHEMICALS in config.py adds Plasma, Silver, Water, WeldingFuel
+// and Oil to the 20 above. Upstream has no jug for Plasma or Oil at all — which
+// is why the plan asked for 4u of oil as if the dispenser had it («масло как
+// будто в раздатчике есть, хотя его варить надо»). The data fix is R6/R8; until
+// the regen the planner tells the truth from here.
 function planLeafAccess(id) {
   const r = DATA.reagents[id];
-  if (!r || r.isDispenser) return null; // the dispenser has it — nothing to say
+  if (!r) return null;
+  if (DISPENSER_JUGS.has(id)) return null; // one of the twenty — nothing to say
+  const ru = planRu();
+  const sources = (r.obtainSources || []).join(' | ');
+  if (FETCHED_JUGS.has(id)) {
+    return {
+      tier: 'jug', blocking: false, mislabelled: false,
+      label: ru ? 'канистра со склада' : 'jug from storage',
+      hint: sources || (ru ? 'Есть канистра, но не в стартовой заправке раздатчика' : 'A jug exists, but not in the dispenser it spawns with'),
+    };
+  }
+  if (r.isDispenser) {
+    const brewed = getFilteredReactions(id).length > 0;
+    return {
+      tier: 'not-a-jug', blocking: false, mislabelled: true,
+      label: brewed ? (ru ? 'варится' : 'brew it') : (ru ? 'не в раздатчике' : 'not in the dispenser'),
+      hint: sources,
+    };
+  }
   const tier = r.accessibility && r.accessibility.tier;
   const label = PLAN_TIER_LABEL[tier];
-  const sources = r.obtainSources || [];
   return {
     tier: tier || null,
-    label: label ? (planRu() ? label.ru : label.en) : (planRu() ? 'не в раздатчике' : 'not in the dispenser'),
-    hint: sources.join(' | ') || (r.accessibility && r.accessibility.reason) || '',
-    blocking: !sources.length,
+    label: label ? (ru ? label.ru : label.en) : (ru ? 'не в раздатчике' : 'not in the dispenser'),
+    hint: sources || (r.accessibility && r.accessibility.reason) || '',
+    blocking: !sources,
+    mislabelled: false,
   };
 }
 
@@ -2576,11 +2608,19 @@ function renderPlanWarnings(plan) {
   const blocked = Object.keys(plan.totalBase)
     .map(id => ({ id, acc: planLeafAccess(id) }))
     .filter(x => x.acc && x.acc.blocking);
+  // A jug of water or welding fuel is a walk to chem storage, and water is in
+  // half the recipes in the game — the tag on the row says enough, a warning on
+  // every plan would just train the player to ignore the box.
   const offsite = Object.keys(plan.totalBase)
     .map(id => ({ id, acc: planLeafAccess(id) }))
-    .filter(x => x.acc && !x.acc.blocking);
+    .filter(x => x.acc && !x.acc.blocking && !x.acc.mislabelled && x.acc.tier !== 'jug');
+  // Leaves our own data calls dispenser chemicals while upstream has no jug for
+  // them: the plan stops there, so it owes the player an explicit note.
+  const notAJug = Object.keys(plan.totalBase)
+    .map(id => ({ id, acc: planLeafAccess(id) }))
+    .filter(x => x.acc && x.acc.mislabelled);
   const tooBig = plan.steps.filter(s => s.batchPlan && s.batchPlan.impossible);
-  if (!blocked.length && !offsite.length && !tooBig.length) return '';
+  if (!blocked.length && !offsite.length && !notAJug.length && !tooBig.length) return '';
 
   const items = [];
   if (blocked.length) {
@@ -2592,6 +2632,11 @@ function renderPlanWarnings(plan) {
     items.push(`<div class="warning-item"><span class="warning-icon">&#8505;</span> <span><strong>${esc(offsite.map(x => planName(x.id)).join(', '))}</strong>: ${ru
       ? 'нет в раздатчике — придётся добыть отдельно (наведите на метку в списке)'
       : 'not in the dispenser — fetch it separately (hover the tag in the list)'}</span></div>`);
+  }
+  if (notAJug.length) {
+    items.push(`<div class="warning-item"><span class="warning-icon">&#9888;</span> <span><strong>${esc(notAJug.map(x => planName(x.id)).join(', '))}</strong>: ${ru
+      ? 'в раздатчике этого нет — придётся сварить или добыть отдельно, план этот шаг не раскрывает'
+      : 'the dispenser does not stock this — brew or fetch it separately; the plan does not expand that step'}</span></div>`);
   }
   if (tooBig.length) {
     items.push(`<div class="warning-item"><span class="warning-icon">&#9888;</span> <span><strong>${esc(tooBig.map(s => planName(s.reagentId)).join(', '))}</strong>: ${ru

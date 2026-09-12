@@ -149,6 +149,24 @@ const cases = [
   ['…and the note says what would brew clean', true,
     (() => { setSource('cmu'); const q = quantizeOrder('CMUBlackSludge', 64); setSource('vanilla'); return q.cleanAt > 64; })()],
 
+  // ── the dispenser really stocks twenty jugs, not twenty-five ──
+  ['one of the twenty jugs carries no tag', null, planLeafAccess('Oxygen')],
+  ['oil is flagged a dispenser chemical by our data', true, !!data.reagents.Oil.isDispenser],
+  ['…but upstream has no oil jug, so the plan says brew it', 'brew it', planLeafAccess('Oil').label],
+  ['…and marks it as our own mislabel, not a fetch-elsewhere', true, planLeafAccess('Oil').mislabelled],
+  ['water is not in the fill but a jug exists', 'jug from storage', planLeafAccess('Water').label],
+  ['welding fuel too', 'jug from storage', planLeafAccess('WeldingFuel').label],
+  ['a jug of water gets a tag but no warning in the box', true, (() => {
+    const plan = planBrew([{ id: 'Cryoxadone', amount: 500 }], 120);
+    return 'Water' in plan.totalBase && !/Water/.test(g('renderPlanWarnings')(plan));
+  })()],
+  ['the medic preset warns about the oil it asks for', true, (() => {
+    const plan = planBrew([{ id: 'Bicaridine', amount: 90 }, { id: 'Kelotane', amount: 90 },
+      { id: 'Dylovene', amount: 90 }, { id: 'Epinephrine', amount: 30 }], 120);
+    const w = g('renderPlanWarnings')(plan);
+    return 'Oil' in plan.totalBase && /does not stock this/.test(w);
+  })()],
+
   // ── names, not prototype ids ──
   ['the steps print display names, not ids', true, (() => {
     const plan = planBrew([{ id: 'SodiumCarbonate', amount: 50 }], 120);
