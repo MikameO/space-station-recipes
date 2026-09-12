@@ -91,8 +91,12 @@ count follows the Source filter. Regression suite: `node
 scripts/test_recipe_ranking.js`, 23 cases on the real `data.json` (21 failed
 on the previous code). `data.json` is unchanged; two reagents (Protein,
 Ipecac) carry an extractor `recipe` that is a byproduct pick — the app now
-shows the direct recipe, the data-side fix is filed under Q6. Cache-bust
-`app.js?v=40`, service worker `chemdb-v84`.
+shows the direct recipe, the data-side fix is filed under Q6. Same-day follow-up:
+the reagent cards (main grid and Botany tab) print the same ranked recipe on
+their chip line instead of the extractor's `r.recipe`, so under RMC14 the
+Vodka card says Enzyme + Black Goo + Potato Juice like the panel does; base
+chemicals keep their `r.recipe` chip. Cache-bust `app.js?v=41`, service
+worker `chemdb-v86`.
 
 ## Series P — 2026-09-12 (Botany: plant-healing group, Botany as a second category, value ranges)
 
