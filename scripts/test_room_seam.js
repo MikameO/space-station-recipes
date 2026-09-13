@@ -12,7 +12,7 @@ const mv = read('tactical/mapview.js');
 const count = (s, needle) => s.split(needle).length - 1;
 
 // Scripts: logic before the client, the client before the panel, all before tactical.js.
-const order = ['tactical/room-logic.js', 'tactical/room.js', 'tactical/room-ui.js', 'tactical/tactical.js'];
+const order = ['tactical/room-logic.js', 'tactical/room.js', 'tactical/room-ui.js', 'tactical/room-requests.js', 'tactical/tactical.js'];
 const at = order.map(src => html.indexOf('src="' + src));
 at.forEach((i, k) => assert.ok(i > 0, order[k] + ' is loaded'));
 for (let k = 1; k < at.length; k++) assert.ok(at[k - 1] < at[k], order[k - 1] + ' loads before ' + order[k]);
