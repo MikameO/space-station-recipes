@@ -1,0 +1,659 @@
+{
+ "schemaVersion": 1,
+ "built": "2026-09-13",
+ "forks": [
+  {
+   "key": "rmc14",
+   "label": "RMC14",
+   "family": "rmc",
+   "locale": "en-US",
+   "source": {
+    "sha": "57112b967696c17c98805627df21ba0f8388aa81",
+    "date": "2026-09-13"
+   },
+   "constants": {
+    "offsetVariance": 500,
+    "mortar": {
+     "minRange": 15,
+     "maxRange": 65,
+     "maxDial": 10,
+     "maxTarget": 1000,
+     "tilesPerOffset": 20,
+     "jitter": [
+      -1,
+      0,
+      0,
+      1
+     ],
+     "targetDelay": 3.0,
+     "deployDelay": 4.0,
+     "loadDelay": 1.5,
+     "travelDelay": 4.5,
+     "impactWarningDelay": 2.5,
+     "impactDelay": 4.5,
+     "warnRange": 15,
+     "impactWarnRange": 10
+    },
+    "ob": {
+     "scatter": [
+      -3,
+      2
+     ],
+     "cooldown": 500.0,
+     "timeline": {
+      "alert": 2.0,
+      "beginFire": 6.0,
+      "fire": 12.0,
+      "warnOne": 16.0,
+      "warnTwo": 20.0,
+      "impact": 24.0
+     },
+     "warnRanges": [
+      30,
+      25,
+      15
+     ]
+    },
+    "roofing": [
+     {
+      "proto": "HiveCoreXeno",
+      "range": 11.848,
+      "allows": []
+     },
+     {
+      "proto": "HivePylonXeno",
+      "range": 8.463,
+      "allows": [
+       "OB"
+      ]
+     }
+    ]
+   },
+   "terms": {
+    "rangefinderLongitude": "LONGITUDE",
+    "rangefinderLatitude": "LATITUDE",
+    "mortarTargetTitle": "Target Coordinates",
+    "mortarTargetX": "Target X",
+    "mortarTargetY": "Target Y",
+    "mortarTargetSet": "Set Target",
+    "mortarOffsetTitle": "Target Offset",
+    "mortarOffsetX": "X Offset",
+    "mortarOffsetY": "Y Offset",
+    "mortarOffsetSet": "Dial Offset",
+    "overwatchLongitude": "LONGITUDE",
+    "overwatchLatitude": "LATITUDE",
+    "supplyLongitude": "Longitude",
+    "supplyLatitude": "Latitude",
+    "refuseTooFar": "You cannot aim at this coordinate, it is too far from your mortar.",
+    "refuseTooClose": "You cannot aim at this coordinate, it is too close to your mortar.",
+    "refuseCovered": "You cannot hit the target. It is probably underground.",
+    "refuseLandingZone": "You cannot bomb the landing zone!",
+    "refuseNotArea": "This area is out of bounds!",
+    "refuseDeployIndoors": "You probably shouldn't deploy indoors.",
+    "obProtected": "The target zone has strong biological protection. The orbital strike cannot reach here.",
+    "obUnderground": "The target zone is deep underground. The orbital strike cannot reach here.",
+    "supplyUnderground": "The landing zone is underground. The supply drop cannot reach here.",
+    "supplyBlocked": "The landing zone appears to be obstructed or out of bounds. Package would be lost on drop."
+   },
+   "review": [],
+   "planets": [
+    {
+     "id": "lv624",
+     "proto": "RMCPlanetLV624",
+     "name": "LV-624 Lazarus Landing",
+     "file": "rmc14/lv624",
+     "h": "6dfd8ab50c2a",
+     "inRotation": true,
+     "minPlayers": 0,
+     "maxPlayers": 0,
+     "levels": [
+      0
+     ],
+     "scenarios": [
+      {
+       "name": "asset_protection",
+       "p": 0.1
+      },
+      {
+       "name": "none",
+       "p": 0.9
+      }
+     ]
+    },
+    {
+     "id": "solaris",
+     "proto": "RMCPlanetSolaris",
+     "name": "Solaris Ridge",
+     "file": "rmc14/solaris",
+     "h": "f6bc98d8b1da",
+     "inRotation": true,
+     "minPlayers": 0,
+     "maxPlayers": 0,
+     "levels": [
+      0
+     ],
+     "scenarios": [
+      {
+       "name": "crashlanding_offices",
+       "p": 0.2
+      },
+      {
+       "name": "none",
+       "p": 0.8
+      }
+     ]
+    },
+    {
+     "id": "shiva",
+     "proto": "RMCPlanetShiva",
+     "name": "Shivas Snowball",
+     "file": "rmc14/shiva",
+     "h": "cde71877e20d",
+     "inRotation": true,
+     "minPlayers": 0,
+     "maxPlayers": 0,
+     "levels": [
+      0
+     ],
+     "scenarios": [
+      {
+       "name": "panic_room_hold",
+       "p": 0.15
+      },
+      {
+       "name": "none",
+       "p": 0.85
+      }
+     ]
+    },
+    {
+     "id": "fiorina",
+     "proto": "RMCPlanetFiorina",
+     "name": "Fiorina Science Annex",
+     "file": "rmc14/fiorina",
+     "h": "25b38f176875",
+     "inRotation": true,
+     "minPlayers": 130,
+     "maxPlayers": 0,
+     "levels": [
+      0
+     ],
+     "scenarios": [
+      {
+       "name": "riot_in_progress",
+       "p": 0.15
+      },
+      {
+       "name": "none",
+       "p": 0.85
+      }
+     ]
+    },
+    {
+     "id": "trijent",
+     "proto": "RMCPlanetTrijent",
+     "name": "Trijent Dam",
+     "file": "rmc14/trijent",
+     "h": "69869302dec5",
+     "inRotation": true,
+     "minPlayers": 130,
+     "maxPlayers": 0,
+     "levels": [
+      0
+     ],
+     "scenarios": [
+      {
+       "name": "none",
+       "p": 0.6
+      },
+      {
+       "name": "spp_bar",
+       "p": 0.4
+      }
+     ]
+    },
+    {
+     "id": "varadero",
+     "proto": "RMCPlanetVaradero",
+     "name": "New Varadero",
+     "file": "rmc14/varadero",
+     "h": "c5334eaca7f4",
+     "inRotation": true,
+     "minPlayers": 0,
+     "maxPlayers": 0,
+     "levels": [
+      0
+     ],
+     "scenarios": [
+      {
+       "name": "none",
+       "p": 1.0
+      }
+     ]
+    },
+    {
+     "id": "kutjevo",
+     "proto": "RMCPlanetKutjevo",
+     "name": "Kutjevo Refinery",
+     "file": "rmc14/kutjevo",
+     "h": "c65355699093",
+     "inRotation": true,
+     "minPlayers": 0,
+     "maxPlayers": 0,
+     "levels": [
+      0
+     ],
+     "scenarios": [
+      {
+       "name": "none",
+       "p": 1.0
+      }
+     ]
+    },
+    {
+     "id": "chances",
+     "proto": "RMCPlanetChances",
+     "name": "LV-522 Chance's Claim",
+     "file": "rmc14/chances",
+     "h": "46d1e521e389",
+     "inRotation": true,
+     "minPlayers": 0,
+     "maxPlayers": 0,
+     "levels": [
+      0
+     ],
+     "scenarios": []
+    },
+    {
+     "id": "hybrisa",
+     "proto": "RMCPlanetHybrisa",
+     "name": "LV-759 Hybrisa Prospera",
+     "file": "rmc14/hybrisa",
+     "h": "658051da42e9",
+     "inRotation": true,
+     "minPlayers": 130,
+     "maxPlayers": 0,
+     "levels": [
+      0
+     ],
+     "scenarios": [
+      {
+       "name": "tse_airbase",
+       "p": 0.3
+      },
+      {
+       "name": "none",
+       "p": 0.7
+      }
+     ]
+    },
+    {
+     "id": "sorokyne",
+     "proto": "RMCPlanetSorokyne",
+     "name": "LV-976 Sorokyne Strata",
+     "file": "rmc14/sorokyne",
+     "h": "e2381ebabe74",
+     "inRotation": true,
+     "minPlayers": 130,
+     "maxPlayers": 0,
+     "levels": [
+      0
+     ],
+     "scenarios": [
+      {
+       "name": "spp_sof",
+       "p": 0.4
+      },
+      {
+       "name": "none",
+       "p": 0.6
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "key": "stories_cm",
+   "label": "Space Stories",
+   "family": "rmc",
+   "locale": "ru-RU",
+   "source": {
+    "sha": "024d853a184f956e0c08d876808ea7771a104a04",
+    "date": "2026-09-10"
+   },
+   "constants": {
+    "offsetVariance": 500,
+    "mortar": {
+     "minRange": 15,
+     "maxRange": 65,
+     "maxDial": 10,
+     "maxTarget": 1000,
+     "tilesPerOffset": 20,
+     "jitter": [
+      -1,
+      0,
+      0,
+      1
+     ],
+     "targetDelay": 3.0,
+     "deployDelay": 4.0,
+     "loadDelay": 1.5,
+     "travelDelay": 4.5,
+     "impactWarningDelay": 2.5,
+     "impactDelay": 4.5,
+     "warnRange": 15,
+     "impactWarnRange": 10
+    },
+    "ob": {
+     "scatter": [
+      -3,
+      2
+     ],
+     "cooldown": 500.0,
+     "timeline": {
+      "alert": 2.0,
+      "beginFire": 6.0,
+      "fire": 12.0,
+      "warnOne": 16.0,
+      "warnTwo": 20.0,
+      "impact": 24.0
+     },
+     "warnRanges": [
+      30,
+      25,
+      15
+     ]
+    },
+    "roofing": [
+     {
+      "proto": "HiveCoreXeno",
+      "range": 11.848,
+      "allows": []
+     },
+     {
+      "proto": "HivePylonXeno",
+      "range": 8.463,
+      "allows": [
+       "OB"
+      ]
+     }
+    ]
+   },
+   "terms": {
+    "rangefinderLongitude": "ДОЛГОТА",
+    "rangefinderLatitude": "ШИРОТА",
+    "mortarTargetTitle": "Координаты цели",
+    "mortarTargetX": "Цель X",
+    "mortarTargetY": "Цель Y",
+    "mortarTargetSet": "Установить цель",
+    "mortarOffsetTitle": "Смещение цели",
+    "mortarOffsetX": "X Смещение",
+    "mortarOffsetY": "Y Смещение",
+    "mortarOffsetSet": "Откалибровать смещение",
+    "overwatchLongitude": "ДОЛГОТА",
+    "overwatchLatitude": "ШИРИНА",
+    "supplyLongitude": "Долгота",
+    "supplyLatitude": "Широта",
+    "refuseTooFar": "Вы не можете прицелиться по этой координате, она находится слишком близко к вашему миномету.",
+    "refuseTooClose": "Вы не можете прицелиться по этой координате, она находится слишком близко к вашему миномету.",
+    "refuseCovered": "Вы не можете попасть в цель. Возможно, она находится под землей.",
+    "refuseLandingZone": "Нельзя бомбить посадочную площадку!",
+    "refuseNotArea": "Эта территория запрещена!",
+    "refuseDeployIndoors": "Возможно, вам не стоит разворачивать в помещении.",
+    "obProtected": "Целевая зона имеет сильную биологическую защиту. Орбитальный удар не может достичь этого места.",
+    "obUnderground": "Целевая зона находится глубоко под землей. Орбитальный удар не может достичь этого места.",
+    "supplyUnderground": "Зона высадки находится под землей. Капля снабжения не может добраться сюда.",
+    "supplyBlocked": "Зона высадки, похоже, заблокирована или находится за пределами границ. Посылка будет потеряна при сбросе."
+   },
+   "review": [
+    {
+     "path": "Content.Shared/_RMC14/Mortar/ActiveMortarShellComponent.cs",
+     "blob": "41e1abba4e0cf56fa8de893c6403399dba106115"
+    },
+    {
+     "path": "Content.Shared/_RMC14/Mortar/SharedMortarSystem.cs",
+     "blob": "5e76b250203e53b14c0d2528fbfded2a22d2299a"
+    },
+    {
+     "path": "Content.Server/_RMC14/Mortar/MortarSystem.cs",
+     "blob": "9c9b56e952cbad16d2980da526660dffde554a7f"
+    },
+    {
+     "path": "Content.Shared/_RMC14/OrbitalCannon/OrbitalCannonSystem.cs",
+     "blob": "6a7cd77724ab518bdfceb9b7c9c38865570393c8"
+    },
+    {
+     "path": "Content.Shared/_RMC14/CCVar/RMCCVars.cs",
+     "blob": "7d77d85bf1111507a2a54d84bc96ee2f97cbe013"
+    },
+    {
+     "path": "Content.Shared/_RMC14/Areas/AreaSystem.cs",
+     "blob": "69c8d1274e068ae20696cc46606895342a9ab53a"
+    },
+    {
+     "path": "Content.Shared/_RMC14/Areas/AreaComponent.cs",
+     "blob": "b347087ced7740c5cb077a0d7c0e16d235d0a470"
+    },
+    {
+     "path": "Content.Shared/_RMC14/SupplyDrop/SharedSupplyDropSystem.cs",
+     "blob": "260cd9eeec2c394f1b8293c35d226ae6f45c559d"
+    }
+   ],
+   "planets": [
+    {
+     "id": "lv624",
+     "proto": "RMCPlanetLV624",
+     "name": "LV-624 Lazarus Landing",
+     "file": "stories_cm/lv624",
+     "h": "aaaa5337f72d",
+     "inRotation": true,
+     "minPlayers": 0,
+     "maxPlayers": 0,
+     "levels": [
+      0
+     ],
+     "scenarios": [
+      {
+       "name": "asset_protection",
+       "p": 0.1
+      },
+      {
+       "name": "none",
+       "p": 0.9
+      }
+     ]
+    },
+    {
+     "id": "solaris",
+     "proto": "RMCPlanetSolaris",
+     "name": "Хребет Солярис",
+     "file": "stories_cm/solaris",
+     "h": "7fad8bda786e",
+     "inRotation": true,
+     "minPlayers": 0,
+     "maxPlayers": 0,
+     "levels": [
+      0
+     ],
+     "scenarios": [
+      {
+       "name": "crashlanding_offices",
+       "p": 0.2
+      },
+      {
+       "name": "none",
+       "p": 0.8
+      }
+     ]
+    },
+    {
+     "id": "shiva",
+     "proto": "RMCPlanetShiva",
+     "name": "Снежный Шар Шивы",
+     "file": "stories_cm/shiva",
+     "h": "31030cbd5477",
+     "inRotation": true,
+     "minPlayers": 0,
+     "maxPlayers": 0,
+     "levels": [
+      0
+     ],
+     "scenarios": [
+      {
+       "name": "panic_room_hold",
+       "p": 0.15
+      },
+      {
+       "name": "none",
+       "p": 0.85
+      }
+     ]
+    },
+    {
+     "id": "fiorina",
+     "proto": "RMCPlanetFiorina",
+     "name": "Научный Комплекс Фиорины",
+     "file": "stories_cm/fiorina",
+     "h": "6b4478abe8c3",
+     "inRotation": true,
+     "minPlayers": 130,
+     "maxPlayers": 0,
+     "levels": [
+      0
+     ],
+     "scenarios": [
+      {
+       "name": "riot_in_progress",
+       "p": 0.15
+      },
+      {
+       "name": "none",
+       "p": 0.85
+      }
+     ]
+    },
+    {
+     "id": "trijent",
+     "proto": "RMCPlanetTrijent",
+     "name": "Дамба Триджент",
+     "file": "stories_cm/trijent",
+     "h": "9cbd877a64f9",
+     "inRotation": true,
+     "minPlayers": 130,
+     "maxPlayers": 0,
+     "levels": [
+      0
+     ],
+     "scenarios": [
+      {
+       "name": "none",
+       "p": 0.6
+      },
+      {
+       "name": "spp_bar",
+       "p": 0.4
+      }
+     ]
+    },
+    {
+     "id": "varadero",
+     "proto": "RMCPlanetVaradero",
+     "name": "Новый Варадеро",
+     "file": "stories_cm/varadero",
+     "h": "c6e2acb7d82a",
+     "inRotation": true,
+     "minPlayers": 0,
+     "maxPlayers": 0,
+     "levels": [
+      0
+     ],
+     "scenarios": [
+      {
+       "name": "none",
+       "p": 1.0
+      }
+     ]
+    },
+    {
+     "id": "kutjevo",
+     "proto": "RMCPlanetKutjevo",
+     "name": "ПЗ Кутьево",
+     "file": "stories_cm/kutjevo",
+     "h": "8f242363aedc",
+     "inRotation": true,
+     "minPlayers": 0,
+     "maxPlayers": 0,
+     "levels": [
+      0
+     ],
+     "scenarios": [
+      {
+       "name": "none",
+       "p": 1.0
+      }
+     ]
+    },
+    {
+     "id": "chances",
+     "proto": "RMCPlanetChances",
+     "name": "LV-522 Притензия Шанса",
+     "file": "stories_cm/chances",
+     "h": "26aa8aeaf1ff",
+     "inRotation": true,
+     "minPlayers": 0,
+     "maxPlayers": 0,
+     "levels": [
+      0
+     ],
+     "scenarios": []
+    },
+    {
+     "id": "hybrisa",
+     "proto": "RMCPlanetHybrisa",
+     "name": "LV-759 Гибриса Проспера",
+     "file": "stories_cm/hybrisa",
+     "h": "4b16619ebd63",
+     "inRotation": true,
+     "minPlayers": 130,
+     "maxPlayers": 0,
+     "levels": [
+      0
+     ],
+     "scenarios": [
+      {
+       "name": "tse_airbase",
+       "p": 0.3
+      },
+      {
+       "name": "none",
+       "p": 0.7
+      }
+     ]
+    },
+    {
+     "id": "sorokyne",
+     "proto": "RMCPlanetSorokyne",
+     "name": "LV-976 Sorokyne Strata",
+     "file": "stories_cm/sorokyne",
+     "h": "43b029759ae2",
+     "inRotation": true,
+     "minPlayers": 130,
+     "maxPlayers": 0,
+     "levels": [
+      0
+     ],
+     "scenarios": [
+      {
+       "name": "spp_sof",
+       "p": 0.4
+      },
+      {
+       "name": "none",
+       "p": 0.6
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}
