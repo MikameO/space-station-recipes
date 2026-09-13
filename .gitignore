@@ -17,6 +17,12 @@ research/**/logs/
 # Card screenshot sources (re-shot by scripts/shoot_cards.mjs); only promo/cards/*.webp ships
 promo/cards-src/
 
+# Brainstorming visual-companion mockups (superpowers skill), local only
+.superpowers/
+
+# Tactical map extractor: content-addressed upstream blobs (ss14_tactical.py)
+cache_tactical/
+
 # Cloudflare Worker local state and secrets (worker/)
 worker/.wrangler/
 worker/.dev.vars
