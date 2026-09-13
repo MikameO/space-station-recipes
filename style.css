@@ -3563,3 +3563,100 @@ main.lib-layout {
   .mut-table th, .mut-table td { padding: 3px 6px; }
   .mut-table td:nth-child(2) { min-width: 160px; }
 }
+
+/* ── Series H: «Sections» overlay (home.js) ─────────────────────────────── */
+.home-btn { display: inline-flex; align-items: center; gap: 6px; cursor: pointer; }
+body.companion .home-btn { display: none; }
+.home-dot-btn { display: inline-block; flex-shrink: 0; width: 8px; height: 8px; border-radius: 50%; background: var(--amber); box-shadow: 0 0 6px var(--amber); animation: home-pulse 1.6s ease-in-out infinite; }
+.home-dot-btn[hidden] { display: none !important; }
+.home-root { position: fixed; inset: 0; z-index: 10004; display: none; align-items: flex-start; justify-content: center; background: rgba(6, 9, 15, 0.84); padding: 24px 12px; overflow-y: auto; }
+.home-root.is-open { display: flex; }
+.home-panel { width: 100%; max-width: 1100px; background: var(--panel); border: 1px solid var(--border-subtle); border-radius: 4px; padding: 18px 20px 22px; }
+.home-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 14px; }
+.home-title-main { color: var(--phosphor); font-size: 1.05rem; letter-spacing: 0.04em; text-transform: uppercase; }
+.home-sub { color: var(--text-sub); font-size: 0.78rem; margin-top: 3px; }
+.home-head-right { display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
+.home-toggle { font-size: 0.7rem; color: var(--text-ghost); display: flex; align-items: center; gap: 6px; cursor: pointer; }
+.home-close { background: none; border: 1px solid var(--border-subtle); color: var(--text-sub); width: 32px; height: 32px; border-radius: 2px; cursor: pointer; font: inherit; }
+.home-close:hover { color: var(--phosphor); border-color: var(--phosphor-dim); }
+.home-close:focus-visible, .home-toggle input:focus-visible { outline: 2px solid var(--phosphor); outline-offset: 2px; }
+.home-grid { display: grid; gap: 12px; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.home-grid-hero { grid-template-columns: repeat(2, minmax(0, 1fr)); margin-bottom: 12px; }
+.home-card { position: relative; display: block; width: 100%; text-align: left; overflow: hidden; min-height: 118px; background: var(--panel-raised); border: 1px solid var(--border-subtle); border-radius: 6px; padding: 0; color: inherit; text-decoration: none; cursor: pointer; font: inherit; }
+.home-card.is-hero { min-height: 150px; }
+.home-card:hover { border-color: var(--border-active); }
+.home-card:focus-visible { outline: 2px solid var(--phosphor); outline-offset: 2px; }
+.home-card.is-updated { border-color: var(--amber); }
+.home-card.is-new { border-color: var(--phosphor); }
+.home-card.is-action { border-style: dashed; border-color: #2c4458; background: var(--hull-plate); }
+.home-card.is-here { cursor: default; }
+/* The top strip of every screenshot is the same site header — crop into the content. */
+.home-shot { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 75% 60%; }
+.home-scrim { position: absolute; inset: 0; background: linear-gradient(90deg, rgba(12, 16, 24, 0.95) 0%, rgba(12, 16, 24, 0.80) 45%, rgba(12, 16, 24, 0.28) 100%); transition: opacity 0.2s; }
+.home-card:hover .home-scrim, .home-card:focus-visible .home-scrim { opacity: 0.75; }
+.home-dot { position: absolute; top: 10px; right: 10px; width: 9px; height: 9px; border-radius: 50%; display: none; }
+.home-card.is-updated .home-dot { display: block; background: var(--amber); animation: home-pulse 1.6s ease-in-out infinite; }
+.home-card.is-new .home-dot { display: block; background: var(--phosphor); animation: home-pulse 1.6s ease-in-out infinite; }
+@keyframes home-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
+.home-body { position: relative; display: block; padding: 12px 14px; }
+.home-title { display: flex; align-items: center; gap: 8px; color: var(--text-bright); font-size: 0.92rem; margin-bottom: 4px; }
+.home-icon { color: var(--phosphor); font-size: 1.05rem; line-height: 1; }
+.home-card.is-antag .home-icon { color: var(--red-alert); }
+.home-card.is-action .home-icon { color: var(--cyan); }
+.home-here { font-size: 0.62rem; color: var(--text-ghost); border: 1px solid var(--border-subtle); border-radius: 3px; padding: 0 5px; text-transform: uppercase; }
+.home-desc { display: block; color: var(--text-sub); font-size: 0.76rem; line-height: 1.4; }
+.home-chips { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 8px; }
+.home-chip { border: 1px solid var(--border-subtle); border-radius: 3px; padding: 1px 6px; font-size: 0.64rem; color: var(--text-sub); background: rgba(12, 16, 24, 0.6); }
+.home-new { display: block; margin-top: 8px; font-size: 0.72rem; color: var(--amber); }
+.home-card.is-new .home-new { color: var(--phosphor); }
+@media (max-width: 900px) { .home-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 480px) {
+  .home-root { padding: 12px 8px; }
+  .home-grid, .home-grid-hero { grid-template-columns: minmax(0, 1fr); }
+  .home-panel { padding: 14px 12px 18px; }
+  .home-head { flex-wrap: wrap; }
+}
+@media (prefers-reduced-motion: reduce) { .home-dot, .home-dot-btn { animation: none !important; } }
+
+/* ── Series H: feedback form and survey (feedback.js) ───────────────────── */
+.fb-root { position: fixed; inset: 0; z-index: 10004; display: none; align-items: flex-start; justify-content: center; background: rgba(6, 9, 15, 0.84); padding: 16px; overflow-y: auto; }
+.fb-root.is-open { display: flex; }
+.fb-panel { position: relative; width: 100%; max-width: 520px; margin: auto; background: var(--panel); border: 1px solid var(--border-subtle); border-radius: 4px; padding: 16px 18px 18px; }
+.fb-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 6px; }
+.fb-title { color: var(--phosphor); font-size: 0.95rem; text-transform: uppercase; letter-spacing: 0.04em; font-weight: normal; margin: 0; }
+.fb-close { background: none; border: 1px solid var(--border-subtle); color: var(--text-sub); width: 30px; height: 30px; border-radius: 2px; cursor: pointer; font: inherit; flex-shrink: 0; }
+.fb-close:hover { color: var(--phosphor); border-color: var(--phosphor-dim); }
+.fb-close:focus-visible, .fb-chip:focus-visible, .fb-alt:focus-visible { outline: 2px solid var(--phosphor); outline-offset: 2px; }
+.fb-form[hidden], .fb-done[hidden] { display: none !important; }
+.fb-label { display: block; color: var(--text-main); font-size: 0.78rem; margin: 10px 0 4px; }
+.fb-textarea, .fb-input { display: block; width: 100%; background: var(--hull-plate); color: var(--text-bright); border: 1px solid var(--border-subtle); border-radius: 2px; padding: 8px 10px; font: inherit; font-size: 0.84rem; }
+.fb-textarea { resize: vertical; min-height: 64px; }
+.fb-textarea:focus, .fb-input:focus { outline: 1px solid var(--phosphor); outline-offset: 0; border-color: var(--phosphor-dim); }
+.fb-hp { position: absolute; left: -9999px; top: auto; width: 1px; height: 1px; overflow: hidden; }
+.fb-note { color: var(--text-ghost); font-size: 0.68rem; margin-top: 10px; line-height: 1.4; }
+.fb-actions { display: flex; align-items: center; gap: 14px; margin-top: 12px; flex-wrap: wrap; }
+.fb-alt { color: var(--text-ghost); font-size: 0.7rem; }
+.fb-alt:hover { color: var(--phosphor); }
+.fb-err { color: var(--red-alert); font-size: 0.7rem; min-height: 1em; margin-top: 3px; }
+.fb-done { text-align: center; padding: 12px 0 4px; color: var(--text-main); font-size: 0.85rem; }
+.fb-done-title { color: var(--phosphor); font-size: 1rem; margin-bottom: 6px; }
+.fb-done a { color: var(--phosphor); }
+.fb-done .btn-small { margin-top: 12px; }
+.fb-chips { display: flex; flex-wrap: wrap; gap: 4px; margin: 8px 0 2px; }
+.fb-chip { border: 1px solid var(--border-subtle); background: none; color: var(--text-sub); border-radius: 3px; padding: 2px 8px; font: inherit; font-size: 0.66rem; cursor: pointer; }
+.fb-chip:hover, .fb-chip[aria-pressed="true"] { color: var(--phosphor); border-color: var(--phosphor-dim); }
+/* Survey: a non-modal card in the corner (sized, so the fixed box does not
+   stretch across the page and swallow clicks); a bottom sheet on phones.
+   Layer: above the app's pin callout (10002), below the modals (10004). */
+.fb-root.fb-survey { inset: auto 16px 16px auto; width: 380px; max-width: calc(100vw - 32px); background: none; padding: 0; overflow: visible; z-index: 10003; }
+.fb-root.fb-survey.is-open { display: block; }
+.fb-root.fb-survey .fb-panel { max-width: none; margin: 0; box-shadow: 0 8px 30px rgba(0, 0, 0, 0.55); max-height: calc(100vh - 32px); overflow-y: auto; }
+@media (max-width: 700px) {
+  .fb-textarea, .fb-input { font-size: 16px; }
+  .fb-root.fb-survey { inset: auto 0 0 0; width: auto; max-width: none; }
+  .fb-root.fb-survey .fb-panel { border-radius: 8px 8px 0 0; max-height: 85vh; }
+  .fb-close, .home-close { width: 44px; height: 44px; }
+  .fb-root.fb-survey .fb-chips { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 4px; }
+  .fb-root.fb-survey .fb-chip { flex: 0 0 auto; }
+  .fb-root.fb-survey .fb-textarea { height: 64px; min-height: 48px; }
+}

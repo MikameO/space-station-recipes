@@ -89,6 +89,8 @@
     'Pin over game — floating always-on-top companion (Chrome/Edge). Falls back to a compact popup.': 'Закрепить поверх игры — плавающее окно-компаньон (Chrome/Edge). Иначе — компактный попап.',
     'Go to Reagents home': 'На главную — Реагенты',
     'Home': 'Домой',
+    'Sections': 'Разделы',
+    'What is on the platform': 'Что есть на платформе',
     'What is Antag mode?': 'Что такое режим антагониста?',
     'Reveals antagonist strategies tab: toxin synthesis routes, delivery methods, and difficulty ratings. Toggle off to return to the standard chemist view.': 'Открывает вкладку стратегий антагониста: синтез токсинов, способы доставки и рейтинг сложности. Выключите, чтобы вернуться к обычному виду химика.',
     'Loading...': 'Загрузка...',

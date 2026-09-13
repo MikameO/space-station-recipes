@@ -23,16 +23,29 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
+      # sections.json drives the Sections overlay: every target must resolve and
+      # every screenshot must exist, or a card opens nothing / shows a blank.
+      - name: Validate sections.json
+        run: python scripts/check_sections.py --no-git
+
+      # Pure logic behind the Sections overlay, the feedback form and its Worker.
+      - name: Series H unit tests
+        run: |
+          node scripts/test_home_logic.js
+          node scripts/test_feedback_logic.js
+          node scripts/test_feedback_worker.mjs
+
       - name: Collect static files
         run: |
           mkdir _site
-          cp index.html library.html app.js i18n.js tutorial.js maps.js ordnance.js library.js botany.js vessels.js style.css data.json favicon.ico _site/
+          cp index.html library.html app.js i18n.js tutorial.js maps.js ordnance.js library.js botany.js vessels.js home.js feedback.js sections.json style.css data.json favicon.ico _site/
           cp sw.js manifest.json robots.txt sitemap.xml _site/
           cp favicon.svg favicon-192.png favicon-512.png apple-touch-icon.png _site/
           cp -r sprites _site/sprites
           cp -r maps _site/maps
           cp -r ordnance _site/ordnance
           cp -r library _site/library
+          mkdir -p _site/promo && cp -r promo/cards _site/promo/cards
           [ -f og-image.png ] && cp og-image.png _site/ || true
 
       # Every asset index.html asks for has to exist in _site. Adding a new file
