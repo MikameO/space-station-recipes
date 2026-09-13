@@ -1653,6 +1653,8 @@ def build(fork_id: str, fconf: dict, fetch) -> dict:
         "fires": fires,
         "nonFillable": sorted(NON_FILLABLE_CASINGS),
         "sheets": sheets,
+        "parts": {key: {"id": pid, "materials": lathe[pid]}
+                  for key, pid in conf.get("parts", {}).items() if pid in lathe},
         "marines": marines,
         "targets": targets,
         "structures": structures,

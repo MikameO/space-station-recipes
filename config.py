@@ -621,10 +621,17 @@ FORK_REGISTRY = {
             "sheet_files": [
                 "Resources/Prototypes/_RMC14/Entities/Objects/Materials/Sheets/metal.yml",
                 "Resources/Prototypes/_RMC14/Entities/Objects/Materials/Sheets/plastic.yml",
+                "Resources/Prototypes/_RMC14/Entities/Objects/Materials/Sheets/glass.yml",
             ],
             "lathe_files": [
                 "Resources/Prototypes/_RMC14/Entities/Structures/Machines/Lathe/armylathe_recipes.yml",
+                "Resources/Prototypes/_RMC14/Entities/Structures/Machines/Lathe/lathe_recipes.yml",
+                "Resources/Prototypes/_Stories/Entities/Structures/Machines/Lathe/lathe_recipes.yml",
             ],
+            # Печатные детали боеприпаса помимо корпуса: взрыватели и мензурка 60u,
+            # через которую в снаряд или трубу заливают топливо. Ведро на 120u не
+            # считаем — их полно в раздатчиках.
+            "parts": {"igniter": "STIgniter", "timer": "STTimer", "beaker": "CMBeaker"},
             # Реагенты, которые либо есть сразу, либо готовятся за полминуты.
             # Список игровой, не выводимый из числа реакций: циклонит стоит
             # шести шагов и всё равно быстрый, октоген восьми и долгий.

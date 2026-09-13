@@ -180,7 +180,12 @@
     'Least material': 'Минимум материала',
     'Shopping list': 'К закупке', 'catalyst': 'катализатор',
     'On hand, not consumed: ': 'Иметь при себе, не расходуется: ',
-    'Casings themselves: ': 'На сами корпуса: ',
+    'Parts: ': 'Детали: ', 'Materials: ': 'Материалы: ', 'glass': 'стекло', 'fuel': 'топливо',
+    'M40 grenade': 'граната M40', 'M15 grenade': 'граната M15', 'M20 mine': 'мина M20',
+    'C4 charge': 'заряд C4', '84mm rocket warhead': 'боеголовка ракеты 84 мм',
+    '80mm mortar warhead': 'миномётная боеголовка 80 мм',
+    '80mm mortar camera warhead': 'камерная боеголовка 80 мм',
+    'igniter': 'воспламенитель', 'timer': 'таймер', '60u glass beaker': 'стеклянная мензурка 60u',
     'steel': 'сталь', 'plastic': 'пластик', 'sheets': 'листов',
     'Put something in the casing first.': 'Сначала положите что-нибудь в корпус.',
     'HE round': 'Фугасный', 'Breach': 'Пролом', 'Denial': 'Отсечение',
@@ -290,6 +295,13 @@
       foot.innerHTML = '';
       return;
     }
+    // A mortar shell or rocket flies on its own fuel, poured through a 60u glass
+    // beaker that stays in the round; the fuel is brewed like any other reagent.
+    const carrier = S.data.casings[carrierOf(S.casing)];
+    if (carrier && carrier.fuel) {
+      roots.push({ id: carrier.fuel, qty: carrier.fuelAmount * S.planCount,
+                   path: 'fuel>' + carrier.fuel, catalyst: false, fuel: true });
+    }
     const totals = {}, catalysts = {};
     const walk = (nodes, seen, depth) => {
       let html = '<ul class="ord-plan-list">';
@@ -307,7 +319,8 @@
             : '<span class="ord-plan-leaf"></span>')
           + '<b class="ord-plan-qty">' + esc(round(n.qty, 1)) + '</b>'
           + '<span class="ord-plan-name">' + esc(rname(n.id)) + '</span>'
-          + (n.catalyst ? '<span class="ord-plan-cat">' + esc(tr('catalyst')) + '</span>' : '');
+          + (n.catalyst ? '<span class="ord-plan-cat">' + esc(tr('catalyst')) + '</span>' : '')
+          + (n.fuel ? '<span class="ord-plan-cat">' + esc(tr('fuel')) + '</span>' : '');
         html += '</div>';
         if (open) html += walk(kids, new Set([...seen, n.id]), depth + 1);
         html += '</li>';
@@ -324,26 +337,42 @@
       parts.push('<div class="ord-plan-sub">' + esc(tr('On hand, not consumed: '))
         + esc(line(catalysts)) + '</div>');
     }
-    const mats = casingOf().materials;
-    if (mats) {
+    // Everything a round is printed from besides its filling: the casing, the
+    // engine a warhead flies on, its fuel beaker, and the trigger parts. They add
+    // up fast -- one mortar round is over ten sheets of steel.
+    const P = S.data.parts || {};
+    const pieces = [[S.casing, casingOf().materials]];
+    for (const key of TRIGGER_PARTS[casingOf().mode] || []) if (P[key]) pieces.push([key, P[key].materials]);
+    if (carrier) {
+      pieces.push([carrierOf(S.casing), carrier.materials]);
+      if (carrier.fuel && P.beaker) pieces.push(['beaker', P.beaker.materials]);
+    }
+    const count = {}, mats = {};
+    for (const [key, m] of pieces) {
+      count[key] = (count[key] || 0) + S.planCount;
+      for (const k in m || {}) mats[k] = (mats[k] || 0) + m[k] * S.planCount;
+    }
+    parts.push('<div class="ord-plan-sub">' + esc(tr('Parts: ')) + esc(Object.keys(count)
+      .map(k => tr(CASING_LABEL[k] || PART_LABEL[k] || k) + ' \u00d7' + count[k]).join(' + ')) + '</div>');
+    if (Object.keys(mats).length) {
       // Sheets, because 70000 steel means nothing to anyone. The units per
       // sheet come from the sheet entity itself, and this fork does not use
       // the vanilla hundred: its metal sheet is 3750.
       const sheets = S.data.sheets || {};
-      const list = Object.keys(mats).sort().map(m => {
-        const units = mats[m] * S.planCount;
-        const per = sheets[m];
-        return matName(m) + ' ' + (per
-          ? round(units / per, 1) + ' ' + tr('sheets')
-          : round(units, 0));
-      }).join(' + ');
-      parts.push('<div class="ord-plan-sub">' + esc(tr('Casings themselves: ')) + esc(list) + '</div>');
+      const list = Object.keys(mats).sort().map(m => matName(m) + ' ' + (sheets[m]
+        ? round(mats[m] / sheets[m], 1) + ' ' + tr('sheets') : round(mats[m], 0))).join(' + ');
+      parts.push('<div class="ord-plan-sub">' + esc(tr('Materials: ')) + esc(list) + '</div>');
     }
     foot.innerHTML = parts.join('');
   }
 
   // Lathe material ids are not reagents, so rname finds nothing for them.
-  const MATERIAL_NAMES = { CMSteel: 'steel', RMCPlastic: 'plastic' };
+  const MATERIAL_NAMES = { CMSteel: 'steel', RMCPlastic: 'plastic', CMGlass: 'glass' };
+  // The cheapest trigger set each assembly mode accepts (SharedOrdnanceCasingSystem):
+  // a mine is cheaper on two igniters than on a proximity sensor and one.
+  const TRIGGER_PARTS = { TimerIgniter: ['timer', 'igniter'], DualIgniter: ['igniter', 'igniter'],
+                          Plastic: ['timer', 'igniter'], Mine: ['igniter', 'igniter'] };
+  const PART_LABEL = { igniter: 'igniter', timer: 'timer', beaker: '60u glass beaker' };
   const matName = id => tr(MATERIAL_NAMES[id] || id);
 
   function casingOf() { return S.data.casings[S.casing]; }

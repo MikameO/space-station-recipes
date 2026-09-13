@@ -106,6 +106,14 @@ now say "at most" as well as "at least" â€” an assault incendiary that burns 6â€
 rather than as long as it can, or a round with its power capped. The search
 penalises overshoot the way it penalises a shortfall.
 
+**The brew plan counts the whole round (O22).** "How much to brew" now adds what
+a round is printed from besides its filling: the 80mm shell or 84mm tube a warhead
+flies on, its 60u of hydrogen or methane (listed with the shopping, tagged fuel),
+the 60u glass beaker that carries it, and the cheapest trigger set the casing
+accepts. Parts are counted, and materials are given in sheets of steel, plastic
+and glass. JSON gains `parts` (`igniter`, `timer`, `beaker` with lathe materials)
+and `sheets.CMGlass`.
+
 **JSON:** `targets[].weak` and `.size`; a `structures` list (`id`, `name`, `hp`,
 `coefficient`); `formula.stun*`, `knockdownSeconds`, `knockdownRef`,
 `wallRef`; `recipes[].group` (`base` | `high`) with optional `name` and `note`

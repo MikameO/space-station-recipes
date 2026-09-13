@@ -564,6 +564,28 @@
   "RMC88mmRocketTube",
   "RMCCasingBase"
  ],
+ "parts": {
+  "beaker": {
+   "id": "CMBeaker",
+   "materials": {
+    "CMGlass": 625.0
+   }
+  },
+  "igniter": {
+   "id": "STIgniter",
+   "materials": {
+    "CMGlass": 62.0,
+    "CMSteel": 625.0
+   }
+  },
+  "timer": {
+   "id": "STTimer",
+   "materials": {
+    "CMGlass": 62.0,
+    "CMSteel": 625.0
+   }
+  }
+ },
  "reagents": {
   "ArnoldPalmer": {
    "d": 0.2,
@@ -2356,6 +2378,7 @@
  ],
  "schema": 1,
  "sheets": {
+  "CMGlass": 3750.0,
   "CMPlasteel": 3750.0,
   "CMSteel": 3750.0,
   "RMCPlastic": 2000.0
