@@ -100,7 +100,7 @@ t('text limits and control characters', () => {
 });
 t('entry parsing and codes', () => {
   assert.deepStrictEqual(R.parseEntry(' k7m4q2 '), { code: 'K7M4Q2', postCode: null });
-  assert.deepStrictEqual(R.parseEntry('K7M4Q2-SLB7'), { code: 'K7M4Q2', postCode: 'SLB7' });
+  assert.deepStrictEqual(R.parseEntry('K7M4Q2-SKB7'), { code: 'K7M4Q2', postCode: 'SKB7' });
   assert.strictEqual(R.parseEntry('K7M4Q2-SLB7-X'), null);
   assert.strictEqual(R.parseEntry('K70O1I'), null, 'O, 0, 1, I are not in the alphabet');
   const code = R.randomCode(6, () => 0.5);

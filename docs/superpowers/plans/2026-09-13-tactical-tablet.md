@@ -378,7 +378,7 @@ t('text limits and control characters', () => {
 });
 t('entry parsing and codes', () => {
   assert.deepStrictEqual(R.parseEntry(' k7m4q2 '), { code: 'K7M4Q2', postCode: null });
-  assert.deepStrictEqual(R.parseEntry('K7M4Q2-SLB7'), { code: 'K7M4Q2', postCode: 'SLB7' });
+  assert.deepStrictEqual(R.parseEntry('K7M4Q2-SKB7'), { code: 'K7M4Q2', postCode: 'SKB7' });
   assert.strictEqual(R.parseEntry('K7M4Q2-SLB7-X'), null);
   assert.strictEqual(R.parseEntry('K70O1I'), null, 'O, 0, 1, I are not in the alphabet');
   const code = R.randomCode(6, () => 0.5);
@@ -6099,7 +6099,8 @@ t('stage 1: position requests go to the mortar owner; the author never accepts t
 });
 ```
 
-6. Expected test output becomes sixteen `ok …` lines and `OK 16 groups` (also in Tasks 4–7 wherever `OK 15 groups` is expected).
+6. Expected test output becomes seventeen `ok …` lines and `OK 17 groups`: the base test already has sixteen groups, so the plan's «15» was a miscount (also in Tasks 4–7 wherever `OK 15 groups` is expected).
+7. The `parseEntry` example uses the post code `SKB7`, not `SLB7`: the code alphabet excludes L like I, O, 0 and 1, and the Worker router and tests use the same 31-character class.
 
 ### Task 3 overrides
 

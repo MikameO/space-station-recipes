@@ -10,8 +10,8 @@
 (function (root) {
   'use strict';
 
-  var CODE_ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-  var CODE_RE = /^[ABCDEFGHJKLMNPQRSTUVWXYZ23456789]+$/;
+  var CODE_ALPHABET = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
+  var CODE_RE = /^[ABCDEFGHJKMNPQRSTUVWXYZ23456789]+$/;
   var REQUEST_TYPES = ['mortar', 'position', 'ob', 'cas', 'supply', 'medevac', 'other'];
   var REQUEST_FLOW = {
     requested: ['accepted', 'denied'],
