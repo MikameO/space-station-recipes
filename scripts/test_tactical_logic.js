@@ -412,10 +412,10 @@ test('T4: where the shell can land — aim error plus jitter, none in laser mode
 
 test('T4: page prefs migrate strictly, layers keep their defaults', () => {
   const d = L.migratePrefs(null);
-  assert.deepStrictEqual(d, { v: 1, weapon: 'mortar', shell: null, hitRadius: {}, layers: { fire: true, deploy: false, rings: true, zone: true, markers: true }, timerFrom: 'fire' });
+  assert.deepStrictEqual(d, { v: 1, weapon: 'mortar', shell: null, warhead: null, hitRadius: {}, layers: { fire: true, deploy: false, rings: true, zone: true, markers: true }, timerFrom: 'fire' });
   const p = L.migratePrefs({ v: 1, weapon: 'ob', shell: 'RMCMortarShellHE', hitRadius: { RMCMortarShellHE: 4.5, bad: 'x', huge: 500 },
     layers: { fire: false, nope: true, rings: 'yes' }, junk: 1 });
-  assert.deepStrictEqual(p, { v: 1, weapon: 'ob', shell: 'RMCMortarShellHE', hitRadius: { RMCMortarShellHE: 4.5 }, timerFrom: 'fire',
+  assert.deepStrictEqual(p, { v: 1, weapon: 'ob', shell: 'RMCMortarShellHE', warhead: null, hitRadius: { RMCMortarShellHE: 4.5 }, timerFrom: 'fire',
     layers: { fire: false, deploy: false, rings: true, zone: true, markers: true } });
   assert.strictEqual(L.migratePrefs({ v: 2, weapon: 'ob' }).weapon, 'mortar');
 });
@@ -491,8 +491,25 @@ test('T6: chat text names the label and every point in game coordinates', () => 
   assert.deepStrictEqual(L.shapeCentre([[0, 0], [4, 0], [4, 4]]), [3.1666666666666665, 1.8333333333333333]);
 });
 
+test('T7: the orbital cannon clock — flight, cooldown from the impact, ready', () => {
+  const t0 = 9_000_000;
+  assert.deepStrictEqual(L.obState(OB, undefined, t0), { phase: 'ready', remaining: 0, next: null });
+  const flight = L.obState(OB, t0, t0 + 13000);
+  assert.strictEqual(flight.phase, 'flight');
+  assert.ok(near(flight.remaining, 11, 1e-9));
+  assert.strictEqual(flight.next.event, 'warning');
+  assert.strictEqual(flight.next.range, 25);
+  const cool = L.obState(OB, t0, t0 + 24000 + 100000);
+  assert.strictEqual(cool.phase, 'cooldown');
+  assert.ok(near(cool.remaining, 400, 1e-9));
+  assert.strictEqual(L.obState(OB, t0, t0 + 24000 + 500000).phase, 'ready');
+  const kept = L.migrateStorage({ v: 1, ob: { firedAt: 5, target: [274, -210], warhead: 'RMCOrbitalCannonWarheadExplosive', radius: 17.5 } });
+  assert.deepStrictEqual(kept.ob, { firedAt: 5, target: [274, -210], warhead: 'RMCOrbitalCannonWarheadExplosive', radius: 17.5 });
+  assert.strictEqual(L.migrateStorage({ v: 1, ob: { firedAt: 'x', target: [1, 1] } }).ob, null);
+});
+
 test('stored planet state: foreign or inconsistent shapes are dropped', () => {
-  const empty = { v: 1, calibration: null, mortar: null, target: null, shots: [], markers: [], shapes: [] };
+  const empty = { v: 1, calibration: null, mortar: null, target: null, shots: [], markers: [], shapes: [], ob: null };
   assert.deepStrictEqual(L.migrateStorage(null), empty);
   assert.deepStrictEqual(L.migrateStorage('x'), empty);
   assert.deepStrictEqual(L.migrateStorage({ v: 2, calibration: {} }), empty);

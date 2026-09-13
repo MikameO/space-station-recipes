@@ -320,6 +320,19 @@
     return state;
   }
 
+  // The orbital cannon's clock after a launch: warnings at 12/16/20 s, impact
+  // at 24 s, then the fire cooldown counted from the impact.
+  function obState(ob, firedAt, now) {
+    if (typeof firedAt !== 'number') return { phase: 'ready', remaining: 0, next: null };
+    var elapsed = (now - firedAt) / 1000;
+    var timeline = obTimeline(ob);
+    var st = timelineState(timeline, elapsed);
+    if (!st.done) return { phase: 'flight', remaining: st.remaining, next: st.next, elapsed: elapsed };
+    var sinceImpact = elapsed - ob.timeline.impact;
+    if (sinceImpact < ob.cooldown) return { phase: 'cooldown', remaining: ob.cooldown - sinceImpact, next: null, elapsed: elapsed };
+    return { phase: 'ready', remaining: 0, next: null, elapsed: elapsed };
+  }
+
   // The dial the mortar holds now: whatever the last recorded shot set.
   function currentDial(shots) {
     var last = shots && shots.length ? shots[shots.length - 1] : null;
@@ -457,12 +470,13 @@
   var DEFAULT_LAYERS = { fire: true, deploy: false, rings: true, zone: true, markers: true };
 
   function migratePrefs(raw) {
-    var out = { v: PREFS_VERSION, weapon: 'mortar', shell: null, hitRadius: {}, layers: {}, timerFrom: 'fire' };
+    var out = { v: PREFS_VERSION, weapon: 'mortar', shell: null, warhead: null, hitRadius: {}, layers: {}, timerFrom: 'fire' };
     LAYER_KEYS.forEach(function (k) { out.layers[k] = DEFAULT_LAYERS[k]; });
     if (!raw || typeof raw !== 'object' || raw.v !== PREFS_VERSION) return out;
     if (raw.weapon === 'mortar' || raw.weapon === 'ob' || raw.weapon === 'supply') out.weapon = raw.weapon;
     if (raw.timerFrom === 'load') out.timerFrom = 'load';
     if (typeof raw.shell === 'string' && raw.shell) out.shell = raw.shell;
+    if (typeof raw.warhead === 'string' && raw.warhead) out.warhead = raw.warhead;
     if (raw.hitRadius && typeof raw.hitRadius === 'object') {
       Object.keys(raw.hitRadius).forEach(function (k) {
         var r = raw.hitRadius[k];
@@ -480,12 +494,17 @@
   // dropped rather than repaired. Shots and markers are validated by their own
   // increments (T5, T6) and pass through as arrays.
   function migrateStorage(raw) {
-    var out = { v: STORAGE_VERSION, calibration: null, mortar: null, target: null, shots: [], markers: [], shapes: [] };
+    var out = { v: STORAGE_VERSION, calibration: null, mortar: null, target: null, shots: [], markers: [], shapes: [], ob: null };
     if (!raw || typeof raw !== 'object' || raw.v !== STORAGE_VERSION) return out;
     if (raw.mortar && isTile(raw.mortar.tile)) {
       out.mortar = { tile: raw.mortar.tile.slice(), mode: raw.mortar.mode === 'laser' ? 'laser' : 'coordinates' };
     }
     if (isTile(raw.target)) out.target = raw.target.slice();
+    if (raw.ob && typeof raw.ob === 'object' && typeof raw.ob.firedAt === 'number' && isFinite(raw.ob.firedAt) && isTile(raw.ob.target)) {
+      out.ob = { firedAt: raw.ob.firedAt, target: raw.ob.target.slice(),
+                 warhead: typeof raw.ob.warhead === 'string' ? raw.ob.warhead : null,
+                 radius: typeof raw.ob.radius === 'number' && isFinite(raw.ob.radius) ? raw.ob.radius : null };
+    }
     var c = raw.calibration;
     if (c && isTile(c.tile) && isTile(c.reading) && isTile(c.offset) && typeof c.at === 'number' &&
         sameVec(offsetFrom(c.tile, c.reading), c.offset)) {
@@ -608,6 +627,7 @@
     shapeCentre: shapeCentre,
     impactBox: impactBox,
     shotState: shotState,
+    obState: obState,
     currentDial: currentDial,
     shotAim: shotAim,
     FLAGS: FLAGS,

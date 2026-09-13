@@ -173,6 +173,9 @@ def main() -> int:
         for s in shells:
             if s.get("kind") not in ("he", "incendiary", "flare", "other") or not s.get("id"):
                 fail(f"{key}: malformed shell entry {s!r}")
+        warheads = constants.get("obWarheads") or []
+        if not any((w.get("radius") or 0) > 0 for w in warheads):
+            fail(f"{key}: constants.obWarheads has no warhead with a blast radius")
         if mirror is not None:
             family_mirror = mirror.get(fork.get("family"))
             for part in ("offsetVariance", "mortar", "ob"):

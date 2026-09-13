@@ -834,6 +834,41 @@ def shells(protos: Protos, mirror: dict) -> list[dict]:
     return sorted(out, key=lambda s: (["he", "incendiary", "flare", "other"].index(s["kind"]), s["id"]))
 
 
+def ob_warheads(protos: Protos) -> list[dict]:
+    """The cannon's warheads and what each does on the ground, from the explosion
+    prototype its OrbitalCannonWarhead points at: the widest blast step, the fire
+    diamond range, and a cluster's spread (OrbitalCannonSystem runs the steps at
+    the impact point, each cluster blast offset by NextVector2(-spread, spread))."""
+    out = []
+    for wid in protos.comp_field("RMCOrbitalCannon", "OrbitalCannon", "warheadTypes") or []:
+        wid = str(wid)
+        expl = protos.comp_field(wid, "OrbitalCannonWarhead", "explosion")
+        if not expl:
+            continue
+        steps = protos.comp_field(str(expl), "OrbitalCannonExplosion", "steps") or []
+        radius = fire = spread = 0.0
+        times, per = 0, 1
+        for st in steps:
+            if not isinstance(st, dict):
+                continue
+            if st.get("type") and st.get("total"):
+                radius = max(radius, intensity_to_radius(float(st["total"]), float(st.get("slope") or 0), float(st.get("max") or 0)))
+            fire = max(fire, float(st.get("fireRange") or 0))
+            spread = max(spread, float(st.get("spread") or 0))
+            if int(st.get("times") or 0) > 1:
+                times, per = int(st["times"]), int(st.get("timesPer") or 1)
+        entry = {"id": wid, "name": protos.name(wid), "radius": round(radius, 2),
+                 "fireRange": int(fire) or None, "spread": spread or None,
+                 "cluster": {"times": times, "per": per} if times else None}
+        warn = [protos.comp_field(wid, "OrbitalCannonWarhead", k) for k in ("firstWarningRange", "secondWarningRange", "thirdWarningRange")]
+        if all(v is not None for v in warn):
+            entry["warnRanges"] = [int(v) for v in warn]
+        out.append(entry)
+    if not out or not any(w["radius"] > 0 for w in out):
+        raise TacticalError("no orbital cannon warhead with a blast found among the prototypes")
+    return out
+
+
 def review_list(co: Checkout, family: str) -> list[dict]:
     out = []
     for path in FAMILIES[family]["code_files"]:
@@ -876,6 +911,7 @@ def build_fork(fork: str, out_dir: Path, only_planet: str | None = None, sha: st
     constants = check_constants(co, cfg["family"])
     constants["roofing"] = roofing(protos)
     constants["shells"] = shells(protos, constants)
+    constants["obWarheads"] = ob_warheads(protos)
     terms = read_terms(co, cfg["family"], cfg["locale"])
     review = review_list(co, cfg["family"])
 

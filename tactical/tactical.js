@@ -198,7 +198,29 @@
       itemStale: 'placed on an older map',
       itemWorld: 'world tiles — calibrate for in-game numbers',
       kinds: { line: 'Line', area: 'Area' },
-      layerMarkers: 'Markers, lines and areas'
+      layerMarkers: 'Markers, lines and areas',
+      fireLabels: { mortar: 'Where the mortar cannot hit (red)', ob: 'Where the OB cannot strike (red)', supply: 'Where the crate cannot land (red)' },
+      obTitle: 'Orbital bombardment',
+      obOk: '✓ The cannon can strike here.',
+      obNo: '✗ {reason}',
+      obWarnings: {
+        wallRedirect: 'An indestructible wall stands at the point — the strike moves to a neighbouring tile or fizzles.',
+        scatterOutsideOb: '{n} of {total} possible landing points lie where the OB is refused — the strike may fizzle there.'
+      },
+      obZoneHint: 'Solid circle: the warhead\'s blast around the aim point. Dashed outline: everywhere the strike can land with the −3…+2 scatter (wider with wrong fuel). Orange diamond: the fire.',
+      warhead: 'Warhead',
+      warheadBlast: '{r} tiles blast',
+      warheadFire: 'fire diamond {r}',
+      warheadCluster: '{times}×{per} blasts within ±{spread}',
+      obLaunched: 'Launched at {coords}',
+      obFlight: 'impact in {s} s',
+      obNextWarn: 'warning ({r} tiles) in {s} s',
+      obCooldown: 'cannon reloading: {s} s',
+      obReady: 'cannon ready',
+      obForget: 'Forget the launch',
+      supplyTitle: 'Supply drop',
+      supplyOk: '✓ The crate lands here.',
+      supplyNo: '✗ {reason}'
     },
     ru: {
       pageName: 'Тактическая карта',
@@ -368,7 +390,29 @@
       itemStale: 'поставлена на старой версии карты',
       itemWorld: 'тайлы мира — для игровых чисел нужна калибровка',
       kinds: { line: 'Линия', area: 'Область' },
-      layerMarkers: 'Метки, линии и области'
+      layerMarkers: 'Метки, линии и области',
+      fireLabels: { mortar: 'Куда миномёт не бьёт (красным)', ob: 'Куда ОБ не бьёт (красным)', supply: 'Куда ящик не ляжет (красным)' },
+      obTitle: 'Орбитальная бомбардировка',
+      obOk: '✓ Пушка может ударить сюда.',
+      obNo: '✗ {reason}',
+      obWarnings: {
+        wallRedirect: 'В точке неразрушимая стена — удар сместится на соседний тайл или сорвётся.',
+        scatterOutsideOb: '{n} из {total} возможных точек прилёта — там, где ОБ запрещён: удар может сорваться.'
+      },
+      obZoneHint: 'Сплошной круг — взрыв боеголовки вокруг точки прицела. Пунктирный контур — всё, куда удар может лечь с разбросом −3…+2 (при ошибке заправки шире). Оранжевый ромб — огонь.',
+      warhead: 'Боеголовка',
+      warheadBlast: 'взрыв {r} тайлов',
+      warheadFire: 'ромб огня {r}',
+      warheadCluster: '{times}×{per} взрывов в пределах ±{spread}',
+      obLaunched: 'Запуск по {coords}',
+      obFlight: 'падение через {s} с',
+      obNextWarn: 'предупреждение ({r} тайлов) через {s} с',
+      obCooldown: 'перезарядка пушки: {s} с',
+      obReady: 'пушка готова',
+      obForget: 'Забыть запуск',
+      supplyTitle: 'Сброс поставки',
+      supplyOk: '✓ Ящик ляжет сюда.',
+      supplyNo: '✗ {reason}'
     }
   };
   var T = L10N[LANG];
@@ -572,7 +616,7 @@
       for (var i = 0; i < w * h; i++) {
         var a = planet.grid[i];
         if (!a) continue;
-        var col = paint(planet.json.areas[a - 1][3]);
+        var col = paint(planet.json.areas[a - 1][3], i);
         if (!col) continue;
         d[i * 4] = col[0]; d[i * 4 + 1] = col[1]; d[i * 4 + 2] = col[2]; d[i * 4 + 3] = col[3];
       }
@@ -584,7 +628,9 @@
       fireLaser: make(function (f) {
         return ((f & F.MORTAR_FIRE) && (f & F.CAS) && (f & F.LASING) && !(f & F.LANDING_ZONE)) ? null : TINT_FIRE_REFUSED;
       }),
-      deploy: make(function (f) { return (f & F.MORTAR_PLACE) ? TINT_DEPLOY_ALLOWED : null; })
+      deploy: make(function (f) { return (f & F.MORTAR_PLACE) ? TINT_DEPLOY_ALLOWED : null; }),
+      ob: make(function (f) { return (f & F.OB) ? null : TINT_FIRE_REFUSED; }),
+      supply: make(function (f, i) { return ((f & F.SUPPLY) && planet.blocked[i] !== 1) ? null : TINT_FIRE_REFUSED; })
     };
   }
 
@@ -627,7 +673,7 @@
       view.setImage(img, json.bounds);
       writeHash();
       renderAll();
-      if (state.store.shots.length) startShotTicker();
+      if (state.store.shots.length || state.store.ob) startShotTicker();
       setStatus('');
       if (!state.opened) {
         state.opened = true;
@@ -674,6 +720,36 @@
   }
 
   function shells() { return (state.fork && state.fork.constants.shells) || []; }
+  function obConstants() { return state.fork.constants.ob; }
+  function warheads() { return (state.fork && state.fork.constants.obWarheads) || []; }
+  function currentWarhead() {
+    var list = warheads();
+    return list.filter(function (w) { return w.id === state.prefs.warhead; })[0] || list[0] || null;
+  }
+  function obRadius() {
+    var w = currentWarhead();
+    if (!w) return null;
+    var own = state.prefs.hitRadius[w.id];
+    return typeof own === 'number' ? own : (w.radius || null);
+  }
+  function obInfo(tile) { return state.planet ? Logic.obChecks(state.planet, tile, obConstants()) : null; }
+  function supplyInfo(tile) { return state.planet ? Logic.supplyChecks(state.planet, tile) : null; }
+  function obRefusal(reason) {
+    var t = terms();
+    return reason === 'obBlocked' ? (t.obUnderground || reason) : reason === 'noArea' ? (t.refuseNotArea || reason) : reason;
+  }
+  function supplyRefusal(reason) {
+    var t = terms();
+    return reason === 'underground' ? (t.supplyUnderground || reason) : reason === 'blocked' ? (t.supplyBlocked || reason)
+      : reason === 'noArea' ? (t.refuseNotArea || reason) : reason;
+  }
+  function warheadNote(w) {
+    var parts = [];
+    if (w.radius) parts.push(fmt(T.warheadBlast, { r: w.radius }));
+    if (w.fireRange) parts.push(fmt(T.warheadFire, { r: w.fireRange }));
+    if (w.cluster) parts.push(fmt(T.warheadCluster, { times: w.cluster.times, per: w.cluster.per, spread: w.spread }));
+    return parts.join(' · ');
+  }
 
   // The player's pick, else the heaviest high-explosive shell (Stories also
   // ships a fragmentation one with a smaller blast), else whatever exists.
@@ -813,7 +889,7 @@
   // The aim point is an integer world point — a tile corner, which is what the
   // rangefinder number names. Solid circle: the blast; dashed outline: the
   // landing box widened by the same radius.
-  function drawHitZone(ctx, v, tile, box, radius, faint) {
+  function drawHitZone(ctx, v, tile, box, radius, faint, outlineRadius) {
     var s = v.scale, p = v.worldToScreen(tile[0], tile[1]);
     var alpha = faint ? 0.55 : 1;
     ctx.setLineDash([]);
@@ -831,7 +907,7 @@
     ctx.fillStyle = 'rgba(0, 229, 255, ' + alpha + ')';
     ctx.fill();
     if (!box) return;
-    var r = radius || 0.5;
+    var r = outlineRadius || radius || 0.5;
     var tl = v.worldToScreen(box.minX - r, box.maxY + r);
     var w = (box.maxX - box.minX + 2 * r) * s, h = (box.maxY - box.minY + 2 * r) * s;
     ctx.setLineDash([6, 4]);
@@ -845,11 +921,14 @@
   }
 
   view.addLayer(function drawTints(ctx, v) {
-    if (!state.tints || weapon() !== 'mortar') return;
+    if (!state.tints) return;
     ctx.imageSmoothingEnabled = false;
-    var w = v.tilesWide() * v.scale, h = v.tilesHigh() * v.scale;
-    if (layerOn('fire')) ctx.drawImage(mortarMode() === 'laser' ? state.tints.fireLaser : state.tints.fire, v.ox, v.oy, w, h);
-    if (layerOn('deploy')) ctx.drawImage(state.tints.deploy, v.ox, v.oy, w, h);
+    var w = v.tilesWide() * v.scale, h = v.tilesHigh() * v.scale, wp = weapon();
+    if (layerOn('fire')) {
+      var tint = wp === 'ob' ? state.tints.ob : wp === 'supply' ? state.tints.supply : (mortarMode() === 'laser' ? state.tints.fireLaser : state.tints.fire);
+      ctx.drawImage(tint, v.ox, v.oy, w, h);
+    }
+    if (wp === 'mortar' && layerOn('deploy')) ctx.drawImage(state.tints.deploy, v.ox, v.oy, w, h);
   });
 
   view.addLayer(function drawLabels(ctx, v) {
@@ -1001,24 +1080,68 @@
     });
   });
 
+  // The fire diamond of an incendiary warhead: SpawnFireDiamond fills tiles within
+  // a Manhattan distance of the point.
+  function drawFireDiamond(ctx, v, tile, range, faint) {
+    var p = v.worldToScreen(tile[0], tile[1]), r = range * v.scale;
+    ctx.setLineDash([4, 4]);
+    ctx.lineWidth = 1.5;
+    ctx.strokeStyle = 'rgba(255, 140, 0, ' + (faint ? 0.5 : 0.9) + ')';
+    ctx.fillStyle = 'rgba(255, 140, 0, ' + (faint ? 0.04 : 0.08) + ')';
+    ctx.beginPath();
+    ctx.moveTo(p[0], p[1] - r); ctx.lineTo(p[0] + r, p[1]); ctx.lineTo(p[0], p[1] + r); ctx.lineTo(p[0] - r, p[1]);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+    ctx.setLineDash([]);
+  }
+
+  function drawWeaponZone(ctx, v, tile, faint) {
+    var wp = weapon();
+    if (wp === 'mortar') {
+      var info = fireInfo(tile);
+      drawHitZone(ctx, v, tile, info && info.box, hitRadius(), faint);
+    } else if (wp === 'ob') {
+      // A cluster's blasts scatter a further ±spread around the landing point.
+      var w = currentWarhead(), r = obRadius();
+      drawHitZone(ctx, v, tile, Logic.obScatterBox(tile, obConstants(), 0), r, faint, w && w.spread ? (r || 0) + w.spread : null);
+      if (w && w.fireRange) drawFireDiamond(ctx, v, tile, w.fireRange, faint);
+    }
+  }
+
+  view.addLayer(function drawOb(ctx, v) {
+    var ob = state.planet && calibration() && weapon() === 'ob' && state.store.ob;
+    if (!ob) return;
+    var st = Logic.obState(obConstants(), ob.firedAt, now());
+    var w = Logic.gameToWorld(calibration().offset, ob.target[0], ob.target[1]);
+    if (st.phase === 'flight') {
+      drawHitZone(ctx, v, w, Logic.obScatterBox(w, obConstants(), 0), ob.radius, false);
+      var p = v.worldToScreen(w[0], w[1]);
+      drawText(ctx, st.remaining.toFixed(1), p[0], p[1] - (ob.radius || 1) * v.scale - 10, 13);
+    } else {
+      var q = v.worldToScreen(w[0], w[1]);
+      ctx.strokeStyle = '#ff3d5a';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.arc(q[0], q[1], 7, 0, Math.PI * 2);
+      ctx.stroke();
+    }
+  });
+
   view.addLayer(function drawTarget(ctx, v) {
     var t = state.planet && calibration() && target();
     if (!t) return;
-    if (weapon() === 'mortar' && layerOn('zone')) {
-      var info = fireInfo(t);
-      drawHitZone(ctx, v, t, info && info.box, hitRadius(), false);
-    }
+    if (layerOn('zone')) drawWeaponZone(ctx, v, t, false);
     markTile(ctx, v, t, '#00e5ff', 2.5);
   });
 
   view.addLayer(function drawHoverZone(ctx, v) {
     var t = state.hoverTile;
-    if (!t || !state.planet || !calibration() || weapon() !== 'mortar' || !layerOn('zone')) return;
+    if (!t || !state.planet || !calibration() || weapon() === 'supply' || !layerOn('zone')) return;
     if (pickMode() !== 'target') return;
     var cur = target();
     if (cur && cur[0] === t[0] && cur[1] === t[1]) return;
-    var info = fireInfo(t);
-    drawHitZone(ctx, v, t, info && info.box, hitRadius(), true);
+    drawWeaponZone(ctx, v, t, true);
   });
 
   view.addLayer(function drawHoverTile(ctx, v) {
@@ -1086,6 +1209,13 @@
           esc(fmt(T.hoverDist, { d: info.checks.distance.toFixed(1) })) + ' · ' +
           esc(fmt(T.hoverErr, { ex: info.box.error[0], ey: info.box.error[1] })) +
           (ok ? '' : ' · ' + esc(refusalText(info.checks.reasons[0]))) + '</div>';
+      } else if (weapon() === 'ob') {
+        var oc = obInfo(t);
+        extra = '<div class="tac-hover-fire ' + (oc.ok ? 'ok' : 'bad') + '">' + (oc.ok ? esc(T.obOk) : '✗ ' + esc(obRefusal(oc.reasons[0]))) +
+          (oc.warnings.length ? ' · ⚠' : '') + '</div>';
+      } else if (weapon() === 'supply') {
+        var sc = supplyInfo(t);
+        extra = '<div class="tac-hover-fire ' + (sc.ok ? 'ok' : 'bad') + '">' + (sc.ok ? esc(T.supplyOk) : '✗ ' + esc(supplyRefusal(sc.reasons[0]))) + '</div>';
       }
     } else {
       coords = Logic.formatCoords(t);
@@ -1167,9 +1297,7 @@
     var w = weapon();
     return '<div class="tac-segment" role="group" aria-label="' + esc(T.weaponTitle) + '">' +
       ['mortar', 'ob', 'supply'].map(function (k) {
-        var soon = k !== 'mortar';
-        return '<button type="button" class="tac-seg' + (w === k ? ' on' : '') + '" data-action="weapon" data-weapon="' + k + '"' +
-          (soon ? ' disabled title="' + esc(T.weaponSoon) + '"' : '') + ' aria-pressed="' + (w === k) + '">' + esc(T.weapons[k]) + '</button>';
+        return '<button type="button" class="tac-seg' + (w === k ? ' on' : '') + '" data-action="weapon" data-weapon="' + k + '" aria-pressed="' + (w === k) + '">' + esc(T.weapons[k]) + '</button>';
       }).join('') + '</div>';
   }
 
@@ -1262,12 +1390,90 @@
     return h;
   }
 
+  function targetFieldsHtml(g, labelX, labelY, copyId) {
+    return '<div class="tac-target-fields">' +
+      '<span class="tac-target-field"><span>' + esc(labelX) + '</span><output class="tac-big">' + esc(g[0]) + '</output></span>' +
+      '<span class="tac-target-field"><span>' + esc(labelY) + '</span><output class="tac-big">' + esc(g[1]) + '</output></span>' +
+      '<span class="tac-target-copy" id="' + copyId + '">' + esc(Logic.formatCoords(g)) + '</span>' +
+      button('copyTarget', T.copy) + '</div>';
+  }
+
+  function findHtml() {
+    return '<label class="tac-input-label tac-find" for="tacFind">' + esc(T.findTitle) +
+      '<span class="tac-find-row"><input id="tacFind" class="tac-input" type="text" autocomplete="off" spellcheck="false" placeholder="-100 200" value="' + esc(state.findDraft) + '">' +
+      button('find', T.find) + '</span></label>' + (state.findMessage ? msg(state.findMessage) : '');
+  }
+
+  function obTimerText(st) {
+    if (st.phase === 'flight') {
+      var s = fmt(T.obFlight, { s: st.remaining.toFixed(1) });
+      if (st.next && st.next.event === 'warning') s += ' · ' + fmt(T.obNextWarn, { r: st.next.range, s: (st.next.at - st.elapsed).toFixed(1) });
+      return s;
+    }
+    if (st.phase === 'cooldown') return fmt(T.obCooldown, { s: Math.ceil(st.remaining) });
+    return T.obReady;
+  }
+
+  function obHtml(cs) {
+    var h = '<h2 id="tacTargetTitle">' + esc(T.obTitle) + '</h2>';
+    var w = currentWarhead(), t = target();
+    if (w) {
+      var r = obRadius(), own = typeof state.prefs.hitRadius[w.id] === 'number';
+      h += '<div class="tac-shell-row"><label class="tac-input-label" for="tacWarhead">' + esc(T.warhead) +
+        '<select id="tacWarhead" class="tac-select">' + warheads().map(function (x) {
+          return '<option value="' + esc(x.id) + '"' + (x.id === w.id ? ' selected' : '') + '>' + esc(x.name) + '</option>';
+        }).join('') + '</select></label>' +
+        '<label class="tac-input-label" for="tacObRadius">' + esc(T.radius) +
+        '<span class="tac-find-row"><input id="tacObRadius" class="tac-input" type="number" min="0" max="60" step="0.5" value="' + (r == null ? '' : r) + '">' +
+        (own ? button('resetObRadius', T.radiusReset) : '') + '</span></label></div>' +
+        '<p class="tac-hint">' + esc(warheadNote(w)) + '</p>';
+    }
+    if (!cs.calibrated) return h + '<p class="tac-muted">' + esc(T.mortarNeedsCal) + '</p>';
+    if (!t) {
+      h += '<p class="tac-muted">' + esc(T.targetNone) + '</p>';
+    } else {
+      var g = toGame(t), c = obInfo(t);
+      h += targetFieldsHtml(g, terms().overwatchLongitude || termX(), terms().overwatchLatitude || termY(), 'tacTargetCoords') +
+        (c.ok ? msg({ text: T.obOk, kind: 'ok' }) : msg({ text: fmt(T.obNo, { reason: obRefusal(c.reasons[0]) }), kind: 'error' })) +
+        c.warnings.map(function (k) { return msg({ text: fmt(T.obWarnings[k] || k, { n: c.outside, total: c.total }), kind: 'warn' }); }).join('') +
+        '<p class="tac-muted">' + esc(fmt(T.calAge, { age: formatAge(cs.ageMs) })) + '</p>' + areaHtml(t);
+      var launch = state.store.ob;
+      var st = launch ? Logic.obState(obConstants(), launch.firedAt, now()) : { phase: 'ready' };
+      h += '<div class="tac-actions">' + button('obFire', T.fire, 'btn-primary', !c.ok || st.phase !== 'ready') + '</div>';
+    }
+    var ob = state.store.ob;
+    if (ob) {
+      var s2 = Logic.obState(obConstants(), ob.firedAt, now());
+      h += '<div class="tac-shot' + (s2.phase === 'flight' ? ' flying' : '') + '"><div class="tac-shot-head"><b>' + esc(fmt(T.obLaunched, { coords: Logic.formatCoords(ob.target) })) + '</b></div>' +
+        '<div class="tac-shot-timer" data-ob-timer>' + esc(obTimerText(s2)) + '</div>' +
+        '<div class="tac-actions">' + button('obForget', T.obForget) + '</div></div>';
+    }
+    h += '<p class="tac-hint">' + esc(T.obZoneHint) + '</p>';
+    return h + findHtml();
+  }
+
+  function supplyHtml(cs) {
+    var h = '<h2 id="tacTargetTitle">' + esc(T.supplyTitle) + '</h2>';
+    if (!cs.calibrated) return h + '<p class="tac-muted">' + esc(T.mortarNeedsCal) + '</p>';
+    var t = target();
+    if (!t) return h + '<p class="tac-muted">' + esc(T.targetNone) + '</p>' + findHtml();
+    var g = toGame(t), c = supplyInfo(t);
+    h += targetFieldsHtml(g, terms().supplyLongitude || termX(), terms().supplyLatitude || termY(), 'tacTargetCoords') +
+      (c.ok ? msg({ text: T.supplyOk, kind: 'ok' }) : msg({ text: fmt(T.supplyNo, { reason: supplyRefusal(c.reasons[0]) }), kind: 'error' })) +
+      '<p class="tac-muted">' + esc(fmt(T.calAge, { age: formatAge(cs.ageMs) })) + '</p>' + areaHtml(t);
+    return h + findHtml();
+  }
+
   function layersHtml() {
     var h = '<h2 id="tacLayersTitle">' + esc(T.layersTitle) + '</h2><div class="tac-layers">';
-    Logic.LAYER_KEYS.forEach(function (k) {
-      h += '<label class="tac-check-label"><input type="checkbox" data-layer="' + k + '"' + (layerOn(k) ? ' checked' : '') + '> ' + esc(T.layers[k]) + '</label>';
+    var wp = weapon();
+    var keys = wp === 'mortar' ? Logic.LAYER_KEYS : wp === 'ob' ? ['fire', 'zone', 'markers'] : ['fire', 'markers'];
+    keys.forEach(function (k) {
+      var label = k === 'fire' ? T.fireLabels[wp] : T.layers[k];
+      h += '<label class="tac-check-label"><input type="checkbox" data-layer="' + k + '"' + (layerOn(k) ? ' checked' : '') + '> ' + esc(label) + '</label>';
     });
     h += '</div>';
+    if (wp !== 'mortar') return h;
     var list = shells(), s = currentShell();
     if (s) {
       var r = hitRadius(), own = typeof state.prefs.hitRadius[s.id] === 'number';
@@ -1413,10 +1619,11 @@
       '<section class="tac-section" aria-labelledby="tacCalTitle">' + calibrationHtml(cs) + '</section>' +
       '<section class="tac-section tac-weapon">' + weaponHtml() + '</section>' +
       (weapon() === 'mortar' ? '<section class="tac-section" aria-labelledby="tacMortarTitle">' + mortarHtml(cs) + '</section>' : '') +
-      '<section class="tac-section" aria-labelledby="tacTargetTitle">' + targetHtml(cs) + '</section>' +
+      '<section class="tac-section" aria-labelledby="tacTargetTitle">' +
+        (weapon() === 'ob' ? obHtml(cs) : weapon() === 'supply' ? supplyHtml(cs) : targetHtml(cs)) + '</section>' +
       (weapon() === 'mortar' && cs.calibrated && mortar() ? '<section class="tac-section" aria-labelledby="tacShotsTitle">' + shotsHtml() + '</section>' : '') +
       '<section class="tac-section" aria-labelledby="tacMarkersTitle">' + markersHtml(cs) + '</section>' +
-      (weapon() === 'mortar' ? '<section class="tac-section" aria-labelledby="tacLayersTitle">' + layersHtml() + '</section>' : '') +
+      '<section class="tac-section" aria-labelledby="tacLayersTitle">' + layersHtml() + '</section>' +
       '<p class="tac-muted tac-hint-block">' + esc(T.hint) + '</p>' +
       '<p class="tac-source">' + esc(fmt(T.source, { fork: f.label, sha: f.source.sha.slice(0, 9), date: f.source.date })) + '</p>';
     state.panelKey = panelKey(cs);
@@ -1540,6 +1747,7 @@
       state.store.mortar = null;
       state.store.target = null;
       state.store.shots = [];
+      state.store.ob = null;
       state.session = Logic.newSession(now(), false);
       state.selected = null;
       state.pickMode = null;
@@ -1662,6 +1870,27 @@
     copyDial: function () {
       var el = $('tacDialCoords');
       if (el) copyCoords(el.textContent, el);
+    },
+    obFire: function () {
+      var t = target();
+      if (!t || !calibration()) return;
+      var w = currentWarhead();
+      state.store.ob = { firedAt: now(), target: toGame(t), warhead: w ? w.id : null, radius: obRadius() };
+      saveStore();
+      trackPlanet('tactical_ob_fire');
+      renderAll();
+      startShotTicker();
+    },
+    obForget: function () {
+      state.store.ob = null;
+      saveStore();
+      renderAll();
+    },
+    resetObRadius: function () {
+      var w = currentWarhead();
+      if (w) delete state.prefs.hitRadius[w.id];
+      savePrefs();
+      renderAll();
     },
     markerPick: function () {
       state.pickMode = pickMode() === 'marker' ? null : 'marker';
@@ -1789,6 +2018,19 @@
 
   function tickShots() {
     var c = mortarConstants(), t = now(), flying = false, landed = false;
+    var ob = state.store.ob, obEl = els.panel.querySelector('[data-ob-timer]');
+    if (ob) {
+      var os = Logic.obState(obConstants(), ob.firedAt, t);
+      if (obEl) {
+        var ot = obTimerText(os);
+        if (obEl.textContent !== ot) obEl.textContent = ot;
+        var row = obEl.parentElement;
+        if (row && os.phase !== 'flight' && row.classList.contains('flying')) { row.classList.remove('flying'); landed = true; }
+      }
+      if (os.phase !== 'ready') flying = true;
+      else if (state.obPhase && state.obPhase !== 'ready') landed = true;   // the cooldown ended: the button comes back
+      state.obPhase = os.phase;
+    }
     shots().forEach(function (s) {
       var st = Logic.shotState(s, c, t);
       var el = els.panel.querySelector('[data-shot-timer="' + s.id + '"]');
@@ -1820,6 +2062,14 @@
     else if (id.indexOf('tacImpact-') === 0) state.impactDraft[id.slice(10)] = el.value;
     else if (id === 'tacMarkerLabel') { state.markerDraft.label = el.value; if (state.shape) state.shape.label = el.value; }
     else if (id === 'tacMarkerCoords') state.markerCoords = el.value;
+    else if (id === 'tacObRadius') {
+      var wh = currentWarhead(), rr = parseFloat(String(el.value).replace(',', '.'));
+      if (!wh) return;
+      if (isFinite(rr) && rr >= 0 && rr <= 60) state.prefs.hitRadius[wh.id] = rr;
+      else if (el.value === '') delete state.prefs.hitRadius[wh.id];
+      savePrefs();
+      view.requestDraw();
+    }
     else if (id === 'tacRadius') {
       var s = currentShell(), r = parseFloat(String(el.value).replace(',', '.'));
       if (!s) return;
@@ -1836,6 +2086,12 @@
       state.prefs.shell = el.value;
       savePrefs();
       renderAll();
+    } else if (el.id === 'tacWarhead') {
+      state.prefs.warhead = el.value;
+      savePrefs();
+      renderAll();
+    } else if (el.id === 'tacObRadius') {
+      renderPanel();
     } else if (el.id === 'tacMarkerCat') {
       state.markerDraft.cat = el.value;
       if (state.shape) { state.shape.cat = el.value; view.requestDraw(); }
@@ -2077,7 +2333,7 @@
     var after = calibration() ? calibration().at : null;
     if (after && after !== before) Logic.confirmSameRound(state.session, now());
     renderAll();
-    if (shots().length) startShotTicker();
+    if (shots().length || state.store.ob) startShotTicker();
   });
 
   applyStaticText();
