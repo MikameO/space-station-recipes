@@ -3,6 +3,46 @@
 `data.json` schema version is in `meta.schemaVersion`. Consumers reading this file
 should pin on a compatible range (semver: breaking changes bump major).
 
+## Series T — 2026-09-13 (Tactical map: `tactical.html`, `tactical/index.json` schema 1)
+
+A standalone page for the marine forks — RMC14, Space Stories, Colonial
+Marines Universe and Russian Marine Corps — that turns the in-game tacmap into
+a coordinate and fire-support helper. Every number follows the game code at a
+pinned commit (`ss14_tactical.py`, sparse blobless clones, `REVIEW` list of the
+formula files by blob SHA); none of it has been checked in a live round yet, and
+the page says so.
+
+**Coordinates and calibration.** Click a tile for its world coordinates; the
+planet moves by a random ±500 per axis every round (`rmc.planet_coordinate_variance`),
+so one lased tile calibrates the round and a second, compare-only tile confirms
+it. Coordinates copy as the rangefinder prints them (longitude first, ASCII minus).
+
+**Mortar.** Position, the 15–65 (CMU 8–165) range rings measured centre to
+corner, the no-error square, the aim error `floor(|Δ|/20)` per axis re-rolled
+on every «Set target», the ±10 dial, the [−1, 0, 0, 1] jitter, load/travel/
+warning/impact timers, «Fired» cards, «Landed here» impacts, laser mode; a hit
+zone that follows the cursor with the shell's own blast radius or the player's,
+and the dashed box of everywhere the shell can land.
+
+**OB and supply.** Warheads from `OrbitalCannonWarhead.explosion` (HE 17.54
+tiles, cluster, incendiary fire diamond, Aegis), the −3…+2 scatter, 12/16/20 s
+warnings, 24 s impact, 500 s cooldown; supply-drop tiles minus hard fixtures.
+
+**Layers.** Strike permissions per weapon (`Area` flags OB/CAS/mortar/supply/LZ/
+lasing), CMU levels with the column rule of `CMUTopDownOrdnanceSystem` (a strike
+must be allowed by every floor in the stack; a mortar deploys only under open
+sky), markers in five categories plus lines and areas shared as chat text, a
+grid every 10 tiles in in-game numbers, a ruler, variable areas (`MapInsert`
+variants with the odds from a replay of `SelectMapScenario` + `ProcessMapInsert`
+per planet scenario), landmarks by category with sprites from 24 px per tile.
+
+**Data.** `tactical/index.json` (forks, constants mirrored from the C# and
+checked, terms, planets, levels, scenarios) and `tactical/<fork>/<planet>[.<depth>].json|png`
+(bounds, areas, RLE grid, masks, labels, inserts, landmarks; `h` = sha1 of body
+and PNG). `scripts/check_tactical.py` validates the files, replays the LV-624
+goldens and six synthetic scenario mixes; `scripts/test_tactical_logic.js` covers
+the page logic. Sprite attribution is generated into `NOTICES`.
+
 ## Series R14–R17 — 2026-09-13 (tanks through a beaker, numbered steps, mixes and pills)
 
 The owner ran the vessel planner on a real shift and came back with one
