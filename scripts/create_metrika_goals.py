@@ -113,6 +113,15 @@ GOALS: list[tuple[str, str]] = [
     # Series G — document library (library.html)
     ("library_doc_open",     "Библиотека: открыт документ"),
     ("library_copy_markup",  "Библиотека: скопирована разметка"),
+    # Series H — sections overlay, feedback form, returning-visitor survey
+    ("home_open",            "Разделы: оверлей открыт (auto/intro/manual)"),
+    ("home_card",            "Разделы: клик по карточке"),
+    ("home_autoshow_off",    "Разделы: авто-показ выключен"),
+    ("feedback_open",        "Обратная связь: форма открыта"),
+    ("feedback_submit",      "Обратная связь: заявка отправлена"),
+    ("feedback_fail",        "Обратная связь: отправка не удалась"),
+    ("survey_shown",         "Опрос: показан"),
+    ("survey_dismiss",       "Опрос: закрыт крестиком"),
 ]
 
 
