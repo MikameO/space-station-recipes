@@ -412,11 +412,12 @@ test('T4: where the shell can land — aim error plus jitter, none in laser mode
 
 test('T4: page prefs migrate strictly, layers keep their defaults', () => {
   const d = L.migratePrefs(null);
-  assert.deepStrictEqual(d, { v: 1, weapon: 'mortar', shell: null, warhead: null, hitRadius: {}, layers: { fire: true, deploy: false, rings: true, zone: true, markers: true, grid: true, inserts: true }, timerFrom: 'fire' });
+  assert.deepStrictEqual(d, { v: 1, weapon: 'mortar', shell: null, warhead: null, hitRadius: {}, layers: { fire: true, deploy: false, rings: true, zone: true, markers: true, grid: true, inserts: true, landmarks: true }, landmarks: { light: true, tree: true, table: true, closet: true, bed: true, power: true, door: true, rack: false, crate: false, vending: false, tank: false }, timerFrom: 'fire' });
   const p = L.migratePrefs({ v: 1, weapon: 'ob', shell: 'RMCMortarShellHE', hitRadius: { RMCMortarShellHE: 4.5, bad: 'x', huge: 500 },
-    layers: { fire: false, nope: true, rings: 'yes' }, junk: 1 });
+    layers: { fire: false, nope: true, rings: 'yes' }, landmarks: { rack: true, light: 'no', bogus: true }, junk: 1 });
   assert.deepStrictEqual(p, { v: 1, weapon: 'ob', shell: 'RMCMortarShellHE', warhead: null, hitRadius: { RMCMortarShellHE: 4.5 }, timerFrom: 'fire',
-    layers: { fire: false, deploy: false, rings: true, zone: true, markers: true, grid: true, inserts: true } });
+    layers: { fire: false, deploy: false, rings: true, zone: true, markers: true, grid: true, inserts: true, landmarks: true },
+    landmarks: { light: true, tree: true, table: true, closet: true, bed: true, power: true, door: true, rack: true, crate: false, vending: false, tank: false } });
   assert.strictEqual(L.migratePrefs({ v: 2, weapon: 'ob' }).weapon, 'mortar');
 });
 
@@ -560,6 +561,27 @@ test('T10: insert zones under a tile carry their odds', () => {
   const pl2 = L.preparePlanet(Object.assign({}, pl.json, { inserts: pl.json.inserts.concat([armory]) }));
   assert.deepStrictEqual(L.insertBoxes(pl2).map((b) => [b.name, b.p, b.bounds.minX]), [['Nexus', 0.3, 2], ['Nexus', 0.1, 5], ['Armory', 0.3, 1]]);
   assert.deepStrictEqual(L.insertsAt(pl2, 2, 2), [{ name: 'Nexus', p: 0.3, parts: [] }, { name: 'Armory', p: 0.3, parts: [] }]);
+});
+
+test('T11: landmarks index by tile, a variable area makes them unreliable', () => {
+  const b = { minX: 0, minY: 0, maxX: 9, maxY: 9 };
+  const rows = (fn) => { const r = []; for (let y = b.maxY; y >= b.minY; y--) { const line = []; for (let x = b.minX; x <= b.maxX; x++) line.push(fn(x, y)); r.push(rle(line)); } return r; };
+  const pl = L.preparePlanet({ schemaVersion: 1, fork: 't', planet: 't', level: 0, bounds: b, areas: [['open', 'Open', null, OPEN]],
+    grid: rows(() => 1), masks: { blocked: rows(() => 0), hardWall: rows(() => 0) }, labels: [],
+    inserts: [{ name: 'Nexus', x: 4.5, y: 4.5, p: 0.3, zones: [{ p: 0.3, scenario: null, file: 'a.yml', bounds: { minX: 5, minY: 5, maxX: 8, maxY: 8 }, tiles: 16 }] }],
+    landmarks: { protos: [['CMTable', 'table', 'table', true], ['CMRack', 'rack', 'rack', false], ['CMTable', 'table', 'table', false]],
+      items: [[1, 1, 0, 0], [1, 1, 1, 3], [6, 6, 0, 1], [2, 2, 2, 0], [3, 3, 9, 0]] } });
+  assert.deepStrictEqual(L.landmarksAt(pl, 1, 1).map((i) => [i.cat, i.reliable, i.mayMove, i.inInsert, i.rot]),
+    [['table', true, false, false, 0], ['rack', false, true, false, 3]]);
+  assert.deepStrictEqual(L.landmarksAt(pl, 6, 6).map((i) => [i.reliable, i.inInsert]), [[false, true]]);   // inside Nexus
+  assert.deepStrictEqual(L.landmarksAt(pl, 2, 2).map((i) => [i.cat, i.reliable, i.mayMove]), [['table', false, true]]); // unanchored table
+  assert.deepStrictEqual(L.landmarksAt(pl, 3, 3), []);                                                       // bad proto index dropped
+  assert.deepStrictEqual(L.landmarksAt(pl, 4, 4), []);
+  const prefs = L.migratePrefs(null).landmarks;
+  assert.deepStrictEqual(L.visibleLandmarks(pl, prefs).map((i) => i.x + ',' + i.y), ['1,1', '6,6', '2,2']);   // racks hidden by default
+  assert.strictEqual(L.visibleLandmarks(pl, Object.assign({}, prefs, { rack: true })).length, 4);
+  // a planet file without landmarks (older data) still prepares
+  assert.deepStrictEqual(L.preparePlanet({ schemaVersion: 1, bounds: b, areas: [], grid: rows(() => 0), masks: { blocked: rows(() => 0), hardWall: rows(() => 0) }, labels: [] }).landmarks.items, []);
 });
 
 test('stored planet state: foreign or inconsistent shapes are dropped', () => {

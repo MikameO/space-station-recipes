@@ -113,8 +113,41 @@
       // column, and a mortar deploys only under open sky.
       columnMortar: json.masks.columnMortar ? decodeRows(json.masks.columnMortar, width) : null,
       columnOb: json.masks.columnOb ? decodeRows(json.masks.columnOb, width) : null,
-      openSky: json.masks.openSky ? decodeRows(json.masks.openSky, width) : null
+      openSky: json.masks.openSky ? decodeRows(json.masks.openSky, width) : null,
+      landmarks: indexLandmarks(json)
     };
+  }
+
+  // Landmarks as the page draws them: one object per item with its category row
+  // resolved, indexed by tile. A landmark inside a variable area (an insert zone
+  // with odds above zero) may not be there this round, so it counts as unreliable.
+  function indexLandmarks(json) {
+    var lm = json.landmarks || { protos: [], items: [] };
+    var zones = [];
+    (json.inserts || []).forEach(function (ins) {
+      ins.zones.forEach(function (z) { if (z.p > 0) zones.push(z.bounds); });
+    });
+    var items = [], byTile = {};
+    (lm.items || []).forEach(function (it) {
+      var row = (lm.protos || [])[it[2]];
+      if (!row) return;
+      var x = it[0], y = it[1];
+      var inInsert = zones.some(function (b) { return x >= b.minX && x <= b.maxX && y >= b.minY && y <= b.maxY; });
+      var item = { x: x, y: y, proto: row[0], name: row[1], cat: row[2], mayMove: !row[3], inInsert: inInsert,
+        reliable: !!row[3] && !inInsert, rot: it[3] || 0 };
+      items.push(item);
+      (byTile[x + ',' + y] = byTile[x + ',' + y] || []).push(item);
+    });
+    return { items: items, byTile: byTile };
+  }
+
+  function landmarksAt(planet, x, y) {
+    return planet.landmarks.byTile[x + ',' + y] || [];
+  }
+
+  // The landmarks the category filters let through.
+  function visibleLandmarks(planet, filters) {
+    return planet.landmarks.items.filter(function (it) { return !!filters[it.cat]; });
   }
 
   // Whether a strike of one kind may reach the ground at a tile: the column rule
@@ -484,8 +517,19 @@
   // Page preferences shared by every planet: weapon, shell, a player's own hit
   // radius per shell, and which layers are on. Unknown keys are dropped.
   var PREFS_VERSION = 1;
-  var LAYER_KEYS = ['fire', 'deploy', 'rings', 'zone', 'markers', 'grid', 'inserts'];
-  var DEFAULT_LAYERS = { fire: true, deploy: false, rings: true, zone: true, markers: true, grid: true, inserts: true };
+  var LAYER_KEYS = ['fire', 'deploy', 'rings', 'zone', 'markers', 'grid', 'inserts', 'landmarks'];
+  var DEFAULT_LAYERS = { fire: true, deploy: false, rings: true, zone: true, markers: true, grid: true, inserts: true, landmarks: true };
+
+  // Landmark categories (T11) in display order. A category that stays put is
+  // shown by default; one the round may move (racks, crates, vending machines,
+  // tanks) is hidden until the player asks for it.
+  var LANDMARK_CATS = [
+    { id: 'light', reliable: true }, { id: 'tree', reliable: true }, { id: 'table', reliable: true },
+    { id: 'closet', reliable: true }, { id: 'bed', reliable: true }, { id: 'power', reliable: true },
+    { id: 'door', reliable: true },
+    { id: 'rack', reliable: false }, { id: 'crate', reliable: false }, { id: 'vending', reliable: false },
+    { id: 'tank', reliable: false }
+  ];
 
   // ── grid and ruler ───────────────────────────────────────────────────────
 
@@ -508,8 +552,9 @@
   }
 
   function migratePrefs(raw) {
-    var out = { v: PREFS_VERSION, weapon: 'mortar', shell: null, warhead: null, hitRadius: {}, layers: {}, timerFrom: 'fire' };
+    var out = { v: PREFS_VERSION, weapon: 'mortar', shell: null, warhead: null, hitRadius: {}, layers: {}, landmarks: {}, timerFrom: 'fire' };
     LAYER_KEYS.forEach(function (k) { out.layers[k] = DEFAULT_LAYERS[k]; });
+    LANDMARK_CATS.forEach(function (c) { out.landmarks[c.id] = c.reliable; });
     if (!raw || typeof raw !== 'object' || raw.v !== PREFS_VERSION) return out;
     if (raw.weapon === 'mortar' || raw.weapon === 'ob' || raw.weapon === 'supply') out.weapon = raw.weapon;
     if (raw.timerFrom === 'load') out.timerFrom = 'load';
@@ -523,6 +568,9 @@
     }
     if (raw.layers && typeof raw.layers === 'object') {
       LAYER_KEYS.forEach(function (k) { if (typeof raw.layers[k] === 'boolean') out.layers[k] = raw.layers[k]; });
+    }
+    if (raw.landmarks && typeof raw.landmarks === 'object') {
+      LANDMARK_CATS.forEach(function (c) { if (typeof raw.landmarks[c.id] === 'boolean') out.landmarks[c.id] = raw.landmarks[c.id]; });
     }
     return out;
   }
@@ -705,6 +753,9 @@
     shapeCentre: shapeCentre,
     insertsAt: insertsAt,
     insertBoxes: insertBoxes,
+    LANDMARK_CATS: LANDMARK_CATS,
+    landmarksAt: landmarksAt,
+    visibleLandmarks: visibleLandmarks,
     impactBox: impactBox,
     shotState: shotState,
     obState: obState,

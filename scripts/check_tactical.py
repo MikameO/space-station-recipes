@@ -90,6 +90,50 @@ def flag_counts(planet: dict) -> dict[str, int]:
     return counts
 
 
+def check_sprites(fork: dict) -> None:
+    """The fork's landmark atlas: the files exist, the hash matches, every box lies
+    inside the image, and every landmark prototype of the fork has a box or is
+    known to draw nothing (a prototype without a Sprite component)."""
+    key, sp = fork.get("key"), fork.get("sprites")
+    if not (isinstance(sp, dict) and isinstance(sp.get("file"), str) and re.fullmatch(r"[0-9a-f]{12}", str(sp.get("h", "")))):
+        fail(f"{key}: sprites entry missing or malformed")
+        return
+    jp, pp = DATA / f"{sp['file']}.json", DATA / f"{sp['file']}.png"
+    if not jp.is_file() or not pp.is_file():
+        fail(f"{key}: {sp['file']}.json/.png missing")
+        return
+    data = json.loads(jp.read_text(encoding="utf-8"))
+    png = pp.read_bytes()
+    stored_h = data.pop("h", None)
+    body = json.dumps(data, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
+    if stored_h != sp["h"] or hashlib.sha1(body + png).hexdigest()[:12] != stored_h:
+        fail(f"{key}: sprites hash mismatch")
+    w, h = png_size(png)
+    protos = data.get("protos") or {}
+    for proto, box in protos.items():
+        if not (isinstance(box, list) and len(box) == 4 and all(isinstance(v, int) and v >= 0 for v in box)
+                and box[2] > 0 and box[3] > 0 and box[0] + box[2] <= w and box[1] + box[3] <= h):
+            fail(f"{key}: sprite box of {proto} outside the atlas")
+            break
+    for src in data.get("rsi") or []:
+        if not (isinstance(src, dict) and src.get("path") and isinstance(src.get("license"), str)):
+            fail(f"{key}: malformed RSI source {src!r}")
+            break
+        if not src["license"]:
+            fail(f"{key}: RSI {src['path']} states no license")
+    used = set()
+    for meta in fork.get("planets") or []:
+        for lv in meta.get("levels") or []:
+            stem = meta["file"] if lv["depth"] == 0 else f"{meta['file']}.{lv['depth']}"
+            planet = json.loads((DATA / f"{stem}.json").read_text(encoding="utf-8"))
+            used |= {row[0] for row in (planet.get("landmarks") or {}).get("protos") or []}
+    without = sorted(used - set(protos))
+    if len(without) > max(3, len(used) // 20):
+        fail(f"{key}: {len(without)} of {len(used)} landmark prototypes have no sprite, e.g. {without[:5]}")
+    print(f"ok   {key}: sprites for {len(protos)} prototypes, {len(data.get('rsi') or [])} RSI"
+          + (f", none for {without}" if without else ""))
+
+
 def check_planet(fork: dict, meta: dict) -> None:
     where = f"{fork['key']}/{meta['id']}"
     if meta.get("file") != f"{fork['key']}/{meta['id']}":
@@ -156,6 +200,25 @@ def check_planet(fork: dict, meta: dict) -> None:
             if not ok:
                 fail(f"{where_lv}: malformed insert {str(ins)[:80]!r}")
                 break
+        lm = planet.get("landmarks")
+        extractor = sys.modules.get("ss14_tactical")
+        cats = set(extractor.LANDMARK_CATEGORIES) if extractor is not None else None
+        ok = isinstance(lm, dict) and isinstance(lm.get("protos"), list) and isinstance(lm.get("items"), list)
+        if ok:
+            for row in lm["protos"]:
+                if not (isinstance(row, list) and len(row) == 4 and isinstance(row[0], str) and isinstance(row[1], str)
+                        and isinstance(row[2], str) and (cats is None or row[2] in cats) and isinstance(row[3], bool)):
+                    ok = False
+                    break
+            bnd = planet["bounds"]
+            for it in lm["items"]:
+                if not (isinstance(it, list) and len(it) == 4 and all(isinstance(v, int) for v in it)
+                        and bnd["minX"] <= it[0] <= bnd["maxX"] and bnd["minY"] <= it[1] <= bnd["maxY"]
+                        and 0 <= it[2] < len(lm["protos"]) and 0 <= it[3] <= 3):
+                    ok = False
+                    break
+        if not ok:
+            fail(f"{where_lv}: malformed landmarks")
         stored_h = planet.pop("h", None)
         body = json.dumps(planet, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
         h = hashlib.sha1(body + raw_png).hexdigest()[:12]
@@ -255,6 +318,7 @@ def main() -> int:
             fail(f"{key}: duplicate planet ids")
         for meta in planets:
             check_planet(fork, meta)
+        check_sprites(fork)
         print(f"ok   {key}: {len(planets)} planets checked")
     if failures:
         print(f"\n{len(failures)} problem(s)")

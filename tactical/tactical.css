@@ -297,6 +297,7 @@ body.tac-body {
 .tac-ruler { font-family: ui-monospace, "Cascadia Mono", Consolas, monospace; font-size: 15px; color: var(--text-bright); }
 
 .tac-hover-insert { color: var(--amber); font-size: 12px; }
+.tac-hover-landmark { color: var(--cyan); font-size: 12px; }
 .tac-hover-fire { font-size: 12px; margin-top: 2px; }
 .tac-hover-fire.ok { color: var(--phosphor); }
 .tac-hover-fire.bad { color: var(--red-alert); }
@@ -342,6 +343,11 @@ body.tac-body {
 
 .tac-check-label { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--text-main); cursor: pointer; }
 .tac-check-label input { accent-color: var(--phosphor); }
+.tac-landmarks { margin: 2px 0 8px; padding: 6px 8px; border: 1px solid var(--border-subtle); border-radius: 6px; }
+.tac-landmarks-title { font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-sub); margin-bottom: 4px; }
+.tac-landmarks-row { display: flex; flex-wrap: wrap; gap: 3px 12px; }
+.tac-landmarks-row .tac-check-label { font-size: 12px; }
+.tac-landmarks .tac-hint { margin: 6px 0 2px; }
 
 .tac-mode { display: flex; align-items: center; gap: 8px; margin-top: 8px; font-size: 13px; }
 .tac-segment.small { flex: 1; }

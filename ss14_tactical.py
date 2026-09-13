@@ -744,7 +744,7 @@ def parse_map(text: str, path: str, allow_no_areas: bool = False) -> dict:
             if not proto or "pos" not in tr:
                 continue
             x, y = (float(v) for v in str(tr["pos"]).split(","))
-            ents.append({"proto": proto, "x": x, "y": y, "parent": tr.get("parent"),
+            ents.append({"proto": proto, "x": x, "y": y, "parent": tr.get("parent"), "rot": tr.get("rot"),
                          "anchored": tr.get("anchored"), "name": (comps.get("MetaData") or {}).get("name")})
     if not grids:
         raise TacticalError(f"{path}: no MapGrid")
@@ -787,6 +787,90 @@ def rle_rows(width: int, height: int, value_at) -> list[list[int]]:
                 prev, run = v, 1
         rows.append(out + [prev, run])
     return rows
+
+
+# ── landmarks (T11) ──────────────────────────────────────────────────────────
+
+# Category, whether the category counts as reliable (the spec's list: lights,
+# trees, tables, closets, beds, power and doors stay put; racks, crates, vending
+# machines and tanks may be moved), and the test on the prototype chain. The
+# first matching rule wins, so lights are recognised before power boxes that
+# merely glow. Chairs and loose items are not landmarks.
+LANDMARK_RULES: list[tuple[str, bool, "callable"]] = [
+    ("light", True, lambda ids, comps: "PoweredLight" in comps
+     or re.search(r"Floodlight|LandingZoneLight|LampPost|Streetlight", ids) is not None),
+    ("tree", True, lambda ids, comps: re.search(r"(^| )\w*Tree\w*", ids) is not None and "Wall" not in ids),
+    ("table", True, lambda ids, comps: re.search(r"(^| )(TableBase|CMTable|RMCTable|Table)", ids) is not None
+     or re.search(r"(^| )(CMTable|RMCTable)\w*", ids) is not None),
+    ("bed", True, lambda ids, comps: re.search(r"(^| )(Bed|CMBed|MedicalBed|RMCBed)( |$)", ids) is not None
+     or "HealOnBuckle" in comps),
+    ("power", True, lambda ids, comps: re.search(r"(^| )\w*(Apc|Generator|SMES|Substation|SolarPanel)\w*", ids) is not None),
+    ("door", True, lambda ids, comps: "Door" in comps and re.search(r"Xeno|Curtain|FogWall", ids) is None),
+    ("crate", False, lambda ids, comps: re.search(r"Crate|OreBox", ids) is not None),
+    ("closet", True, lambda ids, comps: "EntityStorage" in comps),
+    ("vending", False, lambda ids, comps: "VendingMachine" in comps or re.search(r"Vendor|ColMarTech", ids) is not None),
+    ("rack", False, lambda ids, comps: re.search(r"(^| )\w*Rack( |$)", ids) is not None),
+    ("tank", False, lambda ids, comps: re.search(r"StorageTank|TankReagent|WaterTank|FuelTank|Canister", ids) is not None),
+]
+LANDMARK_CATEGORIES = [r[0] for r in LANDMARK_RULES]
+
+
+def landmark_class(protos: Protos, proto: str) -> tuple[str, bool, bool] | None:
+    """(category, category reliable, pullable) of a prototype, or None when it is
+    no landmark: markers, items, xeno structures and anything outside the rules."""
+    try:
+        chain = protos.chain(protos.ents, proto)
+    except TacticalError:
+        return None
+    ids = " ".join(p["id"] for p in chain)
+    if re.search(r"(^| )(MarkerBase|BaseItem)( |$)", ids):
+        return None
+    comps = {c.get("type") for p in chain for c in p.get("components") or [] if isinstance(c, dict)}
+    for cat, reliable, test in LANDMARK_RULES:
+        if test(ids, comps):
+            return cat, reliable, "Pullable" in comps
+    return None
+
+
+def quarter_turns(rot) -> int:
+    """A map Transform `rot` ("1.57 rad") as quarter turns 0..3, counter-clockwise."""
+    if not rot:
+        return 0
+    try:
+        rad = float(str(rot).split()[0])
+    except ValueError:
+        return 0
+    return int(round(rad / (math.pi / 2))) % 4
+
+
+def planet_landmarks(protos: Protos, parsed: dict) -> dict:
+    """Landmarks of one surface: `protos` rows [proto, name, category, reliable]
+    and `items` [x, y, protoIndex, rot]. A reliable category still yields an
+    unreliable row when the map leaves a pullable instance unanchored."""
+    classes: dict[str, tuple | None] = {}
+    rows: dict[tuple[str, bool], int] = {}
+    proto_rows: list[list] = []
+    items: list[list] = []
+    tiles = parsed["tiles"]
+    for e in parsed["entities"]:
+        if e["proto"] not in classes:
+            classes[e["proto"]] = landmark_class(protos, e["proto"])
+        cls = classes[e["proto"]]
+        if cls is None:
+            continue
+        tile = (math.floor(e["x"]), math.floor(e["y"]))
+        if tile not in tiles:
+            continue
+        cat, cat_reliable, pullable = cls
+        anchored = bool(protos.comp_field(e["proto"], "Transform", "anchored", False)) if e["anchored"] is None else bool(e["anchored"])
+        reliable = cat_reliable and (anchored or not pullable)
+        key = (e["proto"], reliable)
+        if key not in rows:
+            rows[key] = len(proto_rows)
+            proto_rows.append([e["proto"], protos.name(e["proto"]), cat, reliable])
+        items.append([tile[0], tile[1], rows[key], quarter_turns(e["rot"])])
+    items.sort()
+    return {"protos": proto_rows, "items": items}
 
 
 def build_planet(fork: str, planet: dict, parsed: dict, protos: Protos, impassable: set[str],
@@ -908,6 +992,7 @@ def build_planet(fork: str, planet: dict, parsed: dict, protos: Protos, impassab
         "masks": masks,
         "labels": labels,
         "inserts": inserts or [],
+        "landmarks": planet_landmarks(protos, parsed),
     }
     body = json.dumps(data, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
     data["h"] = hashlib.sha1(body + png).hexdigest()[:12]
@@ -925,6 +1010,7 @@ def build_planet(fork: str, planet: dict, parsed: dict, protos: Protos, impassab
     if column is not None:
         stats["column"] = {key: sum(1 for t in tiles if t in column[key]) for key in ("columnMortar", "columnOb", "openSky")}
     stats["inserts"] = {i["name"]: i["p"] for i in inserts or []}
+    stats["landmarks"] = Counter(data["landmarks"]["protos"][it[2]][2] for it in data["landmarks"]["items"])
     return data, png, stats
 
 
@@ -1172,6 +1258,159 @@ def insert_footprint(co: Checkout, fam: dict, spawn: str) -> dict | None:
     return {"minX": min(xs), "minY": min(ys), "maxX": max(xs), "maxY": max(ys), "tiles": len(tiles)}
 
 
+# ── sprites (T12) ────────────────────────────────────────────────────────────
+
+ATLAS_WIDTH = 1024
+NOTICES_PATH = SCRIPT_DIR / "NOTICES"
+NOTICES_START = "   [tactical sprites — generated by ss14_tactical.py, do not edit by hand]"
+NOTICES_END = "   [end of tactical sprites]"
+
+
+def sprite_ref(protos: Protos, proto: str) -> tuple[str, str | None] | None:
+    """(rsi path, state) the game shows for a prototype: the Sprite component's
+    own state, else its first layer with a state (a layer may name its own rsi),
+    else the Icon state. None when the prototype draws nothing."""
+    if protos.comp(proto, "Sprite") is None:
+        return None
+    rsi = protos.comp_field(proto, "Sprite", "sprite")
+    state = protos.comp_field(proto, "Sprite", "state")
+    if not state:
+        for layer in protos.comp_field(proto, "Sprite", "layers") or []:
+            if isinstance(layer, dict) and layer.get("state") and layer.get("visible") is not False:
+                rsi = layer.get("sprite") or rsi
+                state = layer["state"]
+                break
+    if not state:
+        rsi = rsi or protos.comp_field(proto, "Icon", "sprite")
+        state = protos.comp_field(proto, "Icon", "state")
+    if not rsi:
+        return None
+    # `/Textures/x.rsi` (a resource path) and `x.rsi` (relative to Textures) both occur
+    path = str(rsi).strip("/")
+    if path.startswith("Textures/"):
+        path = path[len("Textures/"):]
+    return path, (str(state) if state else None)
+
+
+def pick_state(meta: dict, wanted: str | None) -> str | None:
+    """The state to cut: the wanted one, else `full` (icon-smoothed structures),
+    else the first state the RSI declares."""
+    names = [str(s.get("name")) for s in meta.get("states") or [] if isinstance(s, dict) and s.get("name")]
+    if not names:
+        return None
+    if wanted in names:
+        return wanted
+    if "full" in names:
+        return "full"
+    return names[0]
+
+
+def fork_sprites(co: Checkout, fam: dict, protos: Protos, used: list[str]) -> tuple[bytes, dict]:
+    """An atlas of the first (south) frame of every landmark prototype's sprite,
+    at the RSI's own pixel size, and its map plus the RSI licence lines."""
+    refs: dict[str, tuple[str, str | None]] = {}
+    for proto in used:
+        ref = sprite_ref(protos, proto)
+        if ref:
+            refs[proto] = ref
+    roots = [f"{root}/Textures" for root in fam["map_roots"]]
+    rsi_dir: dict[str, str] = {}
+    for rsi, _ in refs.values():
+        if rsi in rsi_dir:
+            continue
+        found = next((f"{root}/{rsi}" for root in roots if co.exists(f"{root}/{rsi}/meta.json")), None)
+        if found:
+            rsi_dir[rsi] = found
+    co.checkout_more([f"/{d}/" for d in sorted(set(rsi_dir.values()))])
+    frames: dict[str, Image.Image] = {}       # "rsi|state" -> cut frame
+    sources: dict[str, dict] = {}
+    missing = Counter()
+    for proto, (rsi, wanted) in sorted(refs.items()):
+        folder = rsi_dir.get(rsi)
+        if not folder:
+            missing[rsi] += 1
+            continue
+        try:
+            meta = json.loads(co.read(f"{folder}/meta.json"))
+        except (TacticalError, ValueError):
+            missing[rsi] += 1
+            continue
+        state = pick_state(meta, wanted)
+        if not state:
+            missing[rsi] += 1
+            continue
+        key = f"{rsi}|{state}"
+        if key not in frames:
+            png = co.dir / folder / f"{state}.png"
+            if not png.is_file():
+                missing[rsi] += 1
+                continue
+            size = meta.get("size") or {}
+            w, h = int(size.get("x", 32)), int(size.get("y", 32))
+            with Image.open(png) as im:
+                frames[key] = im.convert("RGBA").crop((0, 0, w, h))
+        sources.setdefault(rsi, {"path": rsi, "license": str(meta.get("license") or ""),
+                                 "copyright": str(meta.get("copyright") or "")})
+        refs[proto] = (key, state)
+    if missing:
+        print(f"  note sprites: {sum(missing.values())} prototypes without a readable RSI, e.g. {missing.most_common(3)}", flush=True)
+    # shelf packing, tallest first; every frame is placed once, prototypes share it
+    order = sorted(frames, key=lambda k: (-frames[k].height, -frames[k].width, k))
+    placed: dict[str, tuple[int, int, int, int]] = {}
+    x = y = shelf = 0
+    for key in order:
+        fr = frames[key]
+        if x + fr.width > ATLAS_WIDTH:
+            x, y, shelf = 0, y + shelf, 0
+        placed[key] = (x, y, fr.width, fr.height)
+        x += fr.width
+        shelf = max(shelf, fr.height)
+    atlas = Image.new("RGBA", (ATLAS_WIDTH, y + shelf) if placed else (1, 1), (0, 0, 0, 0))
+    for key, (px_, py_, _, _) in placed.items():
+        atlas.paste(frames[key], (px_, py_))
+    buf = io.BytesIO()
+    atlas.save(buf, format="PNG", optimize=True)
+    png_bytes = buf.getvalue()
+    data = {
+        "schemaVersion": SCHEMA,
+        "fork": co.fork,
+        "image": "sprites.png",
+        "protos": {proto: list(placed[key]) for proto, (key, _) in sorted(refs.items()) if key in placed},
+        "rsi": [sources[k] for k in sorted(sources)],
+    }
+    body = json.dumps(data, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
+    data["h"] = hashlib.sha1(body + png_bytes).hexdigest()[:12]
+    return png_bytes, data
+
+
+def update_notices(out_dir: Path) -> None:
+    """Rewrite the generated block of NOTICES from every fork's sprites.json:
+    one line per RSI with its licence and copyright, forks that share a path
+    and copyright listed once."""
+    if not NOTICES_PATH.is_file():
+        return
+    seen: dict[tuple[str, str, str], list[str]] = {}
+    for sj in sorted(out_dir.glob("*/sprites.json")):
+        data = json.loads(sj.read_text(encoding="utf-8"))
+        for src in data.get("rsi") or []:
+            seen.setdefault((src["path"], src["license"], src["copyright"]), []).append(data["fork"])
+    lines = [NOTICES_START, ""]
+    for (path, lic, copy), forks in sorted(seen.items()):
+        lines.append(f"   {path}")
+        lines.append(f"      forks: {', '.join(forks)}; license: {lic or 'not stated'}")
+        if copy:
+            lines.append(f"      {copy}")
+    lines += ["", NOTICES_END]
+    text = NOTICES_PATH.read_text(encoding="utf-8")
+    start, end = text.find(NOTICES_START), text.find(NOTICES_END)
+    if start < 0 or end < 0:
+        raise TacticalError("NOTICES lacks the tactical sprites markers")
+    new = text[:start] + "\n".join(lines) + text[end + len(NOTICES_END):]
+    with open(NOTICES_PATH, "w", encoding="utf-8", newline="") as f:
+        f.write(new)
+    print(f"  NOTICES: {len(seen)} RSI lines", flush=True)
+
+
 def review_list(co: Checkout, family: str) -> list[dict]:
     out = []
     for path in FAMILIES[family]["code_files"]:
@@ -1245,6 +1484,8 @@ def build_fork(fork: str, out_dir: Path, only_planet: str | None = None, sha: st
     fork_dir.mkdir(parents=True, exist_ok=True)
     golden = GOLDEN.get((fork, co.sha[:9]), {})
     entries = {p["id"]: p for p in (previous or {}).get("planets", [])} if only_planet else {}
+    for e in entries.values():
+        e["_landmarkProtos"] = []
     for planet in planets:
         print(f"  {planet['id']}: {', '.join(f'{lv['depth']}={lv['map']}' for lv in planet['levels'])}", flush=True)
         parsed_levels = []
@@ -1260,6 +1501,7 @@ def build_fork(fork: str, out_dir: Path, only_planet: str | None = None, sha: st
         if multi_level:
             columns = column_masks([(d, parsed, area_flags(protos, parsed)) for d, parsed in parsed_levels])
         level_entries = []
+        landmark_protos: list[list] = []
         footprints: dict[str, dict | None] = {}
         for depth, parsed in parsed_levels:
             inserts = planet_inserts(protos, parsed, planet, co, family, footprints) if depth == 0 else None
@@ -1272,6 +1514,7 @@ def build_fork(fork: str, out_dir: Path, only_planet: str | None = None, sha: st
             extra = f" column={stats['column']}" if "column" in stats else ""
             if stats.get("inserts"):
                 extra += f" inserts={stats['inserts']}"
+            extra += f" landmarks={dict(stats['landmarks'].most_common())}"
             print(f"    [{depth:+d}] {stats['size'][0]}x{stats['size'][1]} tiles={stats['tiles']} areas={stats['areas']} "
                   f"labels={stats['labels']} blocked={stats['blocked']} hardWall={stats['hardWall']} "
                   f"flags={stats['flags']}{extra} png={len(png)}B h={data['h']}", flush=True)
@@ -1283,18 +1526,32 @@ def build_fork(fork: str, out_dir: Path, only_planet: str | None = None, sha: st
                     raise TacticalError(f"{fork}/{planet['id']}: golden mismatch\n    expected {expected}\n    got      {got}")
                 print("    golden ok", flush=True)
             level_entries.append({"depth": depth, "h": data["h"]})
+            landmark_protos += data["landmarks"]["protos"]
         entries[planet["id"]] = {
             "id": planet["id"], "proto": planet["proto"], "name": planet["name"],
             "file": f"{fork}/{planet['id']}", "h": level_entries[[l["depth"] for l in level_entries].index(0)]["h"],
             "inRotation": True, "minPlayers": planet["minPlayers"], "maxPlayers": planet["maxPlayers"],
             "levels": level_entries, "scenarios": planet["scenarios"],
+            "_landmarkProtos": landmark_protos,
         }
     order = [p["id"] for p in discover_planets(protos, cfg["family"], co)]
+    used = sorted({row[0] for e in entries.values() for row in e.get("_landmarkProtos", [])})
+    for e in entries.values():
+        e.pop("_landmarkProtos", None)
+    sprites_h = (previous or {}).get("sprites", {}).get("h") if only_planet else None
+    if not only_planet or not sprites_h:
+        png_bytes, sprites = fork_sprites(co, family, protos, used)
+        (fork_dir / "sprites.png").write_bytes(png_bytes)
+        (fork_dir / "sprites.json").write_text(
+            json.dumps(sprites, ensure_ascii=False, separators=(",", ":")) + "\n", encoding="utf-8")
+        sprites_h = sprites["h"]
+        print(f"  sprites: {len(sprites['protos'])} prototypes, {len(sprites['rsi'])} RSI, {len(png_bytes)}B h={sprites_h}", flush=True)
     for r in review:
         print(f"  REVIEW {r['path']} blob {r['blob'][:12]}", flush=True)
     return {
         "key": fork, "label": cfg["label"], "family": cfg["family"], "locale": cfg["locale"],
         "source": {"sha": co.sha, "date": co.date},
+        "sprites": {"file": f"{fork}/sprites", "h": sprites_h},
         "constants": constants, "terms": terms, "review": review,
         "planets": [entries[i] for i in order if i in entries],
     }
@@ -1320,6 +1577,7 @@ def build(forks: list[str], only_planet: str | None) -> None:
         # Written after every fork: a later fork's network failure keeps this one usable.
         write_index({"schemaVersion": SCHEMA, "built": date.today().isoformat(), "forks": list(by_key.values())}, OUT_DIR)
         print(f"wrote {OUT_DIR / 'index.json'} ({fork})", flush=True)
+    update_notices(OUT_DIR)
 
 
 def verify() -> int:

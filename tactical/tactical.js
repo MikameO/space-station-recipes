@@ -138,7 +138,7 @@
       askNote: 'same round?',
       mismatchNote: 'check tile did not match',
       layersTitle: 'Layers and hit zone',
-      layers: { fire: 'Where the mortar cannot hit (red)', deploy: 'Where it can be deployed (green)', rings: 'Range rings and the no-error square', zone: 'Hit zone at the cursor and the target', markers: 'Markers, lines and areas', grid: 'Grid every 10 tiles (50 zoomed out) with in-game numbers', inserts: 'Variable areas — hatched, with the odds' },
+      layers: { fire: 'Where the mortar cannot hit (red)', deploy: 'Where it can be deployed (green)', rings: 'Range rings and the no-error square', zone: 'Hit zone at the cursor and the target', markers: 'Markers, lines and areas', grid: 'Grid every 10 tiles (50 zoomed out) with in-game numbers', inserts: 'Variable areas — hatched, with the odds', landmarks: 'Landmarks by category (zoomed in)' },
       shell: 'Shell',
       shellKinds: { he: 'High explosive', incendiary: 'Incendiary', flare: 'Flare / camera', other: '{name}' },
       radius: 'Radius, tiles',
@@ -234,7 +234,14 @@
       insertHover: 'may differ this round: {list}',
       insertScenario: 'in scenario {s}',
       insertNoScenario: 'only without a special scenario',
-      insertsNote: 'Hatched: parts of the map the round may swap for another version (barricades, ruins, survivors). The number is the chance that version is in play; landmarks inside are unreliable.'
+      insertsNote: 'Hatched: parts of the map the round may swap for another version (barricades, ruins, survivors). The number is the chance that version is in play; landmarks inside are unreliable.',
+      landmarksTitle: 'Landmarks',
+      landmarkCats: { light: 'Lights and lamps', tree: 'Trees', table: 'Tables', closet: 'Closets and lockers', bed: 'Beds', power: 'APCs and generators', door: 'Doors and airlocks', rack: 'Racks', crate: 'Crates', vending: 'Vending machines', tank: 'Tanks' },
+      landmarksMayMove: 'May be moved during the round, off by default:',
+      landmarksZoom: 'Landmarks show from 6 px per tile as category glyphs and from 24 px as the game\'s own sprites — zoom in. Dimmed: may move, or inside a variable area.',
+      landmarkHover: 'Landmark: {list}',
+      landmarkMayMove: 'may move',
+      landmarkInInsert: 'inside a variable area',
     },
     ru: {
       pageName: 'Тактическая карта',
@@ -344,7 +351,7 @@
       askNote: 'тот же раунд?',
       mismatchNote: 'сверка не совпала',
       layersTitle: 'Слои и зона поражения',
-      layers: { fire: 'Куда миномёт не бьёт (красным)', deploy: 'Где можно развернуть (зелёным)', rings: 'Кольца дальности и квадрат без ошибки', zone: 'Зона поражения у курсора и у цели', markers: 'Метки, линии и области', grid: 'Сетка через 10 тайлов (50 при отдалении) с игровыми числами', inserts: 'Изменчивые участки — штриховка и вероятность' },
+      layers: { fire: 'Куда миномёт не бьёт (красным)', deploy: 'Где можно развернуть (зелёным)', rings: 'Кольца дальности и квадрат без ошибки', zone: 'Зона поражения у курсора и у цели', markers: 'Метки, линии и области', grid: 'Сетка через 10 тайлов (50 при отдалении) с игровыми числами', inserts: 'Изменчивые участки — штриховка и вероятность', landmarks: 'Ориентиры по категориям (при приближении)' },
       shell: 'Снаряд',
       shellKinds: { he: 'Фугасный', incendiary: 'Зажигательный', flare: 'Осветительный / камера', other: '{name}' },
       radius: 'Радиус, тайлов',
@@ -440,7 +447,14 @@
       insertHover: 'в этом раунде может отличаться: {list}',
       insertScenario: 'при сценарии {s}',
       insertNoScenario: 'только без особого сценария',
-      insertsNote: 'Штриховка — участки, которые раунд может заменить другой версией (баррикады, руины, выжившие). Число — вероятность, что эта версия в игре; ориентиры внутри ненадёжны.'
+      insertsNote: 'Штриховка — участки, которые раунд может заменить другой версией (баррикады, руины, выжившие). Число — вероятность, что эта версия в игре; ориентиры внутри ненадёжны.',
+      landmarksTitle: 'Ориентиры',
+      landmarkCats: { light: 'Фонари и лампы', tree: 'Деревья', table: 'Столы', closet: 'Шкафы и шкафчики', bed: 'Кровати', power: 'Щитки и генераторы', door: 'Двери и шлюзы', rack: 'Стеллажи', crate: 'Ящики', vending: 'Торговые автоматы', tank: 'Баки' },
+      landmarksMayMove: 'Могут сдвинуть за раунд, по умолчанию скрыты:',
+      landmarksZoom: 'Ориентиры видны от 6 px на тайл значками категорий, от 24 px — спрайтами игры; приблизьте карту. Приглушённые: могут сдвинуть или стоят в изменчивом участке.',
+      landmarkHover: 'Ориентир: {list}',
+      landmarkMayMove: 'могут сдвинуть',
+      landmarkInInsert: 'в изменчивом участке',
     }
   };
   var T = L10N[LANG];
@@ -516,6 +530,7 @@
     meta: null,       // planet entry in the index
     level: 0,         // depth of the level shown (CMU planets have several)
     planet: null,     // Logic.preparePlanet(json)
+    sprites: null,    // { key, map, img } — the fork's landmark atlas once fetched
     tints: null,      // offscreen canvases: fire (refused), deploy (allowed)
     hoverTile: null,
     loadToken: 0,
@@ -1067,6 +1082,126 @@
     });
   });
 
+  // ── landmarks (T11): category glyphs from 6 px per tile ─────────────────
+
+  var LM_COLOURS = { light: '#ffe066', tree: '#39ff85', table: '#c8a06a', closet: '#9fb3c8', bed: '#e8ecf4', power: '#ffb627',
+    door: '#00e5ff', rack: '#8a97a8', crate: '#b5835a', vending: '#e879f9', tank: '#5aa9ff' };
+
+  // One glyph per category, drawn inside the tile square (x, y, s). Every glyph
+  // is a filled shape with a dark outline so it reads on any floor colour.
+  function drawLandmarkGlyph(ctx, cat, x, y, s) {
+    var cx = x + s / 2, cy = y + s / 2, r = s * 0.32;
+    ctx.beginPath();
+    if (cat === 'light') {
+      ctx.arc(cx, cy, r * 0.75, 0, Math.PI * 2);
+      ctx.fill(); ctx.stroke();
+      if (s >= 12) {
+        ctx.beginPath();
+        for (var i = 0; i < 4; i++) {
+          var a = Math.PI / 4 + i * Math.PI / 2;
+          ctx.moveTo(cx + Math.cos(a) * r, cy + Math.sin(a) * r);
+          ctx.lineTo(cx + Math.cos(a) * r * 1.5, cy + Math.sin(a) * r * 1.5);
+        }
+        ctx.stroke();
+      }
+    } else if (cat === 'tree') {
+      ctx.arc(cx, cy, r, 0, Math.PI * 2);
+      ctx.fill(); ctx.stroke();
+    } else if (cat === 'tank') {
+      ctx.arc(cx, cy, r * 0.85, 0, Math.PI * 2);
+      ctx.fill(); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(cx - r * 0.5, cy); ctx.lineTo(cx + r * 0.5, cy); ctx.stroke();
+    } else if (cat === 'table') {
+      ctx.rect(cx - r, cy - r * 0.6, r * 2, r * 1.2);
+      ctx.fill(); ctx.stroke();
+    } else if (cat === 'closet' || cat === 'vending') {
+      ctx.rect(cx - r * 0.7, cy - r, r * 1.4, r * 2);
+      ctx.fill(); ctx.stroke();
+      if (s >= 12) { ctx.beginPath(); ctx.moveTo(cx, cy - r * 0.8); ctx.lineTo(cx, cy + r * 0.8); ctx.stroke(); }
+    } else if (cat === 'bed') {
+      ctx.rect(cx - r * 0.7, cy - r, r * 1.4, r * 2);
+      ctx.fill(); ctx.stroke();
+      if (s >= 12) { ctx.beginPath(); ctx.rect(cx - r * 0.45, cy - r * 0.8, r * 0.9, r * 0.5); ctx.stroke(); }
+    } else if (cat === 'power') {
+      ctx.rect(cx - r * 0.8, cy - r * 0.8, r * 1.6, r * 1.6);
+      ctx.fill(); ctx.stroke();
+      if (s >= 14) {
+        ctx.beginPath();
+        ctx.moveTo(cx + r * 0.25, cy - r * 0.7); ctx.lineTo(cx - r * 0.3, cy + r * 0.1); ctx.lineTo(cx + r * 0.1, cy + r * 0.1); ctx.lineTo(cx - r * 0.25, cy + r * 0.7);
+        ctx.stroke();
+      }
+    } else if (cat === 'door') {
+      ctx.rect(cx - r, cy - r * 0.35, r * 2, r * 0.7);
+      ctx.fill(); ctx.stroke();
+    } else if (cat === 'rack') {
+      ctx.rect(cx - r, cy - r * 0.8, r * 2, r * 1.6);
+      ctx.fill(); ctx.stroke();
+      if (s >= 12) { ctx.beginPath(); ctx.moveTo(cx - r, cy); ctx.lineTo(cx + r, cy); ctx.stroke(); }
+    } else if (cat === 'crate') {
+      ctx.rect(cx - r * 0.85, cy - r * 0.85, r * 1.7, r * 1.7);
+      ctx.fill(); ctx.stroke();
+      if (s >= 12) { ctx.beginPath(); ctx.moveTo(cx - r * 0.85, cy - r * 0.85); ctx.lineTo(cx + r * 0.85, cy + r * 0.85); ctx.stroke(); }
+    } else {
+      ctx.arc(cx, cy, r * 0.6, 0, Math.PI * 2);
+      ctx.fill(); ctx.stroke();
+    }
+  }
+
+  // ── sprites (T12): the game's own art from 24 px per tile ───────────────
+
+  var SPRITE_SCALE = 24;   // px per tile from which sprites replace the glyphs
+
+  // The fork's atlas is fetched once, the first time the map is zoomed in far
+  // enough; until it arrives the glyphs stay. A fork without an atlas keeps glyphs.
+  function ensureSprites() {
+    var f = state.fork, sp = f && f.sprites;
+    if (!sp || !sp.h || (state.sprites && state.sprites.key === f.key)) return;
+    var entry = { key: f.key, map: null, img: null };
+    state.sprites = entry;
+    var base = 'tactical/' + sp.file;
+    fetch(base + '.json?v=' + encodeURIComponent(sp.h)).then(function (r) { return r.ok ? r.json() : null; }).then(function (json) {
+      if (!json || state.sprites !== entry) return;
+      var img = new Image();
+      img.onload = function () { if (state.sprites === entry) { entry.map = json.protos || {}; entry.img = img; view.requestDraw(); } };
+      img.src = base + '.png?v=' + encodeURIComponent(sp.h);
+    }).catch(function () { /* glyphs stay */ });
+  }
+
+  // A landmark's sprite centred on its tile at the map scale (32 px of art per
+  // tile), or false when the atlas has nothing for the prototype.
+  function drawLandmarkSprite(ctx, it, x, y, s) {
+    var sp = state.sprites, box = sp && sp.img && sp.map && sp.map[it.proto];
+    if (!box) return false;
+    var k = s / 32, dw = box[2] * k, dh = box[3] * k;
+    ctx.drawImage(sp.img, box[0], box[1], box[2], box[3], x + s / 2 - dw / 2, y + s / 2 - dh / 2, dw, dh);
+    return true;
+  }
+
+  view.addLayer(function drawLandmarks(ctx, v) {
+    if (!state.planet || !layerOn('landmarks') || v.scale < 6) return;
+    var s = v.scale, w = els.canvas.clientWidth, h = els.canvas.clientHeight;
+    var items = Logic.visibleLandmarks(state.planet, state.prefs.landmarks);
+    var sprites = s >= SPRITE_SCALE;
+    if (sprites) ensureSprites();
+    ctx.lineWidth = Math.max(1, Math.min(2, s / 10));
+    ctx.lineJoin = 'round';
+    ctx.imageSmoothingEnabled = false;
+    var margin = 3 * s;   // a tree's sprite spans three tiles
+    items.forEach(function (it) {
+      var p = v.worldToScreen(it.x, it.y + 1);
+      if (p[0] + margin < 0 || p[1] + margin < 0 || p[0] - margin > w || p[1] - margin > h) return;
+      var dim = !it.reliable;
+      ctx.globalAlpha = dim ? 0.55 : 1;
+      if (sprites && drawLandmarkSprite(ctx, it, p[0], p[1], s)) return;
+      ctx.fillStyle = LM_COLOURS[it.cat] || '#e8ecf4';
+      ctx.strokeStyle = 'rgba(6, 9, 15, 0.9)';
+      ctx.setLineDash(dim ? [2, 2] : []);
+      drawLandmarkGlyph(ctx, it.cat, p[0], p[1], s);
+    });
+    ctx.globalAlpha = 1;
+    ctx.setLineDash([]);
+  });
+
   view.addLayer(function drawLabels(ctx, v) {
     if (!state.planet || v.scale < 2.5) return;
     var size = Math.max(11, Math.min(15, 9 + v.scale * 0.6));
@@ -1344,13 +1479,25 @@
     return i.name + ' ' + pct(i.p) + (tags.length ? ' (' + tags.join('; ') + ')' : '');
   }
 
+  // "Table (may move)" — the category name, the prototype's own name when it
+  // says more, and why the landmark may not be where the map shows it.
+  function landmarkText(it) {
+    var cat = T.landmarkCats[it.cat] || it.cat, notes = [];
+    if (it.mayMove) notes.push(T.landmarkMayMove);
+    if (it.inInsert) notes.push(T.landmarkInInsert);
+    var name = it.name && it.name.toLowerCase() !== it.cat ? cat + ' · ' + it.name : cat;   // "table" adds nothing to "Tables"
+    return name + (notes.length ? ' (' + notes.join(', ') + ')' : '');
+  }
+
   function areaHtml(tile) {
     var area = Logic.areaAt(state.planet, tile[0], tile[1]);
     if (!area) return '<div class="tac-hover-note">' + esc(T.noArea) + '</div>';
     var f = area[3], F = Logic.FLAGS;
     var ins = layerOn('inserts') ? Logic.insertsAt(state.planet, tile[0], tile[1]) : [];
     var insHtml = ins.length ? '<div class="tac-hover-insert">' + esc(fmt(T.insertHover, { list: ins.map(insertText).join('; ') })) + '</div>' : '';
-    return '<div>' + esc(area[1]) + '</div>' + insHtml + '<div class="tac-chips">' +
+    var lms = layerOn('landmarks') ? Logic.landmarksAt(state.planet, tile[0], tile[1]) : [];
+    var lmHtml = lms.length ? '<div class="tac-hover-landmark">' + esc(fmt(T.landmarkHover, { list: lms.map(landmarkText).join('; ') })) + '</div>' : '';
+    return '<div>' + esc(area[1]) + '</div>' + insHtml + lmHtml + '<div class="tac-chips">' +
       chip(T.flags.mortarFire, (f & F.MORTAR_FIRE) && !(f & F.LANDING_ZONE)) +
       chip(T.flags.mortarPlace, f & F.MORTAR_PLACE) +
       chip(T.flags.ob, f & F.OB) +
@@ -1636,10 +1783,29 @@
     return h + findHtml();
   }
 
+  // Category filters for the landmarks on this planet: the categories that stay
+  // put first, then the ones the round may move (off by default).
+  function landmarksHtml() {
+    if (!state.planet || !layerOn('landmarks')) return '';
+    var present = {};
+    state.planet.landmarks.items.forEach(function (it) { present[it.cat] = true; });
+    var cats = Logic.LANDMARK_CATS.filter(function (c) { return present[c.id]; });
+    if (!cats.length) return '';
+    var box = function (c) {
+      return '<label class="tac-check-label"><input type="checkbox" data-landmark="' + c.id + '"' +
+        (state.prefs.landmarks[c.id] ? ' checked' : '') + '> ' + esc(T.landmarkCats[c.id] || c.id) + '</label>';
+    };
+    var stay = cats.filter(function (c) { return c.reliable; }), move = cats.filter(function (c) { return !c.reliable; });
+    var h = '<div class="tac-landmarks"><div class="tac-landmarks-title">' + esc(T.landmarksTitle) + '</div>' +
+      '<div class="tac-landmarks-row">' + stay.map(box).join('') + '</div>';
+    if (move.length) h += '<div class="tac-hint">' + esc(T.landmarksMayMove) + '</div><div class="tac-landmarks-row">' + move.map(box).join('') + '</div>';
+    return h + '<p class="tac-hint">' + esc(T.landmarksZoom) + '</p></div>';
+  }
+
   function layersHtml() {
     var h = '<h2 id="tacLayersTitle">' + esc(T.layersTitle) + '</h2><div class="tac-layers">';
     var wp = weapon();
-    var keys = wp === 'mortar' ? Logic.LAYER_KEYS : wp === 'ob' ? ['fire', 'zone', 'markers', 'grid', 'inserts'] : ['fire', 'markers', 'grid', 'inserts'];
+    var keys = wp === 'mortar' ? Logic.LAYER_KEYS : wp === 'ob' ? ['fire', 'zone', 'markers', 'grid', 'inserts', 'landmarks'] : ['fire', 'markers', 'grid', 'inserts', 'landmarks'];
     keys.forEach(function (k) {
       var label = k === 'fire' ? T.fireLabels[wp] : T.layers[k];
       h += '<label class="tac-check-label"><input type="checkbox" data-layer="' + k + '"' + (layerOn(k) ? ' checked' : '') + '> ' + esc(label) + '</label>';
@@ -1647,6 +1813,7 @@
     h += '</div>';
     if (state.planet && state.planet.columnMortar) h += '<p class="tac-hint">' + esc(T.columnNote) + '</p>';
     if (state.planet && (state.planet.json.inserts || []).length) h += '<p class="tac-hint">' + esc(T.insertsNote) + '</p>';
+    h += landmarksHtml();
     var r = state.ruler, measuring = pickMode() === 'ruler';
     h += '<div class="tac-actions">' + button('rulerStart', T.ruler, measuring ? 'btn-small on' : 'btn-small') +
       (r && r.b ? button('rulerClear', T.rulerClear) : '') + '</div>';
@@ -2290,6 +2457,11 @@
       if (state.shape) { state.shape.cat = el.value; view.requestDraw(); }
     } else if (el.getAttribute && el.getAttribute('data-layer')) {
       state.prefs.layers[el.getAttribute('data-layer')] = !!el.checked;
+      savePrefs();
+      if (el.getAttribute('data-layer') === 'landmarks') renderPanel();   // the category filters follow the layer
+      view.requestDraw();
+    } else if (el.getAttribute && el.getAttribute('data-landmark')) {
+      state.prefs.landmarks[el.getAttribute('data-landmark')] = !!el.checked;
       savePrefs();
       view.requestDraw();
     } else if (el.id === 'tacRadius') {
