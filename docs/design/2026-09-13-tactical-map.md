@@ -327,6 +327,7 @@ MIRRORED SOURCES (как `ss14_ordnance.py`). При сборке экстрак
 | `constants.ob` | `scatter` `[-3, 2]`, `cooldown`, `timeline` (`alert`, `beginFire`, `fire`, `warnOne`, `warnTwo`, `impact`), `warnRanges` |
 | `constants.roofing[]` | `proto`, `range`, `allows` |
 | `constants.shells[]` | снаряды, которые заряжают (компоненты `MortarShell` и `Item`): `id`, `name`, `kind` (`he` / `incendiary` / `flare` / `other`), `radius` — для `he` радиус взрыва в тайлах по зеркалу `ExplosionSystem.IntensityToRadius` из полей `Explosive` (RMC14 HE: 800 / 5 / 30,1 → 5,35; Stories Frag: 96 / 1,6 / 4,8 → 3,87), для `incendiary` — `TileFireOnTrigger.range` (5), для `flare` — `null`; у `he` ещё `explosive` с исходными полями; `shards` — число осколков `ProjectileGrenade.capacity`, если снаряд их несёт (Stories Frag: 60 — зона поражения шире круга) |
+| `constants.obWarheads[]` | боеголовки пушки (`OrbitalCannon.warheadTypes`): `id`, `name`, `radius` — самый широкий шаг взрыва прототипа `OrbitalCannonWarhead.explosion` по зеркалу `IntensityToRadius` (HE 17,54; Aegis 27,39; кластер 3,96 на взрыв), `fireRange` — ромб огня `SpawnFireDiamond` (зажигательная 18, Aegis 35), `spread` и `cluster` `{times, per}` — кластер (75×3 в пределах ±12), `warnRanges` — если боеголовка переопределяет дальности предупреждений (Aegis 60/55/45) |
 | `planets[]` | `id` (нижний регистр), `proto`, `name`, `file` (`<fork>/<id>` — всегда свой форк), `h` (хеш содержимого файлов планеты), `inRotation`, `minPlayers`, `maxPlayers`, `levels`, `scenarios` (`name`, `p`) |
 
 **`tactical/<fork>/<planet>[.<level>].json`** (этаж 0 — без суффикса)
@@ -411,7 +412,7 @@ MIRRORED SOURCES (как `ss14_ordnance.py`). При сборке экстрак
 
 **Хранилище.** `localStorage['chemdb-tactical:<fork>/<planet>']`:
 `{ v: 1, calibration: {offset, at, lastUsed, points}, mortar: {tile, level,
-mode}, target: [x, y], shots: [{id, n, target, dial, at, fromLoad,
+mode}, target: [x, y], ob: {firedAt, target, warhead, radius}, shots: [{id, n, target, dial, at, fromLoad,
 mortarTile, mode, shell, radius, impacts, doubtful}], markers: [{id, cat,
 label, x, y, level, h, at}] }` — цель и смещение выстрела в игровых
 координатах, `mortarTile` — тайл мира; `doubtful` — падения дальше
@@ -420,8 +421,8 @@ label, x, y, level, h, at}] }` — цель и смещение выстрела
 вершины в тайлах мира, линии нужно 2 точки, области — 3, подпись до 40
 символов; текст для чата — подпись и вершины в игровых координатах («→»
 для линии, запятые для области); `localStorage['chemdb-tactical:prefs']`:
-`{v: 1, weapon, shell, hitRadius: {<shell>: тайлов}, layers: {fire, deploy,
-rings, zone, markers}, timerFrom: fire | load}`. Событие `storage` перечитывает состояние из другой вкладки. Нет
+`{v: 1, weapon, shell, hitRadius: {<shell | warhead>: тайлов}, warhead, layers: {fire,
+deploy, rings, zone, markers}, timerFrom: fire | load}`. Событие `storage` перечитывает состояние из другой вкладки. Нет
 доступа к хранилищу — работа в памяти и плашка «метки не сохранятся». Метка
 с `h`, отличным от текущих данных планеты, помечается «поставлена на старой
 версии карты».
