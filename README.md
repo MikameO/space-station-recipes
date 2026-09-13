@@ -35,6 +35,8 @@ Search reagents, plan reactions, explore craft trees, and calculate batch recipe
 | **Maps** | Item finder | Pick a station map, search any item — see where it spawns on a rendered schematic with locker/vendor/floor sources, grouped by nearest beacon |
 | **Ordnance** | Casing calculator | Space Stories fork: pick a casing, mix reagents, see power, blast radius, shrapnel and fire live — plus curves, a two-reagent heatmap, and the cheapest mixture that still hits a given share of the ceiling |
 | **Library** | In-game documents | Player-written doctrines, field manuals and role memos stored verbatim as SS14 paper markup — read them as in game, copy the markup to issue the paper again. Separate page: [library.html](https://mikameo.github.io/space-station-recipes/library.html) |
+| **Sections** | Platform map | ⊞ Sections — every section as a card with a screenshot and what is inside; a card lights up (amber border, dot, one "what's new" line; green for a new section) when it changed since your last visit. Opens itself on your second visit and whenever something is new — switch that off in the overlay |
+| **Feedback** | Idea form & survey | A two-field idea form, no sign-up, filed as a public GitHub issue through a small Cloudflare Worker (`worker/`); from the third visit a one-time survey asks what was hardest and what is missing |
 | **Sell list** | Map price manifest | Every item on the selected map with count, sell price, and total — sortable columns, class chips (guns/melee/food/armor/…), guaranteed-vs-chance loot filter |
 | **Share** | Deep links | URL encodes filters and selection for easy sharing |
 | **RU** | Русская локализация | RU/EN toggle: reagent names & descriptions from the Russian forks' own ru-RU locales (Corvax ss14-ru, Sunrise, ADT, RuCM, Dead Space, Fish) + full Russian UI |
@@ -150,11 +152,17 @@ On any strategy card in Antag mode there's a **⚠ Report inaccuracy** button th
 
 Reagents with `⚠ needs attribution` badges have a "Suggest a source" link that opens the [`attribution.yml`](.github/ISSUE_TEMPLATE/attribution.yml) template with the entry ID pre-filled. Fill in `source_type`, `source_url`, and a one-sentence `source_note`; maintainer adds the entry to `sources.py` and wires it into the relevant `sources` list.
 
+**Feedback Worker**
+
+The in-app idea form and survey POST to a Cloudflare Worker ([`worker/index.js`](worker/index.js)) that files a GitHub issue labelled `idea` or `survey` plus `from-site`, using the repository owner's token — so this public repository never carries a secret. One-time setup: `cd worker && npx wrangler login && npx wrangler secret put GITHUB_TOKEN && npx wrangler deploy`, then paste the printed URL into `FEEDBACK_URL` in [`feedback.js`](feedback.js) and bump its `?v=`. The token is a fine-grained PAT limited to this repository with **Issues: Read and write**; rotate it by running `wrangler secret put` again. While `FEEDBACK_URL` is empty, the header button opens GitHub's template picker, the overlay card the prefilled [`idea.yml`](.github/ISSUE_TEMPLATE/idea.yml), and the survey stays off. Anonymous text is posted under the owner's token, so before filing the Worker breaks @mentions, issue references, GitHub links and image embeds with a zero-width space. Tests: `node scripts/test_feedback_worker.mjs`, `node scripts/test_feedback_logic.js`, `node scripts/test_home_logic.js`.
+
 See [CHANGELOG.md](CHANGELOG.md) for schema evolution.
 
 ## Privacy
 
 This site uses [Yandex.Metrika](https://metrika.yandex.com/) for anonymous usage analytics (page views, click maps, session recordings via Webvisor, and interaction events such as tab opens, search queries, and calculator runs — all limited to fictional in-game terms). No personal data is collected or sold. Analytics help prioritize features based on how the database is actually used across forks.
+
+The idea form and the survey send only what you type plus page context (page, tab, language, selected fork, visit count, phone or desktop, data version) to a Cloudflare Worker, which posts it as a **public** GitHub issue; no IP address is stored in the issue. The visit counter, the "seen" section dates and the survey state live in your browser's localStorage only.
 
 ## License
 

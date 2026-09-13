@@ -3,6 +3,47 @@
 `data.json` schema version is in `meta.schemaVersion`. Consumers reading this file
 should pin on a compatible range (semver: breaking changes bump major).
 
+## Series H — 2026-09-13 (Sections overlay, feedback form, returning-visitor survey; no schema change)
+
+**New — `sections.json` and the «⊞ Sections» overlay.** One manifest lists every
+section with a bilingual description, the features inside it, a screenshot
+(`promo/cards/*.webp`, 720 px) and two dates, `added` and `updated`, plus one
+line of what changed last. `home.js` compares them with what this browser has
+already seen (`localStorage['chemdb-home']`) and badges a card amber ("New: …")
+or green ("New section"); changes older than 60 days are history and never
+badge. The overlay opens itself on the second visit, then on any visit that
+finds unseen changes — at most once a day, never over a followed link, the
+tutorial, the companion window or someone already typing or clicking, and never
+in private browsing, where nothing can be remembered. Switching "Show when
+sections update" off silences the intro too. Closing it marks everything seen. A visit is a page load at
+least six hours after the previous one (`chemdb-visits`). `sections.json` rides
+on `home.js`'s own `?v=`, like the ordnance and map data.
+
+**New — idea form and Worker.** `feedback.js` turns the header feedback button
+and the overlay's "Suggest an idea" card into a two-field form (text and an
+optional public contact). `worker/` is a Cloudflare Worker that checks the
+origin, the size (16 KB of UTF-8), a honeypot, a 3-second minimum and 5 posts a
+minute per IP, breaks @mentions, issue references, GitHub links and image
+embeds with a zero-width space — the text is posted under the owner's token —
+then files a public issue labelled `idea` + `from-site`. **Shipped switched
+off:** `FEEDBACK_URL` is empty until the Worker is deployed; until then the
+header button opens GitHub's template picker and the overlay card the prefilled
+`.github/ISSUE_TEMPLATE/idea.yml`.
+
+**New — returning-visitor survey.** From the third visit, after 60 seconds of
+the tab actually being visible and only when nothing else popped up in that
+load, at most once per visit: what was hardest, what is missing, section chips;
+filed as `survey`. Dismissed once, it asks again after 30 days; dismissed twice
+or answered, never.
+Needs the Worker, so it stays silent while `FEEDBACK_URL` is empty.
+
+**CI and analytics.** `scripts/check_sections.py` validates the manifest before
+every deploy (targets exist, screenshots exist, real dates, a day of slack for
+the UTC runner), and the three Series H unit tests run in the same job. Eight Metrika goals
+registered: `home_open`, `home_card`, `home_autoshow_off`, `feedback_open`,
+`feedback_submit`, `feedback_fail`, `survey_shown`, `survey_dismiss`. Data schema
+unchanged.
+
 ## Series R9–R11 — 2026-09-12 (brewing in the vessels you have)
 
 On CM servers a chemist measures three reagents 1:1:1 with a 300u beaker into a
