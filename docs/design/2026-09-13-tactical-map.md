@@ -275,6 +275,28 @@ Node-тестами через `vm` — `library.js` и `scripts/test_library_ma
 8. CMU (T8): маска разрешения по колонне для миномёта и ОБ, этаж
    детонации ОБ, открытое небо для развёртывания.
 
+**Семейство `cmu` (T8, CMU `bb96eb109`, RuCM — свой коммит).** Прототипы
+читаются из `Resources/Prototypes` и `Content.CMU/Resources/Prototypes`,
+локали — ещё из `Content.CMU/Resources/Locale/<lang>/CMU14`; карты ищутся
+под `Content.CMU/Resources`, потом под `Resources`. Планета —
+`RMCPlanetMapPrototype.mapId` → `gameMap` (`mapPath`, `mapsBelow` → −1, −2…,
+`mapsAbove` → +1, +2…); имя — `votename` или `mapName`. Особенности
+разбора, найденные на 18 планетах: `id: !type:CreateVariants` (ванильная
+атмосферная арматура) регистрируется по каждому значению; `tileAlias`
+(`FloorElevatorShaft` → `FloorDark`) разрешается как в загрузчике карт;
+этаж без единого чанка (Bosenmori Basho +1) пропускается; этаж без
+`AreaGrid` (крыши Corsat, Port Nereid −1/+2, Stable Garrison, Trijent,
+Chances) считается поверхностью без зон — удар сквозь неё запрещён;
+поверхность без зон (Fiorina) собирается с предупреждением — там игра
+откажет любому удару; планета, чьей карты нет в репозитории форка (RuCM
+без Flight), пропускается с предупреждением. Колонна: по каждой XY этажи
+сверху вниз, тайл есть → поверхность, каждая поверхность должна разрешать
+удар (`columnMortar`, `columnOb`); `openSky` — над тайлом этажа нет тайлов
+выше. Sorokyne Strata: `mortarFire` на 18 887 тайлах поверхности, сквозь
+крыши достижимы 10 001, под открытым небом 14 790. Зеркало констант CMU
+совпадает с RMC, кроме дальности 8–165; снаряды CMU — свои (HE 7,82,
+зажигательный взрыв 3,63 + огонь, HEAT MP 3,01).
+
 **Разведка CMU (T1, CMU `9753baf6d`, 2026-09-13).** Планеты — 19 сущностей
 `AUPlanet*`/`CMUPlanet*` с `RMCPlanetMapPrototype` (18 в ротации, Gixens Caverns
 выключена); `rmc_planets.yml` из RMC14 в CMU закомментирован. Компонент хранит
@@ -328,9 +350,9 @@ MIRRORED SOURCES (как `ss14_ordnance.py`). При сборке экстрак
 | `constants.roofing[]` | `proto`, `range`, `allows` |
 | `constants.shells[]` | снаряды, которые заряжают (компоненты `MortarShell` и `Item`): `id`, `name`, `kind` (`he` / `incendiary` / `flare` / `other`), `radius` — для `he` радиус взрыва в тайлах по зеркалу `ExplosionSystem.IntensityToRadius` из полей `Explosive` (RMC14 HE: 800 / 5 / 30,1 → 5,35; Stories Frag: 96 / 1,6 / 4,8 → 3,87), для `incendiary` — `TileFireOnTrigger.range` (5), для `flare` — `null`; у `he` ещё `explosive` с исходными полями; `shards` — число осколков `ProjectileGrenade.capacity`, если снаряд их несёт (Stories Frag: 60 — зона поражения шире круга) |
 | `constants.obWarheads[]` | боеголовки пушки (`OrbitalCannon.warheadTypes`): `id`, `name`, `radius` — самый широкий шаг взрыва прототипа `OrbitalCannonWarhead.explosion` по зеркалу `IntensityToRadius` (HE 17,54; Aegis 27,39; кластер 3,96 на взрыв), `fireRange` — ромб огня `SpawnFireDiamond` (зажигательная 18, Aegis 35), `spread` и `cluster` `{times, per}` — кластер (75×3 в пределах ±12), `warnRanges` — если боеголовка переопределяет дальности предупреждений (Aegis 60/55/45) |
-| `planets[]` | `id` (нижний регистр), `proto`, `name`, `file` (`<fork>/<id>` — всегда свой форк), `h` (хеш содержимого файлов планеты), `inRotation`, `minPlayers`, `maxPlayers`, `levels`, `scenarios` (`name`, `p`) |
+| `planets[]` | `id` (нижний регистр), `proto`, `name`, `file` (`<fork>/<id>` — всегда свой форк), `h` (хеш файлов поверхности), `inRotation`, `minPlayers`, `maxPlayers`, `levels[]` — `{depth, h}` по этажу (у RMC один этаж `0`; у CMU `mapsBelow` → −1, −2…, `mapsAbove` → +1, +2… в порядке списков гейммапы), `scenarios` (`name`, `p`) |
 
-**`tactical/<fork>/<planet>[.<level>].json`** (этаж 0 — без суффикса)
+**`tactical/<fork>/<planet>[.<depth>].json`** (этаж 0 — без суффикса; `<depth>` со знаком, например `sorokyne.-1`, `sorokyne.2`; у каждого этажа своя `bounds` и свой PNG)
 
 | Поле | Содержимое |
 |---|---|
@@ -338,7 +360,7 @@ MIRRORED SOURCES (как `ss14_ordnance.py`). При сборке экстрак
 | `bounds` | `minX`, `minY`, `maxX`, `maxY` — мировые индексы тайлов; пиксель PNG (0,0) = тайл (`minX`, `maxY`) |
 | `areas` | `[[proto, name, color, flags]]`; биты: 1 `OB`, 2 `CAS`, 4 `MortarFire`, 8 `MortarPlacement`, 16 `SupplyDrop`, 32 `LandingZone`, 64 `Lasing` |
 | `grid` | строки сверху вниз, `[индекс, длина, …]`; индекс 1-based в `areas`, 0 — нет тайла |
-| `masks` | `blocked`, `hardWall` — RLE-строки из 0/1 |
+| `masks` | `blocked`, `hardWall` — RLE-строки из 0/1; у семейства CMU ещё `columnMortar`, `columnOb` — XY, где удар разрешён каждой поверхностью колонны (правило `CMUTopDownOrdnanceSystem`: проём — пустой тайл, прозрачных тайлов в CMU нет), и `openSky` — тайлы этажа, над которыми нет тайлов выше (миномёт разворачивается только под открытым небом) |
 | `labels` | `[[текст, x, y]]` — мировые координаты |
 | `inserts` (T10) | `[{id, name, cells, variants: [{spawn, p, scenario, replaceAreas}]}]` |
 | `landmarks` (T11) | `protos: [[proto, name, category, reliable]]`, `items: [[x, y, protoIndex, rot]]` |
