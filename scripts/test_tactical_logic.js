@@ -17,7 +17,7 @@ const L = window.TacticalLogic;
 const F = L.FLAGS;
 
 const MORTAR_RMC = {
-  minRange: 15, maxRange: 65, maxDial: 10, maxTarget: 1000, tilesPerOffset: 20,
+  minRange: 15, maxRange: 65, maxDial: 10, maxTarget: 1000, tilesPerOffset: 20, jitter: [-1, 0, 0, 1],
   loadDelay: 1.5, travelDelay: 4.5, impactWarningDelay: 2.5, impactDelay: 4.5,
   warnRange: 15, impactWarnRange: 10,
 };
@@ -385,16 +385,41 @@ test('«same round?» after a reload, 20 idle minutes or an off-planet coordinat
   assert.strictEqual(after.ageMs, 3 * min);
 });
 
+test('T4: where the shell can land — aim error plus jitter, none in laser mode', () => {
+  const mortar = [20, -98], target = [62, -62];               // mockup pair, 55 tiles apart
+  const box = L.impactBox(mortar, target, MORTAR_RMC, 'coordinates');
+  assert.deepStrictEqual(box, { minX: 59, maxX: 65, minY: -64, maxY: -60, error: [2, 1], jitter: [-1, 1] });
+  const near = L.impactBox(mortar, [30, -90], MORTAR_RMC, 'coordinates');   // inside the zero-error span
+  assert.deepStrictEqual([near.minX, near.maxX, near.minY, near.maxY], [29, 31, -91, -89]);
+  const laser = L.impactBox(mortar, target, MORTAR_RMC, 'laser');
+  assert.deepStrictEqual([laser.minX, laser.maxX, laser.minY, laser.maxY], [62, 62, -62, -62]);
+});
+
+test('T4: page prefs migrate strictly, layers keep their defaults', () => {
+  const d = L.migratePrefs(null);
+  assert.deepStrictEqual(d, { v: 1, weapon: 'mortar', shell: null, hitRadius: {}, layers: { fire: true, deploy: false, rings: true, zone: true } });
+  const p = L.migratePrefs({ v: 1, weapon: 'ob', shell: 'RMCMortarShellHE', hitRadius: { RMCMortarShellHE: 4.5, bad: 'x', huge: 500 },
+    layers: { fire: false, nope: true, rings: 'yes' }, junk: 1 });
+  assert.deepStrictEqual(p, { v: 1, weapon: 'ob', shell: 'RMCMortarShellHE', hitRadius: { RMCMortarShellHE: 4.5 },
+    layers: { fire: false, deploy: false, rings: true, zone: true } });
+  assert.strictEqual(L.migratePrefs({ v: 2, weapon: 'ob' }).weapon, 'mortar');
+});
+
 test('stored planet state: foreign or inconsistent shapes are dropped', () => {
-  const empty = { v: 1, calibration: null, shots: [], markers: [] };
+  const empty = { v: 1, calibration: null, mortar: null, target: null, shots: [], markers: [] };
   assert.deepStrictEqual(L.migrateStorage(null), empty);
   assert.deepStrictEqual(L.migrateStorage('x'), empty);
   assert.deepStrictEqual(L.migrateStorage({ v: 2, calibration: {} }), empty);
   const cal = { tile: [31, -78], reading: [243, -226], offset: [212, -148], at: 5,
     check: { tile: [33, -77], expect: [245, -225], result: null, tried: [] } };
-  const kept = L.migrateStorage({ v: 1, calibration: cal, shots: [], markers: [{ id: 'm1' }] });
+  const kept = L.migrateStorage({ v: 1, calibration: cal, shots: [], markers: [{ id: 'm1' }],
+    mortar: { tile: [20, -98], mode: 'weird' }, target: [62, -62] });
   assert.deepStrictEqual(kept.calibration, cal);
   assert.deepStrictEqual(kept.markers, [{ id: 'm1' }]);
+  assert.deepStrictEqual(kept.mortar, { tile: [20, -98], mode: 'coordinates' });
+  assert.deepStrictEqual(kept.target, [62, -62]);
+  assert.strictEqual(L.migrateStorage({ v: 1, mortar: { tile: [1.5, 2] } }).mortar, null);
+  assert.strictEqual(L.migrateStorage({ v: 1, target: 'x' }).target, null);
   assert.strictEqual(L.migrateStorage({ v: 1, calibration: Object.assign({}, cal, { offset: [0, 0] }) }).calibration, null);
   const wrongCheck = Object.assign({}, cal, { check: { tile: [33, -77], expect: [0, 0], result: null } });
   assert.strictEqual(L.migrateStorage({ v: 1, calibration: wrongCheck }).calibration.check, null);

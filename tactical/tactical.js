@@ -5,8 +5,9 @@
   See LICENSE for details.
 */
 // Tactical map page: data loading, fork and planet selection, the map view, the
-// round calibration and the panel. Pure maths lives in tactical/logic.js
-// (window.TacticalLogic), the canvas view in tactical/mapview.js.
+// round calibration, the mortar position and target, layers and the panel. Pure
+// maths lives in tactical/logic.js (window.TacticalLogic), the canvas view in
+// tactical/mapview.js.
 (function () {
   'use strict';
   if (typeof document === 'undefined') return;
@@ -15,6 +16,7 @@
   var LANG = window.I18N_LANG === 'ru' ? 'ru' : 'en';
   var YM_COUNTER_ID = 108585248;
   var STORAGE_PREFIX = 'chemdb-tactical:';
+  var PREFS_KEY = STORAGE_PREFIX + 'prefs';
   // Below this many CSS px per tile a calibration pick zooms in instead of
   // picking (decision 13): LV-624 fits at ~4 px per tile on a 1080p screen.
   var PICK_MIN_SCALE = 12;
@@ -22,7 +24,10 @@
   var TICK_MS = 30 * 1000;           // calibration age and the idle question
   var RENDER_AFTER_INPUT_MS = 350;   // let the click that woke the page land first
   var MAX_COORD = 1000;              // MortarComponent.MaxTarget, the spin boxes stop there
+  var MAX_RADIUS = 30;               // the radius field: a whole LZ, not a planet
   var DASHES = /[−‒–—﹣－]/g;
+  var TINT_FIRE_REFUSED = [255, 61, 90, 96];     // --red-alert at ~0.38
+  var TINT_DEPLOY_ALLOWED = [57, 255, 133, 70];  // --phosphor at ~0.27
 
   var L10N = {
     en: {
@@ -90,9 +95,39 @@
       sameRoundYes: 'Yes, same round',
       sameRoundCheck: 'Check a tile',
       newRound: 'New round',
-      newRoundHint: 'New round clears the calibration and shots; markers stay.',
-      pointTitle: 'Point',
-      pointNone: 'Click a tile to get its coordinates.',
+      newRoundHint: 'New round clears the calibration, the mortar and shots; markers stay.',
+      weaponTitle: 'Weapon',
+      weapons: { mortar: 'Mortar', ob: 'OB', supply: 'Supply drop' },
+      weaponSoon: 'in the next update',
+      mortarTitle: 'Mortar position',
+      mortarNone: 'Where is the mortar? Click its tile on the map or type the rangefinder reading of that tile.',
+      mortarNeedsCal: 'Calibrate first — the position is entered in in-game coordinates.',
+      mortarPickHint: 'Click the mortar tile on the map.',
+      mortarPickMap: 'Pick on map',
+      mortarPlace: 'Place',
+      mortarMove: 'Move',
+      mortarRemove: 'Remove',
+      mortarAt: 'Mortar at',
+      deployOk: '✓ Can be deployed here.',
+      deployNo: '✗ Cannot deploy here — {reason}',
+      deployNoArea: 'this tile has no area.',
+      targetTitle: 'Target',
+      targetNone: 'Click a tile to get its coordinates.',
+      targetNoMortar: 'Place the mortar to see range and aim error.',
+      dialLine: '{label} 0 0',
+      distance: '{d} tiles from the mortar',
+      fireOk: '✓ The mortar accepts this target.',
+      fireNo: '✗ {reason}',
+      reasons: {
+        noCas: 'the laser needs a CAS-permitted area.',
+        noLasing: 'this area cannot be lased.'
+      },
+      errorLine: 'Aim error up to ±{ex} / ±{ey} tiles, then ±1 jitter.',
+      errorNone: 'No aim error here (within 20 tiles), only ±1 jitter.',
+      warnings: {
+        errorMayExceedMaxRange: 'With the aim error the shell may fly past the maximum range — the game then refuses to fire.',
+        errorMayUndercutMinRange: 'With the aim error the shell may fall inside the minimum range — the game then refuses to fire.'
+      },
       copy: 'Copy',
       copied: 'Copied: {coords}',
       copyFailed: 'The browser blocked copying — the numbers are selected, press Ctrl+C.',
@@ -100,7 +135,18 @@
       find: 'Find',
       offPlanet: '{coords} is off this planet with the current calibration.',
       askNote: 'same round?',
-      mismatchNote: 'check tile did not match'
+      mismatchNote: 'check tile did not match',
+      layersTitle: 'Layers and hit zone',
+      layers: { fire: 'Where the mortar cannot hit (red)', deploy: 'Where it can be deployed (green)', rings: 'Range rings and the no-error square', zone: 'Hit zone at the cursor and the target' },
+      shell: 'Shell',
+      shellKinds: { he: 'High explosive', incendiary: 'Incendiary', flare: 'Flare / camera', other: '{name}' },
+      radius: 'Radius, tiles',
+      radiusDefault: 'By prototype: {r}',
+      radiusReset: 'Reset',
+      radiusFlare: 'A flare does no damage — only the landing box is drawn.',
+      zoneHint: 'Solid circle: the blast around the aim point. Dashed outline: everywhere the shell can land with the aim error and jitter — plan for the whole outline, not the circle.',
+      hoverDist: '{d} tiles',
+      hoverErr: 'error ±{ex}/±{ey}'
     },
     ru: {
       pageName: 'Тактическая карта',
@@ -167,9 +213,39 @@
       sameRoundYes: 'Да, тот же раунд',
       sameRoundCheck: 'Сверить тайлом',
       newRound: 'Новый раунд',
-      newRoundHint: '«Новый раунд» сбрасывает калибровку и выстрелы; метки остаются.',
-      pointTitle: 'Точка',
-      pointNone: 'Кликните тайл, чтобы получить его координаты.',
+      newRoundHint: '«Новый раунд» сбрасывает калибровку, миномёт и выстрелы; метки остаются.',
+      weaponTitle: 'Оружие',
+      weapons: { mortar: 'Миномёт', ob: 'ОБ', supply: 'Поставка' },
+      weaponSoon: 'в следующем обновлении',
+      mortarTitle: 'Позиция миномёта',
+      mortarNone: 'Где стоит миномёт? Кликните его тайл на карте или введите показания дальномера для этого тайла.',
+      mortarNeedsCal: 'Сначала калибровка — позиция вводится в игровых координатах.',
+      mortarPickHint: 'Кликните тайл миномёта на карте.',
+      mortarPickMap: 'Указать на карте',
+      mortarPlace: 'Поставить',
+      mortarMove: 'Переставить',
+      mortarRemove: 'Убрать',
+      mortarAt: 'Миномёт на',
+      deployOk: '✓ Здесь можно развернуть.',
+      deployNo: '✗ Здесь не развернуть — {reason}',
+      deployNoArea: 'у тайла нет зоны.',
+      targetTitle: 'Цель',
+      targetNone: 'Кликните тайл, чтобы получить его координаты.',
+      targetNoMortar: 'Поставьте миномёт, чтобы видеть дальность и ошибку прицела.',
+      dialLine: '{label} 0 0',
+      distance: '{d} тайлов от миномёта',
+      fireOk: '✓ Миномёт примет эту цель.',
+      fireNo: '✗ {reason}',
+      reasons: {
+        noCas: 'лазеру нужна зона, где разрешён КАС.',
+        noLasing: 'эту зону нельзя подсветить лазером.'
+      },
+      errorLine: 'Ошибка прицела до ±{ex} / ±{ey} тайла, плюс дрожание ±1.',
+      errorNone: 'Ошибки прицела здесь нет (ближе 20 тайлов), только дрожание ±1.',
+      warnings: {
+        errorMayExceedMaxRange: 'С учётом ошибки снаряд может выйти за максимальную дальность — тогда игра откажет в выстреле.',
+        errorMayUndercutMinRange: 'С учётом ошибки снаряд может лечь ближе минимальной дальности — тогда игра откажет в выстреле.'
+      },
       copy: 'Копировать',
       copied: 'Скопировано: {coords}',
       copyFailed: 'Браузер не дал скопировать — числа выделены, нажмите Ctrl+C.',
@@ -177,7 +253,18 @@
       find: 'Найти',
       offPlanet: '{coords} — вне планеты при текущей калибровке.',
       askNote: 'тот же раунд?',
-      mismatchNote: 'сверка не совпала'
+      mismatchNote: 'сверка не совпала',
+      layersTitle: 'Слои и зона поражения',
+      layers: { fire: 'Куда миномёт не бьёт (красным)', deploy: 'Где можно развернуть (зелёным)', rings: 'Кольца дальности и квадрат без ошибки', zone: 'Зона поражения у курсора и у цели' },
+      shell: 'Снаряд',
+      shellKinds: { he: 'Фугасный', incendiary: 'Зажигательный', flare: 'Осветительный / камера', other: '{name}' },
+      radius: 'Радиус, тайлов',
+      radiusDefault: 'По прототипу: {r}',
+      radiusReset: 'Сбросить',
+      radiusFlare: 'Осветительный не наносит урона — рисуется только контур прилёта.',
+      zoneHint: 'Сплошной круг — взрыв вокруг точки прицела. Пунктирный контур — всё, куда снаряд может прилететь с ошибкой прицела и дрожанием: рассчитывайте на весь контур, а не на круг.',
+      hoverDist: '{d} тайлов',
+      hoverErr: 'ошибка ±{ex}/±{ey}'
     }
   };
   var T = L10N[LANG];
@@ -249,15 +336,20 @@
     fork: null,       // index entry
     meta: null,       // planet entry in the index
     planet: null,     // Logic.preparePlanet(json)
+    tints: null,      // offscreen canvases: fire (refused), deploy (allowed)
     hoverTile: null,
     loadToken: 0,
     opened: false,
     storeKey: null,
-    store: Logic.migrateStorage(null),        // {v, calibration, shots, markers} of this planet
+    store: Logic.migrateStorage(null),        // {v, calibration, mortar, target, shots, markers} of this planet
+    prefs: Logic.migratePrefs(storage.read(PREFS_KEY)),
     session: Logic.newSession(now(), false),  // whether this page load may trust the offset
-    selected: null,   // world tile picked on the map
+    selected: null,   // world tile picked for calibration (before the offset exists)
+    pickMode: null,   // 'calibrate' | 'mortar' | 'target'; null = by state
     draft: { x: '', y: '' },
     calMessage: null, // {text, kind} shown in the calibration form
+    mortarDraft: '',
+    mortarMessage: null,
     findDraft: '',
     findMessage: null,
     panelKey: ''
@@ -358,6 +450,30 @@
     loadPlanet(meta);
   }
 
+  // One pixel per tile, like the planet PNG: red where the mortar may not hit,
+  // green where it may be deployed. Drawn scaled over the map when a layer is on.
+  function buildTints(planet) {
+    var F = Logic.FLAGS, w = planet.width, h = planet.height;
+    function make(paint) {
+      var c = document.createElement('canvas');
+      c.width = w; c.height = h;
+      var ctx = c.getContext('2d'), img = ctx.createImageData(w, h), d = img.data;
+      for (var i = 0; i < w * h; i++) {
+        var a = planet.grid[i];
+        if (!a) continue;
+        var col = paint(planet.json.areas[a - 1][3]);
+        if (!col) continue;
+        d[i * 4] = col[0]; d[i * 4 + 1] = col[1]; d[i * 4 + 2] = col[2]; d[i * 4 + 3] = col[3];
+      }
+      ctx.putImageData(img, 0, 0);
+      return c;
+    }
+    return {
+      fire: make(function (f) { return ((f & F.MORTAR_FIRE) && !(f & F.LANDING_ZONE)) ? null : TINT_FIRE_REFUSED; }),
+      deploy: make(function (f) { return (f & F.MORTAR_PLACE) ? TINT_DEPLOY_ALLOWED : null; })
+    };
+  }
+
   function loadPlanet(meta) {
     var token = ++state.loadToken;
     var fork = state.fork;
@@ -376,14 +492,17 @@
       }
       state.meta = meta;
       state.planet = planet;
+      state.tints = buildTints(planet);
       state.hoverTile = null;
       state.storeKey = STORAGE_PREFIX + fork.key + '/' + meta.id;
       state.store = Logic.migrateStorage(storage.read(state.storeKey));
       // An offset read back from storage may belong to an earlier round.
       state.session = Logic.newSession(now(), !!state.store.calibration);
       state.selected = null;
+      state.pickMode = null;
       state.draft = { x: '', y: '' };
       state.calMessage = null;
+      state.mortarMessage = null;
       state.findMessage = null;
       view.setImage(img, json.bounds);
       writeHash();
@@ -400,16 +519,57 @@
     });
   }
 
-  // ── calibration state ───────────────────────────────────────────────────
+  // ── derived state ───────────────────────────────────────────────────────
 
   function calibration() { return state.store.calibration; }
   function calState() { return Logic.calibrationState(calibration(), now(), state.session); }
   function toGame(tile) { return Logic.worldToGame(calibration().offset, tile[0], tile[1]); }
   function saveStore() { if (state.storeKey) storage.write(state.storeKey, state.store); }
+  function savePrefs() { storage.write(PREFS_KEY, state.prefs); }
   function terms() { return (state.fork && state.fork.terms) || {}; }
   function termX() { return terms().rangefinderLongitude || 'LONGITUDE'; }
   function termY() { return terms().rangefinderLatitude || 'LATITUDE'; }
-  function maxCoord() { return (state.fork && state.fork.constants.mortar && state.fork.constants.mortar.maxTarget) || MAX_COORD; }
+  function mortarConstants() { return state.fork.constants.mortar; }
+  function maxCoord() { return (state.fork && mortarConstants() && mortarConstants().maxTarget) || MAX_COORD; }
+  function mortar() { return state.store.mortar; }
+  function target() { return state.store.target; }
+  function weapon() { return state.prefs.weapon; }
+  function layerOn(k) { return !!state.prefs.layers[k]; }
+
+  function pickMode() {
+    if (state.pickMode) return state.pickMode;
+    return calibration() ? 'target' : 'calibrate';
+  }
+
+  function shells() { return (state.fork && state.fork.constants.shells) || []; }
+
+  // The player's pick, else the heaviest high-explosive shell (Stories also
+  // ships a fragmentation one with a smaller blast), else whatever exists.
+  function currentShell() {
+    var list = shells();
+    var picked = list.filter(function (s) { return s.id === state.prefs.shell; })[0];
+    if (picked) return picked;
+    var he = list.filter(function (s) { return s.kind === 'he'; }).sort(function (a, b) { return (b.radius || 0) - (a.radius || 0); });
+    return he[0] || list[0] || null;
+  }
+
+  // The radius drawn around the aim point: the player's own number for this
+  // shell, else the prototype's. null for a shell that leaves no crater.
+  function hitRadius() {
+    var s = currentShell();
+    if (!s) return null;
+    var own = state.prefs.hitRadius[s.id];
+    if (typeof own === 'number') return own;
+    return typeof s.radius === 'number' ? s.radius : null;
+  }
+
+  // Kind names read better than prototype names; when a fork ships two shells
+  // of one kind (Stories: fragmentation and HE), the prototype name tells them apart.
+  function shellLabel(s) {
+    if (s.kind === 'other') return s.name;
+    var twins = shells().filter(function (x) { return x.kind === s.kind; }).length > 1;
+    return T.shellKinds[s.kind] + (twins ? ' · ' + s.name : '');
+  }
 
   function formatAge(ms) {
     var m = Math.floor(ms / 60000);
@@ -459,6 +619,23 @@
     view.centerOn(tile[0] + 0.5, tile[1] + 0.5, Math.max(view.scale, PICK_ZOOM_SCALE));
   }
 
+  // Game refusal text for a check reason, in the fork's own words.
+  function refusalText(reason) {
+    var t = terms();
+    var byReason = { tooFar: t.refuseTooFar, tooClose: t.refuseTooClose, covered: t.refuseCovered,
+                     landingZone: t.refuseLandingZone, noArea: t.refuseNotArea };
+    return byReason[reason] || T.reasons[reason] || reason;
+  }
+
+  // Fire checks for a world target from the placed mortar, or null without one.
+  function fireInfo(tile) {
+    var m = mortar();
+    if (!m || !state.planet) return null;
+    var checks = Logic.mortarFireChecks(state.planet, m.tile, tile, mortarConstants(), m.mode);
+    var box = Logic.impactBox(m.tile, tile, mortarConstants(), m.mode);
+    return { checks: checks, box: box };
+  }
+
   // ── map layers ──────────────────────────────────────────────────────────
 
   function drawText(ctx, text, x, y, size) {
@@ -490,6 +667,59 @@
     return p;
   }
 
+  function roundedRect(ctx, x, y, w, h, r) {
+    r = Math.max(0, Math.min(r, w / 2, h / 2));
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.arcTo(x + w, y, x + w, y + h, r);
+    ctx.arcTo(x + w, y + h, x, y + h, r);
+    ctx.arcTo(x, y + h, x, y, r);
+    ctx.arcTo(x, y, x + w, y, r);
+    ctx.closePath();
+  }
+
+  // The aim point is an integer world point — a tile corner, which is what the
+  // rangefinder number names. Solid circle: the blast; dashed outline: the
+  // landing box widened by the same radius.
+  function drawHitZone(ctx, v, tile, box, radius, faint) {
+    var s = v.scale, p = v.worldToScreen(tile[0], tile[1]);
+    var alpha = faint ? 0.55 : 1;
+    ctx.setLineDash([]);
+    ctx.lineWidth = 1.5;
+    if (radius) {
+      ctx.strokeStyle = 'rgba(0, 229, 255, ' + alpha + ')';
+      ctx.fillStyle = 'rgba(0, 229, 255, ' + (faint ? 0.06 : 0.12) + ')';
+      ctx.beginPath();
+      ctx.arc(p[0], p[1], radius * s, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+    }
+    ctx.beginPath();
+    ctx.arc(p[0], p[1], 3, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(0, 229, 255, ' + alpha + ')';
+    ctx.fill();
+    if (!box) return;
+    var r = radius || 0.5;
+    var tl = v.worldToScreen(box.minX - r, box.maxY + r);
+    var w = (box.maxX - box.minX + 2 * r) * s, h = (box.maxY - box.minY + 2 * r) * s;
+    ctx.setLineDash([6, 4]);
+    ctx.lineWidth = 1.5;
+    ctx.strokeStyle = 'rgba(255, 182, 39, ' + alpha + ')';
+    ctx.fillStyle = 'rgba(255, 182, 39, ' + (faint ? 0.05 : 0.09) + ')';
+    roundedRect(ctx, tl[0], tl[1], w, h, r * s);
+    ctx.fill();
+    ctx.stroke();
+    ctx.setLineDash([]);
+  }
+
+  view.addLayer(function drawTints(ctx, v) {
+    if (!state.tints || weapon() !== 'mortar') return;
+    ctx.imageSmoothingEnabled = false;
+    var w = v.tilesWide() * v.scale, h = v.tilesHigh() * v.scale;
+    if (layerOn('fire')) ctx.drawImage(state.tints.fire, v.ox, v.oy, w, h);
+    if (layerOn('deploy')) ctx.drawImage(state.tints.deploy, v.ox, v.oy, w, h);
+  });
+
   view.addLayer(function drawLabels(ctx, v) {
     if (!state.planet || v.scale < 2.5) return;
     var size = Math.max(11, Math.min(15, 9 + v.scale * 0.6));
@@ -497,6 +727,43 @@
       var p = v.worldToScreen(label[1], label[2]);
       drawText(ctx, label[0], p[0], p[1], size);
     });
+  });
+
+  view.addLayer(function drawMortar(ctx, v) {
+    var m = state.planet && weapon() === 'mortar' && mortar();
+    if (!m) return;
+    var c = mortarConstants(), s = v.scale;
+    var centre = v.worldToScreen(m.tile[0] + 0.5, m.tile[1] + 0.5);
+    if (layerOn('rings')) {
+      ctx.setLineDash([8, 6]);
+      ctx.lineWidth = 1.5;
+      ctx.strokeStyle = 'rgba(255, 61, 90, 0.85)';
+      ctx.beginPath();
+      ctx.arc(centre[0], centre[1], c.minRange * s, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.strokeStyle = 'rgba(57, 255, 133, 0.85)';
+      ctx.beginPath();
+      ctx.arc(centre[0], centre[1], c.maxRange * s, 0, Math.PI * 2);
+      ctx.stroke();
+      var z = Logic.zeroErrorSpan(m.tile, c.tilesPerOffset);
+      var tl = v.worldToScreen(z.minX, z.maxY + 1);
+      ctx.setLineDash([3, 3]);
+      ctx.strokeStyle = 'rgba(0, 229, 255, 0.7)';
+      ctx.strokeRect(tl[0], tl[1], (z.maxX - z.minX + 1) * s, (z.maxY - z.minY + 1) * s);
+      ctx.setLineDash([]);
+    }
+    ctx.fillStyle = '#ffb627';
+    ctx.strokeStyle = 'rgba(6, 9, 15, 0.9)';
+    ctx.lineWidth = 2;
+    var r = Math.max(5, Math.min(s / 2, 10));
+    ctx.beginPath();
+    ctx.moveTo(centre[0], centre[1] - r);
+    ctx.lineTo(centre[0] + r, centre[1]);
+    ctx.lineTo(centre[0], centre[1] + r);
+    ctx.lineTo(centre[0] - r, centre[1]);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
   });
 
   view.addLayer(function drawCalibration(ctx, v) {
@@ -510,7 +777,27 @@
   });
 
   view.addLayer(function drawSelected(ctx, v) {
-    if (state.planet && state.selected) markTile(ctx, v, state.selected, '#00e5ff', 2.5);
+    if (state.planet && state.selected && !calibration()) markTile(ctx, v, state.selected, '#00e5ff', 2.5);
+  });
+
+  view.addLayer(function drawTarget(ctx, v) {
+    var t = state.planet && calibration() && target();
+    if (!t) return;
+    if (weapon() === 'mortar' && layerOn('zone')) {
+      var info = fireInfo(t);
+      drawHitZone(ctx, v, t, info && info.box, hitRadius(), false);
+    }
+    markTile(ctx, v, t, '#00e5ff', 2.5);
+  });
+
+  view.addLayer(function drawHoverZone(ctx, v) {
+    var t = state.hoverTile;
+    if (!t || !state.planet || !calibration() || weapon() !== 'mortar' || !layerOn('zone')) return;
+    if (pickMode() !== 'target') return;
+    var cur = target();
+    if (cur && cur[0] === t[0] && cur[1] === t[1]) return;
+    var info = fireInfo(t);
+    drawHitZone(ctx, v, t, info && info.box, hitRadius(), true);
   });
 
   view.addLayer(function drawHoverTile(ctx, v) {
@@ -565,18 +852,26 @@
       els.hover.classList.add('tac-hide');
       return;
     }
-    var cs = calState(), coords, note;
+    var cs = calState(), coords, note, extra = '';
     if (cs.calibrated) {
       coords = Logic.formatCoords(toGame(t));
       note = T.game + ' · ' + fmt(T.calAge, { age: formatAge(cs.ageMs) });
       if (calibration().check && calibration().check.result === 'mismatch') note += ' · ✗ ' + T.mismatchNote;
       if (cs.askSameRound) note += ' · ' + T.askNote;
+      var info = weapon() === 'mortar' ? fireInfo(t) : null;
+      if (info) {
+        var ok = info.checks.ok;
+        extra = '<div class="tac-hover-fire ' + (ok ? 'ok' : 'bad') + '">' + (ok ? '✓' : '✗') + ' ' +
+          esc(fmt(T.hoverDist, { d: info.checks.distance.toFixed(1) })) + ' · ' +
+          esc(fmt(T.hoverErr, { ex: info.box.error[0], ey: info.box.error[1] })) +
+          (ok ? '' : ' · ' + esc(refusalText(info.checks.reasons[0]))) + '</div>';
+      }
     } else {
       coords = Logic.formatCoords(t);
       note = T.world + ' · ' + T.notGame;
     }
     els.hover.innerHTML = '<div class="tac-hover-coords">' + esc(coords) + '</div>' +
-      '<div class="tac-hover-note">' + esc(note) + '</div>' + areaHtml(t);
+      '<div class="tac-hover-note">' + esc(note) + '</div>' + extra + areaHtml(t);
     els.hover.classList.remove('tac-hide');
   }
 
@@ -588,9 +883,9 @@
 
   // ── panel ───────────────────────────────────────────────────────────────
 
-  function button(action, label, cls, disabled) {
+  function button(action, label, cls, disabled, title) {
     return '<button type="button" class="' + (cls || 'btn-small') + '" data-action="' + action + '"' +
-      (disabled ? ' disabled' : '') + '>' + esc(label) + '</button>';
+      (disabled ? ' disabled' : '') + (title ? ' title="' + esc(title) + '"' : '') + '>' + esc(label) + '</button>';
   }
 
   function msg(m, id) {
@@ -647,15 +942,68 @@
       '<p class="tac-hint">' + esc(T.newRoundHint) + '</p>';
   }
 
-  function pointHtml(cs) {
-    var h = '<h2 id="tacPointTitle">' + esc(T.pointTitle) + '</h2>';
-    var t = state.selected;
+  function weaponHtml() {
+    var w = weapon();
+    return '<div class="tac-segment" role="group" aria-label="' + esc(T.weaponTitle) + '">' +
+      ['mortar', 'ob', 'supply'].map(function (k) {
+        var soon = k !== 'mortar';
+        return '<button type="button" class="tac-seg' + (w === k ? ' on' : '') + '" data-action="weapon" data-weapon="' + k + '"' +
+          (soon ? ' disabled title="' + esc(T.weaponSoon) + '"' : '') + ' aria-pressed="' + (w === k) + '">' + esc(T.weapons[k]) + '</button>';
+      }).join('') + '</div>';
+  }
+
+  function mortarHtml(cs) {
+    var h = '<h2 id="tacMortarTitle">' + esc(T.mortarTitle) + '</h2>';
+    var m = mortar();
+    if (!cs.calibrated) return h + '<p class="tac-muted">' + esc(T.mortarNeedsCal) + '</p>';
+    if (!m) {
+      h += '<p class="tac-muted">' + esc(T.mortarNone) + '</p>';
+      if (pickMode() === 'mortar') h += msg({ text: T.mortarPickHint, kind: 'info' });
+      h += '<div class="tac-actions">' + button('pickMortar', T.mortarPickMap, pickMode() === 'mortar' ? 'btn-small on' : 'btn-small') + '</div>' +
+        '<label class="tac-input-label tac-find" for="tacMortarCoords">' + esc(termX() + ' ' + termY()) +
+        '<span class="tac-find-row"><input id="tacMortarCoords" class="tac-input" type="text" autocomplete="off" spellcheck="false" placeholder="-100 200" value="' + esc(state.mortarDraft) + '">' +
+        button('placeMortar', T.mortarPlace) + '</span></label>';
+      if (state.mortarMessage) h += msg(state.mortarMessage);
+      return h;
+    }
+    var place = Logic.placementCheck(state.planet, m.tile);
+    var area = Logic.areaAt(state.planet, m.tile[0], m.tile[1]);
+    h += '<div class="tac-coords-row"><span class="tac-muted">' + esc(T.mortarAt) + '</span><output class="tac-big" id="tacMortarCoordsOut">' +
+      esc(Logic.formatCoords(toGame(m.tile))) + '</output></div>' +
+      (area ? '<p class="tac-muted">' + esc(area[1]) + '</p>' : '') +
+      (place.ok ? msg({ text: T.deployOk, kind: 'ok' })
+        : msg({ text: fmt(T.deployNo, { reason: place.reasons[0] === 'noArea' ? T.deployNoArea : (terms().refuseDeployIndoors || place.reasons[0]) }), kind: 'error' })) +
+      '<div class="tac-actions">' + button('pickMortar', T.mortarMove, pickMode() === 'mortar' ? 'btn-small on' : 'btn-small') + button('removeMortar', T.mortarRemove) + '</div>';
+    if (pickMode() === 'mortar') h += msg({ text: T.mortarPickHint, kind: 'info' });
+    return h;
+  }
+
+  function targetHtml(cs) {
+    var isMortar = weapon() === 'mortar' && !!mortar();
+    var title = isMortar ? (terms().mortarTargetTitle || T.targetTitle) : T.targetTitle;
+    var h = '<h2 id="tacTargetTitle">' + esc(title) + '</h2>';
+    var t = cs.calibrated ? target() : state.selected;
     if (!t) {
-      h += '<p class="tac-muted">' + esc(T.pointNone) + '</p>';
+      h += '<p class="tac-muted">' + esc(T.targetNone) + '</p>';
     } else if (cs.calibrated) {
-      h += '<div class="tac-coords-row"><output class="tac-big" id="tacPointCoords">' + esc(Logic.formatCoords(toGame(t))) + '</output>' +
-        button('copyPoint', T.copy) + '</div>' +
-        '<p class="tac-muted">' + esc(T.game + ' · ' + fmt(T.calAge, { age: formatAge(cs.ageMs) })) + '</p>' + areaHtml(t);
+      var g = toGame(t);
+      h += '<div class="tac-target-fields">' +
+        '<span class="tac-target-field"><span>' + esc(terms().mortarTargetX || termX()) + '</span><output class="tac-big" id="tacTargetX">' + esc(g[0]) + '</output></span>' +
+        '<span class="tac-target-field"><span>' + esc(terms().mortarTargetY || termY()) + '</span><output class="tac-big" id="tacTargetY">' + esc(g[1]) + '</output></span>' +
+        '<span class="tac-target-copy" id="tacTargetCoords">' + esc(Logic.formatCoords(g)) + '</span>' +
+        button('copyTarget', T.copy) + '</div>';
+      if (isMortar) {
+        var info = fireInfo(t), c = info.checks;
+        h += '<p class="tac-dial">' + esc(fmt(T.dialLine, { label: terms().mortarOffsetTitle || 'Dial' })) + '</p>' +
+          '<p class="tac-muted">' + esc(fmt(T.distance, { d: c.distance.toFixed(1) })) + '</p>' +
+          (c.ok ? msg({ text: T.fireOk, kind: 'ok' }) : msg({ text: fmt(T.fireNo, { reason: refusalText(c.reasons[0]) }), kind: 'error' })) +
+          '<p class="tac-muted">' + esc(info.box.error[0] || info.box.error[1]
+            ? fmt(T.errorLine, { ex: info.box.error[0], ey: info.box.error[1] }) : T.errorNone) + '</p>' +
+          c.warnings.map(function (w) { return msg({ text: T.warnings[w] || w, kind: 'warn' }); }).join('');
+      } else if (weapon() === 'mortar') {
+        h += '<p class="tac-muted">' + esc(T.targetNoMortar) + '</p>';
+      }
+      h += '<p class="tac-muted">' + esc(fmt(T.calAge, { age: formatAge(cs.ageMs) })) + '</p>' + areaHtml(t);
     } else {
       h += '<div class="tac-coords-row"><span class="tac-big dim">' + esc(Logic.formatCoords(t)) + '</span></div>' +
         '<p class="tac-muted">' + esc(T.world + ' · ' + T.notGame) + '</p>' + areaHtml(t);
@@ -667,6 +1015,27 @@
       if (state.findMessage) h += msg(state.findMessage);
     }
     return h;
+  }
+
+  function layersHtml() {
+    var h = '<h2 id="tacLayersTitle">' + esc(T.layersTitle) + '</h2><div class="tac-layers">';
+    Logic.LAYER_KEYS.forEach(function (k) {
+      h += '<label class="tac-check-label"><input type="checkbox" data-layer="' + k + '"' + (layerOn(k) ? ' checked' : '') + '> ' + esc(T.layers[k]) + '</label>';
+    });
+    h += '</div>';
+    var list = shells(), s = currentShell();
+    if (s) {
+      var r = hitRadius(), own = typeof state.prefs.hitRadius[s.id] === 'number';
+      h += '<div class="tac-shell-row"><label class="tac-input-label" for="tacShell">' + esc(T.shell) +
+        '<select id="tacShell" class="tac-select">' + list.map(function (x) {
+          return '<option value="' + esc(x.id) + '"' + (x.id === s.id ? ' selected' : '') + '>' + esc(fmt(shellLabel(x), { name: x.name })) + '</option>';
+        }).join('') + '</select></label>' +
+        '<label class="tac-input-label" for="tacRadius">' + esc(T.radius) +
+        '<span class="tac-find-row"><input id="tacRadius" class="tac-input" type="number" min="0" max="' + MAX_RADIUS + '" step="0.5" value="' + (r == null ? '' : r) + '">' +
+        (own ? button('resetRadius', T.radiusReset) : '') + '</span></label></div>' +
+        '<p class="tac-hint">' + esc(s.kind === 'flare' && typeof s.radius !== 'number' ? T.radiusFlare : fmt(T.radiusDefault, { r: s.radius == null ? '—' : s.radius })) + '</p>';
+    }
+    return h + '<p class="tac-hint">' + esc(T.zoneHint) + '</p>';
   }
 
   function panelKey(cs) {
@@ -698,7 +1067,10 @@
       (storage.ok ? '' : msg({ text: T.noStorage, kind: 'warn' })) +
       (cs.askSameRound ? sameRoundHtml(cs) : '') +
       '<section class="tac-section" aria-labelledby="tacCalTitle">' + calibrationHtml(cs) + '</section>' +
-      '<section class="tac-section" aria-labelledby="tacPointTitle">' + pointHtml(cs) + '</section>' +
+      '<section class="tac-section tac-weapon">' + weaponHtml() + '</section>' +
+      (weapon() === 'mortar' ? '<section class="tac-section" aria-labelledby="tacMortarTitle">' + mortarHtml(cs) + '</section>' : '') +
+      '<section class="tac-section" aria-labelledby="tacTargetTitle">' + targetHtml(cs) + '</section>' +
+      (weapon() === 'mortar' ? '<section class="tac-section" aria-labelledby="tacLayersTitle">' + layersHtml() + '</section>' : '') +
       '<p class="tac-muted tac-hint-block">' + esc(T.hint) + '</p>' +
       '<p class="tac-source">' + esc(fmt(T.source, { fork: f.label, sha: f.source.sha.slice(0, 9), date: f.source.date })) + '</p>';
     state.panelKey = panelKey(cs);
@@ -724,6 +1096,35 @@
     if (save) save.disabled = !(state.selected && draftParse().ok);
   }
 
+  // A typed in-game pair as a world tile on this planet, or a message why not.
+  function parseGamePoint(text) {
+    var p = Logic.parseCoords(text, maxCoord());
+    if (!p.ok) return { error: T.parse[p.reason] };
+    var w = Logic.gameToWorld(calibration().offset, p.x, p.y);
+    if (!Logic.areaAt(state.planet, w[0], w[1])) {
+      state.session.offPlanet = true;   // a wrong planet or a stale offset looks exactly like this
+      return { error: fmt(T.offPlanet, { coords: Logic.formatCoords([p.x, p.y]) }) };
+    }
+    return { tile: w };
+  }
+
+  function setMortar(tile) {
+    state.store.mortar = { tile: tile.slice(), mode: (mortar() && mortar().mode) || 'coordinates' };
+    state.pickMode = null;
+    state.mortarMessage = null;
+    saveStore();
+    trackPlanet('tactical_mortar_place');
+    renderAll();
+  }
+
+  function setTarget(tile) {
+    state.store.target = tile.slice();
+    state.findMessage = null;
+    saveStore();
+    if (mortar()) trackPlanet('tactical_target');
+    renderAll();
+  }
+
   // ── actions ─────────────────────────────────────────────────────────────
 
   var actions = {
@@ -744,6 +1145,8 @@
       Logic.confirmSameRound(state.session, now());
       state.draft = { x: '', y: '' };
       state.calMessage = null;
+      state.selected = null;
+      state.pickMode = null;
       saveStore();
       trackPlanet('tactical_calibrate');
       renderAll();
@@ -768,6 +1171,7 @@
       state.selected = calibration().tile.slice();
       state.store.calibration = null;
       state.calMessage = null;
+      state.pickMode = null;
       saveStore();
       renderAll();
       var x = $('tacCalX');
@@ -780,37 +1184,69 @@
     },
     newRound: function () {
       state.store.calibration = null;
+      state.store.mortar = null;
+      state.store.target = null;
       state.store.shots = [];
       state.session = Logic.newSession(now(), false);
       state.selected = null;
+      state.pickMode = null;
       state.draft = { x: '', y: '' };
       state.calMessage = null;
+      state.mortarDraft = '';
+      state.mortarMessage = null;
       state.findDraft = '';
       state.findMessage = null;
       saveStore();
       trackPlanet('tactical_new_round');
       renderAll();
     },
-    copyPoint: function () {
-      if (state.selected && calibration()) copyCoords(Logic.formatCoords(toGame(state.selected)), $('tacPointCoords'));
+    weapon: function (btn) {
+      var w = btn.getAttribute('data-weapon');
+      if (w === state.prefs.weapon || btn.disabled) return;
+      state.prefs.weapon = w;
+      savePrefs();
+      renderAll();
     },
-    find: function () {
-      var p = Logic.parseCoords(state.findDraft, maxCoord());
-      if (!p.ok) {
-        state.findMessage = { text: T.parse[p.reason], kind: 'error' };
-        renderPanel();
-        return;
-      }
-      var w = Logic.gameToWorld(calibration().offset, p.x, p.y);
-      if (!Logic.areaAt(state.planet, w[0], w[1])) {
-        state.session.offPlanet = true;   // a wrong planet or a stale offset looks exactly like this
-        state.findMessage = { text: fmt(T.offPlanet, { coords: Logic.formatCoords([p.x, p.y]) }), kind: 'error' };
+    pickMortar: function () {
+      state.pickMode = pickMode() === 'mortar' ? null : 'mortar';
+      state.mortarMessage = null;
+      renderPanel();
+      els.canvas.focus({ preventScroll: true });
+    },
+    placeMortar: function () {
+      var r = parseGamePoint(state.mortarDraft);
+      if (r.error) {
+        state.mortarMessage = { text: r.error, kind: 'error' };
         renderAll();
         return;
       }
-      state.selected = w;
-      state.findMessage = null;
-      view.centerOn(w[0] + 0.5, w[1] + 0.5, Math.max(view.scale, PICK_MIN_SCALE));
+      state.mortarDraft = '';
+      setMortar(r.tile);
+      showTile(r.tile);
+    },
+    removeMortar: function () {
+      state.store.mortar = null;
+      state.pickMode = null;
+      saveStore();
+      renderAll();
+    },
+    copyTarget: function () {
+      if (target() && calibration()) copyCoords(Logic.formatCoords(toGame(target())), $('tacTargetCoords'));
+    },
+    find: function () {
+      var r = parseGamePoint(state.findDraft);
+      if (r.error) {
+        state.findMessage = { text: r.error, kind: 'error' };
+        renderAll();
+        return;
+      }
+      setTarget(r.tile);
+      view.centerOn(r.tile[0] + 0.5, r.tile[1] + 0.5, Math.max(view.scale, PICK_MIN_SCALE));
+    },
+    resetRadius: function () {
+      var s = currentShell();
+      if (s) delete state.prefs.hitRadius[s.id];
+      savePrefs();
       renderAll();
     }
   };
@@ -819,13 +1255,37 @@
     var btn = e.target.closest ? e.target.closest('[data-action]') : null;
     if (!btn || btn.disabled || !state.planet) return;
     var fn = actions[btn.getAttribute('data-action')];
-    if (fn) fn();
+    if (fn) fn(btn);
   });
 
   els.panel.addEventListener('input', function (e) {
-    var id = e.target.id;
+    var el = e.target, id = el.id;
     if (id === 'tacCalX' || id === 'tacCalY') onCalInput();
-    else if (id === 'tacFind') state.findDraft = e.target.value;
+    else if (id === 'tacFind') state.findDraft = el.value;
+    else if (id === 'tacMortarCoords') state.mortarDraft = el.value;
+    else if (id === 'tacRadius') {
+      var s = currentShell(), r = parseFloat(String(el.value).replace(',', '.'));
+      if (!s) return;
+      if (isFinite(r) && r >= 0 && r <= MAX_RADIUS) state.prefs.hitRadius[s.id] = r;
+      else if (el.value === '') delete state.prefs.hitRadius[s.id];
+      savePrefs();
+      view.requestDraw();
+    }
+  });
+
+  els.panel.addEventListener('change', function (e) {
+    var el = e.target;
+    if (el.id === 'tacShell') {
+      state.prefs.shell = el.value;
+      savePrefs();
+      renderAll();
+    } else if (el.getAttribute && el.getAttribute('data-layer')) {
+      state.prefs.layers[el.getAttribute('data-layer')] = !!el.checked;
+      savePrefs();
+      view.requestDraw();
+    } else if (el.id === 'tacRadius') {
+      renderPanel();   // the reset button appears once a value is the player's own
+    }
   });
 
   // A pasted pair or rangefinder line lands split into both fields.
@@ -847,6 +1307,7 @@
     var id = e.target.id;
     if (id === 'tacCalX' || id === 'tacCalY') { actions.saveCalibration(); e.preventDefault(); }
     else if (id === 'tacFind') { actions.find(); e.preventDefault(); }
+    else if (id === 'tacMortarCoords') { actions.placeMortar(); e.preventDefault(); }
   });
 
   // ── copy ────────────────────────────────────────────────────────────────
@@ -915,20 +1376,28 @@
 
   function pick(tile, sx, sy, fromPointer) {
     if (!state.planet) return;
-    if (!calibration() && view.scale < PICK_MIN_SCALE) {
-      view.zoomAt(PICK_ZOOM_SCALE / view.scale, sx, sy);   // the tile stays under the cursor
-      state.calMessage = { text: T.calPickZoomed, kind: 'info' };
-      renderPanel();
+    var mode = pickMode();
+    if (mode === 'calibrate') {
+      if (view.scale < PICK_MIN_SCALE) {
+        view.zoomAt(PICK_ZOOM_SCALE / view.scale, sx, sy);   // the tile stays under the cursor
+        state.calMessage = { text: T.calPickZoomed, kind: 'info' };
+        renderPanel();
+        return;
+      }
+      state.selected = tile;
+      state.calMessage = null;
+      renderAll();
+      if (fromPointer) {
+        var x = $('tacCalX');
+        if (x && !x.value) x.focus({ preventScroll: true });
+      }
       return;
     }
-    state.selected = tile;
-    state.calMessage = null;
-    state.findMessage = null;
-    renderAll();
-    if (!calibration() && fromPointer) {
-      var x = $('tacCalX');
-      if (x && !x.value) x.focus({ preventScroll: true });
+    if (mode === 'mortar') {
+      setMortar(tile);
+      return;
     }
+    setTarget(tile);
   }
 
   view.onClick(function (tile, e) {
@@ -961,6 +1430,7 @@
     else if (e.key === 'ArrowRight') { view.panBy(-40, 0); e.preventDefault(); }
     else if (e.key === 'ArrowUp') { view.panBy(0, 40); e.preventDefault(); }
     else if (e.key === 'ArrowDown') { view.panBy(0, -40); e.preventDefault(); }
+    else if (e.key === 'Escape' && state.pickMode) { state.pickMode = null; renderPanel(); e.preventDefault(); }
     else if (e.key === 'Enter' || e.key === ' ') {
       var s = view.cssSize(), tile = view.tileAtScreen(s.w / 2, s.h / 2);
       if (tile) pick(tile, s.w / 2, s.h / 2, false);
@@ -1005,9 +1475,16 @@
   setInterval(tick, TICK_MS);
   document.addEventListener('visibilitychange', tick);
 
-  // Another tab of this page wrote the same planet: take its state. A calibration
-  // made there just now is as fresh as one made here.
+  // Another tab of this page wrote the same planet or the prefs: take its state.
+  // A calibration made there just now is as fresh as one made here.
   window.addEventListener('storage', function (e) {
+    if (e.key === PREFS_KEY) {
+      var rawPrefs = null;
+      try { rawPrefs = JSON.parse(e.newValue); } catch (err) { rawPrefs = null; }
+      state.prefs = Logic.migratePrefs(rawPrefs);
+      renderAll();
+      return;
+    }
     if (!state.storeKey || e.key !== state.storeKey) return;
     var before = calibration() ? calibration().at : null;
     var raw = null;

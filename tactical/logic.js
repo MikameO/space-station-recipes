@@ -153,6 +153,20 @@
     return [Math.floor(Math.abs(d[0]) / tilesPerOffset), Math.floor(Math.abs(d[1]) / tilesPerOffset)];
   }
 
+  // Where a shell aimed at `target` can actually land: the aim error the game
+  // rolls for this mortar–target pair, plus the per-shot jitter. Integer points,
+  // inclusive; `radius` (blast or fire) widens the box into the hit zone.
+  function impactBox(mortarTile, target, mortar, mode) {
+    var e = mode === 'laser' ? [0, 0] : errorBounds(mortarTile, target, mortar.tilesPerOffset);
+    var jitter = mode === 'laser' ? [0] : (mortar.jitter || [0]);
+    var jMin = Math.min.apply(null, jitter), jMax = Math.max.apply(null, jitter);
+    return {
+      minX: target[0] - e[0] + jMin, maxX: target[0] + e[0] + jMax,
+      minY: target[1] - e[1] + jMin, maxY: target[1] + e[1] + jMax,
+      error: e, jitter: [jMin, jMax]
+    };
+  }
+
   function zeroErrorSpan(mortarTile, tilesPerOffset) {
     return {
       minX: mortarTile[0] - tilesPerOffset + 1, maxX: mortarTile[0] + tilesPerOffset,
@@ -404,13 +418,41 @@
     });
   }
 
+  // Page preferences shared by every planet: weapon, shell, a player's own hit
+  // radius per shell, and which layers are on. Unknown keys are dropped.
+  var PREFS_VERSION = 1;
+  var LAYER_KEYS = ['fire', 'deploy', 'rings', 'zone'];
+  var DEFAULT_LAYERS = { fire: true, deploy: false, rings: true, zone: true };
+
+  function migratePrefs(raw) {
+    var out = { v: PREFS_VERSION, weapon: 'mortar', shell: null, hitRadius: {}, layers: {} };
+    LAYER_KEYS.forEach(function (k) { out.layers[k] = DEFAULT_LAYERS[k]; });
+    if (!raw || typeof raw !== 'object' || raw.v !== PREFS_VERSION) return out;
+    if (raw.weapon === 'mortar' || raw.weapon === 'ob' || raw.weapon === 'supply') out.weapon = raw.weapon;
+    if (typeof raw.shell === 'string' && raw.shell) out.shell = raw.shell;
+    if (raw.hitRadius && typeof raw.hitRadius === 'object') {
+      Object.keys(raw.hitRadius).forEach(function (k) {
+        var r = raw.hitRadius[k];
+        if (typeof r === 'number' && isFinite(r) && r >= 0 && r <= 100) out.hitRadius[k] = r;
+      });
+    }
+    if (raw.layers && typeof raw.layers === 'object') {
+      LAYER_KEYS.forEach(function (k) { if (typeof raw.layers[k] === 'boolean') out.layers[k] = raw.layers[k]; });
+    }
+    return out;
+  }
+
   // Whatever localStorage held for a planet becomes a valid state. An unknown
   // version, or a calibration whose numbers disagree with each other, is
   // dropped rather than repaired. Shots and markers are validated by their own
   // increments (T5, T6) and pass through as arrays.
   function migrateStorage(raw) {
-    var out = { v: STORAGE_VERSION, calibration: null, shots: [], markers: [] };
+    var out = { v: STORAGE_VERSION, calibration: null, mortar: null, target: null, shots: [], markers: [] };
     if (!raw || typeof raw !== 'object' || raw.v !== STORAGE_VERSION) return out;
+    if (raw.mortar && isTile(raw.mortar.tile)) {
+      out.mortar = { tile: raw.mortar.tile.slice(), mode: raw.mortar.mode === 'laser' ? 'laser' : 'coordinates' };
+    }
+    if (isTile(raw.target)) out.target = raw.target.slice();
     var c = raw.calibration;
     if (c && isTile(c.tile) && isTile(c.reading) && isTile(c.offset) && typeof c.at === 'number' &&
         sameVec(offsetFrom(c.tile, c.reading), c.offset)) {
@@ -433,11 +475,15 @@
 
   root.TacticalLogic = {
     STORAGE_VERSION: STORAGE_VERSION,
+    PREFS_VERSION: PREFS_VERSION,
+    LAYER_KEYS: LAYER_KEYS,
     pickCheckTile: pickCheckTile,
     newSession: newSession,
     noteInput: noteInput,
     confirmSameRound: confirmSameRound,
     migrateStorage: migrateStorage,
+    migratePrefs: migratePrefs,
+    impactBox: impactBox,
     FLAGS: FLAGS,
     STALE_AFTER_MS: STALE_AFTER_MS,
     worldToGame: worldToGame,

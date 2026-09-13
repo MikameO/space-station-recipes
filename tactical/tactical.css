@@ -294,6 +294,56 @@ body.tac-body {
 
 .tac-hint-block { margin-top: 12px; }
 
+.tac-hover-fire { font-size: 12px; margin-top: 2px; }
+.tac-hover-fire.ok { color: var(--phosphor); }
+.tac-hover-fire.bad { color: var(--red-alert); }
+
+.tac-segment { display: flex; gap: 4px; }
+
+.tac-seg {
+  flex: 1;
+  padding: 6px 8px;
+  background: var(--hull);
+  border: 1px solid var(--border-subtle);
+  border-radius: 3px;
+  color: var(--text-sub);
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.tac-seg.on { border-color: var(--phosphor); color: var(--phosphor); background: var(--phosphor-glow); }
+.tac-seg:disabled { opacity: 0.45; cursor: not-allowed; }
+.tac-seg:focus-visible { outline: 2px solid var(--cyan); outline-offset: 1px; }
+
+.tac-panel .btn-small.on { border-color: var(--cyan); color: var(--cyan); }
+
+.tac-target-fields {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 6px 14px;
+}
+
+.tac-target-field { display: flex; flex-direction: column; font-size: 11px; color: var(--text-sub); text-transform: uppercase; letter-spacing: 0.04em; }
+.tac-target-field .tac-big { text-transform: none; letter-spacing: 0; }
+.tac-target-copy { position: absolute; left: -9999px; }
+
+.tac-dial {
+  font-family: ui-monospace, "Cascadia Mono", Consolas, monospace;
+  font-size: 13px;
+  color: var(--text-sub);
+}
+
+.tac-layers { display: flex; flex-direction: column; gap: 4px; margin-bottom: 8px; }
+
+.tac-check-label { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--text-main); cursor: pointer; }
+.tac-check-label input { accent-color: var(--phosphor); }
+
+.tac-shell-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.tac-shell-row .tac-select { width: 100%; max-width: none; font-size: 13px; padding: 6px 8px; }
+.tac-shell-row .tac-input { font-size: 14px; }
+
 @media (max-width: 900px) {
   .tac-layout { grid-template-columns: 1fr; padding: 0 8px 8px; }
   .tac-map-wrap { min-height: 60vh; }
