@@ -33,3 +33,28 @@
 .tac-room-state.busy { color: var(--amber); }
 .tac-room-state.cooldown { color: var(--text-ghost); }
 .tac-room-state.down { color: var(--red-alert); }
+
+/* Task 8: half-monitor (≤1100 px). The page never scrolls; map, strip and panel scroll on their own. */
+@media (max-width: 1100px) {
+  body.tac-room-on { height: 100vh; overflow: hidden; }
+  body.tac-room-on .lib-footer { display: none; }
+  body.tac-room-on .tac-layout {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr) 300px;
+    padding: 0 8px 8px;
+    min-height: 0;
+    overflow: hidden;
+  }
+  body.tac-room-on .tac-map-wrap { min-height: 0; grid-column: 1; grid-row: 1; }
+  body.tac-room-on .tac-canvas-box { min-height: 0; }
+  body.tac-room-on .tac-room-strip { flex: none; height: 64px; min-height: 64px; overflow-y: hidden; }
+  body.tac-room-on .tac-room-strip .tac-room-card { height: 52px; overflow: hidden; }
+  body.tac-room-on .tac-room-panel {
+    grid-column: 1;
+    grid-row: 2;
+    max-height: 300px;
+    min-height: 0;
+    overflow-y: auto;
+  }
+  body.tac-room-on .tac-toolbar { flex-wrap: nowrap; overflow-x: auto; }
+}
