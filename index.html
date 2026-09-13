@@ -189,13 +189,15 @@
       <button class="tab-btn active" id="btn-reagents" data-tab="reagents" role="tab" aria-selected="true" aria-controls="tab-reagents">Reagents</button>
       <button class="tab-btn" id="btn-calculator" data-tab="calculator" role="tab" aria-selected="false" aria-controls="tab-calculator">Calculator</button>
       <button class="tab-btn" id="btn-medbay" data-tab="medbay" role="tab" aria-selected="false" aria-controls="tab-medbay">What Heals?</button>
-      <button class="tab-btn" id="btn-trees" data-tab="trees" role="tab" aria-selected="false" aria-controls="tab-trees">Craft Trees</button>
+      <!-- 2026-09-13 (owner): Craft Trees and Fork Diff leave the menu; the tabs stay reachable by #tab= links like Antag -->
+      <button class="tab-btn" id="btn-trees" data-tab="trees" role="tab" aria-selected="false" aria-controls="tab-trees" style="display:none">Craft Trees</button>
       <button class="tab-btn" id="btn-botany" data-tab="botany" role="tab" aria-selected="false" aria-controls="tab-botany">Botany</button>
       <button class="tab-btn" id="btn-maps" data-tab="maps" role="tab" aria-selected="false" aria-controls="tab-maps">Maps</button>
       <button class="tab-btn" id="btn-ordnance" data-tab="ordnance" role="tab" aria-selected="false" aria-controls="tab-ordnance">Ordnance</button>
       <!-- A1.1 (2026-07-28): Stats/Graph/Reactions removed by Metrika verdict; Fork Diff promoted from the retired Advanced dropdown -->
-      <button class="tab-btn" id="btn-forkdiff" data-tab="forkdiff" role="tab" aria-selected="false" aria-controls="tab-forkdiff">Fork Diff</button>
+      <button class="tab-btn" id="btn-forkdiff" data-tab="forkdiff" role="tab" aria-selected="false" aria-controls="tab-forkdiff" style="display:none">Fork Diff</button>
       <a class="tab-link" href="library.html">Library</a>
+      <a class="tab-link" href="tactical.html">Tactical map CM</a>
       <button class="tab-btn tab-btn-antag" id="btn-antag" data-tab="antag" role="tab" aria-selected="false" aria-controls="tab-antag" style="display:none">&#9760; Antag Strategies</button>
     </div>
 
@@ -848,7 +850,7 @@
 </div>
 
 <!-- i18n.js must load BEFORE app.js: it exposes applyRussianData for init() -->
-<script src="i18n.js?v=44"></script>
+<script src="i18n.js?v=45"></script>
 <script src="app.js?v=52"></script>
 <script defer src="tutorial.js?v=3"></script>
 <script src="maps.js?v=17" defer></script>

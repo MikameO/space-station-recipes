@@ -122,6 +122,7 @@
     'Ordnance': 'Взрывное дело',
     'Fork Diff': 'Сравнение форков',
     'Library': 'Библиотека',
+    'Tactical map CM': 'Тактическая карта CM',
     // Document library (Series G, library.html)
     'In-game documents: doctrines, field manuals, role memos. Texts are stored verbatim.': 'Внутриигровые документы: уставы, наставления, памятки ролей. Тексты хранятся дословно.',
     'Documents': 'Документы',
