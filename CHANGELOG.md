@@ -3,6 +3,33 @@
 `data.json` schema version is in `meta.schemaVersion`. Consumers reading this file
 should pin on a compatible range (semver: breaking changes bump major).
 
+## Series O, O19 — 2026-09-13 (Ordnance: everyday recipes without octogen; `ordnance/<fork>.json` gains fields, schema 1 unchanged)
+
+**Ready recipes, rebuilt.** The catalogue is now two groups. Everyday rows leave
+octogen out and are ranked on what a grenade does on a shift — how far out a
+warrior stays knocked down for two seconds, how far resin walls break, how many
+T0–T1 die within three tiles — as a ladder from *Mass-produced* (inside ANFO's
+four reactions) through *Assault* (90% of the peak for the least material) to the
+*Octogen-free peak*. Full flame, Denial and Breach stay. Reach, damage, shrapnel
+and HE fold into a *High explosive* group that prints a row only where the answer
+needs octogen. The Fire, Burn time and Short chain roles are gone. Thirteen player
+recipes from the Space Stories ordnance thread (`ordnance_community.py`) and the
+owner's 190 ANFO + 50 cyclonite mortar shell are named rows, computed by the same
+formula as everything else.
+
+**Mechanics, mirrored.** Knockdown from `SharedRMCExplosionSystem`
+(`factor = min(20, round(damage × 0.05) / 2)`, banker's rounding, `factor / 2.5` s
+for a weak caste), and resin construction with its explosion coefficients (wall
+×3.64, door ×7.5). That corrects O16, which said no casing breaks a resin wall by
+blast. The Detonation panel gains Knockdown and Resin walls cards, and each gallery
+card says how long the blast keeps that caste on the floor.
+
+**JSON:** `targets[].weak` and `.size`; a `structures` list (`id`, `name`, `hp`,
+`coefficient`); `formula.stun*`, `knockdownSeconds`, `knockdownRef`, `lowTierMax`,
+`wallRef`; `recipes[].group` (`base` | `high`) with optional `name` and `note`
+(`en`, `ru`). Manifest keys: `knockdown_ref`, `structure_files`, `structures`,
+`wall_ref`, `high_power_reagents`.
+
 ## Series H — 2026-09-13 (Sections overlay, feedback form, returning-visitor survey; no schema change)
 
 **New — `sections.json` and the «⊞ Sections» overlay.** One manifest lists every

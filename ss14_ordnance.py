@@ -706,6 +706,8 @@ def build_targets(conf: dict, files: dict[str, str]) -> list[dict]:
             # Flammable.damage is per second and scales with stacks. Every caste
             # burns at 1 Heat except the boiler, which burns at 3.
             "fireHeat": _heat((comp.get("Flammable") or {}).get("damage")) or 1.0,
+            "weak": bool((comp.get("StunOnExplosionReceived") or {}).get("weak")),
+            "size": (comp.get("RMCSize") or {}).get("size"),
         })
         # King, queen and ravager shrug off tile fire entirely, and the queen
         # cannot even be lit. Only a fire carrying RMCFireImmunityBypass gets
@@ -719,6 +721,40 @@ def build_targets(conf: dict, files: dict[str, str]) -> list[dict]:
         vis = comp.get("RMCXenoDamageVisuals") or {}
         if vis.get("prefix"):
             out[-1]["_wounds"] = (str(vis["prefix"]), int(vis.get("states") or 3))
+    return out
+
+
+def build_structures(conf: dict, files: dict[str, str], explosion: str) -> list[dict]:
+    """Resin construction, and how much raw blast takes each piece down.
+
+    Explosion damage goes in with ignoreResistances, so the Resin modifier set
+    never applies, but ExplosionResistance does: a plain wall inherits 3.64 from
+    CMBaseWallXeno and a door sets 7.5. The threshold that counts is the one that
+    destroys the thing; an egg also has a Heat trigger that only burns it.
+    """
+    protos = parse_entities(files)
+    out = []
+    for sid in conf.get("structures", []):
+        if sid not in protos:
+            print(f"  WARNING: structure prototype {sid} not found")
+            continue
+        comp = resolve_entity(protos, sid)
+        hp = None
+        for threshold in (comp.get("Destructible") or {}).get("thresholds") or []:
+            trigger = threshold.get("trigger") or {}
+            destroys = any("Destruction" in (b.get("acts") or [])
+                           for b in threshold.get("behaviors") or [])
+            if trigger.get("_type") == "DamageTrigger" and destroys:
+                hp = float(trigger["damage"])
+                break
+        if hp is None:
+            print(f"  WARNING: {sid} has no destroying damage threshold, skipped")
+            continue
+        resistance = comp.get("ExplosionResistance") or {}
+        overrides = resistance.get("damageCoefficientOverrides") or {}
+        coefficient = float(overrides.get(explosion, resistance.get("damageCoefficient", 1.0)))
+        out.append({"id": sid, "name": comp.get("_name") or sid, "hp": hp,
+                    "coefficient": coefficient})
     return out
 
 
@@ -860,15 +896,14 @@ def fire_area(st: dict) -> float:
     if r <= 0 or st["fireIntensity"] <= 0:
         return 0.0
     return 8 * r + 1 if st["star"] else 2 * r * r + 2 * r + 1
-_SPREADS = lambda s: s["reach"] >= MIN_FIRE_REACH
+
+
+# The high-power group's optimisations. The everyday rows are not on this list:
+# they are ranked on knockdown reach once the sweep is done, see build_recipes.
 CATALOGUE_ROLES = [
     ("radius", "Blast radius", _RADIUS, lambda s, c: s["power"]),
     ("damage", "Peak damage", lambda s, c: s["power"], _RADIUS),
     ("shrapnel", "Shrapnel", lambda s, c: s["shards"], lambda s, c: s["power"]),
-    ("fire", "Fire intensity", lambda s, c: s["fireIntensity"] if _SPREADS(s) else 0.0,
-     lambda s, c: s["fireDuration"]),
-    ("burn", "Burn time", lambda s, c: s["fireDuration"] if _SPREADS(s) else 0.0,
-     lambda s, c: s["fireIntensity"]),
 ]
 # Fire. FlammableSystem ticks once a second; a burning xeno takes
 #   intensity * (stacks / duration * 0.2 + 0.8) * heat / 2
@@ -896,7 +931,7 @@ FIRE_PAT_STACKS = 10.0      # FirePatterComponent.Stacks, and ResistStacks besid
 # the number of distinct reactions a mixture needs. That lines up with how the
 # work actually feels: ammonium nitrate is three, ANFO four, cyclonite six,
 # octogen eight.
-# The short-chain row answers a plain question: what is the best this casing can
+# The mass-produced row answers a plain question: what is the best this casing can
 # do without a longer process than ANFO itself? A share-of-the-best rule was
 # tried first and failed, because the ceiling it measured against was set by
 # octogen, and two thirds of that is already out of reach for anything short.
@@ -909,12 +944,31 @@ SHORT_CHAIN_REAGENT = "RMCANFO"
 # fuel or frost oil, so excluding that tier would throw out the best explosive
 # in the game along with the worst chore.
 PRACTICAL_TIERS = {"dispenser", "self-chem", "unknown", "pickup"}
-# Targets destroyed, summed over these distances. Counting kills at the
-# epicentre alone rewards a concentrated charge and punishes reach: a grenade
-# that kills four things standing exactly on it at 3.4 tiles of blast is worse
-# in a fight than one killing three across 7.2. These are the same four
-# distances the gallery offers, so a row can be checked against it.
-PRACTICAL_DISTANCES = (0, 1, 2, 3)
+# A grenade rarely kills anything that holds a line. What it does every time is
+# put the nearest xenos on the floor for a moment the marines can use.
+# SharedRMCExplosionSystem.OnStunOnExplosionReceivedBeforeExplode, mirrored:
+#   factor = min(20, round(damage * 0.05) / 2)
+# with damage already multiplied by the target's explosion coefficient, and
+# Math.Round rounding half to even, as Python's round does. A caste flagged weak
+# -- every base xeno, ravager included -- is stunned and knocked down for
+# factor / 2.5 s. Crusher, king and queen -- and the oppressor strain of the
+# praetorian, whose flag sits on RMCXenoPraetorianOppressor rather than on the
+# plain praetorian -- are not weak, and go down only past a factor of ten, for
+# factor / 5 / 5 s.
+STUN_SCALE = 0.05
+STUN_CAP = 20.0
+STUN_WEAK_DIVISOR = 2.5
+STUN_STRONG_GATE = 10.0
+STUN_STRONG_DIVISOR = 25.0
+# The everyday ladder asks how far out the reference caste (a warrior: T2 is what
+# meets a push) stays down this long -- enough to turn and fire. Anything lighter
+# goes down further and for longer.
+KNOCKDOWN_SECONDS = 2.0
+# The assault row is the cheapest mixture that keeps this share of the peak.
+ASSAULT_SHARE = 0.9
+# The small-fry column counts T0 and T1. Queen and king also carry tier 0, but
+# they are not weak, and that is what tells them apart.
+LOW_TIER_MAX = 1
 
 # High explosive is judged the way it is used. A round lands near a xeno, not on
 # one, so the distances are two and three tiles. And a T1 does not hold a
@@ -1076,26 +1130,29 @@ def he_effect(st: dict, targets: list, formula: dict, fire: dict | None) -> tupl
     return dead, crit
 
 
-def count_kills(st: dict, targets: list, formula: dict, fire: dict | None,
-                distance: float = 0.0, seconds_in: float = 0.0,
-                seconds_after: float = 0.0) -> int:
-    """Targets destroyed outright.
+def radius_where(st: dict, raw: float, formula: dict) -> float:
+    """The distance out to which the blast still deals `raw` damage."""
+    if st["power"] <= 0 or st["falloff"] <= 0:
+        return 0.0
+    top = st["power"] / INTENSITY_DIVISOR
+    need = raw / formula["damagePerIntensity"]
+    if top < need:
+        return 0.0
+    return (top - need) / max(st["falloff"] / INTENSITY_DIVISOR, MIN_SLOPE)
 
-    Fire defaults to a closed burn window on purpose. A recipe that only clears
-    a threshold while the xeno stands and burns is a hope, not a recipe, and the
-    hive pats a burning xeno out in a couple of seconds.
+
+def knockdown_radius(st: dict, target: dict | None, formula: dict,
+                     seconds: float = KNOCKDOWN_SECONDS) -> float:
+    """How far out `target` stays knocked down for at least `seconds`.
+
+    round(x) reaches n from x = n - 0.5, so the edge is a plain linear solve.
     """
-    blast = blast_damage_at(st["power"], st["falloff"], distance,
-                            formula["damagePerIntensity"])
-    n = 0
-    for target in targets:
-        dealt = blast * target["coefficient"]
-        if fire:
-            dealt += fire_damage(st, target, distance, fire, formula,
-                                 seconds_in, seconds_after)
-        if dealt >= target["dead"]:
-            n += 1
-    return n
+    if not target or not target.get("weak"):
+        return 0.0
+    n = math.ceil(seconds * STUN_WEAK_DIVISOR * 2 - 1e-9)
+    if n / 2 > STUN_CAP:
+        return 0.0
+    return radius_where(st, (n - 0.5) / STUN_SCALE / target["coefficient"], formula)
 
 
 def _solve(rows: list, rhs: list) -> list | None:
@@ -1178,9 +1235,30 @@ def cheapest_flame(casing: dict, reagents: dict, pool: list, iron: str) -> dict 
     return best[1] if best else None
 
 
+def _signature(mix: dict) -> tuple:
+    return tuple(sorted((rid, round(q, 3)) for rid, q in mix.items()))
+
+
 def build_recipes(casings: dict, reagents: dict, formula: dict, costs: dict,
                   cost_base: str, targets: list | None = None,
-                  fires: dict | None = None, chem: dict | None = None) -> list[dict]:
+                  fires: dict | None = None, chem: dict | None = None,
+                  high_power: set | None = None,
+                  community: list | None = None) -> list[dict]:
+    """The ready-recipe catalogue, in two groups.
+
+    Everyday rows leave out the high-power reagents and are judged by what a
+    grenade does on a shift. Nobody has seen one kill a xeno that matters; what
+    it does every time is put the nearest ones on the floor, break their
+    construction and deny ground. So the everyday ladder is climbed on how far
+    out a warrior stays down for two seconds, from the mixture any marine can
+    brew in bulk to the most the casing gives without octogen.
+
+    The high-power rows are the older optimisations -- reach, damage, shrapnel,
+    high explosive -- and a row only prints there when its answer really needs
+    octogen. Named community mixtures go to whichever group their reagents put
+    them in.
+    """
+    high_power = set(high_power or ())
     pool = [rid for rid, spec in reagents.items()
             if spec.get("obtainable")
             and (spec.get("explosive") or spec.get("i") or spec.get("d") or spec.get("r")
@@ -1201,28 +1279,26 @@ def build_recipes(casings: dict, reagents: dict, formula: dict, costs: dict,
     # deltas can only spend volume here, so leaving it out costs nothing and
     # cuts the triple sweep by two thirds.
     shelf = [rid for rid in pool
-             if reagents[rid].get("quick")
+             if rid not in high_power and reagents[rid].get("quick")
              and any(_reagent_deltas(reagents[rid])[k]
                      for k in ("intensity", "duration", "radius"))]
+    ref = next((t for t in targets or [] if t["id"] == formula.get("knockdownRef")), None)
 
     for casing_id, casing in casings.items():
         if casing_id in NON_FILLABLE_CASINGS or not casing.get("maxP"):
             continue
         cap = casing["vol"]
         unit = cap / CATALOGUE_STEPS
-        # value -> (score, mix) per role, plus every evaluated point for the
-        # cheap row, which needs the whole frontier rather than just its peak.
         best = {key: None for key, _, _, _ in CATALOGUE_ROLES}
         radius_points = []
-        # The best score reachable inside a short chain, and the material it
-        # takes, so ties go to the cheaper mixture.
-        short: tuple | None = None
-        # The best high-explosive round, judged the way one is actually used.
         he_best: tuple | None = None
         # Ground held on fire per unit of material. A grenade is seen coming and
         # stepped around, so what it buys is denied floor rather than a kill,
         # and denied floor is bought by the crate.
         denial_best: tuple | None = None
+        # Every octogen-free mixture with a blast, for the everyday ladder:
+        # (knockdown radius, blast radius, work, reactions, mixture).
+        everyday = []
 
         for i, first in enumerate(pool):
             for second in pool[i:]:
@@ -1252,116 +1328,101 @@ def build_recipes(casings: dict, reagents: dict, formula: dict, costs: dict,
                                 best[key] = (rank, value, dict(mix))
                         if st["hasBlast"]:
                             radius_points.append((st["blastRadius"], dict(mix)))
-                        # The practical frontier. Judged with the burn window
-                        # shut, so nothing here depends on a xeno politely
-                        # standing in the flames.
-                        if targets and all(rid in handy for rid in mix):
-                            steps = len(set().union(*(chain[rid] for rid in mix)))
+                        if not targets or not all(rid in handy for rid in mix):
+                            continue
+                        work = round(sum(effort[rid] * q for rid, q in mix.items()), 3)
+                        steps = len(set().union(*(chain[rid] for rid in mix)))
+                        if not any(rid in high_power for rid in mix):
                             # Entering a flame costs a flat 45 heat whatever its
                             # intensity, so what denies ground is area times
                             # seconds, not how fiercely it burns.
-                            if st["reach"] >= MIN_FIRE_REACH and st["fireDuration"] > 0:
-                                work = round(sum(effort[rid] * q
-                                                 for rid, q in mix.items()), 3)
-                                if work > 0:
-                                    value = fire_area(st) * st["fireDuration"] / work
-                                    rank = (round(value, 4), -work)
-                                    if denial_best is None or rank > denial_best[0]:
-                                        denial_best = (rank, dict(mix))
-                            dead, crit = he_effect(st, targets, formula, fire)
-                            hit = dead * HE_DEAD_WEIGHT + crit * HE_CRIT_WEIGHT
-                            if hit:
-                                work = round(sum(effort[rid] * q
-                                                 for rid, q in mix.items()), 3)
-                                rank = (hit, -work, -steps)
-                                if he_best is None or rank > he_best[0]:
-                                    he_best = (rank, dead, crit, dict(mix))
-                            if steps <= step_cap:
-                                k = sum(count_kills(st, targets, formula, fire, d)
-                                        for d in PRACTICAL_DISTANCES)
-                                work = round(sum(effort[rid] * q
-                                                 for rid, q in mix.items()), 3)
-                                rank = (k, -work)
-                                if k and (short is None or rank > short[0]):
-                                    short = (rank, dict(mix))
+                            if (st["reach"] >= MIN_FIRE_REACH and st["fireDuration"] > 0
+                                    and work > 0):
+                                value = fire_area(st) * st["fireDuration"] / work
+                                rank = (round(value, 4), -work)
+                                if denial_best is None or rank > denial_best[0]:
+                                    denial_best = (rank, dict(mix))
+                            if st["hasBlast"]:
+                                everyday.append((knockdown_radius(st, ref, formula),
+                                                 st["blastRadius"], work, steps, dict(mix)))
+                        # Judged with the burn window shut, so nothing here
+                        # depends on a xeno politely standing in the flames.
+                        dead, crit = he_effect(st, targets, formula, fire)
+                        hit = dead * HE_DEAD_WEIGHT + crit * HE_CRIT_WEIGHT
+                        if hit:
+                            rank = (hit, -work, -steps)
+                            if he_best is None or rank > he_best[0]:
+                                he_best = (rank, dead, crit, dict(mix))
 
-        # One mixture can be best at several roles at once; say so on one row
+        # One mixture can answer several roles at once; say so on one row
         # rather than printing it three times.
-        rows: dict[tuple, dict] = {}
-        for key, label, _, _tb in CATALOGUE_ROLES:
-            if best[key] is None:
-                continue
-            _, value, mix = best[key]
-            signature = tuple(sorted((rid, round(q, 3)) for rid, q in mix.items()))
-            if signature in rows:
-                rows[signature]["roles"].append(key)
-                rows[signature]["labels"].append(label)
-                continue
-            rows[signature] = {"casing": casing_id, "roles": [key], "labels": [label],
-                               "mix": mix}
-        out.extend(rows.values())
+        rows: list[dict] = []
 
-        # The cheapest route to nearly the best radius. Ranked by material and
-        # then by reactions, like everything else here; it used to be ranked by
-        # phoron, which is the measure that made octogen look cheap in the first
-        # place. Switching changed nothing, and that is the point: at ninety per
-        # cent of the peak radius there is no octogen-free answer, because the
-        # peak itself needs octogen. So the row is named for what it delivers,
-        # near-maximum reach, rather than promising a cheapness it cannot have.
-        # The genuinely cheap row is the short chain one.
-        if radius_points:
-            ceiling = max(v for v, _ in radius_points)
-            target = ceiling * CHEAP_SHARE
-            good = [(round(sum(effort.get(rid, 0) * q for rid, q in m.items()), 3),
-                     len(set().union(*(chain[rid] for rid in m))), -v, m)
-                    for v, m in radius_points if v >= target]
-            if good:
-                _, _, _, mix = min(good, key=lambda x: x[:3])
-                out.append({"casing": casing_id, "roles": ["cheap"],
-                            "labels": [f"{int(CHEAP_SHARE * 100)}% of the best radius "
-                                       f"for the least material"],
-                            "mix": mix})
+        def add(mix: dict, role: str, label: str, group: str) -> dict:
+            signature = _signature(mix)
+            same = next((r for r in rows if _signature(r["mix"]) == signature), None)
+            if same:
+                if role not in same["roles"]:
+                    same["roles"].append(role)
+                    same["labels"].append(label)
+                return same
+            row = {"casing": casing_id, "group": group, "roles": [role],
+                   "labels": [label], "mix": mix}
+            rows.append(row)
+            return row
+
+        if everyday:
+            # A mine cannot keep a warrior down for two seconds even under its
+            # own blast, and then the same ladder is climbed on blast radius.
+            by_knockdown = max(e[0] for e in everyday) > 0
+            metric = (lambda e: e[0]) if by_knockdown else (lambda e: e[1])
+            peak = max(metric(e) for e in everyday)
+            short = [e for e in everyday if e[3] <= step_cap]
+            if short:
+                mass = max(short, key=lambda e: (round(metric(e), 6), round(e[1], 6), -e[2]))
+                add(mass[4], "mass",
+                    f"Best inside {step_cap} reactions, the length of {SHORT_CHAIN_REAGENT}", "base")
+            # The assault row promises a floored warrior; without one it has
+            # nothing to offer that the other two rows do not already say.
+            if by_knockdown:
+                enough = [e for e in everyday if metric(e) >= peak * ASSAULT_SHARE - 1e-9]
+                lean = min(enough, key=lambda e: (e[2], e[3], -metric(e)))
+                add(lean[4], "assault",
+                    f"{int(ASSAULT_SHARE * 100)}% of the octogen-free peak for the least material",
+                    "base")
+            top = max(everyday, key=lambda e: (round(metric(e), 6), round(e[1], 6), -e[2]))
+            add(top[4], "max", "The most this casing does without octogen", "base")
+
+        for rec in community or []:
+            if rec["casing"] != casing_id:
+                continue
+            mix = {rid: float(q) for rid, q in rec["mix"].items()}
+            group = "high" if any(rid in high_power for rid in mix) else "base"
+            row = add(mix, "community", rec["name"]["en"], group)
+            row["name"] = rec["name"]
+            if rec.get("note"):
+                row["note"] = rec["note"]
 
         hot = cheapest_flame(casing, reagents, shelf, iron) if shelf else None
         if hot:
-            label = ("The most flame this casing can hold, out of the least "
-                     "filling, all of it off the shelf")
-            signature = tuple(sorted((rid, round(q, 3)) for rid, q in hot.items()))
-            same = next((r for r in out
-                         if r["casing"] == casing_id
-                         and tuple(sorted((i, round(q, 3)) for i, q in r["mix"].items())) == signature),
-                        None)
-            if same:
-                same["roles"].append("hot")
-                same["labels"].append(label)
-            else:
-                out.append({"casing": casing_id, "roles": ["hot"], "labels": [label],
-                            "mix": hot})
+            add(hot, "hot", "The most flame this casing can hold, out of the least "
+                            "filling, all of it off the shelf", "base")
 
         if denial_best:
-            mix = denial_best[1]
-            label = f"Most burning ground per unit of material, {MIN_FIRE_REACH} tiles or wider"
-            signature = tuple(sorted((rid, round(q, 3)) for rid, q in mix.items()))
-            same = next((r for r in out
-                         if r["casing"] == casing_id
-                         and tuple(sorted((i, round(q, 3)) for i, q in r["mix"].items())) == signature),
-                        None)
-            if same:
-                same["roles"].append("denial")
-                same["labels"].append(label)
-            else:
-                out.append({"casing": casing_id, "roles": ["denial"], "labels": [label],
-                            "mix": mix})
+            add(denial_best[1], "denial",
+                f"Most burning ground per unit of material, {MIN_FIRE_REACH} tiles or wider",
+                "base")
 
-        # A sticky charge deletes resin within a tile the moment it goes off,
-        # regardless of power: OrdnanceExplosionSystem walks the walls in range
-        # and removes them. No casing can break a resin wall by damage -- the
-        # plain one needs 900 and the strongest ordnance intensity delivers 720
-        # -- so breaching is a stickiness question, and the right filling is
-        # whatever is cheapest that still detonates rather than fizzles.
+        # A sticky charge deletes the resin it touches the moment it goes off,
+        # whatever its power: OrdnanceExplosionSystem walks the walls within a tile
+        # and removes them. Blast breaks walls too -- CMBaseWallXeno takes
+        # explosions at x3.64, so a plain wall gives at 247 raw -- but only a full
+        # casing reaches that, where sticking needs nine units of ethanol. So the
+        # breach row is the cheapest filling that still detonates rather than
+        # fizzles.
         if casing.get("sticky"):
             cheapest = None
-            for rid in sorted(handy):
+            for rid in sorted(handy - high_power):
                 for steps_up in range(1, CATALOGUE_STEPS + 1):
                     mix = {rid: steps_up * unit}
                     st = compute_stats(mix, casing, reagents, iron=iron)
@@ -1373,54 +1434,43 @@ def build_recipes(casings: dict, reagents: dict, formula: dict, costs: dict,
                         cheapest = (rank, dict(mix))
                     break
             if cheapest:
-                mix = cheapest[1]
-                label = "Cheapest filling that still detonates, which is all a breach needs"
-                signature = tuple(sorted((rid, round(q, 3)) for rid, q in mix.items()))
-                same = next((r for r in out
-                             if r["casing"] == casing_id
-                             and tuple(sorted((i, round(q, 3)) for i, q in r["mix"].items())) == signature),
-                            None)
-                if same:
-                    same["roles"].append("breach")
-                    same["labels"].append(label)
-                else:
-                    out.append({"casing": casing_id, "roles": ["breach"],
-                                "labels": [label], "mix": mix})
+                add(cheapest[1], "breach",
+                    "Cheapest filling that still detonates, which is all a breach needs", "base")
+
+        def needs_octogen(mix: dict) -> bool:
+            return any(rid in high_power for rid in mix)
+
+        for key, label, _, _tb in CATALOGUE_ROLES:
+            if best[key] is not None and needs_octogen(best[key][2]):
+                add(best[key][2], key, label, "high")
+
+        # The cheapest route to nearly the best radius. At ninety per cent of the
+        # peak there is no octogen-free answer on most casings, because the peak
+        # itself needs octogen; where there is one, the everyday ladder already
+        # holds it.
+        if radius_points:
+            ceiling = max(v for v, _ in radius_points)
+            target = ceiling * CHEAP_SHARE
+            good = [(round(sum(effort.get(rid, 0) * q for rid, q in m.items()), 3),
+                     len(set().union(*(chain[rid] for rid in m))), -v, m)
+                    for v, m in radius_points if v >= target]
+            if good:
+                mix = min(good, key=lambda x: x[:3])[3]
+                if needs_octogen(mix):
+                    add(mix, "cheap", f"{int(CHEAP_SHARE * 100)}% of the best radius "
+                                      f"for the least material", "high")
 
         # Only where a round can actually reach a front-line caste. For every
         # grenade in the list it cannot, and printing an empty row would suggest
         # otherwise.
-        if he_best:
+        if he_best and needs_octogen(he_best[3]):
             _, dead, crit, mix = he_best
-            label = (f"Best against T{HE_MIN_TIER}+ at "
-                     f"{HE_DISTANCES[0]}-{HE_DISTANCES[-1]} tiles: {dead} dead, {crit} crit")
-            signature = tuple(sorted((rid, round(q, 3)) for rid, q in mix.items()))
-            same = next((r for r in out
-                         if r["casing"] == casing_id
-                         and tuple(sorted((i, round(q, 3)) for i, q in r["mix"].items())) == signature),
-                        None)
-            if same:
-                same["roles"].append("he")
-                same["labels"].append(label)
-            else:
-                out.append({"casing": casing_id, "roles": ["he"], "labels": [label],
-                            "mix": mix})
+            add(mix, "he", f"Best against T{HE_MIN_TIER}+ at "
+                           f"{HE_DISTANCES[0]}-{HE_DISTANCES[-1]} tiles: {dead} dead, {crit} crit",
+                "high")
 
-        # The row for the marine with one chem master and a shift to finish.
-        if short:
-            mix = short[1]
-            label = f"Best inside {step_cap} reactions, the length of {SHORT_CHAIN_REAGENT}"
-            signature = tuple(sorted((rid, round(q, 3)) for rid, q in mix.items()))
-            same = next((r for r in out
-                         if r["casing"] == casing_id
-                         and tuple(sorted((i, round(q, 3)) for i, q in r["mix"].items())) == signature),
-                        None)
-            if same:
-                same["roles"].append("short")
-                same["labels"].append(label)
-            else:
-                out.append({"casing": casing_id, "roles": ["short"], "labels": [label],
-                            "mix": mix})
+        rows.sort(key=lambda r: r["group"] != "base")
+        out.extend(rows)
     return out
 
 
@@ -1573,7 +1623,20 @@ def build(fork_id: str, fconf: dict, fetch) -> dict:
         "firePatStacks": FIRE_PAT_STACKS,
         "heDistances": list(HE_DISTANCES),
         "heMinTier": HE_MIN_TIER,
+        "stunScale": STUN_SCALE,
+        "stunCap": STUN_CAP,
+        "stunWeakDivisor": STUN_WEAK_DIVISOR,
+        "stunStrongGate": STUN_STRONG_GATE,
+        "stunStrongDivisor": STUN_STRONG_DIVISOR,
+        "knockdownSeconds": KNOCKDOWN_SECONDS,
+        "knockdownRef": conf.get("knockdown_ref"),
+        "lowTierMax": LOW_TIER_MAX,
+        "wallRef": conf.get("wall_ref"),
     }
+    structure_files = fetch(conf.get("structure_files", []), url, f"{fork_id}_ordnance")
+    structures = (build_structures(conf, structure_files, conf.get("explosion_proto", "RMC"))
+                  if structure_files else [])
+    print(f"  structures: {len(structures)}")
     # data.json derives availability from "has a reaction or a dispenser slot",
     # which is a question about chemistry rather than about the shift. Welding
     # fuel fails it and still sits in every welder on the ship, so the search
@@ -1581,8 +1644,11 @@ def build(fork_id: str, fconf: dict, fetch) -> dict:
     # the rest of the model uses, rather than bolting a second flag beside it.
     for rid in pickups:
         chem.setdefault(rid, {}).setdefault("accessibility", {})["tier"] = "pickup"
+    from ordnance_community import RECIPES as COMMUNITY
     recipes = build_recipes(out_casings, out_reagents, formula, costs, cost_base,
-                            targets, fires, chem)
+                            targets, fires, chem,
+                            high_power=set(conf.get("high_power_reagents", [])),
+                            community=COMMUNITY.get(fork_id, []))
     print(f"  catalogue: {len(recipes)} recipes")
     return {
         "schema": SCHEMA,
@@ -1593,6 +1659,7 @@ def build(fork_id: str, fconf: dict, fetch) -> dict:
         "sheets": sheets,
         "marines": marines,
         "targets": targets,
+        "structures": structures,
         "recipes": recipes,
         "reagents": out_reagents,
         "casings": out_casings,

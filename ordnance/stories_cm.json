@@ -515,9 +515,18 @@
   "heMinTier": 2,
   "intensityDivisor": 5.0,
   "ironReagent": "RMCIron",
+  "knockdownRef": "CMXenoWarrior",
+  "knockdownSeconds": 2.0,
+  "lowTierMax": 1,
   "minSlope": 0.1,
   "shardsPerUnit": 0.25,
-  "starIntensity": 30.0
+  "starIntensity": 30.0,
+  "stunCap": 20.0,
+  "stunScale": 0.05,
+  "stunStrongDivisor": 25.0,
+  "stunStrongGate": 10.0,
+  "stunWeakDivisor": 2.5,
+  "wallRef": "WallXenoResin"
  },
  "marines": [
   {
@@ -1320,73 +1329,92 @@
  "recipes": [
   {
    "casing": "RMCM40GrenadeCasing",
+   "group": "base",
    "labels": [
-    "Blast radius"
+    "Best inside 4 reactions, the length of RMCANFO"
    ],
    "mix": {
-    "RMCANFO": 78.0,
-    "RMCOctogen": 42.0
+    "RMCANFO": 120.0
    },
    "roles": [
-    "radius"
+    "mass"
    ]
   },
   {
    "casing": "RMCM40GrenadeCasing",
+   "group": "base",
    "labels": [
-    "Peak damage"
+    "90% of the octogen-free peak for the least material"
    ],
    "mix": {
-    "RMCANFO": 60.0,
-    "RMCOctogen": 60.0
+    "RMCANFO": 42.0,
+    "RMCCyclonite": 78.0
    },
    "roles": [
-    "damage"
+    "assault"
    ]
   },
   {
    "casing": "RMCM40GrenadeCasing",
+   "group": "base",
    "labels": [
-    "Shrapnel"
+    "The most this casing does without octogen"
    ],
    "mix": {
-    "RMCIron": 42.0,
-    "RMCOctogen": 78.0
+    "RMCCyclonite": 120.0
    },
    "roles": [
-    "shrapnel"
+    "max"
    ]
   },
   {
    "casing": "RMCM40GrenadeCasing",
+   "group": "base",
    "labels": [
-    "Fire intensity",
-    "Burn time"
+    "Incendiary"
    ],
    "mix": {
-    "RMCEthanol": 114.0,
-    "RMCNapalmUT": 6.0
+    "RMCEthanol": 85.0,
+    "RMCPhosphorus": 10.0,
+    "RMCWeldingFuel": 25.0
+   },
+   "name": {
+    "en": "Incendiary",
+    "ru": "Зажигательная"
+   },
+   "note": {
+    "en": "Every M40 fire ceiling at once",
+    "ru": "Все потолки огня M40 разом"
    },
    "roles": [
-    "fire",
-    "burn"
+    "community"
    ]
   },
   {
    "casing": "RMCM40GrenadeCasing",
+   "group": "base",
    "labels": [
-    "90% of the best radius for the least material"
+    "Assault incendiary"
    ],
    "mix": {
-    "RMCANFO": 90.0,
-    "RMCOctogen": 30.0
+    "RMCHydrogen": 60.0,
+    "RMCPhosphorus": 60.0
+   },
+   "name": {
+    "en": "Assault incendiary",
+    "ru": "Штурм жига"
+   },
+   "note": {
+    "en": "The flame is gone in seconds, so the assault can follow",
+    "ru": "Огонь гаснет за секунды, можно сразу идти в атаку"
    },
    "roles": [
-    "cheap"
+    "community"
    ]
   },
   {
    "casing": "RMCM40GrenadeCasing",
+   "group": "base",
    "labels": [
     "The most flame this casing can hold, out of the least filling, all of it off the shelf"
    ],
@@ -1401,6 +1429,7 @@
   },
   {
    "casing": "RMCM40GrenadeCasing",
+   "group": "base",
    "labels": [
     "Most burning ground per unit of material, 4 tiles or wider"
    ],
@@ -1414,78 +1443,104 @@
   },
   {
    "casing": "RMCM40GrenadeCasing",
+   "group": "high",
    "labels": [
-    "Best inside 4 reactions, the length of RMCANFO"
+    "F.I.G.S."
    ],
    "mix": {
-    "RMCANFO": 114.0,
-    "RMCAmmoniumNitrate": 6.0
+    "RMCANFO": 60.0,
+    "RMCCyclonite": 15.0,
+    "RMCOctogen": 35.0,
+    "RMCPhosphorus": 10.0
+   },
+   "name": {
+    "en": "F.I.G.S.",
+    "ru": "Ф.И.Г.С."
+   },
+   "note": {
+    "en": "Octogen blast with a phosphorus flame",
+    "ru": "Октогеновая волна с фосфорным огнём"
    },
    "roles": [
-    "short"
+    "community"
    ]
   },
   {
-   "casing": "RMCM15GrenadeCasing",
+   "casing": "RMCM40GrenadeCasing",
+   "group": "high",
+   "labels": [
+    "Phosphorus 2.0"
+   ],
+   "mix": {
+    "RMCCLF3": 15.0,
+    "RMCCyclonite": 35.0,
+    "RMCEthanol": 12.0,
+    "RMCHydrogen": 28.0,
+    "RMCOctogen": 30.0
+   },
+   "name": {
+    "en": "Phosphorus 2.0",
+    "ru": "Фосфорная 2.0"
+   },
+   "note": {
+    "en": "Falloff 60 and the flame at the M40 ceiling",
+    "ru": "Спад 60 и огонь на потолке M40"
+   },
+   "roles": [
+    "community"
+   ]
+  },
+  {
+   "casing": "RMCM40GrenadeCasing",
+   "group": "high",
    "labels": [
     "Blast radius"
    ],
    "mix": {
-    "RMCANFO": 117.0,
-    "RMCCyclonite": 63.0
+    "RMCANFO": 78.0,
+    "RMCOctogen": 42.0
    },
    "roles": [
     "radius"
    ]
   },
   {
-   "casing": "RMCM15GrenadeCasing",
+   "casing": "RMCM40GrenadeCasing",
+   "group": "high",
    "labels": [
     "Peak damage"
    ],
    "mix": {
-    "RMCANFO": 99.0,
-    "RMCCyclonite": 81.0
+    "RMCANFO": 60.0,
+    "RMCOctogen": 60.0
    },
    "roles": [
     "damage"
    ]
   },
   {
-   "casing": "RMCM15GrenadeCasing",
+   "casing": "RMCM40GrenadeCasing",
+   "group": "high",
    "labels": [
     "Shrapnel"
    ],
    "mix": {
-    "RMCIron": 81.0,
-    "RMCOctogen": 99.0
+    "RMCIron": 42.0,
+    "RMCOctogen": 78.0
    },
    "roles": [
     "shrapnel"
    ]
   },
   {
-   "casing": "RMCM15GrenadeCasing",
-   "labels": [
-    "Fire intensity",
-    "Burn time"
-   ],
-   "mix": {
-    "RMCEthanol": 162.0
-   },
-   "roles": [
-    "fire",
-    "burn"
-   ]
-  },
-  {
-   "casing": "RMCM15GrenadeCasing",
+   "casing": "RMCM40GrenadeCasing",
+   "group": "high",
    "labels": [
     "90% of the best radius for the least material"
    ],
    "mix": {
-    "RMCANFO": 162.0,
-    "RMCOctogen": 18.0
+    "RMCANFO": 90.0,
+    "RMCOctogen": 30.0
    },
    "roles": [
     "cheap"
@@ -1493,6 +1548,116 @@
   },
   {
    "casing": "RMCM15GrenadeCasing",
+   "group": "base",
+   "labels": [
+    "Best inside 4 reactions, the length of RMCANFO"
+   ],
+   "mix": {
+    "RMCANFO": 180.0
+   },
+   "roles": [
+    "mass"
+   ]
+  },
+  {
+   "casing": "RMCM15GrenadeCasing",
+   "group": "base",
+   "labels": [
+    "90% of the octogen-free peak for the least material"
+   ],
+   "mix": {
+    "RMCANFO": 135.0,
+    "RMCCyclonite": 45.0
+   },
+   "roles": [
+    "assault"
+   ]
+  },
+  {
+   "casing": "RMCM15GrenadeCasing",
+   "group": "base",
+   "labels": [
+    "The most this casing does without octogen"
+   ],
+   "mix": {
+    "RMCANFO": 117.0,
+    "RMCCyclonite": 63.0
+   },
+   "roles": [
+    "max"
+   ]
+  },
+  {
+   "casing": "RMCM15GrenadeCasing",
+   "group": "base",
+   "labels": [
+    "Maxcap"
+   ],
+   "mix": {
+    "RMCANFO": 120.0,
+    "RMCCyclonite": 60.0
+   },
+   "name": {
+    "en": "Maxcap",
+    "ru": "Макскап"
+   },
+   "note": {
+    "en": "Players' favourite; lands on the octogen-free peak",
+    "ru": "Любимая у игроков; стоит на пике без октогена"
+   },
+   "roles": [
+    "community"
+   ]
+  },
+  {
+   "casing": "RMCM15GrenadeCasing",
+   "group": "base",
+   "labels": [
+    "Sunscorch"
+   ],
+   "mix": {
+    "RMCCarbon": 60.0,
+    "RMCEthanol": 90.0,
+    "RMCPhosphorus": 10.0,
+    "RMCWeldingFuel": 20.0
+   },
+   "name": {
+    "en": "Sunscorch",
+    "ru": "Солнцепёк"
+   },
+   "note": {
+    "en": "Every M15 fire ceiling at once",
+    "ru": "Все потолки огня M15 разом"
+   },
+   "roles": [
+    "community"
+   ]
+  },
+  {
+   "casing": "RMCM15GrenadeCasing",
+   "group": "base",
+   "labels": [
+    "Assault incendiary"
+   ],
+   "mix": {
+    "RMCHydrogen": 60.0,
+    "RMCPhosphorus": 60.0
+   },
+   "name": {
+    "en": "Assault incendiary",
+    "ru": "Штурм жига"
+   },
+   "note": {
+    "en": "The flame is gone in seconds, so the assault can follow",
+    "ru": "Огонь гаснет за секунды, можно сразу идти в атаку"
+   },
+   "roles": [
+    "community"
+   ]
+  },
+  {
+   "casing": "RMCM15GrenadeCasing",
+   "group": "base",
    "labels": [
     "The most flame this casing can hold, out of the least filling, all of it off the shelf"
    ],
@@ -1507,6 +1672,7 @@
   },
   {
    "casing": "RMCM15GrenadeCasing",
+   "group": "base",
    "labels": [
     "Most burning ground per unit of material, 4 tiles or wider"
    ],
@@ -1520,66 +1686,27 @@
   },
   {
    "casing": "RMCM15GrenadeCasing",
-   "labels": [
-    "Best inside 4 reactions, the length of RMCANFO"
-   ],
-   "mix": {
-    "RMCANFO": 171.0,
-    "RMCLithium": 9.0
-   },
-   "roles": [
-    "short"
-   ]
-  },
-  {
-   "casing": "RMCM20MineCasing",
-   "labels": [
-    "Blast radius",
-    "Peak damage"
-   ],
-   "mix": {
-    "RMCANFO": 102.0
-   },
-   "roles": [
-    "radius",
-    "damage"
-   ]
-  },
-  {
-   "casing": "RMCM20MineCasing",
+   "group": "high",
    "labels": [
     "Shrapnel"
    ],
    "mix": {
-    "RMCIron": 42.0,
-    "RMCOctogen": 54.0
+    "RMCIron": 81.0,
+    "RMCOctogen": 99.0
    },
    "roles": [
     "shrapnel"
    ]
   },
   {
-   "casing": "RMCM20MineCasing",
-   "labels": [
-    "Fire intensity",
-    "Burn time"
-   ],
-   "mix": {
-    "RMCEthanol": 90.0,
-    "RMCPhosphorus": 6.0
-   },
-   "roles": [
-    "fire",
-    "burn"
-   ]
-  },
-  {
-   "casing": "RMCM20MineCasing",
+   "casing": "RMCM15GrenadeCasing",
+   "group": "high",
    "labels": [
     "90% of the best radius for the least material"
    ],
    "mix": {
-    "RMCANFO": 96.0
+    "RMCANFO": 162.0,
+    "RMCOctogen": 18.0
    },
    "roles": [
     "cheap"
@@ -1587,6 +1714,44 @@
   },
   {
    "casing": "RMCM20MineCasing",
+   "group": "base",
+   "labels": [
+    "Best inside 4 reactions, the length of RMCANFO",
+    "The most this casing does without octogen"
+   ],
+   "mix": {
+    "RMCANFO": 102.0
+   },
+   "roles": [
+    "mass",
+    "max"
+   ]
+  },
+  {
+   "casing": "RMCM20MineCasing",
+   "group": "base",
+   "labels": [
+    "M.A.F.I.N."
+   ],
+   "mix": {
+    "RMCANFO": 100.0,
+    "RMCPhosphorus": 20.0
+   },
+   "name": {
+    "en": "M.A.F.I.N.",
+    "ru": "М.А.Ф.И.Н."
+   },
+   "note": {
+    "en": "Blast at the mine's ceiling with a flame on top",
+    "ru": "Волна на потолке мины и огонь сверху"
+   },
+   "roles": [
+    "community"
+   ]
+  },
+  {
+   "casing": "RMCM20MineCasing",
+   "group": "base",
    "labels": [
     "The most flame this casing can hold, out of the least filling, all of it off the shelf"
    ],
@@ -1601,6 +1766,7 @@
   },
   {
    "casing": "RMCM20MineCasing",
+   "group": "base",
    "labels": [
     "Most burning ground per unit of material, 4 tiles or wider"
    ],
@@ -1614,51 +1780,13 @@
   },
   {
    "casing": "RMCM20MineCasing",
-   "labels": [
-    "Best inside 4 reactions, the length of RMCANFO"
-   ],
-   "mix": {
-    "RMCANFO": 90.0,
-    "RMCLithium": 6.0
-   },
-   "roles": [
-    "short"
-   ]
-  },
-  {
-   "casing": "RMCC4PlasticCasing",
-   "labels": [
-    "Blast radius"
-   ],
-   "mix": {
-    "RMCANFO": 117.0,
-    "RMCCyclonite": 63.0
-   },
-   "roles": [
-    "radius"
-   ]
-  },
-  {
-   "casing": "RMCC4PlasticCasing",
-   "labels": [
-    "Peak damage"
-   ],
-   "mix": {
-    "RMCCyclonite": 153.0,
-    "RMCOctogen": 27.0
-   },
-   "roles": [
-    "damage"
-   ]
-  },
-  {
-   "casing": "RMCC4PlasticCasing",
+   "group": "high",
    "labels": [
     "Shrapnel"
    ],
    "mix": {
-    "RMCIron": 108.0,
-    "RMCOctogen": 72.0
+    "RMCIron": 42.0,
+    "RMCOctogen": 54.0
    },
    "roles": [
     "shrapnel"
@@ -1666,34 +1794,70 @@
   },
   {
    "casing": "RMCC4PlasticCasing",
+   "group": "base",
    "labels": [
-    "Fire intensity",
-    "Burn time"
+    "Best inside 4 reactions, the length of RMCANFO"
    ],
    "mix": {
-    "RMCEthanol": 90.0,
-    "RMCPhosphorus": 36.0
+    "RMCANFO": 180.0
    },
    "roles": [
-    "fire",
-    "burn"
+    "mass"
    ]
   },
   {
    "casing": "RMCC4PlasticCasing",
+   "group": "base",
    "labels": [
-    "90% of the best radius for the least material"
+    "90% of the octogen-free peak for the least material"
    ],
    "mix": {
-    "RMCANFO": 162.0,
-    "RMCOctogen": 18.0
+    "RMCANFO": 135.0,
+    "RMCCyclonite": 45.0
    },
    "roles": [
-    "cheap"
+    "assault"
    ]
   },
   {
    "casing": "RMCC4PlasticCasing",
+   "group": "base",
+   "labels": [
+    "The most this casing does without octogen"
+   ],
+   "mix": {
+    "RMCANFO": 117.0,
+    "RMCCyclonite": 63.0
+   },
+   "roles": [
+    "max"
+   ]
+  },
+  {
+   "casing": "RMCC4PlasticCasing",
+   "group": "base",
+   "labels": [
+    "Maxcap C4"
+   ],
+   "mix": {
+    "RMCANFO": 130.0,
+    "RMCCyclonite": 50.0
+   },
+   "name": {
+    "en": "Maxcap C4",
+    "ru": "Макскап C4"
+   },
+   "note": {
+    "en": "Players' pick against fortifications",
+    "ru": "Выбор игроков против застройки"
+   },
+   "roles": [
+    "community"
+   ]
+  },
+  {
+   "casing": "RMCC4PlasticCasing",
+   "group": "base",
    "labels": [
     "The most flame this casing can hold, out of the least filling, all of it off the shelf"
    ],
@@ -1708,6 +1872,7 @@
   },
   {
    "casing": "RMCC4PlasticCasing",
+   "group": "base",
    "labels": [
     "Most burning ground per unit of material, 4 tiles or wider"
    ],
@@ -1721,6 +1886,7 @@
   },
   {
    "casing": "RMCC4PlasticCasing",
+   "group": "base",
    "labels": [
     "Cheapest filling that still detonates, which is all a breach needs"
    ],
@@ -1733,6 +1899,49 @@
   },
   {
    "casing": "RMCC4PlasticCasing",
+   "group": "high",
+   "labels": [
+    "Peak damage"
+   ],
+   "mix": {
+    "RMCCyclonite": 153.0,
+    "RMCOctogen": 27.0
+   },
+   "roles": [
+    "damage"
+   ]
+  },
+  {
+   "casing": "RMCC4PlasticCasing",
+   "group": "high",
+   "labels": [
+    "Shrapnel"
+   ],
+   "mix": {
+    "RMCIron": 108.0,
+    "RMCOctogen": 72.0
+   },
+   "roles": [
+    "shrapnel"
+   ]
+  },
+  {
+   "casing": "RMCC4PlasticCasing",
+   "group": "high",
+   "labels": [
+    "90% of the best radius for the least material"
+   ],
+   "mix": {
+    "RMCANFO": 162.0,
+    "RMCOctogen": 18.0
+   },
+   "roles": [
+    "cheap"
+   ]
+  },
+  {
+   "casing": "RMCC4PlasticCasing",
+   "group": "high",
    "labels": [
     "Best against T2+ at 2-3 tiles: 0 dead, 2 crit"
    ],
@@ -1745,85 +1954,49 @@
    ]
   },
   {
-   "casing": "RMCC4PlasticCasing",
+   "casing": "RMC88mmRocketWarhead",
+   "group": "base",
    "labels": [
     "Best inside 4 reactions, the length of RMCANFO"
-   ],
-   "mix": {
-    "RMCANFO": 171.0,
-    "RMCLithium": 9.0
-   },
-   "roles": [
-    "short"
-   ]
-  },
-  {
-   "casing": "RMC88mmRocketWarhead",
-   "labels": [
-    "Blast radius"
    ],
    "mix": {
     "RMCANFO": 180.0
    },
    "roles": [
-    "radius"
+    "mass"
    ]
   },
   {
    "casing": "RMC88mmRocketWarhead",
+   "group": "base",
    "labels": [
-    "Peak damage"
+    "90% of the octogen-free peak for the least material"
+   ],
+   "mix": {
+    "RMCANFO": 162.0,
+    "RMCCyclonite": 18.0
+   },
+   "roles": [
+    "assault"
+   ]
+  },
+  {
+   "casing": "RMC88mmRocketWarhead",
+   "group": "base",
+   "labels": [
+    "The most this casing does without octogen"
    ],
    "mix": {
     "RMCANFO": 99.0,
     "RMCCyclonite": 81.0
    },
    "roles": [
-    "damage"
+    "max"
    ]
   },
   {
    "casing": "RMC88mmRocketWarhead",
-   "labels": [
-    "Shrapnel"
-   ],
-   "mix": {
-    "RMCIron": 81.0,
-    "RMCOctogen": 99.0
-   },
-   "roles": [
-    "shrapnel"
-   ]
-  },
-  {
-   "casing": "RMC88mmRocketWarhead",
-   "labels": [
-    "Fire intensity",
-    "Burn time"
-   ],
-   "mix": {
-    "RMCEthanol": 144.0,
-    "RMCNapalmUT": 36.0
-   },
-   "roles": [
-    "fire",
-    "burn"
-   ]
-  },
-  {
-   "casing": "RMC88mmRocketWarhead",
-   "labels": [
-    "90% of the best radius for the least material"
-   ],
-   "mix": {
-    "RMCANFO": 180.0
-   },
-   "roles": [
-    "cheap"
-   ]
-  },
-  {
-   "casing": "RMC88mmRocketWarhead",
+   "group": "base",
    "labels": [
     "The most flame this casing can hold, out of the least filling, all of it off the shelf"
    ],
@@ -1838,6 +2011,7 @@
   },
   {
    "casing": "RMC88mmRocketWarhead",
+   "group": "base",
    "labels": [
     "Most burning ground per unit of material, 4 tiles or wider"
    ],
@@ -1851,19 +2025,181 @@
   },
   {
    "casing": "RMC88mmRocketWarhead",
+   "group": "high",
    "labels": [
-    "Best inside 4 reactions, the length of RMCANFO"
+    "Incendiary rocket"
    ],
    "mix": {
-    "RMCANFO": 171.0,
-    "RMCLithium": 9.0
+    "RMCCLF3": 7.0,
+    "RMCEthanol": 32.0,
+    "RMCHydrogen": 31.0,
+    "RMCOctogen": 110.0
+   },
+   "name": {
+    "en": "Incendiary rocket",
+    "ru": "Зажигательная ракета"
+   },
+   "note": {
+    "en": "Kills a boiler; every other T3 survives it",
+    "ru": "Убивает бойлера; остальные T3 выживают"
    },
    "roles": [
-    "short"
+    "community"
+   ]
+  },
+  {
+   "casing": "RMC88mmRocketWarhead",
+   "group": "high",
+   "labels": [
+    "Shrapnel"
+   ],
+   "mix": {
+    "RMCIron": 81.0,
+    "RMCOctogen": 99.0
+   },
+   "roles": [
+    "shrapnel"
    ]
   },
   {
    "casing": "RMC80mmMortarWarhead",
+   "group": "base",
+   "labels": [
+    "Best inside 4 reactions, the length of RMCANFO"
+   ],
+   "mix": {
+    "RMCANFO": 240.0
+   },
+   "roles": [
+    "mass"
+   ]
+  },
+  {
+   "casing": "RMC80mmMortarWarhead",
+   "group": "base",
+   "labels": [
+    "90% of the octogen-free peak for the least material"
+   ],
+   "mix": {
+    "RMCANFO": 84.0,
+    "RMCCyclonite": 156.0
+   },
+   "roles": [
+    "assault"
+   ]
+  },
+  {
+   "casing": "RMC80mmMortarWarhead",
+   "group": "base",
+   "labels": [
+    "The most this casing does without octogen"
+   ],
+   "mix": {
+    "RMCANFO": 48.0,
+    "RMCCyclonite": 192.0
+   },
+   "roles": [
+    "max"
+   ]
+  },
+  {
+   "casing": "RMC80mmMortarWarhead",
+   "group": "base",
+   "labels": [
+    "Cheap and strong"
+   ],
+   "mix": {
+    "RMCANFO": 190.0,
+    "RMCCyclonite": 50.0
+   },
+   "name": {
+    "en": "Cheap and strong",
+    "ru": "Дёшево и мощно"
+   },
+   "note": {
+    "en": "A quarter of the phoron of a peak shell",
+    "ru": "Четверть форона от пикового снаряда"
+   },
+   "roles": [
+    "community"
+   ]
+  },
+  {
+   "casing": "RMC80mmMortarWarhead",
+   "group": "base",
+   "labels": [
+    "Sun"
+   ],
+   "mix": {
+    "RMCEthanol": 100.0,
+    "RMCPhosphorus": 10.0
+   },
+   "name": {
+    "en": "Sun",
+    "ru": "Солнце"
+   },
+   "note": {
+    "en": "Fire radius at the mortar's ceiling, no blast",
+    "ru": "Радиус огня на потолке миномёта, без волны"
+   },
+   "roles": [
+    "community"
+   ]
+  },
+  {
+   "casing": "RMC80mmMortarWarhead",
+   "group": "base",
+   "labels": [
+    "The most flame this casing can hold, out of the least filling, all of it off the shelf"
+   ],
+   "mix": {
+    "RMCCarbon": 38.0,
+    "RMCEthanol": 76.0,
+    "RMCOxygen": 26.0
+   },
+   "roles": [
+    "hot"
+   ]
+  },
+  {
+   "casing": "RMC80mmMortarWarhead",
+   "group": "base",
+   "labels": [
+    "Most burning ground per unit of material, 4 tiles or wider"
+   ],
+   "mix": {
+    "RMCCarbon": 36.0,
+    "RMCEthanol": 84.0
+   },
+   "roles": [
+    "denial"
+   ]
+  },
+  {
+   "casing": "RMC80mmMortarWarhead",
+   "group": "high",
+   "labels": [
+    "Fire cross"
+   ],
+   "mix": {
+    "RMCANFO": 140.0,
+    "RMCOctogen": 100.0
+   },
+   "name": {
+    "en": "Fire cross",
+    "ru": "Взрывной крест"
+   },
+   "note": {
+    "en": "A full blast plus a fire star",
+    "ru": "Полная волна плюс огненная звезда"
+   },
+   "roles": [
+    "community"
+   ]
+  },
+  {
+   "casing": "RMC80mmMortarWarhead",
+   "group": "high",
    "labels": [
     "Blast radius",
     "Best against T2+ at 2-3 tiles: 10 dead, 4 crit"
@@ -1879,6 +2215,7 @@
   },
   {
    "casing": "RMC80mmMortarWarhead",
+   "group": "high",
    "labels": [
     "Peak damage"
    ],
@@ -1892,6 +2229,7 @@
   },
   {
    "casing": "RMC80mmMortarWarhead",
+   "group": "high",
    "labels": [
     "Shrapnel"
    ],
@@ -1905,21 +2243,7 @@
   },
   {
    "casing": "RMC80mmMortarWarhead",
-   "labels": [
-    "Fire intensity",
-    "Burn time"
-   ],
-   "mix": {
-    "RMCCarbon": 48.0,
-    "RMCPhosphorus": 48.0
-   },
-   "roles": [
-    "fire",
-    "burn"
-   ]
-  },
-  {
-   "casing": "RMC80mmMortarWarhead",
+   "group": "high",
    "labels": [
     "90% of the best radius for the least material"
    ],
@@ -1932,112 +2256,37 @@
    ]
   },
   {
-   "casing": "RMC80mmMortarWarhead",
+   "casing": "RMC80mmMortarCameraWarhead",
+   "group": "base",
    "labels": [
-    "The most flame this casing can hold, out of the least filling, all of it off the shelf"
+    "Best inside 4 reactions, the length of RMCANFO",
+    "90% of the octogen-free peak for the least material"
    ],
    "mix": {
-    "RMCCarbon": 38.0,
-    "RMCEthanol": 76.0,
-    "RMCOxygen": 26.0
+    "RMCANFO": 180.0
    },
    "roles": [
-    "hot"
-   ]
-  },
-  {
-   "casing": "RMC80mmMortarWarhead",
-   "labels": [
-    "Most burning ground per unit of material, 4 tiles or wider"
-   ],
-   "mix": {
-    "RMCCarbon": 36.0,
-    "RMCEthanol": 84.0
-   },
-   "roles": [
-    "denial"
-   ]
-  },
-  {
-   "casing": "RMC80mmMortarWarhead",
-   "labels": [
-    "Best inside 4 reactions, the length of RMCANFO"
-   ],
-   "mix": {
-    "RMCANFO": 228.0,
-    "RMCLithium": 12.0
-   },
-   "roles": [
-    "short"
+    "mass",
+    "assault"
    ]
   },
   {
    "casing": "RMC80mmMortarCameraWarhead",
+   "group": "base",
    "labels": [
-    "Blast radius"
+    "The most this casing does without octogen"
    ],
    "mix": {
     "RMCANFO": 162.0,
     "RMCCyclonite": 18.0
    },
    "roles": [
-    "radius"
+    "max"
    ]
   },
   {
    "casing": "RMC80mmMortarCameraWarhead",
-   "labels": [
-    "Peak damage"
-   ],
-   "mix": {
-    "RMCOctogen": 180.0
-   },
-   "roles": [
-    "damage"
-   ]
-  },
-  {
-   "casing": "RMC80mmMortarCameraWarhead",
-   "labels": [
-    "Shrapnel"
-   ],
-   "mix": {
-    "RMCIron": 171.0,
-    "RMCOctogen": 9.0
-   },
-   "roles": [
-    "shrapnel"
-   ]
-  },
-  {
-   "casing": "RMC80mmMortarCameraWarhead",
-   "labels": [
-    "Fire intensity",
-    "Burn time"
-   ],
-   "mix": {
-    "RMCCarbon": 45.0,
-    "RMCPhosphorus": 45.0
-   },
-   "roles": [
-    "fire",
-    "burn"
-   ]
-  },
-  {
-   "casing": "RMC80mmMortarCameraWarhead",
-   "labels": [
-    "90% of the best radius for the least material"
-   ],
-   "mix": {
-    "RMCANFO": 180.0
-   },
-   "roles": [
-    "cheap"
-   ]
-  },
-  {
-   "casing": "RMC80mmMortarCameraWarhead",
+   "group": "base",
    "labels": [
     "The most flame this casing can hold, out of the least filling, all of it off the shelf"
    ],
@@ -2052,6 +2301,7 @@
   },
   {
    "casing": "RMC80mmMortarCameraWarhead",
+   "group": "base",
    "labels": [
     "Most burning ground per unit of material, 4 tiles or wider"
    ],
@@ -2065,6 +2315,34 @@
   },
   {
    "casing": "RMC80mmMortarCameraWarhead",
+   "group": "high",
+   "labels": [
+    "Peak damage"
+   ],
+   "mix": {
+    "RMCOctogen": 180.0
+   },
+   "roles": [
+    "damage"
+   ]
+  },
+  {
+   "casing": "RMC80mmMortarCameraWarhead",
+   "group": "high",
+   "labels": [
+    "Shrapnel"
+   ],
+   "mix": {
+    "RMCIron": 171.0,
+    "RMCOctogen": 9.0
+   },
+   "roles": [
+    "shrapnel"
+   ]
+  },
+  {
+   "casing": "RMC80mmMortarCameraWarhead",
+   "group": "high",
    "labels": [
     "Best against T2+ at 2-3 tiles: 0 dead, 2 crit"
    ],
@@ -2075,19 +2353,6 @@
    "roles": [
     "he"
    ]
-  },
-  {
-   "casing": "RMC80mmMortarCameraWarhead",
-   "labels": [
-    "Best inside 4 reactions, the length of RMCANFO"
-   ],
-   "mix": {
-    "RMCANFO": 171.0,
-    "RMCLithium": 9.0
-   },
-   "roles": [
-    "short"
-   ]
   }
  ],
  "schema": 1,
@@ -2096,6 +2361,50 @@
   "CMSteel": 3750.0,
   "RMCPlastic": 2000.0
  },
+ "structures": [
+  {
+   "coefficient": 3.64,
+   "hp": 900.0,
+   "id": "WallXenoResin",
+   "name": "resin wall"
+  },
+  {
+   "coefficient": 3.64,
+   "hp": 1350.0,
+   "id": "WallXenoResinThick",
+   "name": "thick resin wall"
+  },
+  {
+   "coefficient": 3.64,
+   "hp": 300.0,
+   "id": "WallXenoMembrane",
+   "name": "resin membrane"
+  },
+  {
+   "coefficient": 7.5,
+   "hp": 600.0,
+   "id": "DoorXenoResin",
+   "name": "resin door"
+  },
+  {
+   "coefficient": 1.0,
+   "hp": 45.0,
+   "id": "XenoStickyResin",
+   "name": "sticky resin"
+  },
+  {
+   "coefficient": 1.0,
+   "hp": 80.0,
+   "id": "XenoEgg",
+   "name": "egg"
+  },
+  {
+   "coefficient": 1.0,
+   "hp": 100.0,
+   "id": "XenoNest",
+   "name": "alien nest"
+  }
+ ],
  "targets": [
   {
    "armor": 0.0,
@@ -2107,12 +2416,14 @@
    "id": "CMXenoLesserDrone",
    "name": "Lesser Drone",
    "rsi": "_Stories/Mobs/Xenos/LesserDrone/lesser_drone.rsi",
+   "size": "VerySmallXeno",
    "sprites": {
     "alive": "CMXenoLesserDrone-alive.png",
     "crit": "CMXenoLesserDrone-crit.png",
     "dead": "CMXenoLesserDrone-dead.png"
    },
    "tier": 0,
+   "weak": true,
    "woundStates": 3,
    "wounds": {
     "downed": "CMXenoLesserDrone-downed.png",
@@ -2134,12 +2445,14 @@
    "id": "CMXenoDrone",
    "name": "Drone",
    "rsi": "_Stories/Mobs/Xenos/Drone/drone.rsi",
+   "size": "Xeno",
    "sprites": {
     "alive": "CMXenoDrone-alive.png",
     "crit": "CMXenoDrone-crit.png",
     "dead": "CMXenoDrone-dead.png"
    },
    "tier": 1,
+   "weak": true,
    "woundStates": 3,
    "wounds": {
     "downed": "CMXenoDrone-downed.png",
@@ -2161,12 +2474,14 @@
    "id": "CMXenoRunner",
    "name": "Runner",
    "rsi": "_Stories/Mobs/Xenos/Runner/runner.rsi",
+   "size": "SmallXeno",
    "sprites": {
     "alive": "CMXenoRunner-alive.png",
     "crit": "CMXenoRunner-crit.png",
     "dead": "CMXenoRunner-dead.png"
    },
    "tier": 1,
+   "weak": true,
    "woundStates": 3,
    "wounds": {
     "downed": "CMXenoRunner-downed.png",
@@ -2188,12 +2503,14 @@
    "id": "CMXenoDefender",
    "name": "Defender",
    "rsi": "_Stories/Mobs/Xenos/Defender/defender.rsi",
+   "size": "Xeno",
    "sprites": {
     "alive": "CMXenoDefender-alive.png",
     "crit": "CMXenoDefender-crit.png",
     "dead": "CMXenoDefender-dead.png"
    },
    "tier": 1,
+   "weak": true,
    "woundStates": 3,
    "wounds": {
     "downed": "CMXenoDefender-downed.png",
@@ -2215,12 +2532,14 @@
    "id": "CMXenoSentinel",
    "name": "Sentinel",
    "rsi": "_Stories/Mobs/Xenos/Sentinel/sentinel.rsi",
+   "size": "Xeno",
    "sprites": {
     "alive": "CMXenoSentinel-alive.png",
     "crit": "CMXenoSentinel-crit.png",
     "dead": "CMXenoSentinel-dead.png"
    },
    "tier": 1,
+   "weak": true,
    "woundStates": 3,
    "wounds": {
     "downed": "CMXenoSentinel-downed.png",
@@ -2242,12 +2561,14 @@
    "id": "CMXenoHivelord",
    "name": "Hivelord",
    "rsi": "_Stories/Mobs/Xenos/Hivelord/hivelord.rsi",
+   "size": "Big",
    "sprites": {
     "alive": "CMXenoHivelord-alive.png",
     "crit": "CMXenoHivelord-crit.png",
     "dead": "CMXenoHivelord-dead.png"
    },
    "tier": 2,
+   "weak": true,
    "woundStates": 3,
    "wounds": {
     "downed": "CMXenoHivelord-downed.png",
@@ -2269,12 +2590,14 @@
    "id": "CMXenoCarrier",
    "name": "Carrier",
    "rsi": "_Stories/Mobs/Xenos/Carrier/carrier.rsi",
+   "size": "Big",
    "sprites": {
     "alive": "CMXenoCarrier-alive.png",
     "crit": "CMXenoCarrier-crit.png",
     "dead": "CMXenoCarrier-dead.png"
    },
    "tier": 2,
+   "weak": true,
    "woundStates": 3,
    "wounds": {
     "downed": "CMXenoCarrier-downed.png",
@@ -2296,12 +2619,14 @@
    "id": "CMXenoBurrower",
    "name": "Burrower",
    "rsi": "_Stories/Mobs/Xenos/Burrower/burrower.rsi",
+   "size": "Xeno",
    "sprites": {
     "alive": "CMXenoBurrower-alive.png",
     "crit": "CMXenoBurrower-crit.png",
     "dead": "CMXenoBurrower-dead.png"
    },
    "tier": 2,
+   "weak": true,
    "woundStates": 3,
    "wounds": {
     "downed": "CMXenoBurrower-downed.png",
@@ -2323,12 +2648,14 @@
    "id": "CMXenoLurker",
    "name": "Lurker",
    "rsi": "_Stories/Mobs/Xenos/Lurker/lurker.rsi",
+   "size": "Xeno",
    "sprites": {
     "alive": "CMXenoLurker-alive.png",
     "crit": "CMXenoLurker-crit.png",
     "dead": "CMXenoLurker-dead.png"
    },
    "tier": 2,
+   "weak": true,
    "woundStates": 3,
    "wounds": {
     "downed": "CMXenoLurker-downed.png",
@@ -2350,12 +2677,14 @@
    "id": "CMXenoWarrior",
    "name": "Warrior",
    "rsi": "_Stories/Mobs/Xenos/Warrior/warrior.rsi",
+   "size": "Xeno",
    "sprites": {
     "alive": "CMXenoWarrior-alive.png",
     "crit": "CMXenoWarrior-crit.png",
     "dead": "CMXenoWarrior-dead.png"
    },
    "tier": 2,
+   "weak": true,
    "woundStates": 3,
    "wounds": {
     "downed": "CMXenoWarrior-downed.png",
@@ -2377,12 +2706,14 @@
    "id": "CMXenoSpitter",
    "name": "Spitter",
    "rsi": "_Stories/Mobs/Xenos/Spitter/spitter.rsi",
+   "size": "Xeno",
    "sprites": {
     "alive": "CMXenoSpitter-alive.png",
     "crit": "CMXenoSpitter-crit.png",
     "dead": "CMXenoSpitter-dead.png"
    },
    "tier": 2,
+   "weak": true,
    "woundStates": 3,
    "wounds": {
     "downed": "CMXenoSpitter-downed.png",
@@ -2405,12 +2736,14 @@
    "id": "CMXenoRavager",
    "name": "Ravager",
    "rsi": "_Stories/Mobs/Xenos/Ravager/ravager.rsi",
+   "size": "Big",
    "sprites": {
     "alive": "CMXenoRavager-alive.png",
     "crit": "CMXenoRavager-crit.png",
     "dead": "CMXenoRavager-dead.png"
    },
    "tier": 3,
+   "weak": true,
    "woundStates": 3,
    "wounds": {
     "downed": "CMXenoRavager-downed.png",
@@ -2432,12 +2765,14 @@
    "id": "RMCXenoCrusher",
    "name": "Crusher",
    "rsi": "_Stories/Mobs/Xenos/Crusher/crusher.rsi",
+   "size": "Immobile",
    "sprites": {
     "alive": "RMCXenoCrusher-alive.png",
     "crit": "RMCXenoCrusher-crit.png",
     "dead": "RMCXenoCrusher-dead.png"
    },
    "tier": 3,
+   "weak": false,
    "woundStates": 3,
    "wounds": {
     "downed": "RMCXenoCrusher-downed.png",
@@ -2459,12 +2794,14 @@
    "id": "CMXenoPraetorian",
    "name": "Praetorian",
    "rsi": "_Stories/Mobs/Xenos/Praetorian/praetorian.rsi",
+   "size": "Big",
    "sprites": {
     "alive": "CMXenoPraetorian-alive.png",
     "crit": "CMXenoPraetorian-crit.png",
     "dead": "CMXenoPraetorian-dead.png"
    },
    "tier": 3,
+   "weak": true,
    "woundStates": 3,
    "wounds": {
     "downed": "CMXenoPraetorian-downed.png",
@@ -2486,12 +2823,14 @@
    "id": "RMCXenoBoiler",
    "name": "Boiler",
    "rsi": "_Stories/Mobs/Xenos/Boiler/boiler.rsi",
+   "size": "Big",
    "sprites": {
     "alive": "RMCXenoBoiler-alive.png",
     "crit": "RMCXenoBoiler-crit.png",
     "dead": "RMCXenoBoiler-dead.png"
    },
    "tier": 3,
+   "weak": true,
    "woundStates": 3,
    "wounds": {
     "downed": "RMCXenoBoiler-downed.png",
@@ -2515,12 +2854,14 @@
    "igniteImmune": true,
    "name": "Queen",
    "rsi": "_Stories/Mobs/Xenos/Queen/queen.rsi",
+   "size": "Immobile",
    "sprites": {
     "alive": "CMXenoQueen-alive.png",
     "crit": "CMXenoQueen-crit.png",
     "dead": "CMXenoQueen-dead.png"
    },
    "tier": 0,
+   "weak": false,
    "woundStates": 3,
    "wounds": {
     "downed": "CMXenoQueen-downed.png",
@@ -2543,12 +2884,14 @@
    "id": "RMCXenoKing",
    "name": "King",
    "rsi": "_Stories/Mobs/Xenos/King/king.rsi",
+   "size": "Immobile",
    "sprites": {
     "alive": "RMCXenoKing-alive.png",
     "crit": "RMCXenoKing-crit.png",
     "dead": "RMCXenoKing-dead.png"
    },
    "tier": 0,
+   "weak": false,
    "woundStates": 3,
    "wounds": {
     "downed": "RMCXenoKing-downed.png",

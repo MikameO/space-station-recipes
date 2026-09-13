@@ -182,7 +182,7 @@
     'Casings themselves: ': 'На сами корпуса: ',
     'steel': 'сталь', 'plastic': 'пластик', 'sheets': 'листов',
     'Put something in the casing first.': 'Сначала положите что-нибудь в корпус.',
-    'Short chain': 'Короткая цепь', 'HE round': 'Фугасный', 'Breach': 'Пролом', 'Denial': 'Отсечение',
+    'HE round': 'Фугасный', 'Breach': 'Пролом', 'Denial': 'Отсечение',
     'Full flame, cheap': 'Макс огонь дёшево',
     'HE': 'Фугас',
     'Work': 'Материал', 'Steps': 'Реакций',
@@ -201,6 +201,28 @@
     'no burn': 'не горит',
     'dies at': 'смерть при',
     'Nothing baked for this casing.': 'Для этого корпуса готовых рецептов нет.',
+    'Mass-produced': 'Массовая',
+    'Assault': 'Штурм',
+    'Octogen-free peak': 'Предел без октогена',
+    'community': 'сообщество',
+    'Down': 'Сбит',
+    'Walls': 'Стены',
+    'Small fry': 'Мелочь',
+    'High explosive: what octogen buys': 'Мощная взрывчатка: что даёт октоген',
+    'Knockdown': 'Сбивает с ног',
+    'Resin walls': 'Смоляные стены',
+    'warrior on the floor': 'воин на земле',
+    'none': 'нет',
+    'no': 'нет',
+    'Knocked down': 'Сбит с ног',
+    'floored': 'сбит',
+    'resin wall': 'смоляная стена',
+    'thick resin wall': 'толстая смоляная стена',
+    'resin membrane': 'смоляная мембрана',
+    'resin door': 'смоляная дверь',
+    'sticky resin': 'липкая смола',
+    'egg': 'яйцо',
+    'alien nest': 'гнездо',
     'Target': 'Цель', 'Mixture': 'Смесь',
     'Blast': 'Волна', 'Saved': 'Экономия',
     'These numbers come from': 'Цифры взяты из форка',
@@ -875,6 +897,22 @@
       ? round(st.fireIntensity, 1) + ' / ' + st.reach + ' / ' + round(st.fireDuration, 0) + 's'
       : 'none',
       st.fireIntensity ? (st.star ? tr('star — rays') + ' ' + st.reach + ' ' + tr('tiles') : tr('diamond')) : ''));
+    // What a grenade does every time rather than now and then: the reference
+    // caste on the floor, and the resin it breaks.
+    const form = S.data.formula;
+    if (form.stunScale > 0) {
+      const down = knockdownRadius(st);
+      cards.push(card(tr('Knockdown'), down > 0 ? round(down, 1) + ' ' + tr('tiles') : tr('none'),
+        tr('warrior on the floor') + ' \u2265' + form.knockdownSeconds + ' s'));
+    }
+    const structures = S.data.structures || [];
+    if (structures.length) {
+      const wall = structureById(form.wallRef);
+      const reach = structureRadius(st, wall);
+      const note = structures.filter(s => s !== wall && structureRadius(st, s) > 0)
+        .map(s => tr(s.name) + ' ' + round(structureRadius(st, s), 1)).join(' \u00b7 ');
+      cards.push(card(tr('Resin walls'), reach > 0 ? round(reach, 1) + ' ' + tr('tiles') : tr('none'), note));
+    }
 
     let flame = '';
     if (st.flame) {
@@ -2269,7 +2307,8 @@
     if (!rows.length) { box.innerHTML = '<p class="ord-empty">' + esc(tr('Nothing baked for this casing.')) + '</p>'; return; }
     const c = casingOf();
     const F = S.data.formula;
-    const dmgPer = F.damagePerIntensity / F.intensityDivisor;
+    const wall = structureById(F.wallRef);
+    const lang = window.I18N_LANG === 'ru' ? 'ru' : 'en';
     const built = rows.map(r => {
       const st = computeStats(r.mix, c, S.dampener);
       // Two numbers phoron alone hides. Work is the whole shopping list in
@@ -2283,50 +2322,75 @@
         for (const s of (S.data.reagents[id] || {}).steps || []) steps.add(s);
       }
       return { r, st, cost: mixCost(r.mix, S.costBase), work, steps: steps.size,
-               he: heEffect(st), dmg: st.power * dmgPer, kills: killCount(st) };
+               he: heEffect(st), kills: killCount(st), down: knockdownRadius(st),
+               walls: structureRadius(st, wall), low: lowTierKills(st) };
     });
-    box.innerHTML = `<table class="ord-table">
-      <thead><tr>
+    const dash = '\u2014';
+    const tiles = v => v > 0 ? esc(round(v, 1)) : dash;
+    const fireCell = st => st.fireIntensity
+      ? esc(round(st.fireIntensity, 0)) + '/' + st.reach + '/' + esc(round(st.fireDuration, 0)) + 's'
+      : dash;
+    // The name and its tag go in the narrow first column; the note rides under
+    // the mixture, which has the width for a sentence.
+    const forCell = b => {
+      const roles = b.r.roles.filter(k => k !== 'community').map(k => esc(tr(ROLE_LABEL[k] || k)));
+      if (!b.r.name) return roles.join(' + ');
+      return `<b>${esc(b.r.name[lang] || b.r.name.en)}</b>`
+        + (roles.length ? '<br>' + roles.join(' + ') : '')
+        + `<div class="ord-row-note">${esc(tr('community'))}</div>`;
+    };
+    const noteOf = b => b.r.note
+      ? `<div class="ord-row-note">${esc(b.r.note[lang] || b.r.note.en)}</div>` : '';
+    const head = (mid, end) => `<thead><tr>
         <th>${esc(tr('For'))}</th><th>${esc(tr('Mixture'))}</th>
-        <th class="num">${esc(tr('Power'))}</th><th class="num">${esc(tr('Blast'))}</th>
-        <th class="num">${esc(tr('Shrapnel'))}</th><th class="num">${esc(tr('Fire'))}</th>
+        <th class="num">${esc(tr('Power'))}</th><th class="num">${esc(tr('Blast'))}</th>${mid}
         <th class="num">${esc(rname(S.costBase))}</th><th class="num">${esc(tr('Work'))}</th>
-        <th class="num">${esc(tr('Steps'))}</th><th class="num">${esc(tr('Kills'))}</th>
-        <th class="num">${esc(tr('HE'))}</th>
-      </tr></thead><tbody>${built.map(b => `<tr title="${esc(tr('Work') + ' ' + round(b.work, 0)
-          + ', ' + rname(S.costBase) + ' ' + round(b.cost, 1)
-          + ', ' + tr('reactions to run: ') + b.steps
-          + '. ' + tr('Against T2+ two or three tiles away: ')
-          + b.he.dead + ' ' + tr('destroyed') + ', ' + b.he.crit + ' ' + tr('crippled'))}">
-        <td>${esc(b.r.roles.map(k => tr(ROLE_LABEL[k] || k)).join(' + '))}</td>
-        <td class="ord-mix-cell">${esc(describeMix(b.r.mix))}</td>
+        <th class="num">${esc(tr('Steps'))}</th>${end}</tr></thead>`;
+    const lead = b => `<td>${forCell(b)}</td>
+        <td class="ord-mix-cell">${esc(describeMix(b.r.mix))}${noteOf(b)}</td>
         <td class="num">${esc(round(b.st.power, 0))}</td>
-        <td class="num">${b.st.hasBlast ? esc(round(b.st.blastRadius, 2)) : '\u2014'}</td>
-        <td class="num">${b.st.shards || '\u2014'}</td>
-        <td class="num">${b.st.fireIntensity ? esc(round(b.st.fireIntensity, 0)) + '/' + b.st.reach + '/' + esc(round(b.st.fireDuration, 0)) + 's' : '\u2014'}</td>
-        <td class="num">${esc(round(b.cost, 1))}</td>
-        <td class="num">${esc(round(b.work, 0))}</td>
-        <td class="num">${b.steps}</td>
+        <td class="num">${b.st.hasBlast ? esc(round(b.st.blastRadius, 2)) : dash}</td>`;
+    const cost = b => `<td class="num">${esc(round(b.cost, 1))}</td>
+        <td class="num">${esc(round(b.work, 0))}</td><td class="num">${b.steps}</td>`;
+    const base = built.filter(b => b.r.group !== 'high');
+    const high = built.filter(b => b.r.group === 'high');
+    const baseTable = base.length ? `<table class="ord-table">${head(
+        `<th class="num">${esc(tr('Down'))} \u2265${F.knockdownSeconds}s</th>
+        <th class="num">${esc(tr('Walls'))}</th><th class="num">${esc(tr('Small fry'))}</th>
+        <th class="num">${esc(tr('Fire'))}</th>`, '')}<tbody>${base.map(b => `<tr data-i="${built.indexOf(b)}">
+        ${lead(b)}
+        <td class="num">${tiles(b.down)}</td><td class="num">${tiles(b.walls)}</td>
+        <td class="num">${b.low || dash}</td><td class="num">${fireCell(b.st)}</td>${cost(b)}
+      </tr>`).join('')}</tbody></table>` : '';
+    const highTable = high.length ? `<details><summary>${esc(tr('High explosive: what octogen buys'))} (${high.length})</summary>
+      <table class="ord-table">${head(
+        `<th class="num">${esc(tr('Shrapnel'))}</th><th class="num">${esc(tr('Fire'))}</th>`,
+        `<th class="num">${esc(tr('Kills'))}</th><th class="num">${esc(tr('HE'))}</th>`)}<tbody>${high.map(b => `<tr data-i="${built.indexOf(b)}" title="${esc(tr('Against T2+ two or three tiles away: ')
+          + b.he.dead + ' ' + tr('destroyed') + ', ' + b.he.crit + ' ' + tr('crippled'))}">
+        ${lead(b)}
+        <td class="num">${b.st.shards || dash}</td><td class="num">${fireCell(b.st)}</td>${cost(b)}
         <td class="num">${b.kills}/${(S.data.targets || []).length}</td>
         <td class="num">${b.he.dead || b.he.crit
           ? `<b class="ord-he-dead">${b.he.dead}</b>\u2620 ${b.he.crit}\u25b2`
-          : '\u2014'}</td>
-      </tr>`).join('')}</tbody></table>`;
-    box.querySelectorAll('tbody tr').forEach((tr_, i) => {
-      tr_.style.cursor = 'pointer';
-      tr_.onclick = () => {
-        S.mix = Object.assign({}, built[i].r.mix);
-        track('ordnance_recipe_use', { role: built[i].r.roles.join('+') });
+          : dash}</td>
+      </tr>`).join('')}</tbody></table></details>` : '';
+    box.innerHTML = baseTable + highTable;
+    box.querySelectorAll('tbody tr').forEach(row => {
+      const b = built[+row.dataset.i];
+      row.style.cursor = 'pointer';
+      row.onclick = () => {
+        S.mix = Object.assign({}, b.r.mix);
+        track('ordnance_recipe_use', { role: b.r.roles.join('+') });
         renderAll();
       };
     });
   }
 
   const ROLE_LABEL = {
+    mass: 'Mass-produced', assault: 'Assault', max: 'Octogen-free peak',
+    hot: 'Full flame, cheap', denial: 'Denial', breach: 'Breach',
     radius: 'Reach', damage: 'Damage', shrapnel: 'Shrapnel',
-    fire: 'Fire', burn: 'Burn time', cheap: 'Near max reach',
-    short: 'Short chain', he: 'HE round', breach: 'Breach', denial: 'Denial',
-    hot: 'Full flame, cheap',
+    cheap: 'Near max reach', he: 'HE round',
   };
 
   // ── what it does to them ───────────────────────────────────────────────────
@@ -2451,6 +2515,65 @@
       .filter(t => targetOutcome(st, t, 0).state === 'dead').length;
   }
 
+  // SharedRMCExplosionSystem.OnStunOnExplosionReceivedBeforeExplode, mirrored
+  // with ss14_ordnance.py. The damage it reads is already multiplied by the
+  // target's coefficient, and Math.Round there rounds half to even, which
+  // JavaScript's Math.round does not.
+  function roundHalfEven(x) {
+    const r = Math.round(x);
+    return (Math.abs(x % 1) === 0.5 && r % 2 !== 0) ? r - 1 : r;
+  }
+
+  function knockdownSeconds(dealt, target) {
+    const F = S.data.formula;
+    if (!(F.stunScale > 0)) return 0;
+    const factor = Math.min(F.stunCap, roundHalfEven(dealt * F.stunScale) / 2);
+    if (factor > 0 && target.weak) return factor / F.stunWeakDivisor;
+    if (factor > F.stunStrongGate) return factor / F.stunStrongDivisor;
+    return 0;
+  }
+
+  // The distance out to which the blast still deals `raw` damage.
+  function radiusWhere(st, raw) {
+    const F = S.data.formula;
+    if (st.power <= 0 || st.falloff <= 0) return 0;
+    const top = st.power / F.intensityDivisor, need = raw / F.damagePerIntensity;
+    if (top < need) return 0;
+    return (top - need) / Math.max(st.falloff / F.intensityDivisor, F.minSlope);
+  }
+
+  function targetById(id) { return (S.data.targets || []).find(t => t.id === id) || null; }
+  function structureById(id) { return (S.data.structures || []).find(s => s.id === id) || null; }
+
+  // How far out the reference caste stays down for the catalogue's seconds.
+  // round(x) reaches n from x = n - 0.5, so the edge is a plain linear solve.
+  function knockdownRadius(st) {
+    const F = S.data.formula;
+    const ref = targetById(F.knockdownRef);
+    if (!ref || !ref.weak || !(F.stunScale > 0)) return 0;
+    const n = Math.ceil(F.knockdownSeconds * F.stunWeakDivisor * 2 - 1e-9);
+    if (n / 2 > F.stunCap) return 0;
+    return radiusWhere(st, (n - 0.5) / F.stunScale / ref.coefficient);
+  }
+
+  function structureRadius(st, s) { return s ? radiusWhere(st, s.hp / s.coefficient) : 0; }
+
+  // T0 and T1 destroyed at the gallery's first four distances, burn window shut.
+  // Queen and king also carry tier 0, and neither of them is weak.
+  function lowTierKills(st) {
+    const F = S.data.formula;
+    const max = F.lowTierMax != null ? F.lowTierMax : 1;
+    let n = 0;
+    for (let d = 0; d <= 3; d++) {
+      const blast = blastDamageAt(st, d);
+      for (const t of S.data.targets || []) {
+        if (!t.weak || (t.tier || 0) > max) continue;
+        if (blast * t.coefficient + fireOutcome(st, t, d, 0, 0).total >= t.dead) n++;
+      }
+    }
+    return n;
+  }
+
   // What the same round does to the people who threw it. Blast only: a marine
   // burns through a different branch of FlammableSystem than a xeno, with fire
   // protection from the suit on top, and none of that is mirrored here.
@@ -2540,6 +2663,10 @@
             + ' = ' + round(o.fire.total, 0)
           : (t.fireImmune ? tr('shrugged off') : tr('out of reach'))));
       }
+      // Only the blast counts: ExplosionReceivedEvent carries explosion damage,
+      // and a flame knocks nobody down.
+      const down = knockdownSeconds(o.blast, t);
+      lines.push(tr('Knocked down') + ': ' + (down > 0 ? round(down, 1) + ' s' : tr('no')));
       lines.push(tr('dies at') + ' ' + round(t.dead, 0));
       const tip = esc(lines.join('\n'));
       return `<div class="ord-xeno ord-xeno-${o.state}" title="${tip}">
@@ -2559,6 +2686,8 @@
           : (st.fireIntensity > 0 && t.fireImmune
              ? `<div class="ord-xeno-fire ord-xeno-noburn">${esc(tr('no burn'))}</div>` : '')}
         <div class="ord-xeno-hits">${o.hits ? esc(o.hits) + ' \u00d7' : esc(tr('no effect'))}</div>
+        ${down > 0 && o.state !== 'dead'
+          ? `<div class="ord-xeno-dmg">${esc(tr('floored'))} ${esc(round(down, 1))} s</div>` : ''}
       </div>`;
     }).join('');
   }

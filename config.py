@@ -668,6 +668,26 @@ FORK_REGISTRY = {
                 "RMCXenoKing",
             ],
             "target_sprite_states": ["alive", "crit", "dead"],
+            # Каста, по которой каталог меряет «сбит с ног на 2 с»: линию держит T2,
+            # а всё легче воина падает дальше и дольше.
+            "knockdown_ref": "CMXenoWarrior",
+            # Смоляная застройка. Взрыв бьёт с ignoreResistances, но через
+            # ExplosionResistance: стена ×3.64 (CMBaseWallXeno), дверь ×7.5.
+            "structure_files": [
+                "Resources/Prototypes/_RMC14/Entities/Structures/Base/base_structure.yml",
+                "Resources/Prototypes/_RMC14/Entities/Structures/Xeno/xeno_walls.yml",
+                "Resources/Prototypes/_RMC14/Entities/Structures/Xeno/xeno_doors.yml",
+                "Resources/Prototypes/_RMC14/Entities/Structures/Xeno/xeno_floor_resin.yml",
+                "Resources/Prototypes/_RMC14/Entities/Structures/Xeno/xeno_egg.yml",
+                "Resources/Prototypes/_RMC14/Entities/Structures/Xeno/xeno_nest.yml",
+            ],
+            "structures": [
+                "WallXenoResin", "WallXenoResinThick", "WallXenoMembrane",
+                "DoorXenoResin", "XenoStickyResin", "XenoEgg", "XenoNest",
+            ],
+            "wall_ref": "WallXenoResin",
+            # Мощная взрывчатка: в базовые готовые рецепты не идёт, только в свою группу.
+            "high_power_reagents": ["RMCOctogen"],
             # Прототип взрыва, которым стреляет OrdnanceExplosionSystem
             "explosion_proto": "RMC",
             "iron_reagent": "RMCIron",
