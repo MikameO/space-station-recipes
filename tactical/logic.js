@@ -108,8 +108,24 @@
       bounds: b,
       grid: decodeRows(json.grid, width),
       blocked: decodeRows(json.masks.blocked, width),
-      hardWall: decodeRows(json.masks.hardWall, width)
+      hardWall: decodeRows(json.masks.hardWall, width),
+      // Multi-level planets (CMU): a strike must be allowed by every surface in the
+      // column, and a mortar deploys only under open sky.
+      columnMortar: json.masks.columnMortar ? decodeRows(json.masks.columnMortar, width) : null,
+      columnOb: json.masks.columnOb ? decodeRows(json.masks.columnOb, width) : null,
+      openSky: json.masks.openSky ? decodeRows(json.masks.openSky, width) : null
     };
+  }
+
+  // Whether a strike of one kind may reach the ground at a tile: the column rule
+  // where the planet has levels, the area flag otherwise.
+  function strikeAllowed(planet, kind, x, y) {
+    var mask = kind === 'ob' ? planet.columnOb : planet.columnMortar;
+    if (mask) {
+      var i = cellIndex(planet, x, y);
+      return i >= 0 && mask[i] === 1;
+    }
+    return !!(flagsAt(planet, x, y) & (kind === 'ob' ? FLAGS.OB : FLAGS.MORTAR_FIRE));
   }
 
   function cellIndex(planet, x, y) {
@@ -177,7 +193,9 @@
   function placementCheck(planet, tile) {
     var area = areaAt(planet, tile[0], tile[1]);
     if (!area) return { ok: false, reasons: ['noArea'] };
-    return (area[3] & FLAGS.MORTAR_PLACE) ? { ok: true, reasons: [] } : { ok: false, reasons: ['indoors'] };
+    if (!(area[3] & FLAGS.MORTAR_PLACE)) return { ok: false, reasons: ['indoors'] };
+    if (planet.openSky && !maskAt(planet, 'openSky', tile[0], tile[1])) return { ok: false, reasons: ['covered'] };
+    return { ok: true, reasons: [] };
   }
 
   // Checks the server runs when the shell is loaded (MortarSystem.ValidateTargetCoordinates),
@@ -194,7 +212,7 @@
       reasons.push('noArea');
     } else {
       if (area[3] & FLAGS.LANDING_ZONE) reasons.push('landingZone');
-      if (!(area[3] & FLAGS.MORTAR_FIRE)) reasons.push('covered');
+      if (!strikeAllowed(planet, 'mortar', target[0], target[1])) reasons.push('covered');
       if (laser && !(area[3] & FLAGS.CAS)) reasons.push('noCas');
       if (laser && !(area[3] & FLAGS.LASING)) reasons.push('noLasing');
     }
@@ -213,7 +231,7 @@
       for (var x = target[0] - bounds[0]; x <= target[0] + bounds[0] && !refused; x++) {
         for (var y = target[1] - bounds[1]; y <= target[1] + bounds[1]; y++) {
           var a = areaAt(planet, x, y);
-          if (!a || (a[3] & FLAGS.LANDING_ZONE) || !(a[3] & FLAGS.MORTAR_FIRE)) { refused = true; break; }
+          if (!a || (a[3] & FLAGS.LANDING_ZONE) || !strikeAllowed(planet, 'mortar', x, y)) { refused = true; break; }
         }
       }
       if (refused) warnings.push('errorMayHitRefusedArea');
@@ -356,13 +374,13 @@
     var reasons = [], warnings = [];
     var area = areaAt(planet, target[0], target[1]);
     if (!area) reasons.push('noArea');
-    else if (!(area[3] & FLAGS.OB)) reasons.push('obBlocked');
+    else if (!strikeAllowed(planet, 'ob', target[0], target[1])) reasons.push('obBlocked');
     if (maskAt(planet, 'hardWall', target[0], target[1])) warnings.push('wallRedirect');
     var box = obScatterBox(target, ob, 0), outside = 0, total = 0;
     for (var x = box.minX; x <= box.maxX; x++) {
       for (var y = box.minY; y <= box.maxY; y++) {
         total++;
-        if (!(flagsAt(planet, x, y) & FLAGS.OB)) outside++;
+        if (!strikeAllowed(planet, 'ob', x, y)) outside++;
       }
     }
     if (outside) warnings.push('scatterOutsideOb');
@@ -645,6 +663,7 @@
     areaAt: areaAt,
     flagsAt: flagsAt,
     maskAt: maskAt,
+    strikeAllowed: strikeAllowed,
     distance: distance,
     errorBounds: errorBounds,
     zeroErrorSpan: zeroErrorSpan,

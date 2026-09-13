@@ -220,7 +220,12 @@
       obForget: 'Forget the launch',
       supplyTitle: 'Supply drop',
       supplyOk: '✓ The crate lands here.',
-      supplyNo: '✗ {reason}'
+      supplyNo: '✗ {reason}',
+      obUndergroundFallback: 'The orbital strike cannot reach here — the ground is covered or underground.',
+      level: 'Level',
+      levelSurface: 'surface',
+      mortarOnLevel: 'The mortar stands on level {n}; switch there to see whether it can be deployed.',
+      columnNote: 'Levels: a strike reaches the ground only if every floor in the column above it allows it; a mortar deploys only under open sky.'
     },
     ru: {
       pageName: 'Тактическая карта',
@@ -412,7 +417,12 @@
       obForget: 'Забыть запуск',
       supplyTitle: 'Сброс поставки',
       supplyOk: '✓ Ящик ляжет сюда.',
-      supplyNo: '✗ {reason}'
+      supplyNo: '✗ {reason}',
+      obUndergroundFallback: 'Орбитальный удар сюда не дойдёт — точка накрыта или под землёй.',
+      level: 'Этаж',
+      levelSurface: 'поверхность',
+      mortarOnLevel: 'Миномёт стоит на этаже {n}; переключитесь туда, чтобы видеть, можно ли там развернуть.',
+      columnNote: 'Этажи: удар доходит до земли, только если его разрешает каждый этаж над точкой; миномёт разворачивается только под открытым небом.'
     }
   };
   var T = L10N[LANG];
@@ -470,6 +480,9 @@
     planetLabel: $('tacPlanetLabel'),
     fork: $('tacFork'),
     planet: $('tacPlanet'),
+    levelField: $('tacLevelField'),
+    levelLabel: $('tacLevelLabel'),
+    level: $('tacLevel'),
     zoomIn: $('tacZoomIn'),
     zoomOut: $('tacZoomOut'),
     fit: $('tacFit'),
@@ -483,6 +496,7 @@
     index: null,
     fork: null,       // index entry
     meta: null,       // planet entry in the index
+    level: 0,         // depth of the level shown (CMU planets have several)
     planet: null,     // Logic.preparePlanet(json)
     tints: null,      // offscreen canvases: fire (refused), deploy (allowed)
     hoverTile: null,
@@ -518,6 +532,7 @@
     els.pageName.textContent = T.pageName;
     els.forkLabel.textContent = T.fork;
     els.planetLabel.textContent = T.planet;
+    els.levelLabel.textContent = T.level;
     els.fit.textContent = T.fit;
     els.zoomIn.setAttribute('aria-label', T.zoomIn);
     els.zoomOut.setAttribute('aria-label', T.zoomOut);
@@ -543,13 +558,33 @@
 
   function readHash() {
     var m = /(?:^|[#&])map=([\w-]+)\/([\w-]+)/.exec(location.hash);
-    return m ? { fork: m[1], planet: m[2] } : null;
+    if (!m) return null;
+    var lv = /(?:^|[#&])level=(-?\d+)/.exec(location.hash);
+    return { fork: m[1], planet: m[2], level: lv ? parseInt(lv[1], 10) : 0 };
   }
 
   function writeHash() {
     if (!state.fork || !state.meta) return;
-    var h = '#map=' + state.fork.key + '/' + state.meta.id;
+    var h = '#map=' + state.fork.key + '/' + state.meta.id + (state.level ? '&level=' + state.level : '');
     if (location.hash !== h) history.replaceState(null, '', h);
+  }
+
+  // Index entries list levels as {depth, h}; a single-level planet may still carry [0].
+  function levelsOf(meta) {
+    var list = (meta.levels || [0]).map(function (lv) { return typeof lv === 'number' ? { depth: lv, h: meta.h } : lv; });
+    return list.sort(function (a, b) { return a.depth - b.depth; });
+  }
+
+  function levelName(depth) {
+    return depth === 0 ? '0 · ' + T.levelSurface : (depth > 0 ? '+' + depth : String(depth));
+  }
+
+  function fillLevels(meta, depth) {
+    var list = levelsOf(meta);
+    els.levelField.classList.toggle('tac-hide', list.length < 2);
+    els.level.innerHTML = list.map(function (lv) {
+      return '<option value="' + lv.depth + '"' + (lv.depth === depth ? ' selected' : '') + '>' + esc(levelName(lv.depth)) + '</option>';
+    }).join('');
   }
 
   // ── data ────────────────────────────────────────────────────────────────
@@ -578,7 +613,7 @@
       var wanted = readHash();
       var fork = (wanted && index.forks.filter(function (f) { return f.key === wanted.fork; })[0]) || index.forks[0];
       fillForks(fork.key);
-      selectFork(fork, wanted && wanted.fork === fork.key ? wanted.planet : null);
+      selectFork(fork, wanted && wanted.fork === fork.key ? wanted.planet : null, wanted ? wanted.level : 0);
     }).catch(function (err) {
       console.error(err);
       setStatus(T.loadFailed, { error: true, retry: loadIndex });
@@ -598,11 +633,11 @@
     }).join('');
   }
 
-  function selectFork(fork, planetId) {
+  function selectFork(fork, planetId, depth) {
     state.fork = fork;
     var meta = (planetId && fork.planets.filter(function (p) { return p.id === planetId; })[0]) || fork.planets[0];
     fillPlanets(fork, meta.id);
-    loadPlanet(meta);
+    loadPlanet(meta, depth || 0);
   }
 
   // One pixel per tile, like the planet PNG: red where the mortar may not hit,
@@ -623,29 +658,35 @@
       ctx.putImageData(img, 0, 0);
       return c;
     }
+    var cm = planet.columnMortar, co = planet.columnOb, sky = planet.openSky;
     return {
-      fire: make(function (f) { return ((f & F.MORTAR_FIRE) && !(f & F.LANDING_ZONE)) ? null : TINT_FIRE_REFUSED; }),
-      fireLaser: make(function (f) {
-        return ((f & F.MORTAR_FIRE) && (f & F.CAS) && (f & F.LASING) && !(f & F.LANDING_ZONE)) ? null : TINT_FIRE_REFUSED;
+      fire: make(function (f, i) { return ((cm ? cm[i] === 1 : (f & F.MORTAR_FIRE)) && !(f & F.LANDING_ZONE)) ? null : TINT_FIRE_REFUSED; }),
+      fireLaser: make(function (f, i) {
+        return ((cm ? cm[i] === 1 : (f & F.MORTAR_FIRE)) && (f & F.CAS) && (f & F.LASING) && !(f & F.LANDING_ZONE)) ? null : TINT_FIRE_REFUSED;
       }),
-      deploy: make(function (f) { return (f & F.MORTAR_PLACE) ? TINT_DEPLOY_ALLOWED : null; }),
-      ob: make(function (f) { return (f & F.OB) ? null : TINT_FIRE_REFUSED; }),
+      deploy: make(function (f, i) { return ((f & F.MORTAR_PLACE) && (!sky || sky[i] === 1)) ? TINT_DEPLOY_ALLOWED : null; }),
+      ob: make(function (f, i) { return (co ? co[i] === 1 : (f & F.OB)) ? null : TINT_FIRE_REFUSED; }),
       supply: make(function (f, i) { return ((f & F.SUPPLY) && planet.blocked[i] !== 1) ? null : TINT_FIRE_REFUSED; })
     };
   }
 
-  function loadPlanet(meta) {
+  function loadPlanet(meta, depth) {
     var token = ++state.loadToken;
     var fork = state.fork;
+    var levels = levelsOf(meta);
+    var lv = levels.filter(function (l) { return l.depth === (depth || 0); })[0] || levels.filter(function (l) { return l.depth === 0; })[0];
     setStatus(T.loading);
-    var base = 'tactical/' + meta.file;
-    Promise.all([fetchJson(base + '.json?h=' + meta.h), loadImage(base + '.png?h=' + meta.h)]).then(function (res) {
+    var base = 'tactical/' + meta.file + (lv.depth ? '.' + lv.depth : '');
+    var samePlanet = state.meta === meta;
+    Promise.all([fetchJson(base + '.json?h=' + lv.h), loadImage(base + '.png?h=' + lv.h)]).then(function (res) {
       if (token !== state.loadToken) return;
       var json = res[0], img = res[1];
-      if (json.h !== meta.h) {
+      if (json.h !== lv.h || json.level !== lv.depth) {
         setStatus(T.staleData, { error: true });
         return;
       }
+      state.level = lv.depth;
+      fillLevels(meta, lv.depth);
       var planet = Logic.preparePlanet(json);
       if (img.naturalWidth !== planet.width || img.naturalHeight !== planet.height) {
         throw new Error('PNG ' + img.naturalWidth + 'x' + img.naturalHeight + ' does not match bounds ' + planet.width + 'x' + planet.height);
@@ -654,22 +695,25 @@
       state.planet = planet;
       state.tints = buildTints(planet);
       state.hoverTile = null;
-      state.storeKey = STORAGE_PREFIX + fork.key + '/' + meta.id;
-      state.store = Logic.migrateStorage(storage.read(state.storeKey));
-      // An offset read back from storage may belong to an earlier round.
-      state.session = Logic.newSession(now(), !!state.store.calibration);
-      state.selected = null;
-      state.pickMode = null;
-      state.impactShotId = null;
-      state.impactDraft = {};
-      state.impactMessage = {};
-      state.shape = null;
-      state.markerCoords = '';
-      state.markerMessage = null;
-      state.draft = { x: '', y: '' };
-      state.calMessage = null;
-      state.mortarMessage = null;
-      state.findMessage = null;
+      if (!samePlanet) {
+        state.storeKey = STORAGE_PREFIX + fork.key + '/' + meta.id;
+        state.store = Logic.migrateStorage(storage.read(state.storeKey));
+        // An offset read back from storage may belong to an earlier round.
+        state.session = Logic.newSession(now(), !!state.store.calibration);
+        state.selected = null;
+        state.pickMode = null;
+        state.impactShotId = null;
+        state.impactDraft = {};
+        state.impactMessage = {};
+        state.shape = null;
+        state.markerCoords = '';
+        state.markerMessage = null;
+        state.draft = { x: '', y: '' };
+        state.calMessage = null;
+        state.mortarMessage = null;
+        state.findMessage = null;
+      }
+      var keepView = samePlanet && state.planet && view.bounds;
       view.setImage(img, json.bounds);
       writeHash();
       renderAll();
@@ -682,7 +726,7 @@
     }).catch(function (err) {
       if (token !== state.loadToken) return;
       console.error(err);
-      setStatus(T.loadFailed, { error: true, retry: function () { loadPlanet(meta); } });
+      setStatus(T.loadFailed, { error: true, retry: function () { loadPlanet(meta, depth); } });
     });
   }
 
@@ -736,7 +780,7 @@
   function supplyInfo(tile) { return state.planet ? Logic.supplyChecks(state.planet, tile) : null; }
   function obRefusal(reason) {
     var t = terms();
-    return reason === 'obBlocked' ? (t.obUnderground || reason) : reason === 'noArea' ? (t.refuseNotArea || reason) : reason;
+    return reason === 'obBlocked' ? (t.obUnderground || T.obUndergroundFallback) : reason === 'noArea' ? (t.refuseNotArea || reason) : reason;
   }
   function supplyRefusal(reason) {
     var t = terms();
@@ -1317,11 +1361,13 @@
     }
     var place = Logic.placementCheck(state.planet, m.tile);
     var area = Logic.areaAt(state.planet, m.tile[0], m.tile[1]);
+    var otherLevel = (m.level || 0) !== state.level;
     h += '<div class="tac-coords-row"><span class="tac-muted">' + esc(T.mortarAt) + '</span><output class="tac-big" id="tacMortarCoordsOut">' +
       esc(Logic.formatCoords(toGame(m.tile))) + '</output></div>' +
-      (area ? '<p class="tac-muted">' + esc(area[1]) + '</p>' : '') +
-      (place.ok ? msg({ text: T.deployOk, kind: 'ok' })
-        : msg({ text: fmt(T.deployNo, { reason: place.reasons[0] === 'noArea' ? T.deployNoArea : (terms().refuseDeployIndoors || place.reasons[0]) }), kind: 'error' })) +
+      (otherLevel ? msg({ text: fmt(T.mortarOnLevel, { n: levelName(m.level || 0) }), kind: 'info' })
+        : (area ? '<p class="tac-muted">' + esc(area[1]) + '</p>' : '') +
+          (place.ok ? msg({ text: T.deployOk, kind: 'ok' })
+            : msg({ text: fmt(T.deployNo, { reason: place.reasons[0] === 'noArea' ? T.deployNoArea : (terms().refuseDeployIndoors || place.reasons[0]) }), kind: 'error' }))) +
       '<div class="tac-actions">' + button('pickMortar', T.mortarMove, pickMode() === 'mortar' ? 'btn-small on' : 'btn-small') + button('removeMortar', T.mortarRemove) + '</div>';
     if (pickMode() === 'mortar') h += msg({ text: T.mortarPickHint, kind: 'info' });
     h += '<div class="tac-mode"><span class="tac-muted">' + esc(T.modeLabel) + '</span><div class="tac-segment small" role="group">' +
@@ -1473,6 +1519,7 @@
       h += '<label class="tac-check-label"><input type="checkbox" data-layer="' + k + '"' + (layerOn(k) ? ' checked' : '') + '> ' + esc(label) + '</label>';
     });
     h += '</div>';
+    if (state.planet && state.planet.columnMortar) h += '<p class="tac-hint">' + esc(T.columnNote) + '</p>';
     if (wp !== 'mortar') return h;
     var list = shells(), s = currentShell();
     if (s) {
@@ -1669,7 +1716,7 @@
   }
 
   function setMortar(tile) {
-    state.store.mortar = { tile: tile.slice(), mode: (mortar() && mortar().mode) || 'coordinates' };
+    state.store.mortar = { tile: tile.slice(), mode: (mortar() && mortar().mode) || 'coordinates', level: state.level };
     state.pickMode = null;
     state.mortarMessage = null;
     saveStore();
@@ -2251,7 +2298,11 @@
 
   els.planet.addEventListener('change', function () {
     var meta = state.fork.planets.filter(function (p) { return p.id === els.planet.value; })[0];
-    loadPlanet(meta);
+    loadPlanet(meta, 0);
+  });
+
+  els.level.addEventListener('change', function () {
+    if (state.meta) loadPlanet(state.meta, parseInt(els.level.value, 10) || 0);
   });
 
   els.zoomIn.addEventListener('click', function () { view.zoomBy(1.4); });
@@ -2280,11 +2331,11 @@
   window.addEventListener('hashchange', function () {
     var wanted = readHash();
     if (!wanted || !state.index) return;
-    if (state.fork && state.meta && wanted.fork === state.fork.key && wanted.planet === state.meta.id) return;
+    if (state.fork && state.meta && wanted.fork === state.fork.key && wanted.planet === state.meta.id && wanted.level === state.level) return;
     var fork = state.index.forks.filter(function (f) { return f.key === wanted.fork; })[0];
     if (!fork) return;
     fillForks(fork.key);
-    selectFork(fork, wanted.planet);
+    selectFork(fork, wanted.planet, wanted.level);
   });
 
   // ── round lifetime ──────────────────────────────────────────────────────

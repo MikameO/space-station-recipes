@@ -75,6 +75,8 @@ class TacticalError(RuntimeError):
 TACTICAL_FORKS = {
     "rmc14": {"family": "rmc", "label": "RMC14", "locale": "en-US"},
     "stories_cm": {"family": "rmc", "label": "Space Stories", "locale": "ru-RU"},
+    "cmu": {"family": "cmu", "label": "Colonial Marines Universe", "locale": "en-US"},
+    "rucm": {"family": "cmu", "label": "Russian Marine Corps", "locale": "ru-RU"},
 }
 
 RMC_CODE_FILES = [
@@ -99,13 +101,32 @@ RMC_CODE_FILES = [
     "Content.Shared/_RMC14/Atmos/TileFireOnTriggerComponent.cs",
 ]
 
+# CMU keeps its own content under Content.CMU (upstream 60b9be5fd, 2026-08-30); a planet
+# entity there names a gameMap by `mapId`, and the gameMap lists the levels below and
+# above the surface. Every level is a full map file with its own AreaGrid.
+CMU_CODE_FILES = RMC_CODE_FILES + [
+    "Content.CMU/Shared/ZLevels/Ordnance/CMUTopDownOrdnanceSystem.cs",
+    "Content.CMU/Shared/ZLevels/Core/CMUZLevelOpeningCache.cs",
+    "Content.CMU/Server/ZLevels/Core/CMUZLevelsSystem.cs",
+]
+
 FAMILIES = {
     "rmc": {
         "min_planets": 10,
-        "planet_prefix": "RMCPlanet",
-        "prototype_dir": "Resources/Prototypes",
+        "planet_prefixes": ["RMCPlanet"],
+        "prototype_dirs": ["Resources/Prototypes"],
+        "map_roots": ["Resources"],
         "locale_dirs": ["Resources/Locale/en-US/_RMC14", "Resources/Locale/ru-RU/_RMC14"],
         "code_files": RMC_CODE_FILES,
+    },
+    "cmu": {
+        "min_planets": 10,
+        "planet_prefixes": ["AUPlanet", "AuPlanet", "CMUPlanet", "RMCPlanet"],
+        "prototype_dirs": ["Resources/Prototypes", "Content.CMU/Resources/Prototypes"],
+        "map_roots": ["Content.CMU/Resources", "Resources"],
+        "locale_dirs": ["Resources/Locale/en-US/_RMC14", "Resources/Locale/ru-RU/_RMC14",
+                        "Content.CMU/Resources/Locale/en-US/CMU14", "Content.CMU/Resources/Locale/ru-RU/CMU14"],
+        "code_files": CMU_CODE_FILES,
     },
 }
 
@@ -155,6 +176,9 @@ MIRROR = {
         },
     },
 }
+
+MIRROR["cmu"] = json.loads(json.dumps(MIRROR["rmc"]))
+MIRROR["cmu"]["mortar"].update({"minRange": 8, "maxRange": 165})   # CMU MortarComponent.cs 9753baf6
 
 _MORTAR = "Content.Shared/_RMC14/Mortar/MortarComponent.cs"
 _SHELL = "Content.Shared/_RMC14/Mortar/MortarShellComponent.cs"
@@ -224,6 +248,35 @@ TERM_KEYS = {
     "supplyUnderground": "rmc-supply-drop-underground",
     "supplyBlocked": "rmc-supply-drop-blocked",
 }
+
+# ColonialMarinesUniverse 9753baf6, read 2026-09-13 (T1 recon + T8): the RMC layer copies
+# and the top-down ordnance walk.
+CMU_REVIEWED = {
+    "Content.CMU/Shared/ZLevels/Ordnance/CMUTopDownOrdnanceSystem.cs": "16ed26a9b520f689c289fd829f2aa55571b1358d",
+    "Content.CMU/Shared/ZLevels/Core/CMUZLevelOpeningCache.cs": "783079ccc9645392f09e42e9d81b4f8d7752f46b",
+    "Content.CMU/Server/ZLevels/Core/CMUZLevelsSystem.cs": "d5fc79b43ee564564c28004f2acd03dcb878a921",
+    "Content.Shared/_RMC14/Mortar/MortarComponent.cs": "cfd9514b3b248f9e281c0efdc7cce5039362f6d4",
+    "Content.Shared/_RMC14/Mortar/MortarShellComponent.cs": "8946d6467ca3e07daab37c07f69616060725db63",
+    "Content.Shared/_RMC14/Mortar/ActiveMortarShellComponent.cs": "e5a5baf64d2a22bd8d4cb9a4399c25d1340a0c5f",
+    "Content.Shared/_RMC14/Mortar/SharedMortarSystem.cs": "cc90d832c61c8c02ca082956427e2dd344250c22",
+    "Content.Server/_RMC14/Mortar/MortarSystem.cs": "28bc2639ff4104449614dd9ea315817cf9aa671c",
+    "Content.Shared/_RMC14/OrbitalCannon/OrbitalCannonComponent.cs": "f28105e34335455e96bfa4a329157c2bd450fa5f",
+    "Content.Shared/_RMC14/OrbitalCannon/OrbitalCannonFiringComponent.cs": "a7d80a18de225d5a111118feed3eb954bbe7d346",
+    "Content.Shared/_RMC14/OrbitalCannon/OrbitalCannonSystem.cs": "42672d78b993503c32d46bb066f7dce36c1a4e84",
+    "Content.Shared/_RMC14/CCVar/RMCCVars.cs": "7ff708db1efc60f83292c298d928f9a795a2f156",
+    "Content.Shared/_RMC14/Areas/AreaSystem.cs": "8544b1ee56797573f1f56a98e6fc93476b72244d",
+    "Content.Shared/_RMC14/Areas/AreaComponent.cs": "e2b5bfa6d94c8917a5553bcd6f263f2877303cea",
+    "Content.Shared/_RMC14/Rangefinder/RangefinderSystem.cs": "56fce4880cd575fd04c3362741ef2136254ca905",
+    "Content.Shared/_RMC14/Rules/RMCPlanetSystem.cs": "0bd9732d51a8f85922a6fc0fe3e8f9518f922030",
+    "Content.Shared/_RMC14/SupplyDrop/SharedSupplyDropSystem.cs": "c22a81481ef0f74148cd48647b179299724cd165",
+    "Content.Server/_RMC14/MapInsert/MapInsertSystem.cs": "3da6264ad6cbfeb1bc2976ebafaa534ea44c6256",
+    "Content.Shared/Physics/CollisionGroup.cs": "01fac1c2a6582244c9f3e07dffece216c6400ff9",
+    "Content.Server/Explosion/EntitySystems/ExplosionSystem.cs": "bf789dae6e28f700a72fb9f33c18aafc43da1a43",
+    "Content.Shared/_RMC14/Atmos/TileFireOnTriggerComponent.cs": "0026b06deb5b07a930197aedd9ca202ab14da2a7",
+}
+for _path, _blob in CMU_REVIEWED.items():
+    if _blob not in REVIEWED_BLOBS.setdefault(_path, []):
+        REVIEWED_BLOBS[_path].append(_blob)
 
 # Research snapshot of LV-624 (docs/design/2026-09-13-tactical-map.md, «Верификация»),
 # checked only when the build runs at the same commit.
@@ -318,6 +371,11 @@ class Checkout:
     def blob(self, path: str) -> str:
         return run_git(["rev-parse", f"{self.sha}:{path}"], cwd=self.dir).strip()
 
+    def exists(self, path: str) -> bool:
+        """Is the path in the commit's tree? Answered from the tree objects the clone
+        already has — `cat-file -e` would lazily fetch the blob and fail offline."""
+        return bool(run_git(["ls-tree", "--name-only", self.sha, "--", path], cwd=self.dir).strip())
+
 
 # ── YAML and prototypes ──────────────────────────────────────────────────────
 
@@ -344,6 +402,8 @@ class Protos:
     def __init__(self):
         self.ents: dict[str, dict] = {}
         self.tiles: dict[str, dict] = {}
+        self.tile_aliases: dict[str, str] = {}   # tileAlias: an old tile id a map may still use
+        self.game_maps: dict[str, dict] = {}
         self.errors: list[str] = []
 
     def load_dir(self, co: Checkout, prefix: str) -> None:
@@ -359,11 +419,26 @@ class Protos:
                 for p in doc:
                     if not isinstance(p, dict) or "id" not in p:
                         continue
+                    pid = p["id"]
+                    # `id: !type:CreateVariants {values: [...]}` (vanilla atmos piping) makes
+                    # one entity per value from the same body; register each of them.
+                    if isinstance(pid, dict) and str(pid.get("_type", "")).endswith("CreateVariants"):
+                        ids = [str(v) for v in pid.get("values") or []]
+                    elif isinstance(pid, str):
+                        ids = [pid]
+                    else:
+                        continue
                     kind = p.get("type")
-                    if kind == "entity":
-                        self.ents[str(p["id"])] = p
-                    elif kind == "tile":
-                        self.tiles[str(p["id"])] = p
+                    for one in ids:
+                        body = p if one == pid else dict(p, id=one)
+                        if kind == "entity":
+                            self.ents[one] = body
+                        elif kind == "tile":
+                            self.tiles[one] = body
+                        elif kind == "tileAlias" and p.get("target"):
+                            self.tile_aliases[one] = str(p["target"])
+                        elif kind == "gameMap":
+                            self.game_maps[one] = body
 
     @staticmethod
     def _parents(p: dict) -> list[str]:
@@ -419,8 +494,16 @@ class Protos:
                 return str(p["name"])
         return pid
 
+    def resolve_tile(self, tid: str) -> str:
+        """Follow tileAlias entries the way the map loader migrates old tile ids."""
+        seen = set()
+        while tid in self.tile_aliases and tid not in seen:
+            seen.add(tid)
+            tid = self.tile_aliases[tid]
+        return tid
+
     def tile_field(self, tid: str, key: str):
-        for p in self.chain(self.tiles, tid):
+        for p in self.chain(self.tiles, self.resolve_tile(tid)):
             if key in p:
                 return p[key]
         return None
@@ -549,34 +632,73 @@ def read_terms(co: Checkout, family: str, locale: str) -> dict[str, str]:
 
 # ── planets and maps ─────────────────────────────────────────────────────────
 
-def discover_planets(protos: Protos, family: str) -> list[dict]:
-    prefix = FAMILIES[family]["planet_prefix"]
+def discover_planets(protos: Protos, family: str, co: Checkout) -> list[dict]:
+    """Rotation planets with their map files per level. RMC planets name the map on the
+    component; CMU planets name a gameMap whose mapPath is the surface and whose
+    mapsBelow / mapsAbove are the levels at depths -1, -2… and +1, +2… in list order
+    (CMUZLevelsSystem.OnGameMapLoad)."""
+    fam = FAMILIES[family]
     planets = []
     for pid, proto in protos.ents.items():
         comp = next((c for c in proto.get("components") or []
                      if isinstance(c, dict) and c.get("type") == "RMCPlanetMapPrototype"), None)
         if comp is None or comp.get("inRotation", True) is False:
             continue
-        map_path = str(comp.get("map") or "")
-        if not map_path.startswith("/Maps/"):
-            raise TacticalError(f"{pid}: unexpected map path {map_path!r}")
+        game_map = None
+        if comp.get("map"):
+            level_paths = [(0, str(comp["map"]))]
+            min_players, max_players = comp.get("minPlayers"), comp.get("maxPlayers")
+        elif comp.get("mapId"):
+            game_map = protos.game_maps.get(str(comp["mapId"]))
+            if game_map is None:
+                raise TacticalError(f"{pid}: gameMap {comp['mapId']!r} is missing")
+            level_paths = [(0, str(game_map["mapPath"]))]
+            level_paths += [(-(i + 1), str(m)) for i, m in enumerate(game_map.get("mapsBelow") or [])]
+            level_paths += [(i + 1, str(m)) for i, m in enumerate(game_map.get("mapsAbove") or [])]
+            min_players = comp.get("minPlayers", game_map.get("minPlayers"))
+            max_players = comp.get("maxPlayers", game_map.get("maxPlayers"))
+        else:
+            raise TacticalError(f"{pid}: planet without map or mapId")
+        levels = []
+        for depth, map_path in level_paths:
+            if not map_path.startswith("/Maps/"):
+                raise TacticalError(f"{pid}: unexpected map path {map_path!r}")
+            found = next((f"{root}{map_path}" for root in fam["map_roots"] if co.exists(f"{root}{map_path}")), None)
+            if found is None:
+                # A downstream fork can carry the prototype without the map (RuCM lacks
+                # CMU's newer Flight): the server could not load it either.
+                print(f"  {'WARNING' if depth == 0 else 'note'} {pid}: map {map_path} is not in the repository — "
+                      f"{'planet skipped' if depth == 0 else f'level {depth:+d} skipped'}", flush=True)
+                if depth == 0:
+                    levels = None
+                    break
+                continue
+            levels.append({"depth": depth, "map": found})
+        if levels is None:
+            continue
+        pid_short = pid
+        for prefix in fam["planet_prefixes"]:
+            if pid.startswith(prefix):
+                pid_short = pid[len(prefix):]
+                break
+        name = str(comp.get("votename") or (game_map or {}).get("mapName") or protos.name(pid))
         planets.append({
-            "id": (pid[len(prefix):] if pid.startswith(prefix) else pid).lower(),
+            "id": pid_short.lower(),
             "proto": pid,
-            "name": protos.name(pid),
-            "map": "Resources" + map_path,
-            "minPlayers": int(comp.get("minPlayers") or 0),
-            "maxPlayers": int(comp.get("maxPlayers") or 0),
+            "name": name,
+            "levels": sorted(levels, key=lambda l: l["depth"]),
+            "minPlayers": int(min_players or 0),
+            "maxPlayers": int(max_players or 0),
             "scenarios": [{"name": str(s.get("scenarioName")), "p": float(s.get("scenarioProbability") or 0)}
                           for s in comp.get("nightmareScenarios") or []],
         })
     ids = [p["id"] for p in planets]
     if len(set(ids)) != len(ids):
         raise TacticalError(f"duplicate planet ids: {ids}")
-    return planets
+    return sorted(planets, key=lambda p: p["proto"])
 
 
-def parse_map(text: str, path: str) -> dict:
+def parse_map(text: str, path: str, allow_no_areas: bool = False) -> dict:
     try:
         doc = next(iter(yaml.load_all(text, Loader=_Loader)))
     except (yaml.YAMLError, StopIteration) as e:
@@ -618,11 +740,16 @@ def parse_map(text: str, path: str) -> dict:
         raise TacticalError(f"{path}: no MapGrid")
     main = max(grids, key=lambda uid: len(grids[uid]))
     chosen = [ag for uid, ag in area_grids if uid == main] or [ag for _, ag in area_grids]
-    if len(chosen) != 1:
+    if len(chosen) > 1:
         raise TacticalError(f"{path}: expected one AreaGrid, found {len(chosen)}")
-    areas = {tuple(map(int, str(k).split(","))): str(v) for k, v in (chosen[0].get("areas") or {}).items()}
+    # A CMU roof level may carry no AreaGrid at all: its tiles are surfaces without an
+    # area, so no strike is allowed through them (AreaSystem answers false there).
+    areas = {tuple(map(int, str(k).split(","))): str(v) for k, v in (chosen[0].get("areas") or {}).items()} if chosen else {}
     if not areas:
-        raise TacticalError(f"{path}: the AreaGrid has no areas")
+        # A surface without areas (CMU Fiorina) is a map where AreaSystem answers false
+        # to every strike — the data says so rather than the build refusing the planet.
+        label = "WARNING" if not allow_no_areas else "note"
+        print(f"    {label} {path.rsplit('/', 1)[-1]}: no areas — {len(grids[main])} tiles, every strike refused there", flush=True)
     return {"tiles": grids[main], "areas": areas, "entities": [e for e in ents if e["parent"] == main]}
 
 
@@ -653,7 +780,10 @@ def rle_rows(width: int, height: int, value_at) -> list[list[int]]:
 
 
 def build_planet(fork: str, planet: dict, parsed: dict, protos: Protos, impassable: set[str],
-                 area_keys: set[str]) -> tuple[dict, bytes, dict]:
+                 area_keys: set[str], level: int = 0, column: dict | None = None) -> tuple[dict, bytes, dict]:
+    """One level of a planet. `column`, for multi-level families, holds the XY sets a
+    strike may hit through the whole stack (`mortar`, `ob`) and the tiles of this level
+    with nothing above them (`openSky`)."""
     tiles, areas = parsed["tiles"], parsed["areas"]
     xs = [t[0] for t in tiles]
     ys = [t[1] for t in tiles]
@@ -711,7 +841,7 @@ def build_planet(fork: str, planet: dict, parsed: dict, protos: Protos, impassab
 
     tile_colour = {}
     for tid in sorted(set(tiles.values())):
-        if tid not in protos.tiles:
+        if protos.resolve_tile(tid) not in protos.tiles:
             raise TacticalError(f"{planet['id']}: tile prototype {tid!r} is missing")
         tile_colour[tid] = parse_colour(protos.tile_field(tid, "minimapColor"))
 
@@ -751,12 +881,16 @@ def build_planet(fork: str, planet: dict, parsed: dict, protos: Protos, impassab
         "blocked": rle_rows(width, height, lambda c, r: 1 if tile_at(c, r) in blocked else 0),
         "hardWall": rle_rows(width, height, lambda c, r: 1 if tile_at(c, r) in hard_wall else 0),
     }
+    if column is not None:
+        for key in ("columnMortar", "columnOb", "openSky"):
+            allowed = column[key]
+            masks[key] = rle_rows(width, height, lambda c, r, a=allowed: 1 if tile_at(c, r) in a else 0)
     labels.sort(key=lambda l: (l[0], l[1], l[2]))
     data = {
         "schemaVersion": SCHEMA,
         "fork": fork,
         "planet": planet["id"],
-        "level": 0,
+        "level": level,
         "bounds": {"minX": min_x, "minY": min_y, "maxX": max_x, "maxY": max_y},
         "areas": area_rows,
         "grid": grid,
@@ -776,7 +910,46 @@ def build_planet(fork: str, planet: dict, parsed: dict, protos: Protos, impassab
         "hardWall": len(hard_wall),
         "size": [width, height],
     }
+    if column is not None:
+        stats["column"] = {key: sum(1 for t in tiles if t in column[key]) for key in ("columnMortar", "columnOb", "openSky")}
     return data, png, stats
+
+
+def column_masks(levels: list[tuple[int, dict, dict]]) -> dict[int, dict]:
+    """CMUTopDownOrdnanceSystem.TryResolveImpactColumn walks the levels from the top:
+    every tile that exists (an opening is an empty tile — no CMU tile is `transparent`)
+    is a surface, and every surface must allow the strike or the whole column is
+    refused. Returns per depth the XY sets for that level's masks."""
+    ordered = sorted(levels, key=lambda l: -l[0])          # highest first
+    columns: dict[tuple[int, int], list[int]] = {}
+    for depth, parsed, flag_of in ordered:
+        for xy in parsed["tiles"]:
+            columns.setdefault(xy, []).append(depth)
+    allowed = {"columnMortar": set(), "columnOb": set()}
+    for xy, depths in columns.items():
+        flags = [flag_of_at(levels, d, xy) for d in depths]
+        if all(f & FLAG_MORTAR_FIRE for f in flags):
+            allowed["columnMortar"].add(xy)
+        if all(f & FLAG_OB for f in flags):
+            allowed["columnOb"].add(xy)
+    out = {}
+    for depth, parsed, _ in levels:
+        above = [d for d, _, _ in levels if d > depth]
+        open_sky = {xy for xy in parsed["tiles"]
+                    if not any(xy in next(p for dd, p, _ in levels if dd == d)["tiles"] for d in above)}
+        out[depth] = {"columnMortar": allowed["columnMortar"], "columnOb": allowed["columnOb"], "openSky": open_sky}
+    return out
+
+
+FLAG_MORTAR_FIRE = 4
+FLAG_OB = 1
+
+
+def flag_of_at(levels, depth, xy) -> int:
+    for d, parsed, flag_of in levels:
+        if d == depth:
+            return flag_of.get(parsed["areas"].get(xy), 0)
+    return 0
 
 
 def roofing(protos: Protos) -> list[dict]:
@@ -809,8 +982,13 @@ def shells(protos: Protos, mirror: dict) -> list[dict]:
     for pid, proto in protos.ents.items():
         # The shell is the item a player loads; the fired ActiveMortarShell effect
         # entities carry the same components but are not choices in a UI.
-        if proto.get("abstract") or protos.comp(pid, "MortarShell") is None or protos.comp(pid, "Item") is None:
+        if proto.get("abstract"):
             continue
+        try:
+            if protos.comp(pid, "MortarShell") is None or protos.comp(pid, "Item") is None:
+                continue
+        except TacticalError:
+            continue   # an entity whose parent chain is broken is not a shell we could load
         entry = {"id": pid, "name": protos.name(pid), "kind": "other", "radius": None}
         total = float(protos.comp_field(pid, "Explosive", "totalIntensity", 0) or 0)
         if total > 0:
@@ -818,10 +996,14 @@ def shells(protos: Protos, mirror: dict) -> list[dict]:
             max_i = float(protos.comp_field(pid, "Explosive", "maxIntensity", 0) or 0)
             entry.update(kind="he", radius=round(intensity_to_radius(total, slope, max_i), 2),
                          explosive={"totalIntensity": total, "intensitySlope": slope, "maxIntensity": max_i})
-        elif protos.comp(pid, "TileFireOnTrigger") is not None:
-            entry.update(kind="incendiary",
-                         radius=int(protos.comp_field(pid, "TileFireOnTrigger", "range", mirror["mortar"]["tileFireRange"])))
-        elif protos.comp(pid, "MortarCameraShell") is not None:
+        # CMU's incendiary shell bursts and burns: the fire range is kept next to the blast.
+        if protos.comp(pid, "TileFireOnTrigger") is not None:
+            fire = int(protos.comp_field(pid, "TileFireOnTrigger", "range", mirror["mortar"]["tileFireRange"]))
+            entry["kind"] = "incendiary"
+            entry["fireRange"] = fire
+            if entry["radius"] is None:
+                entry["radius"] = fire
+        elif entry["kind"] == "other" and protos.comp(pid, "MortarCameraShell") is not None:
             entry.update(kind="flare")
         # A fragmentation charge also throws shrapnel projectiles well past the blast
         # (Stories: ProjectileGrenade capacity 60, spread 360°) — the circle understates it.
@@ -880,31 +1062,42 @@ def review_list(co: Checkout, family: str) -> list[dict]:
 
 # ── build ────────────────────────────────────────────────────────────────────
 
+def area_flags(protos: Protos, parsed: dict) -> dict[str, int]:
+    """Flag bits per area prototype used on one level (the same rule as build_planet)."""
+    out = {}
+    for aid in set(parsed["areas"].values()):
+        fields = protos.area_fields(aid)
+        out[aid] = sum(bit for key, bit in FLAG_BITS if fields.get(key))
+    return out
+
+
 def build_fork(fork: str, out_dir: Path, only_planet: str | None = None, sha: str | None = None,
                previous: dict | None = None) -> dict:
     cfg = TACTICAL_FORKS[fork]
     family = FAMILIES[cfg["family"]]
+    multi_level = cfg["family"] == "cmu"
     print(f"[{fork}]", flush=True)
     co = Checkout(fork)
     co.pin(sha)
-    base = [f"/{family['prototype_dir']}/"] + [f"/{d}/" for d in family["locale_dirs"]] \
+    base = [f"/{d}/" for d in family["prototype_dirs"]] + [f"/{d}/" for d in family["locale_dirs"]] \
         + [f"/{p}" for p in family["code_files"]]
     co.checkout(base)
 
     protos = Protos()
-    protos.load_dir(co, family["prototype_dir"])
-    print(f"  prototypes: {len(protos.ents)} entities, {len(protos.tiles)} tiles", flush=True)
+    for d in family["prototype_dirs"]:
+        protos.load_dir(co, d)
+    print(f"  prototypes: {len(protos.ents)} entities, {len(protos.tiles)} tiles, {len(protos.game_maps)} game maps", flush=True)
     if protos.errors:
         print(f"  WARNING: {len(protos.errors)} prototype files failed to parse, first: {protos.errors[0]}", flush=True)
 
-    planets = discover_planets(protos, cfg["family"])
+    planets = discover_planets(protos, cfg["family"], co)
     if len(planets) < family["min_planets"]:
         raise TacticalError(f"{fork}: {len(planets)} rotation planets, expected at least {family['min_planets']}")
     if only_planet:
         planets = [p for p in planets if p["id"] == only_planet]
         if not planets:
             raise TacticalError(f"{fork}: no rotation planet {only_planet!r}")
-    co.checkout(base + [f"/{p['map']}" for p in planets])
+    co.checkout(base + [f"/{lv['map']}" for p in planets for lv in p["levels"]])
 
     impassable = impassable_layers(co.read("Content.Shared/Physics/CollisionGroup.cs"))
     area_keys = area_component_keys(co.read("Content.Shared/_RMC14/Areas/AreaComponent.cs"))
@@ -920,29 +1113,46 @@ def build_fork(fork: str, out_dir: Path, only_planet: str | None = None, sha: st
     golden = GOLDEN.get((fork, co.sha[:9]), {})
     entries = {p["id"]: p for p in (previous or {}).get("planets", [])} if only_planet else {}
     for planet in planets:
-        print(f"  {planet['id']}: {planet['map']}", flush=True)
-        parsed = parse_map(co.read(planet["map"]), planet["map"])
-        data, png, stats = build_planet(fork, planet, parsed, protos, impassable, area_keys)
-        (fork_dir / f"{planet['id']}.png").write_bytes(png)
-        (fork_dir / f"{planet['id']}.json").write_text(
-            json.dumps(data, ensure_ascii=False, separators=(",", ":")) + "\n", encoding="utf-8")
-        print(f"    {stats['size'][0]}x{stats['size'][1]} tiles={stats['tiles']} areas={stats['areas']} "
-              f"labels={stats['labels']} blocked={stats['blocked']} hardWall={stats['hardWall']} "
-              f"flags={stats['flags']} png={len(png)}B h={data['h']}", flush=True)
-        expected = golden.get(planet["id"])
-        if expected:
-            got = {k: ({f: stats[k][f] for f in expected[k]} if isinstance(expected[k], dict) else stats[k])
-                   for k in expected}
-            if got != expected:
-                raise TacticalError(f"{fork}/{planet['id']}: golden mismatch\n    expected {expected}\n    got      {got}")
-            print("    golden ok", flush=True)
+        print(f"  {planet['id']}: {', '.join(f'{lv['depth']}={lv['map']}' for lv in planet['levels'])}", flush=True)
+        parsed_levels = []
+        for lv in planet["levels"]:
+            parsed = parse_map(co.read(lv["map"]), lv["map"], allow_no_areas=lv["depth"] != 0)
+            if not parsed["tiles"]:
+                if lv["depth"] == 0:
+                    raise TacticalError(f"{planet['id']}: the surface map has no tiles")
+                print(f"    note level {lv['depth']:+d}: no tiles at all — skipped", flush=True)
+                continue
+            parsed_levels.append((lv["depth"], parsed))
+        columns = None
+        if multi_level:
+            columns = column_masks([(d, parsed, area_flags(protos, parsed)) for d, parsed in parsed_levels])
+        level_entries = []
+        for depth, parsed in parsed_levels:
+            data, png, stats = build_planet(fork, planet, parsed, protos, impassable, area_keys, depth,
+                                            columns[depth] if columns else None)
+            stem = planet["id"] if depth == 0 else f"{planet['id']}.{depth}"
+            (fork_dir / f"{stem}.png").write_bytes(png)
+            (fork_dir / f"{stem}.json").write_text(
+                json.dumps(data, ensure_ascii=False, separators=(",", ":")) + "\n", encoding="utf-8")
+            extra = f" column={stats['column']}" if "column" in stats else ""
+            print(f"    [{depth:+d}] {stats['size'][0]}x{stats['size'][1]} tiles={stats['tiles']} areas={stats['areas']} "
+                  f"labels={stats['labels']} blocked={stats['blocked']} hardWall={stats['hardWall']} "
+                  f"flags={stats['flags']}{extra} png={len(png)}B h={data['h']}", flush=True)
+            expected = golden.get(planet["id"]) if depth == 0 else None
+            if expected:
+                got = {k: ({f: stats[k][f] for f in expected[k]} if isinstance(expected[k], dict) else stats[k])
+                       for k in expected}
+                if got != expected:
+                    raise TacticalError(f"{fork}/{planet['id']}: golden mismatch\n    expected {expected}\n    got      {got}")
+                print("    golden ok", flush=True)
+            level_entries.append({"depth": depth, "h": data["h"]})
         entries[planet["id"]] = {
             "id": planet["id"], "proto": planet["proto"], "name": planet["name"],
-            "file": f"{fork}/{planet['id']}", "h": data["h"], "inRotation": True,
-            "minPlayers": planet["minPlayers"], "maxPlayers": planet["maxPlayers"],
-            "levels": [0], "scenarios": planet["scenarios"],
+            "file": f"{fork}/{planet['id']}", "h": level_entries[[l["depth"] for l in level_entries].index(0)]["h"],
+            "inRotation": True, "minPlayers": planet["minPlayers"], "maxPlayers": planet["maxPlayers"],
+            "levels": level_entries, "scenarios": planet["scenarios"],
         }
-    order = [p["id"] for p in discover_planets(protos, cfg["family"])]
+    order = [p["id"] for p in discover_planets(protos, cfg["family"], co)]
     for r in review:
         print(f"  REVIEW {r['path']} blob {r['blob'][:12]}", flush=True)
     return {
@@ -989,10 +1199,12 @@ def verify() -> int:
                 if old.get(key) != new.get(key):
                     problems.append(f"{old['key']}: index field {key!r} differs")
             for planet in new["planets"]:
-                for ext in ("json", "png"):
-                    a, b = OUT_DIR / f"{planet['file']}.{ext}", tmp / f"{planet['file']}.{ext}"
-                    if not a.is_file() or a.read_bytes() != b.read_bytes():
-                        problems.append(f"{planet['file']}.{ext} differs from a rebuild at {old['source']['sha'][:9]}")
+                for lv in planet["levels"]:
+                    stem = planet["file"] if lv["depth"] == 0 else f"{planet['file']}.{lv['depth']}"
+                    for ext in ("json", "png"):
+                        a, b = OUT_DIR / f"{stem}.{ext}", tmp / f"{stem}.{ext}"
+                        if not a.is_file() or a.read_bytes() != b.read_bytes():
+                            problems.append(f"{stem}.{ext} differs from a rebuild at {old['source']['sha'][:9]}")
     finally:
         shutil.rmtree(tmp, ignore_errors=True)
     for p in problems:

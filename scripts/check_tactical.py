@@ -93,51 +93,66 @@ def check_planet(fork: dict, meta: dict) -> None:
     if meta.get("file") != f"{fork['key']}/{meta['id']}":
         fail(f"{where}: file {meta.get('file')!r} must point at its own fork")
         return
-    jpath, ppath = DATA / f"{meta['file']}.json", DATA / f"{meta['file']}.png"
-    if not jpath.is_file() or not ppath.is_file():
-        fail(f"{where}: missing {jpath.name if not jpath.is_file() else ppath.name}")
+    levels = meta.get("levels") or [{"depth": 0, "h": meta.get("h")}]
+    levels = [lv if isinstance(lv, dict) else {"depth": lv, "h": meta.get("h")} for lv in levels]
+    if not any(lv.get("depth") == 0 for lv in levels):
+        fail(f"{where}: no surface level (depth 0)")
         return
-    raw_png = ppath.read_bytes()
-    planet = json.loads(jpath.read_text(encoding="utf-8"))
-    for key, want in (("schemaVersion", 1), ("fork", fork["key"]), ("planet", meta["id"]), ("level", 0)):
-        if planet.get(key) != want:
-            fail(f"{where}: {key} = {planet.get(key)!r}, expected {want!r}")
-    b = planet["bounds"]
-    width, height = b["maxX"] - b["minX"] + 1, b["maxY"] - b["minY"] + 1
-    try:
-        if png_size(raw_png) != (width, height):
-            fail(f"{where}: PNG {png_size(raw_png)} does not match bounds {width}x{height}")
-    except ValueError as e:
-        fail(f"{where}: {e}")
-    areas = planet["areas"]
-    for a in areas:
-        if not (isinstance(a, list) and len(a) == 4 and isinstance(a[0], str) and isinstance(a[1], str)
-                and (a[2] is None or re.fullmatch(r"#[0-9a-f]{8}", a[2])) and isinstance(a[3], int)):
-            fail(f"{where}: malformed area {a!r}")
-            break
-    check_rows(f"{where} grid", planet["grid"], width, height, len(areas))
-    for mask in ("blocked", "hardWall"):
-        check_rows(f"{where} mask {mask}", planet["masks"][mask], width, height, 1)
-    for label in planet["labels"]:
-        if not (isinstance(label, list) and len(label) == 3 and isinstance(label[0], str)
-                and all(isinstance(v, (int, float)) for v in label[1:])):
-            fail(f"{where}: malformed label {label!r}")
-            break
-    stored_h = planet.pop("h", None)
-    body = json.dumps(planet, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
-    h = hashlib.sha1(body + raw_png).hexdigest()[:12]
-    if stored_h != h or meta.get("h") != h:
-        fail(f"{where}: hash file={stored_h} index={meta.get('h')} recomputed={h}")
-    golden = GOLDEN.get((fork["key"], fork["source"]["sha"][:9]))
-    if golden and meta["id"] == "lv624":
-        planet["h"] = stored_h
-        counts = flag_counts(planet)
-        got = {"areas": len(areas), "labels": len(planet["labels"]),
-               "flags": {k: counts[k] for k in golden["flags"]}}
-        if got != golden:
-            fail(f"{where}: golden mismatch {got} vs {golden}")
-        else:
-            print(f"ok   {where} matches the research numbers")
+    multi = fork.get("family") == "cmu"
+    for lv in levels:
+        depth = lv.get("depth")
+        stem = meta["file"] if depth == 0 else f"{meta['file']}.{depth}"
+        where_lv = f"{where}[{depth:+d}]" if depth else where
+        jpath, ppath = DATA / f"{stem}.json", DATA / f"{stem}.png"
+        if not jpath.is_file() or not ppath.is_file():
+            fail(f"{where_lv}: missing {jpath.name if not jpath.is_file() else ppath.name}")
+            continue
+        raw_png = ppath.read_bytes()
+        planet = json.loads(jpath.read_text(encoding="utf-8"))
+        for key, want in (("schemaVersion", 1), ("fork", fork["key"]), ("planet", meta["id"]), ("level", depth)):
+            if planet.get(key) != want:
+                fail(f"{where_lv}: {key} = {planet.get(key)!r}, expected {want!r}")
+        b = planet["bounds"]
+        width, height = b["maxX"] - b["minX"] + 1, b["maxY"] - b["minY"] + 1
+        try:
+            if png_size(raw_png) != (width, height):
+                fail(f"{where_lv}: PNG {png_size(raw_png)} does not match bounds {width}x{height}")
+        except ValueError as e:
+            fail(f"{where_lv}: {e}")
+        areas = planet["areas"]
+        for a in areas:
+            if not (isinstance(a, list) and len(a) == 4 and isinstance(a[0], str) and isinstance(a[1], str)
+                    and (a[2] is None or re.fullmatch(r"#[0-9a-f]{8}", a[2])) and isinstance(a[3], int)):
+                fail(f"{where_lv}: malformed area {a!r}")
+                break
+        check_rows(f"{where_lv} grid", planet["grid"], width, height, len(areas))
+        masks = planet["masks"]
+        required = ["blocked", "hardWall"] + (["columnMortar", "columnOb", "openSky"] if multi else [])
+        for mask in required:
+            if mask not in masks:
+                fail(f"{where_lv}: mask {mask} missing")
+        for mask in masks:
+            check_rows(f"{where_lv} mask {mask}", masks[mask], width, height, 1)
+        for label in planet["labels"]:
+            if not (isinstance(label, list) and len(label) == 3 and isinstance(label[0], str)
+                    and all(isinstance(v, (int, float)) for v in label[1:])):
+                fail(f"{where_lv}: malformed label {label!r}")
+                break
+        stored_h = planet.pop("h", None)
+        body = json.dumps(planet, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
+        h = hashlib.sha1(body + raw_png).hexdigest()[:12]
+        if stored_h != h or lv.get("h") != h or (depth == 0 and meta.get("h") != h):
+            fail(f"{where_lv}: hash file={stored_h} index={lv.get('h')} recomputed={h}")
+        golden = GOLDEN.get((fork["key"], fork["source"]["sha"][:9]))
+        if golden and meta["id"] == "lv624" and depth == 0:
+            planet["h"] = stored_h
+            counts = flag_counts(planet)
+            got = {"areas": len(areas), "labels": len(planet["labels"]),
+                   "flags": {k: counts[k] for k in golden["flags"]}}
+            if got != golden:
+                fail(f"{where}: golden mismatch {got} vs {golden}")
+            else:
+                print(f"ok   {where} matches the research numbers")
 
 
 def main() -> int:
@@ -186,8 +201,8 @@ def main() -> int:
         if not isinstance(fork.get("review"), list):
             fail(f"{key}: review must be a list")
         planets = fork.get("planets") or []
-        if fork.get("family") == "rmc" and len(planets) < 10:
-            fail(f"{key}: {len(planets)} planets, expected 10 rotation planets")
+        if fork.get("family") in ("rmc", "cmu") and len(planets) < 10:
+            fail(f"{key}: {len(planets)} planets, expected at least 10 rotation planets")
         ids = [p.get("id") for p in planets]
         if len(set(ids)) != len(ids):
             fail(f"{key}: duplicate planet ids")

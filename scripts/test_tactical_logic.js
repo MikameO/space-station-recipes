@@ -508,6 +508,30 @@ test('T7: the orbital cannon clock — flight, cooldown from the impact, ready',
   assert.strictEqual(L.migrateStorage({ v: 1, ob: { firedAt: 'x', target: [1, 1] } }).ob, null);
 });
 
+test('T8: with levels, the column decides — every surface must allow, deploy needs open sky', () => {
+  const b = { minX: 0, minY: 0, maxX: 9, maxY: 9 };
+  // the surface allows everything; the column masks say x >= 5 is roofed by a floor above
+  const rows = (fn) => { const r = []; for (let y = b.maxY; y >= b.minY; y--) { const line = []; for (let x = b.minX; x <= b.maxX; x++) line.push(fn(x, y)); r.push(rle(line)); } return r; };
+  const json = { schemaVersion: 1, fork: 't', planet: 't', level: 0, bounds: b, areas: [['open', 'Open', null, OPEN]],
+    grid: rows(() => 1), labels: [],
+    masks: { blocked: rows(() => 0), hardWall: rows(() => 0),
+      columnMortar: rows((x) => (x < 5 ? 1 : 0)), columnOb: rows((x) => (x < 7 ? 1 : 0)), openSky: rows((x) => (x < 5 ? 1 : 0)) } };
+  const pl = L.preparePlanet(json);
+  assert.strictEqual(L.strikeAllowed(pl, 'mortar', 2, 2), true);
+  assert.strictEqual(L.strikeAllowed(pl, 'mortar', 6, 2), false);
+  assert.strictEqual(L.strikeAllowed(pl, 'ob', 6, 2), true);
+  assert.strictEqual(L.strikeAllowed(pl, 'ob', 8, 2), false);
+  const cmu = Object.assign({}, MORTAR_CMU);
+  assert.deepStrictEqual(L.mortarFireChecks(pl, [0, 0], [9, 4], cmu, 'coordinates').reasons, ['covered']);   // 9.2 tiles, roofed column
+  assert.deepStrictEqual(L.mortarFireChecks(pl, [0, 0], [4, 9], cmu, 'coordinates').reasons, []);          // 9.2 tiles, open column
+  assert.deepStrictEqual(L.obChecks(pl, [8, 3], OB).reasons, ['obBlocked']);
+  assert.ok(L.obChecks(pl, [5, 3], OB).ok);                                   // scatter box reaches x = 7
+  assert.ok(L.obChecks(pl, [5, 3], OB).warnings.includes('scatterOutsideOb'));
+  assert.deepStrictEqual(L.placementCheck(pl, [6, 6]).reasons, ['covered']);
+  assert.ok(L.placementCheck(pl, [1, 1]).ok);
+  assert.ok(L.placementCheck(openWorld, [1, 1]).ok);                         // no masks: flags alone decide
+});
+
 test('stored planet state: foreign or inconsistent shapes are dropped', () => {
   const empty = { v: 1, calibration: null, mortar: null, target: null, shots: [], markers: [], shapes: [], ob: null };
   assert.deepStrictEqual(L.migrateStorage(null), empty);
