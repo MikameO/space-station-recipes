@@ -416,10 +416,12 @@ mortarTile, mode, shell, radius, impacts, doubtful}], markers: [{id, cat,
 label, x, y, level, h, at}] }` — цель и смещение выстрела в игровых
 координатах, `mortarTile` — тайл мира; `doubtful` — падения дальше
 `±(e + 1)` от точки прицела: показываются с пометкой, в оценку ошибки не
-входят (T6 добавит `shapes: [{id, kind: line | area, cat, label, points, h,
-at}]`); `localStorage['chemdb-tactical:prefs']`: `{v: 1, weapon, shell,
-hitRadius: {<shell>: тайлов}, layers: {fire, deploy, rings, zone}, timerFrom:
-fire | load}`. Событие `storage` перечитывает состояние из другой вкладки. Нет
+входят; `shapes: [{id, kind: line | area, cat, label, points, h, at}]` —
+вершины в тайлах мира, линии нужно 2 точки, области — 3, подпись до 40
+символов; текст для чата — подпись и вершины в игровых координатах («→»
+для линии, запятые для области); `localStorage['chemdb-tactical:prefs']`:
+`{v: 1, weapon, shell, hitRadius: {<shell>: тайлов}, layers: {fire, deploy,
+rings, zone, markers}, timerFrom: fire | load}`. Событие `storage` перечитывает состояние из другой вкладки. Нет
 доступа к хранилищу — работа в памяти и плашка «метки не сохранятся». Метка
 с `h`, отличным от текущих данных планеты, помечается «поставлена на старой
 версии карты».
