@@ -5956,6 +5956,362 @@ Run `scripts/room_pilot_stats.py` on all pilot exports with the owner's client i
 
 ---
 
+## Stage 1 (owner, 2026-09-13): staff officer and mortar crew
+
+The owner narrowed the first release to two roles: a staff officer sends the mortar crew strike requests and position requests, and the crew sees them on the map and answers with statuses. «Один миномёт будет более чем рад таким попользоваться.» The sections below override the task texts; everything they do not mention stays as written. Task 6 (shared marks, lines, areas, freehand) is deferred to the full version and is not executed in Stage 1.
+
+### Task 1 overrides
+
+1. Keep the full policy from Step 3 as a test fixture: create `scripts/fixtures/room_policy_full.json` with exactly the Step 3 JSON (same `"fork": "stories_cm"`). The room tests of Tasks 2–4 load this fixture, not the shipping policy.
+2. Write the shipping `tactical/policy/stories_cm.json` as the two-role policy below instead of the Step 3 JSON.
+
+```json
+{
+  "v": 1,
+  "fork": "stories_cm",
+  "stage": "so-mortar",
+  "sanction": [
+    { "server": "Space Stories - Marine Corps Core", "status": "none", "since": null }
+  ],
+  "levels": {
+    "staff":    { "nameRu": "Штаб",        "nameEn": "Staff",    "line": { "width": 4,   "dash": [] },     "marker": "square",  "color": "#f5f5f5" },
+    "squad":    { "nameRu": "Отряд",       "nameEn": "Squad",    "line": { "width": 2.5, "dash": [] },     "marker": "diamond", "color": "squad" },
+    "service":  { "nameRu": "Служба",      "nameEn": "Service",  "line": { "width": 2,   "dash": [6, 4] }, "marker": "circle",  "color": "#5ad1e6" },
+    "observer": { "nameRu": "Наблюдатель", "nameEn": "Observer", "line": null, "marker": null, "color": "#8a99b3" }
+  },
+  "enemy": { "color": "#ff5a5a", "marker": "triangle" },
+  "squads": {},
+  "posts": [
+    { "id": "so",       "nameRu": "Офицер штаба",      "nameEn": "Staff Officer", "level": "staff",    "max": 3, "admin": true },
+    { "id": "mortar",   "nameRu": "Миномётный расчёт", "nameEn": "Mortar crew",   "level": "service",  "max": 2 },
+    { "id": "observer", "nameRu": "Наблюдатель",       "nameEn": "Observer",      "level": "observer", "max": 8 }
+  ],
+  "functions": [],
+  "layers": {
+    "shared":   { "write": ["staff"], "cadenceSec": 0 },
+    "staff":    { "write": ["staff"] },
+    "squad:*":  { "write": ["squad"] },
+    "service":  { "write": ["service"] },
+    "requests": { "write": ["staff", "service"] },
+    "assets":   { "write": ["service", "staff"] }
+  },
+  "rights": {
+    "confirmJoin":        ["staff"],
+    "publishCalibration": ["staff", "service"],
+    "acceptRequest":      ["asset-owner", "staff"],
+    "kick":               ["staff"],
+    "assignLabel":        ["staff"],
+    "radioSilence":       ["staff"],
+    "extend":             ["staff"]
+  },
+  "ttl": {
+    "enemyMarkerSec": 600,
+    "roomMaxSec": 10800,
+    "roomExtendSec": 3600,
+    "roomIdleLockSec": 480,
+    "exportGraceSec": 3600,
+    "memberIdleSec": 600,
+    "wordSec": 300
+  },
+  "assets": [
+    { "type": "mortar", "count": 1, "owner": "mortar" }
+  ],
+  "limits": {
+    "objects": 2000, "label": 40, "note": 80, "callsign": 20, "points": 64,
+    "opsPerSec": 10, "opsPerMin": 60, "bytes": 2097152, "message": 4096
+  }
+}
+```
+
+3. `tactical/policy/rmc14.json` is the same document with `"fork": "rmc14"` and the sanction list `[{ "server": "[EN][MRP] Rounys Marine Corps Alamo [US East]", "status": "none", "since": null }]`.
+4. Step 5 expected output: `ok rmc14.json 3 posts 1 assets`, `ok stories_cm.json 3 posts 1 assets`, `OK`.
+5. Step 6 also stages `scripts/fixtures/room_policy_full.json`.
+
+### Task 2 overrides
+
+1. In `scripts/test_room_logic.js` load the fixture instead of the shipping policy:
+
+```js
+const policy = JSON.parse(fs.readFileSync(path.join(__dirname, 'fixtures', 'room_policy_full.json'), 'utf8'));
+```
+
+2. In `tactical/room-logic.js` use
+
+```js
+  var REQUEST_TYPES = ['mortar', 'position', 'ob', 'cas', 'supply', 'medevac', 'other'];
+```
+
+and add `position: 'mortar'` to `REQUEST_ASSET`:
+
+```js
+  var REQUEST_ASSET = { mortar: 'mortar', position: 'mortar', ob: 'ob', cas: 'dropship', supply: 'supply', medevac: 'medevac' };
+```
+
+3. Replace `requestActions` with this version: the author of a request never accepts or carries it out, and position requests get «place».
+
+```js
+  // Buttons a member gets on a request card, by state and rights. `extra` as in hasRight.
+  function requestActions(policy, member, req, extra) {
+    if (!member || !member.confirmed || req.deleted) return [];
+    var owner = hasRight(policy, member, 'acceptRequest', req, extra);
+    var author = !!(req.by && req.by.client === member.client);
+    var crew = owner && !author;   // whoever carries it out, never whoever asked
+    var def = assetDef(policy, assetTypeOf(req));
+    var loader = !!(def && def.loader === member.post) || isStaff(policy, member);
+    var out = [];
+    if (req.status === 'requested') {
+      if (crew) out.push('accept', 'deny');
+      if (author) out.push('cancel');
+    } else if (req.status === 'accepted') {
+      if (req.type === 'mortar' && crew) out.push('take');
+      if (req.type === 'position' && crew) out.push('place');
+      if (req.type === 'ob' && loader) out.push('load');
+      if (['mortar', 'ob', 'position'].indexOf(req.type) < 0 && owner) out.push('fire');
+      if (owner) out.push('done', 'deny');
+    } else if (req.status === 'loaded') {
+      if (owner) out.push('fire', 'deny');
+    } else if (req.status === 'firing') {
+      if (owner) out.push('done');
+    } else if (author) {
+      out.push('repeat');
+    }
+    return out;
+  }
+```
+
+4. In `deadlines`, a missing asset definition yields no hint instead of a crash:
+
+```js
+    if (type === 'supply') return { impactAt: null, readyAt: asset ? firedAt + asset.cooldownSec * 1000 : null };
+    if (type === 'dropship') return { impactAt: null, readyAt: asset ? firedAt + asset.flyBySec * 1000 : null };
+```
+
+5. Add this test group before `console.log('OK', n, 'groups');`:
+
+```js
+t('stage 1: position requests go to the mortar owner; the author never accepts their own request', () => {
+  const pos = { id: 'p', kind: 'request', type: 'position', status: 'requested', by: { client: 'c-so', post: 'so', squad: null } };
+  assert.strictEqual(R.validateData(policy, 'request', { type: 'position', target: { x: 1, y: 2 } }), null);
+  assert.deepStrictEqual(R.requestActions(policy, ot, pos), ['accept', 'deny']);
+  assert.deepStrictEqual(R.requestActions(policy, staff, pos), ['cancel']);
+  assert.deepStrictEqual(R.requestActions(policy, ot, Object.assign({}, pos, { status: 'accepted' })), ['place', 'done', 'deny']);
+  assert.deepStrictEqual(R.requestActions(policy, staff, Object.assign({}, pos, { type: 'mortar', status: 'accepted' })), ['done', 'deny']);
+});
+```
+
+6. Expected test output becomes sixteen `ok …` lines and `OK 16 groups` (also in Tasks 4–7 wherever `OK 15 groups` is expected).
+
+### Task 3 overrides
+
+1. `worker/room/room.js`: after the imports add `const policiesOf = env => env.POLICIES || POLICIES;`. Replace `this.policy = POLICIES[this.meta.fork];` with `this.policy = policiesOf(this.env)[this.meta.fork];` and, in `init`, `const policy = POLICIES[b.fork];` with `const policy = policiesOf(this.env)[b.fork];`.
+2. `worker/room/router.js`: after the imports add `const policiesOf = env => env.POLICIES || POLICIES;`. In `routeRoom` replace `const policy = POLICIES[path.slice('/policy/'.length)];` with `const policy = policiesOf(env)[path.slice('/policy/'.length)];`. In `createRoom` replace `!POLICIES[tok.fork]` with `!policiesOf(env)[tok.fork]` and `const policy = POLICIES[tok.fork];` with `const policy = policiesOf(env)[tok.fork];`.
+3. `scripts/test_room_worker.mjs`: replace `import POLICIES from '../worker/room/policies.js';` with `import FULL from './fixtures/room_policy_full.json' with { type: 'json' };`; in `makeEnv` add `POLICIES: { stories_cm: FULL },` to the defaults object; in the chronology case replace `POLICIES.stories_cm` with `FULL`. All twenty cases keep their expectations.
+4. Step 13 smoke run uses the shipping policy: the creator post is `so`, and the expected `sheet` has 5 entries (3 staff officers, 2 mortar crews).
+
+### Task 4 overrides
+
+1. `scripts/test_room_client.js`: replace `const policy = JSON.parse(read('policy/stories_cm.json'));` with
+
+```js
+const policy = JSON.parse(fs.readFileSync(path.join(__dirname, 'fixtures', 'room_policy_full.json'), 'utf8'));
+```
+
+2. In the demo case replace `assert.ok(c.members().length >= 4);` with `assert.ok(c.members().length >= 3);`.
+3. Replace `demoScript` in `tactical/room-fixtures.js` with this policy-agnostic version:
+
+```js
+  // A short LV-624 evening for whatever policy is loaded: a second staff officer
+  // and the mortar crew join, the crew publishes the round calibration and its
+  // mortar, the staff officer sends a strike and a position request, the crew accepts.
+  function demoScript(policy) {
+    var ru = policy.fork === 'stories_cm';
+    var staffPost = policy.posts.filter(function (p) { return p.level === 'staff'; })[0].id;
+    var mortarDef = policy.assets.filter(function (a) { return a.type === 'mortar'; })[0];
+    var so = { client: 'demo-staff-0001', post: staffPost, squad: null };
+    var crew = { client: 'demo-crew-0001', post: mortarDef ? mortarDef.owner : staffPost, squad: null };
+    function member(m, callsign) {
+      return { afterMs: 0, by: m, op: { op: 'put', kind: 'member', id: 'mem-' + m.client,
+        data: { client: m.client, post: m.post, squad: null, slot: m.post + '::0', confirmed: true, confirmedAt: 0, callsign: callsign } } };
+    }
+    return [
+      member(so, ru ? 'Орлов' : 'Orlov'),
+      member(crew, ru ? 'Сидоров' : 'Sidorov'),
+      { afterMs: 3000, by: crew, op: { op: 'put', kind: 'calibration', id: 'calibration', data: { offset: [212, -148] } } },
+      { afterMs: 5000, by: crew, op: { op: 'patch', kind: 'asset', id: 'asset-mortar-1', data: { tile: [20, -98], state: 'deployed' } } },
+      { afterMs: 8000, by: so, op: { op: 'put', kind: 'request', id: 'demo-req-1', data: { type: 'mortar', target: { x: 62, y: -62 },
+        note: ru ? 'Гнездо у Nexus' : 'Nest near Nexus', priority: 'urgent', status: 'requested', flags: [] } } },
+      { afterMs: 12000, by: crew, op: { op: 'patch', kind: 'request', id: 'demo-req-1', expectedStatus: 'requested', data: { status: 'accepted', acceptedBy: crew } } },
+      { afterMs: 16000, by: so, op: { op: 'put', kind: 'request', id: 'demo-req-2', data: { type: 'position', target: { x: 30, y: -90 },
+        note: ru ? 'Ближе к посадке' : 'Closer to the LZ', priority: 'normal', status: 'requested', flags: [] } } },
+      { afterMs: 20000, by: crew, op: { op: 'patch', kind: 'request', id: 'demo-req-2', expectedStatus: 'requested', data: { status: 'accepted', acceptedBy: crew } } }
+    ];
+  }
+```
+
+### Task 5 overrides
+
+1. In the `window.TacRoom.attach({ … })` block of Step 4 (h), add after `takeTarget`:
+
+```js
+      takePosition: function (tile) {
+        if (weapon() !== 'mortar') { state.prefs.weapon = 'mortar'; savePrefs(); }
+        setMortar(tile);
+      },
+```
+
+2. `tactical/room-ui.js`, `homeHtml`: a policy may have no squads. Replace the post/squad picker lines
+
+```js
+      selectHtml('join', 'post', T.post, posts, draft('join', 'post', 'sl')) +
+      selectHtml('join', 'squad', T.squad, squads, draft('join', 'squad', squads[0][0])) + '</div>' +
+```
+
+with
+
+```js
+      selectHtml('join', 'post', T.post, posts, draft('join', 'post', posts[0][0])) +
+      (squads.length ? selectHtml('join', 'squad', T.squad, squads, draft('join', 'squad', squads[0][0])) : '') + '</div>' +
+```
+
+   and in `onSubmit` replace `squad: f.squad.value` with `squad: f.squad ? f.squad.value : null`. In the create form replace `draft('create', 'post', 'co')` with `draft('create', 'post', staff[0][0])`.
+3. `staffHtml`: show the squad `<select>` of the briefing sheet only when `Object.keys(ui.policy.squads).length` is non-zero; the copy button and the sheet stay.
+4. Step 8 expectation: `rows` is at least 3 (you, the scripted staff officer and the scripted crew).
+
+### Task 6
+
+Deferred to the full version; not executed in Stage 1. `scripts/test_room_seam.js` and `tactical.html` do not get `room-draw.js`.
+
+### Task 7 overrides
+
+1. Step 1: the script order is `['tactical/room-logic.js', 'tactical/room.js', 'tactical/room-ui.js', 'tactical/room-requests.js', 'tactical/tactical.js']` (replace the Task 5 line). Step 2: add the `room-requests.js` tag directly after `<script src="tactical/room-ui.js?v=1" defer></script>`.
+2. `tactical/room-requests.js`:
+   - `var TYPES = ['mortar', 'position'];`
+   - `TYPE_COLOUR` gains `position: '#00e5ff'`.
+   - English l10n: `types` gains `position: 'Position'`; `actions` gains `place: 'Set position'`; add `doneBy: { position: 'Deployed' }` and `placed: 'The Fire panel now has this mortar position.'`. Russian: `position: 'Позиция'`, `place: 'Встать сюда'`, `doneBy: { position: 'Развёрнут' }`, `placed: 'Позиция миномёта выставлена на панели «Огонь».'`.
+   - `actionButton` label and size:
+
+```js
+    var label = action === 'fire' ? (T.actions.fire[req.type] || T.actions.fire.other)
+      : action === 'done' && T.doneBy[req.type] ? T.doneBy[req.type] : T.actions[action];
+    var big = action === 'take' || action === 'place' || action === 'accept' || action === 'fire' || action === 'load';
+```
+
+   - New action and a position-aware «done»:
+
+```js
+      'req-place': function (el, api) {
+        var r = getReq(api, el);
+        if (!r) return;
+        api.ui.hooks.takePosition([r.target.x, r.target.y]);
+        api.toast(api.T().placed);
+      },
+      'req-done': function (el, api) {
+        var r = getReq(api, el);
+        if (!r) return;
+        patchStatus(api, r, 'done');
+        api.track('room_request_done');
+        if (rq.taken === r.id) rq.taken = null;
+        if (r.type === 'position') {
+          var row = assetRows(api).filter(function (x) { return x.def.type === 'mortar' && canEdit(api, x); })[0];
+          if (row) api.ui.client.queue({ op: 'patch', kind: 'asset', id: row.id, data: { tile: [r.target.x, r.target.y], state: 'deployed' } });
+        }
+      },
+```
+
+   - `drawRings`: position requests draw a dashed square instead of a ring — replace `ctx.arc(p[0], p[1], rad, 0, Math.PI * 2);` inside the request loop with `if (r.type === 'position') ctx.rect(p[0] - rad, p[1] - rad, rad * 2, rad * 2); else ctx.arc(p[0], p[1], rad, 0, Math.PI * 2);`. After the loop and before `if (rq.target)`, draw every deployed mortar with its range rings so the staff officer sees what the crew can reach:
+
+```js
+    var consts = constants(api);
+    assetRows(api).forEach(function (row) {
+      var o = row.obj;
+      if (row.def.type !== 'mortar' || !o || !o.tile || o.state !== 'deployed') return;
+      var m = v.worldToScreen(o.tile[0] + 0.5, o.tile[1] + 0.5), s = Math.max(5, v.scale * 0.6);
+      ctx.save();
+      ctx.fillStyle = TYPE_COLOUR.mortar;
+      ctx.fillRect(m[0] - s, m[1] - s, s * 2, s * 2);
+      if (consts && consts.mortar) {
+        ctx.setLineDash([6, 6]);
+        ctx.globalAlpha = 0.5;
+        ctx.strokeStyle = TYPE_COLOUR.mortar;
+        [consts.mortar.minRange, consts.mortar.maxRange].forEach(function (tiles) {
+          ctx.beginPath();
+          ctx.arc(m[0], m[1], tiles * v.scale, 0, Math.PI * 2);
+          ctx.stroke();
+        });
+      }
+      ctx.restore();
+    });
+```
+
+3. Step 6 verification (demo, you are the staff officer; wait 22 s after creating the room):
+
+```js
+const wait = ms => new Promise(r => setTimeout(r, ms));
+const c = TacRoomUI.api.ui.client;
+document.querySelector('[data-room-action="tab"][data-tab="requests"]').click();
+await wait(300);
+const act = id => [...document.querySelectorAll(`#tacRoom [data-room-action^="req-"][data-id="${id}"]`)].map(b => b.dataset.roomAction);
+const strike = act('demo-req-1'), position = act('demo-req-2');
+document.querySelector('#tacRoom [data-room-action="req-take"][data-id="demo-req-1"]').click();
+await wait(300);
+const fireCard = document.querySelector('.tac-room-fire').textContent;
+document.querySelector('[data-room-action="reqNew"]').click();
+await wait(200);
+document.querySelector('[data-room-action="reqType"][data-type="position"]').click();
+await wait(200);
+document.querySelector('[data-room-action="reqPick"]').click();
+TacRoom.consumePick([40, -80]);
+await wait(200);
+document.querySelector('[data-room-form="request"] button[type="submit"]').click();
+await wait(600);
+const mine = c.requests().find(r => r.type === 'position' && r.id !== 'demo-req-2');
+({ strike, position, fireCard, mineActions: act(mine.id), mortar: c.merged().objects['asset-mortar-1'].tile })
+```
+
+   Expected: `strike` is `['req-take', 'req-done', 'req-deny']`; `position` is `['req-place', 'req-done', 'req-deny']`; `fireCard` holds the «поставьте миномёт» or «откалибруйте» warning; `mineActions` is `['req-cancel']`; `mortar` is `[20, -98]`. Then:
+
+```js
+const wait = ms => new Promise(r => setTimeout(r, ms));
+const c = TacRoomUI.api.ui.client;
+document.querySelector('#tacRoom [data-room-action="req-place"][data-id="demo-req-2"]').click();
+await wait(300);
+document.querySelector('#tacRoom [data-room-action="req-done"][data-id="demo-req-2"]').click();
+await wait(900);
+({ status: c.requests().find(r => r.id === 'demo-req-2').status, tile: c.merged().objects['asset-mortar-1'].tile })
+```
+
+   Expected: `{ status: 'done', tile: [30, -90] }`. Screenshot at 12+ px per tile: the strike ring, the dashed position square, the mortar square with dashed rings at 15 and 65 tiles.
+4. Step 7 end-to-end with the local Worker: tab A creates the room as «Офицер штаба» with the token; tab B joins with `<CODE>-<mortar code from the sheet>`; A confirms; A sends one strike request and one position request; B accepts both, presses «Встать сюда» on the position (B's Fire panel shows the mortar there) and «Развёрнут»; within 3 s A's map shows the mortar square with range rings at that tile; B accepts and «Выполнено» on the strike; A turns on «Радиомолчание» and B's next request attempt toasts «Радиомолчание.»; A downloads the log and the `.txt` has lines for both requests.
+
+### Task 8 overrides
+
+In Step 2 the shelf check expects at least 3 roster rows.
+
+### Task 9 overrides
+
+1. Section 1, third sentence: «На первом этапе комната рассчитана на двоих: офицер штаба выдаёт миномётному расчёту запросы на удар и на позицию, расчёт видит их на карте и отвечает статусами, а офицер видит, где стоит миномёт и куда он достаёт.»
+2. Section 7, third bullet: «**Участники пилота:** два-три офицера штаба и расчёта, названные администрацией или сообществом; владелец проекта в их число не входит.»
+3. Section 8, second bullet: «**Вспомогательное, по журналам:** не меньше шести полезных комнат (офицер штаба и расчёт подтверждены, хотя бы один запрос доведён до «выполнен»), из них три созданы разными офицерами и хотя бы одна без владельца проекта; три и больше участников в двух и больше раундах; медиана от запроса до «принят» меньше минуты.»
+
+### Task 10 overrides
+
+1. `scripts/room_pilot_stats.py` gets a `--stage` option with two threshold sets; Stage 1 is the default. Replace the `useful = …` line in `room_stats` with `useful = len(confirmed) >= T['confirmed'] and len(done) >= 1 and len(work) >= T['ops'] and len(clients) >= T['clients']`, give `room_stats` a third parameter `T`, and in `main` use:
+
+```python
+    STAGES = {
+        'so-mortar': {'confirmed': 2, 'ops': 4, 'clients': 2, 'rooms': 6, 'creators': 3, 'without_owner': 1, 'repeat': 3},
+        'full': {'confirmed': 3, 'ops': 10, 'clients': 3, 'rooms': 6, 'creators': 3, 'without_owner': 1, 'repeat': 5},
+    }
+    ap.add_argument('--stage', choices=sorted(STAGES), default='so-mortar')
+```
+
+   with every hard-coded threshold in the KT-B lines and in `passed` read from `STAGES[args.stage]`. Step 2 expectation for the two-officer end-to-end export: `useful=True` if both requests were done, otherwise `useful=False`, and `KT-B NOT MET` either way (one room).
+2. README row text: «A per-round room on the tactical map. Stage 1: a staff officer sends the mortar crew strike and position requests; the crew answers with statuses and the officer sees the mortar and its range. Off on every server until its administration sanctions it; nothing is read from the game».
+3. CHANGELOG section title: `## Series V, stage 1 — 2026-09-13 (Officers' room: staff officer and mortar crew; hidden until a server sanctions it)`, and its first sentence says the room serves two roles in Stage 1.
+4. Step 8 `whatsNew`: `{"en": "Officers' room on Space Stories Core: strike and position requests from the staff officer to the mortar crew", "ru": "Командный планшет на Space Stories Core: запросы на удар и на позицию от офицера штаба миномётному расчёту"}`; the `inside` item is `{"en": "Staff officer and mortar crew", "ru": "Офицер штаба и расчёт"}`.
+
+---
+
 ## Self-review
 
 **Spec coverage** (spec section → task):
