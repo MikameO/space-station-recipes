@@ -477,6 +477,11 @@
     } catch (e) { /* analytics must never break the page */ }
   }
 
+  // Officers' room (tactical/room*.js): tells the room what the officer did here.
+  function roomNotify(event, payload) {
+    if (window.TacRoom) window.TacRoom.notify(event, payload);
+  }
+
   // Events carry the fork and planet only — never coordinates or marker text.
   function trackPlanet(goal) {
     track(goal, { fork: state.fork && state.fork.key, planet: state.meta && state.meta.id });
@@ -2030,6 +2035,7 @@
     state.store.target = tile.slice();
     state.findMessage = null;
     saveStore();
+    roomNotify('target', tile.slice());
     if (mortar()) trackPlanet('tactical_target');
     renderAll();
   }
@@ -2290,6 +2296,7 @@
     },
     itemDelete: function (btn) {
       var id = btn.getAttribute('data-id');
+      roomNotify('delete', id);
       state.store.markers = markers().filter(function (m) { return m.id !== id; });
       state.store.shapes = shapes().filter(function (s) { return s.id !== id; });
       saveStore();
@@ -2300,6 +2307,7 @@
   function addMarker(tile) {
     var d = state.markerDraft;
     markers().push({ id: newId('m'), cat: d.cat, label: Logic.cleanLabel(d.label), x: tile[0], y: tile[1], h: state.meta.h, at: now() });
+    roomNotify('marker', markers()[markers().length - 1]);
     state.pickMode = null;
     state.markerMessage = null;
     saveStore();
@@ -2316,6 +2324,7 @@
       return;
     }
     shapes().push({ id: newId('s'), kind: s.kind, cat: s.cat, label: Logic.cleanLabel(s.label), points: s.points, h: state.meta.h, at: now() });
+    roomNotify('shape', shapes()[shapes().length - 1]);
     state.shape = null;
     state.pickMode = null;
     state.markerMessage = null;
@@ -2344,6 +2353,7 @@
     });
     state.pickMode = null;
     saveStore();
+    roomNotify('shot', lastShot());
     trackPlanet('tactical_shot');
     renderAll();
     startShotTicker();
@@ -2560,6 +2570,7 @@
 
   function pick(tile, sx, sy, fromPointer) {
     if (!state.planet) return;
+    if (window.TacRoom && window.TacRoom.consumePick(tile)) return;
     var mode = pickMode();
     if (mode === 'calibrate') {
       if (view.scale < PICK_MIN_SCALE) {
@@ -2714,6 +2725,28 @@
     renderAll();
     if (shots().length || state.store.ob) startShotTicker();
   });
+
+  if (window.TacRoom) {
+    window.TacRoom.attach({
+      view: view,
+      getContext: function () {
+        return {
+          fork: state.fork, meta: state.meta, level: state.level, planet: state.planet,
+          calibration: calibration(), mortar: mortar(), shell: currentShell(), hitRadius: hitRadius(), lang: LANG
+        };
+      },
+      takeTarget: function (tile) {
+        if (weapon() !== 'mortar') { state.prefs.weapon = 'mortar'; savePrefs(); }
+        setTarget(tile);
+      },
+      takePosition: function (tile) {
+        if (weapon() !== 'mortar') { state.prefs.weapon = 'mortar'; savePrefs(); }
+        setMortar(tile);
+      },
+      fire: function (targetGame, dial) { recordShot(targetGame, dial); return lastShot(); },
+      redraw: function () { renderAll(); }
+    });
+  }
 
   applyStaticText();
   loadIndex();
