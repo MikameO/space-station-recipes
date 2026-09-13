@@ -35,16 +35,24 @@ jobs:
           node scripts/test_feedback_logic.js
           node scripts/test_feedback_worker.mjs
 
+      # Tactical map: fire maths against game-code cases, and the committed planet
+      # data (RLE widths, PNG size, hashes) — both offline.
+      - name: Series T checks
+        run: |
+          node scripts/test_tactical_logic.js
+          python scripts/check_tactical.py
+
       - name: Collect static files
         run: |
           mkdir _site
-          cp index.html library.html app.js i18n.js tutorial.js maps.js ordnance.js library.js botany.js vessels.js mixes.js home.js feedback.js sections.json style.css data.json favicon.ico _site/
+          cp index.html library.html tactical.html app.js i18n.js tutorial.js maps.js ordnance.js library.js botany.js vessels.js mixes.js home.js feedback.js sections.json style.css data.json favicon.ico _site/
           cp sw.js manifest.json robots.txt sitemap.xml _site/
           cp favicon.svg favicon-192.png favicon-512.png apple-touch-icon.png _site/
           cp -r sprites _site/sprites
           cp -r maps _site/maps
           cp -r ordnance _site/ordnance
           cp -r library _site/library
+          cp -r tactical _site/tactical
           mkdir -p _site/promo && cp -r promo/cards _site/promo/cards
           [ -f og-image.png ] && cp og-image.png _site/ || true
 
@@ -57,7 +65,7 @@ jobs:
         run: |
           python - <<'PY'
           import re, sys, pathlib
-          pages = ['index.html', 'library.html']
+          pages = ['index.html', 'library.html', 'tactical.html']
           missing = []
           checked = 0
           for page in pages:

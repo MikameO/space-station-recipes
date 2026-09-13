@@ -1,0 +1,194 @@
+/*
+  SPDX-License-Identifier: GPL-3.0-only
+  Copyright (C) 2026 MikameO
+  This file is part of Space Station Recipes.
+  See LICENSE for details.
+*/
+/* Tactical map page. Shared header and theme variables come from style.css;
+   everything here is scoped to .tac-* so the rest of the site is untouched. */
+
+body.tac-body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.tac-hide { display: none !important; }
+
+.tac-layout {
+  flex: 1;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(300px, 390px);
+  gap: 12px;
+  padding: 0 16px 12px;
+  min-height: 0;
+}
+
+.tac-map-wrap {
+  display: flex;
+  flex-direction: column;
+  min-height: 70vh;
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  background: var(--hull-plate);
+  overflow: hidden;
+}
+
+.tac-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--border-subtle);
+  background: var(--panel);
+}
+
+.tac-toolbar-gap { flex: 1; }
+
+.tac-field {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--text-sub);
+}
+
+.tac-select {
+  background: var(--hull);
+  color: var(--text-bright);
+  border: 1px solid var(--border-active);
+  border-radius: 4px;
+  padding: 4px 6px;
+  font: inherit;
+  font-size: 13px;
+  max-width: 240px;
+}
+
+.tac-zoom { min-width: 34px; font-size: 16px; line-height: 1; }
+
+.tac-canvas-box {
+  position: relative;
+  flex: 1;
+  min-height: 360px;
+}
+
+.tac-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  touch-action: none;
+  cursor: crosshair;
+  outline: none;
+}
+
+.tac-canvas:focus-visible { box-shadow: inset 0 0 0 2px var(--cyan); }
+
+.tac-hover {
+  position: absolute;
+  left: 10px;
+  bottom: 10px;
+  max-width: calc(100% - 20px);
+  padding: 6px 10px;
+  border: 1px solid var(--border-active);
+  border-radius: 6px;
+  background: rgba(6, 9, 15, 0.9);
+  color: var(--text-bright);
+  font-size: 13px;
+  line-height: 1.45;
+  pointer-events: none;
+}
+
+.tac-hover-coords {
+  font-family: ui-monospace, "Cascadia Mono", Consolas, monospace;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.tac-hover-note { color: var(--text-ghost); font-size: 12px; }
+
+.tac-chips { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 3px; }
+
+.tac-chip {
+  display: inline-block;
+  padding: 0 6px;
+  border-radius: 3px;
+  font-size: 11px;
+  line-height: 18px;
+  border: 1px solid var(--border-subtle);
+  color: var(--text-sub);
+}
+
+.tac-chip.yes { border-color: rgba(57, 255, 133, 0.5); color: var(--phosphor); }
+.tac-chip.no { border-color: rgba(255, 61, 90, 0.45); color: var(--red-alert); text-decoration: line-through; }
+.tac-chip.warn { border-color: rgba(255, 182, 39, 0.5); color: var(--amber); }
+
+.tac-status {
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: calc(100% - 24px);
+  padding: 8px 14px;
+  border: 1px solid var(--border-active);
+  border-radius: 6px;
+  background: rgba(6, 9, 15, 0.94);
+  color: var(--text-bright);
+  font-size: 14px;
+}
+
+.tac-status.error { border-color: var(--red-alert); }
+.tac-status button { margin-left: 10px; }
+
+.tac-panel {
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  background: var(--panel);
+  padding: 12px;
+  overflow-y: auto;
+  max-height: calc(100vh - 120px);
+  color: var(--text-main);
+  font-size: 14px;
+}
+
+.tac-beta {
+  padding: 8px 10px;
+  border: 1px solid rgba(255, 182, 39, 0.4);
+  border-radius: 6px;
+  background: var(--amber-dim);
+  color: var(--amber);
+  font-size: 13px;
+  margin-bottom: 10px;
+}
+
+.tac-source {
+  color: var(--text-ghost);
+  font-size: 12px;
+  margin-top: 10px;
+}
+
+.tac-source code { font-size: 11px; }
+
+.tac-section {
+  border-top: 1px solid var(--border-subtle);
+  padding-top: 10px;
+  margin-top: 10px;
+}
+
+.tac-section h2 {
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-sub);
+  margin: 0 0 6px;
+}
+
+.tac-muted { color: var(--text-ghost); font-size: 13px; }
+
+@media (max-width: 900px) {
+  .tac-layout { grid-template-columns: 1fr; padding: 0 8px 8px; }
+  .tac-map-wrap { min-height: 60vh; }
+  .tac-panel { max-height: none; }
+}

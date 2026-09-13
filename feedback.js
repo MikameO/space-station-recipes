@@ -431,7 +431,7 @@
     function ctxNow() {
       return {
         enabled: enabled(), storageOk: store.ok,
-        companion: document.body.classList.contains('companion'),
+        companion: document.body.classList.contains('companion') || document.body.hasAttribute('data-no-autopopup'), // tactical.html: never over the map
         deepLink: arrivedWithHash,
         tutorialActive: !!document.querySelector('#tut-root.active'),
         visits: window.ChemDBVisits || null,
