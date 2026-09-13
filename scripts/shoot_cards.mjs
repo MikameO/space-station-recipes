@@ -39,7 +39,6 @@ const SHOTS = {
     document.getElementById('calcBtn').click();
   }],
   medbay:     ['/#tab=medbay', null],
-  trees:      ['/#tab=trees', () => { window.restoreTreeSession({ treeTarget: 'Bicaridine', treeAmount: '30' }); }],
   botany:     ['/#tab=botany', () => { document.querySelector('.tab-btn[data-tab="botany"]').click(); }],
   maps:       ['/#tab=maps', null],
   ordnance:   ['/#tab=ordnance&src=stories_cm', null],
