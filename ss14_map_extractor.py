@@ -667,7 +667,11 @@ def parse_map_file(fork_key: str, fork_cfg: dict, path: str) -> dict:
     except AttributeError:
         docs = load_yaml_docs(content, path)
     doc = docs[0]
-    tilemap = doc.get("tilemap") or {}
+    # Tile ids are per map file, not global: RMC-14's sorokyne.yml maps 0 to
+    # CMFloorPlating and Space to 2, so emptiness is decided by the tilemap
+    # name. An id the tilemap does not list means the chunk stride or format
+    # drifted — refuse the map rather than bake it with holes.
+    tilemap = {int(k): str(v) for k, v in (doc.get("tilemap") or {}).items()}
     grids = {}       # gridUid -> {"tiles": {(tx,ty): tileProtoId}, "name": str|None}
     entities = {}    # protoId -> [(x, y, gridUid)]
     beacon_overrides = {}  # (x,y,grid) -> text  — map-level NavMapBeacon text override
@@ -683,10 +687,13 @@ def parse_map_file(fork_key: str, fork_cfg: dict, path: str) -> dict:
                 for ind, chunk in (grid_comp.get("chunks") or {}).items():
                     cx, cy = map(int, str(chunk.get("ind", ind)).split(","))
                     for i, type_id in decode_chunk(chunk["tiles"]):
-                        if type_id == 0:
-                            continue  # Space
+                        tile_name = tilemap.get(type_id)
+                        if tile_name is None:
+                            raise RuntimeError(f"{path}: tile id {type_id} is not in the tilemap (chunk {ind})")
+                        if tile_name == "Space":
+                            continue
                         tx, ty = cx * 16 + i % 16, cy * 16 + i // 16
-                        g["tiles"][(tx, ty)] = tilemap.get(type_id)
+                        g["tiles"][(tx, ty)] = tile_name
                 continue
             tr = comps.get("Transform")
             if not proto or not tr or "pos" not in tr:
