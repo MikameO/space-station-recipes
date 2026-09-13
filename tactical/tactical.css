@@ -294,6 +294,8 @@ body.tac-body {
 
 .tac-hint-block { margin-top: 12px; }
 
+.tac-ruler { font-family: ui-monospace, "Cascadia Mono", Consolas, monospace; font-size: 15px; color: var(--text-bright); }
+
 .tac-hover-fire { font-size: 12px; margin-top: 2px; }
 .tac-hover-fire.ok { color: var(--phosphor); }
 .tac-hover-fire.bad { color: var(--red-alert); }

@@ -412,11 +412,11 @@ test('T4: where the shell can land — aim error plus jitter, none in laser mode
 
 test('T4: page prefs migrate strictly, layers keep their defaults', () => {
   const d = L.migratePrefs(null);
-  assert.deepStrictEqual(d, { v: 1, weapon: 'mortar', shell: null, warhead: null, hitRadius: {}, layers: { fire: true, deploy: false, rings: true, zone: true, markers: true }, timerFrom: 'fire' });
+  assert.deepStrictEqual(d, { v: 1, weapon: 'mortar', shell: null, warhead: null, hitRadius: {}, layers: { fire: true, deploy: false, rings: true, zone: true, markers: true, grid: true }, timerFrom: 'fire' });
   const p = L.migratePrefs({ v: 1, weapon: 'ob', shell: 'RMCMortarShellHE', hitRadius: { RMCMortarShellHE: 4.5, bad: 'x', huge: 500 },
     layers: { fire: false, nope: true, rings: 'yes' }, junk: 1 });
   assert.deepStrictEqual(p, { v: 1, weapon: 'ob', shell: 'RMCMortarShellHE', warhead: null, hitRadius: { RMCMortarShellHE: 4.5 }, timerFrom: 'fire',
-    layers: { fire: false, deploy: false, rings: true, zone: true, markers: true } });
+    layers: { fire: false, deploy: false, rings: true, zone: true, markers: true, grid: true } });
   assert.strictEqual(L.migratePrefs({ v: 2, weapon: 'ob' }).weapon, 'mortar');
 });
 
@@ -530,6 +530,16 @@ test('T8: with levels, the column decides — every surface must allow, deploy n
   assert.deepStrictEqual(L.placementCheck(pl, [6, 6]).reasons, ['covered']);
   assert.ok(L.placementCheck(pl, [1, 1]).ok);
   assert.ok(L.placementCheck(openWorld, [1, 1]).ok);                         // no masks: flags alone decide
+});
+
+test('T9: grid lines fall on round in-game numbers; the ruler measures centre to centre', () => {
+  assert.strictEqual(L.gridStep(4), 10);
+  assert.strictEqual(L.gridStep(2.7), 50);
+  // offset +212: world x = 8 is in-game 220, x = 18 is 230 …
+  assert.deepStrictEqual(L.gridLines(0, 40, 10, 212), [8, 18, 28, 38]);
+  assert.deepStrictEqual(L.gridLines(-87, 87, 50, 212), [-62, -12, 38, 88].filter((v) => v <= 87));
+  assert.deepStrictEqual(L.gridLines(-20, 20, 10, 0), [-20, -10, 0, 10, 20]);
+  assert.deepStrictEqual(L.rulerDistance([20, -98], [62, -62]), { tiles: Math.sqrt(42 * 42 + 36 * 36), dx: 42, dy: 36 });
 });
 
 test('stored planet state: foreign or inconsistent shapes are dropped', () => {

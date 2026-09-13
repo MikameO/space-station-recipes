@@ -484,8 +484,28 @@
   // Page preferences shared by every planet: weapon, shell, a player's own hit
   // radius per shell, and which layers are on. Unknown keys are dropped.
   var PREFS_VERSION = 1;
-  var LAYER_KEYS = ['fire', 'deploy', 'rings', 'zone', 'markers'];
-  var DEFAULT_LAYERS = { fire: true, deploy: false, rings: true, zone: true, markers: true };
+  var LAYER_KEYS = ['fire', 'deploy', 'rings', 'zone', 'markers', 'grid'];
+  var DEFAULT_LAYERS = { fire: true, deploy: false, rings: true, zone: true, markers: true, grid: true };
+
+  // ── grid and ruler ───────────────────────────────────────────────────────
+
+  // Grid lines every 10 tiles read well from ~4 px per tile; below that every 50.
+  function gridStep(scale) { return scale >= 4 ? 10 : 50; }
+
+  // World x (or y) of every grid line inside [lo, hi] whose in-game number is a
+  // multiple of the step — so the labels are round in-game numbers.
+  function gridLines(lo, hi, step, offset) {
+    var out = [];
+    var first = Math.ceil((lo + offset) / step) * step - offset;
+    for (var v = first; v <= hi; v += step) out.push(v);
+    return out;
+  }
+
+  // Straight-line distance between two tiles, centre to centre, in tiles.
+  function rulerDistance(a, b) {
+    var dx = b[0] - a[0], dy = b[1] - a[1];
+    return { tiles: Math.sqrt(dx * dx + dy * dy), dx: dx, dy: dy };
+  }
 
   function migratePrefs(raw) {
     var out = { v: PREFS_VERSION, weapon: 'mortar', shell: null, warhead: null, hitRadius: {}, layers: {}, timerFrom: 'fire' };
@@ -635,6 +655,9 @@
     confirmSameRound: confirmSameRound,
     migrateStorage: migrateStorage,
     migratePrefs: migratePrefs,
+    gridStep: gridStep,
+    gridLines: gridLines,
+    rulerDistance: rulerDistance,
     validShot: validShot,
     MARKER_CATS: MARKER_CATS,
     LABEL_MAX: LABEL_MAX,
