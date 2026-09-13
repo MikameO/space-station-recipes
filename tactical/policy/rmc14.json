@@ -1,0 +1,55 @@
+{
+  "v": 1,
+  "fork": "rmc14",
+  "stage": "so-mortar",
+  "sanction": [
+    { "server": "[EN][MRP] Rounys Marine Corps Alamo [US East]", "status": "none", "since": null }
+  ],
+  "levels": {
+    "staff":    { "nameRu": "Штаб",        "nameEn": "Staff",    "line": { "width": 4,   "dash": [] },     "marker": "square",  "color": "#f5f5f5" },
+    "squad":    { "nameRu": "Отряд",       "nameEn": "Squad",    "line": { "width": 2.5, "dash": [] },     "marker": "diamond", "color": "squad" },
+    "service":  { "nameRu": "Служба",      "nameEn": "Service",  "line": { "width": 2,   "dash": [6, 4] }, "marker": "circle",  "color": "#5ad1e6" },
+    "observer": { "nameRu": "Наблюдатель", "nameEn": "Observer", "line": null, "marker": null, "color": "#8a99b3" }
+  },
+  "enemy": { "color": "#ff5a5a", "marker": "triangle" },
+  "squads": {},
+  "posts": [
+    { "id": "so",       "nameRu": "Офицер штаба",      "nameEn": "Staff Officer", "level": "staff",    "max": 3, "admin": true },
+    { "id": "mortar",   "nameRu": "Миномётный расчёт", "nameEn": "Mortar crew",   "level": "service",  "max": 2 },
+    { "id": "observer", "nameRu": "Наблюдатель",       "nameEn": "Observer",      "level": "observer", "max": 8 }
+  ],
+  "functions": [],
+  "layers": {
+    "shared":   { "write": ["staff"], "cadenceSec": 0 },
+    "staff":    { "write": ["staff"] },
+    "squad:*":  { "write": ["squad"] },
+    "service":  { "write": ["service"] },
+    "requests": { "write": ["staff", "service"] },
+    "assets":   { "write": ["service", "staff"] }
+  },
+  "rights": {
+    "confirmJoin":        ["staff"],
+    "publishCalibration": ["staff", "service"],
+    "acceptRequest":      ["asset-owner", "staff"],
+    "kick":               ["staff"],
+    "assignLabel":        ["staff"],
+    "radioSilence":       ["staff"],
+    "extend":             ["staff"]
+  },
+  "ttl": {
+    "enemyMarkerSec": 600,
+    "roomMaxSec": 10800,
+    "roomExtendSec": 3600,
+    "roomIdleLockSec": 480,
+    "exportGraceSec": 3600,
+    "memberIdleSec": 600,
+    "wordSec": 300
+  },
+  "assets": [
+    { "type": "mortar", "count": 1, "owner": "mortar" }
+  ],
+  "limits": {
+    "objects": 2000, "label": 40, "note": 80, "callsign": 20, "points": 64,
+    "opsPerSec": 10, "opsPerMin": 60, "bytes": 2097152, "message": 4096
+  }
+}
