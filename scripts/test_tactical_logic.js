@@ -335,14 +335,69 @@ test('hive roof reach is measured corner-to-centre (x −11…+12 along its row)
 
 // ── round lifetime ──────────────────────────────────────────────────────────
 
-test('calibration asks «same round?» after 20 idle minutes or a reload', () => {
-  const t0 = 1_000_000;
-  assert.deepStrictEqual(L.calibrationState(null, t0, false), { calibrated: false });
-  const cal = { offset: [212, -148], at: t0, lastInput: t0 };
-  assert.strictEqual(L.calibrationState(cal, t0 + 10 * 60000, false).askSameRound, false);
-  assert.strictEqual(L.calibrationState(cal, t0 + 21 * 60000, false).askSameRound, true);
-  assert.strictEqual(L.calibrationState(cal, t0 + 60000, true).askSameRound, true);
-  assert.strictEqual(L.calibrationState(Object.assign({ confirmedThisLoad: true }, cal), t0 + 60000, true).askSameRound, false);
+test('T3 pair: world 31 −78 ↔ game 243 −226; the suggested check tile catches a swap', () => {
+  const tile = [31, -78];
+  const offset = L.offsetFrom(tile, [243, -226]);
+  const check = L.pickCheckTile(openWorld, tile, []);
+  assert.ok(check && L.isDiscriminating(tile, check));
+  const swapped = L.offsetFrom(tile, [-226, 243]);
+  const expected = L.worldToGame(swapped, check[0], check[1]);   // what the page would predict
+  const shown = L.worldToGame(offset, check[0], check[1]);       // what the rangefinder shows
+  assert.notDeepStrictEqual(expected, shown);
+  assert.notDeepStrictEqual(expected, [shown[1], shown[0]]);     // even when read back swapped
+});
+
+test('check tile skips walls, off-planet tiles and tiles already tried', () => {
+  const b = { minX: 0, minY: 0, maxX: 10, maxY: 10 };
+  const open = (x, y) => (x === 4 && y === 8) || (x === 8 && y === 3);
+  const cramped = planet(b, [['a', 'A', null, OPEN]], () => 1, { blocked: (x, y) => !open(x, y) });
+  assert.deepStrictEqual(L.pickCheckTile(cramped, [5, 5], []), [4, 8]);
+  assert.deepStrictEqual(L.pickCheckTile(cramped, [5, 5], [[4, 8]]), [8, 3]);
+  assert.strictEqual(L.pickCheckTile(cramped, [5, 5], [[4, 8], [8, 3]]), null);
+  const small = planet(b, [['a', 'A', null, OPEN]], () => 1);
+  assert.deepStrictEqual(L.pickCheckTile(small, [0, 0], []), [1, 2]);
+});
+
+test('«same round?» after a reload, 20 idle minutes or an off-planet coordinate', () => {
+  const t0 = 1_000_000, min = 60000;
+  const cal = { offset: [212, -148], at: t0 };
+  assert.deepStrictEqual(L.calibrationState(null, t0, L.newSession(t0, false)),
+    { calibrated: false, askSameRound: false, reasons: [] });
+
+  const untouched = L.newSession(t0, false);
+  assert.deepStrictEqual(L.calibrationState(cal, t0 + 10 * min, untouched).reasons, []);
+  assert.deepStrictEqual(L.calibrationState(cal, t0 + 21 * min, untouched).reasons, ['idle']);
+
+  const busy = L.newSession(t0, false);
+  L.noteInput(busy, t0 + 15 * min);
+  L.noteInput(busy, t0 + 30 * min);
+  assert.deepStrictEqual(L.calibrationState(cal, t0 + 30 * min, busy).reasons, []);
+  L.noteInput(busy, t0 + 55 * min);                              // a 25-minute gap between inputs
+  assert.deepStrictEqual(L.calibrationState(cal, t0 + 55 * min, busy).reasons, ['idle']);
+
+  const reloaded = L.newSession(t0, true);
+  assert.deepStrictEqual(L.calibrationState(cal, t0 + min, reloaded).reasons, ['reload']);
+  reloaded.offPlanet = true;
+  assert.deepStrictEqual(L.calibrationState(cal, t0 + min, reloaded).reasons, ['reload', 'offPlanet']);
+  L.confirmSameRound(reloaded, t0 + 2 * min);
+  const after = L.calibrationState(cal, t0 + 3 * min, reloaded);
+  assert.strictEqual(after.askSameRound, false);
+  assert.strictEqual(after.ageMs, 3 * min);
+});
+
+test('stored planet state: foreign or inconsistent shapes are dropped', () => {
+  const empty = { v: 1, calibration: null, shots: [], markers: [] };
+  assert.deepStrictEqual(L.migrateStorage(null), empty);
+  assert.deepStrictEqual(L.migrateStorage('x'), empty);
+  assert.deepStrictEqual(L.migrateStorage({ v: 2, calibration: {} }), empty);
+  const cal = { tile: [31, -78], reading: [243, -226], offset: [212, -148], at: 5,
+    check: { tile: [33, -77], expect: [245, -225], result: null, tried: [] } };
+  const kept = L.migrateStorage({ v: 1, calibration: cal, shots: [], markers: [{ id: 'm1' }] });
+  assert.deepStrictEqual(kept.calibration, cal);
+  assert.deepStrictEqual(kept.markers, [{ id: 'm1' }]);
+  assert.strictEqual(L.migrateStorage({ v: 1, calibration: Object.assign({}, cal, { offset: [0, 0] }) }).calibration, null);
+  const wrongCheck = Object.assign({}, cal, { check: { tile: [33, -77], expect: [0, 0], result: null } });
+  assert.strictEqual(L.migrateStorage({ v: 1, calibration: wrongCheck }).calibration.check, null);
 });
 
 if (failed) {

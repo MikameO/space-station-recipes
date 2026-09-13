@@ -38,9 +38,22 @@
     return dx !== 0 && dy !== 0 && Math.abs(dx) !== Math.abs(dy);
   }
 
+  // Every discriminating step within 5 tiles, nearest first: a close tile stays in
+  // line of sight, and a cramped corridor still leaves one on open floor.
+  var CHECK_STEPS = (function () {
+    var steps = [];
+    for (var dx = -5; dx <= 5; dx++) {
+      for (var dy = -5; dy <= 5; dy++) {
+        if (dx && dy && Math.abs(dx) !== Math.abs(dy)) steps.push([dx, dy]);
+      }
+    }
+    return steps.sort(function (a, b) {
+      return (a[0] * a[0] + a[1] * a[1]) - (b[0] * b[0] + b[1] * b[1]) || a[0] - b[0] || a[1] - b[1];
+    });
+  })();
+
   function checkTileCandidates(first) {
-    var steps = [[3, 1], [1, 3], [-3, 1], [1, -3], [-3, -1], [-1, -3], [3, -1], [-1, 3], [4, 2], [2, 4]];
-    return steps.map(function (s) { return [first[0] + s[0], first[1] + s[1]]; });
+    return CHECK_STEPS.map(function (s) { return [first[0] + s[0], first[1] + s[1]]; });
   }
 
   function formatCoords(pair) {
@@ -326,21 +339,105 @@
     return blocked;
   }
 
+  // ── calibration check ────────────────────────────────────────────────────
+
+  // The tile the page suggests after a calibration: a discriminating neighbour
+  // that exists on the planet and is not a wall or window, so the rangefinder
+  // lands on open floor. Tiles the player already tried are skipped.
+  function pickCheckTile(planet, first, tried) {
+    var skip = tried || [];
+    var list = checkTileCandidates(first);
+    for (var i = 0; i < list.length; i++) {
+      var t = list[i];
+      if (skip.some(function (s) { return sameVec(s, t); })) continue;
+      if (!areaAt(planet, t[0], t[1]) || maskAt(planet, 'blocked', t[0], t[1])) continue;
+      return t;
+    }
+    return null;
+  }
+
   // ── round lifetime ───────────────────────────────────────────────────────
 
   var STALE_AFTER_MS = 20 * 60 * 1000;
 
-  function calibrationState(calibration, now, reloaded) {
-    if (!calibration || !calibration.offset) return { calibrated: false };
-    var idle = now - (calibration.lastInput || calibration.at || 0);
-    return {
-      calibrated: true,
-      ageMs: now - (calibration.at || now),
-      askSameRound: !!reloaded && !calibration.confirmedThisLoad || idle > STALE_AFTER_MS
-    };
+  // Whether the page may trust the offset in this page load. A second monitor
+  // never goes hidden, so staleness is measured between inputs, not by visibility.
+  //   fromStorage — the calibration was read back, not made in this load;
+  //   confirmed   — the player calibrated or answered «same round» in this load;
+  //   idleGap     — two inputs on the page were more than 20 minutes apart;
+  //   offPlanet   — a typed coordinate fell off the planet under this offset.
+  function newSession(now, fromStorage) {
+    return { fromStorage: !!fromStorage, confirmed: false, idleGap: false, offPlanet: false, lastInput: now };
+  }
+
+  function noteInput(session, now) {
+    if (now - session.lastInput > STALE_AFTER_MS) session.idleGap = true;
+    session.lastInput = now;
+    return session;
+  }
+
+  function confirmSameRound(session, now) {
+    session.confirmed = true;
+    session.idleGap = false;
+    session.offPlanet = false;
+    session.lastInput = now;
+    return session;
+  }
+
+  function calibrationState(calibration, now, session) {
+    if (!calibration || !calibration.offset) return { calibrated: false, askSameRound: false, reasons: [] };
+    var s = session || newSession(now, false);
+    var reasons = [];
+    if (s.fromStorage && !s.confirmed) reasons.push('reload');
+    if (s.idleGap || now - s.lastInput > STALE_AFTER_MS) reasons.push('idle');
+    if (s.offPlanet) reasons.push('offPlanet');
+    return { calibrated: true, ageMs: Math.max(0, now - (calibration.at || now)), askSameRound: reasons.length > 0, reasons: reasons };
+  }
+
+  // ── storage ──────────────────────────────────────────────────────────────
+
+  var STORAGE_VERSION = 1;
+
+  function isTile(p) {
+    return Array.isArray(p) && p.length === 2 && p.every(function (n) {
+      return typeof n === 'number' && isFinite(n) && Math.floor(n) === n;
+    });
+  }
+
+  // Whatever localStorage held for a planet becomes a valid state. An unknown
+  // version, or a calibration whose numbers disagree with each other, is
+  // dropped rather than repaired. Shots and markers are validated by their own
+  // increments (T5, T6) and pass through as arrays.
+  function migrateStorage(raw) {
+    var out = { v: STORAGE_VERSION, calibration: null, shots: [], markers: [] };
+    if (!raw || typeof raw !== 'object' || raw.v !== STORAGE_VERSION) return out;
+    var c = raw.calibration;
+    if (c && isTile(c.tile) && isTile(c.reading) && isTile(c.offset) && typeof c.at === 'number' &&
+        sameVec(offsetFrom(c.tile, c.reading), c.offset)) {
+      var k = c.check;
+      var checkOk = k && isTile(k.tile) && isTile(k.expect) &&
+        (k.result === null || k.result === 'match' || k.result === 'mismatch') &&
+        sameVec(worldToGame(c.offset, k.tile[0], k.tile[1]), k.expect);
+      out.calibration = {
+        tile: c.tile.slice(), reading: c.reading.slice(), offset: c.offset.slice(), at: c.at,
+        check: checkOk
+          ? { tile: k.tile.slice(), expect: k.expect.slice(), result: k.result,
+              tried: (Array.isArray(k.tried) ? k.tried : []).filter(isTile) }
+          : null
+      };
+    }
+    if (Array.isArray(raw.shots)) out.shots = raw.shots.slice();
+    if (Array.isArray(raw.markers)) out.markers = raw.markers.slice();
+    return out;
   }
 
   root.TacticalLogic = {
+    STORAGE_VERSION: STORAGE_VERSION,
+    pickCheckTile: pickCheckTile,
+    newSession: newSession,
+    noteInput: noteInput,
+    confirmSameRound: confirmSameRound,
+    migrateStorage: migrateStorage,
     FLAGS: FLAGS,
     STALE_AFTER_MS: STALE_AFTER_MS,
     worldToGame: worldToGame,
