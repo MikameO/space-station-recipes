@@ -101,6 +101,11 @@ for a weak caste), and resin construction with its explosion coefficients (wall
 blast. The Detonation panel gains Knockdown and Resin walls cards, and each gallery
 card says how long the blast keeps that caste on the floor.
 
+**Task search takes upper limits (O21).** A requirement in "Build for a task" can
+now say "at most" as well as "at least" — an assault incendiary that burns 6–15 s
+rather than as long as it can, or a round with its power capped. The search
+penalises overshoot the way it penalises a shortfall.
+
 **JSON:** `targets[].weak` and `.size`; a `structures` list (`id`, `name`, `hp`,
 `coefficient`); `formula.stun*`, `knockdownSeconds`, `knockdownRef`,
 `wallRef`; `recipes[].group` (`base` | `high`) with optional `name` and `note`

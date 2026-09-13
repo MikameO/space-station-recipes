@@ -158,6 +158,7 @@
     'Fire reach': 'Охват огня',
     'same everywhere': 'одинаково везде',
     'at least': 'не менее',
+    'at most': 'не более',
     'Uses': 'Реагентов:',
     'cost': 'цена',
     'Lowest cost': 'Минимальная цена',
@@ -2020,6 +2021,10 @@
     return { objective: S.reqObjective, reqs: S.reqs, costLimit: S.reqCostLimit };
   }
 
+  // A requirement bounds a metric from below, from above, or both: an assault
+  // incendiary wants its fire gone in 6-15 s, not burning as long as it can.
+  const reqOn = r => r.metric && (r.min > 0 || r.max != null);
+
   function reqEvaluate(mix, spec) {
     const c = casingOf();
     const st = computeStats(mix, c, S.dampener);
@@ -2031,9 +2036,10 @@
     // dominate the penalty and stall the climb.
     let miss = 0;
     for (const req of spec.reqs) {
-      if (!req.metric || !(req.min > 0)) continue;
+      if (!reqOn(req)) continue;
       const have = METRICS[req.metric].get(st, dmgPer);
-      if (have < req.min) miss += (req.min - have) / req.min;
+      if (req.min > 0 && have < req.min) miss += (req.min - have) / req.min;
+      if (req.max != null && have > req.max) miss += (have - req.max) / Math.max(req.max, 1);
     }
     if (spec.costLimit != null && cost > spec.costLimit) {
       miss += (cost - spec.costLimit) / Math.max(spec.costLimit, 1);
@@ -2242,6 +2248,9 @@
       <span class="ord-req-op">${esc(tr('at least'))}</span>
       <input type="number" class="ord-req-min" min="0" step="1" value="${esc(req.min)}"
              aria-label="Required value">
+      <span class="ord-req-op">${esc(tr('at most'))}</span>
+      <input type="number" class="ord-req-min ord-req-max" min="0" step="1" placeholder="\u2014"
+             value="${req.max != null ? esc(req.max) : ''}" aria-label="Upper limit">
       <button class="ord-req-del" aria-label="Remove requirement">&times;</button>
     </div>`).join('') || `<p class="ord-empty">${esc(tr('No requirements: the search just maximises.'))}</p>`;
 
@@ -2249,6 +2258,10 @@
       const idx = +row.dataset.idx;
       row.querySelector('.ord-req-metric').onchange = e => { S.reqs[idx].metric = e.target.value; };
       row.querySelector('.ord-req-min').oninput = e => { S.reqs[idx].min = +e.target.value || 0; };
+      row.querySelector('.ord-req-max').oninput = e => {
+        const v = e.target.value.trim();
+        S.reqs[idx].max = v === '' ? null : Math.max(0, +v);
+      };
       row.querySelector('.ord-req-del').onclick = () => { S.reqs.splice(idx, 1); renderReqList(); };
     });
   }
@@ -2265,11 +2278,13 @@
     const st = ev.st;
     const F = S.data.formula;
     const dmgPer = F.damagePerIntensity / F.intensityDivisor;
-    const rows = S.reqs.filter(r => r.metric && r.min > 0).map(r => {
+    const rows = S.reqs.filter(reqOn).map(r => {
       const have = METRICS[r.metric].get(st, dmgPer);
-      const ok = have >= r.min - 1e-9;
+      const ok = !(r.min > 0 && have < r.min - 1e-9) && !(r.max != null && have > r.max + 1e-9);
+      const bounds = [r.min > 0 ? tr('at least') + ' ' + round(r.min, 2) : '',
+                      r.max != null ? tr('at most') + ' ' + round(r.max, 2) : ''].filter(Boolean);
       return `<tr class="${ok ? 'ord-ok' : 'ord-bad'}"><td>${esc(mlabel(r.metric))}</td>
-        <td>${esc(tr('at least'))} ${esc(round(r.min, 2))}</td>
+        <td>${esc(bounds.join(', '))}</td>
         <td>${esc(round(have, 2))} ${ok ? '\u2713' : '\u2717'}</td></tr>`;
     }).join('');
     const objLabel = S.reqObjective === 'lowestCost'
