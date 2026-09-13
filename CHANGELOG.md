@@ -3,6 +3,83 @@
 `data.json` schema version is in `meta.schemaVersion`. Consumers reading this file
 should pin on a compatible range (semver: breaking changes bump major).
 
+## Series R14–R17 — 2026-09-13 (tanks through a beaker, numbered steps, mixes and pills)
+
+The owner ran the vessel planner on a real shift and came back with one
+correction to the model, three readability problems and a feature request.
+
+**A tank takes nothing from the dispenser.** A floor tank
+(`RMCToggleableSolutionTransfer`, Input/Output) is filled only from a beaker and
+emptied only into one, and neither it nor a jug goes on the hotplate. The flag
+that decided hot steps was `FitsInDispenser` all along, so it is now `fits`,
+labelled "fits dispenser & hotplate" (sets saved with the old `heatable` still
+load). A vessel without it is filled one reagent per trip of the biggest empty
+beaker, so nothing starts reacting in the measuring vessel, and every trip is
+counted. Product moved from tank to tank rides in an empty beaker too. With no
+empty beaker on the table the plan reports a shortage, and shortages now come
+first when the rollout compares layouts, then mixes, transfers, trips and
+vessels. The chain into the tank still wins: 540u of Cryoxadone takes 2 mixes,
+0 transfers and 4 beaker trips. The brute-force oracle now compares
+(shortages, mixes) over every RMC14 target and three vessel sets, and finds 0
+mismatches.
+
+**One numbered list instead of cards per vessel.** Cards grouped by vessel made
+the player jump between tanks to follow the order. The plan is now one list in
+the order to do it. ↪ marks a change of vessel, a note asks to follow the
+numbers, and each block ends with what each vessel holds. Every pour names the
+reagent and both vessels — "Pour 150u Inaprovaline from Reagent tank 1000u #1
+into High-capacity beaker 300u #1" — in Russian with the «из» and «в» case forms
+kept per preset vessel. The panel and the plan are set at 0.85–0.9rem (they were
+0.62–0.73rem; the old block used a `--text-dim` the theme never defined).
+
+**Tanks without picking a fork.** With the source on "All" the vessel panel asks
+which server: CM servers (the default, so the tank is there) or the station
+forks. It opens by default and says how beakers and tanks differ. It also points
+to RMC14 or RuCM for CM recipes.
+
+**Mixes and pills.** A new calculator section plans several medicines brewed
+apart and combined — in one vessel, or pressed into pills in the RMC14
+ChemMaster (500u buffer, 16 pills a bottle, up to 8 bottles a press, dose =
+buffer ÷ pills).
+- Parts become amounts on the 5u pour step with the same ladder a single recipe
+  uses: 1000u of a seven-part mix becomes 1015u at 145u each. For pills the
+  ladder runs on one bottle, so 15u pills of that mix come out at 15.31u.
+- Components are brewed through the usual planner. Surplus stays behind as a
+  visible leftover. The last numbered step pours exactly each share into an
+  empty vessel or the ChemMaster buffer, load by load.
+- The mix must not react at all. `simulateBeaker` takes an optional fork, and
+  the mix is checked on the active fork and on every CM fork. Inaprovaline +
+  Dylovene is refused in red because it makes Tricordrazine, and on CMU the four
+  medicines of General Cure are refused because they fall into CMU's trap (see
+  below).
+- Presets come from RMC14 prototypes that ship pre-filled with more than one
+  medicine: the Meralyne–Bicaridine and Kelotane–Dermaline pills, the emergency
+  autoinjector, the Tricordrazine revival injector. General Cure (GC) and
+  "Unga" are included and marked as players' mixes.
+- Oxycodone–Dylovene is not a preset, because RMC14 has no oxycodone yet (its
+  prototypes say `# TODO RMC14 oxycodone`).
+
+**CMU's General Cure trap.** CMU keeps `CMUCreateSludgeGC` on purpose: 16u each
+of Bicaridine, Meralyne, Kelotane and Dermaline turn into black sludge, so an
+attempt to brew General Cure there ruins the tank or part of it (confirmed by the
+owner). The mix check names the trap in plain words, refuses GC and Unga on CMU,
+and flags them in yellow on RMC14. The registry makes RuCM inherit the trap from
+CMU; whether it exists on a live RuCM server is R18.
+
+Tests:
+- `node scripts/test_vessel_plan.js` — 74 cases;
+- `node scripts/test_mix_plan.js` — 44 cases (new);
+- `test_brew_plan.js` — 52; `test_recipe_ranking.js` — 27.
+
+Verified in the preview, in both languages: an RU shift plan through the 300u
+beaker; the Meralyne–Bicaridine preset as 32 pills of 15u; Unga refused on RuCM
+with the trap explained. At 375px there is no horizontal scroll, and the console
+is clean. The calculator card in the Sections overlay is re-shot.
+
+Cache-bust: `app.js?v=52`, `style.css?v=77`, `i18n.js?v=44`, `vessels.js?v=3`,
+`mixes.js?v=2`, `home.js?v=4`, `sections.json?v=4`, service worker `chemdb-v103`.
+`mixes.js` joins the deploy copy list and `PRECACHE`.
+
 ## Series O, O19 — 2026-09-13 (Ordnance: everyday recipes without octogen; `ordnance/<fork>.json` gains fields, schema 1 unchanged)
 
 **Ready recipes, rebuilt.** The catalogue is now two groups. Everyday rows leave
