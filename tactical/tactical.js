@@ -138,7 +138,7 @@
       askNote: 'same round?',
       mismatchNote: 'check tile did not match',
       layersTitle: 'Layers and hit zone',
-      layers: { fire: 'Where the mortar cannot hit (red)', deploy: 'Where it can be deployed (green)', rings: 'Range rings and the no-error square', zone: 'Hit zone at the cursor and the target' },
+      layers: { fire: 'Where the mortar cannot hit (red)', deploy: 'Where it can be deployed (green)', rings: 'Range rings and the no-error square', zone: 'Hit zone at the cursor and the target', markers: 'Markers, lines and areas' },
       shell: 'Shell',
       shellKinds: { he: 'High explosive', incendiary: 'Incendiary', flare: 'Flare / camera', other: '{name}' },
       radius: 'Radius, tiles',
@@ -176,7 +176,29 @@
       impactAt: 'fell at {coords}',
       impactErr: 'error {e}',
       implausible: 'does not look like this shot — the calibration may be stale',
-      shardsNote: 'plus {n} shrapnel pieces well beyond the circle'
+      shardsNote: 'plus {n} shrapnel pieces well beyond the circle',
+      markersTitle: 'Markers',
+      markerCat: 'Category',
+      markerCats: { mortar: 'Mortar', cas: 'CAS', supply: 'Supply', ob: 'OB', custom: 'Custom' },
+      markerLabel: 'Label',
+      markerLabelPh: 'FOB, Supply Alpha, OB…',
+      markerPlace: 'Place on map',
+      markerPlaceHint: 'Click the tile for the marker.',
+      markerByCoords: 'Place',
+      markerCoordsNeedCal: 'Calibrate to place markers by in-game coordinates.',
+      lineStart: 'Line',
+      areaStart: 'Area',
+      shapeHint: 'Click the vertices on the map; Enter or «Done» finishes, Esc cancels. A line needs 2 points, an area 3.',
+      shapeDone: 'Done',
+      shapeCancel: 'Cancel',
+      shapeTooFew: 'Not enough points yet.',
+      markersNone: 'Nothing marked on this planet yet. Markers keep their place across rounds.',
+      itemShow: 'Show',
+      itemDelete: 'Delete',
+      itemStale: 'placed on an older map',
+      itemWorld: 'world tiles — calibrate for in-game numbers',
+      kinds: { line: 'Line', area: 'Area' },
+      layerMarkers: 'Markers, lines and areas'
     },
     ru: {
       pageName: 'Тактическая карта',
@@ -286,7 +308,7 @@
       askNote: 'тот же раунд?',
       mismatchNote: 'сверка не совпала',
       layersTitle: 'Слои и зона поражения',
-      layers: { fire: 'Куда миномёт не бьёт (красным)', deploy: 'Где можно развернуть (зелёным)', rings: 'Кольца дальности и квадрат без ошибки', zone: 'Зона поражения у курсора и у цели' },
+      layers: { fire: 'Куда миномёт не бьёт (красным)', deploy: 'Где можно развернуть (зелёным)', rings: 'Кольца дальности и квадрат без ошибки', zone: 'Зона поражения у курсора и у цели', markers: 'Метки, линии и области' },
       shell: 'Снаряд',
       shellKinds: { he: 'Фугасный', incendiary: 'Зажигательный', flare: 'Осветительный / камера', other: '{name}' },
       radius: 'Радиус, тайлов',
@@ -324,7 +346,29 @@
       impactAt: 'упало на {coords}',
       impactErr: 'ошибка {e}',
       implausible: 'не похоже на этот выстрел — калибровка могла устареть',
-      shardsNote: 'плюс {n} осколков далеко за пределами круга'
+      shardsNote: 'плюс {n} осколков далеко за пределами круга',
+      markersTitle: 'Метки',
+      markerCat: 'Категория',
+      markerCats: { mortar: 'Миномёт', cas: 'КАС', supply: 'Поставка', ob: 'ОБ', custom: 'Своя' },
+      markerLabel: 'Подпись',
+      markerLabelPh: 'ПОБ, Поставка Альфа, ОБ…',
+      markerPlace: 'Поставить на карте',
+      markerPlaceHint: 'Кликните тайл для метки.',
+      markerByCoords: 'Поставить',
+      markerCoordsNeedCal: 'Чтобы ставить метки по игровым координатам, нужна калибровка.',
+      lineStart: 'Линия',
+      areaStart: 'Область',
+      shapeHint: 'Кликайте вершины на карте; Enter или «Готово» — завершить, Esc — отмена. Линии нужно 2 точки, области — 3.',
+      shapeDone: 'Готово',
+      shapeCancel: 'Отмена',
+      shapeTooFew: 'Точек пока мало.',
+      markersNone: 'На этой планете пока ничего не отмечено. Метки не сбрасываются с новым раундом.',
+      itemShow: 'Показать',
+      itemDelete: 'Удалить',
+      itemStale: 'поставлена на старой версии карты',
+      itemWorld: 'тайлы мира — для игровых чисел нужна калибровка',
+      kinds: { line: 'Линия', area: 'Область' },
+      layerMarkers: 'Метки, линии и области'
     }
   };
   var T = L10N[LANG];
@@ -415,6 +459,10 @@
     impactShotId: null,   // the shot a map click reports an impact for
     impactDraft: {},      // Para-Cam text typed per shot id
     impactMessage: {},    // per shot id: {text, kind}
+    markerDraft: { cat: 'custom', label: '' },
+    markerCoords: '',
+    markerMessage: null,
+    shape: null,          // a line or area being drawn: {kind, cat, label, points}
     panelKey: ''
   };
 
@@ -569,6 +617,9 @@
       state.impactShotId = null;
       state.impactDraft = {};
       state.impactMessage = {};
+      state.shape = null;
+      state.markerCoords = '';
+      state.markerMessage = null;
       state.draft = { x: '', y: '' };
       state.calMessage = null;
       state.mortarMessage = null;
@@ -610,6 +661,12 @@
   function lastShot() { var s = shots(); return s.length ? s[s.length - 1] : null; }
   function shotById(id) { return shots().filter(function (s) { return s.id === id; })[0] || null; }
   function signedPair(p) { return signed(p[0]) + ' ' + signed(p[1]); }
+  var CAT_COLOURS = { mortar: '#ffb627', cas: '#e879f9', supply: '#39ff85', ob: '#ff3d5a', custom: '#00e5ff' };
+  function markers() { return state.store.markers; }
+  function shapes() { return state.store.shapes; }
+  function catName(cat) { return T.markerCats[cat] || cat; }
+  function itemText(item) { return Logic.chatText(item, calibration() ? calibration().offset : null, catName(item.cat)); }
+  function newId(prefix) { return prefix + now().toString(36) + Math.random().toString(36).slice(2, 6); }
 
   function pickMode() {
     if (state.pickMode) return state.pickMode;
@@ -713,9 +770,9 @@
 
   // ── map layers ──────────────────────────────────────────────────────────
 
-  function drawText(ctx, text, x, y, size) {
+  function drawText(ctx, text, x, y, size, align) {
     ctx.font = '600 ' + size + 'px system-ui, sans-serif';
-    ctx.textAlign = 'center';
+    ctx.textAlign = align || 'center';
     ctx.textBaseline = 'middle';
     ctx.lineJoin = 'round';
     ctx.lineWidth = 3;
@@ -892,6 +949,55 @@
         ctx.arc(r[0], r[1], 5, 0, Math.PI * 2);
         ctx.stroke();
       });
+    });
+  });
+
+  function drawShape(ctx, v, s, colour, draft) {
+    var pts = s.points.map(function (p) { return v.worldToScreen(p[0] + 0.5, p[1] + 0.5); });
+    if (draft && state.hoverTile && pickMode() === 'shape') pts.push(v.worldToScreen(state.hoverTile[0] + 0.5, state.hoverTile[1] + 0.5));
+    if (pts.length < 2) {
+      if (pts.length === 1) { ctx.fillStyle = colour; ctx.beginPath(); ctx.arc(pts[0][0], pts[0][1], 4, 0, Math.PI * 2); ctx.fill(); }
+      return;
+    }
+    ctx.beginPath();
+    pts.forEach(function (q, i) { if (i) ctx.lineTo(q[0], q[1]); else ctx.moveTo(q[0], q[1]); });
+    if (s.kind === 'area' && pts.length >= 3) ctx.closePath();
+    if (s.kind === 'area' && pts.length >= 3) {
+      ctx.fillStyle = colour;
+      ctx.globalAlpha = draft ? 0.1 : 0.18;
+      ctx.fill();
+      ctx.globalAlpha = 1;
+    }
+    ctx.setLineDash(draft ? [6, 4] : []);
+    ctx.lineJoin = 'round';
+    ctx.lineWidth = 4.5;
+    ctx.strokeStyle = 'rgba(6, 9, 15, 0.8)';
+    ctx.stroke();
+    ctx.lineWidth = 2.5;
+    ctx.strokeStyle = colour;
+    ctx.stroke();
+    ctx.setLineDash([]);
+  }
+
+  view.addLayer(function drawMarkers(ctx, v) {
+    if (!state.planet || !layerOn('markers')) return;
+    var size = Math.max(11, Math.min(14, 9 + v.scale * 0.5));
+    shapes().forEach(function (s) {
+      drawShape(ctx, v, s, CAT_COLOURS[s.cat], false);
+      var c = Logic.shapeCentre(s.points), p = v.worldToScreen(c[0], c[1]);
+      drawText(ctx, s.label || catName(s.cat), p[0], p[1], size);
+    });
+    if (state.shape) drawShape(ctx, v, state.shape, CAT_COLOURS[state.shape.cat], true);
+    markers().forEach(function (m) {
+      var p = v.worldToScreen(m.x + 0.5, m.y + 0.5);
+      ctx.fillStyle = CAT_COLOURS[m.cat];
+      ctx.strokeStyle = 'rgba(6, 9, 15, 0.9)';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.arc(p[0], p[1], 5, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+      drawText(ctx, m.label || catName(m.cat), p[0] + 9, p[1], size, 'left');
     });
   });
 
@@ -1180,6 +1286,57 @@
 
   function eventName(ev) { return T.events[ev] || ev; }
 
+  function markersHtml(cs) {
+    var d = state.markerDraft, mode = pickMode();
+    var h = '<h2 id="tacMarkersTitle">' + esc(T.markersTitle) + '</h2>' +
+      '<div class="tac-marker-form">' +
+      '<label class="tac-input-label" for="tacMarkerCat">' + esc(T.markerCat) +
+      '<select id="tacMarkerCat" class="tac-select">' + Logic.MARKER_CATS.map(function (c) {
+        return '<option value="' + c + '"' + (d.cat === c ? ' selected' : '') + '>' + esc(catName(c)) + '</option>';
+      }).join('') + '</select></label>' +
+      '<label class="tac-input-label" for="tacMarkerLabel">' + esc(T.markerLabel) +
+      '<input id="tacMarkerLabel" class="tac-input" type="text" maxlength="' + Logic.LABEL_MAX + '" autocomplete="off" placeholder="' + esc(T.markerLabelPh) + '" value="' + esc(d.label) + '"></label></div>';
+    if (state.shape) {
+      h += msg({ text: T.shapeHint, kind: 'info' }) +
+        '<p class="tac-muted">' + esc(T.kinds[state.shape.kind]) + ' · ' + esc(state.shape.label || catName(state.shape.cat)) + ' · ' + state.shape.points.length + '</p>' +
+        '<div class="tac-actions">' + button('shapeDone', T.shapeDone, 'btn-primary', state.shape.points.length < (state.shape.kind === 'area' ? 3 : 2)) +
+        button('shapeCancel', T.shapeCancel) + '</div>';
+    } else {
+      h += '<div class="tac-actions">' + button('markerPick', T.markerPlace, mode === 'marker' ? 'btn-small on' : 'btn-small') +
+        button('shapeStart', T.lineStart, 'btn-small', false).replace('data-action="shapeStart"', 'data-action="shapeStart" data-kind="line"') +
+        button('shapeStart', T.areaStart, 'btn-small', false).replace('data-action="shapeStart"', 'data-action="shapeStart" data-kind="area"') + '</div>';
+      if (mode === 'marker') h += msg({ text: T.markerPlaceHint, kind: 'info' });
+      if (cs.calibrated) {
+        h += '<span class="tac-find-row"><input id="tacMarkerCoords" class="tac-input" type="text" autocomplete="off" spellcheck="false" placeholder="-100 200" value="' + esc(state.markerCoords) + '">' +
+          button('markerByCoords', T.markerByCoords) + '</span>';
+      } else {
+        h += '<p class="tac-hint">' + esc(T.markerCoordsNeedCal) + '</p>';
+      }
+      if (state.markerMessage) h += msg(state.markerMessage);
+    }
+    var items = markers().map(function (m) { return { kind: 'marker', item: m }; })
+      .concat(shapes().map(function (s) { return { kind: s.kind, item: s }; }))
+      .sort(function (a, b) { return b.item.at - a.item.at; });
+    if (!items.length) return h + '<p class="tac-muted">' + esc(T.markersNone) + '</p>';
+    h += '<ul class="tac-items">';
+    items.forEach(function (e) {
+      var it = e.item, stale = it.h && state.meta && it.h !== state.meta.h;
+      h += '<li class="tac-item" data-id="' + esc(it.id) + '"><span class="tac-dot" style="background:' + CAT_COLOURS[it.cat] + '"></span>' +
+        '<span class="tac-item-text"><b>' + esc(it.label || catName(it.cat)) + '</b>' + (e.kind !== 'marker' ? ' · ' + esc(T.kinds[e.kind]) : '') +
+        '<br><span class="tac-item-coords">' + esc(itemText(it)) + '</span>' +
+        (cs.calibrated ? '' : '<br><span class="tac-hint">' + esc(T.itemWorld) + '</span>') +
+        (stale ? '<br><span class="tac-chip warn">' + esc(T.itemStale) + '</span>' : '') + '</span>' +
+        '<span class="tac-item-actions">' + button('itemCopy', T.copy).replace('data-action="itemCopy"', 'data-action="itemCopy" data-id="' + esc(it.id) + '"') +
+        button('itemShow', T.itemShow).replace('data-action="itemShow"', 'data-action="itemShow" data-id="' + esc(it.id) + '"') +
+        button('itemDelete', T.itemDelete).replace('data-action="itemDelete"', 'data-action="itemDelete" data-id="' + esc(it.id) + '"') + '</span></li>';
+    });
+    return h + '</ul>';
+  }
+
+  function findItem(id) {
+    return markers().filter(function (m) { return m.id === id; })[0] || shapes().filter(function (s) { return s.id === id; })[0] || null;
+  }
+
   function shotsHtml() {
     var h = '<h2 id="tacShotsTitle">' + esc(T.shotsTitle) + '</h2>' +
       '<div class="tac-mode"><span class="tac-muted">' + esc(T.timerFrom) + '</span><div class="tac-segment small" role="group">' +
@@ -1258,6 +1415,7 @@
       (weapon() === 'mortar' ? '<section class="tac-section" aria-labelledby="tacMortarTitle">' + mortarHtml(cs) + '</section>' : '') +
       '<section class="tac-section" aria-labelledby="tacTargetTitle">' + targetHtml(cs) + '</section>' +
       (weapon() === 'mortar' && cs.calibrated && mortar() ? '<section class="tac-section" aria-labelledby="tacShotsTitle">' + shotsHtml() + '</section>' : '') +
+      '<section class="tac-section" aria-labelledby="tacMarkersTitle">' + markersHtml(cs) + '</section>' +
       (weapon() === 'mortar' ? '<section class="tac-section" aria-labelledby="tacLayersTitle">' + layersHtml() + '</section>' : '') +
       '<p class="tac-muted tac-hint-block">' + esc(T.hint) + '</p>' +
       '<p class="tac-source">' + esc(fmt(T.source, { fork: f.label, sha: f.source.sha.slice(0, 9), date: f.source.date })) + '</p>';
@@ -1504,8 +1662,85 @@
     copyDial: function () {
       var el = $('tacDialCoords');
       if (el) copyCoords(el.textContent, el);
+    },
+    markerPick: function () {
+      state.pickMode = pickMode() === 'marker' ? null : 'marker';
+      state.markerMessage = null;
+      renderPanel();
+      els.canvas.focus({ preventScroll: true });
+    },
+    markerByCoords: function () {
+      var r = parseGamePoint(state.markerCoords);
+      if (r.error) {
+        state.markerMessage = { text: r.error, kind: 'error' };
+        renderAll();
+        revealBanner();
+        return;
+      }
+      state.markerCoords = '';
+      addMarker(r.tile);
+      showTile(r.tile);
+    },
+    shapeStart: function (btn) {
+      state.shape = { kind: btn.getAttribute('data-kind') === 'area' ? 'area' : 'line', cat: state.markerDraft.cat, label: state.markerDraft.label, points: [] };
+      state.pickMode = 'shape';
+      renderPanel();
+      els.canvas.focus({ preventScroll: true });
+    },
+    shapeDone: finishShape,
+    shapeCancel: cancelShape,
+    itemCopy: function (btn) {
+      var it = findItem(btn.getAttribute('data-id'));
+      if (it) copyCoords(itemText(it), btn.closest('.tac-item').querySelector('.tac-item-coords'));
+    },
+    itemShow: function (btn) {
+      var it = findItem(btn.getAttribute('data-id'));
+      if (!it) return;
+      var c = it.points ? Logic.shapeCentre(it.points) : [it.x + 0.5, it.y + 0.5];
+      view.centerOn(c[0], c[1], Math.max(view.scale, PICK_MIN_SCALE / 2));
+    },
+    itemDelete: function (btn) {
+      var id = btn.getAttribute('data-id');
+      state.store.markers = markers().filter(function (m) { return m.id !== id; });
+      state.store.shapes = shapes().filter(function (s) { return s.id !== id; });
+      saveStore();
+      renderAll();
     }
   };
+
+  function addMarker(tile) {
+    var d = state.markerDraft;
+    markers().push({ id: newId('m'), cat: d.cat, label: Logic.cleanLabel(d.label), x: tile[0], y: tile[1], h: state.meta.h, at: now() });
+    state.pickMode = null;
+    state.markerMessage = null;
+    saveStore();
+    trackPlanet('tactical_marker_add');
+    renderAll();
+  }
+
+  function finishShape() {
+    var s = state.shape;
+    if (!s) return;
+    if (s.points.length < (s.kind === 'area' ? 3 : 2)) {
+      state.markerMessage = { text: T.shapeTooFew, kind: 'warn' };
+      renderPanel();
+      return;
+    }
+    shapes().push({ id: newId('s'), kind: s.kind, cat: s.cat, label: Logic.cleanLabel(s.label), points: s.points, h: state.meta.h, at: now() });
+    state.shape = null;
+    state.pickMode = null;
+    state.markerMessage = null;
+    saveStore();
+    trackPlanet('tactical_shape_add');
+    renderAll();
+  }
+
+  function cancelShape() {
+    state.shape = null;
+    state.pickMode = null;
+    state.markerMessage = null;
+    renderAll();
+  }
 
   // A shot as fired: the numbers entered in the mortar, the clock, the mortar
   // tile and the shell — everything a later dial or an impact report needs.
@@ -1583,6 +1818,8 @@
     else if (id === 'tacFind') state.findDraft = el.value;
     else if (id === 'tacMortarCoords') state.mortarDraft = el.value;
     else if (id.indexOf('tacImpact-') === 0) state.impactDraft[id.slice(10)] = el.value;
+    else if (id === 'tacMarkerLabel') { state.markerDraft.label = el.value; if (state.shape) state.shape.label = el.value; }
+    else if (id === 'tacMarkerCoords') state.markerCoords = el.value;
     else if (id === 'tacRadius') {
       var s = currentShell(), r = parseFloat(String(el.value).replace(',', '.'));
       if (!s) return;
@@ -1599,6 +1836,9 @@
       state.prefs.shell = el.value;
       savePrefs();
       renderAll();
+    } else if (el.id === 'tacMarkerCat') {
+      state.markerDraft.cat = el.value;
+      if (state.shape) { state.shape.cat = el.value; view.requestDraw(); }
     } else if (el.getAttribute && el.getAttribute('data-layer')) {
       state.prefs.layers[el.getAttribute('data-layer')] = !!el.checked;
       savePrefs();
@@ -1629,6 +1869,8 @@
     else if (id === 'tacFind') { actions.find(); e.preventDefault(); }
     else if (id === 'tacMortarCoords') { actions.placeMortar(); e.preventDefault(); }
     else if (id.indexOf('tacImpact-') === 0) { actions.impactAdd(); e.preventDefault(); }
+    else if (id === 'tacMarkerCoords') { actions.markerByCoords(); e.preventDefault(); }
+    else if (id === 'tacMarkerLabel' && state.shape) { finishShape(); e.preventDefault(); }
   });
 
   // ── copy ────────────────────────────────────────────────────────────────
@@ -1718,6 +1960,17 @@
       setMortar(tile);
       return;
     }
+    if (mode === 'marker') {
+      addMarker(tile);
+      return;
+    }
+    if (mode === 'shape' && state.shape) {
+      var last = state.shape.points[state.shape.points.length - 1];
+      if (!last || last[0] !== tile[0] || last[1] !== tile[1]) state.shape.points.push(tile.slice());
+      renderPanel();
+      view.requestDraw();
+      return;
+    }
     if (mode === 'impact') {
       var shot = shotById(state.impactShotId);
       if (shot && calibration()) addImpact(shot, toGame(tile));
@@ -1757,7 +2010,8 @@
     else if (e.key === 'ArrowRight') { view.panBy(-40, 0); e.preventDefault(); }
     else if (e.key === 'ArrowUp') { view.panBy(0, 40); e.preventDefault(); }
     else if (e.key === 'ArrowDown') { view.panBy(0, -40); e.preventDefault(); }
-    else if (e.key === 'Escape' && state.pickMode) { state.pickMode = null; renderPanel(); e.preventDefault(); }
+    else if (e.key === 'Escape' && state.pickMode) { if (state.shape) cancelShape(); else { state.pickMode = null; renderPanel(); } e.preventDefault(); }
+    else if (e.key === 'Enter' && state.shape) { finishShape(); e.preventDefault(); }
     else if (e.key === 'Enter' || e.key === ' ') {
       var s = view.cssSize(), tile = view.tileAtScreen(s.w / 2, s.h / 2);
       if (tile) pick(tile, s.w / 2, s.h / 2, false);

@@ -412,11 +412,11 @@ test('T4: where the shell can land — aim error plus jitter, none in laser mode
 
 test('T4: page prefs migrate strictly, layers keep their defaults', () => {
   const d = L.migratePrefs(null);
-  assert.deepStrictEqual(d, { v: 1, weapon: 'mortar', shell: null, hitRadius: {}, layers: { fire: true, deploy: false, rings: true, zone: true }, timerFrom: 'fire' });
+  assert.deepStrictEqual(d, { v: 1, weapon: 'mortar', shell: null, hitRadius: {}, layers: { fire: true, deploy: false, rings: true, zone: true, markers: true }, timerFrom: 'fire' });
   const p = L.migratePrefs({ v: 1, weapon: 'ob', shell: 'RMCMortarShellHE', hitRadius: { RMCMortarShellHE: 4.5, bad: 'x', huge: 500 },
     layers: { fire: false, nope: true, rings: 'yes' }, junk: 1 });
   assert.deepStrictEqual(p, { v: 1, weapon: 'ob', shell: 'RMCMortarShellHE', hitRadius: { RMCMortarShellHE: 4.5 }, timerFrom: 'fire',
-    layers: { fire: false, deploy: false, rings: true, zone: true } });
+    layers: { fire: false, deploy: false, rings: true, zone: true, markers: true } });
   assert.strictEqual(L.migratePrefs({ v: 2, weapon: 'ob' }).weapon, 'mortar');
 });
 
@@ -462,17 +462,46 @@ test('T5: stored shots are validated one by one', () => {
   assert.strictEqual(L.migratePrefs({ v: 1, timerFrom: 'x' }).timerFrom, 'fire');
 });
 
+test('T6: markers and shapes migrate strictly, labels are trimmed', () => {
+  const raw = { v: 1, markers: [
+    { id: 'a', cat: 'ob', label: '  ОБ   Альфа  ', x: 62, y: -62, h: 'abc', at: 5 },
+    { cat: 'nope', label: 'x'.repeat(60), x: 1, y: 1 },
+    { cat: 'cas', x: 1.5, y: 2 }, 'junk'
+  ], shapes: [
+    { id: 's1', kind: 'line', cat: 'custom', label: 'Баррикады', points: [[0, 0], [3, 1], 'x'] },
+    { kind: 'area', cat: 'supply', label: 'ПОБ', points: [[0, 0], [4, 0]] },
+    { kind: 'blob', points: [[0, 0], [1, 1], [2, 2]] },
+    { kind: 'area', label: 'ПОБ', points: [[0, 0], [4, 0], [4, 4]] }
+  ] };
+  const st = L.migrateStorage(raw);
+  assert.deepStrictEqual(st.markers, [
+    { id: 'a', cat: 'ob', label: 'ОБ Альфа', x: 62, y: -62, h: 'abc', at: 5 },
+    { id: 'm1', cat: 'custom', label: 'x'.repeat(40), x: 1, y: 1, h: null, at: 0 }
+  ]);
+  assert.deepStrictEqual(st.shapes.map((s) => [s.id, s.kind, s.points.length]), [['s1', 'line', 2], ['s3', 'area', 3]]);
+});
+
+test('T6: chat text names the label and every point in game coordinates', () => {
+  const off = [212, -148];
+  assert.strictEqual(L.chatText({ cat: 'ob', label: 'ОБ Альфа', x: 62, y: -62 }, off), 'ОБ Альфа 274 -210');
+  assert.strictEqual(L.chatText({ cat: 'ob', label: '', x: 62, y: -62 }, off, 'ОБ'), 'ОБ 274 -210');
+  assert.strictEqual(L.chatText({ cat: 'ob', label: '', x: 62, y: -62 }, null), '62 -62');
+  assert.strictEqual(L.chatText({ kind: 'line', label: 'Баррикады', points: [[0, 0], [3, 1]] }, off), 'Баррикады: 212 -148 → 215 -147');
+  assert.strictEqual(L.chatText({ kind: 'area', label: 'ПОБ', points: [[0, 0], [4, 0], [4, 4]] }, off), 'ПОБ: 212 -148, 216 -148, 216 -144');
+  assert.deepStrictEqual(L.shapeCentre([[0, 0], [4, 0], [4, 4]]), [3.1666666666666665, 1.8333333333333333]);
+});
+
 test('stored planet state: foreign or inconsistent shapes are dropped', () => {
-  const empty = { v: 1, calibration: null, mortar: null, target: null, shots: [], markers: [] };
+  const empty = { v: 1, calibration: null, mortar: null, target: null, shots: [], markers: [], shapes: [] };
   assert.deepStrictEqual(L.migrateStorage(null), empty);
   assert.deepStrictEqual(L.migrateStorage('x'), empty);
   assert.deepStrictEqual(L.migrateStorage({ v: 2, calibration: {} }), empty);
   const cal = { tile: [31, -78], reading: [243, -226], offset: [212, -148], at: 5,
     check: { tile: [33, -77], expect: [245, -225], result: null, tried: [] } };
-  const kept = L.migrateStorage({ v: 1, calibration: cal, shots: [], markers: [{ id: 'm1' }],
+  const kept = L.migrateStorage({ v: 1, calibration: cal, shots: [], markers: [{ id: 'm1', x: 1, y: 2 }],
     mortar: { tile: [20, -98], mode: 'weird' }, target: [62, -62] });
   assert.deepStrictEqual(kept.calibration, cal);
-  assert.deepStrictEqual(kept.markers, [{ id: 'm1' }]);
+  assert.deepStrictEqual(kept.markers, [{ id: 'm1', cat: 'custom', label: '', x: 1, y: 2, h: null, at: 0 }]);
   assert.deepStrictEqual(kept.mortar, { tile: [20, -98], mode: 'coordinates' });
   assert.deepStrictEqual(kept.target, [62, -62]);
   assert.strictEqual(L.migrateStorage({ v: 1, mortar: { tile: [1.5, 2] } }).mortar, null);

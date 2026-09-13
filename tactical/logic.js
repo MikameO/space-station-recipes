@@ -453,8 +453,8 @@
   // Page preferences shared by every planet: weapon, shell, a player's own hit
   // radius per shell, and which layers are on. Unknown keys are dropped.
   var PREFS_VERSION = 1;
-  var LAYER_KEYS = ['fire', 'deploy', 'rings', 'zone'];
-  var DEFAULT_LAYERS = { fire: true, deploy: false, rings: true, zone: true };
+  var LAYER_KEYS = ['fire', 'deploy', 'rings', 'zone', 'markers'];
+  var DEFAULT_LAYERS = { fire: true, deploy: false, rings: true, zone: true, markers: true };
 
   function migratePrefs(raw) {
     var out = { v: PREFS_VERSION, weapon: 'mortar', shell: null, hitRadius: {}, layers: {}, timerFrom: 'fire' };
@@ -480,7 +480,7 @@
   // dropped rather than repaired. Shots and markers are validated by their own
   // increments (T5, T6) and pass through as arrays.
   function migrateStorage(raw) {
-    var out = { v: STORAGE_VERSION, calibration: null, mortar: null, target: null, shots: [], markers: [] };
+    var out = { v: STORAGE_VERSION, calibration: null, mortar: null, target: null, shots: [], markers: [], shapes: [] };
     if (!raw || typeof raw !== 'object' || raw.v !== STORAGE_VERSION) return out;
     if (raw.mortar && isTile(raw.mortar.tile)) {
       out.mortar = { tile: raw.mortar.tile.slice(), mode: raw.mortar.mode === 'laser' ? 'laser' : 'coordinates' };
@@ -502,8 +502,68 @@
       };
     }
     if (Array.isArray(raw.shots)) out.shots = raw.shots.map(validShot).filter(Boolean);
-    if (Array.isArray(raw.markers)) out.markers = raw.markers.slice();
+    if (Array.isArray(raw.markers)) {
+      out.markers = raw.markers.map(function (m, i) { return validMarker(m, 'm' + i); }).filter(Boolean);
+    }
+    if (Array.isArray(raw.shapes)) {
+      out.shapes = raw.shapes.map(function (s, i) { return validShape(s, 's' + i); }).filter(Boolean);
+    }
     return out;
+  }
+
+  // ── markers, lines and areas ─────────────────────────────────────────────
+
+  var MARKER_CATS = ['mortar', 'cas', 'supply', 'ob', 'custom'];
+  var LABEL_MAX = 40;
+
+  function cleanLabel(s) {
+    return String(s == null ? '' : s).replace(/\s+/g, ' ').trim().slice(0, LABEL_MAX);
+  }
+
+  // Markers live in world tiles, so they outlive the round's offset; `h` is the
+  // planet data they were placed on — a marker from an older map is flagged.
+  function validMarker(m, fallbackId) {
+    if (!m || typeof m !== 'object' || !isTile([m.x, m.y])) return null;
+    return {
+      id: m.id ? String(m.id) : fallbackId,
+      cat: MARKER_CATS.indexOf(m.cat) >= 0 ? m.cat : 'custom',
+      label: cleanLabel(m.label),
+      x: m.x, y: m.y,
+      h: typeof m.h === 'string' ? m.h : null,
+      at: typeof m.at === 'number' && isFinite(m.at) ? m.at : 0
+    };
+  }
+
+  function validShape(s, fallbackId) {
+    if (!s || typeof s !== 'object' || (s.kind !== 'line' && s.kind !== 'area')) return null;
+    var points = (Array.isArray(s.points) ? s.points : []).filter(isTile).map(function (p) { return p.slice(); });
+    if (points.length < (s.kind === 'area' ? 3 : 2)) return null;
+    return {
+      id: s.id ? String(s.id) : fallbackId,
+      kind: s.kind,
+      cat: MARKER_CATS.indexOf(s.cat) >= 0 ? s.cat : 'custom',
+      label: cleanLabel(s.label),
+      points: points,
+      h: typeof s.h === 'string' ? s.h : null,
+      at: typeof s.at === 'number' && isFinite(s.at) ? s.at : 0
+    };
+  }
+
+  // The line a player pastes into chat: the label and the in-game numbers of
+  // every point (world tiles without an offset, when nothing is calibrated).
+  function chatText(item, offset, fallbackLabel) {
+    var conv = function (p) { return formatCoords(offset ? worldToGame(offset, p[0], p[1]) : p); };
+    var label = item.label || fallbackLabel || '';
+    if (item.points) {
+      return (label ? label + ': ' : '') + item.points.map(conv).join(item.kind === 'line' ? ' → ' : ', ');
+    }
+    return (label ? label + ' ' : '') + conv([item.x, item.y]);
+  }
+
+  function shapeCentre(points) {
+    var sx = 0, sy = 0;
+    points.forEach(function (p) { sx += p[0] + 0.5; sy += p[1] + 0.5; });
+    return [sx / points.length, sy / points.length];
   }
 
   // A shot as the page records it: target and dial in game coordinates, the
@@ -539,6 +599,13 @@
     migrateStorage: migrateStorage,
     migratePrefs: migratePrefs,
     validShot: validShot,
+    MARKER_CATS: MARKER_CATS,
+    LABEL_MAX: LABEL_MAX,
+    cleanLabel: cleanLabel,
+    validMarker: validMarker,
+    validShape: validShape,
+    chatText: chatText,
+    shapeCentre: shapeCentre,
     impactBox: impactBox,
     shotState: shotState,
     currentDial: currentDial,
