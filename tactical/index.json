@@ -8,7 +8,7 @@
    "family": "rmc",
    "locale": "en-US",
    "source": {
-    "sha": "57112b967696c17c98805627df21ba0f8388aa81",
+    "sha": "c82d001cc2ac7755d80066f66883f273da0fd3fc",
     "date": "2026-09-13"
    },
    "constants": {
@@ -415,7 +415,8 @@
        "totalIntensity": 96.0,
        "intensitySlope": 1.6,
        "maxIntensity": 4.8
-      }
+      },
+      "shards": 60
      },
      {
       "id": "RMCMortarShellHE",

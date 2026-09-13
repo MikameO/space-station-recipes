@@ -340,6 +340,45 @@ body.tac-body {
 .tac-check-label { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--text-main); cursor: pointer; }
 .tac-check-label input { accent-color: var(--phosphor); }
 
+.tac-mode { display: flex; align-items: center; gap: 8px; margin-top: 8px; font-size: 13px; }
+.tac-segment.small { flex: 1; }
+.tac-segment.small .tac-seg { padding: 4px 8px; font-size: 12px; }
+
+.tac-warn-inline { color: var(--amber); }
+
+.tac-card {
+  border: 1px solid var(--border-active);
+  border-radius: 6px;
+  padding: 8px 10px;
+  margin-top: 10px;
+}
+
+.tac-dial-card { border-color: rgba(255, 182, 39, 0.5); }
+
+.tac-keep { color: var(--red-alert); font-size: 13px; font-weight: 600; }
+
+.tac-shot {
+  border-left: 3px solid var(--border-subtle);
+  padding: 4px 0 6px 10px;
+  margin-top: 8px;
+  font-size: 13px;
+}
+
+.tac-shot.flying { border-left-color: var(--cyan); }
+.tac-shot-head { color: var(--text-bright); }
+
+.tac-shot-timer {
+  font-family: ui-monospace, "Cascadia Mono", Consolas, monospace;
+  font-size: 15px;
+  color: var(--text-sub);
+  margin-top: 2px;
+}
+
+.tac-shot.flying .tac-shot-timer { color: var(--cyan); font-weight: 700; }
+.tac-impact { color: var(--text-sub); font-size: 12px; }
+.tac-impact.doubtful { color: var(--amber); }
+.tac-shot .tac-find-row { margin-top: 6px; }
+
 .tac-shell-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 .tac-shell-row .tac-select { width: 100%; max-width: none; font-size: 13px; padding: 6px 8px; }
 .tac-shell-row .tac-input { font-size: 14px; }

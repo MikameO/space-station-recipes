@@ -247,20 +247,21 @@
   // near the last shot, the same target plus a dial (the error stays).
   function fireVariants(opts) {
     var mortar = opts.constants;
+    var mode = opts.mode === 'laser' ? 'laser' : 'coordinates';
     var target = gameToWorld(opts.offset, opts.gameTarget[0], opts.gameTarget[1]);
     var current = opts.currentDial || [0, 0];
     var result = {
       newTarget: {
         target: opts.gameTarget.slice(),
         dial: [0, 0],
-        resetDial: !sameVec(current, [0, 0]),
+        resetDial: mode !== 'laser' && !sameVec(current, [0, 0]),
         currentDial: current.slice(),
-        checks: opts.planet && opts.mortarTile ? mortarFireChecks(opts.planet, opts.mortarTile, target, mortar, 'coordinates') : null
+        checks: opts.planet && opts.mortarTile ? mortarFireChecks(opts.planet, opts.mortarTile, target, mortar, mode) : null
       },
       dial: null
     };
     var last = opts.lastShot;
-    if (last) {
+    if (last && mode !== 'laser') {
       var err = estimateError(last);
       var e = err || [0, 0];
       var d = [opts.gameTarget[0] - last.target[0] - e[0], opts.gameTarget[1] - last.target[1] - e[1]];
@@ -306,6 +307,28 @@
     }
     var end = timeline[timeline.length - 1].at;
     return { done: elapsed >= end, remaining: Math.max(0, end - elapsed), next: next };
+  }
+
+  // A recorded shot's clock: seconds since the button was pressed decide the
+  // state, so a tab that was hidden for a while shows the truth on return.
+  function shotState(shot, mortar, now) {
+    var timeline = mortarTimeline(mortar, !!shot.fromLoad);
+    var elapsed = (now - shot.at) / 1000;
+    var state = timelineState(timeline, elapsed);
+    state.elapsed = elapsed;
+    state.timeline = timeline;
+    return state;
+  }
+
+  // The dial the mortar holds now: whatever the last recorded shot set.
+  function currentDial(shots) {
+    var last = shots && shots.length ? shots[shots.length - 1] : null;
+    return last ? last.dial.slice() : [0, 0];
+  }
+
+  // The in-game aim point of a shot: target plus dial, both in game coordinates.
+  function shotAim(shot) {
+    return [shot.target[0] + shot.dial[0], shot.target[1] + shot.dial[1]];
   }
 
   // ── OB and supply ────────────────────────────────────────────────────────
@@ -434,10 +457,11 @@
   var DEFAULT_LAYERS = { fire: true, deploy: false, rings: true, zone: true };
 
   function migratePrefs(raw) {
-    var out = { v: PREFS_VERSION, weapon: 'mortar', shell: null, hitRadius: {}, layers: {} };
+    var out = { v: PREFS_VERSION, weapon: 'mortar', shell: null, hitRadius: {}, layers: {}, timerFrom: 'fire' };
     LAYER_KEYS.forEach(function (k) { out.layers[k] = DEFAULT_LAYERS[k]; });
     if (!raw || typeof raw !== 'object' || raw.v !== PREFS_VERSION) return out;
     if (raw.weapon === 'mortar' || raw.weapon === 'ob' || raw.weapon === 'supply') out.weapon = raw.weapon;
+    if (raw.timerFrom === 'load') out.timerFrom = 'load';
     if (typeof raw.shell === 'string' && raw.shell) out.shell = raw.shell;
     if (raw.hitRadius && typeof raw.hitRadius === 'object') {
       Object.keys(raw.hitRadius).forEach(function (k) {
@@ -477,9 +501,31 @@
           : null
       };
     }
-    if (Array.isArray(raw.shots)) out.shots = raw.shots.slice();
+    if (Array.isArray(raw.shots)) out.shots = raw.shots.map(validShot).filter(Boolean);
     if (Array.isArray(raw.markers)) out.markers = raw.markers.slice();
     return out;
+  }
+
+  // A shot as the page records it: target and dial in game coordinates, the
+  // mortar tile it was fired from, the clock it was stamped with, its impacts.
+  function validShot(s) {
+    if (!s || typeof s !== 'object' || !isTile(s.target) || !isTile(s.dial) || !isTile(s.mortarTile)) return null;
+    if (typeof s.at !== 'number' || !isFinite(s.at) || typeof s.n !== 'number') return null;
+    return {
+      id: typeof s.id === 'string' ? s.id : String(s.n),
+      n: s.n,
+      target: s.target.slice(),
+      dial: s.dial.slice(),
+      at: s.at,
+      fromLoad: !!s.fromLoad,
+      mortarTile: s.mortarTile.slice(),
+      mode: s.mode === 'laser' ? 'laser' : 'coordinates',
+      shell: typeof s.shell === 'string' ? s.shell : null,
+      radius: typeof s.radius === 'number' && isFinite(s.radius) ? s.radius : null,
+      impacts: (Array.isArray(s.impacts) ? s.impacts : []).filter(isTile).map(function (p) { return p.slice(); }),
+      // reported impacts too far from the target to be this shell: kept for the eye, not for the maths
+      doubtful: (Array.isArray(s.doubtful) ? s.doubtful : []).filter(isTile).map(function (p) { return p.slice(); })
+    };
   }
 
   root.TacticalLogic = {
@@ -492,7 +538,11 @@
     confirmSameRound: confirmSameRound,
     migrateStorage: migrateStorage,
     migratePrefs: migratePrefs,
+    validShot: validShot,
     impactBox: impactBox,
+    shotState: shotState,
+    currentDial: currentDial,
+    shotAim: shotAim,
     FLAGS: FLAGS,
     STALE_AFTER_MS: STALE_AFTER_MS,
     worldToGame: worldToGame,

@@ -147,7 +147,36 @@
       radiusFlare: 'A flare does no damage — only the landing box is drawn.',
       zoneHint: 'Solid circle: the blast around the aim point. Dashed outline: everywhere the shell can land with the aim error and jitter — plan for the whole outline, not the circle.',
       hoverDist: '{d} tiles',
-      hoverErr: 'error ±{ex}/±{ey}'
+      hoverErr: 'error ±{ex}/±{ey}',
+      fire: 'Fire',
+      undoShot: 'Undo last shot',
+      keepTarget: 'Do not change the target — it is already {coords}: pressing «{set}» re-rolls the aim error.',
+      fromShot: 'from shot №{n}',
+      errKnown: 'aim error by impact: {e}',
+      errUnknown: 'aim error unknown — mark where the last shell fell and the dial will include it',
+      nowDial: '(the mortar holds {dial} now — set 0 0 first)',
+      laserNote: 'Laser mode: no aim error, dial or jitter — the shell lands where the laser points; the target needs CAS and lasing permission.',
+      modeLabel: 'Mode',
+      modeCoords: 'Coordinates',
+      modeLaser: 'Laser',
+      shotsTitle: 'Shots',
+      noShots: 'Press «Fire» on a card the moment the shell leaves — the timer and the previous-shot dial start from that.',
+      timerFrom: 'Timer from',
+      timerFire: 'the shot',
+      timerLoad: 'loading',
+      shotLine: '№{n} · {target}',
+      shotDial: 'dial {dial}',
+      inFlight: 'impact in {s} s',
+      nextEvent: 'next: {event} in {s} s',
+      events: { fired: 'the shot', travelSound: 'travel sound (≤15 tiles)', impactWarning: 'incoming warning (≤10 tiles)', impact: 'impact' },
+      landed: 'landed {age}',
+      impactHere: 'Landed here',
+      impactPick: 'Click the tile where the shell fell.',
+      impactAdd: 'Add',
+      impactAt: 'fell at {coords}',
+      impactErr: 'error {e}',
+      implausible: 'does not look like this shot — the calibration may be stale',
+      shardsNote: 'plus {n} shrapnel pieces well beyond the circle'
     },
     ru: {
       pageName: 'Тактическая карта',
@@ -266,7 +295,36 @@
       radiusFlare: 'Осветительный не наносит урона — рисуется только контур прилёта.',
       zoneHint: 'Сплошной круг — взрыв вокруг точки прицела. Пунктирный контур — всё, куда снаряд может прилететь с ошибкой прицела и дрожанием: рассчитывайте на весь контур, а не на круг.',
       hoverDist: '{d} тайлов',
-      hoverErr: 'ошибка ±{ex}/±{ey}'
+      hoverErr: 'ошибка ±{ex}/±{ey}',
+      fire: 'Выстрел',
+      undoShot: 'Отменить последний выстрел',
+      keepTarget: 'Цель не менять — уже {coords}: нажатие «{set}» перевыберет ошибку прицела.',
+      fromShot: 'от выстрела №{n}',
+      errKnown: 'ошибка прицела по падению: {e}',
+      errUnknown: 'ошибка прицела неизвестна — отметьте, куда упал последний снаряд, и смещение её учтёт',
+      nowDial: '(в миномёте сейчас {dial} — сначала выставьте 0 0)',
+      laserNote: 'Лазерный режим: ни ошибки прицела, ни смещения, ни дрожания — снаряд ложится в точку лазера; цели нужно разрешение КАС и подсветки.',
+      modeLabel: 'Режим',
+      modeCoords: 'Координаты',
+      modeLaser: 'Лазер',
+      shotsTitle: 'Выстрелы',
+      noShots: 'Нажмите «Выстрел» на карточке в момент, когда снаряд ушёл, — от него пойдут таймер и смещение для следующего.',
+      timerFrom: 'Таймер от',
+      timerFire: 'выстрела',
+      timerLoad: 'заряжания',
+      shotLine: '№{n} · {target}',
+      shotDial: 'смещение {dial}',
+      inFlight: 'падение через {s} с',
+      nextEvent: 'дальше: {event} через {s} с',
+      events: { fired: 'выстрел', travelSound: 'звук полёта (≤15 тайлов)', impactWarning: 'предупреждение о прилёте (≤10 тайлов)', impact: 'падение' },
+      landed: 'упал {age}',
+      impactHere: 'Упало здесь',
+      impactPick: 'Кликните тайл, куда упал снаряд.',
+      impactAdd: 'Добавить',
+      impactAt: 'упало на {coords}',
+      impactErr: 'ошибка {e}',
+      implausible: 'не похоже на этот выстрел — калибровка могла устареть',
+      shardsNote: 'плюс {n} осколков далеко за пределами круга'
     }
   };
   var T = L10N[LANG];
@@ -354,6 +412,9 @@
     mortarMessage: null,
     findDraft: '',
     findMessage: null,
+    impactShotId: null,   // the shot a map click reports an impact for
+    impactDraft: {},      // Para-Cam text typed per shot id
+    impactMessage: {},    // per shot id: {text, kind}
     panelKey: ''
   };
 
@@ -472,6 +533,9 @@
     }
     return {
       fire: make(function (f) { return ((f & F.MORTAR_FIRE) && !(f & F.LANDING_ZONE)) ? null : TINT_FIRE_REFUSED; }),
+      fireLaser: make(function (f) {
+        return ((f & F.MORTAR_FIRE) && (f & F.CAS) && (f & F.LASING) && !(f & F.LANDING_ZONE)) ? null : TINT_FIRE_REFUSED;
+      }),
       deploy: make(function (f) { return (f & F.MORTAR_PLACE) ? TINT_DEPLOY_ALLOWED : null; })
     };
   }
@@ -502,6 +566,9 @@
       state.session = Logic.newSession(now(), !!state.store.calibration);
       state.selected = null;
       state.pickMode = null;
+      state.impactShotId = null;
+      state.impactDraft = {};
+      state.impactMessage = {};
       state.draft = { x: '', y: '' };
       state.calMessage = null;
       state.mortarMessage = null;
@@ -509,6 +576,7 @@
       view.setImage(img, json.bounds);
       writeHash();
       renderAll();
+      if (state.store.shots.length) startShotTicker();
       setStatus('');
       if (!state.opened) {
         state.opened = true;
@@ -537,6 +605,11 @@
   function target() { return state.store.target; }
   function weapon() { return state.prefs.weapon; }
   function layerOn(k) { return !!state.prefs.layers[k]; }
+  function mortarMode() { return mortar() ? mortar().mode : 'coordinates'; }
+  function shots() { return state.store.shots; }
+  function lastShot() { var s = shots(); return s.length ? s[s.length - 1] : null; }
+  function shotById(id) { return shots().filter(function (s) { return s.id === id; })[0] || null; }
+  function signedPair(p) { return signed(p[0]) + ' ' + signed(p[1]); }
 
   function pickMode() {
     if (state.pickMode) return state.pickMode;
@@ -718,7 +791,7 @@
     if (!state.tints || weapon() !== 'mortar') return;
     ctx.imageSmoothingEnabled = false;
     var w = v.tilesWide() * v.scale, h = v.tilesHigh() * v.scale;
-    if (layerOn('fire')) ctx.drawImage(state.tints.fire, v.ox, v.oy, w, h);
+    if (layerOn('fire')) ctx.drawImage(mortarMode() === 'laser' ? state.tints.fireLaser : state.tints.fire, v.ox, v.oy, w, h);
     if (layerOn('deploy')) ctx.drawImage(state.tints.deploy, v.ox, v.oy, w, h);
   });
 
@@ -787,6 +860,39 @@
 
   view.addLayer(function drawSelected(ctx, v) {
     if (state.planet && state.selected && !calibration()) markTile(ctx, v, state.selected, '#00e5ff', 2.5);
+  });
+
+  view.addLayer(function drawShots(ctx, v) {
+    var list = state.planet && calibration() && weapon() === 'mortar' ? shots() : [];
+    if (!list.length) return;
+    var c = mortarConstants(), t = now(), off = calibration().offset;
+    list.forEach(function (s, i) {
+      var st = Logic.shotState(s, c, t);
+      var aim = Logic.shotAim(s), w = Logic.gameToWorld(off, aim[0], aim[1]);
+      if (!st.done) {
+        var box = s.mode === 'laser' ? null : Logic.impactBox(s.mortarTile, w, c, s.mode);
+        drawHitZone(ctx, v, w, box, s.radius, false);
+        var p = v.worldToScreen(w[0], w[1]);
+        drawText(ctx, st.remaining.toFixed(1), p[0], p[1] - (s.radius || 1) * v.scale - 10, 13);
+      } else if (i === list.length - 1) {
+        var q = v.worldToScreen(w[0], w[1]);
+        ctx.strokeStyle = '#ffb627';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(q[0] - 6, q[1] - 6); ctx.lineTo(q[0] + 6, q[1] + 6);
+        ctx.moveTo(q[0] + 6, q[1] - 6); ctx.lineTo(q[0] - 6, q[1] + 6);
+        ctx.stroke();
+        drawText(ctx, '№' + s.n, q[0], q[1] - 12, 11);
+      }
+      s.impacts.forEach(function (g) {
+        var iw = Logic.gameToWorld(off, g[0], g[1]), r = v.worldToScreen(iw[0], iw[1]);
+        ctx.strokeStyle = '#ff3d5a';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(r[0], r[1], 5, 0, Math.PI * 2);
+        ctx.stroke();
+      });
+    });
   });
 
   view.addLayer(function drawTarget(ctx, v) {
@@ -984,6 +1090,11 @@
         : msg({ text: fmt(T.deployNo, { reason: place.reasons[0] === 'noArea' ? T.deployNoArea : (terms().refuseDeployIndoors || place.reasons[0]) }), kind: 'error' })) +
       '<div class="tac-actions">' + button('pickMortar', T.mortarMove, pickMode() === 'mortar' ? 'btn-small on' : 'btn-small') + button('removeMortar', T.mortarRemove) + '</div>';
     if (pickMode() === 'mortar') h += msg({ text: T.mortarPickHint, kind: 'info' });
+    h += '<div class="tac-mode"><span class="tac-muted">' + esc(T.modeLabel) + '</span><div class="tac-segment small" role="group">' +
+      [['coordinates', T.modeCoords], ['laser', T.modeLaser]].map(function (o) {
+        return '<button type="button" class="tac-seg' + (m.mode === o[0] ? ' on' : '') + '" data-action="mortarMode" data-mode="' + o[0] + '" aria-pressed="' + (m.mode === o[0]) + '">' + esc(o[1]) + '</button>';
+      }).join('') + '</div></div>';
+    if (m.mode === 'laser') h += '<p class="tac-hint">' + esc(T.laserNote) + '</p>';
     return h;
   }
 
@@ -1002,13 +1113,32 @@
         '<span class="tac-target-copy" id="tacTargetCoords">' + esc(Logic.formatCoords(g)) + '</span>' +
         button('copyTarget', T.copy) + '</div>';
       if (isMortar) {
-        var info = fireInfo(t), c = info.checks;
-        h += '<p class="tac-dial">' + esc(fmt(T.dialLine, { label: terms().mortarOffsetTitle || 'Dial' })) + '</p>' +
-          '<p class="tac-muted">' + esc(fmt(T.distance, { d: c.distance.toFixed(1) })) + '</p>' +
-          (c.ok ? msg({ text: T.fireOk, kind: 'ok' }) : msg({ text: fmt(T.fireNo, { reason: refusalText(c.reasons[0]) }), kind: 'error' })) +
-          '<p class="tac-muted">' + esc(info.box.error[0] || info.box.error[1]
-            ? fmt(T.errorLine, { ex: info.box.error[0], ey: info.box.error[1] }) : T.errorNone) + '</p>' +
-          c.warnings.map(function (w) { return msg({ text: T.warnings[w] || w, kind: 'warn' }); }).join('');
+        var info = fireInfo(t), c = info.checks, laser = mortarMode() === 'laser';
+        var variants = Logic.fireVariants({ offset: calibration().offset, gameTarget: g, constants: mortarConstants(), planet: state.planet,
+          mortarTile: mortar().tile, currentDial: Logic.currentDial(shots()), lastShot: lastShot(), mode: mortarMode() });
+        if (!laser) {
+          h += '<p class="tac-dial">' + esc(fmt(T.dialLine, { label: terms().mortarOffsetTitle || 'Dial' })) +
+            (variants.newTarget.resetDial ? ' <span class="tac-warn-inline">' + esc(fmt(T.nowDial, { dial: signedPair(variants.newTarget.currentDial) })) + '</span>' : '') + '</p>';
+        }
+        h += '<p class="tac-muted">' + esc(fmt(T.distance, { d: c.distance.toFixed(1) })) + '</p>' +
+          (c.ok ? msg({ text: T.fireOk, kind: 'ok' }) : msg({ text: fmt(T.fireNo, { reason: refusalText(c.reasons[0]) }), kind: 'error' }));
+        if (!laser) {
+          h += '<p class="tac-muted">' + esc(info.box.error[0] || info.box.error[1]
+            ? fmt(T.errorLine, { ex: info.box.error[0], ey: info.box.error[1] }) : T.errorNone) + '</p>';
+        }
+        h += c.warnings.map(function (w) { return msg({ text: T.warnings[w] || w, kind: 'warn' }); }).join('') +
+          '<div class="tac-actions">' + button('fireNew', T.fire, 'btn-primary', !c.ok) + '</div>';
+        var d = variants.dial;
+        if (d) {
+          h += '<div class="tac-card tac-dial-card"><h3>' + esc(terms().mortarOffsetTitle || 'Dial') + ' · ' + esc(fmt(T.fromShot, { n: lastShot().n })) + '</h3>' +
+            '<div class="tac-target-fields">' +
+            '<span class="tac-target-field"><span>' + esc(terms().mortarOffsetX || 'X') + '</span><output class="tac-big">' + esc(signed(d.dial[0])) + '</output></span>' +
+            '<span class="tac-target-field"><span>' + esc(terms().mortarOffsetY || 'Y') + '</span><output class="tac-big">' + esc(signed(d.dial[1])) + '</output></span>' +
+            '<span class="tac-target-copy" id="tacDialCoords">' + esc(Logic.formatCoords(d.dial)) + '</span>' + button('copyDial', T.copy) + '</div>' +
+            '<p class="tac-keep">' + esc(fmt(T.keepTarget, { coords: Logic.formatCoords(d.baseTarget), set: terms().mortarTargetSet || 'Set Target' })) + '</p>' +
+            '<p class="tac-muted">' + esc(d.errorKnown ? fmt(T.errKnown, { e: signedPair(d.error) }) : T.errUnknown) + '</p>' +
+            '<div class="tac-actions">' + button('fireDial', T.fire, 'btn-primary') + '</div></div>';
+        }
       } else if (weapon() === 'mortar') {
         h += '<p class="tac-muted">' + esc(T.targetNoMortar) + '</p>';
       }
@@ -1042,9 +1172,57 @@
         '<label class="tac-input-label" for="tacRadius">' + esc(T.radius) +
         '<span class="tac-find-row"><input id="tacRadius" class="tac-input" type="number" min="0" max="' + MAX_RADIUS + '" step="0.5" value="' + (r == null ? '' : r) + '">' +
         (own ? button('resetRadius', T.radiusReset) : '') + '</span></label></div>' +
-        '<p class="tac-hint">' + esc(s.kind === 'flare' && typeof s.radius !== 'number' ? T.radiusFlare : fmt(T.radiusDefault, { r: s.radius == null ? '—' : s.radius })) + '</p>';
+        '<p class="tac-hint">' + esc(s.kind === 'flare' && typeof s.radius !== 'number' ? T.radiusFlare : fmt(T.radiusDefault, { r: s.radius == null ? '—' : s.radius })) +
+        (s.shards ? ' · ' + esc(fmt(T.shardsNote, { n: s.shards })) : '') + '</p>';
     }
     return h + '<p class="tac-hint">' + esc(T.zoneHint) + '</p>';
+  }
+
+  function eventName(ev) { return T.events[ev] || ev; }
+
+  function shotsHtml() {
+    var h = '<h2 id="tacShotsTitle">' + esc(T.shotsTitle) + '</h2>' +
+      '<div class="tac-mode"><span class="tac-muted">' + esc(T.timerFrom) + '</span><div class="tac-segment small" role="group">' +
+      [['fire', T.timerFire], ['load', T.timerLoad]].map(function (o) {
+        var on = state.prefs.timerFrom === o[0];
+        return '<button type="button" class="tac-seg' + (on ? ' on' : '') + '" data-action="timerFrom" data-from="' + o[0] + '" aria-pressed="' + on + '">' + esc(o[1]) + '</button>';
+      }).join('') + '</div></div>';
+    var list = shots();
+    if (!list.length) return h + '<p class="tac-muted">' + esc(T.noShots) + '</p>';
+    var t = now(), c = mortarConstants();
+    list.slice().reverse().slice(0, 6).forEach(function (s, i) {
+      var st = Logic.shotState(s, c, t);
+      var isLast = i === 0;
+      h += '<div class="tac-shot' + (st.done ? '' : ' flying') + '" data-shot="' + esc(s.id) + '">' +
+        '<div class="tac-shot-head"><b>' + esc(fmt(T.shotLine, { n: s.n, target: Logic.formatCoords(s.target) })) + '</b>' +
+        (s.mode === 'laser' ? ' · ' + esc(T.modeLaser) : ' · ' + esc(fmt(T.shotDial, { dial: signedPair(s.dial) }))) + '</div>' +
+        '<div class="tac-shot-timer" data-shot-timer="' + esc(s.id) + '">' + esc(shotTimerText(s, st)) + '</div>';
+      s.impacts.forEach(function (p) {
+        var e = [p[0] - s.target[0] - s.dial[0], p[1] - s.target[1] - s.dial[1]];
+        h += '<div class="tac-impact">' + esc(fmt(T.impactAt, { coords: Logic.formatCoords(p) })) + ' · ' + esc(fmt(T.impactErr, { e: signedPair(e) })) + '</div>';
+      });
+      s.doubtful.forEach(function (p) {
+        h += '<div class="tac-impact doubtful">' + esc(fmt(T.impactAt, { coords: Logic.formatCoords(p) })) + ' · ' + esc(T.implausible) + '</div>';
+      });
+      var m = state.impactMessage[s.id];
+      if (m) h += msg(m);
+      if (isLast) {
+        h += (pickMode() === 'impact' && state.impactShotId === s.id ? msg({ text: T.impactPick, kind: 'info' }) : '') +
+          '<div class="tac-actions">' + button('impactHere', T.impactHere, pickMode() === 'impact' && state.impactShotId === s.id ? 'btn-small on' : 'btn-small') +
+          button('undoShot', T.undoShot) + '</div>' +
+          '<span class="tac-find-row"><input id="tacImpact-' + esc(s.id) + '" class="tac-input" type="text" autocomplete="off" spellcheck="false" placeholder="Para-Cam (X):(Y)" value="' + esc(state.impactDraft[s.id] || '') + '">' +
+          button('impactAdd', T.impactAdd) + '</span>';
+      }
+      h += '</div>';
+    });
+    return h;
+  }
+
+  function shotTimerText(s, st) {
+    if (st.done) return fmt(T.landed, { age: formatAge(Math.max(0, (st.elapsed - st.timeline[st.timeline.length - 1].at) * 1000)) });
+    var text = fmt(T.inFlight, { s: st.remaining.toFixed(1) });
+    if (st.next && st.next.event !== 'impact') text += ' · ' + fmt(T.nextEvent, { event: eventName(st.next.event), s: (st.next.at - st.elapsed).toFixed(1) });
+    return text;
   }
 
   function panelKey(cs) {
@@ -1079,6 +1257,7 @@
       '<section class="tac-section tac-weapon">' + weaponHtml() + '</section>' +
       (weapon() === 'mortar' ? '<section class="tac-section" aria-labelledby="tacMortarTitle">' + mortarHtml(cs) + '</section>' : '') +
       '<section class="tac-section" aria-labelledby="tacTargetTitle">' + targetHtml(cs) + '</section>' +
+      (weapon() === 'mortar' && cs.calibrated && mortar() ? '<section class="tac-section" aria-labelledby="tacShotsTitle">' + shotsHtml() + '</section>' : '') +
       (weapon() === 'mortar' ? '<section class="tac-section" aria-labelledby="tacLayersTitle">' + layersHtml() + '</section>' : '') +
       '<p class="tac-muted tac-hint-block">' + esc(T.hint) + '</p>' +
       '<p class="tac-source">' + esc(fmt(T.source, { fork: f.label, sha: f.source.sha.slice(0, 9), date: f.source.date })) + '</p>';
@@ -1212,6 +1391,9 @@
       state.mortarMessage = null;
       state.findDraft = '';
       state.findMessage = null;
+      state.impactShotId = null;
+      state.impactDraft = {};
+      state.impactMessage = {};
       saveStore();
       trackPlanet('tactical_new_round');
       renderAll();
@@ -1266,8 +1448,127 @@
       if (s) delete state.prefs.hitRadius[s.id];
       savePrefs();
       renderAll();
+    },
+    mortarMode: function (btn) {
+      var m = mortar(), mode = btn.getAttribute('data-mode');
+      if (!m || m.mode === mode) return;
+      m.mode = mode;
+      saveStore();
+      renderAll();
+    },
+    timerFrom: function (btn) {
+      state.prefs.timerFrom = btn.getAttribute('data-from') === 'load' ? 'load' : 'fire';
+      savePrefs();
+      renderPanel();
+    },
+    fireNew: function () {
+      if (target() && mortar()) recordShot(toGame(target()), [0, 0]);
+    },
+    fireDial: function () {
+      var d = target() && mortar() && Logic.fireVariants({ offset: calibration().offset, gameTarget: toGame(target()), constants: mortarConstants(),
+        planet: state.planet, mortarTile: mortar().tile, currentDial: Logic.currentDial(shots()), lastShot: lastShot(), mode: mortarMode() }).dial;
+      if (d) recordShot(d.baseTarget, d.dial);
+    },
+    undoShot: function () {
+      var s = shots();
+      if (!s.length) return;
+      var gone = s.pop();
+      delete state.impactMessage[gone.id];
+      delete state.impactDraft[gone.id];
+      if (state.impactShotId === gone.id) { state.impactShotId = null; state.pickMode = null; }
+      saveStore();
+      trackPlanet('tactical_undo_shot');
+      renderAll();
+    },
+    impactHere: function () {
+      var s = lastShot();
+      if (!s) return;
+      var on = pickMode() === 'impact' && state.impactShotId === s.id;
+      state.pickMode = on ? null : 'impact';
+      state.impactShotId = on ? null : s.id;
+      renderPanel();
+      els.canvas.focus({ preventScroll: true });
+    },
+    impactAdd: function () {
+      var s = lastShot();
+      if (!s) return;
+      var p = Logic.parseCoords(state.impactDraft[s.id] || '', maxCoord());
+      if (!p.ok) {
+        state.impactMessage[s.id] = { text: T.parse[p.reason], kind: 'error' };
+        renderPanel();
+        return;
+      }
+      state.impactDraft[s.id] = '';
+      addImpact(s, [p.x, p.y]);
+    },
+    copyDial: function () {
+      var el = $('tacDialCoords');
+      if (el) copyCoords(el.textContent, el);
     }
   };
+
+  // A shot as fired: the numbers entered in the mortar, the clock, the mortar
+  // tile and the shell — everything a later dial or an impact report needs.
+  function recordShot(targetGame, dial) {
+    var list = shots();
+    var n = list.length ? list[list.length - 1].n + 1 : 1;
+    var s = currentShell();
+    list.push({
+      id: now() + '-' + n, n: n, target: targetGame.slice(), dial: dial.slice(), at: now(),
+      fromLoad: state.prefs.timerFrom === 'load', mortarTile: mortar().tile.slice(), mode: mortarMode(),
+      shell: s ? s.id : null, radius: hitRadius(), impacts: [], doubtful: []
+    });
+    state.pickMode = null;
+    saveStore();
+    trackPlanet('tactical_shot');
+    renderAll();
+    startShotTicker();
+  }
+
+  // The impact reported through «Landed here» or a Para-Cam name, in game
+  // coordinates. Beyond the error bound plus jitter it cannot be this shot.
+  function addImpact(shot, point) {
+    var targetWorld = Logic.gameToWorld(calibration().offset, shot.target[0], shot.target[1]);
+    var bounds = shot.mode === 'laser' ? [0, 0] : Logic.errorBounds(shot.mortarTile, targetWorld, mortarConstants().tilesPerOffset);
+    if (Logic.impactPlausible(shot, point, bounds)) {
+      shot.impacts.push(point.slice());
+      delete state.impactMessage[shot.id];
+    } else {
+      shot.doubtful.push(point.slice());   // listed with its own note, so no extra message
+      delete state.impactMessage[shot.id];
+    }
+    state.pickMode = null;
+    state.impactShotId = null;
+    saveStore();
+    trackPlanet('tactical_impact');
+    renderAll();
+  }
+
+  // While a shell is in the air the timer line and the map countdown tick;
+  // the moment it lands the panel re-renders once.
+  var shotTicker = 0;
+  function startShotTicker() {
+    if (shotTicker) return;
+    shotTicker = setInterval(tickShots, 250);
+  }
+
+  function tickShots() {
+    var c = mortarConstants(), t = now(), flying = false, landed = false;
+    shots().forEach(function (s) {
+      var st = Logic.shotState(s, c, t);
+      var el = els.panel.querySelector('[data-shot-timer="' + s.id + '"]');
+      if (el) {
+        var text = shotTimerText(s, st);
+        if (el.textContent !== text) el.textContent = text;
+        var row = el.parentElement;
+        if (row && st.done && row.classList.contains('flying')) { row.classList.remove('flying'); landed = true; }
+      }
+      if (!st.done) flying = true;
+    });
+    view.requestDraw();
+    if (!flying) { clearInterval(shotTicker); shotTicker = 0; }
+    if (landed) renderAll();
+  }
 
   els.panel.addEventListener('click', function (e) {
     var btn = e.target.closest ? e.target.closest('[data-action]') : null;
@@ -1281,6 +1582,7 @@
     if (id === 'tacCalX' || id === 'tacCalY') onCalInput();
     else if (id === 'tacFind') state.findDraft = el.value;
     else if (id === 'tacMortarCoords') state.mortarDraft = el.value;
+    else if (id.indexOf('tacImpact-') === 0) state.impactDraft[id.slice(10)] = el.value;
     else if (id === 'tacRadius') {
       var s = currentShell(), r = parseFloat(String(el.value).replace(',', '.'));
       if (!s) return;
@@ -1326,6 +1628,7 @@
     if (id === 'tacCalX' || id === 'tacCalY') { actions.saveCalibration(); e.preventDefault(); }
     else if (id === 'tacFind') { actions.find(); e.preventDefault(); }
     else if (id === 'tacMortarCoords') { actions.placeMortar(); e.preventDefault(); }
+    else if (id.indexOf('tacImpact-') === 0) { actions.impactAdd(); e.preventDefault(); }
   });
 
   // ── copy ────────────────────────────────────────────────────────────────
@@ -1415,6 +1718,12 @@
       setMortar(tile);
       return;
     }
+    if (mode === 'impact') {
+      var shot = shotById(state.impactShotId);
+      if (shot && calibration()) addImpact(shot, toGame(tile));
+      else { state.pickMode = null; state.impactShotId = null; renderPanel(); }
+      return;
+    }
     setTarget(tile);
   }
 
@@ -1491,7 +1800,10 @@
     if (state.planet && calibration() && panelKey(calState()) !== state.panelKey) renderAll();
   }
   setInterval(tick, TICK_MS);
-  document.addEventListener('visibilitychange', tick);
+  document.addEventListener('visibilitychange', function () {
+    tick();
+    if (state.planet && shots().length) { tickShots(); renderAll(); }   // a hidden tab's timers catch up at once
+  });
 
   // Another tab of this page wrote the same planet or the prefs: take its state.
   // A calibration made there just now is as fresh as one made here.
@@ -1511,6 +1823,7 @@
     var after = calibration() ? calibration().at : null;
     if (after && after !== before) Logic.confirmSameRound(state.session, now());
     renderAll();
+    if (shots().length) startShotTicker();
   });
 
   applyStaticText();

@@ -412,12 +412,54 @@ test('T4: where the shell can land — aim error plus jitter, none in laser mode
 
 test('T4: page prefs migrate strictly, layers keep their defaults', () => {
   const d = L.migratePrefs(null);
-  assert.deepStrictEqual(d, { v: 1, weapon: 'mortar', shell: null, hitRadius: {}, layers: { fire: true, deploy: false, rings: true, zone: true } });
+  assert.deepStrictEqual(d, { v: 1, weapon: 'mortar', shell: null, hitRadius: {}, layers: { fire: true, deploy: false, rings: true, zone: true }, timerFrom: 'fire' });
   const p = L.migratePrefs({ v: 1, weapon: 'ob', shell: 'RMCMortarShellHE', hitRadius: { RMCMortarShellHE: 4.5, bad: 'x', huge: 500 },
     layers: { fire: false, nope: true, rings: 'yes' }, junk: 1 });
-  assert.deepStrictEqual(p, { v: 1, weapon: 'ob', shell: 'RMCMortarShellHE', hitRadius: { RMCMortarShellHE: 4.5 },
+  assert.deepStrictEqual(p, { v: 1, weapon: 'ob', shell: 'RMCMortarShellHE', hitRadius: { RMCMortarShellHE: 4.5 }, timerFrom: 'fire',
     layers: { fire: false, deploy: false, rings: true, zone: true } });
   assert.strictEqual(L.migratePrefs({ v: 2, weapon: 'ob' }).weapon, 'mortar');
+});
+
+test('T5: a shot\'s clock survives a hidden tab — state comes from timestamps', () => {
+  const t0 = 5_000_000;
+  const shot = { n: 1, target: [274, -210], dial: [0, 0], at: t0, fromLoad: false, mortarTile: [20, -98], impacts: [] };
+  const s1 = L.shotState(shot, MORTAR_RMC, t0 + 5000);          // 5 s after the shot: travel sound passed, warning ahead
+  assert.strictEqual(s1.done, false);
+  assert.strictEqual(s1.next.event, 'impactWarning');
+  assert.ok(near(s1.remaining, 4, 1e-9));
+  const s2 = L.shotState(shot, MORTAR_RMC, t0 + 60000);         // came back a minute later: landed, nothing pending
+  assert.strictEqual(s2.done, true);
+  assert.strictEqual(s2.remaining, 0);
+  assert.strictEqual(s2.next, null);
+  const loaded = L.shotState(Object.assign({}, shot, { fromLoad: true }), MORTAR_RMC, t0 + 1000);
+  assert.ok(near(loaded.remaining, 9.5, 1e-9));                 // 1.5 s load + 9 s flight − 1 s elapsed
+});
+
+test('T5: the mortar holds the last shot\'s dial; the aim point is target + dial', () => {
+  assert.deepStrictEqual(L.currentDial([]), [0, 0]);
+  const shots = [{ target: [274, -210], dial: [0, 0] }, { target: [274, -210], dial: [-2, -1] }];
+  assert.deepStrictEqual(L.currentDial(shots), [-2, -1]);
+  assert.deepStrictEqual(L.shotAim(shots[1]), [272, -211]);
+  const v = L.fireVariants({ offset: [212, -148], gameTarget: [275, -212], constants: MORTAR_RMC, planet: openWorld,
+    mortarTile: [20, -98], currentDial: [-2, -1], lastShot: Object.assign({ id: 's2', impacts: [] }, shots[1]) });
+  assert.strictEqual(v.newTarget.resetDial, true);
+  assert.deepStrictEqual(v.newTarget.currentDial, [-2, -1]);
+  assert.deepStrictEqual(v.dial.dial, [1, -2]);                  // no impact known: error assumed 0
+  const laser = L.fireVariants({ offset: [212, -148], gameTarget: [275, -212], constants: MORTAR_RMC, planet: openWorld,
+    mortarTile: [20, -98], currentDial: [-2, -1], lastShot: shots[1], mode: 'laser' });
+  assert.strictEqual(laser.dial, null);
+  assert.strictEqual(laser.newTarget.resetDial, false);
+  assert.deepStrictEqual(laser.newTarget.checks.bounds, [0, 0]);
+});
+
+test('T5: stored shots are validated one by one', () => {
+  const good = { n: 1, target: [274, -210], dial: [0, 0], at: 1, mortarTile: [20, -98], impacts: [[276, -209], 'x'], mode: 'odd', extra: 1 };
+  const kept = L.migrateStorage({ v: 1, shots: [good, { n: 2 }, null, { n: 3, target: [1, 1], dial: [0, 0], at: 'now', mortarTile: [0, 0] }] });
+  assert.strictEqual(kept.shots.length, 1);
+  assert.deepStrictEqual(kept.shots[0], { id: '1', n: 1, target: [274, -210], dial: [0, 0], at: 1, fromLoad: false,
+    mortarTile: [20, -98], mode: 'coordinates', shell: null, radius: null, impacts: [[276, -209]], doubtful: [] });
+  assert.strictEqual(L.migratePrefs({ v: 1, timerFrom: 'load' }).timerFrom, 'load');
+  assert.strictEqual(L.migratePrefs({ v: 1, timerFrom: 'x' }).timerFrom, 'fire');
 });
 
 test('stored planet state: foreign or inconsistent shapes are dropped', () => {

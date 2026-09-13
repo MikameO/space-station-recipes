@@ -823,6 +823,11 @@ def shells(protos: Protos, mirror: dict) -> list[dict]:
                          radius=int(protos.comp_field(pid, "TileFireOnTrigger", "range", mirror["mortar"]["tileFireRange"])))
         elif protos.comp(pid, "MortarCameraShell") is not None:
             entry.update(kind="flare")
+        # A fragmentation charge also throws shrapnel projectiles well past the blast
+        # (Stories: ProjectileGrenade capacity 60, spread 360°) — the circle understates it.
+        shards = protos.comp_field(pid, "ProjectileGrenade", "capacity")
+        if shards:
+            entry["shards"] = int(shards)
         out.append(entry)
     if not any(s["kind"] == "he" and s["radius"] for s in out):
         raise TacticalError("no high-explosive mortar shell found among the prototypes")
