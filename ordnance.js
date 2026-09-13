@@ -519,6 +519,13 @@
       buildCostSelect();
       banSlowReagents();
       buildExcludeSelect();
+      loadPrefs();
+      // ponytail: saved when the page goes away rather than on every edit; hidden
+      // covers a phone killing the tab, which may never fire pagehide.
+      window.addEventListener('pagehide', savePrefs);
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'hidden') savePrefs();
+      });
       renderReqList();
       loadMasks();
       renderMaskList();
@@ -1441,6 +1448,43 @@
     try {
       localStorage.setItem(MASK_STORE, JSON.stringify({ masks: S.masks, mode: S.maskMode }));
     } catch (e) { /* storage blocked; masks just will not survive a reload */ }
+  }
+
+  // The trigger picked per assembly mode and the spec search setup. Read with the
+  // same suspicion as the masks: an older build may have stored another shape.
+  const PREF_STORE = 'chemdb-ord-prefs';
+
+  function loadPrefs() {
+    try {
+      const saved = JSON.parse(localStorage.getItem(PREF_STORE) || 'null');
+      if (saved) {
+        for (const [mode, i] of Object.entries(saved.triggerPick || {})) {
+          if (TRIGGER_OPTIONS[mode] && Number.isInteger(i) && TRIGGER_OPTIONS[mode][i]) S.triggerPick[mode] = i;
+        }
+        if (Array.isArray(saved.reqs)) {
+          S.reqs = saved.reqs.filter(r => r && METRICS[r.metric]).slice(0, 5).map(r => ({
+            metric: r.metric,
+            min: +r.min > 0 ? +r.min : 0,
+            max: typeof r.max === 'number' && r.max >= 0 ? r.max : null,
+          }));
+        }
+        if (saved.reqObjective === 'lowestCost' || METRICS[saved.reqObjective]) S.reqObjective = saved.reqObjective;
+        if (saved.reqCostLimit === null || (typeof saved.reqCostLimit === 'number' && saved.reqCostLimit >= 0)) {
+          S.reqCostLimit = saved.reqCostLimit;
+        }
+      }
+    } catch (e) { /* private mode, or a shape from an older build */ }
+    const objective = $('ordReqObjective');
+    objective.value = S.reqObjective;
+    objective.onchange({ target: objective });
+    $('ordReqCost').value = S.reqCostLimit == null ? '' : S.reqCostLimit;
+  }
+
+  function savePrefs() {
+    try {
+      localStorage.setItem(PREF_STORE, JSON.stringify({ triggerPick: S.triggerPick, reqs: S.reqs,
+        reqObjective: S.reqObjective, reqCostLimit: S.reqCostLimit }));
+    } catch (e) { /* storage blocked; the choices just will not survive a reload */ }
   }
 
   const activeMasks = () => S.masks.filter(m => m.on !== false);

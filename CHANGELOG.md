@@ -120,6 +120,11 @@ timer, proximity sensor or signaller with its igniter, the mine two igniters or 
 proximity sensor and one — and the brew plan counts the set you pick. `parts`
 gains `prox` and `signaller`.
 
+**Choices survive a reload (O24).** The trigger picked for each assembly mode and
+the "Build for a task" setup — requirements with both bounds, the objective and
+the material ceiling — are kept in `localStorage` (`chemdb-ord-prefs`) and read
+back, checked, when the tab opens.
+
 **JSON:** `targets[].weak` and `.size`; a `structures` list (`id`, `name`, `hp`,
 `coefficient`); `formula.stun*`, `knockdownSeconds`, `knockdownRef`,
 `wallRef`; `recipes[].group` (`base` | `high`) with optional `name` and `note`
