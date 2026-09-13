@@ -6107,6 +6107,8 @@ t('stage 1: position requests go to the mortar owner; the author never accepts t
 2. `worker/room/router.js`: after the imports add `const policiesOf = env => env.POLICIES || POLICIES;`. In `routeRoom` replace `const policy = POLICIES[path.slice('/policy/'.length)];` with `const policy = policiesOf(env)[path.slice('/policy/'.length)];`. In `createRoom` replace `!POLICIES[tok.fork]` with `!policiesOf(env)[tok.fork]` and `const policy = POLICIES[tok.fork];` with `const policy = policiesOf(env)[tok.fork];`.
 3. `scripts/test_room_worker.mjs`: replace `import POLICIES from '../worker/room/policies.js';` with `import FULL from './fixtures/room_policy_full.json' with { type: 'json' };`; in `makeEnv` add `POLICIES: { stories_cm: FULL },` to the defaults object; in the chronology case replace `POLICIES.stories_cm` with `FULL`. All twenty cases keep their expectations.
 4. Step 13 smoke run uses the shipping policy: the creator post is `so`, and the expected `sheet` has 5 entries (3 staff officers, 2 mortar crews).
+5. In the `--sync` block replace `encoding='utf-8'` with `encoding='utf-8-sig'` in the `bundle = …` line, so a policy saved with a BOM passes there too (Task 1 reads policies with `utf-8-sig`).
+6. The `--sync` block replaces the last **four** lines of `scripts/check_room_policy.py`, from `files = sorted(…)` through `print('OK')`. Task 1's follow-up keeps them byte-identical; the `pos_int`, `_check` and `check` functions above them stay as they are.
 
 ### Task 4 overrides
 
@@ -6176,6 +6178,7 @@ with
    and in `onSubmit` replace `squad: f.squad.value` with `squad: f.squad ? f.squad.value : null`. In the create form replace `draft('create', 'post', 'co')` with `draft('create', 'post', staff[0][0])`.
 3. `staffHtml`: show the squad `<select>` of the briefing sheet only when `Object.keys(ui.policy.squads).length` is non-zero; the copy button and the sheet stay.
 4. Step 8 expectation: `rows` is at least 3 (you, the scripted staff officer and the scripted crew).
+5. Knock copy: in the English strings replace `'Say this word on the radio. Any officer already in the room confirms you. The word lasts 5 minutes.'` with `'Say this word on the radio. Anyone already in the room confirms you. The word lasts 5 minutes.'`, and in the Russian strings `'Назовите это слово по рации. Подтвердит любой офицер, который уже в комнате. Слово действует 5 минут.'` with `'Назовите это слово по рации. Подтвердит любой участник, который уже в комнате. Слово действует 5 минут.'` In Stage 1 the mortar crew confirms joins too.
 
 ### Task 6
 
