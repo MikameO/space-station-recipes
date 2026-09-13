@@ -737,21 +737,28 @@
     var c = mortarConstants(), s = v.scale;
     var centre = v.worldToScreen(m.tile[0] + 0.5, m.tile[1] + 0.5);
     if (layerOn('rings')) {
-      ctx.setLineDash([8, 6]);
-      ctx.lineWidth = 1.5;
-      ctx.strokeStyle = 'rgba(255, 61, 90, 0.85)';
-      ctx.beginPath();
-      ctx.arc(centre[0], centre[1], c.minRange * s, 0, Math.PI * 2);
-      ctx.stroke();
-      ctx.strokeStyle = 'rgba(57, 255, 133, 0.85)';
-      ctx.beginPath();
-      ctx.arc(centre[0], centre[1], c.maxRange * s, 0, Math.PI * 2);
-      ctx.stroke();
+      // A dark underlay keeps the dashes readable over white walls and pale floors.
+      var ring = function (radius, colour, label) {
+        [['rgba(6, 9, 15, 0.85)', 5], [colour, 2.5]].forEach(function (pass) {
+          ctx.setLineDash([10, 7]);
+          ctx.lineWidth = pass[1];
+          ctx.strokeStyle = pass[0];
+          ctx.beginPath();
+          ctx.arc(centre[0], centre[1], radius * s, 0, Math.PI * 2);
+          ctx.stroke();
+        });
+        if (s >= 1.5) drawText(ctx, label, centre[0], centre[1] - radius * s - 9, 12);
+      };
+      ring(c.minRange, '#ff3d5a', String(c.minRange));
+      ring(c.maxRange, '#39ff85', String(c.maxRange));
       var z = Logic.zeroErrorSpan(m.tile, c.tilesPerOffset);
       var tl = v.worldToScreen(z.minX, z.maxY + 1);
-      ctx.setLineDash([3, 3]);
-      ctx.strokeStyle = 'rgba(0, 229, 255, 0.7)';
-      ctx.strokeRect(tl[0], tl[1], (z.maxX - z.minX + 1) * s, (z.maxY - z.minY + 1) * s);
+      [['rgba(6, 9, 15, 0.85)', 4], ['#00e5ff', 2]].forEach(function (pass) {
+        ctx.setLineDash([5, 4]);
+        ctx.lineWidth = pass[1];
+        ctx.strokeStyle = pass[0];
+        ctx.strokeRect(tl[0], tl[1], (z.maxX - z.minX + 1) * s, (z.maxY - z.minY + 1) * s);
+      });
       ctx.setLineDash([]);
     }
     ctx.fillStyle = '#ffb627';
