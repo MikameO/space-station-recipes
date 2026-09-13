@@ -517,7 +517,6 @@
   "ironReagent": "RMCIron",
   "knockdownRef": "CMXenoWarrior",
   "knockdownSeconds": 2.0,
-  "lowTierMax": 1,
   "minSlope": 0.1,
   "shardsPerUnit": 0.25,
   "starIntensity": 30.0,

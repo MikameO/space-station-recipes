@@ -102,7 +102,7 @@ blast. The Detonation panel gains Knockdown and Resin walls cards, and each gall
 card says how long the blast keeps that caste on the floor.
 
 **JSON:** `targets[].weak` and `.size`; a `structures` list (`id`, `name`, `hp`,
-`coefficient`); `formula.stun*`, `knockdownSeconds`, `knockdownRef`, `lowTierMax`,
+`coefficient`); `formula.stun*`, `knockdownSeconds`, `knockdownRef`,
 `wallRef`; `recipes[].group` (`base` | `high`) with optional `name` and `note`
 (`en`, `ru`). Manifest keys: `knockdown_ref`, `structure_files`, `structures`,
 `wall_ref`, `high_power_reagents`.

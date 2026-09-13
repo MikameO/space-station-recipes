@@ -205,9 +205,7 @@
     'Assault': 'Штурм',
     'Octogen-free peak': 'Предел без октогена',
     'community': 'сообщество',
-    'Down': 'Сбит',
     'Walls': 'Стены',
-    'Small fry': 'Мелочь',
     'High explosive: what octogen buys': 'Мощная взрывчатка: что даёт октоген',
     'Knockdown': 'Сбивает с ног',
     'Resin walls': 'Смоляные стены',
@@ -2311,25 +2309,18 @@
     const lang = window.I18N_LANG === 'ru' ? 'ru' : 'en';
     const built = rows.map(r => {
       const st = computeStats(r.mix, c, S.dampener);
-      // Two numbers phoron alone hides. Work is the whole shopping list in
-      // units of base chemistry. Steps is how many distinct reactions the
-      // mixture needs, and that is what makes octogen a chore: eight against
-      // ANFO's four. Reagents sharing a chain share its steps, so ANFO with
-      // ammonium nitrate costs four, not seven.
-      const work = mixWork(r.mix);
+      // Steps is how many distinct reactions the mixture needs, which is what
+      // makes octogen a chore: eight against ANFO's four. Reagents sharing a
+      // chain share its steps, so ANFO with ammonium nitrate costs four, not seven.
       const steps = new Set();
       for (const id of Object.keys(r.mix)) {
         for (const s of (S.data.reagents[id] || {}).steps || []) steps.add(s);
       }
-      return { r, st, cost: mixCost(r.mix, S.costBase), work, steps: steps.size,
-               he: heEffect(st), kills: killCount(st), down: knockdownRadius(st),
-               walls: structureRadius(st, wall), low: lowTierKills(st) };
+      return { r, st, steps: steps.size, he: heEffect(st), kills: killCount(st),
+               down: knockdownRadius(st), walls: structureRadius(st, wall) };
     });
     const dash = '\u2014';
     const tiles = v => v > 0 ? esc(round(v, 1)) : dash;
-    const fireCell = st => st.fireIntensity
-      ? esc(round(st.fireIntensity, 0)) + '/' + st.reach + '/' + esc(round(st.fireDuration, 0)) + 's'
-      : dash;
     // The name and its tag go in the narrow first column; the note rides under
     // the mixture, which has the width for a sentence.
     const forCell = b => {
@@ -2341,40 +2332,36 @@
     };
     const noteOf = b => b.r.note
       ? `<div class="ord-row-note">${esc(b.r.note[lang] || b.r.note.en)}</div>` : '';
-    const head = (mid, end) => `<thead><tr>
+    // One head and one row shape for both groups, so a column means the same
+    // thing in each. Phoron and material are the planner's business.
+    const head = `<thead><tr>
         <th>${esc(tr('For'))}</th><th>${esc(tr('Mixture'))}</th>
-        <th class="num">${esc(tr('Power'))}</th><th class="num">${esc(tr('Blast'))}</th>${mid}
-        <th class="num">${esc(rname(S.costBase))}</th><th class="num">${esc(tr('Work'))}</th>
-        <th class="num">${esc(tr('Steps'))}</th>${end}</tr></thead>`;
-    const lead = b => `<td>${forCell(b)}</td>
-        <td class="ord-mix-cell">${esc(describeMix(b.r.mix))}${noteOf(b)}</td>
+        <th class="num">${esc(tr('Power'))}</th><th class="num">${esc(tr('Blast'))}</th>
+        <th class="num">${esc(tr('Knockdown'))} \u2265${F.knockdownSeconds}s</th>
+        <th class="num">${esc(tr('Walls'))}</th><th class="num">${esc(tr('Kills'))}</th>
+        <th class="num">${esc(tr('HE'))}</th><th class="num">${esc(tr('Fire'))}</th>
+        <th class="num">${esc(tr('Steps'))}</th></tr></thead>`;
+    const row = b => `<tr data-i="${built.indexOf(b)}">
+        <td>${forCell(b)}</td>
+        <td class="ord-mix-cell">${esc(describeMix(b.r.mix))}${noteOf(b)}${b.st.shards
+          ? `<div class="ord-row-note">${esc(tr('shrapnel'))} ${b.st.shards}</div>` : ''}</td>
         <td class="num">${esc(round(b.st.power, 0))}</td>
-        <td class="num">${b.st.hasBlast ? esc(round(b.st.blastRadius, 2)) : dash}</td>`;
-    const cost = b => `<td class="num">${esc(round(b.cost, 1))}</td>
-        <td class="num">${esc(round(b.work, 0))}</td><td class="num">${b.steps}</td>`;
+        <td class="num">${b.st.hasBlast ? esc(round(b.st.blastRadius, 2)) : dash}</td>
+        <td class="num">${tiles(b.down)}</td><td class="num">${tiles(b.walls)}</td>
+        <td class="num">${b.kills ? b.kills + '/' + (S.data.targets || []).length : dash}</td>
+        <td class="num">${b.he.dead || b.he.crit
+          ? `<b class="ord-he-dead">${b.he.dead}</b>\u2620 ${b.he.crit}\u25b2` : dash}</td>
+        <td class="num">${b.st.fireIntensity
+          ? esc(round(b.st.fireIntensity, 0)) + '/' + b.st.reach + '/' + esc(round(b.st.fireDuration, 0)) + 's'
+          : dash}</td>
+        <td class="num">${b.steps}</td>
+      </tr>`;
+    const table = list => `<table class="ord-table">${head}<tbody>${list.map(row).join('')}</tbody></table>`;
     const base = built.filter(b => b.r.group !== 'high');
     const high = built.filter(b => b.r.group === 'high');
-    const baseTable = base.length ? `<table class="ord-table">${head(
-        `<th class="num">${esc(tr('Down'))} \u2265${F.knockdownSeconds}s</th>
-        <th class="num">${esc(tr('Walls'))}</th><th class="num">${esc(tr('Small fry'))}</th>
-        <th class="num">${esc(tr('Fire'))}</th>`, '')}<tbody>${base.map(b => `<tr data-i="${built.indexOf(b)}">
-        ${lead(b)}
-        <td class="num">${tiles(b.down)}</td><td class="num">${tiles(b.walls)}</td>
-        <td class="num">${b.low || dash}</td><td class="num">${fireCell(b.st)}</td>${cost(b)}
-      </tr>`).join('')}</tbody></table>` : '';
-    const highTable = high.length ? `<details><summary>${esc(tr('High explosive: what octogen buys'))} (${high.length})</summary>
-      <table class="ord-table">${head(
-        `<th class="num">${esc(tr('Shrapnel'))}</th><th class="num">${esc(tr('Fire'))}</th>`,
-        `<th class="num">${esc(tr('Kills'))}</th><th class="num">${esc(tr('HE'))}</th>`)}<tbody>${high.map(b => `<tr data-i="${built.indexOf(b)}" title="${esc(tr('Against T2+ two or three tiles away: ')
-          + b.he.dead + ' ' + tr('destroyed') + ', ' + b.he.crit + ' ' + tr('crippled'))}">
-        ${lead(b)}
-        <td class="num">${b.st.shards || dash}</td><td class="num">${fireCell(b.st)}</td>${cost(b)}
-        <td class="num">${b.kills}/${(S.data.targets || []).length}</td>
-        <td class="num">${b.he.dead || b.he.crit
-          ? `<b class="ord-he-dead">${b.he.dead}</b>\u2620 ${b.he.crit}\u25b2`
-          : dash}</td>
-      </tr>`).join('')}</tbody></table></details>` : '';
-    box.innerHTML = baseTable + highTable;
+    box.innerHTML = (base.length ? table(base) : '') + (high.length
+      ? `<details><summary>${esc(tr('High explosive: what octogen buys'))} (${high.length})</summary>${table(high)}</details>`
+      : '');
     box.querySelectorAll('tbody tr').forEach(row => {
       const b = built[+row.dataset.i];
       row.style.cursor = 'pointer';
@@ -2558,21 +2545,6 @@
 
   function structureRadius(st, s) { return s ? radiusWhere(st, s.hp / s.coefficient) : 0; }
 
-  // T0 and T1 destroyed at the gallery's first four distances, burn window shut.
-  // Queen and king also carry tier 0, and neither of them is weak.
-  function lowTierKills(st) {
-    const F = S.data.formula;
-    const max = F.lowTierMax != null ? F.lowTierMax : 1;
-    let n = 0;
-    for (let d = 0; d <= 3; d++) {
-      const blast = blastDamageAt(st, d);
-      for (const t of S.data.targets || []) {
-        if (!t.weak || (t.tier || 0) > max) continue;
-        if (blast * t.coefficient + fireOutcome(st, t, d, 0, 0).total >= t.dead) n++;
-      }
-    }
-    return n;
-  }
 
   // What the same round does to the people who threw it. Blast only: a marine
   // burns through a different branch of FlammableSystem than a xeno, with fire

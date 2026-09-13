@@ -966,9 +966,6 @@ STUN_STRONG_DIVISOR = 25.0
 KNOCKDOWN_SECONDS = 2.0
 # The assault row is the cheapest mixture that keeps this share of the peak.
 ASSAULT_SHARE = 0.9
-# The small-fry column counts T0 and T1. Queen and king also carry tier 0, but
-# they are not weak, and that is what tells them apart.
-LOW_TIER_MAX = 1
 
 # High explosive is judged the way it is used. A round lands near a xeno, not on
 # one, so the distances are two and three tiles. And a T1 does not hold a
@@ -1630,7 +1627,6 @@ def build(fork_id: str, fconf: dict, fetch) -> dict:
         "stunStrongDivisor": STUN_STRONG_DIVISOR,
         "knockdownSeconds": KNOCKDOWN_SECONDS,
         "knockdownRef": conf.get("knockdown_ref"),
-        "lowTierMax": LOW_TIER_MAX,
         "wallRef": conf.get("wall_ref"),
     }
     structure_files = fetch(conf.get("structure_files", []), url, f"{fork_id}_ordnance")
