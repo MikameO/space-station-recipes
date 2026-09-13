@@ -9,8 +9,9 @@
   после него: «просто реализуй это. А потом, если что я внесу правки». Готов к
   реализации.
 - **Затрагивает:** новые `ss14_tactical.py`, `tactical.html`,
-  `tactical/tactical.js`, `tactical/mapview.js`, `tactical/tactical.css`,
-  `tactical/index.json` и файлы планет, `scripts/test_tactical_logic.js`,
+  `tactical/logic.js`, `tactical/tactical.js`, `tactical/mapview.js`,
+  `tactical/tactical.css`, `tactical/index.json` и файлы планет,
+  `scripts/test_tactical_logic.js`,
   `scripts/check_tactical.py`; правки `.gitignore`, `sections.json`,
   `.github/workflows/deploy.yml` (один раз, T2), `home.js` и `feedback.js`
   (флаг «без автопоказа» с их тестами, T2), `sitemap.xml`,
@@ -177,6 +178,13 @@
   «не похоже на этот выстрел — калибровка устарела?».
 - **Лазерный режим:** ни ошибки, ни смещения, ни дрожания; слой разрешений —
   КАС + лазер + `MortarFire`, не зона посадки.
+- **Зона поражения у курсора** (запрос владельца 2026-09-13, T4): в режиме
+  прицеливания за мышью следует круг радиуса поражения снаряда вокруг тайла
+  под курсором, а для миномёта ещё и контур «куда может лечь»: прямоугольник
+  ошибки ±e плюс дрожание ±1, расширенный на этот радиус. Радиус по умолчанию
+  берётся из прототипа выбранного снаряда; игрок может выставить свой (поле в
+  тайлах, запоминается в настройках). После «Выстрела» круг остаётся на цели до
+  падения (T5); у ОБ — радиус боеголовки и разброс −3…+2 (T7).
 
 **② Огонь (ОБ).** Координаты цели, разрешение с учётом крыши зоны;
 прямоугольник «куда может лечь» −3…+2 с подсветкой, если часть его выходит
@@ -200,7 +208,7 @@ ss14_tactical.py ── поиск планет → разбор карт → ц
         ▼
 tactical/index.json + tactical/<fork>/<planet>[.<level>].png|json
         ▼
-tactical.html ── tactical/mapview.js (холст) + tactical/tactical.js (TacticalLogic + UI) + tactical/tactical.css
+tactical.html ── tactical/mapview.js (холст) + tactical/logic.js (TacticalLogic) + tactical/tactical.js (UI) + tactical/tactical.css
         ▼
 localStorage: ключ на планету + настройки
 ```
@@ -214,18 +222,20 @@ Node-тестами через `vm` — `library.js` и `scripts/test_library_ma
 **Источники.**
 
 - Репозиторий и ветка — из `config.FORK_REGISTRY` (только чтение).
-- На каждый форк за запуск — один SHA коммита (`commits/<branch>`).
-- Списки файлов — обходом только нужных поддеревьев на этом SHA
-  (`git/trees/<sha>`): рекурсивное дерево целиком у всех четырёх репозиториев
-  урезано. Для RMC-семейства — `Resources/Maps/_RMC14`,
-  `Resources/Prototypes` (`_RMC14`, `Entities/Structures`, `Tiles`); для CMU —
-  ещё `Content.CMU/Resources/{Maps,Prototypes}`.
-- Файлы — raw по SHA; кеш `cache_tactical/blobs/<sha_блоба>` (в
-  `.gitignore`); кеш `cache_maps/` не используется (замороженный июльский
-  снимок без `Content.CMU`).
-- Пустой ответ, ошибка HTTP, неразобранный YAML, пропущенный чанк — исключение.
-- Из `ss14_map_extractor.py` импортируются только `_type_constructor` и
-  `decode_chunk` (с проверкой, что все 256 тайлов чанка прочитаны).
+- На каждый форк за запуск — один SHA коммита.
+- Файлы — частичный sparse-клон git в `cache_tactical/<fork>/repo` (в
+  `.gitignore`): без блобов и закреплён на этом SHA, git докачивает только
+  нужные пути — сначала `Resources/Prototypes`, локали `_RMC14` и файлы C#,
+  затем карты найденных планет. Рекурсивное дерево через API у всех четырёх
+  репозиториев урезано, клон этим не ограничен; SHA блоба даёт сам git. Кеш
+  `cache_maps/` не используется (замороженный июльский снимок без `Content.CMU`).
+- Сетевые команды git повторяются при сетевых ошибках; зависшая передача
+  обрывается через 60 с.
+- Ошибка git, неразобранный файл карты, пропущенный чанк — исключение.
+- Из `ss14_map_extractor.py` импортируется только `decode_chunk` (с проверкой,
+  что все 256 тайлов чанка прочитаны).
+- Пустой тайл — тот, чьё имя в `tilemap` карты `Space`: номера тайлов у
+  каждой карты свои (у Sorokyne 0 — `CMFloorPlating`, а `Space` — 2).
 
 **Прототипы.** Своя таблица сущностей и тайлов с наследованием (родитель —
 строка или список). Поля `Area` сливаются по полям по цепочке; неизвестные
@@ -258,6 +268,26 @@ Node-тестами через `vm` — `library.js` и `scripts/test_library_ma
 7. Ориентиры (T11): предметы по категориям с флагом надёжности.
 8. CMU (T8): маска разрешения по колонне для миномёта и ОБ, этаж
    детонации ОБ, открытое небо для развёртывания.
+
+**Разведка CMU (T1, CMU `9753baf6d`, 2026-09-13).** Планеты — 19 сущностей
+`AUPlanet*`/`CMUPlanet*` с `RMCPlanetMapPrototype` (18 в ротации, Gixens Caverns
+выключена); `rmc_planets.yml` из RMC14 в CMU закомментирован. Компонент хранит
+не путь карты, а `mapId` → прототип `gameMap` с `mapPath`, `mapsBelow` и
+`mapsAbove` под `Content.CMU/Resources/Maps/CMU14/`, поэтому `discover_planets`
+семейства CMU разрешает эту цепочку. Этажи есть у 13 планет из 18 (Stable
+Garrison Redux — 7, Hope's Retreat — 5, Sorokyne Strata, Port Nereid и
+Shepherds' Pride — по 4, остальные — по 3 или 2); одноэтажные — Hybrisa
+Metropolitan, Fiorina, Flight, LV-624, Solaris Gulch. Этажи грузятся без сдвига
+(`maxRandomOffset: 0`) в общей сетке тайлов: у Sorokyne 29 486 из 29 751 тайла
+этажа +1 лежат над тайлами этажа 0, а `parse_map` читает каждый этаж (по одной
+`AreaGrid`). Глубины: `mapsBelow` → −1, −2…, `mapsAbove` → +1, +2… по порядку
+списков (`CMUZLevelsSystem.OnGameMapLoad`).
+`CMUTopDownOrdnanceSystem.TryResolveImpactColumn` идёт по этажам сверху вниз:
+тайл, который есть и не проём (`CMUZLevelOpeningCache.IsOpeningTile`), —
+поверхность; у каждой поверхности проверяется разрешение зоны (`CanMortarFire`
+или `CanOrbitalBombard` с причиной `Roofed`), и первый отказ блокирует удар;
+верхняя поверхность — `FirstImpact`, нижняя — `TerminalImpact`. В CMU
+`MortarComponent`: `MinimumRange` 8, `MaximumRange` 165, `TilesPerOffset` 20.
 
 **Константы.** Зеркало по семействам форков в `ss14_tactical.py` с блоком
 MIRRORED SOURCES (как `ss14_ordnance.py`). При сборке экстрактор читает на
@@ -332,21 +362,27 @@ MIRRORED SOURCES (как `ss14_ordnance.py`). При сборке экстрак
 тайл ↔ экран, перерисовка слоёв по кадру (кеш слоя вводится, только если
 кадр дольше 16 мс), события наведения и клика с индексом тайла.
 
-**`tactical/tactical.js`.** Чистая половина — `window.TacticalLogic`:
+**`tactical/logic.js`** (`window.TacticalLogic`) — чистая логика без DOM:
 
-- `worldToGame`, `gameToWorld`, `calibrate(points)` → сдвиг и проблемы
-  (`mismatch`, `outOfVariance`, `indiscriminate`);
+- `worldToGame`, `gameToWorld`, `offsetFrom(world, game)` → сдвиг;
+  `calibrationIssues` (`outOfVariance`); `isDiscriminating` и
+  `checkTileCandidates` — тайл сверки, на котором перестановка X/Y или знак
+  меняют ожидаемые числа; `formatCoords` с ASCII-минусом;
 - `parseCoords(text)` — «-100 200», «-100, 200», «ДОЛГОТА -100 ШИРОТА 200»,
   «LONGITUDE -100, LATITUDE 200», «Para-Cam (-100):(200)»; отказ при >2 чисел
   без подписей и при |значение| > 1000;
-- `areaAt`, `flags`, проверки миномёта, ОБ и сброса по семейству и режиму;
-- `mortarErrorBounds`, `inRange` (центр тайла → угол цели),
-  `zeroErrorZone`, `roofedBy(markers, point)` (угол → центр структуры);
-- `fireVariants(state, target)`, `estimateError(shot, impacts)`;
-- `obScatterBox`, `timeline(kind, startAt, now)`;
-- `insertReplay(marker, scenarios)` (T10), `migrateStorage(raw)`.
+- `preparePlanet`, `areaAt`, `flagsAt`, `maskAt`; `placementCheck`,
+  `mortarFireChecks`, `obChecks`, `supplyChecks` по семейству и режиму;
+- `errorBounds`, `distance` (центр тайла → угол цели), `zeroErrorSpan`,
+  `roofedFlags` (угол → центр структуры);
+- `fireVariants({offset, gameTarget, constants, planet, mortarTile,
+  currentDial, lastShot})`, `estimateError`, `impactPlausible`;
+- `obScatterBox`, `mortarTimeline`, `obTimeline`, `timelineState`,
+  `calibrationState` (возраст, «Тот же раунд?»);
+- позже: `insertReplay(marker, scenarios)` (T10), `migrateStorage(raw)`.
 
-Интерфейсная половина — панель этапов, списки, слои, таймеры, хранилище, L10N.
+**`tactical/tactical.js`** — интерфейс: панель этапов, списки, слои, таймеры,
+хранилище, L10N.
 
 **Панель.** Переключатель оружия (Миномёт / ОБ / Поставка), шаги с
 состоянием, поля ДОЛГОТА/ШИРОТА (X первым), возраст калибровки, варианты огня,
@@ -508,7 +544,7 @@ RU/EN; 375 px без горизонтальной прокрутки; консо
 | T1 | Экстрактор RMC-семейства: SHA, поддеревья, кеш блобов, 10 планет rmc14 и stories_cm, PNG, зоны, маски, подписи, константы с проверкой, `h`, `--verify`; разведка одной многоэтажной планеты CMU | `--verify` зелёный; эталоны LV-624; индекс с 10 планетами у каждого форка; отчёт разведки CMU |
 | T2 | `tactical.html`, холст, выбор форка и планеты, наведение (тайл, зона), `deploy.yml`, `check_tactical.py`, каркас тестов | страница открывается, зум и панорама, проверка ссылок и тесты проходят |
 | T3 | Калибровка: одна точка, проверочная, возраст, «Тот же раунд?», «Новый раунд», разбор координат, игровые координаты и копирование | эталонная пара; все предупреждения; тесты калибровки и разбора |
-| T4 | Миномёт: позиция, кольца (центр/угол), зона без ошибки, координаты цели с проверками, слой миномёта, карточка «Разделы» | сценарий макета; слой = эталонные количества; карточка |
+| T4 | Миномёт: позиция, кольца (центр/угол), зона без ошибки, координаты цели с проверками, круг зоны поражения у курсора с настраиваемым радиусом, слой миномёта, карточка «Разделы» | сценарий макета; слой = эталонные количества; карточка |
 | T5 | Цикл огня: вариант смещения, «Выстрел», таймеры, «Упало здесь» с Para-Cam, лазерный режим | сценарий макета; таймеры в фоне; тесты |
 | T6 | Метки: 5 категорий, клик и координаты, копирование, хранилище по планете, `storage` | метки переживают перезагрузку и синхронизируются между вкладками |
 | T7 | ОБ и поставка: панели, слои, разброс, стена, таймер, перезарядка | проверки против масок и эталонов |

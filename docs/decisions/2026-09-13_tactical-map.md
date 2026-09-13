@@ -23,7 +23,7 @@ Facts established during the session that the first spec draft lacked:
 
 ### 1. Sourcing: pinned commit, subtree listing, content-addressed cache
 
-**Chosen:** `ss14_tactical.py` resolves one commit SHA per fork per run, walks only the subtrees it needs at that SHA (`git/trees/<sha>`), downloads raw files at the SHA and caches them by blob SHA in gitignored `cache_tactical/`. An empty response or an unparseable file raises. From `ss14_map_extractor.py` it imports only `_type_constructor` and `decode_chunk`, and fails when `decode_chunk` skips a chunk.
+**Chosen:** `ss14_tactical.py` resolves one commit SHA per fork per run and reads it from a blobless sparse partial git clone in gitignored `cache_tactical/<fork>/repo`: git fetches only the paths it needs (prototypes, locales and C# files first, then the rotation planets' maps), and blob SHAs come from git itself. Network git commands retry; a failed fetch or an unparseable map raises. From `ss14_map_extractor.py` it imports only `decode_chunk`, and fails when it skips a chunk. The first draft walked `git/trees` and downloaded raw files one by one; a partial clone gives the same pinning without per-file HTTP requests or API rate limits.
 **Rationale:** System Architect and Devil's Advocate (D1 4/10): forever caches plus branch `raw_url` mix July trees with HEAD files, so `ref` proves nothing; confirmed by the stale and truncated trees above.
 **Rejected:** reusing `fetch_repo_tree`/`cache_maps/` — frozen snapshot without `Content.CMU`; editing `ss14_map_extractor.py` — other pipelines depend on its cache semantics.
 **Conditions to revisit:** subtree walks hit GitHub API limits on a full rebuild.
@@ -45,7 +45,7 @@ Facts established during the session that the first spec draft lacked:
 
 ### 4. Page assets live in `tactical/`; shared files are edited once
 
-**Chosen:** `tactical.html` at the root; `tactical/tactical.js`, `tactical/mapview.js` (local canvas view: fit, pan, zoom to cursor, DPR, tile↔screen, layer redraw), `tactical/tactical.css`, strings in the module's own L10N table. `deploy.yml` is edited once in T2 (copy list, asset-guard page list, Node test, offline check). `sw.js`, `i18n.js` and `style.css` are not edited: the network-first handler caches visited files, and offline use is best-effort, not promised in the UI.
+**Chosen:** `tactical.html` at the root; `tactical/logic.js` (pure maths, Node-tested), `tactical/tactical.js` (UI), `tactical/mapview.js` (local canvas view: fit, pan, zoom to cursor, DPR, tile↔screen, layer redraw), `tactical/tactical.css`, strings in the module's own L10N table. `deploy.yml` is edited once in T2 (copy list, asset-guard page list, Node test, offline check). `sw.js`, `i18n.js` and `style.css` are not edited: the network-first handler caches visited files, and offline use is best-effort, not promised in the UI.
 **Rationale:** System Architect — 6 of the 11 shared files the series planned to touch were already being edited by parallel sessions; Product Manager (D4 5/10) — a generic MapView pays off only with the Maps tab migration, which is outside the series; Devil's Advocate — `activate` deletes the runtime cache on every `CACHE` bump, so PRECACHE entries buy nothing durable.
 **Rejected:** a root-level shared `mapview.js` — no second consumer in the series; PRECACHE entries — wiped by other sessions' bumps.
 **Confidence:** medium-high.
