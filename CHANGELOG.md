@@ -3,6 +3,23 @@
 `data.json` schema version is in `meta.schemaVersion`. Consumers reading this file
 should pin on a compatible range (semver: breaking changes bump major).
 
+## Series V, stage 1 — 2026-09-14 (Officers' room: staff officer and mortar crew; hidden until a server sanctions it)
+
+In stage 1 the room serves two roles: a staff officer sends the mortar crew
+strike and position requests, and the crew answers with statuses, takes the
+target into the Series T fire card or sets its mortar at the requested tile,
+while the officer sees the mortar and its range rings. The room is layered over
+`tactical.html`: a Cloudflare Worker with a Registry and one Room Durable Object
+per room (op log in SQLite-backed storage, polling with `Retry-After`, no
+repeating timers), one-time post codes from the briefing sheet confirmed by a
+live member, an admin-signed server token as the only gate, radio silence, an
+observer link and a log export for moderators. Policy per fork in
+`tactical/policy/*.json`; the full multi-role policy stays a test fixture for
+the next stage. Every server starts at `"status": "none"` and the deployed
+page keeps `ROOM_URL` empty, so the room is invisible until an administration
+says yes in writing. Design: `docs/design/2026-09-13-tactical-tablet.md`;
+decisions: `docs/decisions/2026-09-13_tactical-tablet.md`.
+
 ## Series T — 2026-09-13 (Tactical map: `tactical.html`, `tactical/index.json` schema 1)
 
 A standalone page for the marine forks — RMC14, Space Stories, Colonial
