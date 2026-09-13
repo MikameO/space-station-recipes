@@ -28,7 +28,7 @@
     "assets":   { "write": ["service", "staff"] }
   },
   "rights": {
-    "confirmJoin":        ["staff"],
+    "confirmJoin":        ["staff", "service"],
     "publishCalibration": ["staff", "service"],
     "acceptRequest":      ["asset-owner", "staff"],
     "kick":               ["staff"],

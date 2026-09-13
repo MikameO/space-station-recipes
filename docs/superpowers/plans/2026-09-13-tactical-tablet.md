@@ -5996,7 +5996,7 @@ The owner narrowed the first release to two roles: a staff officer sends the mor
     "assets":   { "write": ["service", "staff"] }
   },
   "rights": {
-    "confirmJoin":        ["staff"],
+    "confirmJoin":        ["staff", "service"],
     "publishCalibration": ["staff", "service"],
     "acceptRequest":      ["asset-owner", "staff"],
     "kick":               ["staff"],
