@@ -138,7 +138,7 @@
       askNote: 'same round?',
       mismatchNote: 'check tile did not match',
       layersTitle: 'Layers and hit zone',
-      layers: { fire: 'Where the mortar cannot hit (red)', deploy: 'Where it can be deployed (green)', rings: 'Range rings and the no-error square', zone: 'Hit zone at the cursor and the target', markers: 'Markers, lines and areas', grid: 'Grid every 10 tiles (50 zoomed out) with in-game numbers' },
+      layers: { fire: 'Where the mortar cannot hit (red)', deploy: 'Where it can be deployed (green)', rings: 'Range rings and the no-error square', zone: 'Hit zone at the cursor and the target', markers: 'Markers, lines and areas', grid: 'Grid every 10 tiles (50 zoomed out) with in-game numbers', inserts: 'Variable areas — hatched, with the odds' },
       shell: 'Shell',
       shellKinds: { he: 'High explosive', incendiary: 'Incendiary', flare: 'Flare / camera', other: '{name}' },
       radius: 'Radius, tiles',
@@ -230,7 +230,11 @@
       level: 'Level',
       levelSurface: 'surface',
       mortarOnLevel: 'The mortar stands on level {n}; switch there to see whether it can be deployed.',
-      columnNote: 'Levels: a strike reaches the ground only if every floor in the column above it allows it; a mortar deploys only under open sky.'
+      columnNote: 'Levels: a strike reaches the ground only if every floor in the column above it allows it; a mortar deploys only under open sky.',
+      insertHover: 'may differ this round: {list}',
+      insertScenario: 'in scenario {s}',
+      insertNoScenario: 'only without a special scenario',
+      insertsNote: 'Hatched: parts of the map the round may swap for another version (barricades, ruins, survivors). The number is the chance that version is in play; landmarks inside are unreliable.'
     },
     ru: {
       pageName: 'Тактическая карта',
@@ -340,7 +344,7 @@
       askNote: 'тот же раунд?',
       mismatchNote: 'сверка не совпала',
       layersTitle: 'Слои и зона поражения',
-      layers: { fire: 'Куда миномёт не бьёт (красным)', deploy: 'Где можно развернуть (зелёным)', rings: 'Кольца дальности и квадрат без ошибки', zone: 'Зона поражения у курсора и у цели', markers: 'Метки, линии и области', grid: 'Сетка через 10 тайлов (50 при отдалении) с игровыми числами' },
+      layers: { fire: 'Куда миномёт не бьёт (красным)', deploy: 'Где можно развернуть (зелёным)', rings: 'Кольца дальности и квадрат без ошибки', zone: 'Зона поражения у курсора и у цели', markers: 'Метки, линии и области', grid: 'Сетка через 10 тайлов (50 при отдалении) с игровыми числами', inserts: 'Изменчивые участки — штриховка и вероятность' },
       shell: 'Снаряд',
       shellKinds: { he: 'Фугасный', incendiary: 'Зажигательный', flare: 'Осветительный / камера', other: '{name}' },
       radius: 'Радиус, тайлов',
@@ -432,7 +436,11 @@
       level: 'Этаж',
       levelSurface: 'поверхность',
       mortarOnLevel: 'Миномёт стоит на этаже {n}; переключитесь туда, чтобы видеть, можно ли там развернуть.',
-      columnNote: 'Этажи: удар доходит до земли, только если его разрешает каждый этаж над точкой; миномёт разворачивается только под открытым небом.'
+      columnNote: 'Этажи: удар доходит до земли, только если его разрешает каждый этаж над точкой; миномёт разворачивается только под открытым небом.',
+      insertHover: 'в этом раунде может отличаться: {list}',
+      insertScenario: 'при сценарии {s}',
+      insertNoScenario: 'только без особого сценария',
+      insertsNote: 'Штриховка — участки, которые раунд может заменить другой версией (баррикады, руины, выжившие). Число — вероятность, что эта версия в игре; ориентиры внутри ненадёжны.'
     }
   };
   var T = L10N[LANG];
@@ -1028,6 +1036,37 @@
     ctx.textAlign = 'center';
   });
 
+  var hatchPattern = null;
+  function hatch(ctx) {
+    if (hatchPattern) return hatchPattern;
+    var c = document.createElement('canvas');
+    c.width = c.height = 8;
+    var g = c.getContext('2d');
+    g.strokeStyle = 'rgba(255, 182, 39, 0.55)';
+    g.lineWidth = 1.5;
+    g.beginPath(); g.moveTo(-2, 6); g.lineTo(6, -2); g.moveTo(2, 10); g.lineTo(10, 2); g.stroke();
+    hatchPattern = ctx.createPattern(c, 'repeat');
+    return hatchPattern;
+  }
+
+  view.addLayer(function drawInserts(ctx, v) {
+    var list = state.planet && layerOn('inserts') ? (state.planet.json.inserts || []) : [];
+    if (!list.length) return;
+    var s = v.scale, size = Math.max(10, Math.min(13, 8 + s * 0.5));
+    Logic.insertBoxes(state.planet).forEach(function (box) {
+      var b = box.bounds, tl = v.worldToScreen(b.minX, b.maxY + 1);
+      var w = (b.maxX - b.minX + 1) * s, h = (b.maxY - b.minY + 1) * s;
+      ctx.fillStyle = hatch(ctx);
+      ctx.fillRect(tl[0], tl[1], w, h);
+      ctx.setLineDash([4, 3]);
+      ctx.lineWidth = 1.5;
+      ctx.strokeStyle = 'rgba(255, 182, 39, 0.9)';
+      ctx.strokeRect(tl[0] + 0.5, tl[1] + 0.5, w - 1, h - 1);
+      ctx.setLineDash([]);
+      if (s >= 2 && w > 40) drawText(ctx, box.name + ' ' + Math.round(box.p * 100) + '%', tl[0] + w / 2, tl[1] + h / 2, size);
+    });
+  });
+
   view.addLayer(function drawLabels(ctx, v) {
     if (!state.planet || v.scale < 2.5) return;
     var size = Math.max(11, Math.min(15, 9 + v.scale * 0.6));
@@ -1294,11 +1333,24 @@
     return '<span class="tac-chip ' + (on ? 'yes' : 'no') + '">' + esc(label) + '</span>';
   }
 
+  // "Nexus 40% (10% in scenario asset_protection)"; the game's 'none' tag means
+  // the variant only appears when no special scenario is running.
+  function insertText(i) {
+    var pct = function (p) { return Math.round(p * 100) + '%'; };
+    var tags = i.parts.map(function (part) {
+      var s = part.scenario === 'none' ? T.insertNoScenario : fmt(T.insertScenario, { s: part.scenario });
+      return part.p < i.p - 1e-9 ? pct(part.p) + ' ' + s : s;
+    });
+    return i.name + ' ' + pct(i.p) + (tags.length ? ' (' + tags.join('; ') + ')' : '');
+  }
+
   function areaHtml(tile) {
     var area = Logic.areaAt(state.planet, tile[0], tile[1]);
     if (!area) return '<div class="tac-hover-note">' + esc(T.noArea) + '</div>';
     var f = area[3], F = Logic.FLAGS;
-    return '<div>' + esc(area[1]) + '</div><div class="tac-chips">' +
+    var ins = layerOn('inserts') ? Logic.insertsAt(state.planet, tile[0], tile[1]) : [];
+    var insHtml = ins.length ? '<div class="tac-hover-insert">' + esc(fmt(T.insertHover, { list: ins.map(insertText).join('; ') })) + '</div>' : '';
+    return '<div>' + esc(area[1]) + '</div>' + insHtml + '<div class="tac-chips">' +
       chip(T.flags.mortarFire, (f & F.MORTAR_FIRE) && !(f & F.LANDING_ZONE)) +
       chip(T.flags.mortarPlace, f & F.MORTAR_PLACE) +
       chip(T.flags.ob, f & F.OB) +
@@ -1587,12 +1639,14 @@
   function layersHtml() {
     var h = '<h2 id="tacLayersTitle">' + esc(T.layersTitle) + '</h2><div class="tac-layers">';
     var wp = weapon();
-    var keys = wp === 'mortar' ? Logic.LAYER_KEYS : wp === 'ob' ? ['fire', 'zone', 'markers', 'grid'] : ['fire', 'markers', 'grid'];
+    var keys = wp === 'mortar' ? Logic.LAYER_KEYS : wp === 'ob' ? ['fire', 'zone', 'markers', 'grid', 'inserts'] : ['fire', 'markers', 'grid', 'inserts'];
     keys.forEach(function (k) {
       var label = k === 'fire' ? T.fireLabels[wp] : T.layers[k];
       h += '<label class="tac-check-label"><input type="checkbox" data-layer="' + k + '"' + (layerOn(k) ? ' checked' : '') + '> ' + esc(label) + '</label>';
     });
     h += '</div>';
+    if (state.planet && state.planet.columnMortar) h += '<p class="tac-hint">' + esc(T.columnNote) + '</p>';
+    if (state.planet && (state.planet.json.inserts || []).length) h += '<p class="tac-hint">' + esc(T.insertsNote) + '</p>';
     var r = state.ruler, measuring = pickMode() === 'ruler';
     h += '<div class="tac-actions">' + button('rulerStart', T.ruler, measuring ? 'btn-small on' : 'btn-small') +
       (r && r.b ? button('rulerClear', T.rulerClear) : '') + '</div>';
@@ -1601,7 +1655,6 @@
       var d = Logic.rulerDistance(r.a, r.b);
       h += '<p class="tac-ruler">' + esc(fmt(T.rulerText, { d: d.tiles.toFixed(1), dx: signed(d.dx), dy: signed(d.dy) })) + '</p>';
     }
-    if (state.planet && state.planet.columnMortar) h += '<p class="tac-hint">' + esc(T.columnNote) + '</p>';
     if (wp !== 'mortar') return h;
     var list = shells(), s = currentShell();
     if (s) {

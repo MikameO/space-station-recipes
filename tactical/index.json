@@ -171,14 +171,14 @@
      "proto": "RMCPlanetChances",
      "name": "LV-522 Chance's Claim",
      "file": "rmc14/chances",
-     "h": "46d1e521e389",
+     "h": "b9b3bae08fc3",
      "inRotation": true,
      "minPlayers": 0,
      "maxPlayers": 0,
      "levels": [
       {
        "depth": 0,
-       "h": "46d1e521e389"
+       "h": "b9b3bae08fc3"
       }
      ],
      "scenarios": []
@@ -188,14 +188,14 @@
      "proto": "RMCPlanetFiorina",
      "name": "Fiorina Science Annex",
      "file": "rmc14/fiorina",
-     "h": "25b38f176875",
+     "h": "72cd66e82c85",
      "inRotation": true,
      "minPlayers": 130,
      "maxPlayers": 0,
      "levels": [
       {
        "depth": 0,
-       "h": "25b38f176875"
+       "h": "72cd66e82c85"
       }
      ],
      "scenarios": [
@@ -214,14 +214,14 @@
      "proto": "RMCPlanetHybrisa",
      "name": "LV-759 Hybrisa Prospera",
      "file": "rmc14/hybrisa",
-     "h": "658051da42e9",
+     "h": "621748330003",
      "inRotation": true,
      "minPlayers": 130,
      "maxPlayers": 0,
      "levels": [
       {
        "depth": 0,
-       "h": "658051da42e9"
+       "h": "621748330003"
       }
      ],
      "scenarios": [
@@ -240,14 +240,14 @@
      "proto": "RMCPlanetKutjevo",
      "name": "Kutjevo Refinery",
      "file": "rmc14/kutjevo",
-     "h": "c65355699093",
+     "h": "e7488edf1316",
      "inRotation": true,
      "minPlayers": 0,
      "maxPlayers": 0,
      "levels": [
       {
        "depth": 0,
-       "h": "c65355699093"
+       "h": "e7488edf1316"
       }
      ],
      "scenarios": [
@@ -262,14 +262,14 @@
      "proto": "RMCPlanetLV624",
      "name": "LV-624 Lazarus Landing",
      "file": "rmc14/lv624",
-     "h": "6dfd8ab50c2a",
+     "h": "fd2f3b2e0c0b",
      "inRotation": true,
      "minPlayers": 0,
      "maxPlayers": 0,
      "levels": [
       {
        "depth": 0,
-       "h": "6dfd8ab50c2a"
+       "h": "fd2f3b2e0c0b"
       }
      ],
      "scenarios": [
@@ -288,14 +288,14 @@
      "proto": "RMCPlanetShiva",
      "name": "Shivas Snowball",
      "file": "rmc14/shiva",
-     "h": "cde71877e20d",
+     "h": "7817d9db1b0c",
      "inRotation": true,
      "minPlayers": 0,
      "maxPlayers": 0,
      "levels": [
       {
        "depth": 0,
-       "h": "cde71877e20d"
+       "h": "7817d9db1b0c"
       }
      ],
      "scenarios": [
@@ -314,14 +314,14 @@
      "proto": "RMCPlanetSolaris",
      "name": "Solaris Ridge",
      "file": "rmc14/solaris",
-     "h": "f6bc98d8b1da",
+     "h": "52596cb9b879",
      "inRotation": true,
      "minPlayers": 0,
      "maxPlayers": 0,
      "levels": [
       {
        "depth": 0,
-       "h": "f6bc98d8b1da"
+       "h": "52596cb9b879"
       }
      ],
      "scenarios": [
@@ -340,14 +340,14 @@
      "proto": "RMCPlanetSorokyne",
      "name": "LV-976 Sorokyne Strata",
      "file": "rmc14/sorokyne",
-     "h": "e2381ebabe74",
+     "h": "7daabbeefbc5",
      "inRotation": true,
      "minPlayers": 130,
      "maxPlayers": 0,
      "levels": [
       {
        "depth": 0,
-       "h": "e2381ebabe74"
+       "h": "7daabbeefbc5"
       }
      ],
      "scenarios": [
@@ -366,14 +366,14 @@
      "proto": "RMCPlanetTrijent",
      "name": "Trijent Dam",
      "file": "rmc14/trijent",
-     "h": "69869302dec5",
+     "h": "c0de1aa012c5",
      "inRotation": true,
      "minPlayers": 130,
      "maxPlayers": 0,
      "levels": [
       {
        "depth": 0,
-       "h": "69869302dec5"
+       "h": "c0de1aa012c5"
       }
      ],
      "scenarios": [
@@ -392,14 +392,14 @@
      "proto": "RMCPlanetVaradero",
      "name": "New Varadero",
      "file": "rmc14/varadero",
-     "h": "c5334eaca7f4",
+     "h": "aabe6bbc5c88",
      "inRotation": true,
      "minPlayers": 0,
      "maxPlayers": 0,
      "levels": [
       {
        "depth": 0,
-       "h": "c5334eaca7f4"
+       "h": "aabe6bbc5c88"
       }
      ],
      "scenarios": [
@@ -629,14 +629,14 @@
      "proto": "RMCPlanetChances",
      "name": "LV-522 Притензия Шанса",
      "file": "stories_cm/chances",
-     "h": "26aa8aeaf1ff",
+     "h": "5adc4cc15045",
      "inRotation": true,
      "minPlayers": 0,
      "maxPlayers": 0,
      "levels": [
       {
        "depth": 0,
-       "h": "26aa8aeaf1ff"
+       "h": "5adc4cc15045"
       }
      ],
      "scenarios": []
@@ -646,14 +646,14 @@
      "proto": "RMCPlanetFiorina",
      "name": "Научный Комплекс Фиорины",
      "file": "stories_cm/fiorina",
-     "h": "6b4478abe8c3",
+     "h": "d1a774ae6e38",
      "inRotation": true,
      "minPlayers": 130,
      "maxPlayers": 0,
      "levels": [
       {
        "depth": 0,
-       "h": "6b4478abe8c3"
+       "h": "d1a774ae6e38"
       }
      ],
      "scenarios": [
@@ -672,14 +672,14 @@
      "proto": "RMCPlanetHybrisa",
      "name": "LV-759 Гибриса Проспера",
      "file": "stories_cm/hybrisa",
-     "h": "4b16619ebd63",
+     "h": "048c68cf44ae",
      "inRotation": true,
      "minPlayers": 130,
      "maxPlayers": 0,
      "levels": [
       {
        "depth": 0,
-       "h": "4b16619ebd63"
+       "h": "048c68cf44ae"
       }
      ],
      "scenarios": [
@@ -698,14 +698,14 @@
      "proto": "RMCPlanetKutjevo",
      "name": "ПЗ Кутьево",
      "file": "stories_cm/kutjevo",
-     "h": "8f242363aedc",
+     "h": "126cba24c23f",
      "inRotation": true,
      "minPlayers": 0,
      "maxPlayers": 0,
      "levels": [
       {
        "depth": 0,
-       "h": "8f242363aedc"
+       "h": "126cba24c23f"
       }
      ],
      "scenarios": [
@@ -720,14 +720,14 @@
      "proto": "RMCPlanetLV624",
      "name": "LV-624 Lazarus Landing",
      "file": "stories_cm/lv624",
-     "h": "aaaa5337f72d",
+     "h": "ef70f71ea93f",
      "inRotation": true,
      "minPlayers": 0,
      "maxPlayers": 0,
      "levels": [
       {
        "depth": 0,
-       "h": "aaaa5337f72d"
+       "h": "ef70f71ea93f"
       }
      ],
      "scenarios": [
@@ -746,14 +746,14 @@
      "proto": "RMCPlanetShiva",
      "name": "Снежный Шар Шивы",
      "file": "stories_cm/shiva",
-     "h": "31030cbd5477",
+     "h": "c6192dc1ed9a",
      "inRotation": true,
      "minPlayers": 0,
      "maxPlayers": 0,
      "levels": [
       {
        "depth": 0,
-       "h": "31030cbd5477"
+       "h": "c6192dc1ed9a"
       }
      ],
      "scenarios": [
@@ -772,14 +772,14 @@
      "proto": "RMCPlanetSolaris",
      "name": "Хребет Солярис",
      "file": "stories_cm/solaris",
-     "h": "7fad8bda786e",
+     "h": "dddf062a1450",
      "inRotation": true,
      "minPlayers": 0,
      "maxPlayers": 0,
      "levels": [
       {
        "depth": 0,
-       "h": "7fad8bda786e"
+       "h": "dddf062a1450"
       }
      ],
      "scenarios": [
@@ -798,14 +798,14 @@
      "proto": "RMCPlanetSorokyne",
      "name": "LV-976 Sorokyne Strata",
      "file": "stories_cm/sorokyne",
-     "h": "43b029759ae2",
+     "h": "09fea5ad46e7",
      "inRotation": true,
      "minPlayers": 130,
      "maxPlayers": 0,
      "levels": [
       {
        "depth": 0,
-       "h": "43b029759ae2"
+       "h": "09fea5ad46e7"
       }
      ],
      "scenarios": [
@@ -824,14 +824,14 @@
      "proto": "RMCPlanetTrijent",
      "name": "Дамба Триджент",
      "file": "stories_cm/trijent",
-     "h": "9cbd877a64f9",
+     "h": "b1f3c21b44e7",
      "inRotation": true,
      "minPlayers": 130,
      "maxPlayers": 0,
      "levels": [
       {
        "depth": 0,
-       "h": "9cbd877a64f9"
+       "h": "b1f3c21b44e7"
       }
      ],
      "scenarios": [
@@ -850,14 +850,14 @@
      "proto": "RMCPlanetVaradero",
      "name": "Новый Варадеро",
      "file": "stories_cm/varadero",
-     "h": "c6e2acb7d82a",
+     "h": "3a1a55d91c81",
      "inRotation": true,
      "minPlayers": 0,
      "maxPlayers": 0,
      "levels": [
       {
        "depth": 0,
-       "h": "c6e2acb7d82a"
+       "h": "3a1a55d91c81"
       }
      ],
      "scenarios": [
@@ -1065,14 +1065,14 @@
      "proto": "AUPlanetBosenmoriBasho",
      "name": "Bosenmori Basho",
      "file": "cmu/bosenmoribasho",
-     "h": "2ae1d4b082c9",
+     "h": "c5de2b2270e1",
      "inRotation": true,
      "minPlayers": 0,
      "maxPlayers": 75,
      "levels": [
       {
        "depth": 0,
-       "h": "2ae1d4b082c9"
+       "h": "c5de2b2270e1"
       }
      ],
      "scenarios": []
@@ -1082,22 +1082,22 @@
      "proto": "AUPlanetCorsatStation",
      "name": "Corsat Station",
      "file": "cmu/corsatstation",
-     "h": "8999495c28ce",
+     "h": "acf38fe002fd",
      "inRotation": true,
      "minPlayers": 0,
      "maxPlayers": 200,
      "levels": [
       {
        "depth": -1,
-       "h": "6badce3adbc0"
+       "h": "79ee0967aef5"
       },
       {
        "depth": 0,
-       "h": "8999495c28ce"
+       "h": "acf38fe002fd"
       },
       {
        "depth": 1,
-       "h": "54b022ee01fb"
+       "h": "cd68e008a768"
       }
      ],
      "scenarios": []
@@ -1107,14 +1107,14 @@
      "proto": "AUPlanetFlight",
      "name": "Flight",
      "file": "cmu/flight",
-     "h": "ca620f092901",
+     "h": "3d40462ec5a9",
      "inRotation": true,
      "minPlayers": 0,
      "maxPlayers": 75,
      "levels": [
       {
        "depth": 0,
-       "h": "ca620f092901"
+       "h": "3d40462ec5a9"
       }
      ],
      "scenarios": []
@@ -1124,26 +1124,26 @@
      "proto": "AUPlanetLV327",
      "name": "Port Nereid",
      "file": "cmu/lv327",
-     "h": "b2a7a787c92c",
+     "h": "227b34be8483",
      "inRotation": true,
      "minPlayers": 0,
      "maxPlayers": 200,
      "levels": [
       {
        "depth": -1,
-       "h": "926329355d8b"
+       "h": "abffe4fee29d"
       },
       {
        "depth": 0,
-       "h": "b2a7a787c92c"
+       "h": "227b34be8483"
       },
       {
        "depth": 1,
-       "h": "56428239c81b"
+       "h": "172e03f51899"
       },
       {
        "depth": 2,
-       "h": "c1a9bcfd7af5"
+       "h": "5f86361b098e"
       }
      ],
      "scenarios": []
@@ -1153,14 +1153,14 @@
      "proto": "AUPlanetLV624",
      "name": "LV624 Green Hell",
      "file": "cmu/lv624",
-     "h": "1d752f886970",
+     "h": "a0777df30f05",
      "inRotation": true,
      "minPlayers": 0,
      "maxPlayers": 65,
      "levels": [
       {
        "depth": 0,
-       "h": "1d752f886970"
+       "h": "a0777df30f05"
       }
      ],
      "scenarios": []
@@ -1170,14 +1170,14 @@
      "proto": "AUPlanetLV747",
      "name": "Solaris Gulch",
      "file": "cmu/lv747",
-     "h": "d45b76f736b3",
+     "h": "7b56002548db",
      "inRotation": true,
      "minPlayers": 0,
      "maxPlayers": 75,
      "levels": [
       {
        "depth": 0,
-       "h": "d45b76f736b3"
+       "h": "7b56002548db"
       }
      ],
      "scenarios": []
@@ -1187,14 +1187,14 @@
      "proto": "AUPlanetLV759",
      "name": "Hybrisa Metropolitan",
      "file": "cmu/lv759",
-     "h": "d542bb50fe13",
+     "h": "593bb6fed3c1",
      "inRotation": true,
      "minPlayers": 0,
      "maxPlayers": 200,
      "levels": [
       {
        "depth": 0,
-       "h": "d542bb50fe13"
+       "h": "593bb6fed3c1"
       }
      ],
      "scenarios": []
@@ -1204,26 +1204,26 @@
      "proto": "AUPlanetShepherdsPride",
      "name": "Shepherds' Pride",
      "file": "cmu/shepherdspride",
-     "h": "77d429e64bb6",
+     "h": "d59051d1aa5c",
      "inRotation": true,
      "minPlayers": 0,
      "maxPlayers": 75,
      "levels": [
       {
        "depth": -1,
-       "h": "37732ce5e0c7"
+       "h": "45916230e5d2"
       },
       {
        "depth": 0,
-       "h": "77d429e64bb6"
+       "h": "d59051d1aa5c"
       },
       {
        "depth": 1,
-       "h": "4b2befb7b4ec"
+       "h": "1c28378987da"
       },
       {
        "depth": 2,
-       "h": "4491243580ae"
+       "h": "f0260c52560d"
       }
      ],
      "scenarios": []
@@ -1233,26 +1233,26 @@
      "proto": "AUPlanetSorokyne",
      "name": "Sorokyne Strata",
      "file": "cmu/sorokyne",
-     "h": "7936d99276d3",
+     "h": "fac9188c5ba4",
      "inRotation": true,
      "minPlayers": 0,
      "maxPlayers": 200,
      "levels": [
       {
        "depth": -1,
-       "h": "48bf67d0ad0d"
+       "h": "58167f098a4a"
       },
       {
        "depth": 0,
-       "h": "7936d99276d3"
+       "h": "fac9188c5ba4"
       },
       {
        "depth": 1,
-       "h": "cd364c3ada70"
+       "h": "7c961d5ecd09"
       },
       {
        "depth": 2,
-       "h": "eefb38a7fae8"
+       "h": "73600d9154b0"
       }
      ],
      "scenarios": []
@@ -1262,22 +1262,22 @@
      "proto": "AUPlanetStableGarrison",
      "name": "Stable Garrison",
      "file": "cmu/stablegarrison",
-     "h": "7204d8dad584",
+     "h": "cfb214959819",
      "inRotation": true,
      "minPlayers": 0,
      "maxPlayers": 75,
      "levels": [
       {
        "depth": -1,
-       "h": "1d57688bc767"
+       "h": "238c1fac5b85"
       },
       {
        "depth": 0,
-       "h": "7204d8dad584"
+       "h": "cfb214959819"
       },
       {
        "depth": 1,
-       "h": "76e63d587375"
+       "h": "aa8cfcbff2f5"
       }
      ],
      "scenarios": []
@@ -1287,22 +1287,22 @@
      "proto": "AUPlanetTrijent",
      "name": "Raijin Hydroelectric",
      "file": "cmu/trijent",
-     "h": "292daac5a262",
+     "h": "4be5c5643da9",
      "inRotation": true,
      "minPlayers": 0,
      "maxPlayers": 500,
      "levels": [
       {
        "depth": -1,
-       "h": "abe9a7c6dbcd"
+       "h": "6db42404f10b"
       },
       {
        "depth": 0,
-       "h": "292daac5a262"
+       "h": "4be5c5643da9"
       },
       {
        "depth": 1,
-       "h": "71c76fd3d590"
+       "h": "aa45bcd27fbb"
       }
      ],
      "scenarios": []
@@ -1312,22 +1312,22 @@
      "proto": "AuPlanetChances",
      "name": "Chances Claim",
      "file": "cmu/chances",
-     "h": "cc75176793eb",
+     "h": "775adf07b181",
      "inRotation": true,
      "minPlayers": 0,
      "maxPlayers": 75,
      "levels": [
       {
        "depth": -1,
-       "h": "b3fe1d592f2d"
+       "h": "6c8959d457cb"
       },
       {
        "depth": 0,
-       "h": "cc75176793eb"
+       "h": "775adf07b181"
       },
       {
        "depth": 1,
-       "h": "7f4cffda1253"
+       "h": "f0829312daa9"
       }
      ],
      "scenarios": []
@@ -1337,14 +1337,14 @@
      "proto": "AuPlanetFiorina",
      "name": "Fiorina Prison",
      "file": "cmu/fiorina",
-     "h": "9bd68187d222",
+     "h": "6291be067b69",
      "inRotation": true,
      "minPlayers": 0,
      "maxPlayers": 200,
      "levels": [
       {
        "depth": 0,
-       "h": "9bd68187d222"
+       "h": "6291be067b69"
       }
      ],
      "scenarios": []
@@ -1354,22 +1354,22 @@
      "proto": "AuPlanetKutjevo",
      "name": "Kutjevo Biolab",
      "file": "cmu/kutjevo",
-     "h": "abcec2a8d3a9",
+     "h": "b13d6da63fc0",
      "inRotation": true,
      "minPlayers": 0,
      "maxPlayers": 200,
      "levels": [
       {
        "depth": -1,
-       "h": "2098bd1b7015"
+       "h": "6d99389f6270"
       },
       {
        "depth": 0,
-       "h": "abcec2a8d3a9"
+       "h": "b13d6da63fc0"
       },
       {
        "depth": 1,
-       "h": "773dbefc676b"
+       "h": "e44baf2a6adf"
       }
      ],
      "scenarios": []
@@ -1379,18 +1379,18 @@
      "proto": "AuPlanetShivasSnowball",
      "name": "Shivas' Snowball",
      "file": "cmu/shivassnowball",
-     "h": "1b4fcd218e10",
+     "h": "cc2b8bdac43b",
      "inRotation": true,
      "minPlayers": 0,
      "maxPlayers": 200,
      "levels": [
       {
        "depth": -1,
-       "h": "25cd6c12a766"
+       "h": "bb0079fd026d"
       },
       {
        "depth": 0,
-       "h": "1b4fcd218e10"
+       "h": "cc2b8bdac43b"
       }
      ],
      "scenarios": []
@@ -1400,30 +1400,30 @@
      "proto": "CMUPlanetHopesRetreat",
      "name": "Hope's Retreat",
      "file": "cmu/hopesretreat",
-     "h": "e18d9db94bc5",
+     "h": "8af72394b8e0",
      "inRotation": true,
      "minPlayers": 0,
      "maxPlayers": 200,
      "levels": [
       {
        "depth": -1,
-       "h": "a44498b3d27a"
+       "h": "be26aad96c96"
       },
       {
        "depth": 0,
-       "h": "e18d9db94bc5"
+       "h": "8af72394b8e0"
       },
       {
        "depth": 1,
-       "h": "d0ecb989d088"
+       "h": "6c293c021f4d"
       },
       {
        "depth": 2,
-       "h": "f6c32281e258"
+       "h": "396fb4656512"
       },
       {
        "depth": 3,
-       "h": "d3644d675f7e"
+       "h": "095d3e7c5164"
       }
      ],
      "scenarios": []
@@ -1433,22 +1433,22 @@
      "proto": "CMUPlanetLament",
      "name": "Barker's Lament",
      "file": "cmu/lament",
-     "h": "5cf323e9ea6e",
+     "h": "bfdc0013119e",
      "inRotation": true,
      "minPlayers": 40,
      "maxPlayers": 140,
      "levels": [
       {
        "depth": -1,
-       "h": "abb26c205b27"
+       "h": "52b59142322e"
       },
       {
        "depth": 0,
-       "h": "5cf323e9ea6e"
+       "h": "bfdc0013119e"
       },
       {
        "depth": 1,
-       "h": "397faa889305"
+       "h": "f378ea294e8d"
       }
      ],
      "scenarios": []
@@ -1458,38 +1458,38 @@
      "proto": "CMUPlanetStableGarrisonRedux",
      "name": "Stable Garrison Redux",
      "file": "cmu/stablegarrisonredux",
-     "h": "4d1b5defe77f",
+     "h": "a49c04e76945",
      "inRotation": true,
      "minPlayers": 0,
      "maxPlayers": 250,
      "levels": [
       {
        "depth": -2,
-       "h": "8fe48c3103dc"
+       "h": "569af4623f84"
       },
       {
        "depth": -1,
-       "h": "8340695b4e31"
+       "h": "31264fb7d53b"
       },
       {
        "depth": 0,
-       "h": "4d1b5defe77f"
+       "h": "a49c04e76945"
       },
       {
        "depth": 1,
-       "h": "ec3ae29a5e68"
+       "h": "97134a6206cf"
       },
       {
        "depth": 2,
-       "h": "6f6640019043"
+       "h": "44a0cc7866d1"
       },
       {
        "depth": 3,
-       "h": "e4e95cdc32d4"
+       "h": "1feca7397dd8"
       },
       {
        "depth": 4,
-       "h": "e402477167e0"
+       "h": "d41f7fbd2560"
       }
      ],
      "scenarios": []
@@ -1692,14 +1692,14 @@
      "proto": "AUPlanetBosenmoriBasho",
      "name": "Bosenmori Basho",
      "file": "rucm/bosenmoribasho",
-     "h": "21c3c5064f1d",
+     "h": "a57fdb74a33b",
      "inRotation": true,
      "minPlayers": 0,
      "maxPlayers": 75,
      "levels": [
       {
        "depth": 0,
-       "h": "21c3c5064f1d"
+       "h": "a57fdb74a33b"
       }
      ],
      "scenarios": []
@@ -1709,22 +1709,22 @@
      "proto": "AUPlanetCorsatStation",
      "name": "Corsat Station",
      "file": "rucm/corsatstation",
-     "h": "bab817c1d04e",
+     "h": "5c7c11b81141",
      "inRotation": true,
      "minPlayers": 0,
      "maxPlayers": 200,
      "levels": [
       {
        "depth": -1,
-       "h": "adbe28ad104a"
+       "h": "c828965cd12c"
       },
       {
        "depth": 0,
-       "h": "bab817c1d04e"
+       "h": "5c7c11b81141"
       },
       {
        "depth": 1,
-       "h": "7c33a34aa566"
+       "h": "f55927167343"
       }
      ],
      "scenarios": []
@@ -1734,14 +1734,14 @@
      "proto": "AUPlanetFlight",
      "name": "Flight",
      "file": "rucm/flight",
-     "h": "64a0230aad86",
+     "h": "596f95ef23e6",
      "inRotation": true,
      "minPlayers": 0,
      "maxPlayers": 75,
      "levels": [
       {
        "depth": 0,
-       "h": "64a0230aad86"
+       "h": "596f95ef23e6"
       }
      ],
      "scenarios": []
@@ -1751,26 +1751,26 @@
      "proto": "AUPlanetLV327",
      "name": "Port Nereid",
      "file": "rucm/lv327",
-     "h": "08f2e14259bc",
+     "h": "859d78730333",
      "inRotation": true,
      "minPlayers": 0,
      "maxPlayers": 200,
      "levels": [
       {
        "depth": -1,
-       "h": "04556bbcf3ef"
+       "h": "5d2ff157d5f6"
       },
       {
        "depth": 0,
-       "h": "08f2e14259bc"
+       "h": "859d78730333"
       },
       {
        "depth": 1,
-       "h": "a3f4d066c2ca"
+       "h": "cd8b6f795ab8"
       },
       {
        "depth": 2,
-       "h": "fd6ea88e3217"
+       "h": "3d617a59dc58"
       }
      ],
      "scenarios": []
@@ -1780,14 +1780,14 @@
      "proto": "AUPlanetLV624",
      "name": "LV624 Green Hell",
      "file": "rucm/lv624",
-     "h": "d98c2916d11f",
+     "h": "303394153499",
      "inRotation": true,
      "minPlayers": 0,
      "maxPlayers": 65,
      "levels": [
       {
        "depth": 0,
-       "h": "d98c2916d11f"
+       "h": "303394153499"
       }
      ],
      "scenarios": []
@@ -1797,14 +1797,14 @@
      "proto": "AUPlanetLV747",
      "name": "Solaris Gulch",
      "file": "rucm/lv747",
-     "h": "1ba87b6f4d77",
+     "h": "b94e9a69d95c",
      "inRotation": true,
      "minPlayers": 0,
      "maxPlayers": 75,
      "levels": [
       {
        "depth": 0,
-       "h": "1ba87b6f4d77"
+       "h": "b94e9a69d95c"
       }
      ],
      "scenarios": []
@@ -1814,14 +1814,14 @@
      "proto": "AUPlanetLV759",
      "name": "Hybrisa Metropolitan",
      "file": "rucm/lv759",
-     "h": "7f1ded4e8406",
+     "h": "b148474a116b",
      "inRotation": true,
      "minPlayers": 0,
      "maxPlayers": 200,
      "levels": [
       {
        "depth": 0,
-       "h": "7f1ded4e8406"
+       "h": "b148474a116b"
       }
      ],
      "scenarios": []
@@ -1831,26 +1831,26 @@
      "proto": "AUPlanetShepherdsPride",
      "name": "Shepherds' Pride",
      "file": "rucm/shepherdspride",
-     "h": "557c38b17f54",
+     "h": "a8bebc4e2ab5",
      "inRotation": true,
      "minPlayers": 0,
      "maxPlayers": 75,
      "levels": [
       {
        "depth": -1,
-       "h": "46ce4569b667"
+       "h": "51c2879b5410"
       },
       {
        "depth": 0,
-       "h": "557c38b17f54"
+       "h": "a8bebc4e2ab5"
       },
       {
        "depth": 1,
-       "h": "51af50151f15"
+       "h": "9e3df8a16ce3"
       },
       {
        "depth": 2,
-       "h": "534eec2397a1"
+       "h": "4675200e0804"
       }
      ],
      "scenarios": []
@@ -1860,26 +1860,26 @@
      "proto": "AUPlanetSorokyne",
      "name": "Sorokyne Strata",
      "file": "rucm/sorokyne",
-     "h": "accd23ac172c",
+     "h": "9684c0c59c22",
      "inRotation": true,
      "minPlayers": 0,
      "maxPlayers": 200,
      "levels": [
       {
        "depth": -1,
-       "h": "e38a727ff861"
+       "h": "a021dc5fa2b4"
       },
       {
        "depth": 0,
-       "h": "accd23ac172c"
+       "h": "9684c0c59c22"
       },
       {
        "depth": 1,
-       "h": "5f42a46a8a52"
+       "h": "185d98ec5fab"
       },
       {
        "depth": 2,
-       "h": "d39f340ea719"
+       "h": "ad300f62441e"
       }
      ],
      "scenarios": []
@@ -1889,22 +1889,22 @@
      "proto": "AUPlanetStableGarrison",
      "name": "Stable Garrison",
      "file": "rucm/stablegarrison",
-     "h": "e0b20d85eb64",
+     "h": "6f4fe301a414",
      "inRotation": true,
      "minPlayers": 0,
      "maxPlayers": 75,
      "levels": [
       {
        "depth": -1,
-       "h": "25bde2e69b08"
+       "h": "81c0fa83769a"
       },
       {
        "depth": 0,
-       "h": "e0b20d85eb64"
+       "h": "6f4fe301a414"
       },
       {
        "depth": 1,
-       "h": "37fd0702269e"
+       "h": "fd4335c3e178"
       }
      ],
      "scenarios": []
@@ -1914,22 +1914,22 @@
      "proto": "AUPlanetTrijent",
      "name": "Raijin Hydroelectric",
      "file": "rucm/trijent",
-     "h": "7add3df25639",
+     "h": "78ebd17fb7f8",
      "inRotation": true,
      "minPlayers": 0,
      "maxPlayers": 500,
      "levels": [
       {
        "depth": -1,
-       "h": "90e734c02e14"
+       "h": "cfe27a3bac16"
       },
       {
        "depth": 0,
-       "h": "7add3df25639"
+       "h": "78ebd17fb7f8"
       },
       {
        "depth": 1,
-       "h": "ea198839cb97"
+       "h": "ed73ddff820e"
       }
      ],
      "scenarios": []
@@ -1939,22 +1939,22 @@
      "proto": "AuPlanetChances",
      "name": "Chances Claim",
      "file": "rucm/chances",
-     "h": "66cd8bab4555",
+     "h": "b39144d9ef88",
      "inRotation": true,
      "minPlayers": 0,
      "maxPlayers": 75,
      "levels": [
       {
        "depth": -1,
-       "h": "420c14380654"
+       "h": "7ae53f3de93a"
       },
       {
        "depth": 0,
-       "h": "66cd8bab4555"
+       "h": "b39144d9ef88"
       },
       {
        "depth": 1,
-       "h": "73929d186c4d"
+       "h": "d1b79fd5cc1f"
       }
      ],
      "scenarios": []
@@ -1964,14 +1964,14 @@
      "proto": "AuPlanetFiorina",
      "name": "Fiorina Prison",
      "file": "rucm/fiorina",
-     "h": "5433306afea4",
+     "h": "c4aed9ac1782",
      "inRotation": true,
      "minPlayers": 0,
      "maxPlayers": 200,
      "levels": [
       {
        "depth": 0,
-       "h": "5433306afea4"
+       "h": "c4aed9ac1782"
       }
      ],
      "scenarios": []
@@ -1981,22 +1981,22 @@
      "proto": "AuPlanetKutjevo",
      "name": "Kutjevo Biolab",
      "file": "rucm/kutjevo",
-     "h": "77d090bd461e",
+     "h": "25a3d21b508f",
      "inRotation": true,
      "minPlayers": 0,
      "maxPlayers": 200,
      "levels": [
       {
        "depth": -1,
-       "h": "b428d062f671"
+       "h": "caade5a4a938"
       },
       {
        "depth": 0,
-       "h": "77d090bd461e"
+       "h": "25a3d21b508f"
       },
       {
        "depth": 1,
-       "h": "cd88c8db2d12"
+       "h": "6416de8cbd6e"
       }
      ],
      "scenarios": []
@@ -2006,18 +2006,18 @@
      "proto": "AuPlanetShivasSnowball",
      "name": "Shivas' Snowball",
      "file": "rucm/shivassnowball",
-     "h": "8fced905bf3b",
+     "h": "eb880d91cb3c",
      "inRotation": true,
      "minPlayers": 0,
      "maxPlayers": 200,
      "levels": [
       {
        "depth": -1,
-       "h": "46917b8f5571"
+       "h": "ef9bfa5303d2"
       },
       {
        "depth": 0,
-       "h": "8fced905bf3b"
+       "h": "eb880d91cb3c"
       }
      ],
      "scenarios": []
@@ -2027,30 +2027,30 @@
      "proto": "CMUPlanetHopesRetreat",
      "name": "Hope's Retreat",
      "file": "rucm/hopesretreat",
-     "h": "a5669741721e",
+     "h": "f9abe9826d67",
      "inRotation": true,
      "minPlayers": 0,
      "maxPlayers": 200,
      "levels": [
       {
        "depth": -1,
-       "h": "f133f8daee35"
+       "h": "83b0f2915ee8"
       },
       {
        "depth": 0,
-       "h": "a5669741721e"
+       "h": "f9abe9826d67"
       },
       {
        "depth": 1,
-       "h": "ba19b65b4e50"
+       "h": "5116bd208af5"
       },
       {
        "depth": 2,
-       "h": "93b546e60cee"
+       "h": "bcdc83688a7f"
       },
       {
        "depth": 3,
-       "h": "f7fc74f5b311"
+       "h": "4071be9fb2ff"
       }
      ],
      "scenarios": []
@@ -2060,22 +2060,22 @@
      "proto": "CMUPlanetLament",
      "name": "Barker's Lament",
      "file": "rucm/lament",
-     "h": "3d6516662d71",
+     "h": "13a7588af714",
      "inRotation": true,
      "minPlayers": 40,
      "maxPlayers": 140,
      "levels": [
       {
        "depth": -1,
-       "h": "c5aaa3528493"
+       "h": "8ddf4572501c"
       },
       {
        "depth": 0,
-       "h": "3d6516662d71"
+       "h": "13a7588af714"
       },
       {
        "depth": 1,
-       "h": "63b1eef41181"
+       "h": "f1c96d603b5d"
       }
      ],
      "scenarios": []
@@ -2085,38 +2085,38 @@
      "proto": "CMUPlanetStableGarrisonRedux",
      "name": "Stable Garrison Redux",
      "file": "rucm/stablegarrisonredux",
-     "h": "b6dd4a43cce9",
+     "h": "ca488cdd0a21",
      "inRotation": true,
      "minPlayers": 0,
      "maxPlayers": 250,
      "levels": [
       {
        "depth": -2,
-       "h": "80e3cdd5973e"
+       "h": "8cd4281b5015"
       },
       {
        "depth": -1,
-       "h": "ceb8077a1133"
+       "h": "245d8deddbda"
       },
       {
        "depth": 0,
-       "h": "b6dd4a43cce9"
+       "h": "ca488cdd0a21"
       },
       {
        "depth": 1,
-       "h": "7d2f634a099e"
+       "h": "539e009c1504"
       },
       {
        "depth": 2,
-       "h": "0159ba807a71"
+       "h": "d1ab6f7b4437"
       },
       {
        "depth": 3,
-       "h": "92c83e870e9f"
+       "h": "fdbe9452ce6d"
       },
       {
        "depth": 4,
-       "h": "dea3827d83c0"
+       "h": "87256b443211"
       }
      ],
      "scenarios": []

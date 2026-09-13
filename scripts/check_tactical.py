@@ -25,12 +25,14 @@ DATA = ROOT / "tactical"
 
 # LV-624 at the commits the research used (tiles that carry an area, per flag).
 GOLDEN = {
-    ("rmc14", "57112b967"): {"areas": 75, "labels": 21,
+    ("rmc14", "c82d001cc"): {"areas": 75, "labels": 21,
                               "flags": {"OB": 38850, "CAS": 19392, "mortarFire": 19381,
-                                        "mortarPlacement": 15982, "supplyDrop": 19381}},
+                                        "mortarPlacement": 15982, "supplyDrop": 19381},
+                              "inserts": {"Corporate Dome": 0.1, "CLF ship": 0.0, "Nexus Barricaded": 0.3, "Hydro Destroyed": 0.3, "Medbay": 0.1, "Together Surv Spawn": 0.9}},
     ("stories_cm", "024d853a1"): {"areas": 75, "labels": 21,
                                    "flags": {"OB": 38850, "CAS": 19392, "mortarFire": 19381,
-                                             "mortarPlacement": 15982, "supplyDrop": 19381}},
+                                             "mortarPlacement": 15982, "supplyDrop": 19381},
+                                   "inserts": {"Corporate Dome": 0.1, "CLF ship": 0.0, "Nexus Barricaded": 0.3, "Hydro Destroyed": 0.3, "Medbay": 0.1, "Together Surv Spawn": 0.9}},
 }
 FLAG_BITS = {"OB": 1, "CAS": 2, "mortarFire": 4, "mortarPlacement": 8, "supplyDrop": 16, "landingZone": 32, "lasing": 64}
 MORTAR_KEYS = {"minRange", "maxRange", "maxDial", "maxTarget", "tilesPerOffset", "jitter", "targetDelay",
@@ -138,6 +140,22 @@ def check_planet(fork: dict, meta: dict) -> None:
                     and all(isinstance(v, (int, float)) for v in label[1:])):
                 fail(f"{where_lv}: malformed label {label!r}")
                 break
+        for ins in planet.get("inserts") or []:
+            ok = (isinstance(ins, dict) and isinstance(ins.get("name"), str)
+                  and all(isinstance(ins.get(k), (int, float)) for k in ("x", "y", "p")) and 0 <= ins["p"] <= 1
+                  and isinstance(ins.get("zones"), list) and ins["zones"])
+            if ok:
+                for z in ins["zones"]:
+                    bnd = z.get("bounds") if isinstance(z, dict) else None
+                    if not (isinstance(bnd, dict) and all(isinstance(bnd.get(k), int) for k in ("minX", "minY", "maxX", "maxY"))
+                            and bnd["minX"] <= bnd["maxX"] and bnd["minY"] <= bnd["maxY"]
+                            and isinstance(z.get("p"), (int, float)) and 0 <= z["p"] <= 1
+                            and isinstance(z.get("tiles"), int) and z["tiles"] > 0):
+                        ok = False
+                        break
+            if not ok:
+                fail(f"{where_lv}: malformed insert {str(ins)[:80]!r}")
+                break
         stored_h = planet.pop("h", None)
         body = json.dumps(planet, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
         h = hashlib.sha1(body + raw_png).hexdigest()[:12]
@@ -147,12 +165,39 @@ def check_planet(fork: dict, meta: dict) -> None:
         if golden and meta["id"] == "lv624" and depth == 0:
             planet["h"] = stored_h
             counts = flag_counts(planet)
+            odds = {i["name"]: i["p"] for i in planet.get("inserts") or []}
             got = {"areas": len(areas), "labels": len(planet["labels"]),
-                   "flags": {k: counts[k] for k in golden["flags"]}}
+                   "flags": {k: counts[k] for k in golden["flags"]},
+                   "inserts": {k: odds.get(k) for k in golden["inserts"]}}
             if got != golden:
                 fail(f"{where}: golden mismatch {got} vs {golden}")
             else:
                 print(f"ok   {where} matches the research numbers")
+
+
+def check_variation_odds(odds) -> None:
+    """Synthetic replays of MapInsertSystem with mixed scenario tags (T10 DoD)."""
+    v = lambda p, scenario=None: {"p": p, "scenario": scenario}  # noqa: E731
+    cases = [
+        # two survivor spawns without tags: each keeps its own probability
+        ([v(0.45), v(0.45)], [], [0.45, 0.45]),
+        # scenario-only variation: never without the scenario, its share with it
+        ([v(1.0, "clf_ship")], [], [0.0]),
+        ([v(1.0, "clf_ship")], [{"name": "clf_ship", "p": 0.25}], [0.25]),
+        # tagged variation in the middle: skipped without the scenario, its mass
+        # falls to the next eligible variation (cumulative still advances)
+        ([v(0.3), v(0.3, "x"), v(0.4)], [{"name": "x", "p": 0.5}], [0.3, 0.15, 0.55]),
+        # probabilities past 1.0 are clipped, the tail can never be reached
+        ([v(0.7), v(0.5), v(0.2)], [], [0.7, 0.3, 0.0]),
+        # scenario weights are clipped at 1.0 in registration order; with "b" active the
+        # skipped "a" variation still moves the cumulative, so "b" collects its mass too
+        ([v(0.5, "a"), v(0.5, "b")], [{"name": "a", "p": 0.8}, {"name": "b", "p": 0.8}], [0.4, 0.2]),
+    ]
+    for variations, scenarios, expected in cases:
+        got = odds(variations, scenarios)
+        if any(abs(g - e) > 1e-9 for g, e in zip(got, expected)) or len(got) != len(expected):
+            fail(f"variation_odds({variations}, {scenarios}) = {got}, expected {expected}")
+    print("ok   variation_odds: synthetic scenarios")
 
 
 def main() -> int:
@@ -173,6 +218,8 @@ def main() -> int:
         mirror = ss14_tactical.MIRROR
     except Exception as e:  # pragma: no cover - CI without the extractor's packages
         print(f"note mirror comparison skipped ({type(e).__name__}: {e})")
+    if mirror is not None:
+        check_variation_odds(ss14_tactical.variation_odds)
     for fork in forks:
         key = fork.get("key")
         if not re.fullmatch(r"[0-9a-f]{40}", (fork.get("source") or {}).get("sha", "")):

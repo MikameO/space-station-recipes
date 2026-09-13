@@ -412,11 +412,11 @@ test('T4: where the shell can land — aim error plus jitter, none in laser mode
 
 test('T4: page prefs migrate strictly, layers keep their defaults', () => {
   const d = L.migratePrefs(null);
-  assert.deepStrictEqual(d, { v: 1, weapon: 'mortar', shell: null, warhead: null, hitRadius: {}, layers: { fire: true, deploy: false, rings: true, zone: true, markers: true, grid: true }, timerFrom: 'fire' });
+  assert.deepStrictEqual(d, { v: 1, weapon: 'mortar', shell: null, warhead: null, hitRadius: {}, layers: { fire: true, deploy: false, rings: true, zone: true, markers: true, grid: true, inserts: true }, timerFrom: 'fire' });
   const p = L.migratePrefs({ v: 1, weapon: 'ob', shell: 'RMCMortarShellHE', hitRadius: { RMCMortarShellHE: 4.5, bad: 'x', huge: 500 },
     layers: { fire: false, nope: true, rings: 'yes' }, junk: 1 });
   assert.deepStrictEqual(p, { v: 1, weapon: 'ob', shell: 'RMCMortarShellHE', warhead: null, hitRadius: { RMCMortarShellHE: 4.5 }, timerFrom: 'fire',
-    layers: { fire: false, deploy: false, rings: true, zone: true, markers: true, grid: true } });
+    layers: { fire: false, deploy: false, rings: true, zone: true, markers: true, grid: true, inserts: true } });
   assert.strictEqual(L.migratePrefs({ v: 2, weapon: 'ob' }).weapon, 'mortar');
 });
 
@@ -540,6 +540,26 @@ test('T9: grid lines fall on round in-game numbers; the ruler measures centre to
   assert.deepStrictEqual(L.gridLines(-87, 87, 50, 212), [-62, -12, 38, 88].filter((v) => v <= 87));
   assert.deepStrictEqual(L.gridLines(-20, 20, 10, 0), [-20, -10, 0, 10, 20]);
   assert.deepStrictEqual(L.rulerDistance([20, -98], [62, -62]), { tiles: Math.sqrt(42 * 42 + 36 * 36), dx: 42, dy: 36 });
+});
+
+test('T10: insert zones under a tile carry their odds', () => {
+  const b = { minX: 0, minY: 0, maxX: 9, maxY: 9 };
+  const rows = (fn) => { const r = []; for (let y = b.maxY; y >= b.minY; y--) { const line = []; for (let x = b.minX; x <= b.maxX; x++) line.push(fn(x, y)); r.push(rle(line)); } return r; };
+  const pl = L.preparePlanet({ schemaVersion: 1, fork: 't', planet: 't', level: 0, bounds: b, areas: [['open', 'Open', null, OPEN]],
+    grid: rows(() => 1), masks: { blocked: rows(() => 0), hardWall: rows(() => 0) }, labels: [],
+    inserts: [{ name: 'Nexus', x: 4.5, y: 4.5, p: 0.4, zones: [
+      { p: 0.3, scenario: null, file: 'a.yml', bounds: { minX: 2, minY: 2, maxX: 6, maxY: 6 }, tiles: 25 },
+      { p: 0.1, scenario: 'asset_protection', file: 'b.yml', bounds: { minX: 5, minY: 5, maxX: 8, maxY: 8 }, tiles: 16 },
+      { p: 0, scenario: null, file: 'c.yml', bounds: { minX: 0, minY: 0, maxX: 9, maxY: 9 }, tiles: 100 } ] }] });
+  assert.deepStrictEqual(L.insertsAt(pl, 3, 3), [{ name: 'Nexus', p: 0.3, parts: [] }]);
+  assert.deepStrictEqual(L.insertsAt(pl, 6, 6), [{ name: 'Nexus', p: 0.4, parts: [{ scenario: 'asset_protection', p: 0.1 }] }]);
+  assert.deepStrictEqual(L.insertsAt(pl, 9, 0), []);                          // a zone with odds 0 never shows
+  // variants sharing one footprint (Armory looted/extra/cheese) draw as one box with the summed odds
+  const armory = { name: 'Armory', x: 1.5, y: 1.5, p: 0.3, zones: [0.1, 0.1, 0.1].map((p, i) => (
+    { p, scenario: null, file: 'a' + i + '.yml', bounds: { minX: 1, minY: 1, maxX: 3, maxY: 3 }, tiles: 9 }))};
+  const pl2 = L.preparePlanet(Object.assign({}, pl.json, { inserts: pl.json.inserts.concat([armory]) }));
+  assert.deepStrictEqual(L.insertBoxes(pl2).map((b) => [b.name, b.p, b.bounds.minX]), [['Nexus', 0.3, 2], ['Nexus', 0.1, 5], ['Armory', 0.3, 1]]);
+  assert.deepStrictEqual(L.insertsAt(pl2, 2, 2), [{ name: 'Nexus', p: 0.3, parts: [] }, { name: 'Armory', p: 0.3, parts: [] }]);
 });
 
 test('stored planet state: foreign or inconsistent shapes are dropped', () => {

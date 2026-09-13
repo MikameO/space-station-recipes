@@ -484,8 +484,8 @@
   // Page preferences shared by every planet: weapon, shell, a player's own hit
   // radius per shell, and which layers are on. Unknown keys are dropped.
   var PREFS_VERSION = 1;
-  var LAYER_KEYS = ['fire', 'deploy', 'rings', 'zone', 'markers', 'grid'];
-  var DEFAULT_LAYERS = { fire: true, deploy: false, rings: true, zone: true, markers: true, grid: true };
+  var LAYER_KEYS = ['fire', 'deploy', 'rings', 'zone', 'markers', 'grid', 'inserts'];
+  var DEFAULT_LAYERS = { fire: true, deploy: false, rings: true, zone: true, markers: true, grid: true, inserts: true };
 
   // ── grid and ruler ───────────────────────────────────────────────────────
 
@@ -617,6 +617,43 @@
     return (label ? label + ' ' : '') + conv([item.x, item.y]);
   }
 
+  // Variable insert zones covering a tile: the planet's MapInsert markers whose
+  // variation footprints contain it, with the odds the round shows them.
+  // Inserts whose variants can change the tile: one entry per marker with the
+  // summed odds of the variants covering the tile and, apart, the share that
+  // needs a scenario tag ('none' is the game's tag for "no special scenario").
+  function insertsAt(planet, x, y) {
+    var out = [];
+    (planet.json.inserts || []).forEach(function (ins) {
+      var p = 0, parts = {};
+      ins.zones.forEach(function (z) {
+        var b = z.bounds;
+        if (!(z.p > 0) || x < b.minX || x > b.maxX || y < b.minY || y > b.maxY) return;
+        p += z.p;
+        if (z.scenario) parts[z.scenario] = (parts[z.scenario] || 0) + z.p;
+      });
+      if (p > 0) out.push({ name: ins.name, p: Math.min(1, Math.round(p * 1e4) / 1e4),
+        parts: Object.keys(parts).map(function (s) { return { scenario: s, p: Math.round(parts[s] * 1e4) / 1e4 }; }) });
+    });
+    return out;
+  }
+
+  // Variant rectangles for drawing: variants of one marker that share a footprint
+  // are one hatched box labelled with their summed odds.
+  function insertBoxes(planet) {
+    var out = [];
+    (planet.json.inserts || []).forEach(function (ins) {
+      var byKey = {};
+      ins.zones.forEach(function (z) {
+        if (!(z.p > 0)) return;
+        var b = z.bounds, key = [b.minX, b.minY, b.maxX, b.maxY].join(',');
+        if (!byKey[key]) { byKey[key] = { name: ins.name, bounds: b, p: 0 }; out.push(byKey[key]); }
+        byKey[key].p = Math.min(1, Math.round((byKey[key].p + z.p) * 1e4) / 1e4);
+      });
+    });
+    return out;
+  }
+
   function shapeCentre(points) {
     var sx = 0, sy = 0;
     points.forEach(function (p) { sx += p[0] + 0.5; sy += p[1] + 0.5; });
@@ -666,6 +703,8 @@
     validShape: validShape,
     chatText: chatText,
     shapeCentre: shapeCentre,
+    insertsAt: insertsAt,
+    insertBoxes: insertBoxes,
     impactBox: impactBox,
     shotState: shotState,
     obState: obState,

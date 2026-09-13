@@ -296,6 +296,7 @@ body.tac-body {
 
 .tac-ruler { font-family: ui-monospace, "Cascadia Mono", Consolas, monospace; font-size: 15px; color: var(--text-bright); }
 
+.tac-hover-insert { color: var(--amber); font-size: 12px; }
 .tac-hover-fire { font-size: 12px; margin-top: 2px; }
 .tac-hover-fire.ok { color: var(--phosphor); }
 .tac-hover-fire.bad { color: var(--red-alert); }

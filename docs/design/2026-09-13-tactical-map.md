@@ -362,7 +362,7 @@ MIRRORED SOURCES (как `ss14_ordnance.py`). При сборке экстрак
 | `grid` | строки сверху вниз, `[индекс, длина, …]`; индекс 1-based в `areas`, 0 — нет тайла |
 | `masks` | `blocked`, `hardWall` — RLE-строки из 0/1; у семейства CMU ещё `columnMortar`, `columnOb` — XY, где удар разрешён каждой поверхностью колонны (правило `CMUTopDownOrdnanceSystem`: проём — пустой тайл, прозрачных тайлов в CMU нет), и `openSky` — тайлы этажа, над которыми нет тайлов выше (миномёт разворачивается только под открытым небом) |
 | `labels` | `[[текст, x, y]]` — мировые координаты |
-| `inserts` (T10) | `[{id, name, cells, variants: [{spawn, p, scenario, replaceAreas}]}]` |
+| `inserts` (T10) | `[{name, x, y, p, zones: [{p, scenario, file, bounds, tiles}]}]` — маркер `MapInsert` (мировые координаты), `p` — вероятность, что на месте что-то появится (сумма по зонам); у зоны `p` — вероятность именно этого варианта по повтору `SelectMapScenario` + `ProcessMapInsert` с весами сценариев планеты, `scenario` — тег варианта или `null`, `bounds` — прямоугольник тайлов файла вставки в позиции `(int)(маркер − 0,5 + смещение)`, `tiles` — число непустых тайлов в нём; варианты с `p` = 0 остаются в файле, страница их не рисует |
 | `landmarks` (T11) | `protos: [[proto, name, category, reliable]]`, `items: [[x, y, protoIndex, rot]]` |
 | `column` (T8, CMU) | маски разрешения по колонне для миномёта и ОБ, этаж детонации ОБ, открытое небо (при необходимости `schemaVersion` 2) |
 

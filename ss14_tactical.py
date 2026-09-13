@@ -281,12 +281,14 @@ for _path, _blob in CMU_REVIEWED.items():
 # Research snapshot of LV-624 (docs/design/2026-09-13-tactical-map.md, «Верификация»),
 # checked only when the build runs at the same commit.
 GOLDEN = {
-    ("rmc14", "57112b967"): {"lv624": {"tiles": 38850, "areas": 75, "labels": 21,
+    ("rmc14", "c82d001cc"): {"lv624": {"tiles": 38850, "areas": 75, "labels": 21,
                                         "flags": {"OB": 38850, "CAS": 19392, "mortarFire": 19381,
-                                                  "mortarPlacement": 15982, "supplyDrop": 19381}}},
+                                                  "mortarPlacement": 15982, "supplyDrop": 19381},
+                                        "inserts": {"Corporate Dome": 0.1, "CLF ship": 0.0, "Nexus Barricaded": 0.3, "Hydro Destroyed": 0.3, "Medbay": 0.1, "Together Surv Spawn": 0.9}}},
     ("stories_cm", "024d853a1"): {"lv624": {"tiles": 38850, "areas": 75, "labels": 21,
                                              "flags": {"OB": 38850, "CAS": 19392, "mortarFire": 19381,
-                                                       "mortarPlacement": 15982, "supplyDrop": 19381}}},
+                                                       "mortarPlacement": 15982, "supplyDrop": 19381},
+                                             "inserts": {"Corporate Dome": 0.1, "CLF ship": 0.0, "Nexus Barricaded": 0.3, "Hydro Destroyed": 0.3, "Medbay": 0.1, "Together Surv Spawn": 0.9}}},
 }
 
 FLAG_BITS = [("OB", 1), ("CAS", 2), ("mortarFire", 4), ("mortarPlacement", 8),
@@ -355,6 +357,14 @@ class Checkout:
         run_git(["config", "core.sparseCheckoutCone", "false"], cwd=self.dir)
         run_git(["checkout", "-q", "--force", "--detach", self.sha], cwd=self.dir)
         run_git(["read-tree", "-mu", "HEAD"], cwd=self.dir)   # re-apply a changed pattern list
+
+    def checkout_more(self, patterns: list[str]) -> None:
+        """Add paths to the sparse checkout (insert grids are discovered while building)."""
+        info = self.dir / ".git" / "info" / "sparse-checkout"
+        have = info.read_text(encoding="utf-8").split("\n") if info.is_file() else []
+        new = [p for p in patterns if p not in have]
+        if new:
+            self.checkout([p for p in have if p] + new)
 
     def read(self, path: str) -> str:
         p = self.dir / path
@@ -780,7 +790,8 @@ def rle_rows(width: int, height: int, value_at) -> list[list[int]]:
 
 
 def build_planet(fork: str, planet: dict, parsed: dict, protos: Protos, impassable: set[str],
-                 area_keys: set[str], level: int = 0, column: dict | None = None) -> tuple[dict, bytes, dict]:
+                 area_keys: set[str], level: int = 0, column: dict | None = None,
+                 inserts: list[dict] | None = None) -> tuple[dict, bytes, dict]:
     """One level of a planet. `column`, for multi-level families, holds the XY sets a
     strike may hit through the whole stack (`mortar`, `ob`) and the tiles of this level
     with nothing above them (`openSky`)."""
@@ -896,6 +907,7 @@ def build_planet(fork: str, planet: dict, parsed: dict, protos: Protos, impassab
         "grid": grid,
         "masks": masks,
         "labels": labels,
+        "inserts": inserts or [],
     }
     body = json.dumps(data, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
     data["h"] = hashlib.sha1(body + png).hexdigest()[:12]
@@ -912,6 +924,7 @@ def build_planet(fork: str, planet: dict, parsed: dict, protos: Protos, impassab
     }
     if column is not None:
         stats["column"] = {key: sum(1 for t in tiles if t in column[key]) for key in ("columnMortar", "columnOb", "openSky")}
+    stats["inserts"] = {i["name"]: i["p"] for i in inserts or []}
     return data, png, stats
 
 
@@ -1051,6 +1064,114 @@ def ob_warheads(protos: Protos) -> list[dict]:
     return out
 
 
+# ── map inserts (T10) ────────────────────────────────────────────────────────
+
+def insert_variations(protos: Protos, proto: str) -> list[dict]:
+    """The MapInsert variations of a marker prototype, in list order."""
+    out = []
+    for v in protos.comp_field(proto, "MapInsert", "variations") or []:
+        if not isinstance(v, dict) or not v.get("spawn"):
+            continue
+        off = str(v.get("offset") or "0,0").split(",")
+        out.append({
+            "spawn": str(v["spawn"]),
+            "p": float(v.get("probability", 1.0)),
+            "scenario": str(v.get("nightmareScenario") or ""),
+            "offset": (float(off[0]), float(off[1]) if len(off) > 1 else 0.0),
+        })
+    return out
+
+
+def variation_odds(variations: list[dict], scenarios: list[dict]) -> list[float]:
+    """Mirror of MapInsertSystem: SelectMapScenario picks the first scenario whose
+    cumulative probability reaches the roll (the remainder is "no scenario");
+    ProcessMapInsert then walks the variations, adding every probability to the
+    cumulative but stopping only at one whose scenario tag is empty or equals the
+    round's, once the cumulative reaches a second roll. A tagged variation that is
+    skipped still moves the cumulative, so its mass falls to the next eligible one."""
+    weights = []
+    cum = 0.0
+    for s in scenarios:
+        share = max(0.0, min(s["p"], 1.0 - cum))
+        weights.append((s["name"], share))
+        cum += share
+    weights.append(("", max(0.0, 1.0 - cum)))
+    odds = [0.0] * len(variations)
+    for active, weight in weights:
+        if weight <= 0:
+            continue
+        cumulative, last_eligible = 0.0, 0.0
+        for i, v in enumerate(variations):
+            cumulative += v["p"]
+            if v["scenario"] and v["scenario"] != active:
+                continue
+            reach = min(cumulative, 1.0)
+            odds[i] += weight * max(0.0, reach - last_eligible)
+            last_eligible = reach
+            if reach >= 1.0:
+                break
+    return [round(o, 4) for o in odds]
+
+
+def planet_inserts(protos: Protos, parsed: dict, planet: dict, co: Checkout, fam: dict,
+                   footprints: dict[str, dict | None]) -> list[dict]:
+    """Every MapInsert marker on the surface with its variations' odds and footprints
+    (the insert grid's tiles placed at (int)(marker − 0.5 + offset), as the game does)."""
+    out = []
+    for e in parsed["entities"]:
+        try:
+            variations = insert_variations(protos, e["proto"]) if protos.comp(e["proto"], "MapInsert") else []
+        except TacticalError:
+            continue
+        if not variations:
+            continue
+        odds = variation_odds(variations, planet["scenarios"])
+        zones = []
+        for v, odd in zip(variations, odds):
+            fp = footprints.get(v["spawn"])
+            if fp is None:
+                fp = footprints[v["spawn"]] = insert_footprint(co, fam, v["spawn"])
+            if fp is None:
+                continue
+            cx = int(e["x"] - 0.5 + v["offset"][0])
+            cy = int(e["y"] - 0.5 + v["offset"][1])
+            zones.append({
+                "p": odd, "scenario": v["scenario"] or None,
+                "file": v["spawn"].rsplit("/", 1)[-1],
+                "bounds": {"minX": cx + fp["minX"], "minY": cy + fp["minY"], "maxX": cx + fp["maxX"], "maxY": cy + fp["maxY"]},
+                "tiles": fp["tiles"],
+            })
+        if not zones:
+            continue
+        out.append({
+            "name": protos.name(e["proto"]),
+            "x": round(e["x"], 2), "y": round(e["y"], 2),
+            "p": round(min(1.0, sum(z["p"] for z in zones)), 4),
+            "zones": zones,
+        })
+    return sorted(out, key=lambda i: (i["name"], i["x"], i["y"]))
+
+
+def insert_footprint(co: Checkout, fam: dict, spawn: str) -> dict | None:
+    """Bounds of an insert grid's tiles relative to its origin, or None when the fork
+    does not ship the file (the game would fail to load that variation too)."""
+    path = next((f"{root}{spawn}" for root in fam["map_roots"] if co.exists(f"{root}{spawn}")), None)
+    if path is None:
+        print(f"    WARNING insert {spawn} is not in the repository — variation ignored", flush=True)
+        return None
+    try:
+        parsed = parse_map(co.read(path), path, allow_no_areas=True)
+    except TacticalError as e:
+        print(f"    WARNING insert {spawn}: {e}", flush=True)
+        return None
+    tiles = parsed["tiles"]
+    if not tiles:
+        return None
+    xs = [t[0] for t in tiles]
+    ys = [t[1] for t in tiles]
+    return {"minX": min(xs), "minY": min(ys), "maxX": max(xs), "maxY": max(ys), "tiles": len(tiles)}
+
+
 def review_list(co: Checkout, family: str) -> list[dict]:
     out = []
     for path in FAMILIES[family]["code_files"]:
@@ -1097,7 +1218,19 @@ def build_fork(fork: str, out_dir: Path, only_planet: str | None = None, sha: st
         planets = [p for p in planets if p["id"] == only_planet]
         if not planets:
             raise TacticalError(f"{fork}: no rotation planet {only_planet!r}")
-    co.checkout(base + [f"/{lv['map']}" for p in planets for lv in p["levels"]])
+    insert_paths = set()
+    for pid in protos.ents:
+        try:
+            variations = insert_variations(protos, pid) if protos.comp(pid, "MapInsert") else []
+        except TacticalError:
+            continue
+        for v in variations:
+            found = next((f"{root}{v['spawn']}" for root in family["map_roots"] if co.exists(f"{root}{v['spawn']}")), None)
+            if found:
+                insert_paths.add(found)
+    co.checkout(base + [f"/{lv['map']}" for p in planets for lv in p["levels"]] + sorted(f"/{ip}" for ip in insert_paths))
+    if insert_paths:
+        print(f"  {len(insert_paths)} insert grids", flush=True)
 
     impassable = impassable_layers(co.read("Content.Shared/Physics/CollisionGroup.cs"))
     area_keys = area_component_keys(co.read("Content.Shared/_RMC14/Areas/AreaComponent.cs"))
@@ -1127,14 +1260,18 @@ def build_fork(fork: str, out_dir: Path, only_planet: str | None = None, sha: st
         if multi_level:
             columns = column_masks([(d, parsed, area_flags(protos, parsed)) for d, parsed in parsed_levels])
         level_entries = []
+        footprints: dict[str, dict | None] = {}
         for depth, parsed in parsed_levels:
+            inserts = planet_inserts(protos, parsed, planet, co, family, footprints) if depth == 0 else None
             data, png, stats = build_planet(fork, planet, parsed, protos, impassable, area_keys, depth,
-                                            columns[depth] if columns else None)
+                                            columns[depth] if columns else None, inserts)
             stem = planet["id"] if depth == 0 else f"{planet['id']}.{depth}"
             (fork_dir / f"{stem}.png").write_bytes(png)
             (fork_dir / f"{stem}.json").write_text(
                 json.dumps(data, ensure_ascii=False, separators=(",", ":")) + "\n", encoding="utf-8")
             extra = f" column={stats['column']}" if "column" in stats else ""
+            if stats.get("inserts"):
+                extra += f" inserts={stats['inserts']}"
             print(f"    [{depth:+d}] {stats['size'][0]}x{stats['size'][1]} tiles={stats['tiles']} areas={stats['areas']} "
                   f"labels={stats['labels']} blocked={stats['blocked']} hardWall={stats['hardWall']} "
                   f"flags={stats['flags']}{extra} png={len(png)}B h={data['h']}", flush=True)
