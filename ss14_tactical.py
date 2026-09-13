@@ -94,6 +94,9 @@ RMC_CODE_FILES = [
     "Content.Shared/_RMC14/SupplyDrop/SharedSupplyDropSystem.cs",
     "Content.Server/_RMC14/MapInsert/MapInsertSystem.cs",
     "Content.Shared/Physics/CollisionGroup.cs",
+    # Shell hit zones: blast radius from Explosive fields, fire radius from TileFireOnTrigger.
+    "Content.Server/Explosion/EntitySystems/ExplosionSystem.cs",
+    "Content.Shared/_RMC14/Atmos/TileFireOnTriggerComponent.cs",
 ]
 
 FAMILIES = {
@@ -111,6 +114,8 @@ FAMILIES = {
 # build is listed under `review` in index.json and printed as REVIEW.
 REVIEWED_BLOBS = {
     # RMC-14 57112b9, read 2026-09-13
+    "Content.Server/Explosion/EntitySystems/ExplosionSystem.cs": ["ceefaebb9e14f335e4588004bfa1d1f3a32c4e5e"],
+    "Content.Shared/_RMC14/Atmos/TileFireOnTriggerComponent.cs": ["0026b06deb5b07a930197aedd9ca202ab14da2a7"],
     "Content.Shared/_RMC14/Mortar/MortarComponent.cs": ["a63ffb14f2fd63ac47ac7a6b4fad836a763d2963"],
     "Content.Shared/_RMC14/Mortar/MortarShellComponent.cs": ["60976acf6b2792ee0482a82d0cad75330c9d4fbd"],
     "Content.Shared/_RMC14/Mortar/ActiveMortarShellComponent.cs": ["7950b973a935bfa741cd85825b0ab07a9c2b0aff"],
@@ -140,6 +145,7 @@ MIRROR = {
             "targetDelay": 3.0, "deployDelay": 4.0, "loadDelay": 1.5,
             "travelDelay": 4.5, "impactWarningDelay": 2.5, "impactDelay": 4.5,
             "warnRange": 15, "impactWarnRange": 10,
+            "tileFireRange": 2,   # TileFireOnTriggerComponent.Range default; shells override it
         },
         "ob": {
             "scatter": [-3, 2],
@@ -155,9 +161,11 @@ _SHELL = "Content.Shared/_RMC14/Mortar/MortarShellComponent.cs"
 _ACTIVE = "Content.Shared/_RMC14/Mortar/ActiveMortarShellComponent.cs"
 _CANNON = "Content.Shared/_RMC14/OrbitalCannon/OrbitalCannonComponent.cs"
 _FIRING = "Content.Shared/_RMC14/OrbitalCannon/OrbitalCannonFiringComponent.cs"
+_TILEFIRE = "Content.Shared/_RMC14/Atmos/TileFireOnTriggerComponent.cs"
 
 # (file, C# field, path into the family mirror)
 FIELD_CHECKS = [
+    (_TILEFIRE, "Range", ("mortar", "tileFireRange")),
     (_MORTAR, "MinimumRange", ("mortar", "minRange")),
     (_MORTAR, "MaximumRange", ("mortar", "maxRange")),
     (_MORTAR, "MaxDial", ("mortar", "maxDial")),
@@ -782,6 +790,45 @@ def roofing(protos: Protos) -> list[dict]:
     return out
 
 
+def intensity_to_radius(total: float, slope: float, max_intensity: float) -> float:
+    """Mirror of ExplosionSystem.IntensityToRadius: the cone (or frustum, once the
+    per-tile cap bites) whose volume is the total intensity."""
+    if total <= 0 or slope <= 0:
+        return 0.0
+    r0 = max_intensity / slope
+    v0 = slope * math.pi / 3 * r0 ** 3          # RadiusToIntensity(r0, slope) without a cap
+    if max_intensity <= 0 or total <= v0:
+        return (3 * total / (slope * math.pi)) ** (1 / 3)
+    return r0 * (math.sqrt(12 * total / v0 - 3) / 6 + 0.5)
+
+
+def shells(protos: Protos, mirror: dict) -> list[dict]:
+    """Every loadable mortar shell with the radius of what it does on the ground:
+    `he` — blast radius in tiles, `incendiary` — tile-fire range, `flare` — none."""
+    out = []
+    for pid, proto in protos.ents.items():
+        # The shell is the item a player loads; the fired ActiveMortarShell effect
+        # entities carry the same components but are not choices in a UI.
+        if proto.get("abstract") or protos.comp(pid, "MortarShell") is None or protos.comp(pid, "Item") is None:
+            continue
+        entry = {"id": pid, "name": protos.name(pid), "kind": "other", "radius": None}
+        total = float(protos.comp_field(pid, "Explosive", "totalIntensity", 0) or 0)
+        if total > 0:
+            slope = float(protos.comp_field(pid, "Explosive", "intensitySlope", 0) or 0)
+            max_i = float(protos.comp_field(pid, "Explosive", "maxIntensity", 0) or 0)
+            entry.update(kind="he", radius=round(intensity_to_radius(total, slope, max_i), 2),
+                         explosive={"totalIntensity": total, "intensitySlope": slope, "maxIntensity": max_i})
+        elif protos.comp(pid, "TileFireOnTrigger") is not None:
+            entry.update(kind="incendiary",
+                         radius=int(protos.comp_field(pid, "TileFireOnTrigger", "range", mirror["mortar"]["tileFireRange"])))
+        elif protos.comp(pid, "MortarCameraShell") is not None:
+            entry.update(kind="flare")
+        out.append(entry)
+    if not any(s["kind"] == "he" and s["radius"] for s in out):
+        raise TacticalError("no high-explosive mortar shell found among the prototypes")
+    return sorted(out, key=lambda s: (["he", "incendiary", "flare", "other"].index(s["kind"]), s["id"]))
+
+
 def review_list(co: Checkout, family: str) -> list[dict]:
     out = []
     for path in FAMILIES[family]["code_files"]:
@@ -823,6 +870,7 @@ def build_fork(fork: str, out_dir: Path, only_planet: str | None = None, sha: st
     area_keys = area_component_keys(co.read("Content.Shared/_RMC14/Areas/AreaComponent.cs"))
     constants = check_constants(co, cfg["family"])
     constants["roofing"] = roofing(protos)
+    constants["shells"] = shells(protos, constants)
     terms = read_terms(co, cfg["family"], cfg["locale"])
     review = review_list(co, cfg["family"])
 

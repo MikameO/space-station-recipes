@@ -32,7 +32,8 @@
      "impactWarningDelay": 2.5,
      "impactDelay": 4.5,
      "warnRange": 15,
-     "impactWarnRange": 10
+     "impactWarnRange": 10,
+     "tileFireRange": 2
     },
     "ob": {
      "scatter": [
@@ -66,6 +67,31 @@
       "allows": [
        "OB"
       ]
+     }
+    ],
+    "shells": [
+     {
+      "id": "RMCMortarShellHE",
+      "name": "80mm high explosive mortar shell",
+      "kind": "he",
+      "radius": 5.35,
+      "explosive": {
+       "totalIntensity": 800.0,
+       "intensitySlope": 5.0,
+       "maxIntensity": 30.1
+      }
+     },
+     {
+      "id": "RMCMortarShellIncendiary",
+      "name": "80mm incendiary mortar shell",
+      "kind": "incendiary",
+      "radius": 5
+     },
+     {
+      "id": "RMCMortarShellFlare",
+      "name": "80mm flare/camera mortar shell",
+      "kind": "flare",
+      "radius": null
      }
     ]
    },
@@ -342,7 +368,8 @@
      "impactWarningDelay": 2.5,
      "impactDelay": 4.5,
      "warnRange": 15,
-     "impactWarnRange": 10
+     "impactWarnRange": 10,
+     "tileFireRange": 2
     },
     "ob": {
      "scatter": [
@@ -376,6 +403,42 @@
       "allows": [
        "OB"
       ]
+     }
+    ],
+    "shells": [
+     {
+      "id": "RMCMortarShellFrag",
+      "name": "80mm fragmentation mortar shell",
+      "kind": "he",
+      "radius": 3.87,
+      "explosive": {
+       "totalIntensity": 96.0,
+       "intensitySlope": 1.6,
+       "maxIntensity": 4.8
+      }
+     },
+     {
+      "id": "RMCMortarShellHE",
+      "name": "80mm high explosive mortar shell",
+      "kind": "he",
+      "radius": 5.35,
+      "explosive": {
+       "totalIntensity": 800.0,
+       "intensitySlope": 5.0,
+       "maxIntensity": 30.1
+      }
+     },
+     {
+      "id": "RMCMortarShellIncendiary",
+      "name": "80mm incendiary mortar shell",
+      "kind": "incendiary",
+      "radius": 5
+     },
+     {
+      "id": "RMCMortarShellFlare",
+      "name": "80mm flare/camera mortar shell",
+      "kind": "flare",
+      "radius": null
      }
     ]
    },
@@ -437,6 +500,10 @@
     {
      "path": "Content.Shared/_RMC14/SupplyDrop/SharedSupplyDropSystem.cs",
      "blob": "260cd9eeec2c394f1b8293c35d226ae6f45c559d"
+    },
+    {
+     "path": "Content.Server/Explosion/EntitySystems/ExplosionSystem.cs",
+     "blob": "39a6d0a70d44625b7f69128831bdd97e8136229e"
     }
    ],
    "planets": [

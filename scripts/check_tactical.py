@@ -167,6 +167,12 @@ def main() -> int:
             fail(f"{key}: mortar constants missing {sorted(MORTAR_KEYS - set(constants.get('mortar') or {}))}")
         if not OB_KEYS <= set(constants.get("ob") or {}):
             fail(f"{key}: OB constants missing {sorted(OB_KEYS - set(constants.get('ob') or {}))}")
+        shells = constants.get("shells") or []
+        if not any(s.get("kind") == "he" and (s.get("radius") or 0) > 0 for s in shells):
+            fail(f"{key}: constants.shells has no high-explosive shell with a blast radius")
+        for s in shells:
+            if s.get("kind") not in ("he", "incendiary", "flare", "other") or not s.get("id"):
+                fail(f"{key}: malformed shell entry {s!r}")
         if mirror is not None:
             family_mirror = mirror.get(fork.get("family"))
             for part in ("offsetVariance", "mortar", "ob"):
