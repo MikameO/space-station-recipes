@@ -578,6 +578,20 @@
     "CMSteel": 625.0
    }
   },
+  "prox": {
+   "id": "STProximitySensor",
+   "materials": {
+    "CMGlass": 250.0,
+    "CMSteel": 1000.0
+   }
+  },
+  "signaller": {
+   "id": "STSignaller",
+   "materials": {
+    "CMGlass": 250.0,
+    "CMSteel": 1250.0
+   }
+  },
   "timer": {
    "id": "STTimer",
    "materials": {

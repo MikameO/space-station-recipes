@@ -114,6 +114,12 @@ accepts. Parts are counted, and materials are given in sheets of steel, plastic
 and glass. JSON gains `parts` (`igniter`, `timer`, `beaker` with lathe materials)
 and `sheets.CMGlass`.
 
+**Trigger choice for C4 and the mine (O23).** Where a casing accepts more than
+one trigger set, the Trigger line under the casing is a dropdown — C4 takes a
+timer, proximity sensor or signaller with its igniter, the mine two igniters or a
+proximity sensor and one — and the brew plan counts the set you pick. `parts`
+gains `prox` and `signaller`.
+
 **JSON:** `targets[].weak` and `.size`; a `structures` list (`id`, `name`, `hp`,
 `coefficient`); `formula.stun*`, `knockdownSeconds`, `knockdownRef`,
 `wallRef`; `recipes[].group` (`base` | `high`) with optional `name` and `note`

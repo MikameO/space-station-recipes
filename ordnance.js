@@ -31,16 +31,17 @@
     RMC80mmMortarCameraWarhead: '80mm mortar camera warhead',
     RMC80mmMortarShell: '80mm mortar shell', RMC88mmRocketTube: '84mm rocket tube',
   };
-  // SharedOrdnanceCasingSystem, the switch on RequiredAssemblyMode. A casing
-  // that fails it simply refuses the trigger, so this is the difference between
-  // a shell and a dud in your hands.
-  const ASSEMBLY = {
-    TimerIgniter: 'a timer and one igniter',
-    DualIgniter: 'two igniters',
-    Plastic: 'a timer, proximity sensor or signaller, plus one igniter',
-    Mine: 'a proximity sensor and one igniter, or two igniters',
-    Any: 'any trigger',
+  // SharedOrdnanceCasingSystem, the switch on RequiredAssemblyMode: every trigger
+  // set a casing accepts. A casing that fails it refuses the trigger, so this is
+  // the difference between a shell and a dud. The first set is the cheapest and
+  // the one the brew plan counts until the player picks another.
+  const TRIGGER_OPTIONS = {
+    TimerIgniter: [['timer', 'igniter']],
+    DualIgniter: [['igniter', 'igniter']],
+    Plastic: [['timer', 'igniter'], ['prox', 'igniter'], ['signaller', 'igniter']],
+    Mine: [['igniter', 'igniter'], ['prox', 'igniter']],
   };
+  const triggerParts = mode => (TRIGGER_OPTIONS[mode] || [])[S.triggerPick[mode] || 0] || [];
   const METRICS = {
     power: { label: 'Power', get: s => s.power },
     blastRadius: { label: 'Blast radius', get: s => s.hasBlast ? s.blastRadius : 0 },
@@ -83,6 +84,7 @@
     // opened. The total counts the frontier, so folding a reagent asks for
     // the reagent and opening it asks for what the reagent is made from.
     planCount: 1, planOpen: [],
+    triggerPick: {},                // assembly mode -> index into TRIGGER_OPTIONS
     galleryRange: 0,
     // How long a xeno actually burns. The flame outlasts the target's
     // patience: it runs out, and the hive pats it out at ten stacks a
@@ -121,13 +123,7 @@
     'at floor': 'на нижнем пределе',
     'Trigger': 'Взрыватель',
     'Carrier': 'Носитель',
-    'a timer and one igniter': 'таймер и один воспламенитель',
-    'two igniters': 'два воспламенителя',
-    'a timer, proximity sensor or signaller, plus one igniter':
-      'таймер, датчик движения или сигналлер и один воспламенитель',
-    'a proximity sensor and one igniter, or two igniters':
-      'датчик движения и один воспламенитель либо два воспламенителя',
-    'any trigger': 'любой взрыватель',
+    'proximity sensor': 'датчик движения', 'signaller': 'сигналлер',
     'in the tail, separate from the mixture': 'в хвост, отдельно от смеси',
     '80mm mortar shell': '80-мм миномётный снаряд',
     '84mm rocket tube': '84-мм ракетная труба',
@@ -342,7 +338,7 @@
     // up fast -- one mortar round is over ten sheets of steel.
     const P = S.data.parts || {};
     const pieces = [[S.casing, casingOf().materials]];
-    for (const key of TRIGGER_PARTS[casingOf().mode] || []) if (P[key]) pieces.push([key, P[key].materials]);
+    for (const key of triggerParts(casingOf().mode)) if (P[key]) pieces.push([key, P[key].materials]);
     if (carrier) {
       pieces.push([carrierOf(S.casing), carrier.materials]);
       if (carrier.fuel && P.beaker) pieces.push(['beaker', P.beaker.materials]);
@@ -368,11 +364,8 @@
 
   // Lathe material ids are not reagents, so rname finds nothing for them.
   const MATERIAL_NAMES = { CMSteel: 'steel', RMCPlastic: 'plastic', CMGlass: 'glass' };
-  // The cheapest trigger set each assembly mode accepts (SharedOrdnanceCasingSystem):
-  // a mine is cheaper on two igniters than on a proximity sensor and one.
-  const TRIGGER_PARTS = { TimerIgniter: ['timer', 'igniter'], DualIgniter: ['igniter', 'igniter'],
-                          Plastic: ['timer', 'igniter'], Mine: ['igniter', 'igniter'] };
-  const PART_LABEL = { igniter: 'igniter', timer: 'timer', beaker: '60u glass beaker' };
+  const PART_LABEL = { igniter: 'igniter', timer: 'timer', prox: 'proximity sensor',
+                       signaller: 'signaller', beaker: '60u glass beaker' };
   const matName = id => tr(MATERIAL_NAMES[id] || id);
 
   function casingOf() { return S.data.casings[S.casing]; }
@@ -837,8 +830,20 @@
     if (!box) return;
     const c = casingOf();
     const parts = [];
-    const mode = ASSEMBLY[c.mode];
-    if (mode) parts.push(`<b>${esc(tr('Trigger'))}:</b> ${esc(tr(mode))}`);
+    const options = TRIGGER_OPTIONS[c.mode] || [];
+    if (options.length) {
+      const label = keys => {
+        const n = {};
+        for (const k of keys) n[k] = (n[k] || 0) + 1;
+        return Object.keys(n).map(k => tr(PART_LABEL[k]) + (n[k] > 1 ? ' \u00d7' + n[k] : '')).join(' + ');
+      };
+      const pick = S.triggerPick[c.mode] || 0;
+      parts.push(`<b>${esc(tr('Trigger'))}:</b> ` + (options.length > 1
+        ? `<select id="ordTrigger" class="sort-select" aria-label="${esc(tr('Trigger'))}">${options
+            .map((o, i) => `<option value="${i}"${i === pick ? ' selected' : ''}>${esc(label(o))}</option>`)
+            .join('')}</select>`
+        : esc(label(options[0]))));
+    }
     const carrier = carrierOf(S.casing);
     if (carrier) {
       const cc = S.data.casings[carrier];
@@ -850,6 +855,8 @@
     }
     box.innerHTML = parts.join(' · ');
     box.hidden = !parts.length;
+    const pickEl = $('ordTrigger');
+    if (pickEl) pickEl.onchange = e => { S.triggerPick[c.mode] = +e.target.value; renderPlan(); };
   }
 
   function renderMix() {
