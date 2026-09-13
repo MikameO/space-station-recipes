@@ -8,6 +8,10 @@
 // public repo never carries a secret. Design: docs/design/2026-09-12-home-menu-and-feedback.md.
 // Tests: scripts/test_feedback_worker.mjs. Setup: header of wrangler.toml.
 
+import { routeRoom, isRoomPath } from './room/router.js';
+export { Room } from './room/room.js';
+export { Registry } from './room/registry.js';
+
 const REPO = 'MikameO/space-station-recipes';
 const LABELS = { idea: ['idea', 'from-site'], survey: ['survey', 'from-site'] };
 // Bytes, not characters: a full-length Russian survey is about 4 000 characters
@@ -111,6 +115,7 @@ export function buildIssue(body) {
 
 export default {
   async fetch(request, env) {
+    if (isRoomPath(new URL(request.url).pathname)) return routeRoom(request, env);
     const origin = request.headers.get('Origin') || '';
     const allowed = allowedOrigins(env).includes(origin);
 
