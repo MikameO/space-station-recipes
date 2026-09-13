@@ -239,6 +239,21 @@ test('aim error near the range edge is a warning', () => {
 const offset = [212, -148];
 const mortarTile = L.gameToWorld(offset, 232, -246);   // world 20 −98
 
+test('an error box that reaches a refused area is a warning, since the game validates target+error', () => {
+  const b = { minX: -120, minY: -120, maxX: 120, maxY: 120 };
+  const LZ = F.OB | F.CAS | F.MORTAR_FIRE | F.MORTAR_PLACE | F.SUPPLY | F.LANDING_ZONE;
+  // landing zone occupies x >= 64
+  const edge = planet(b, [['open', 'Open', null, OPEN], ['lz', 'LZ', null, LZ]], (x) => (x >= 64 ? 2 : 1));
+  const mortar = [20, -98];
+  const near = L.mortarFireChecks(edge, mortar, [62, -62], MORTAR_RMC, 'coordinates');   // e = ±2/±1 → box reaches x = 64
+  assert.strictEqual(near.ok, true);
+  assert.ok(near.warnings.includes('errorMayHitRefusedArea'));
+  const safe = L.mortarFireChecks(edge, mortar, [60, -62], MORTAR_RMC, 'coordinates');   // box ends at x = 62
+  assert.ok(!safe.warnings.includes('errorMayHitRefusedArea'));
+  const laser = L.mortarFireChecks(edge, mortar, [62, -62], MORTAR_RMC, 'laser');         // no error box at all
+  assert.ok(!laser.warnings.includes('errorMayHitRefusedArea'));
+});
+
 test('mockup: new target 274 −210 is 55 tiles away with error ±2/±1', () => {
   assert.deepStrictEqual(mortarTile, [20, -98]);
   const v = L.fireVariants({ offset, gameTarget: [274, -210], constants: MORTAR_RMC, planet: openWorld, mortarTile });

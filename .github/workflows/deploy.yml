@@ -36,9 +36,12 @@ jobs:
           node scripts/test_feedback_worker.mjs
 
       # Tactical map: fire maths against game-code cases, and the committed planet
-      # data (RLE widths, PNG size, hashes) — both offline.
+      # data (RLE widths, PNG size, hashes) — both offline. PyYAML and Pillow let
+      # check_tactical.py import the extractor and compare the index constants
+      # with its mirror; without them that comparison is silently skipped.
       - name: Series T checks
         run: |
+          python -m pip install --quiet pyyaml pillow
           node scripts/test_tactical_logic.js
           python scripts/check_tactical.py
 

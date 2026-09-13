@@ -126,7 +126,8 @@
       errorNone: 'No aim error here (within 20 tiles), only ±1 jitter.',
       warnings: {
         errorMayExceedMaxRange: 'With the aim error the shell may fly past the maximum range — the game then refuses to fire.',
-        errorMayUndercutMinRange: 'With the aim error the shell may fall inside the minimum range — the game then refuses to fire.'
+        errorMayUndercutMinRange: 'With the aim error the shell may fall inside the minimum range — the game then refuses to fire.',
+        errorMayHitRefusedArea: 'With the aim error the shell may land where the mortar is not allowed to hit (a landing zone or a covered area) — the game checks the point after the error and may refuse to fire.'
       },
       copy: 'Copy',
       copied: 'Copied: {coords}',
@@ -244,7 +245,8 @@
       errorNone: 'Ошибки прицела здесь нет (ближе 20 тайлов), только дрожание ±1.',
       warnings: {
         errorMayExceedMaxRange: 'С учётом ошибки снаряд может выйти за максимальную дальность — тогда игра откажет в выстреле.',
-        errorMayUndercutMinRange: 'С учётом ошибки снаряд может лечь ближе минимальной дальности — тогда игра откажет в выстреле.'
+        errorMayUndercutMinRange: 'С учётом ошибки снаряд может лечь ближе минимальной дальности — тогда игра откажет в выстреле.',
+        errorMayHitRefusedArea: 'С учётом ошибки снаряд может лечь туда, где миномёту бить нельзя (зона посадки или накрытая зона), — игра проверяет точку уже с ошибкой и может отказать в выстреле.'
       },
       copy: 'Копировать',
       copied: 'Скопировано: {coords}',
@@ -898,7 +900,7 @@
   }
 
   function sameRoundHtml(cs) {
-    return '<div class="tac-banner"><h2>' + esc(T.sameRoundTitle) + '</h2><p>' +
+    return '<div class="tac-banner" role="alert"><h2>' + esc(T.sameRoundTitle) + '</h2><p>' +
       esc(fmt(T.sameRoundAge, { age: formatAge(cs.ageMs) })) + ' ' +
       cs.reasons.map(function (r) { return esc(T.sameRoundReasons[r]); }).join(' ') + '</p>' +
       '<div class="tac-actions">' + button('sameRound', T.sameRoundYes, 'btn-primary') +
@@ -1083,6 +1085,13 @@
     view.requestDraw();
   }
 
+  // The «same round?» banner sits at the top of the panel; a question raised by
+  // a field at the bottom must scroll into view or nobody sees it.
+  function revealBanner() {
+    var b = els.panel.querySelector('.tac-banner');
+    if (b && b.scrollIntoView) b.scrollIntoView({ block: 'nearest' });
+  }
+
   // Typing must not re-render the form: update the hint and the button in place.
   function onCalInput() {
     state.draft = { x: $('tacCalX').value, y: $('tacCalY').value };
@@ -1218,6 +1227,7 @@
       if (r.error) {
         state.mortarMessage = { text: r.error, kind: 'error' };
         renderAll();
+        revealBanner();
         return;
       }
       state.mortarDraft = '';
@@ -1238,6 +1248,7 @@
       if (r.error) {
         state.findMessage = { text: r.error, kind: 'error' };
         renderAll();
+        revealBanner();
         return;
       }
       setTarget(r.tile);

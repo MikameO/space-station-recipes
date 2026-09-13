@@ -199,7 +199,7 @@
       if (laser && !(area[3] & FLAGS.LASING)) reasons.push('noLasing');
     }
     if (!reasons.length && (bounds[0] || bounds[1])) {
-      var far = 0, near = Infinity;
+      var far = 0, near = Infinity, refused = false;
       [-bounds[0], bounds[0]].forEach(function (ex) {
         [-bounds[1], bounds[1]].forEach(function (ey) {
           var d = distance(mortarTile, [target[0] + ex, target[1] + ey]);
@@ -208,6 +208,15 @@
       });
       if (far > mortar.maxRange) warnings.push('errorMayExceedMaxRange');
       if (near < mortar.minRange) warnings.push('errorMayUndercutMinRange');
+      // The game validates target + error + dial, not the aim point: any point of
+      // the error box in a refused area can make the mortar refuse the shot.
+      for (var x = target[0] - bounds[0]; x <= target[0] + bounds[0] && !refused; x++) {
+        for (var y = target[1] - bounds[1]; y <= target[1] + bounds[1]; y++) {
+          var a = areaAt(planet, x, y);
+          if (!a || (a[3] & FLAGS.LANDING_ZONE) || !(a[3] & FLAGS.MORTAR_FIRE)) { refused = true; break; }
+        }
+      }
+      if (refused) warnings.push('errorMayHitRefusedArea');
     }
     return { ok: reasons.length === 0, reasons: reasons, warnings: warnings, distance: dist, bounds: bounds };
   }
