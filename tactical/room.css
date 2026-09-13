@@ -1,0 +1,35 @@
+/* Task 7: requests, cards, fire card, assets */
+.tac-room-btn.big { min-height: 44px; min-width: 88px; font-size: 14px; }
+.tac-room-req {
+  border: 1px solid var(--border-subtle);
+  border-left: 3px solid var(--req, var(--border-active));
+  border-radius: 6px;
+  padding: 8px;
+  margin: 8px 0;
+}
+.tac-room-req.urgent { box-shadow: inset 0 0 0 1px var(--red-alert); }
+.tac-room-req.st-done, .tac-room-req.st-denied, .tac-room-req.faded { opacity: 0.6; }
+.tac-room-req .tac-room-actions { margin-top: 6px; }
+.tac-room-status { color: var(--text-bright); }
+.tac-room-card {
+  flex: none;
+  width: 280px;
+  min-height: 52px;
+  padding: 6px 8px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 6px;
+  background: var(--panel-raised);
+  cursor: pointer;
+  font-size: 13px;
+}
+.tac-room-card.urgent { border-color: var(--red-alert); }
+.tac-room-card.flash { animation: tac-room-flash 1s ease-in-out 3; }
+@keyframes tac-room-flash { 50% { border-color: var(--amber); box-shadow: 0 0 0 2px var(--amber-dim); } }
+.tac-room-types { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 8px; }
+.tac-room-target { display: flex; gap: 8px; align-items: center; }
+.tac-room-fire { margin-top: 8px; padding: 8px; border: 1px dashed var(--amber); border-radius: 6px; }
+.tac-room-fire-coords { font: 700 22px ui-monospace, "Cascadia Mono", Consolas, monospace; color: var(--text-bright); }
+.tac-room-state.ready { color: var(--phosphor); }
+.tac-room-state.busy { color: var(--amber); }
+.tac-room-state.cooldown { color: var(--text-ghost); }
+.tac-room-state.down { color: var(--red-alert); }
