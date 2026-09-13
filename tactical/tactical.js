@@ -478,8 +478,13 @@
   }
 
   // Officers' room (tactical/room*.js): tells the room what the officer did here.
+  // The room gets a copy, and nothing it throws reaches Series T.
   function roomNotify(event, payload) {
-    if (window.TacRoom) window.TacRoom.notify(event, payload);
+    if (window.TacRoom) {
+      try {
+        window.TacRoom.notify(event, payload !== null && typeof payload === 'object' ? JSON.parse(JSON.stringify(payload)) : payload);
+      } catch (e) { if (window.console) console.warn('room', e); }
+    }
   }
 
   // Events carry the fork and planet only — never coordinates or marker text.
@@ -2726,26 +2731,29 @@
     if (shots().length || state.store.ob) startShotTicker();
   });
 
+  // A room that fails to start never stops the map: applyStaticText and loadIndex below must run.
   if (window.TacRoom) {
-    window.TacRoom.attach({
-      view: view,
-      getContext: function () {
-        return {
-          fork: state.fork, meta: state.meta, level: state.level, planet: state.planet,
-          calibration: calibration(), mortar: mortar(), shell: currentShell(), hitRadius: hitRadius(), lang: LANG
-        };
-      },
-      takeTarget: function (tile) {
-        if (weapon() !== 'mortar') { state.prefs.weapon = 'mortar'; savePrefs(); }
-        setTarget(tile);
-      },
-      takePosition: function (tile) {
-        if (weapon() !== 'mortar') { state.prefs.weapon = 'mortar'; savePrefs(); }
-        setMortar(tile);
-      },
-      fire: function (targetGame, dial) { recordShot(targetGame, dial); return lastShot(); },
-      redraw: function () { renderAll(); }
-    });
+    try {
+      window.TacRoom.attach({
+        view: view,
+        getContext: function () {
+          return {
+            fork: state.fork, meta: state.meta, level: state.level, planet: state.planet,
+            calibration: calibration(), mortar: mortar(), shell: currentShell(), hitRadius: hitRadius(), lang: LANG
+          };
+        },
+        takeTarget: function (tile) {
+          if (weapon() !== 'mortar') { state.prefs.weapon = 'mortar'; savePrefs(); }
+          setTarget(tile);
+        },
+        takePosition: function (tile) {
+          if (weapon() !== 'mortar') { state.prefs.weapon = 'mortar'; savePrefs(); }
+          setMortar(tile);
+        },
+        fire: function (targetGame, dial) { recordShot(targetGame, dial); return lastShot(); },
+        redraw: function () { renderAll(); }
+      });
+    } catch (e) { if (window.console) console.warn('room', e); }
   }
 
   applyStaticText();

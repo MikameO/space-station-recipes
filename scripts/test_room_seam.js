@@ -33,6 +33,59 @@ assert.deepStrictEqual(events, ['delete', 'marker', 'shape', 'shot', 'target']);
 const renderPanel = js.slice(js.indexOf('function renderPanel()'), js.indexOf('function renderAll()'));
 assert.ok(renderPanel.length > 0 && !/TacRoom|roomNotify/.test(renderPanel), 'renderPanel knows nothing of the room');
 
+// The end of a {…} block that starts at or after `from` (quotes and // comments skipped).
+function blockEnd(src, from) {
+  let depth = 0, quote = null;
+  for (let i = src.indexOf('{', from); i >= 0 && i < src.length; i++) {
+    const ch = src[i];
+    if (quote) { if (ch === '\\') i++; else if (ch === quote) quote = null; continue; }
+    if (ch === "'" || ch === '"') { quote = ch; continue; }
+    if (ch === '/' && src[i + 1] === '/') { i = src.indexOf('\n', i); if (i < 0) return -1; continue; }
+    if (ch === '{') depth++;
+    else if (ch === '}' && --depth === 0) return i + 1;
+  }
+  return -1;
+}
+const guardBlocks = [];
+for (let at = js.indexOf('if (window.TacRoom) {'); at >= 0; at = js.indexOf('if (window.TacRoom) {', at + 1)) {
+  guardBlocks.push({ start: at, end: blockEnd(js, at) });
+}
+
+// Every seam call goes through window.TacRoom and is guarded: inside if (window.TacRoom) { … } or behind window.TacRoom &&.
+const seamCalls = [...js.matchAll(/TacRoom\.(\w+)\(/g)];
+assert.deepStrictEqual([...new Set(seamCalls.map(m => m[1]))].sort(), ['attach', 'consumePick', 'notify']);
+seamCalls.forEach(m => {
+  const i = m.index;
+  const line = js.slice(js.lastIndexOf('\n', i) + 1, i);
+  assert.strictEqual(js.slice(i - 7, i), 'window.', 'TacRoom.' + m[1] + ' is reached through window');
+  const inBlock = guardBlocks.some(b => b.start < i && i < b.end);
+  assert.ok(inBlock || /if \(window\.TacRoom && window\.$/.test(line), 'TacRoom.' + m[1] + ' is guarded by window.TacRoom');
+});
+
+// attach runs inside try/catch (a throwing room never stops applyStaticText/loadIndex) and hands over every hook.
+const attachAt = js.indexOf('window.TacRoom.attach(');
+const attachBlock = guardBlocks.find(b => b.start < attachAt && attachAt < b.end);
+assert.ok(attachBlock, 'attach sits inside if (window.TacRoom) { … }');
+const attachText = js.slice(attachBlock.start, attachBlock.end);
+assert.ok(/try\s*\{\s*window\.TacRoom\.attach\(/.test(attachText), 'attach runs inside try');
+assert.ok(/\}\s*catch\s*\(\s*\w+\s*\)/.test(attachText), 'attach failures are caught');
+['view', 'getContext', 'takeTarget', 'takePosition', 'fire', 'redraw'].forEach(h =>
+  assert.ok(new RegExp('\\b' + h + ':\\s').test(attachText), 'attach hands over ' + h));
+assert.ok(js.indexOf('applyStaticText();', attachBlock.end) > 0 && js.indexOf('loadIndex();', attachBlock.end) > 0, 'the map starts after attach');
+
+// roomNotify hands the room a copy and catches what it throws.
+const notifyAt = js.indexOf('function roomNotify(');
+const notifyText = js.slice(notifyAt, blockEnd(js, notifyAt));
+assert.ok(/JSON\.parse\(JSON\.stringify\(/.test(notifyText), 'roomNotify passes a copy');
+assert.ok(/try\s*\{/.test(notifyText) && /catch\s*\(/.test(notifyText), 'roomNotify catches');
+
+// Room scripts are deferred; the demo fixture is loaded on demand only.
+order.slice(0, 4).forEach(src => {
+  const tag = (html.match(new RegExp('<script[^>]*src="' + src.replace(/\./g, '\\.') + '[^"]*"[^>]*>')) || [''])[0];
+  assert.ok(/\sdefer[\s>=]/.test(tag), src + ' has defer');
+});
+assert.ok(!html.includes('room-fixtures.js'), 'room-fixtures.js is not on the page');
+
 // MapView: layers are created once and drawn every frame — the survive-redraw contract.
 assert.strictEqual((mv.match(/this\.layers\s*=/g) || []).length, 1, 'layers assigned only in the constructor');
 assert.ok(/for \(var i = 0; i < this\.layers\.length; i\+\+\)/.test(mv), 'draw() walks every layer each frame');
