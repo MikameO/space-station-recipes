@@ -1452,35 +1452,61 @@ body.antag-active .hint-chip:hover, body.antag-active .hint-chip:focus-visible {
 .step-batches-total { color: var(--text-ghost); }
 .step-batches-bad { color: var(--red-alert); }
 
-/* ── VESSEL PLANNER (Series R9–R11): the vessel set and per-vessel steps ── */
+/* ── VESSEL PLANNER (Series R9–R11, R14–R15): the vessel set and the numbered
+   order of work. The type is larger than the rest of the calculator on purpose —
+   this is read mid-shift, often on a second screen (owner 2026-09-13: «шрифт
+   мелковат»). The theme has no --text-dim; the old block fell back to inherit. ── */
 .vessel-panel-host { margin: -8px 0 16px; }
-.vessel-panel { border: 1px solid var(--border-subtle); background: var(--hull); padding: 6px 10px; font-size: 0.72rem; }
-.vessel-panel > summary { cursor: pointer; color: var(--text-dim); }
-.vessel-panel-title { font-family: 'Oxanium', sans-serif; font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--phosphor); }
-.vessel-rows { display: flex; flex-direction: column; gap: 4px; margin: 8px 0; }
-.vessel-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-.vessel-name { min-width: 170px; }
-.vessel-size input { width: 70px; margin-right: 2px; background: var(--hull-plate); border: 1px solid var(--border-subtle); color: inherit; padding: 2px 4px; }
-.vessel-heat { color: var(--text-ghost); }
+.vessel-panel { border: 1px solid var(--border-subtle); background: var(--hull); padding: 8px 12px; font-size: 0.85rem; line-height: 1.45; }
+.vessel-panel > summary { cursor: pointer; color: var(--text-sub); }
+.vessel-panel-title { font-family: 'Oxanium', sans-serif; font-size: 0.74rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--phosphor); }
+.vessel-panel-summary { color: var(--text-main); }
+.vessel-family { display: flex; gap: 8px; flex-wrap: wrap; margin: 10px 0 4px; }
+.vessel-family-chip { background: none; border: 1px solid var(--border-subtle); border-radius: 2px; color: var(--text-sub); padding: 5px 10px; font: inherit; font-size: 0.8rem; cursor: pointer; }
+.vessel-family-chip:hover { border-color: var(--phosphor-dim); color: var(--phosphor); }
+.vessel-family-chip.active { border-color: var(--phosphor); color: var(--phosphor); background: var(--phosphor-glow); }
+.vessel-family-fixed { margin: 10px 0 4px; color: var(--text-sub); }
+.vessel-howto { margin: 6px 0; color: var(--text-main); }
+.vessel-hint { margin: 4px 0; color: var(--amber); }
+.vessel-rows { display: flex; flex-direction: column; gap: 6px; margin: 10px 0; }
+.vessel-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.vessel-name { min-width: 200px; color: var(--text-bright); }
+.vessel-size input { width: 76px; margin-right: 2px; background: var(--hull-plate); border: 1px solid var(--border-subtle); color: inherit; padding: 3px 5px; font: inherit; }
+.vessel-fits { color: var(--text-sub); }
 .vessel-stepper { display: inline-flex; align-items: center; gap: 6px; }
-.vessel-stepper button, .vessel-remove { min-width: 26px; height: 24px; background: none; border: 1px solid var(--border-subtle); border-radius: 2px; color: var(--text-dim); cursor: pointer; }
+.vessel-stepper button, .vessel-remove { min-width: 30px; height: 28px; background: none; border: 1px solid var(--border-subtle); border-radius: 2px; color: var(--text-sub); cursor: pointer; font-size: 0.95rem; }
 .vessel-stepper button:hover, .vessel-remove:hover { border-color: var(--phosphor-dim); color: var(--phosphor); }
-.vessel-count { min-width: 18px; text-align: center; color: var(--phosphor); font-weight: bold; }
+.vessel-count { min-width: 20px; text-align: center; color: var(--phosphor); font-weight: bold; }
 .vessel-panel-foot { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
-.vessel-note { color: var(--text-ghost); font-size: 0.64rem; }
-.vessel-card { border: 1px solid var(--border-subtle); padding: 8px 10px; margin-bottom: 8px; }
-.vessel-card-title { font-size: 0.68rem; color: var(--cyan); margin-bottom: 4px; }
-.vessel-card-missing { border-color: var(--red-alert); }
-.vessel-card-missing .vessel-card-title, .vessel-missing-text { color: var(--red-alert); }
-.vessel-card-mixer .vessel-card-title { color: var(--violet); }
-.vessel-line { padding: 4px 0; font-size: 0.73rem; }
-.vessel-store, .vessel-transfer, .vessel-leftover { color: var(--text-ghost); font-size: 0.68rem; }
-.vessel-sim-ok { color: var(--phosphor); font-size: 0.62rem; }
-.vessel-sim-bad { color: var(--amber); font-size: 0.62rem; }
-.vessel-totals { margin-top: 6px; color: var(--amber); font-size: 0.7rem; }
+.vessel-note { color: var(--text-ghost); font-size: 0.78rem; }
+
+/* One numbered block per step, in the order to do it; ↪ marks a change of vessel. */
+.vplan-note { border-left: 2px solid var(--amber); background: var(--amber-dim); padding: 6px 10px; margin: 0 0 10px; font-size: 0.86rem; color: var(--text-main); }
+.vplan-step { border-left: 2px solid var(--border-active); padding: 6px 0 8px 12px; margin-bottom: 8px; }
+.vplan-step-missing { border-left-color: var(--red-alert); }
+.vplan-step-mixer { border-left-color: var(--violet); }
+.vplan-step-mix { border-left-color: var(--phosphor); }
+.vplan-head { display: flex; align-items: baseline; gap: 6px; flex-wrap: wrap; margin-bottom: 4px; font-size: 0.86rem; }
+.vplan-num { color: var(--amber); font-weight: 700; font-size: 1rem; min-width: 1.2em; }
+.vplan-switch { color: var(--amber); font-weight: 700; }
+.vplan-vessel { color: var(--cyan); }
+.vplan-step-mixer .vplan-vessel { color: var(--violet); }
+.vplan-line { font-size: 0.9rem; line-height: 1.5; padding: 2px 0; color: var(--text-main); }
+.vplan-pours { margin: 2px 0 2px 20px; padding: 0; }
+.vplan-pours li { font-size: 0.88rem; }
+.vplan-result { color: var(--text-bright); }
+.vplan-bad { color: var(--red-alert); }
+.vplan-end { margin-top: 8px; font-size: 0.86rem; color: var(--text-sub); }
+.vplan-end-title { color: var(--text-main); }
+.vessel-section .step-batches { margin-left: 0; font-size: 0.82rem; }
+.vessel-section .step-temp { font-size: 0.84rem; }
+.vessel-sim-ok { color: var(--phosphor); font-size: 0.78rem; }
+.vessel-sim-bad { color: var(--amber); font-size: 0.78rem; }
+.vessel-totals { margin-top: 8px; color: var(--amber); font-size: 0.88rem; }
 @media (max-width: 768px) {
   .vessel-name { min-width: 0; flex: 1 1 100%; }
-  .vessel-stepper button, .vessel-remove { min-width: 44px; height: 44px; }
+  .vessel-stepper button, .vessel-remove, .vessel-family-chip { min-width: 44px; min-height: 44px; }
+  .vplan-pours { margin-left: 12px; }
 }
 
 
