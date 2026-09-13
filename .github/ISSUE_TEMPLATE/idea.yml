@@ -1,0 +1,22 @@
+name: Idea or suggestion
+description: Something missing, confusing, or worth adding — the same channel as the in-app "Suggest an idea" form.
+title: "[idea] "
+labels: ["idea"]
+body:
+  - type: textarea
+    id: idea
+    attributes:
+      label: What is missing, or what got in the way?
+      description: One paragraph is plenty. Russian or English.
+    validations:
+      required: true
+  - type: input
+    id: context
+    attributes:
+      label: Where were you? (section, fork, device)
+      placeholder: "Calculator · rucm · phone"
+  - type: input
+    id: contact
+    attributes:
+      label: How to reach you (optional, public)
+      placeholder: "Discord nick"

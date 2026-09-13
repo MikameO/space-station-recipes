@@ -16,3 +16,8 @@ research/**/logs/
 
 # Card screenshot sources (re-shot by scripts/shoot_cards.mjs); only promo/cards/*.webp ships
 promo/cards-src/
+
+# Cloudflare Worker local state and secrets (worker/)
+worker/.wrangler/
+worker/.dev.vars
+worker/node_modules/

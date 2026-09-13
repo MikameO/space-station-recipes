@@ -1,0 +1,26 @@
+# chemdb-feedback — turns the site's idea form and survey into GitHub issues.
+#
+# One-time setup by the repo owner (nothing in this file is a secret):
+#   1. cd worker && npx wrangler login
+#   2. npx wrangler secret put GITHUB_TOKEN
+#        -> paste a fine-grained PAT: this repository only, permission "Issues: Read and write"
+#   3. npx wrangler deploy
+#        -> prints https://chemdb-feedback.<account>.workers.dev
+#   4. put that URL into FEEDBACK_URL in feedback.js, bump its ?v=, commit.
+# Rotate the token by repeating step 2. Stop abuse with `npx wrangler delete`
+# or by blanking ALLOWED_ORIGINS in the Cloudflare dashboard.
+# Local run: `npx wrangler dev --var ALLOWED_ORIGINS:http://127.0.0.1:8090` with the
+# token in worker/.dev.vars (GITHUB_TOKEN=...; gitignored).
+
+name = "chemdb-feedback"
+main = "index.js"
+compatibility_date = "2026-09-01"
+
+[vars]
+ALLOWED_ORIGINS = "https://mikameo.github.io"
+
+# 5 submissions per minute per IP (Workers Rate Limiting binding, free plan).
+[[ratelimits]]
+name = "RL"
+namespace_id = "1001"
+simple = { limit = 5, period = 60 }
