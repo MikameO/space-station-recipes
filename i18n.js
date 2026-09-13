@@ -261,6 +261,15 @@
     'Type to search...': 'Начните вводить...',
     'Calculate': 'Рассчитать',
     'Batch / Shift Planner': 'Партия / план на смену',
+    // R16–R17: the mixes section's static markup; every string with a number in
+    // it is built in mixes.js.
+    'Mixes & Pills': 'Смеси и таблетки',
+    'Several medicines are brewed apart, then combined in one vessel or pressed into pills in the ChemMaster. The planner splits the order into parts, lays the brewing over your vessels and checks that the components do not react with each other.': 'Несколько лекарств варятся отдельно, а потом смешиваются в одной ёмкости или прессуются в таблетки в ChemMaster. Планировщик делит заказ на доли, раскладывает варку по вашей посуде и проверяет, что компоненты не реагируют друг с другом.',
+    'Mixes explained': 'Пояснение смесей',
+    'Medicines that do not react with each other, brewed apart and combined in one bottle of pills or one tank': 'Лекарства, которые не реагируют друг с другом: варятся отдельно и собираются в одну таблетницу или один бак',
+    'Add a mix component': 'Добавить компонент смеси',
+    'Parts in the mix': 'Доли в смеси',
+    'Plan Mix': 'Спланировать смесь',
     'Add multiple targets to compute one combined ingredient list. Useful when planning a full shift instead of a single recipe.': 'Добавьте несколько целей и получите один общий список ингредиентов. Удобно для планирования смены целиком.',
     'Batch planner explained': 'Пояснение планировщика',
     'Add multiple targets to get one optimized shopping list': 'Несколько целей — один оптимизированный список покупок',

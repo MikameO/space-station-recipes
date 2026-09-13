@@ -1655,7 +1655,10 @@ function renderForkDiff() {
 // (Stir/Shake) never auto-fire in a plain beaker.
 // ─────────────────────────────────────────────
 
-function simulateBeaker(contents, tempK) {
+// forkId: which fork's reactions apply (the Source filter by default) — the mix
+// planner checks one mix against every fork of its family.
+function simulateBeaker(contents, tempK, forkId) {
+  const fork = forkId || activeSource;
   const state = {};
   for (const [id, amt] of Object.entries(contents)) state[id] = amt;
   const log = [];
@@ -1664,7 +1667,7 @@ function simulateBeaker(contents, tempK) {
   for (let step = 1; step <= MAX_STEPS; step++) {
     let best = null;
     for (const rx of Object.values(DATA.reactions)) {
-      if (!reactionInFork(rx, activeSource === 'all' ? 'all' : activeSource)) continue;
+      if (!reactionInFork(rx, fork)) continue;
       if (rx.mixer && rx.mixer.length) continue; // needs Stir/Shake — not a beaker pour
       if (rx.minTemp && tempK < rx.minTemp) continue;
       if (rx.maxTemp && tempK > rx.maxTemp) continue;

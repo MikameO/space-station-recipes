@@ -1509,6 +1509,36 @@ body.antag-active .hint-chip:hover, body.antag-active .hint-chip:focus-visible {
   .vplan-pours { margin-left: 12px; }
 }
 
+/* ── MIXES & PILLS (Series R16–R17): components with parts, the output, and the
+   reaction check between components ── */
+.mix-rows { display: flex; flex-direction: column; gap: 6px; margin: 8px 0; font-size: 0.88rem; }
+.mix-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.mix-name { min-width: 180px; color: var(--text-bright); }
+.mix-parts { color: var(--text-sub); }
+.mix-parts input { width: 70px; background: var(--hull-plate); border: 1px solid var(--border-subtle); color: inherit; padding: 3px 5px; font: inherit; }
+.mix-empty { color: var(--text-ghost); font-size: 0.84rem; margin: 6px 0; }
+.mix-output { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin: 10px 0; font-size: 0.88rem; color: var(--text-main); }
+.mix-output .search-input { width: 76px; }
+.mix-mode { color: var(--text-bright); cursor: pointer; }
+.mix-fields { display: inline-flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.mix-compat, .mix-composition, .mix-pills { grid-column: 1 / -1; }
+.mix-compat { border: 1px solid var(--border-subtle); border-left: 3px solid var(--phosphor); padding: 8px 12px; margin-bottom: 10px; font-size: 0.9rem; }
+.mix-compat-bad { border-left-color: var(--red-alert); background: var(--red-dim); }
+.mix-compat-title { font-weight: 700; color: var(--phosphor); margin-bottom: 4px; }
+.mix-compat-bad .mix-compat-title { color: var(--red-alert); }
+.mix-compat-line { color: var(--text-main); padding: 2px 0; }
+.mix-compat-warn { color: var(--amber); }
+.mix-rx-id { color: var(--text-ghost); font-size: 0.78rem; }
+.mix-table-wrap { overflow-x: auto; }
+.mix-table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+.mix-table th { text-align: left; color: var(--text-sub); font-weight: 600; padding: 4px 8px; border-bottom: 1px solid var(--border-subtle); }
+.mix-table td { padding: 4px 8px; border-bottom: 1px solid rgba(26,37,64,0.25); color: var(--text-main); }
+.mix-num { text-align: right; white-space: nowrap; }
+@media (max-width: 768px) {
+  .mix-name { min-width: 0; flex: 1 1 100%; }
+  .mix-row .vessel-remove { min-width: 44px; min-height: 44px; }
+}
+
 
 /* ══════════════════════════════════════════
    CRAFT TREES

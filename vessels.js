@@ -193,6 +193,13 @@
     }
 
     const holds = (v) => Object.values(stock).some(list => list.some(e => e.v === v && e.amount > EPS));
+    // Take what sits in beakers before what sits in tanks: a beaker emptied by its
+    // own pour is free to carry the tank's share next. Mixing Meralyne + Bicaridine
+    // on one beaker and one tank found no carrier the other way round.
+    const fromBeakersFirst = (reactants) => reactants.slice().sort((a, b) => {
+      const rank = (r) => (produced.has(r.id) && (stock[r.id] || []).length && (stock[r.id] || []).every(e => e.v.fits) ? 0 : 1);
+      return rank(a) - rank(b);
+    });
     const largestFits = () => (vessels.filter(v => v.fits).sort((a, b) => b.size - a.size)[0] || { size: 120 }).size;
 
     // An empty vessel that fits the dispenser, to measure with or to carry in.
@@ -317,7 +324,7 @@
 
     function fill(step, v, chainedId, batch) {
       const items = [];
-      for (const r of step.reactants) {
+      for (const r of fromBeakersFirst(step.reactants)) {
         if (r.catalyst) {
           const need = round2(r.amount - (v.contents[r.id] || 0));
           if (need > EPS) { addTo(v.contents, r.id, need); items.push({ reagentId: r.id, amount: need, catalyst: true }); }
@@ -389,7 +396,7 @@
       const shares = loads.length > 1 ? loads.map(vol => vol / step.amount) : null;
 
       const items = [];
-      for (const r of step.reactants) {
+      for (const r of fromBeakersFirst(step.reactants)) {
         if (produced.has(r.id)) take(r.id, r.amount, v, shares);
         else { addTo(v.contents, r.id, r.amount); items.push({ reagentId: r.id, amount: r.amount, catalyst: false }); }
       }
@@ -667,7 +674,7 @@
       : 'Steps move between vessels — follow the numbers; ↪ marks a change of vessel.'}</div>` : '';
 
     const problems = [...new Set([...res.missing.map(v => missingText(v.missing)), ...res.toolMissing.map(toolText)])];
-    const warn = problems.length ? `<div class="warning-box"><div class="warning-box-title">${ru ? 'Не хватает посуды' : 'Not enough vessels'}</div>${
+    const warn = problems.length ? `<div class="warning-box"><div class="warning-box-title">${ru ? 'Не хватает посуды — добавьте её в панели «Посуда» выше' : 'Not enough vessels — add them in the «Vessels» panel above'}</div>${
       problems.map(p => `<div class="warning-item"><span class="warning-icon">&#9888;</span> <span>${p}</span></div>`).join('')}</div>` : '';
 
     const totals = `<div class="vessel-totals">${ru ? 'Итог' : 'Total'}: ${[

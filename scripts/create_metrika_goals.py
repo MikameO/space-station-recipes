@@ -60,6 +60,8 @@ GOALS: list[tuple[str, str]] = [
     ("brew_container",    "Калькулятор: выбрана ёмкость для порций"),
     ("vessel_inventory_change", "Калькулятор: изменён набор посуды"),
     ("vessel_plan",       "Калькулятор: план разложен по посуде"),
+    ("mix_plan",          "Калькулятор: спланирована смесь"),
+    ("mix_preset",        "Калькулятор: выбрана готовая смесь"),
     ("reverse_used",      "Калькулятор: reverse lookup"),
     ("tree_built",        "Построено craft-дерево"),
     ("share_click",       "Скопирована share-ссылка"),
