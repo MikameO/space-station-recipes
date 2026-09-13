@@ -46,12 +46,44 @@ const SHOTS = {
   forkdiff:   ['/#tab=forkdiff', null],
   library:    ['/library.html', null],
   antag:      ['/#antag=1&tab=antag', null],
+  // tactical: a calibrated LV-624 with the mortar placed and a target picked — the
+  // page keeps that in localStorage per planet, so it is seeded before load (below)
+  // and the prep only zooms towards the target with wheel events, as a hand would.
+  tactical:   ['/tactical.html#map=rmc14/lv624', async () => {
+    const same = document.querySelector('.tac-banner [data-action="sameRound"]');   // seeded state counts as a reload
+    if (same) { same.click(); await new Promise(r => setTimeout(r, 100)); }
+    const c = document.getElementById('tacCanvas'), r = c.getBoundingClientRect();
+    const b = { minX: -87, maxX: 87, minY: -109, maxY: 112 };
+    const w = c.clientWidth, h = c.clientHeight, tw = b.maxX - b.minX + 1, th = b.maxY - b.minY + 1;
+    const s = Math.max(0.5, Math.min(64, Math.min(w / tw, h / th) * 0.96));
+    const ox = (w - tw * s) / 2, oy = (h - th * s) / 2;
+    const x = r.left + ox + (45 + 0.5 - b.minX) * s, y = r.top + oy + (b.maxY + 1 - (-70 + 0.5)) * s;
+    for (let i = 0; i < 6; i++) c.dispatchEvent(new WheelEvent('wheel', { clientX: x, clientY: y, deltaY: -100, bubbles: true, cancelable: true }));
+    c.dispatchEvent(new PointerEvent('pointermove', { clientX: x + 40, clientY: y - 30, bubbles: true, pointerId: 1, pointerType: 'mouse', isPrimary: true }));
+  }],
 };
+
+// Per-shot localStorage seeds, applied before the page loads.
+const SEEDS = {
+  tactical: {
+    'chemdb-tactical:rmc14/lv624': JSON.stringify({ v: 1,
+      calibration: { tile: [31, -78], reading: [243, -226], offset: [212, -148], at: Date.now(), check: { tile: [29, -79], expect: [241, -227], result: 'match', tried: [] } },
+      mortar: { tile: [20, -98], mode: 'coordinates' }, target: [45, -70], shots: [], markers: [] }),
+  },
+};
+
+// Optional ids after the base URL shoot only those cards (the others keep their files).
+const ONLY = new Set(process.argv.slice(3));
 
 const browser = await puppeteer.launch({ executablePath: CHROME, headless: true, defaultViewport: { width: 1800, height: 915 } });
 try {
   for (const [id, [url, prep]] of Object.entries(SHOTS)) {
+    if (ONLY.size && !ONLY.has(id)) continue;
     const page = await browser.newPage();
+    const seed = SEEDS[id] || {};
+    await page.evaluateOnNewDocument((entries) => {
+      for (const [k, v] of entries) localStorage.setItem(k, v);
+    }, Object.entries(seed));
     // Tutorial auto-starts on a fresh profile; the home menu must not auto-show either.
     // ss14_pin_callout_seen is a third one found by visual review: setupPinCallout()
     // (app.js) shows a "Pin over your game" discovery bubble to every visitor, on
@@ -64,6 +96,7 @@ try {
     });
     await page.goto(BASE + url, { waitUntil: 'networkidle2', timeout: 60000 });
     if (url.startsWith('/library')) await page.waitForSelector('#libList');
+    else if (url.startsWith('/tactical')) await page.waitForSelector('#tacPanel .tac-offset', { timeout: 60000 });
     else await page.waitForSelector('#loadingOverlay.hidden', { timeout: 60000 });
     if (prep) { await page.evaluate(prep); }
     await new Promise(r => setTimeout(r, 1500)); // let the tab render / map paint

@@ -23,7 +23,12 @@ def build(png: pathlib.Path) -> int:
 
 def main() -> int:
     DST.mkdir(parents=True, exist_ok=True)
-    pngs = sorted(SRC.glob('*.png'))
+    # Optional ids: build only those cards (a re-shoot of one section must not
+    # re-encode the others).
+    pngs = [SRC / f'{i}.png' for i in sys.argv[1:]] or sorted(SRC.glob('*.png'))
+    missing = [p for p in pngs if not p.is_file()]
+    if missing:
+        print('no source for', ', '.join(p.name for p in missing)); return 1
     if not pngs:
         print('no sources in promo/cards-src — run node scripts/shoot_cards.mjs first'); return 1
     worst = max(build(p) for p in pngs)
