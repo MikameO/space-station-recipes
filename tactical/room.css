@@ -1,0 +1,177 @@
+/*
+  SPDX-License-Identifier: GPL-3.0-only
+  Copyright (C) 2026 MikameO
+  This file is part of Space Station Recipes.
+  See LICENSE for details.
+*/
+/* Officers' room on the tactical map. Scoped to .tac-room-* and body.tac-room-on;
+   tactical.css is never overridden outside these selectors. */
+
+.tac-room-panel { grid-column: 2; grid-row: 1; }
+body.tac-room-on #tacPanel { display: none; }
+
+.tac-room-draw {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+}
+.tac-room-draw.active { pointer-events: auto; cursor: crosshair; touch-action: none; }
+
+.tac-room-chips {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  right: 8px;
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  flex-wrap: nowrap;
+  pointer-events: none;
+  z-index: 3;
+  scrollbar-width: none;
+}
+.tac-room-chips > * { pointer-events: auto; }
+
+.tac-room-chip {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 28px;
+  padding: 0 10px;
+  border-radius: 14px;
+  border: 1px solid var(--border-active);
+  background: rgba(6, 9, 15, 0.92);
+  color: var(--text-bright);
+  font-size: 13px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.tac-room-chip.ready { border-color: var(--phosphor); color: var(--phosphor); }
+.tac-room-chip.busy { border-color: var(--amber); color: var(--amber); }
+.tac-room-chip.cooldown { border-color: var(--border-subtle); color: var(--text-ghost); }
+.tac-room-chip.down { border-color: var(--red-alert); color: var(--red-alert); }
+
+.tac-room-strip {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 6px 8px;
+  border-top: 1px solid var(--border-subtle);
+  min-height: 64px;
+  background: var(--panel);
+}
+
+.tac-room-shelf {
+  position: absolute;
+  top: 44px;
+  right: 8px;
+  bottom: 8px;
+  width: min(360px, calc(100% - 16px));
+  overflow-y: auto;
+  z-index: 4;
+  border: 1px solid var(--border-active);
+  border-radius: 8px;
+  background: var(--panel);
+  padding: 10px;
+}
+.tac-room-close { float: right; }
+
+.tac-room-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+.tac-room-code {
+  font-family: ui-monospace, "Cascadia Mono", Consolas, monospace;
+  font-size: 18px;
+  letter-spacing: 0.08em;
+  color: var(--phosphor);
+}
+.tac-room-me { margin-left: auto; color: var(--text-bright); }
+
+.tac-room-tools { display: flex; gap: 4px; flex-wrap: wrap; margin: 6px 0; }
+.tac-room-tabs { display: flex; gap: 4px; margin: 8px 0; flex-wrap: wrap; }
+
+.tac-room-form { display: flex; flex-direction: column; gap: 8px; }
+.tac-room-form .tac-select, .tac-room-form .tac-input { width: 100%; }
+.tac-room-postpick { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.tac-room-code.tac-input { text-transform: uppercase; font-family: ui-monospace, "Cascadia Mono", Consolas, monospace; letter-spacing: 0.08em; }
+
+.tac-room-word {
+  font: 700 28px ui-monospace, "Cascadia Mono", Consolas, monospace;
+  letter-spacing: 0.1em;
+  color: var(--phosphor);
+  text-align: center;
+  padding: 14px;
+  margin: 8px 0;
+  border: 1px dashed var(--phosphor-dim);
+  border-radius: 8px;
+}
+
+.tac-room-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--border-subtle);
+  flex-wrap: wrap;
+}
+.tac-room-row.faded { opacity: 0.5; }
+.tac-room-row.me .tac-room-name { color: var(--text-bright); }
+.tac-room-name { flex: 1; min-width: 140px; overflow-wrap: anywhere; }
+.tac-room-actions { display: flex; gap: 4px; flex-wrap: wrap; }
+.tac-room-tag {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 0 6px;
+  border-radius: 8px;
+  border: 1px solid var(--border-active);
+  font-size: 11px;
+  color: var(--cyan);
+}
+
+.tac-room-sig { flex: none; width: 14px; height: 14px; border: 2px solid var(--sig, #fff); }
+.tac-room-sig-staff { border-width: 3px; }
+.tac-room-sig-squad { transform: rotate(45deg) scale(0.8); }
+.tac-room-sig-service { border-radius: 50%; border-style: dashed; }
+
+.tac-room-sheet {
+  max-height: 180px;
+  overflow: auto;
+  padding: 8px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 6px;
+  background: var(--hull-plate);
+  font-size: 12px;
+  white-space: pre-wrap;
+}
+.tac-room-staff { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+
+.tac-room-banner p { margin: 0 0 6px; }
+.tac-room-banner.frozen { border-color: var(--cyan); background: var(--cyan-dim); }
+.tac-room-banner.warn { border-color: var(--amber); }
+
+.tac-room-btn.on { border-color: var(--cyan); color: var(--cyan); }
+
+.tac-room-toast {
+  position: fixed;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: calc(100% - 32px);
+  padding: 10px 16px;
+  border: 1px solid var(--border-active);
+  border-radius: 8px;
+  background: rgba(6, 9, 15, 0.96);
+  color: var(--text-bright);
+  font-size: 14px;
+  z-index: 50;
+}
+
+body.tac-room-picking .tac-canvas { cursor: cell; }
