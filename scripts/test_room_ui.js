@@ -51,7 +51,7 @@ function world(opt = {}) {
     body: el('body'), head: el('head'), activeElement: null,
     getElementById: id => els[id] || null, createElement: tag => el(tag), addEventListener() {}
   };
-  const w = { els, document, warnings: [], goals: [], fetches: [], intervals: [], layers: [], draws: 0, listeners: {}, copied: [] };
+  const w = { els, document, warnings: [], goals: [], fetches: [], intervals: [], clearedIntervals: [], layers: [], draws: 0, listeners: {}, copied: [] };
   const win = {
     I18N_LANG: opt.lang || 'ru',
     location: { hash: opt.hash || '', hostname: '127.0.0.1', origin: 'http://127.0.0.1:8000', pathname: '/tactical.html', search: '' },
@@ -59,6 +59,7 @@ function world(opt = {}) {
     console: { warn: (...a) => w.warnings.push(a.map(x => (x && x.message) || String(x)).join(' ')) },
     setTimeout: (fn, ms) => setTimeout(fn, ms), clearTimeout: t => clearTimeout(t),
     setInterval: fn => { w.intervals.push(fn); return w.intervals.length; },
+    clearInterval: id => { w.clearedIntervals.push(id); },
     requestAnimationFrame: opt.raf || (fn => { fn(); return 1; }),
     matchMedia: () => ({ matches: !!opt.narrow, addEventListener() {} }),
     performance: { getEntriesByType: () => [{ type: opt.nav || 'navigate' }] },
@@ -130,25 +131,65 @@ async function t(name, fn) { await fn(); n++; console.log('ok', name); }
     assert.strictEqual(bare.layers.length, 0);
   });
 
-  await t('the 1 s tick runs on TacRoom.timers when room.js offers them, on the page setInterval otherwise', async () => {
+  // Changed in the final review: outside a room the tick stays on the page timers, so a visitor's page starts no worker.
+  await t('the 1 s tick: page timers while the panel is off or no room code is held, TacRoom.timers only in a room; one interval at a time', async () => {
     const w = world();
-    const asked = [];
-    w.win.TacRoom.timers = { setInterval: (fn, ms) => { asked.push({ fn, ms }); return 7; }, clearInterval() {} };
+    const asked = [], cleared = [];
+    w.win.TacRoom.timers = { setInterval: (fn, ms) => { asked.push({ fn, ms }); return 70 + asked.length; }, clearInterval: id => cleared.push(id) };
     w.attach();
-    assert.deepStrictEqual([asked.length, asked[0] && asked[0].ms, w.intervals.length], [1, 1000, 0], 'worker timers, no page interval');
-    assert.deepStrictEqual([w.ui().tickTimer.timers, w.ui().tickTimer.id], [w.win.TacRoom.timers, 7]);
-    assert.doesNotThrow(() => asked[0].fn(), 'the timer runs the shell tick');
+    await settle();
+    const ui = w.ui();
+    assert.deepStrictEqual([asked.length, w.intervals.length, ui.tickTimer.timers === w.win, ui.tickTimer.id], [0, 1, true, 1], 'a visitor outside a room wakes no worker timer');
     w.attach();
-    assert.strictEqual(asked.length, 1, 'a second attach adds no tick');
+    assert.deepStrictEqual([asked.length, w.intervals.length], [0, 1], 'a second attach adds no tick');
+    ui.client = stubClient({ code: null });
+    ui.on = true;
+    w.intervals[0]();
+    assert.deepStrictEqual([asked.length, w.intervals.length], [0, 1], 'the panel open without a room code stays on the page timers');
+    ui.client.code = 'ABCD23';
+    w.intervals[0]();
+    assert.deepStrictEqual([asked.length, asked[0].ms, w.clearedIntervals, ui.tickTimer.timers === w.win.TacRoom.timers], [1, 1000, [1], true],
+      'in a room: TacRoom.timers, and the page interval is cleared');
+    asked[0].fn();
+    asked[0].fn();
+    assert.strictEqual(asked.length, 1, 'ticks inside the room start no second interval');
+    ui.on = false;
+    asked[0].fn();
+    assert.deepStrictEqual([asked.length, cleared, w.intervals.length, ui.tickTimer.timers === w.win], [1, [71], 2, true], 'the panel off: back on the page timers');
+
+    // Through the real paths: a created room moves the tick at once (onUpdate), leaving puts it back.
+    const demo = world({ hash: '#room=demo', sessionStorage: fakeStorage(), fixtures: true, fetch: answer(basePolicy) });
+    const demoAsked = [], demoCleared = [];
+    demo.win.TacRoom.timers = { setInterval: (fn, ms) => { demoAsked.push(ms); return 90 + demoAsked.length; }, clearInterval: id => demoCleared.push(id) };
+    demo.attach();
+    await settle();
+    assert.deepStrictEqual([demoAsked.length, demo.ui().on], [0, true], 'the demo panel is open, no room yet');
+    submit(demo, 'create', { post: 'so', callsign: '' });
+    await settle();
+    const c = demo.ui().client;
+    c.stopLoop();
+    assert.deepStrictEqual([c.status, demoAsked, demo.ui().tickTimer.timers === demo.win.TacRoom.timers], ['in', [1000], true]);
+    click(demo, 'leave');
+    click(demo, 'leave');
+    await settle();
+    assert.deepStrictEqual([c.code, demoCleared, demoAsked.length, demo.ui().tickTimer.timers === demo.win], [null, [91], 1, true]);
+
     const node = world();
     node.attach();
-    assert.deepStrictEqual([node.win.TacRoom.timers.mode(), node.intervals.length], ['page', 1], 'no Worker under Node: TacRoom.timers lands on the page timer');
+    await settle();
+    node.ui().client = stubClient({ code: 'ABCD23' });
+    node.ui().on = true;
+    node.intervals[0]();
+    assert.deepStrictEqual([node.win.TacRoom.timers.mode(), node.intervals.length, node.clearedIntervals], ['page', 2, [1]],
+      'no Worker under Node: TacRoom.timers lands on the page timer');
     const bare = world();
     delete bare.win.TacRoom.timers;
     bare.attach();
-    assert.deepStrictEqual([bare.intervals.length, bare.ui().tickTimer.timers], [1, bare.win], 'a room.js without timers: the page setInterval');
-    assert.doesNotThrow(() => bare.intervals[0]());
     await settle();
+    bare.ui().client = stubClient({ code: 'ABCD23' });
+    bare.ui().on = true;
+    assert.doesNotThrow(() => bare.intervals[0]());
+    assert.deepStrictEqual([bare.intervals.length, bare.ui().tickTimer.timers === bare.win], [1, true], 'a room.js without timers: the page setInterval');
   });
 
   await t('U2: a throwing module stays inside the shell (notify, draw, tick, pick) and a used pick is no cancel', async () => {
@@ -657,6 +698,37 @@ async function t(name, fn) { await fn(); n++; console.log('ok', name); }
     assert.strictEqual(api.squadName('bravo'), 'Bravo');
     assert.strictEqual(api.fnName('mortar'), 'Mortar');
     assert.strictEqual(api.fnName('medic'), 'Медик', 'falls back to the Russian name');
+  });
+
+  await t('final review: texts for the remaining Worker error codes; no toast or form error for session or rotated once the banner says expired; esc covers the apostrophe', async () => {
+    const w = world({ hash: '#room=demo', sessionStorage: fakeStorage(), fixtures: true, fetch: answer(basePolicy) });
+    w.attach();
+    await settle();
+    const api = w.api(), ui = w.ui(), c = ui.client;
+    const codes = ['session', 'code', 'observer', 'collision', 'client', 'planet', 'missing', 'extended', 'id'];
+    codes.forEach(code => assert.ok(api.errorText(code).indexOf('Ошибка') !== 0, 'ru text for ' + code));
+    const en = world({ lang: 'en' });
+    codes.forEach(code => assert.ok(en.api().errorText(code).indexOf('Error:') !== 0, 'en text for ' + code));
+    for (const error of ['session', 'rotated']) {
+      ui.toastEl.textContent = '';
+      ui.lastError = null;
+      c.status = 'expired';
+      c.error = error;
+      c.onUpdate(c);
+      await settle();
+      const html = w.els.tacRoom.innerHTML;
+      assert.strictEqual(ui.toastEl.textContent, '', 'no toast for ' + error);
+      assert.ok(html.indexOf('Сессия закрыта: код сменили') >= 0, 'the banner says it');
+      assert.ok(html.indexOf('tac-msg error') < 0, 'no form error repeats it for ' + error);
+    }
+    ui.toastEl.textContent = '';
+    ui.lastError = null;
+    c.status = 'idle';
+    c.error = 'session';
+    c.onUpdate(c);
+    await settle();
+    assert.strictEqual(ui.toastEl.textContent, api.errorText('session'), 'outside the expired state the text shows');
+    assert.strictEqual(api.esc('<a href=\'x\' title="y">&</a>'), '&lt;a href=&#39;x&#39; title=&quot;y&quot;&gt;&amp;&lt;/a&gt;');
   });
 
   notes.forEach(x => console.log('note:', x));

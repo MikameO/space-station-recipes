@@ -286,7 +286,7 @@
     this.more = false;
     this.changes = 0;
     this.memo = null;
-    for (var cid in waiters) waiters[cid]({ ok: false, error: 'reset' });
+    for (var cid in waiters) if (has(waiters, cid)) waiters[cid]({ ok: false, error: 'reset' });
   };
 
   // Per room and per client: two officers testing in one browser never share a session.
@@ -359,9 +359,17 @@
   };
 
   function isObject(v) { return !!v && typeof v === 'object' && !Array.isArray(v); }
-  // A pending op as queue() stores it; anything else in storage is dropped.
+  // A pending op as queue() stores it, with an id the room accepts; anything else in storage is dropped.
   function storedOp(op) {
-    return isObject(op) && typeof op.cid === 'string' && typeof op.op === 'string' && typeof op.kind === 'string' && typeof op.id === 'string';
+    return isObject(op) && typeof op.cid === 'string' && typeof op.op === 'string' && typeof op.kind === 'string' && typeof op.id === 'string' &&
+      !R.idError(op.kind, op.id);
+  }
+  // The briefing sheet as the Worker sends it, [{post, squad, code}]; other entries go, and anything but a list is no sheet.
+  function storedSheet(v) {
+    if (!Array.isArray(v)) return null;
+    return v.filter(function (s) {
+      return isObject(s) && typeof s.post === 'string' && typeof s.code === 'string' && (s.squad === null || s.squad === undefined || typeof s.squad === 'string');
+    }).map(function (s) { return { post: s.post, squad: s.squad || null, code: s.code }; });
   }
 
   // Storage is never trusted: an older format, a hand edit or a broken write must not break every render.
@@ -373,11 +381,16 @@
     this.session = saved.session || null;
     this.observer = saved.observer || null;
     this.word = saved.word || null;
-    this.sheet = saved.sheet || null;
+    this.sheet = storedSheet(saved.sheet);
     this.observerToken = saved.observerToken || null;
     var seq = saved.seq, objects = {}, id;
     this.room = R.createState(typeof seq === 'number' && isFinite(seq) && seq > 0 ? Math.floor(seq) : 0);
-    if (isObject(saved.objects)) for (id in saved.objects) if (has(saved.objects, id) && isObject(saved.objects[id])) objects[id] = saved.objects[id];
+    // JSON.parse keeps a "__proto__" key as an own key: assigned here it would replace the prototype of objects.
+    if (isObject(saved.objects)) {
+      for (id in saved.objects) {
+        if (has(saved.objects, id) && isObject(saved.objects[id]) && !R.idError(saved.objects[id].kind, id)) objects[id] = saved.objects[id];
+      }
+    }
     this.room.objects = objects;
     this.pending = (Array.isArray(saved.pending) ? saved.pending : []).filter(storedOp);
     this.acked = (Array.isArray(saved.acked) ? saved.acked : []).filter(function (a) {
@@ -762,15 +775,16 @@
       return m.state;
     }
     var objects = {}, own = {}, id;
-    for (id in this.room.objects) objects[id] = this.room.objects[id];
+    for (id in this.room.objects) if (has(this.room.objects, id)) objects[id] = this.room.objects[id];
     var s = R.createState(this.room.seq);
     s.objects = objects;
     var at = this.serverNow();
     var me = this.me ? { client: this.me.client, post: this.me.post, squad: this.me.squad || null } : { client: this.client, post: null, squad: null };
+    // Own keys only: an op id like `constructor` must never pick up Object.prototype's member.
     function overlay(op, seq, mark) {
-      if (objects[op.id] && !own[op.id]) { objects[op.id] = copy(objects[op.id]); own[op.id] = true; }
+      if (has(objects, op.id) && !has(own, op.id)) { objects[op.id] = copy(objects[op.id]); own[op.id] = true; }
       var res = R.applyOp(s, { seq: seq, at: at, by: me, op: op.op, kind: op.kind, id: op.id, data: copy(op.data || {}), expectedStatus: op.expectedStatus });
-      if (res.ok && objects[op.id]) {
+      if (res.ok && has(objects, op.id)) {
         own[op.id] = true;
         if (mark) objects[op.id].pending = true;
       }
@@ -794,6 +808,7 @@
   RoomClient.prototype.members = function () {
     var out = [], P = this.policy, id, o;
     for (id in this.room.objects) {
+      if (!has(this.room.objects, id)) continue;
       o = this.room.objects[id];
       if (o.kind === 'member' && !o.deleted) out.push(o);
     }

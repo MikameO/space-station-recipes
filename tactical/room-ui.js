@@ -78,6 +78,10 @@
         json: 'The server could not read the request.', fields: 'Invalid fields in the change.', field: 'Invalid fields in the change.',
         deleted: 'That object was already removed.', fork: 'This key belongs to another server fork.', reset: 'The room was reset; the change was not sent.',
         early: 'Too early: the round can be extended in its last 20 minutes.', size: 'The change is too large to send.',
+        session: 'Your session ended: join the room again.', code: 'Wrong room code.',
+        observer: 'The moderator link only reads the room, or it has ended.', collision: 'No free room code came up: try again.',
+        client: 'This browser sent a broken id: reload the page.', planet: 'Pick the planet on the map before creating a room.',
+        missing: 'That object no longer exists.', extended: 'The round is already extended.', id: 'Invalid object id.',
         fallback: 'Error: {code}'
       }
     },
@@ -129,6 +133,10 @@
         json: 'Сервер не понял запрос.', fields: 'Недопустимые поля в изменении.', field: 'Недопустимые поля в изменении.',
         deleted: 'Этот объект уже удалён.', fork: 'Этот ключ выдан для другого форка сервера.', reset: 'Комната перезапущена, изменение не отправлено.',
         early: 'Рано: продлить раунд можно в последние 20 минут.', size: 'Изменение слишком большое для отправки.',
+        session: 'Сессия закрыта: войдите в комнату заново.', code: 'Неверный код комнаты.',
+        observer: 'Ссылка для модератора только читает комнату или уже не действует.', collision: 'Не удалось подобрать новый код комнаты, попробуйте ещё раз.',
+        client: 'Браузер прислал неверный идентификатор: перезагрузите страницу.', planet: 'Выберите планету на карте, прежде чем создавать комнату.',
+        missing: 'Этого объекта уже нет.', extended: 'Раунд уже продлён.', id: 'Недопустимый идентификатор объекта.',
         fallback: 'Ошибка: {code}'
       }
     }
@@ -167,7 +175,7 @@
   }
   function esc(s) {
     return String(s === null || s === undefined ? '' : s)
-      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
   }
   function fmt(template, vars) {
     return String(template).replace(/\{(\w+)\}/g, function (m, k) { return vars && vars[k] !== undefined ? vars[k] : m; });
@@ -217,6 +225,11 @@
     return p ? p.name : (id || '');
   }
   function errorText(code) { return has(T.errors, code) ? T.errors[code] : fmt(T.errors.fallback, { code: code }); }
+  // The client's error as the panel shows it: none for a session that ended, since the «expired» banner already says so.
+  function shownError(c) {
+    if (!c || !c.error || c.error === 'network') return null;
+    return c.status === 'expired' && (c.error === 'session' || c.error === 'rotated') ? null : c.error;
+  }
   function planetOk() {
     var m = ui.client && ui.client.meta;
     if (!m || !m.planet) return true;   // meta not loaded yet
@@ -385,7 +398,7 @@
   function fixtureReady() {
     if (!ui.demo || root.TacRoomFixture) return Promise.resolve();
     if (!ui.fixtureLoading) {
-      ui.fixtureLoading = loadScript('tactical/room-fixtures.js?v=1').then(null, function (e) { ui.fixtureLoading = null; throw e; });
+      ui.fixtureLoading = loadScript('tactical/room-fixtures.js?v=2').then(null, function (e) { ui.fixtureLoading = null; throw e; });
     }
     return ui.fixtureLoading;
   }
@@ -414,8 +427,9 @@
   function onClientUpdate(c) {
     var shown = {};   // a refused batch (for example 423) must not stack one toast per op
     while (c.rejected.length) { var r = c.rejected.shift(), msg = errorText(r.error); if (!shown[msg]) { shown[msg] = true; toast(msg); } }
-    if (c.error && c.error !== ui.lastError && c.error !== 'network') toast(errorText(c.error));
+    if (shownError(c) && c.error !== ui.lastError) toast(errorText(c.error));
     ui.lastError = c.error;
+    syncTick();
     var current = CURRENT_KEY + ':' + c.client;
     if (c.status === 'expired' || c.status === 'gone') ui.storage.remove(current);   // a reload must not resume a dead session
     else if (c.code && (c.status === 'in' || c.status === 'knocking' || c.status === 'observer')) {
@@ -605,7 +619,7 @@
     var squads = Object.keys(P.squads).map(function (s) { return [s, squadName(s)]; });
     var withPost = entry.indexOf('-') >= 0;
     var callsignMax = Math.max(1, Math.floor(+P.limits.callsign) || 20);
-    var error = c.error && c.error !== 'network' ? '<p class="tac-msg error">' + esc(errorText(c.error)) + '</p>' : '';
+    var error = shownError(c) ? '<p class="tac-msg error">' + esc(errorText(c.error)) + '</p>' : '';
     var inCreate = ui.errorForm === 'create';   // the error shows inside the form that was sent
     // The server key never comes back into the page: a saved key is only named, and replacing it starts from an empty field.
     var savedKey = ui.demo ? null : ui.storage.read(KEY_PREFIX + ui.forkKey);
@@ -839,6 +853,7 @@
     ui.forceRender = true;
     render();
     ui.hooks.redraw();
+    syncTick();
   }
 
   // ── actions ────────────────────────────────────────────
@@ -1070,12 +1085,29 @@
   function tick() {
     try {
       var ctx = ui.hooks.getContext();
-      if (ctx.fork && ui.forkKey !== ctx.fork.key) { switchFork(ctx.fork.key); return; }
+      if (ctx.fork && ui.forkKey !== ctx.fork.key) { switchFork(ctx.fork.key); syncTick(); return; }
       var planet = ctx.meta ? ctx.meta.id : null;
       if (planet !== ui.planetId) { ui.planetId = planet; if (ui.on) queueRender(); }
       updateCountdowns();
     } catch (e) { warn('tick', e); return; }
     eachModule('tick', function (m) { m.tick(api); });
+    syncTick();
+  }
+
+  // The 1 s tick runs on the page's own timers for a visitor who is not in a room (a hidden page may doze, and
+  // TacRoom.timers would start a worker for nothing), and on TacRoom.timers while the panel shows a room with a code,
+  // so the request ping keeps its pace in a window behind the game. One interval at a time; the old one goes after the new starts.
+  function syncTick() {
+    if (!ui.hooks) return;
+    var worker = ui.root && ui.root.timers;
+    var room = ui.on && !!(ui.client && ui.client.code);
+    var clock = room && worker && typeof worker.setInterval === 'function' && typeof worker.clearInterval === 'function' ? worker : root;
+    var cur = ui.tickTimer;
+    if (cur && cur.timers === clock) return;
+    try {
+      ui.tickTimer = { timers: clock, id: clock.setInterval(tick, 1000) };
+    } catch (e) { warn('tick timer', e); return; }
+    if (cur) { try { cur.timers.clearInterval(cur.id); } catch (e) { warn('tick timer', e); } }
   }
 
   function mount(hooks, apiRoot) {
@@ -1123,10 +1155,9 @@
       });
     });
     eachModule('mount', function (m) { m.mount(api); });
-    // Worker timers from room.js when there: the request ping keeps its pace in a window hidden behind the game.
-    // No unmount or leave path stops the tick (leaving the room still needs fork switches), so it runs for the page.
-    var clock = apiRoot.timers && typeof apiRoot.timers.setInterval === 'function' ? apiRoot.timers : root;
-    ui.tickTimer = { timers: clock, id: clock.setInterval(tick, 1000) };
+    // The tick runs for the page (leaving the room still needs fork switches); syncTick moves it between the page
+    // timers and TacRoom.timers as the officer enters or leaves a room.
+    syncTick();
     tick();
   }
 
