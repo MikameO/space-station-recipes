@@ -16,26 +16,39 @@
   var PREFIX = 'chemdb-tactical:';
   var CURRENT_KEY = PREFIX + 'room-current';
   var DEV_KEY = PREFIX + 'room-dev';
-  var SITE = 'https://mikameo.github.io/space-station-recipes/tactical.html';
+  var KEY_PREFIX = PREFIX + 'room-key:';
+  var DEMO_KEY = PREFIX + 'room-demo';   // sessionStorage: the demo survives a reload of this tab
+  var PROD_SITE = 'https://mikameo.github.io/space-station-recipes/tactical.html';
+  var SITE = siteUrl(root.location);
   var YM = 108585248;
+  var EDIT_HOLD_MS = 4000;   // a text field without input this long no longer holds panel writes back
+
+  // Links and the briefing sheet point at the page they were made on; a local preview never sends people to production.
+  function siteUrl(loc) {
+    if (!loc || !loc.hostname || loc.hostname === 'mikameo.github.io' || !loc.origin || loc.origin === 'null') return PROD_SITE;
+    return loc.origin + (loc.pathname || '/tactical.html');
+  }
 
   var L10N = {
     en: {
       toggleRoom: 'Room', toggleFire: 'Fire',
-      entryTitle: 'Join a room', entryLabel: 'Code from the briefing sheet', entryHint: 'K7M4Q2 or K7M4Q2-SL4B',
+      entryTitle: 'Join a room', entryLabel: 'Code from the briefing sheet', entryHint: 'K7M4Q2 or K7M4Q2-SK4B',
       callsign: 'Callsign (optional)', post: 'Post', squad: 'Squad', join: 'Join',
       createTitle: 'Create a room (staff)', serverKey: 'Server key', createPost: 'Your post', create: 'Create',
+      keySaved: 'key saved', keyReplace: 'replace', keyForget: 'forget key', keyForgotten: 'The server key is forgotten.',
       demoCreate: 'Create a demo room', demoNote: 'Demo: the room lives in this tab only; the other officers are scripted.',
-      knockTitle: 'Waiting for confirmation',
+      knockTitle: 'Waiting for confirmation', resuming: 'Returning to the room…',
       knockText: 'Say this word on the radio. Anyone already in the room confirms you. The word lasts 5 minutes.',
       cancel: 'Cancel', leave: 'Leave', leaveAsk: 'Leave for sure?', observerBadge: 'Observer',
       tabs: { roster: 'Roster' }, shelf: 'Roster {n}', knockBadge: 'knock {n}',
       confirm: 'Confirm', gone: 'Dropped', goneAsk: 'Drop for sure?', claim: 'Take over', knocking: 'waiting', wordsAsk: 'Word heard:',
+      knockWaiting: 'Waiting to join: {who}',
       sheet: 'Briefing sheet', sheetAll: 'Whole sheet', sheetHead: 'Command tablet',
       sheetHint: 'Enter the post code as one line: ROOM-CODE.', roomCode: 'Room', copy: 'Copy', copied: 'Copied',
-      observerLink: 'Moderator link', rotate: 'Change code', rotateAsk: 'Every session ends. Change?', rotated: 'New room code: {code}. Tell it on the radio.',
+      observerLink: 'Moderator link', observerFail: 'No moderator link yet: try again.',
+      rotate: 'Change code', rotateAsk: 'Every session and the moderator link end. Change?', rotated: 'New room code: {code}. Tell it on the radio.',
       silenceOn: 'Radio silence', silenceOff: 'End radio silence', extend: 'Extend by an hour',
-      close: 'Close the room', closeAsk: 'Close for sure?', exportLog: 'Download log', continueRound: 'Continue this round',
+      close: 'Close the room', closeAsk: 'Close for sure?', exportLog: 'Download log', exportJson: 'Download JSON', continueRound: 'Continue this round',
       present: 'I am here', presentAsk: 'No actions from you for 8 minutes: the room drops you at 10.',
       newCode: 'New post code: {code}', pickHint: '{hint} · Esc cancels',
       levelNames: { staff: 'Staff', squad: 'Squads', service: 'Services', observer: 'Observers' },
@@ -59,25 +72,32 @@
         rate: 'Too fast, wait a second.', layer: 'You cannot draw on that layer.', right: 'Your post cannot do that.',
         status: 'Someone changed it first.', transition: 'Not possible in this state.', network: 'No connection.',
         unconfirmed: 'Wait for confirmation.', creator: 'Only staff posts create rooms.', disabled: 'Rooms are switched off.',
+        member: 'This post is already held. Rejoin from the same browser or ask for a reissue.', exists: 'That object already exists.',
+        author: 'You cannot carry out your own request.', last: 'Cannot remove the last member who can confirm joins.',
+        knocks: 'Too many people waiting, try again in a minute.', rotated: 'The room code was changed — ask staff for the new one.',
+        json: 'The server could not read the request.', fields: 'Invalid fields in the change.', field: 'Invalid fields in the change.',
         fallback: 'Error: {code}'
       }
     },
     ru: {
       toggleRoom: 'Комната', toggleFire: 'Огонь',
-      entryTitle: 'Войти в комнату', entryLabel: 'Код с листа брифинга', entryHint: 'K7M4Q2 или K7M4Q2-SL4B',
+      entryTitle: 'Войти в комнату', entryLabel: 'Код с листа брифинга', entryHint: 'K7M4Q2 или K7M4Q2-SK4B',
       callsign: 'Позывной (необязательно)', post: 'Должность', squad: 'Отряд', join: 'Войти',
       createTitle: 'Создать комнату (штаб)', serverKey: 'Ключ сервера', createPost: 'Ваша должность', create: 'Создать',
+      keySaved: 'ключ сохранён', keyReplace: 'заменить', keyForget: 'забыть ключ', keyForgotten: 'Ключ сервера забыт.',
       demoCreate: 'Создать демо-комнату', demoNote: 'Демо: комната живёт только в этой вкладке, остальные офицеры сыграны сценарием.',
-      knockTitle: 'Ждём подтверждения',
+      knockTitle: 'Ждём подтверждения', resuming: 'Возвращаемся в комнату…',
       knockText: 'Назовите это слово по рации. Подтвердит любой участник, который уже в комнате. Слово действует 5 минут.',
       cancel: 'Отменить', leave: 'Выйти', leaveAsk: 'Точно выйти?', observerBadge: 'Наблюдатель',
       tabs: { roster: 'Реестр' }, shelf: 'Реестр {n}', knockBadge: 'стук {n}',
       confirm: 'Подтвердить', gone: 'Выбыл', goneAsk: 'Точно выбыл?', claim: 'Занять', knocking: 'ждёт', wordsAsk: 'Услышанное слово:',
+      knockWaiting: 'Ждёт входа: {who}',
       sheet: 'Лист брифинга', sheetAll: 'Весь лист', sheetHead: 'Командный планшет',
       sheetHint: 'Код должности вводится одной строкой: КОМНАТА-КОД.', roomCode: 'Комната', copy: 'Копировать', copied: 'Скопировано',
-      observerLink: 'Ссылка для модератора', rotate: 'Сменить код', rotateAsk: 'Все сессии закроются. Сменить?', rotated: 'Новый код комнаты: {code}. Передайте по рации.',
+      observerLink: 'Ссылка для модератора', observerFail: 'Ссылка для модератора не выдана: попробуйте ещё раз.',
+      rotate: 'Сменить код', rotateAsk: 'Все сессии и ссылка для модератора закроются. Сменить?', rotated: 'Новый код комнаты: {code}. Передайте по рации.',
       silenceOn: 'Радиомолчание', silenceOff: 'Снять радиомолчание', extend: 'Продлить на час',
-      close: 'Закрыть комнату', closeAsk: 'Точно закрыть?', exportLog: 'Скачать журнал', continueRound: 'Продолжить раунд',
+      close: 'Закрыть комнату', closeAsk: 'Точно закрыть?', exportLog: 'Скачать журнал', exportJson: 'Скачать JSON', continueRound: 'Продолжить раунд',
       present: 'На месте', presentAsk: 'От вас 8 минут нет действий: через 10 комната снимет вас с должности.',
       newCode: 'Новый код должности: {code}', pickHint: '{hint} · Esc — отмена',
       levelNames: { staff: 'Штаб', squad: 'Отряды', service: 'Службы', observer: 'Наблюдатели' },
@@ -101,6 +121,10 @@
         rate: 'Слишком быстро, подождите секунду.', layer: 'На этом слое вам рисовать нельзя.', right: 'Ваша должность этого не может.',
         status: 'Кто-то изменил это раньше вас.', transition: 'В этом состоянии так нельзя.', network: 'Нет связи.',
         unconfirmed: 'Дождитесь подтверждения.', creator: 'Комнату создаёт только штаб.', disabled: 'Комнаты выключены.',
+        member: 'Эта должность уже занята участником. Войдите с того же браузера или попросите «Занять».', exists: 'Такой объект уже есть — кто-то создал его раньше.',
+        author: 'Свой запрос нельзя принять или выполнить.', last: 'Нельзя снять последнего, кто может впускать в комнату.',
+        knocks: 'Слишком много ожидающих входа, попробуйте через минуту.', rotated: 'Код комнаты сменили — возьмите новый у штаба.',
+        json: 'Сервер не понял запрос.', fields: 'Недопустимые поля в изменении.', field: 'Недопустимые поля в изменении.',
         fallback: 'Ошибка: {code}'
       }
     }
@@ -112,13 +136,31 @@
   var ui = {
     hooks: null, root: null, els: {}, storage: null, policies: {}, policy: null, client: null,
     forkKey: null, planetId: null, on: false, tab: null, shelf: false, pick: null, demo: false,
-    pendingHash: {}, drafts: {}, confirming: null, sheetSquad: '', renderQueued: false,
-    prevStatus: null, lastError: null, narrow: false, fixtureReady: null, toastEl: null, toastTimer: 0
+    pendingHash: {}, drafts: {}, confirming: null, sheetSquad: '', renderQueued: false, forceRender: false,
+    html: {}, deferred: {}, keyReplace: false, errorForm: null, exporting: false,
+    editAt: 0, selectOpen: false, selectEl: null, deferTimer: 0,
+    lastError: null, narrow: false, fixtureLoading: null, toastEl: null, toastTimer: 0
   };
 
   // ── helpers ─────────────────────────────────────────────
 
   function $(id) { return document.getElementById(id); }
+  function has(obj, key) { return !!obj && Object.prototype.hasOwnProperty.call(obj, key); }
+  function cls(s) { return String(s === null || s === undefined ? '' : s).replace(/[^A-Za-z0-9_-]/g, ''); }
+  function safeColor(c) { return /^#[0-9A-Fa-f]{3,8}$/.test(String(c)) ? c : '#ffffff'; }
+  function warn(where, e) {
+    try {
+      if (!root.console || !root.console.warn) return;
+      if (e === undefined) root.console.warn('room: ' + where); else root.console.warn('room: ' + where, e);
+    } catch (x) { /* never break */ }
+  }
+  // Every module hook runs on its own: one throwing module never stops the others, the shell or Series T.
+  function eachModule(part, run) {
+    modules.forEach(function (m) {
+      if (!m[part]) return;
+      try { run(m); } catch (e) { warn(part + ' in ' + (m.id || 'module'), e); }
+    });
+  }
   function esc(s) {
     return String(s === null || s === undefined ? '' : s)
       .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -128,16 +170,18 @@
   }
   function attrs(data) {
     var out = '';
-    for (var k in data) if (Object.prototype.hasOwnProperty.call(data, k)) out += ' data-' + k + '="' + esc(data[k]) + '"';
+    for (var k in data) if (Object.prototype.hasOwnProperty.call(data, k)) out += ' data-' + cls(k) + '="' + esc(data[k]) + '"';
     return out;
   }
-  function btn(action, label, data, cls) {
-    return '<button type="button" class="btn-small tac-room-btn' + (cls ? ' ' + cls : '') + '" data-room-action="' + action + '"' + attrs(data || {}) + '>' + esc(label) + '</button>';
+  function classes(s) { return String(s || '').split(/\s+/).map(cls).filter(Boolean).join(' '); }
+  function btn(action, label, data, extra) {
+    return '<button type="button" class="btn-small tac-room-btn' + (extra ? ' ' + classes(extra) : '') + '" data-room-action="' + cls(action) + '"' + attrs(data || {}) + '>' + esc(label) + '</button>';
   }
   function banner(text, kind, actions) {
-    return '<div class="tac-banner tac-room-banner' + (kind ? ' ' + kind : '') + '"><p>' + esc(text) + '</p>' + (actions || '') + '</div>';
+    return '<div class="tac-banner tac-room-banner' + (kind ? ' ' + classes(kind) : '') + '"><p>' + esc(text) + '</p>' + (actions || '') + '</div>';
   }
   function track(goal) {
+    if (ui.demo) return;   // the demo never counts as a real room
     try { if (typeof root.ym === 'function') root.ym(YM, 'reachGoal', goal, { fork: ui.forkKey }); } catch (e) { /* never break */ }
   }
   function hhmm(serverMs) {
@@ -153,19 +197,28 @@
     return d ? (LANG === 'ru' ? d.nameRu : d.nameEn) : id;
   }
   function squadName(id) {
-    var s = ui.policy && ui.policy.squads[id];
+    var s = ui.policy && has(ui.policy.squads, id) ? ui.policy.squads[id] : null;
     return s ? (LANG === 'ru' ? s.nameRu : s.nameEn) : (id || '');
+  }
+  function memberName(m) {
+    return postName(m.post) + (m.squad ? ' · ' + squadName(m.squad) : '') + (m.callsign ? ' «' + m.callsign + '»' : '');
   }
   function fnName(id) {
     var f = ui.policy && ui.policy.functions.filter(function (x) { return x.id === id; })[0];
-    return f ? f.nameRu : id;
+    return f ? (LANG === 'en' && f.nameEn ? f.nameEn : f.nameRu) : id;
   }
   function planetName(id) {
     var ctx = ui.hooks ? ui.hooks.getContext() : null;
     var p = ctx && ctx.fork ? ctx.fork.planets.filter(function (x) { return x.id === id; })[0] : null;
     return p ? p.name : (id || '');
   }
-  function errorText(code) { return T.errors[code] || fmt(T.errors.fallback, { code: code }); }
+  function errorText(code) { return has(T.errors, code) ? T.errors[code] : fmt(T.errors.fallback, { code: code }); }
+  function planetOk() {
+    var m = ui.client && ui.client.meta;
+    if (!m || !m.planet) return true;   // meta not loaded yet
+    var ctx = ui.hooks ? ui.hooks.getContext() : null;
+    return !!(ctx && ctx.meta && ctx.meta.id === m.planet);
+  }
   function offset() {
     var c = ui.client && ui.client.calibration();
     if (c) return c.offset;
@@ -215,13 +268,14 @@
     ta.remove();
   }
   function download(name, text, type) {
-    var blob = new Blob([text], { type: type || 'application/json' });
+    var url = URL.createObjectURL(new Blob([text], { type: type || 'application/json' }));
     var a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
+    a.href = url;
     a.download = name;
     document.body.appendChild(a);
     a.click();
-    setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 0);
+    a.remove();
+    setTimeout(function () { URL.revokeObjectURL(url); }, 1000);   // revoking at once can cancel the download
   }
   function toast(text) {
     if (!ui.toastEl) return;
@@ -245,6 +299,25 @@
     var client = /[#&]client=([A-Za-z0-9_-]{8,40})/.exec(hash || '');   // dev only: a second officer in the same browser
     return { room: room ? room[1] : null, observe: observe ? observe[1] : null, client: client ? client[1] : null };
   }
+  // The observer token is a secret: it leaves the address bar (and history) as soon as the panel has read it.
+  // Series T's writeHash drops it only after the planet loads, never on a failed load or a same-planet hashchange.
+  function stripObserve() {
+    var loc = root.location, hist = root.history;
+    if (!loc || !hist || !hist.replaceState || !/[#&]observe=/.test(loc.hash || '')) return;
+    var rest = String(loc.hash).replace(/^#/, '').split('&').filter(function (p) { return p && p.indexOf('observe=') !== 0; }).join('&');
+    try { hist.replaceState(hist.state, '', (loc.pathname || '') + (loc.search || '') + (rest ? '#' + rest : '')); } catch (e) { /* keep going */ }
+  }
+  // An observer link opened in a tab that already shows the map arrives as a hashchange: read it, strip it, follow it.
+  function onHashChange() {
+    try {
+      var h = parseHash(root.location ? root.location.hash : '');
+      stripObserve();
+      if (!h.observe) return;
+      var ctx = ui.hooks.getContext();
+      if (ui.policy && ui.client && !(ctx.fork && ctx.fork.key !== ui.forkKey)) startObserve(h.observe);
+      else ui.pendingHash.observe = h.observe;   // switchFork follows it once the policy is loaded
+    } catch (e) { warn('hashchange', e); }
+  }
 
   // ── pick mode ────────────────────────────────────────────
 
@@ -254,19 +327,24 @@
     if (hint) toast(fmt(T.pickHint, { hint: hint }));
     queueRender();
   }
-  function cancelPick() {
-    if (!ui.pick) return;
+  function clearPick() {
     var p = ui.pick;
     ui.pick = null;
     document.body.classList.remove('tac-room-picking');
-    if (p.onCancel) p.onCancel();
     queueRender();
+    return p;
   }
+  function cancelPick() {
+    if (!ui.pick) return;
+    var p = clearPick();
+    if (p.onCancel) { try { p.onCancel(); } catch (e) { warn('pick cancel', e); } }
+  }
+  // Series T offers every map click here first. A used pick is not a cancel, so onCancel stays silent.
   function consumePick(tile) {
     if (!ui.on || !ui.pick) return false;
     var p = ui.pick;
-    if (!p.keep) cancelPick();
-    p.handler(tile);
+    if (!p.keep) clearPick();
+    try { p.handler(tile); } catch (e) { warn('pick', e); }
     return true;
   }
 
@@ -282,12 +360,40 @@
     if (!policy || !roomUrl()) return false;
     return !!devFlags() || policy.sanction.some(function (s) { return s.status !== 'none'; });
   }
+  function validPolicy(p) {
+    return !!(p && Array.isArray(p.posts) && Array.isArray(p.sanction) && Array.isArray(p.functions) && Array.isArray(p.assets) &&
+      p.squads && p.levels && p.rights && p.limits && p.ttl && p.layers &&
+      p.posts.some(function (x) { return x && x.level === 'staff'; }));
+  }
+  // Only a good policy is cached: after a failed load the toggle stays hidden and the next fork switch tries again.
   function loadPolicy(forkKey) {
-    if (ui.policies[forkKey] !== undefined) return Promise.resolve(ui.policies[forkKey]);
+    if (has(ui.policies, forkKey)) return Promise.resolve(ui.policies[forkKey]);
     var url = ui.demo ? 'tactical/policy/' + forkKey + '.json?v=1' : roomUrl() ? roomUrl() + '/policy/' + forkKey : null;
-    if (!url) { ui.policies[forkKey] = null; return Promise.resolve(null); }
-    return root.fetch(url).then(function (r) { return r.ok ? r.json() : null; }, function () { return null; })
-      .then(function (p) { ui.policies[forkKey] = p; return p; });
+    if (!url || typeof root.fetch !== 'function') return Promise.resolve(null);
+    return new Promise(function (resolve) { resolve(root.fetch(url)); })
+      .then(function (r) { return r && r.ok ? r.json() : null; })
+      .then(function (p) {
+        if (!validPolicy(p)) return null;
+        ui.policies[forkKey] = p;
+        return p;
+      }, function () { return null; });
+  }
+  function fixtureReady() {
+    if (!ui.demo || root.TacRoomFixture) return Promise.resolve();
+    if (!ui.fixtureLoading) {
+      ui.fixtureLoading = loadScript('tactical/room-fixtures.js?v=1').then(null, function (e) { ui.fixtureLoading = null; throw e; });
+    }
+    return ui.fixtureLoading;
+  }
+  // #room=demo starts the demo; a reload of the same tab keeps it (sessionStorage), a fresh visit does not.
+  function demoMode(hash) {
+    var ss = null, nav = '', kept = false;
+    try { ss = root.sessionStorage || null; } catch (e) { ss = null; }
+    try { var entry = root.performance.getEntriesByType('navigation')[0]; nav = entry ? entry.type : ''; } catch (e) { nav = ''; }
+    try { kept = !!ss && ss.getItem(DEMO_KEY) === '1'; } catch (e) { kept = false; }
+    var on = hash.room === 'demo' || (kept && !hash.room && !hash.observe && nav !== 'navigate');
+    try { if (ss) { if (on) ss.setItem(DEMO_KEY, '1'); else ss.removeItem(DEMO_KEY); } } catch (e) { /* the demo then ends on reload */ }
+    return on;
   }
   function ensureClient() {
     var ctx = ui.hooks.getContext();
@@ -300,23 +406,31 @@
       planet: ctx.meta ? ctx.meta.id : null, h: ctx.meta ? ctx.meta.h : '', onUpdate: onClientUpdate
     });
   }
+  // room_confirm is counted by the confirmer (actions.confirm), never again by the joiner.
   function onClientUpdate(c) {
-    if (c.status === 'in' && ui.prevStatus === 'knocking') track('room_confirm');
-    ui.prevStatus = c.status;
     while (c.rejected.length) { var r = c.rejected.shift(); toast(errorText(r.error)); }
     if (c.error && c.error !== ui.lastError && c.error !== 'network') toast(errorText(c.error));
     ui.lastError = c.error;
-    if (c.code && (c.status === 'in' || c.status === 'knocking' || c.status === 'observer')) {
-      ui.storage.write(CURRENT_KEY + ':' + c.client, { fork: c.fork, code: c.code });
+    var current = CURRENT_KEY + ':' + c.client;
+    if (c.status === 'expired' || c.status === 'gone') ui.storage.remove(current);   // a reload must not resume a dead session
+    else if (c.code && (c.status === 'in' || c.status === 'knocking' || c.status === 'observer')) {
+      ui.storage.write(current, { fork: c.fork, code: c.code });
     }
     queueRender();
+  }
+  // One path for an observer link, whether it came with the page load or a later hashchange.
+  function startObserve(token) {
+    var parts = String(token).split('.'), watcher = ui.client;
+    watcher.stopLoop();
+    watcher.observe(parts[0], parts[1]).then(function () { if (ui.client === watcher) watcher.startLoop(); });
+    setOn(true);
   }
   function switchFork(key) {
     ui.forkKey = key;
     if (ui.client) ui.client.stopLoop();
     ui.client = null;
     ui.policy = null;
-    ui.fixtureReady.then(function () { return loadPolicy(key); }).then(function (policy) {
+    fixtureReady().then(function () { return loadPolicy(key); }).then(function (policy) {
       if (ui.forkKey !== key) return;
       ui.policy = policy;
       var show = available(policy);
@@ -326,33 +440,53 @@
       var h = ui.pendingHash;
       ui.pendingHash = {};
       if (h.observe) {
-        var parts = h.observe.split('.');
-        ui.client.observe(parts[0], parts[1]).then(function () { ui.client.startLoop(); });
-        setOn(true);
+        startObserve(h.observe);
       } else {
         var cur = ui.storage.read(CURRENT_KEY + ':' + ui.client.client);
         if (!ui.demo && cur && cur.fork === key && ui.client.restore(cur.code)) ui.client.startLoop();
         if (h.room || ui.demo) { ui.drafts['join.entry'] = h.room && h.room !== 'demo' ? h.room : ''; setOn(true); }
       }
       queueRender();
+    }).then(null, function (e) {
+      // A broken policy or fixture: no toggle, no half-drawn panel; the next fork switch tries again.
+      if (ui.forkKey !== key) return;
+      warn('fork ' + key, e);
+      if (ui.client) ui.client.stopLoop();
+      ui.client = null;
+      ui.policy = null;
+      ui.els.toggle.classList.add('tac-hide');
+      if (ui.on) setOn(false);
     });
   }
 
   // ── rendering ────────────────────────────────────────────
 
-  function queueRender() {
+  // A frame or 100 ms, whichever comes first: a hidden or occluded window pauses frames, and the panel
+  // must still follow the officer's clicks. `once` makes the loser a no-op.
+  function queueRender(force) {
+    if (force === true) ui.forceRender = true;
     if (ui.renderQueued) return;
     ui.renderQueued = true;
-    (root.requestAnimationFrame || function (f) { return setTimeout(f, 16); })(render);
+    var done = false;
+    function once() { if (done) return; done = true; render(); }
+    try { if (typeof root.requestAnimationFrame === 'function') root.requestAnimationFrame(once); } catch (e) { /* the timer renders */ }
+    setTimeout(once, 100);   // the global timer: a bare window stub (Node module tests) has none of its own
   }
 
   function collect(part) {
-    return modules.map(function (m) { return m[part] ? m[part](api) : ''; }).join('');
+    var out = '';
+    eachModule(part, function (m) { out += m[part](api) || ''; });
+    return out;
+  }
+
+  function knockingMembers() {
+    return ui.client ? ui.client.members().filter(function (m) { return !m.confirmed; }) : [];
   }
 
   function tabs() {
-    var list = [{ id: 'roster', label: T.tabs.roster, narrow: false }];
-    modules.forEach(function (m) { if (m.tabs) list = list.concat(m.tabs(api)); });
+    var knocks = knockingMembers().length;
+    var list = [{ id: 'roster', label: T.tabs.roster + (knocks ? ' · ' + fmt(T.knockBadge, { n: knocks }) : ''), narrow: false }];
+    eachModule('tabs', function (m) { list = list.concat(m.tabs(api) || []); });
     var narrow = list.filter(function (t) { return t.narrow; });
     return ui.narrow && narrow.length ? narrow : list;
   }
@@ -361,7 +495,9 @@
     if (id === 'roster') return rosterHtml();
     for (var i = 0; i < modules.length; i++) {
       var m = modules[i];
-      if (m.tabs && m.tabs(api).some(function (t) { return t.id === id; })) return m.panel(id, api);
+      try {
+        if (m.tabs && m.tabs(api).some(function (t) { return t.id === id; })) return m.panel(id, api);
+      } catch (e) { warn('panel in ' + (m.id || 'module'), e); return ''; }
     }
     return '';
   }
@@ -372,22 +508,59 @@
 
   function render() {
     ui.renderQueued = false;
+    var force = ui.forceRender;
+    ui.forceRender = false;
     if (!ui.els.panel) return;
     var room = ui.on && inRoom();
     ui.els.chips.classList.toggle('tac-hide', !room);
     ui.els.strip.classList.toggle('tac-hide', !room);
     ui.els.shelf.classList.toggle('tac-hide', !(room && ui.shelf && ui.narrow));
     if (!ui.on) return;
-    var focus = captureFocus(ui.els.panel);
-    ui.els.panel.innerHTML = panelHtml(room);
-    restoreFocus(ui.els.panel, focus);
+    writeBox('panel', panelHtml(room), force);
     if (room) {
-      ui.els.chips.innerHTML = chipsHtml();
-      ui.els.strip.innerHTML = collect('strip');
-      if (ui.shelf && ui.narrow) ui.els.shelf.innerHTML = shelfHtml();
+      writeBox('chips', chipsHtml(), force);
+      writeBox('strip', collect('strip'), force);
+      if (ui.shelf && ui.narrow) writeBox('shelf', shelfHtml(), force);
     }
     updateCountdowns();
     ui.hooks.view.requestDraw();
+  }
+
+  // Writes only what changed, and never under an officer who is typing (a text field with input in the
+  // last 4 s) or has a list open: that write waits for focusout, the next change event or the 4 s cap.
+  // Checkboxes, radios and buttons never hold it back. Clicks and submits force it.
+  function writeBox(name, html, force) {
+    var box = ui.els[name];
+    if (html === ui.html[name]) { ui.deferred[name] = false; return; }
+    if (!force && editing(box)) { ui.deferred[name] = true; wakeDeferred(); return; }
+    var focus = captureFocus(box);
+    // The server key lives only in the field's value property, never in markup or drafts: carry it over by hand.
+    var keyField = box.querySelector ? box.querySelector('input[name="token"]') : null;
+    var key = keyField ? keyField.value : '';
+    box.innerHTML = html;
+    if (key) { var fresh = box.querySelector('input[name="token"]'); if (fresh) fresh.value = key; }
+    ui.html[name] = html;
+    ui.deferred[name] = false;
+    restoreFocus(box, focus);
+  }
+  function editing(box) {
+    var el = document.activeElement;
+    if (!el || el === box || !box.contains(el) || Date.now() - ui.editAt >= EDIT_HOLD_MS) return false;
+    var tag = el.tagName || '';
+    if (tag === 'TEXTAREA') return true;
+    if (tag === 'INPUT') return /^(text|search|email|url|tel|password|number)?$/.test(String(el.type || '').toLowerCase());
+    return tag === 'SELECT' && ui.selectOpen;
+  }
+  function wakeDeferred() {
+    if (ui.deferTimer) return;
+    ui.deferTimer = setTimeout(function () {
+      ui.deferTimer = 0;
+      if (anyDeferred()) queueRender();
+    }, Math.max(50, EDIT_HOLD_MS - (Date.now() - ui.editAt) + 50));
+  }
+  function anyDeferred() {
+    for (var k in ui.deferred) if (has(ui.deferred, k) && ui.deferred[k]) return true;
+    return false;
   }
 
   function panelHtml(room) {
@@ -397,7 +570,8 @@
       var top = '';
       if (c.status === 'expired') top = banner(T.banners.expired, 'warn');
       if (c.status === 'gone') top = banner(T.banners.gone, 'warn');
-      if (!ui.storage.ok) top += banner(T.banners.storage);
+      if (!ui.storage.ok && !ui.demo) top += banner(T.banners.storage);
+      if (c.status === 'resuming') return top + resumingHtml();
       return top + (c.status === 'knocking' ? knockHtml() : homeHtml());
     }
     var list = tabs();
@@ -407,7 +581,7 @@
     return bannersHtml() + headHtml() +
       (c.status === 'in' ? '<div class="tac-room-tools">' + collect('tools') + '</div>' : '') +
       '<div class="tac-room-tabs" role="tablist">' + list.map(function (t) {
-        return '<button type="button" role="tab" class="tac-seg' + (t.id === ui.tab ? ' on' : '') + '" aria-selected="' + (t.id === ui.tab) + '" data-room-action="tab" data-tab="' + t.id + '">' + esc(t.label) + '</button>';
+        return '<button type="button" role="tab" class="tac-seg' + (t.id === ui.tab ? ' on' : '') + '" aria-selected="' + (t.id === ui.tab) + '" data-room-action="tab" data-tab="' + esc(t.id) + '">' + esc(t.label) + '</button>';
       }).join('') + '</div>' +
       '<div class="tac-room-tab">' + tabPanel(ui.tab) + '</div>';
   }
@@ -425,7 +599,16 @@
     var staff = P.posts.filter(function (p) { return p.level === 'staff'; }).map(function (p) { return [p.id, postName(p.id)]; });
     var squads = Object.keys(P.squads).map(function (s) { return [s, squadName(s)]; });
     var withPost = entry.indexOf('-') >= 0;
+    var callsignMax = Math.max(1, Math.floor(+P.limits.callsign) || 20);
     var error = c.error && c.error !== 'network' ? '<p class="tac-msg error">' + esc(errorText(c.error)) + '</p>' : '';
+    var inCreate = ui.errorForm === 'create';   // the error shows inside the form that was sent
+    // The server key never comes back into the page: a saved key is only named, and replacing it starts from an empty field.
+    var savedKey = ui.demo ? null : ui.storage.read(KEY_PREFIX + ui.forkKey);
+    var keyField = ui.demo ? '<p class="tac-muted">' + esc(T.demoNote) + '</p>'
+      : savedKey && !ui.keyReplace
+        ? '<p class="tac-muted tac-room-keyline">' + esc(T.keySaved) + ' · ' + btn('keyReplace', T.keyReplace) + ' ' + btn('keyForget', T.keyForget) + '</p>'
+        : '<label class="tac-input-label">' + esc(T.serverKey) + '<input class="tac-input" type="password" name="token" autocomplete="new-password" spellcheck="false"></label>' +
+          (savedKey ? '<p class="tac-muted tac-room-keyline">' + btn('keyForget', T.keyForget) + '</p>' : '');
     return '<section class="tac-section"><h2>' + esc(T.entryTitle) + '</h2>' +
       '<form data-room-form="join" class="tac-room-form">' +
       '<label class="tac-input-label">' + esc(T.entryLabel) +
@@ -433,18 +616,22 @@
       '<div class="tac-room-postpick' + (withPost ? ' tac-hide' : '') + '">' +
       selectHtml('join', 'post', T.post, posts, draft('join', 'post', posts[0][0])) +
       (squads.length ? selectHtml('join', 'squad', T.squad, squads, draft('join', 'squad', squads[0][0])) : '') + '</div>' +
-      '<label class="tac-input-label">' + esc(T.callsign) + '<input class="tac-input" name="callsign" maxlength="' + P.limits.callsign + '" value="' + esc(draft('join', 'callsign', '')) + '"></label>' +
-      '<button type="submit" class="btn-small tac-room-btn">' + esc(T.join) + '</button>' + error +
+      '<label class="tac-input-label">' + esc(T.callsign) + '<input class="tac-input" name="callsign" maxlength="' + callsignMax + '" value="' + esc(draft('join', 'callsign', '')) + '"></label>' +
+      '<button type="submit" class="btn-small tac-room-btn">' + esc(T.join) + '</button>' + (inCreate ? '' : error) +
       '</form></section>' +
-      '<section class="tac-section"><details' + (ui.demo ? ' open' : '') + '><summary>' + esc(T.createTitle) + '</summary>' +
-      '<form data-room-form="create" class="tac-room-form">' +
-      (ui.demo ? '<p class="tac-muted">' + esc(T.demoNote) + '</p>'
-        : '<label class="tac-input-label">' + esc(T.serverKey) + '<input class="tac-input" name="token" autocomplete="off" spellcheck="false" value="' +
-          esc(draft('create', 'token', ui.storage.read(PREFIX + 'room-key:' + ui.forkKey) || '')) + '"></label>') +
+      '<section class="tac-section"><details data-room-details="create"' + (draft('create', 'open', ui.demo) ? ' open' : '') + '><summary>' + esc(T.createTitle) + '</summary>' +
+      '<form data-room-form="create" class="tac-room-form">' + keyField +
       selectHtml('create', 'post', T.createPost, staff, draft('create', 'post', staff[0][0])) +
-      '<label class="tac-input-label">' + esc(T.callsign) + '<input class="tac-input" name="callsign" maxlength="' + P.limits.callsign + '" value="' + esc(draft('create', 'callsign', '')) + '"></label>' +
-      '<button type="submit" class="btn-small tac-room-btn">' + esc(ui.demo ? T.demoCreate : T.create) + '</button>' +
+      '<label class="tac-input-label">' + esc(T.callsign) + '<input class="tac-input" name="callsign" maxlength="' + callsignMax + '" value="' + esc(draft('create', 'callsign', '')) + '"></label>' +
+      '<button type="submit" class="btn-small tac-room-btn">' + esc(ui.demo ? T.demoCreate : T.create) + '</button>' + (inCreate ? error : '') +
       '</form></details></section>';
+  }
+
+  // A saved session is being checked: no join or create form, so nothing sent now can race the restore poll.
+  function resumingHtml() {
+    return (ui.client.error === 'network' ? banner(T.banners.network, 'warn') : '') +
+      '<section class="tac-section"><p class="tac-muted">' + esc(T.resuming) + '</p>' +
+      btn('leave', ui.confirming === 'leave' ? T.leaveAsk : T.leave) + '</section>';
   }
 
   function knockHtml() {
@@ -475,16 +662,28 @@
     return !!(m && !m.extended && !m.closed && can('extend') && ui.client.serverNow() >= m.warnAt);
   }
 
+  // The Worker exports to staff and the observer only: the crew never sees a button that would be refused.
+  function canExport() { return !!ui.client && (ui.client.status === 'observer' || isStaff()); }
+  function exportButtons() { return canExport() ? btn('exportLog', T.exportLog) + btn('exportJson', T.exportJson) : ''; }
+
   function bannersHtml() {
     var c = ui.client, m = c.meta || {}, now = c.serverNow(), out = [];
-    var ctx = ui.hooks.getContext();
-    if (!ui.storage.ok) out.push(banner(T.banners.storage));
+    if (!ui.storage.ok && !ui.demo) out.push(banner(T.banners.storage));
     if (c.error === 'network') out.push(banner(T.banners.network, 'warn'));
-    if (m.frozen) out.push(banner(fmt(T.banners[m.frozen.reason] || T.banners.silence, { t: hhmm(m.frozen.at) }), 'frozen'));
+    if (m.frozen) out.push(banner(fmt(has(T.banners, m.frozen.reason) ? T.banners[m.frozen.reason] : T.banners.silence, { t: hhmm(m.frozen.at) }), 'frozen'));
+    if (c.status === 'in' && can('confirmJoin')) {
+      // The Roster tab is hidden on a narrow screen: the knock shows here at any width.
+      var knocking = knockingMembers();
+      knocking.forEach(function (k) {
+        var who = memberName(k) + (knocking.length < 2 && k.word ? ' · ' + k.word : '');
+        out.push(banner(fmt(T.knockWaiting, { who: who }), 'warn',
+          knocking.length >= 2 ? wordChoices(k, knocking) : btn('confirm', T.confirm, { client: k.client }, 'big')));
+      });
+    }
     if (m.locked && !m.closed) out.push(banner(T.banners.locked, 'warn', isStaff() ? btn('continueRound', T.continueRound) + btn('close', ui.confirming === 'close' ? T.closeAsk : T.close) : ''));
-    if (m.closed) out.push(banner(T.banners.closed, 'warn', btn('exportLog', T.exportLog)));
+    if (m.closed) out.push(banner(T.banners.closed, 'warn', exportButtons()));
     if (!m.closed && m.warnAt && now >= m.warnAt) out.push(banner(fmt(T.banners.warn, { t: hhmm(m.maxAt) }), 'warn', canExtend() ? btn('extend', T.extend) : ''));
-    if (m.planet && ctx.meta && ctx.meta.id !== m.planet) out.push(banner(fmt(T.banners.planet, { planet: planetName(m.planet) })));
+    if (m.planet && !planetOk()) out.push(banner(fmt(T.banners.planet, { planet: planetName(m.planet) })));
     if (c.status === 'in' && presenceDue(now)) out.push(banner(T.presentAsk, 'warn', btn('present', T.present)));
     return out.join('');
   }
@@ -500,6 +699,7 @@
       return '<h3>' + esc(T.levelNames[lv]) + '</h3>' + groups[lv].map(function (m) { return memberRow(m, knocking); }).join('');
     }).join('');
     if (isStaff()) html += staffHtml();
+    else if (c.status === 'observer') html += '<div class="tac-room-staff">' + exportButtons() + '</div>';
     return html;
   }
 
@@ -517,7 +717,7 @@
     var c = ui.client, P = ui.policy, mine = me();
     var seen = c.presence[m.client];
     var faded = m.confirmed && !(typeof seen === 'number' && seen <= 90000);
-    var name = postName(m.post) + (m.squad ? ' · ' + squadName(m.squad) : '') + (m.callsign ? ' «' + m.callsign + '»' : '');
+    var name = memberName(m);
     var tags = (m.functions || []).map(function (f) { return '<span class="tac-room-tag">' + esc(fnName(f)) + '</span>'; }).join('');
     var actions = '';
     var self = mine && mine.client === m.client;
@@ -538,7 +738,7 @@
     var style = R.levelStyle(P, m);
     var waiting = m.confirmed ? '' : ' <em>' + esc(T.knocking) + (knocking.length < 2 && m.word ? ' · ' + esc(m.word) : '') + '</em>';
     return '<div class="tac-room-row' + (faded ? ' faded' : '') + (self ? ' me' : '') + '">' +
-      '<span class="tac-room-sig tac-room-sig-' + style.level + '" style="--sig:' + esc(style.color) + '"></span>' +
+      '<span class="tac-room-sig tac-room-sig-' + cls(style.level) + '" style="--sig:' + esc(safeColor(style.color)) + '"></span>' +
       '<span class="tac-room-name">' + esc(name) + tags + waiting + '</span>' +
       '<span class="tac-room-actions">' + actions + '</span></div>';
   }
@@ -550,7 +750,7 @@
       list.forEach(function (s) { (by[s.post] = by[s.post] || []).push(c.code + '-' + s.code); });
       return Object.keys(by).map(function (p) { return postName(p) + ': ' + by[p].join(', '); });
     }
-    var out = ['[head=2]' + T.sheetHead + '[/head]', '[bold]' + T.roomCode + ':[/bold] ' + c.code, SITE.replace('https://', ''), T.sheetHint];
+    var out = ['[head=2]' + T.sheetHead + '[/head]', '[bold]' + T.roomCode + ':[/bold] ' + c.code, SITE.replace(/^https?:\/\//, ''), T.sheetHint];
     if (!filter) {
       out.push('', '[head=3]' + T.levelNames.staff + ' / ' + T.levelNames.service + '[/head]');
       out = out.concat(lines(c.sheet.filter(function (s) { return !s.squad; })));
@@ -569,7 +769,7 @@
     var sheet = c.sheet
       ? (Object.keys(ui.policy.squads).length
         ? '<select class="tac-select" data-room-change="sheetSquad"><option value="">' + esc(T.sheetAll) + '</option>' +
-          Object.keys(ui.policy.squads).map(function (s) { return '<option value="' + s + '"' + (s === ui.sheetSquad ? ' selected' : '') + '>' + esc(squadName(s)) + '</option>'; }).join('') +
+          Object.keys(ui.policy.squads).map(function (s) { return '<option value="' + esc(s) + '"' + (s === ui.sheetSquad ? ' selected' : '') + '>' + esc(squadName(s)) + '</option>'; }).join('') +
           '</select> '
         : '') +
         btn('sheetCopy', T.copy) + '<pre class="tac-room-sheet">' + esc(sheetMarkup(ui.sheetSquad)) + '</pre>'
@@ -580,7 +780,7 @@
       btn('rotate', ui.confirming === 'rotate' ? T.rotateAsk : T.rotate) +
       btn('silence', silence ? T.silenceOff : T.silenceOn, null, silence ? 'on' : '') +
       (canExtend() ? btn('extend', T.extend) : '') +
-      btn('exportLog', T.exportLog) +
+      exportButtons() +
       btn('close', ui.confirming === 'close' ? T.closeAsk : T.close) +
       '</div></section>';
   }
@@ -597,9 +797,8 @@
   }
 
   function shelfHtml() {
-    var layers = modules.filter(function (m) { return m.tabs && m.tabs(api).some(function (t) { return t.id === 'layers'; }); })[0];
-    return '<div class="tac-room-shelf-inner">' + btn('shelf', '×', null, 'tac-room-close') + rosterHtml() +
-      (layers ? layers.panel('layers', api) : '') + '</div>';
+    // tabPanel guards every module call: a throwing layers panel leaves the shelf with the roster only.
+    return '<div class="tac-room-shelf-inner">' + btn('shelf', '×', null, 'tac-room-close') + rosterHtml() + tabPanel('layers') + '</div>';
   }
 
   function updateCountdowns() {
@@ -632,6 +831,7 @@
     ui.els.toggle.setAttribute('aria-pressed', ui.on ? 'true' : 'false');
     ui.els.toggle.textContent = ui.on ? T.toggleFire : T.toggleRoom;
     if (!ui.on) { cancelPick(); ui.shelf = false; }
+    ui.forceRender = true;
     render();
     ui.hooks.redraw();
   }
@@ -647,6 +847,21 @@
 
   function twoStep(key, run) {
     if (ui.confirming === key) { ui.confirming = null; run(); } else { ui.confirming = key; queueRender(); }
+  }
+
+  // One file per click: a browser blocks a second download started by the same click.
+  function exportRoom(asJson) {
+    var c = ui.client;
+    if (!c || ui.exporting) return;
+    ui.exporting = true;
+    c.exportRoom().then(function (r) {
+      ui.exporting = false;
+      if (r.status !== 200 || !r.body) { toast(errorText((r.body && r.body.error) || 'http-' + r.status)); return; }
+      var name = 'room-' + cls(c.code) + '-' + new Date().toISOString().slice(0, 16).replace(/[:T]/g, '-');
+      if (!asJson && r.body.text) download(name + '.txt', r.body.text, 'text/plain;charset=utf-8');
+      else download(name + '.json', JSON.stringify(r.body, null, 1));
+      track('room_export');
+    }, function () { ui.exporting = false; toast(errorText('network')); });
   }
 
   var actions = {
@@ -679,10 +894,24 @@
         return SITE + '#map=' + ui.forkKey + '/' + ((c.meta && c.meta.planet) || (ctx.meta && ctx.meta.id)) + '&observe=' + c.code + '.' + token;
       }
       if (c.observerToken) { copyText(link(c.observerToken)); return; }
-      adminThen('observer', null, function (b) { c.observerToken = b.observerToken; c.persist(); copyText(link(b.observerToken)); });
+      // The link is off until staff asks: room creation returns no observer token.
+      adminThen('observer', null, function (b) {
+        if (!b || !b.observerToken) { toast(T.observerFail); return; }
+        c.observerToken = b.observerToken;
+        c.persist();
+        copyText(link(b.observerToken));
+      });
     },
     rotate: function () {
-      twoStep('rotate', function () { adminThen('rotate', null, function (b) { toast(fmt(T.rotated, { code: b.code })); }); });
+      var c = ui.client;
+      twoStep('rotate', function () {
+        adminThen('rotate', null, function (b) {
+          if (!b || !b.code) return;   // no new code came back: nothing changed, no toast
+          c.observerToken = null;      // the new code ends the old moderator link
+          c.persist();
+          toast(fmt(T.rotated, { code: b.code }));
+        });
+      });
     },
     silence: function () {
       var m = ui.client.meta || {};
@@ -691,15 +920,14 @@
     extend: function () { adminThen('extend'); },
     close: function () { twoStep('close', function () { adminThen('close'); }); },
     continueRound: function () { adminThen('unlock'); },
-    exportLog: function () {
-      var c = ui.client;
-      c.exportRoom().then(function (r) {
-        if (r.status !== 200) { toast(errorText((r.body && r.body.error) || 'http-' + r.status)); return; }
-        var stamp = new Date().toISOString().slice(0, 16).replace(/[:T]/g, '-');
-        download('room-' + c.code + '-' + stamp + '.json', JSON.stringify(r.body, null, 1));
-        if (r.body.text) download('room-' + c.code + '-' + stamp + '.txt', r.body.text, 'text/plain;charset=utf-8');
-        track('room_export');
-      });
+    exportLog: function () { exportRoom(false); },
+    exportJson: function () { exportRoom(true); },
+    keyReplace: function () { ui.keyReplace = true; queueRender(); },
+    keyForget: function () {
+      ui.storage.remove(KEY_PREFIX + ui.forkKey);
+      ui.keyReplace = false;
+      toast(T.keyForgotten);
+      queueRender();
     },
     present: function () {
       var mine = me();
@@ -729,21 +957,49 @@
     e.preventDefault();
     if (el.getAttribute('data-room-action') !== 'leave' && ui.confirming && ui.confirming.indexOf(el.getAttribute('data-room-action')) !== 0) ui.confirming = null;
     fn(el, api, e);
+    if (ui.renderQueued) ui.forceRender = true;   // the officer clicked: show the result even if a field keeps focus
   }
 
+  // A change event closes the open list, so a waiting write is safe now.
   function onChange(e) {
     var el = e.target;
     if (el.getAttribute && el.getAttribute('data-room-change')) {
       var fn = findHandler('changes', el.getAttribute('data-room-change'));
       if (fn) fn(el, api, e);
-      return;
+    } else {
+      onInput(e);
     }
-    onInput(e);
+    ui.selectOpen = false;
+    if (ui.renderQueued || anyDeferred()) queueRender(true);
+  }
+
+  function onFocusOut() { ui.selectOpen = false; if (anyDeferred()) queueRender(); }
+
+  // A native list has no "open" event: a press on a SELECT (or its keyboard opener) counts as open
+  // until a change, focusout, a closing key, a second press or the 4 s cap.
+  function onPointerDown(e) {
+    var t = e.target, isSelect = !!(t && t.tagName === 'SELECT');
+    ui.selectOpen = isSelect && !(ui.selectOpen && ui.selectEl === t);
+    ui.selectEl = isSelect ? t : null;
+    if (ui.selectOpen) ui.editAt = Date.now();
+  }
+  function onFieldKey(e) {
+    var t = e.target;
+    if (!t || t.tagName !== 'SELECT') return;
+    if (e.key === ' ' || e.key === 'F4' || (e.altKey && (e.key === 'ArrowDown' || e.key === 'ArrowUp'))) { ui.selectOpen = true; ui.selectEl = t; ui.editAt = Date.now(); }
+    else if (e.key === 'Escape' || e.key === 'Enter' || e.key === 'Tab') { ui.selectOpen = false; if (anyDeferred()) queueRender(); }
+  }
+
+  function onToggle(e) {
+    var el = e.target, name = el && el.getAttribute ? el.getAttribute('data-room-details') : null;
+    if (name) ui.drafts[name + '.open'] = !!el.open;
   }
 
   function onInput(e) {
     var el = e.target;
     if (!el.name || !el.form) return;
+    ui.editAt = Date.now();
+    if (el.type === 'password') return;   // the server key never enters drafts, so never markup
     var form = el.form.getAttribute('data-room-form');
     ui.drafts[form + '.' + el.name] = el.type === 'checkbox' ? el.checked : el.value;
     if (form === 'join' && el.name === 'entry') {
@@ -767,50 +1023,71 @@
     var name = form.getAttribute && form.getAttribute('data-room-form');
     if (!name) return;
     e.preventDefault();
+    if (name !== 'join' && name !== 'create') {
+      var fn = findHandler('submits', name);
+      if (fn) fn(form, api, e);
+      queueRender(true);
+      return;
+    }
     var f = form.elements, c = ui.client, ctx = ui.hooks.getContext();
+    if (!c) return;
     c.error = null;
+    ui.errorForm = name;
     c.planet = ctx.meta ? ctx.meta.id : c.planet;
     c.h = ctx.meta ? ctx.meta.h : c.h;
     if (name === 'join') {
       c.join({ entry: f.entry.value, post: f.post.value, squad: f.squad ? f.squad.value : null, callsign: f.callsign.value }).then(function () {
         if (c.status === 'knocking' || c.status === 'in') { clearDrafts('join'); c.startLoop(); }
-        queueRender();
-      });
-    } else if (name === 'create') {
-      var token = ui.demo ? 'demo' : f.token.value.trim();
-      if (!ui.demo) ui.storage.write(PREFIX + 'room-key:' + ui.forkKey, token);
-      c.createRoom({ token: token, keyId: ui.demo ? 'demo' : tokenKeyId(token), post: f.post.value, callsign: f.callsign.value }).then(function () {
-        if (c.status === 'in') { clearDrafts('create'); track('room_create'); c.startLoop(); ui.tab = null; }
-        queueRender();
+        queueRender(true);
       });
     } else {
-      var fn = findHandler('submits', name);
-      if (fn) fn(form, api, e);
+      var fork = ui.forkKey;
+      var saved = ui.demo ? null : ui.storage.read(KEY_PREFIX + fork);
+      var typed = !ui.demo && f.token ? String(f.token.value || '').trim() : '';
+      var token = ui.demo ? 'demo' : typed || saved || '';
+      var before = c.code;
+      c.createRoom({ token: token, keyId: ui.demo ? 'demo' : tokenKeyId(token), post: f.post.value, callsign: f.callsign.value }).then(function () {
+        // A restore poll can turn the status to `in` meanwhile: only a new room code proves this create worked.
+        // A network blip on the first poll after it does not undo a created room.
+        if (c.code && c.code !== before && (!c.error || c.error === 'network')) {
+          // Kept only once it has opened a room: a mistyped key never replaces a good one.
+          if (typed && typed !== saved) ui.storage.write(KEY_PREFIX + fork, typed);
+          ui.keyReplace = false;
+          clearDrafts('create'); track('room_create'); c.startLoop(); ui.tab = null;
+        }
+        queueRender(true);
+      });
     }
   }
 
   // ── lifecycle ────────────────────────────────────────────
 
   function tick() {
-    var ctx = ui.hooks.getContext();
-    if (ctx.fork && ui.forkKey !== ctx.fork.key) { switchFork(ctx.fork.key); return; }
-    var planet = ctx.meta ? ctx.meta.id : null;
-    if (planet !== ui.planetId) { ui.planetId = planet; if (ui.on) queueRender(); }
-    updateCountdowns();
-    modules.forEach(function (m) { if (m.tick) m.tick(api); });
+    try {
+      var ctx = ui.hooks.getContext();
+      if (ctx.fork && ui.forkKey !== ctx.fork.key) { switchFork(ctx.fork.key); return; }
+      var planet = ctx.meta ? ctx.meta.id : null;
+      if (planet !== ui.planetId) { ui.planetId = planet; if (ui.on) queueRender(); }
+      updateCountdowns();
+    } catch (e) { warn('tick', e); return; }
+    eachModule('tick', function (m) { m.tick(api); });
   }
 
   function mount(hooks, apiRoot) {
+    if (root.top !== root.self) return;   // never run inside a frame: a foreign page cannot click «Подтвердить» for staff
+    if (ui.hooks) return;                 // attach runs once
     ui.hooks = hooks;
     ui.root = apiRoot;
-    ui.storage = apiRoot.makeStorage(root.localStorage);
     ui.els = { toggle: $('tacRoomToggle'), panel: $('tacRoom'), chips: $('tacRoomChips'), strip: $('tacRoomStrip'), shelf: $('tacRoomShelf'), draw: $('tacRoomDraw') };
-    if (!ui.els.panel || !ui.els.toggle) return;
-    if (root.top !== root.self) return;   // never run inside a frame: a foreign page cannot click «Подтвердить» for staff
+    if (!ui.els.panel || !ui.els.toggle || !ui.els.chips || !ui.els.strip || !ui.els.shelf) return;
     ui.pendingHash = parseHash(root.location.hash);
+    stripObserve();
+    if (root.addEventListener) root.addEventListener('hashchange', onHashChange);
     ui.clientHash = ui.pendingHash.client;
-    ui.demo = ui.pendingHash.room === 'demo';
-    ui.fixtureReady = ui.demo ? loadScript('tactical/room-fixtures.js?v=1') : Promise.resolve();
+    ui.demo = demoMode(ui.pendingHash);
+    var ls = null;
+    try { ls = root.localStorage; } catch (e) { ls = null; }   // the getter itself throws when site data is blocked
+    ui.storage = apiRoot.makeStorage(ui.demo ? null : ls);    // the demo keeps everything in memory
     ui.els.toggle.textContent = T.toggleRoom;
     ui.els.toggle.addEventListener('click', function () { setOn(!ui.on); });
     [ui.els.panel, ui.els.chips, ui.els.strip, ui.els.shelf].forEach(function (box) {
@@ -818,6 +1095,10 @@
       box.addEventListener('change', onChange);
       box.addEventListener('input', onInput);
       box.addEventListener('submit', onSubmit);
+      box.addEventListener('focusout', onFocusOut);
+      box.addEventListener('mousedown', onPointerDown);
+      box.addEventListener('keydown', onFieldKey);
+      box.addEventListener('toggle', onToggle, true);   // toggle does not bubble; capture still reaches the box
     });
     document.addEventListener('keydown', function (e) {
       if (e.key === 'Escape' && ui.pick) { cancelPick(); e.preventDefault(); e.stopPropagation(); }
@@ -830,17 +1111,20 @@
     ui.toastEl.setAttribute('role', 'status');
     document.body.appendChild(ui.toastEl);
     hooks.view.addLayer(function drawRoom(ctx, v) {
-      if (!ui.on || !inRoom()) return;
-      modules.forEach(function (m) { if (m.draw) m.draw(ctx, v, api); });
+      if (!ui.on || !inRoom() || !planetOk()) return;   // room objects belong to the room's planet only
+      eachModule('draw', function (m) {
+        ctx.save();
+        try { m.draw(ctx, v, api); } finally { ctx.restore(); }
+      });
     });
-    modules.forEach(function (m) { if (m.mount) m.mount(api); });
+    eachModule('mount', function (m) { m.mount(api); });
     root.setInterval(tick, 1000);
     tick();
   }
 
   function notify(event, payload) {
     if (!ui.on || !inRoom()) return;
-    modules.forEach(function (m) { if (m.notify) m.notify(event, payload, api); });
+    eachModule('notify', function (m) { m.notify(event, payload, api); });
   }
 
   var api = {
@@ -849,7 +1133,7 @@
     esc: esc, fmt: fmt, btn: btn, banner: banner, render: queueRender, toast: toast, errorText: errorText,
     setPick: setPick, cancelPick: cancelPick, hhmm: hhmm, mmss: mmss,
     postName: postName, squadName: squadName, fnName: fnName, planetName: planetName,
-    offset: offset, gameText: gameText, toWorld: toWorld, me: me, can: can, isStaff: isStaff, myLayer: myLayer,
+    offset: offset, gameText: gameText, toWorld: toWorld, me: me, can: can, isStaff: isStaff, myLayer: myLayer, planetOk: planetOk,
     draft: draft, clearDrafts: clearDrafts, track: track, copyText: copyText, download: download
   };
 
@@ -857,16 +1141,22 @@
     api: api,
     register: function (module) {
       modules.push(module);
-      if (module.l10n) {
-        ['en', 'ru'].forEach(function (lang) {
-          var src = module.l10n[lang] || {};
-          Object.keys(src).forEach(function (k) {
-            if (k === 'tabs') { Object.keys(src.tabs).forEach(function (t) { L10N[lang].tabs[t] = src.tabs[t]; }); }
-            else if (k === 'errors') { Object.keys(src.errors).forEach(function (t) { L10N[lang].errors[t] = src.errors[t]; }); }
-            else { L10N[lang][k] = src[k]; }
-          });
+      if (!module.l10n) return;
+      var clashes = [];
+      function clash(key) { if (clashes.indexOf(key) < 0) clashes.push(key); }
+      ['en', 'ru'].forEach(function (lang) {
+        var src = module.l10n[lang] || {}, dst = L10N[lang];
+        Object.keys(src).forEach(function (k) {
+          if (k === 'tabs' || k === 'errors') {
+            Object.keys(src[k]).forEach(function (t) { if (has(dst[k], t)) clash(k + '.' + t); dst[k][t] = src[k][t]; });
+          } else {
+            if (has(dst, k)) clash(k);
+            dst[k] = src[k];
+          }
         });
-      }
+      });
+      // A clash replaces the shell's own text: a module 'claim' once relabelled the destructive reissue button.
+      if (clashes.length) warn('l10n keys of ' + (module.id || 'a module') + ' override existing keys: ' + clashes.join(', '));
     },
     mount: mount,
     notify: notify,
