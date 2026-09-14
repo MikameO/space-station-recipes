@@ -62,6 +62,10 @@
       calDone: 'Round offset {x} {y}',
       calFrom: 'calibrated {age} on {coords}',
       calAge: 'calibrated {age}',
+      calSummary: 'Calibration: offset {x} {y} · {age}',
+      calChecked: '✓ checked',
+      calExpand: 'Change',
+      calCollapse: 'Collapse',
       parse: {
         tooFew: 'Type two numbers: longitude (X), then latitude (Y).',
         tooMany: 'Too many numbers — keep only longitude (X) and latitude (Y).',
@@ -275,6 +279,10 @@
       calDone: 'Сдвиг раунда {x} {y}',
       calFrom: 'калибровка {age} по тайлу {coords}',
       calAge: 'калибровка {age}',
+      calSummary: 'Привязка: сдвиг {x} {y} · {age}',
+      calChecked: '✓ проверено',
+      calExpand: 'Изменить',
+      calCollapse: 'Свернуть',
       parse: {
         tooFew: 'Нужны два числа: сначала долгота (X), потом широта (Y).',
         tooMany: 'Слишком много чисел — оставьте долготу (X) и широту (Y).',
@@ -553,6 +561,7 @@
     pickMode: null,   // 'calibrate' | 'mortar' | 'target'; null = by state
     draft: { x: '', y: '' },
     calMessage: null, // {text, kind} shown in the calibration form
+    calOpen: false,   // a foldable calibration block was opened (page memory only)
     mortarDraft: '',
     mortarMessage: null,
     findDraft: '',
@@ -754,6 +763,7 @@
         state.markerMessage = null;
         state.draft = { x: '', y: '' };
         state.calMessage = null;
+        state.calOpen = false;
         state.mortarMessage = null;
         state.findMessage = null;
       }
@@ -1616,11 +1626,20 @@
         '<div class="tac-actions">' + button('saveCalibration', T.calSave, 'btn-primary', !(state.selected && draftParse().ok)) + '</div>';
     }
     var v = state.fork.constants.offsetVariance;
+    // A checked offset nobody doubts folds into one line until the player opens it.
+    var foldable = Logic.calCollapsible(c, cs, v);
+    if (foldable && !state.calOpen) {
+      return h + '<div class="tac-cal-summary"><span>' +
+        esc(fmt(T.calSummary, { x: signed(c.offset[0]), y: signed(c.offset[1]), age: formatAge(cs.ageMs) })) +
+        (c.check ? ' · <span class="ok">' + esc(T.calChecked) + '</span>' : '') + '</span>' +
+        button('calExpand', T.calExpand) + '</div>';
+    }
     h += '<div class="tac-offset">' + esc(fmt(T.calDone, { x: signed(c.offset[0]), y: signed(c.offset[1]) })) + '</div>' +
       '<p class="tac-muted">' + esc(fmt(T.calFrom, { age: formatAge(cs.ageMs), coords: Logic.formatCoords(c.reading) })) + '</p>';
     if (Logic.calibrationIssues(c.offset, v).length) h += msg({ text: fmt(T.outOfVariance, { v: v }), kind: 'warn' });
     return h + checkHtml(c) +
-      '<div class="tac-actions">' + button('newRound', T.newRound) + button('recalibrate', T.recalibrate) + '</div>' +
+      '<div class="tac-actions">' + button('newRound', T.newRound) + button('recalibrate', T.recalibrate) +
+      (foldable ? button('calCollapse', T.calCollapse) : '') + '</div>' +
       '<p class="tac-hint">' + esc(T.newRoundHint) + '</p>';
   }
 
@@ -2051,6 +2070,44 @@
 
   // ── actions ─────────────────────────────────────────────────────────────
 
+  // A calibration as the page stores it: the lased tile, its reading, the offset
+  // and a check tile next to it. A saved offset and the room's one are built alike.
+  function makeCalibration(tile, reading) {
+    var offset = Logic.offsetFrom(tile, reading);
+    var check = Logic.pickCheckTile(state.planet, tile, []);
+    return {
+      tile: tile, reading: reading, offset: offset, at: now(),
+      check: check ? { tile: check, expect: Logic.worldToGame(offset, check[0], check[1]), result: null, tried: [] } : null
+    };
+  }
+
+  // The room's calibration (hook applyCalibration): taken as if saved here, the
+  // same round confirmed. False when no planet is loaded or the numbers disagree.
+  function applyRoomCalibration(cal) {
+    if (!state.planet || !cal || typeof cal !== 'object' || !Logic.isTile(cal.tile) || !Logic.isTile(cal.reading)) return false;
+    var offset = Logic.offsetFrom(cal.tile, cal.reading);
+    if (cal.offset != null && !(Logic.isTile(cal.offset) && cal.offset[0] === offset[0] && cal.offset[1] === offset[1])) return false;
+    state.store.calibration = makeCalibration(cal.tile.slice(), cal.reading.slice());
+    Logic.confirmSameRound(state.session, now());
+    state.draft = { x: '', y: '' };
+    state.calMessage = null;
+    state.selected = null;
+    state.pickMode = null;
+    state.calOpen = false;
+    saveStore();
+    renderAll();
+    return true;
+  }
+
+  // Opening or folding the calibration only redraws the panel; the button that
+  // replaces the pressed one takes the focus, so the keyboard stays in place.
+  function toggleCalibration(open) {
+    state.calOpen = open;
+    renderPanel();
+    var next = els.panel.querySelector('[data-action="' + (open ? 'calCollapse' : 'calExpand') + '"]');
+    if (next) next.focus({ preventScroll: true });
+  }
+
   var actions = {
     saveCalibration: function () {
       var p = draftParse();
@@ -2059,22 +2116,19 @@
         renderPanel();
         return;
       }
-      var tile = state.selected.slice(), reading = [p.x, p.y];
-      var offset = Logic.offsetFrom(tile, reading);
-      var check = Logic.pickCheckTile(state.planet, tile, []);
-      state.store.calibration = {
-        tile: tile, reading: reading, offset: offset, at: now(),
-        check: check ? { tile: check, expect: Logic.worldToGame(offset, check[0], check[1]), result: null, tried: [] } : null
-      };
+      state.store.calibration = makeCalibration(state.selected.slice(), [p.x, p.y]);
       Logic.confirmSameRound(state.session, now());
       state.draft = { x: '', y: '' };
       state.calMessage = null;
       state.selected = null;
       state.pickMode = null;
+      state.calOpen = false;
       saveStore();
       trackPlanet('tactical_calibrate');
       renderAll();
     },
+    calExpand: function () { toggleCalibration(true); },
+    calCollapse: function () { toggleCalibration(false); },
     checkMatch: function () {
       calibration().check.result = 'match';
       Logic.confirmSameRound(state.session, now());   // a second tile agreeing proves the round
@@ -2095,6 +2149,7 @@
       state.selected = calibration().tile.slice();
       state.store.calibration = null;
       state.calMessage = null;
+      state.calOpen = false;
       state.pickMode = null;
       saveStore();
       renderAll();
@@ -2117,6 +2172,7 @@
       state.pickMode = null;
       state.draft = { x: '', y: '' };
       state.calMessage = null;
+      state.calOpen = false;
       state.mortarDraft = '';
       state.mortarMessage = null;
       state.findDraft = '';
@@ -2755,6 +2811,7 @@
           setMortar(tile);
         },
         fire: function (targetGame, dial) { recordShot(targetGame, dial); return lastShot(); },
+        applyCalibration: function (cal) { return applyRoomCalibration(cal); },
         redraw: function () { renderAll(); }
       });
     } catch (e) { if (window.console) console.warn('room', e); }

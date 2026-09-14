@@ -504,6 +504,16 @@
     return { calibrated: true, ageMs: Math.max(0, now - (calibration.at || now)), askSameRound: reasons.length > 0, reasons: reasons };
   }
 
+  // Whether the calibration block may fold into one line: an offset exists, its
+  // check tile agreed (or there was none to check), the offset is within the
+  // server's variance and the page is not asking «same round?».
+  function calCollapsible(calibration, calState, variance) {
+    if (!calibration || !isTile(calibration.offset) || !calState) return false;
+    if (calibration.check && calibration.check.result !== 'match') return false;
+    if (calibrationIssues(calibration.offset, variance).length) return false;
+    return !calState.askSameRound;
+  }
+
   // ── storage ──────────────────────────────────────────────────────────────
 
   var STORAGE_VERSION = 1;
@@ -792,6 +802,8 @@
     obChecks: obChecks,
     supplyChecks: supplyChecks,
     roofedFlags: roofedFlags,
-    calibrationState: calibrationState
+    calibrationState: calibrationState,
+    calCollapsible: calCollapsible,
+    isTile: isTile
   };
 })(typeof window !== 'undefined' ? window : this);

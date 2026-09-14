@@ -75,7 +75,7 @@ assert.ok(attachBlock, 'attach sits inside if (window.TacRoom) { … }');
 const attachText = js.slice(attachBlock.start, attachBlock.end);
 assert.ok(/try\s*\{\s*window\.TacRoom\.attach\(/.test(attachText), 'attach runs inside try');
 assert.ok(/\}\s*catch\s*\(\s*\w+\s*\)/.test(attachText), 'attach failures are caught');
-['view', 'getContext', 'takeTarget', 'takePosition', 'fire', 'redraw'].forEach(h =>
+['view', 'getContext', 'takeTarget', 'takePosition', 'fire', 'applyCalibration', 'redraw'].forEach(h =>
   assert.ok(new RegExp('\\b' + h + ':\\s').test(attachText), 'attach hands over ' + h));
 assert.ok(js.indexOf('applyStaticText();', attachBlock.end) > 0 && js.indexOf('loadIndex();', attachBlock.end) > 0, 'the map starts after attach');
 
@@ -88,14 +88,14 @@ assert.ok(/try\s*\{/.test(notifyText) && /catch\s*\(/.test(notifyText), 'roomNot
 // Executed: the attach block and the two start lines of tactical.js, with a throwing room, with no room, and the hooks it hands over.
 const startBlock = js.slice(attachBlock.start, js.indexOf('loadIndex();', attachBlock.end) + 'loadIndex();'.length);
 const seamNames = ['window', 'console', 'view', 'state', 'calibration', 'mortar', 'currentShell', 'hitRadius', 'LANG', 'weapon',
-  'savePrefs', 'setTarget', 'setMortar', 'recordShot', 'lastShot', 'renderAll', 'applyStaticText', 'loadIndex'];
+  'savePrefs', 'setTarget', 'setMortar', 'recordShot', 'lastShot', 'applyRoomCalibration', 'renderAll', 'applyStaticText', 'loadIndex'];
 function runStart(TacRoom) {
   const calls = [];
   const win = { TacRoom, console: { warn: () => calls.push('warn') } };
   new Function(...seamNames, startBlock)(win, win.console, {}, { prefs: {} }, () => null, () => null, () => null, () => 0, 'ru',
     () => 'mortar', () => calls.push('savePrefs'), t => calls.push('setTarget ' + t), t => calls.push('setMortar ' + t),
-    () => calls.push('recordShot'), () => null, () => calls.push('renderAll'),
-    () => calls.push('applyStaticText'), () => calls.push('loadIndex'));
+    () => calls.push('recordShot'), () => null, c => { calls.push('applyRoomCalibration ' + JSON.stringify(c)); return !!c; },
+    () => calls.push('renderAll'), () => calls.push('applyStaticText'), () => calls.push('loadIndex'));
   return calls;
 }
 assert.deepStrictEqual(runStart({ attach() { throw new Error('room'); } }), ['warn', 'applyStaticText', 'loadIndex'], 'a throwing attach never stops the map');
@@ -106,6 +106,50 @@ assert.deepStrictEqual(started, ['applyStaticText', 'loadIndex']);
 handed.takePosition([3, 4]);
 handed.takeTarget([5, 6]);
 assert.ok(started.includes('setMortar 3,4') && started.includes('setTarget 5,6'), 'takePosition and takeTarget reach the Fire panel');
+const roomCal = { tile: [1, 2], reading: [13, -3], offset: [12, -5] };
+assert.strictEqual(handed.applyCalibration(roomCal), true, 'applyCalibration answers what the Fire panel answers');
+assert.strictEqual(handed.applyCalibration(null), false);
+assert.ok(started.includes('applyRoomCalibration ' + JSON.stringify(roomCal)), 'applyCalibration reaches the Fire panel');
+
+// applyRoomCalibration is a named function of the Fire panel, not room code inside the attach block; no goal, no notify.
+const applyAt = js.indexOf('function applyRoomCalibration(');
+assert.ok(applyAt > 0 && !(attachBlock.start < applyAt && applyAt < attachBlock.end), 'applyRoomCalibration sits outside the attach block');
+const makeAt = js.indexOf('function makeCalibration(');
+const applyText = js.slice(applyAt, blockEnd(js, applyAt));
+assert.ok(makeAt > 0 && !/trackPlanet|roomNotify|TacRoom/.test(applyText), 'applying the room calibration sends no goal and no notification');
+assert.ok(/saveCalibration: function \(\) \{[\s\S]*?state\.store\.calibration = makeCalibration\(/.test(js), 'saveCalibration builds its calibration with the shared helper');
+
+// Executed: applyRoomCalibration checks the shape and takes the calibration the way «Save the round offset» does.
+const logicWin = {};
+new Function('window', read('tactical/logic.js'))(logicWin);
+const calText = js.slice(makeAt, blockEnd(js, makeAt)) + '\n' + applyText;
+function calHarness(planet) {
+  const calls = [];
+  const st = { planet, store: { calibration: null }, session: logicWin.TacticalLogic.newSession(0, true),
+    draft: { x: '9', y: '9' }, calMessage: { text: 'old' }, selected: [7, 7], pickMode: 'mortar', calOpen: true };
+  const Logic = Object.assign({}, logicWin.TacticalLogic, { pickCheckTile: (p, tile) => [tile[0] + 2, tile[1] + 1] });
+  const apply = new Function('state', 'Logic', 'now', 'saveStore', 'renderAll', calText + '\nreturn applyRoomCalibration;')(
+    st, Logic, () => 5000, () => calls.push('saveStore'), () => calls.push('renderAll'));
+  return { st, calls, apply };
+}
+const applied = calHarness({});
+assert.strictEqual(applied.apply(roomCal), true);
+assert.deepStrictEqual(applied.st.store.calibration, { tile: [1, 2], reading: [13, -3], offset: [12, -5], at: 5000,
+  check: { tile: [3, 3], expect: [15, -2], result: null, tried: [] } });
+assert.strictEqual(applied.st.session.confirmed, true, 'the room calibration confirms the same round');
+assert.deepStrictEqual([applied.st.draft, applied.st.calMessage, applied.st.selected, applied.st.pickMode, applied.st.calOpen],
+  [{ x: '', y: '' }, null, null, null, false]);
+assert.deepStrictEqual(applied.calls, ['saveStore', 'renderAll']);
+assert.strictEqual(calHarness({}).apply({ tile: [1, 2], reading: [13, -3] }), true, 'the offset may be left out');
+[null, 'cal', {}, { tile: [1, 2] }, { tile: ['1', 2], reading: [13, -3] }, { tile: [1, 2], reading: [13.5, -3] },
+  { tile: [1, 2, 3], reading: [13, -3] }, { tile: [1, 2], reading: [13, -3], offset: [12, 5] },
+  { tile: [1, 2], reading: [13, -3], offset: 'x' }].forEach(c => {
+  const h = calHarness({});
+  assert.strictEqual(h.apply(c), false, JSON.stringify(c) + ' is refused');
+  assert.strictEqual(h.st.store.calibration, null);
+  assert.deepStrictEqual(h.calls, []);
+});
+assert.strictEqual(calHarness(null).apply(roomCal), false, 'no planet loaded, no calibration');
 
 // Executed: roomNotify hands over a copy and swallows what the room throws.
 const roomNotify = new Function('window', 'console', notifyText + '\nreturn roomNotify;')(
