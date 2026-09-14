@@ -327,7 +327,8 @@
     var room = /[#&]room=([A-Za-z0-9]+)/.exec(hash || '');
     var observe = /[#&]observe=([A-Za-z0-9]+\.[A-Za-z0-9_-]+)/.exec(hash || '');
     var client = /[#&]client=([A-Za-z0-9_-]{8,24})/.exec(hash || '');   // dev only: a second officer in the same browser
-    return { room: room ? room[1] : null, observe: observe ? observe[1] : null, client: client ? client[1] : null };
+    var roomdev = /[#&]roomdev=([0-9]{2,5}|off)(?![A-Za-z0-9_-])/.exec(hash || '');   // dev only, local hosts: applyRoomDev
+    return { room: room ? room[1] : null, observe: observe ? observe[1] : null, client: client ? client[1] : null, roomdev: roomdev ? roomdev[1] : null };
   }
   // The observer token is a secret: it leaves the address bar (and history) as soon as the panel has read it.
   // Series T's writeHash drops it only after the planet loads, never on a failed load or a same-planet hashchange.
@@ -342,6 +343,7 @@
     try {
       var h = parseHash(root.location ? root.location.hash : '');
       stripObserve();
+      if (applyRoomDev(h.roomdev) && ui.forkKey) { switchFork(ui.forkKey); return; }
       if (!h.observe) return;
       var ctx = ui.hooks.getContext();
       if (ui.policy && ui.client && !(ctx.fork && ctx.fork.key !== ui.forkKey)) startObserve(h.observe);
@@ -381,6 +383,14 @@
   // ── availability and client ────────────────────────────────────
 
   function devFlags() { return ui.storage.read(DEV_KEY); }
+  // Local development only: #roomdev=<port> on 127.0.0.1 or localhost remembers a room Worker on that port and
+  // #roomdev=off forgets it, so each test browser needs one link instead of a console snippet. Other hosts ignore it.
+  function applyRoomDev(value) {
+    var host = root.location ? root.location.hostname : '';
+    if (!value || ui.demo || !ui.storage || (host !== '127.0.0.1' && host !== 'localhost')) return false;
+    if (value === 'off') ui.storage.remove(DEV_KEY); else ui.storage.write(DEV_KEY, { url: 'http://127.0.0.1:' + value });
+    return true;
+  }
   function roomUrl() {
     var d = devFlags();
     return (d && d.url) || (ui.root && ui.root.ROOM_URL) || '';
@@ -1212,6 +1222,7 @@
     var ls = null;
     try { ls = root.localStorage; } catch (e) { ls = null; }   // the getter itself throws when site data is blocked
     ui.storage = apiRoot.makeStorage(ui.demo ? null : ls);    // the demo keeps everything in memory
+    applyRoomDev(ui.pendingHash.roomdev);
     ui.els.entry.addEventListener('click', function (e) {
       var tab = e && e.target && e.target.closest ? e.target.closest('[data-room-entry]') : null;
       if (!tab) return;

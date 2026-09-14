@@ -835,6 +835,32 @@ async function t(name, fn) { await fn(); n++; console.log('ok', name); }
     assert.strictEqual(gone.ui().retryAt, 0, 'no retry for a fork the Worker has no policy for');
   });
 
+  await t('#roomdev=<port> on a local host remembers a local room Worker from a link or a hashchange; off forgets it; other hosts ignore it', async () => {
+    const ls = fakeStorage();
+    const w = world({ hash: '#map=stories_cm/lv624&roomdev=8787', localStorage: ls, fetch: answer(policyWith('none')) });
+    w.attach();
+    await settle();
+    assert.deepStrictEqual(JSON.parse(ls.getItem('chemdb-tactical:room-dev')), { url: 'http://127.0.0.1:8787' });
+    assert.ok(w.fetches.indexOf('http://127.0.0.1:8787/policy/stories_cm') >= 0, w.fetches.join(' '));
+    assert.ok(!w.els.tacRoomEntry.classList.contains('tac-hide'), 'the entry shows with the dev flag');
+    w.win.location.hash = '#roomdev=off';
+    w.listeners.hashchange[0]();
+    await settle();
+    assert.strictEqual(ls.getItem('chemdb-tactical:room-dev'), null, 'off forgets it');
+    assert.ok(w.els.tacRoomEntry.classList.contains('tac-hide'), 'and the entry goes');
+    w.win.location.hash = '#roomdev=8787';
+    w.listeners.hashchange[0]();
+    await settle();
+    assert.ok(!w.els.tacRoomEntry.classList.contains('tac-hide'), 'a hashchange turns it on without a reload');
+    const prodLs = fakeStorage();
+    const prod = world({ hash: '#roomdev=8787', localStorage: prodLs, fetch: answer(policyWith('none')) });
+    prod.win.location.hostname = 'mikameo.github.io';
+    prod.attach();
+    await settle();
+    assert.strictEqual(prodLs.getItem('chemdb-tactical:room-dev'), null, 'production ignores it');
+    assert.strictEqual(prod.fetches.length, 0, 'and fetches nothing');
+  });
+
   notes.forEach(x => console.log('note:', x));
   console.log('OK', n, 'cases');
   process.exit(0);
