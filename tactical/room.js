@@ -6,14 +6,26 @@
 // Officers' room client: transports (the Worker over HTTP, or the fixture for
 // the demo), session and storage, polling with Retry-After, pending ops with
 // optimistic apply, and window.TacRoom — the hook tactical.js attaches to.
-// No DOM: tactical/room-ui.js renders. Tests: scripts/test_room_client.js.
+// No DOM: tactical/room-ui.js renders. Tests: scripts/test_room_client*.js.
 (function (root) {
   'use strict';
 
   var R = root.TacticalRoomLogic;
   var PREFIX = 'chemdb-tactical:';
   var CLIENT_KEY = PREFIX + 'room-client';
+  // Member ids are 'mem-' + client + '-' + seq, and the Worker caps ids at 40 characters.
+  var CLIENT_MAX = 24;
+  var CLIENT_RE = /^[A-Za-z0-9_-]{8,24}$/;
   var ROOM_URL = '';   // set by the owner after `wrangler deploy`; empty keeps the room hidden
+  var TIMEOUT_MS = 15000;
+  var MAX_BACKOFF_SEC = 30;
+  // Statuses in which queue() refuses at once: nothing written there would ever reach the room.
+  var NO_WRITE = ['idle', 'observer', 'closed', 'expired', 'gone'];
+
+  function warn(what, e) {
+    var c = root.console || (typeof console !== 'undefined' ? console : null);
+    try { if (c && c.warn) c.warn('[room] ' + what, e); } catch (x) { /* nowhere left to report */ }
+  }
 
   function makeStorage(ls) {
     var memory = {}, ok = false;
@@ -40,30 +52,67 @@
   function copy(v) { return v === undefined ? undefined : JSON.parse(JSON.stringify(v)); }
   function assign(a, b) { for (var k in b) if (Object.prototype.hasOwnProperty.call(b, k)) a[k] = b[k]; return a; }
 
+  // No answer, a rate limit or a server error: the request may be retried later.
+  function transient(status) { return status === 0 || status === 429 || status >= 500; }
+  // The Worker's own reason when it gave one (disabled, rate), otherwise plain 'network'.
+  function transientError(r) {
+    var e = r.body && r.body.error;
+    return r.status !== 0 && r.status !== 200 && e && e !== 'bad-json' ? e : 'network';
+  }
+
   // ── HTTP transport ─────────────────────────────────────────
 
-  function HttpTransport(base, fetchFn) {
+  // opts: {timeoutMs, setTimeout, clearTimeout, AbortController} — for tests.
+  function HttpTransport(base, fetchFn, opts) {
+    opts = opts || {};
     this.base = String(base || '').replace(/\/$/, '');
     this.fetchFn = fetchFn || (root.fetch ? root.fetch.bind(root) : null);
+    this.timeoutMs = opts.timeoutMs || TIMEOUT_MS;
+    this.setTimer = opts.setTimeout || (root.setTimeout ? root.setTimeout.bind(root) : null);
+    this.clearTimer = opts.clearTimeout || (root.clearTimeout ? root.clearTimeout.bind(root) : function () {});
+    this.Abort = opts.AbortController || root.AbortController || (typeof AbortController !== 'undefined' ? AbortController : null);
   }
+  // Always resolves {status, body, retryAfter}; status 0 for no answer, a failed body read or the timeout.
   HttpTransport.prototype.request = function (method, path, opts) {
     opts = opts || {};
+    var self = this;
     var headers = { 'Content-Type': 'application/json' };
     if (opts.session) headers['X-Room-Session'] = opts.session;
     if (opts.observer) headers['X-Room-Observer'] = opts.observer;
     if (opts.keyId) headers['X-Room-Key-Id'] = opts.keyId;
-    return this.fetchFn(this.base + path, { method: method, headers: headers, body: opts.body ? JSON.stringify(opts.body) : undefined })
-      .then(function (res) {
-        var retry = parseInt(res.headers.get('Retry-After') || '', 10);
+    var init = { method: method, headers: headers, body: opts.body ? JSON.stringify(opts.body) : undefined };
+    var ctrl = null, timer = null;
+    function noAnswer(error) { return { status: 0, body: { error: error }, retryAfter: null }; }
+    var answer;
+    try {
+      if (this.Abort) { ctrl = new this.Abort(); init.signal = ctrl.signal; }
+      answer = Promise.resolve(this.fetchFn(this.base + path, init)).then(function (res) {
+        var retry = parseInt((res.headers && res.headers.get && res.headers.get('Retry-After')) || '', 10);
         return res.text().then(function (text) {
           var body;
           try { body = text ? JSON.parse(text) : null; } catch (e) { body = { error: 'bad-json' }; }
           return { status: res.status, body: body, retryAfter: isFinite(retry) ? retry : null };
         });
-      }, function () { return { status: 0, body: { error: 'network' }, retryAfter: null }; });
+      });
+    } catch (e) {
+      answer = Promise.reject(e);
+    }
+    answer = answer.then(null, function () { return noAnswer('network'); });
+    if (!this.setTimer) return answer;
+    var late = new Promise(function (resolve) {
+      timer = self.setTimer(function () {
+        try { if (ctrl) ctrl.abort(); } catch (e) { /* already settled */ }
+        resolve(noAnswer('timeout'));
+      }, self.timeoutMs);
+    });
+    return Promise.race([answer, late]).then(function (r) {
+      if (timer !== null) self.clearTimer(timer);
+      return r;
+    });
   };
   HttpTransport.prototype.create = function (body, keyId) { return this.request('POST', '/room', { body: body, keyId: keyId }); };
-  HttpTransport.prototype.join = function (code, body) { return this.request('POST', '/room/' + code + '/join', { body: body }); };
+  // auth: re-entering a confirmed seat needs the seat's current session as proof.
+  HttpTransport.prototype.join = function (code, body, auth) { return this.request('POST', '/room/' + code + '/join', assign({ body: body }, auth || {})); };
   HttpTransport.prototype.poll = function (code, since, auth) { return this.request('GET', '/room/' + code + '/ops?since=' + since, auth); };
   HttpTransport.prototype.snapshot = function (code, cursor, auth) {
     return this.request('GET', '/room/' + code + '/snapshot' + (cursor ? '?cursor=' + encodeURIComponent(cursor) : ''), auth);
@@ -88,17 +137,29 @@
     this.onUpdate = opts.onUpdate || function () {};
     this.setTimer = opts.setTimeout || (root.setTimeout ? root.setTimeout.bind(root) : function () { return 0; });
     this.clearTimer = opts.clearTimeout || (root.clearTimeout ? root.clearTimeout.bind(root) : function () {});
-    this.client = opts.clientId || this.store.read(CLIENT_KEY);
-    if (!this.client) {
-      this.client = 'c' + Date.now().toString(36) + Math.random().toString(36).slice(2, 10);
-      this.store.write(CLIENT_KEY, this.client);
+    if (opts.clientId) {
+      this.client = String(opts.clientId).slice(0, CLIENT_MAX);
+    } else {
+      this.client = this.store.read(CLIENT_KEY);
+      if (typeof this.client !== 'string' || !CLIENT_RE.test(this.client)) {
+        this.client = 'c' + Date.now().toString(36) + Math.random().toString(36).slice(2, 10);
+        this.store.write(CLIENT_KEY, this.client);
+      }
     }
     this.running = false;
     this.timer = null;
+    this.loopId = 0;
+    this.gen = 0;
+    this.pollTicket = 0;
+    this.caughtUp = 0;
+    this.waiters = {};
     this.reset();
   }
 
   RoomClient.prototype.reset = function () {
+    var waiters = this.waiters;
+    this.gen += 1;            // every answer to a request sent before this belongs to another room
+    this.waiters = {};
     this.code = null;
     this.session = null;
     this.observer = null;
@@ -112,24 +173,88 @@
     this.meta = null;
     this.presence = {};
     this.offset = 0;
+    this.rtt = null;
     this.pending = [];
+    this.acked = [];          // [{op, seq}]: accepted by the server, not yet in this.room
     this.rejected = [];
     this.retryAfter = 10;
     this.lastOwnOpAt = 0;
     this.flushing = false;
+    this.flushGen = 0;
+    this.unsure = false;      // a send went unanswered: read the log before sending again
+    this.unsureAt = 0;
+    this.more = false;
+    this.changes = 0;
+    this.memo = null;
+    for (var cid in waiters) waiters[cid]({ ok: false, error: 'reset' });
   };
 
   // Per room and per client: two officers testing in one browser never share a session.
   RoomClient.prototype.key = function (code) { return PREFIX + 'room/' + (code || this.code) + ':' + this.client; };
   RoomClient.prototype.auth = function () { return this.observer ? { observer: this.observer } : { session: this.session }; };
+  RoomClient.prototype.holder = function () { return this.observer || this.session || null; };
   RoomClient.prototype.serverNow = function () { return R.serverNowEst(this.offset, this.clock()); };
+
+  // onUpdate belongs to the panel: its exceptions never break the client's own chains.
+  RoomClient.prototype.emit = function () {
+    try { this.onUpdate(this); } catch (e) { warn('onUpdate', e); }
+  };
+
+  // Answers queue()'s promise for cid: now, or with `later` once the caller has polled, so whoever
+  // awaits the op already sees the server's copy. Taken out of waiters at once: reset() cannot undo it.
+  RoomClient.prototype.answer = function (cid, result, later) {
+    var fn = this.waiters[cid];
+    if (!fn) return;
+    delete this.waiters[cid];
+    if (later) later.push(function () { fn(result); }); else fn(result);
+  };
+
+  RoomClient.prototype.isPending = function (cid) {
+    for (var i = 0; i < this.pending.length; i++) if (this.pending[i].cid === cid) return true;
+    return false;
+  };
+
+  RoomClient.prototype.drop = function (ops, error, status, later) {
+    if (!ops.length) return;
+    this.pending = R.mergePending(this.pending, ops.map(function (o) { return o.cid; }));
+    this.changes++;
+    for (var i = 0; i < ops.length; i++) {
+      this.answer(ops[i].cid, status === undefined ? { ok: false, error: error } : { ok: false, error: error, status: status }, later);
+    }
+  };
+
+  function callAll(list) { for (var i = 0; i < list.length; i++) list[i](); }
+
+  RoomClient.prototype.markUnsure = function () {
+    this.unsure = true;
+    this.unsureAt = this.pollTicket;
+  };
+
+  RoomClient.prototype.backoff = function (r) {
+    var hint = r && r.retryAfter ? r.retryAfter : 0;
+    this.retryAfter = Math.max(hint, Math.min(MAX_BACKOFF_SEC, Math.max(2, this.retryAfter * 2)));
+  };
+
+  // Keeps the sample with the shortest round trip: its error is at most half of it. The bound
+  // relaxes by 10 ms a sample so an old best gives way, and a jump over a minute is taken at once.
+  RoomClient.prototype.sampleClock = function (sent, got, serverNow) {
+    if (typeof serverNow !== 'number') return;
+    var rtt = Math.max(0, got - sent);
+    var offset = R.clockOffset(sent, got, serverNow);
+    if (this.rtt === null || rtt <= this.rtt || Math.abs(offset - this.offset) > 60000) {
+      this.rtt = rtt;
+      this.offset = offset;
+    } else {
+      this.rtt += 10;
+    }
+  };
 
   RoomClient.prototype.persist = function () {
     if (!this.code) return;
     this.store.write(this.key(), {
       code: this.code, fork: this.fork, planet: this.planet, session: this.session, observer: this.observer,
       word: this.word, sheet: this.sheet, observerToken: this.observerToken,
-      seq: this.room.seq, objects: this.room.objects, pending: this.pending
+      seq: this.room.seq, objects: this.room.objects, pending: this.pending, acked: this.acked
     });
   };
 
@@ -138,7 +263,7 @@
     if (!saved || saved.fork !== this.fork) return false;
     this.reset();
     this.code = saved.code;
-    this.session = saved.session;
+    this.session = saved.session || null;
     this.observer = saved.observer || null;
     this.word = saved.word || null;
     this.sheet = saved.sheet || null;
@@ -146,27 +271,49 @@
     this.room = R.createState(saved.seq || 0);
     this.room.objects = saved.objects || {};
     this.pending = saved.pending || [];
-    this.status = this.observer ? 'observer' : 'resuming';
+    this.acked = saved.acked || [];
+    if (this.pending.length) this.markUnsure();   // they may have landed before the page closed
+    this.status = this.observer ? 'observer' : this.session ? 'resuming' : 'expired';
     this.me = this.findMe();
     return true;
   };
 
   RoomClient.prototype.fail = function (r) {
     this.error = (r.body && r.body.error) || 'http-' + r.status;
-    this.onUpdate(this);
+    this.emit();
     return this;
   };
 
+  // 401, or 404 for the room: the dead secret leaves storage, the last picture stays.
+  RoomClient.prototype.end = function (status, r) {
+    this.status = status;
+    this.error = (r.body && r.body.error) || (status === 'gone' ? 'room' : 'session');
+    this.drop(this.pending.slice(), status);
+    this.session = null;
+    this.observer = null;
+    this.persist();
+    this.emit();
+    return this;
+  };
+
+  // A 404 for a room that should still be alive: the code was rotated and this client left behind.
+  RoomClient.prototype.evicted = function () {
+    var m = this.meta;
+    return !!(this.session && m && !m.closed && m.maxAt && this.serverNow() < m.maxAt);
+  };
+
   RoomClient.prototype.createRoom = function (p) {
-    var self = this;
+    var self = this, gen = this.gen;
     var body = { token: p.token, planet: this.planet, h: this.h, creator: { client: this.client, post: p.post, callsign: p.callsign || '' } };
     return this.transport.create(body, p.keyId).then(function (r) {
-      if (r.status !== 200) return self.fail(r);
+      if (gen !== self.gen) return self;
+      if (r.status !== 200 || !r.body) return self.fail(r);
+      if (r.body.fork !== self.fork) { self.error = 'fork'; self.emit(); return self; }
       self.reset();
       self.code = r.body.code;
       self.session = r.body.session;
-      self.sheet = r.body.sheet;
-      self.observerToken = r.body.observerToken;
+      self.sheet = r.body.sheet || null;
+      self.observerToken = r.body.observerToken || null;   // the Worker may leave it to the observer action
       self.status = 'in';
       self.persist();
       return self.poll();
@@ -174,14 +321,21 @@
   };
 
   RoomClient.prototype.join = function (p) {
-    var self = this;
+    var self = this, gen = this.gen;
     var e = R.parseEntry(p.entry);
-    if (!e) { this.error = 'entry'; this.onUpdate(this); return Promise.resolve(this); }
+    if (!e) { this.error = 'entry'; this.emit(); return Promise.resolve(this); }
     var body = { client: this.client, callsign: p.callsign || '' };
     if (e.postCode) body.postCode = e.postCode;
     else { body.post = p.post; body.squad = p.squad || null; }
-    return this.transport.join(e.code, body).then(function (r) {
-      if (r.status !== 200) return self.fail(r);
+    var proof = null;
+    if (this.code === e.code) proof = this.session;
+    else {
+      var saved = this.store.read(this.key(e.code));
+      if (saved && saved.fork === this.fork) proof = saved.session || null;
+    }
+    return this.transport.join(e.code, body, proof ? { session: proof } : {}).then(function (r) {
+      if (gen !== self.gen) return self;
+      if (r.status !== 200 || !r.body) return self.fail(r);   // 409 member: the seat is held and no proof matched
       self.reset();
       self.code = e.code;
       self.session = r.body.session;
@@ -204,89 +358,197 @@
   RoomClient.prototype.poll = function () {
     var self = this;
     if (!this.code) return Promise.resolve(this);
+    var gen = this.gen, holder = this.holder(), room = this.room, code = this.code, since = room.seq;
+    var ticket = ++this.pollTicket;
     var sent = this.clock();
-    return this.transport.poll(this.code, this.room.seq, this.auth()).then(function (r) {
-      var got = self.clock();
-      if (r.status === 0) {
-        self.error = 'network';
-        self.retryAfter = Math.min(30, Math.max(2, self.retryAfter * 2));
-        self.onUpdate(self);
-        return self;
-      }
-      if (r.status === 401) { self.status = 'expired'; self.persist(); self.onUpdate(self); return self; }
-      if (r.status === 404) { self.status = 'gone'; self.onUpdate(self); return self; }
-      if (r.status !== 200) return self.fail(r);
-      var b = r.body;
-      self.error = null;
-      self.offset = R.clockOffset(sent, got, b.serverNow);
-      self.meta = b.meta;
-      self.presence = b.presence || {};
-      self.retryAfter = r.retryAfter || 10;
-      if (b.knocking) {
-        self.status = 'knocking';
-        self.word = b.word;
-      } else {
-        b.ops.forEach(function (op) { if (op.seq > self.room.seq) R.applyOp(self.room, op); });
-        if (self.status === 'knocking' || self.status === 'resuming') self.status = 'in';
-        if (b.more) self.retryAfter = 0;
-      }
-      self.me = self.findMe();
-      if (b.meta && b.meta.closed && self.status === 'in') self.status = 'closed';
-      self.persist();
-      self.onUpdate(self);
-      return self;
-    });
+    return this.transport.poll(code, since, this.auth()).then(function (r) {
+      // A reset, rotation, expiry or rebuild while this poll was out: its answer describes another room.
+      if (gen !== self.gen || holder !== self.holder() || room !== self.room || code !== self.code) return self;
+      return self.onPoll(r, sent, self.clock(), since, ticket);
+    }).then(null, function (e) { warn('poll', e); return self; });
   };
 
+  RoomClient.prototype.onPoll = function (r, sent, got, since, ticket) {
+    var self = this;
+    var b = r.body;
+    if (transient(r.status) || (r.status === 200 && !(b && b.meta))) {
+      this.error = transientError(r);
+      this.backoff(r);
+      this.emit();
+      return this;
+    }
+    if (r.status === 401) return this.end('expired', r);   // session revoked, epoch rotated, or 'rotated' code
+    if (r.status === 404) return this.end(this.evicted() ? 'expired' : 'gone', r);
+    if (r.status !== 200) { this.backoff(r); return this.fail(r); }
+    this.error = null;
+    this.sampleClock(sent, got, b.serverNow);
+    this.meta = b.meta;
+    this.presence = b.presence || {};   // empty while knocking
+    this.retryAfter = r.retryAfter || 10;
+    var rebuild = false;
+    if (b.knocking) {
+      this.status = 'knocking';
+      this.word = b.word;
+    } else {
+      var ops = Array.isArray(b.ops) ? b.ops : [];
+      ops.forEach(function (op) {
+        if (op.seq <= self.room.seq) return;
+        R.applyOp(self.room, op);
+        if (op.seq > self.room.seq) self.room.seq = op.seq;   // never ask again for an op the log already gave
+        // Our own op in the log: accepted, even if its ack never arrived.
+        if (op.cid && op.by && op.by.client === self.client && self.isPending(op.cid)) {
+          self.pending = R.mergePending(self.pending, [op.cid]);
+          self.answer(op.cid, { ok: true, seq: op.seq });
+        }
+      });
+      if (ops.length) this.changes++;
+      this.acked = this.acked.filter(function (a) { return a.seq > self.room.seq; });
+      this.more = !!b.more;
+      if (b.more) this.retryAfter = 0;
+      else {
+        this.caughtUp = Math.max(this.caughtUp, ticket);
+        // Fewer ops than the server's seq promised: rebuild from the start of the log.
+        if (typeof b.seq === 'number' && this.room.seq < b.seq) {
+          if (since > 0) rebuild = true;
+          else this.room.seq = b.seq;
+        }
+      }
+      if (this.status === 'knocking' || this.status === 'resuming') this.status = 'in';
+    }
+    this.me = this.findMe();
+    if (b.meta.closed && this.status === 'in') {
+      this.status = 'closed';
+      this.drop(this.pending.slice(), 'closed');
+    }
+    if (rebuild) {
+      this.room = R.createState();
+      this.changes++;
+    }
+    this.persist();
+    this.emit();
+    return rebuild ? this.poll() : this;
+  };
+
+  // Resolves {ok:true, seq} once the room has the op, {ok:false, error, status} when it refuses it;
+  // waits through network errors, 429 and 5xx. Refused at once where nothing can be written.
   RoomClient.prototype.queue = function (op) {
+    var self = this;
+    var refused = this.observer ? 'observer' : NO_WRITE.indexOf(this.status) >= 0 ? this.status : null;
+    if (refused) return Promise.resolve({ ok: false, error: refused });
     cidSeq += 1;
-    op.cid = Date.now().toString(36) + '-' + cidSeq.toString(36);
+    op.cid = Date.now().toString(36) + '-' + cidSeq.toString(36) + Math.random().toString(36).slice(2, 6);
+    var result = new Promise(function (resolve) { self.waiters[op.cid] = resolve; });
     this.pending.push(op);
+    this.changes++;
     this.lastOwnOpAt = this.clock();
     this.persist();
-    this.onUpdate(this);
-    return this.flush();
+    this.emit();
+    this.flush();
+    return result;
   };
 
   RoomClient.prototype.flush = function () {
     var self = this;
-    if (this.flushing || !this.pending.length || !this.code || this.observer || this.status !== 'in') return Promise.resolve(this);
+    if ((this.flushing && this.flushGen === this.gen) || !this.pending.length || !this.code || this.observer || this.status !== 'in') {
+      return Promise.resolve(this);
+    }
+    var gen = this.gen, holder = this.holder(), code = this.code;
     this.flushing = true;
-    var batch = this.pending.slice(0, 64);
-    var cids = batch.map(function (o) { return o.cid; });
-    return this.transport.send(this.code, batch, this.auth()).then(function (r) {
-      self.flushing = false;
-      if (r.status === 0) { self.error = 'network'; self.onUpdate(self); return self; }
-      if (r.status === 401) { self.status = 'expired'; self.persist(); self.onUpdate(self); return self; }
-      if (r.status !== 200) {
-        var reason = (r.body && r.body.error) || 'http-' + r.status;
-        batch.forEach(function (op) { self.rejected.push({ op: op, error: reason }); });
-        self.pending = R.mergePending(self.pending, cids);
-        self.persist();
-        return self.poll();
-      }
-      r.body.acks.forEach(function (a) {
-        if (!a.error) return;
-        var op = batch.filter(function (o) { return o.cid === a.cid; })[0];
-        self.rejected.push({ op: op, error: a.error, status: a.status });
+    this.flushGen = gen;
+    function done() { if (self.flushGen === gen) self.flushing = false; }
+    function fresh() { return gen === self.gen && holder === self.holder() && code === self.code; }
+    if (this.unsure && this.caughtUp <= this.unsureAt) {
+      // The last send went unanswered: read the log first, so an op that landed is not sent twice.
+      return this.poll().then(function () {
+        done();
+        return fresh() && self.caughtUp > self.unsureAt ? self.flush() : self;
       });
-      self.pending = R.mergePending(self.pending, cids);
-      self.persist();
-      return self.poll();
+    }
+    this.unsure = false;
+    var perSec = this.policy && this.policy.limits && this.policy.limits.opsPerSec;
+    var batch = this.pending.slice(0, Math.max(1, Math.min(64, perSec || 10)));
+    return this.transport.send(code, batch, this.auth()).then(function (r) {
+      done();
+      if (!fresh()) {
+        if (self.pending.length) self.markUnsure();
+        return self;
+      }
+      return self.onSend(r, batch);
+    }).then(null, function (e) { done(); warn('flush', e); return self; });
+  };
+
+  RoomClient.prototype.onSend = function (r, batch) {
+    var self = this, st = r.status, body = r.body;
+    if (transient(st) || (st === 200 && !(body && Array.isArray(body.acks)))) {
+      if (st !== 429) this.markUnsure();
+      this.error = transientError(r);
+      this.backoff(r);
+      this.emit();
+      return this;
+    }
+    if (st === 401) return this.end('expired', r);
+    if (st === 404) return this.end(this.evicted() ? 'expired' : 'gone', r);
+    var later = [];
+    if (st !== 200) {
+      // 423 (silence, locked, closed, stopped, budget) or another 4xx: the batch is refused, with the reason.
+      var reason = (body && body.error) || 'http-' + st;
+      var sent = batch.filter(function (op) { return self.isPending(op.cid); });
+      sent.forEach(function (op) { self.rejected.push({ op: op, error: reason, status: st }); });
+      this.drop(sent, reason, st, later);
+      this.persist();
+      this.emit();
+      return this.poll().then(function () { callAll(later); return self; });
+    }
+    this.error = null;
+    var acks = {}, progressed = false, limited = false;
+    body.acks.forEach(function (a) { if (a && a.cid) acks[a.cid] = a; });
+    batch.forEach(function (op) {
+      var a = acks[op.cid];
+      if (!a || !self.isPending(op.cid)) return;   // no ack: stays pending; already confirmed by a poll: done
+      if (a.error === 'rate') { limited = true; return; }   // the per-client limit: send it again later
+      progressed = true;
+      self.pending = R.mergePending(self.pending, [op.cid]);
+      if (a.error) {
+        self.rejected.push({ op: op, error: a.error, status: a.status });
+        self.answer(op.cid, a.status === undefined ? { ok: false, error: a.error } : { ok: false, error: a.error, status: a.status }, later);
+      } else {
+        // dup:true is the Worker's original ack for a resent cid: accepted all the same.
+        if (a.seq > self.room.seq) self.acked.push({ op: op, seq: a.seq });
+        self.answer(op.cid, { ok: true, seq: a.seq }, later);
+      }
+    });
+    this.changes++;
+    this.persist();
+    this.emit();
+    return this.poll().then(function () {
+      callAll(later);
+      return progressed && !limited && self.pending.length ? self.flush() : self;
     });
   };
 
   RoomClient.prototype.admin = function (action, payload) {
     var self = this;
+    if (!this.code) return Promise.resolve({ status: 0, body: { error: 'room' }, retryAfter: null });
+    var gen = this.gen, holder = this.holder(), code = this.code;
     var body = assign({ action: action }, payload || {});
-    return this.transport.admin(this.code, body, this.auth()).then(function (r) {
-      if (r.status === 401) { self.status = 'expired'; self.onUpdate(self); return r; }
-      if (r.status !== 200) { self.fail(r); return r; }
+    return this.transport.admin(code, body, this.auth()).then(function (r) {
+      if (gen !== self.gen || holder !== self.holder() || code !== self.code) return r;
+      if (r.status === 401) { self.end('expired', r); return r; }
+      if (r.status === 404 && r.body && r.body.error === 'room') { self.end(self.evicted() ? 'expired' : 'gone', r); return r; }
+      if (r.status !== 200 || !r.body) { self.fail(r); return r; }
+      self.error = null;
+      if (action === 'observer' && r.body.observerToken) self.observerToken = r.body.observerToken;
       if (action === 'rotate' && r.body.code) {
+        // New code and epoch: earlier answers describe the old room, and the observer link died with it.
         self.store.remove(self.key());
+        self.gen += 1;
         self.code = r.body.code;
         self.session = r.body.session;
+        self.observerToken = null;
         self.room = R.createState();
+        self.flushing = false;
+        self.changes++;
+        if (self.pending.length) self.markUnsure();
       }
       self.persist();
       return self.poll().then(function () { return r; });
@@ -301,18 +563,28 @@
     this.stopLoop();
     if (this.code) this.store.remove(this.key());
     this.reset();
-    this.onUpdate(this);
+    this.emit();
   };
 
   RoomClient.prototype.startLoop = function () {
     var self = this;
     if (this.running) return;
     this.running = true;
+    var loop = ++this.loopId;
+    function live() { return self.running && loop === self.loopId; }
     function step() {
-      if (!self.running) return;
-      self.flush().then(function () { return self.poll(); }).then(function () {
-        if (!self.running) return;
-        if (self.status === 'expired' || self.status === 'gone') { self.running = false; return; }
+      self.timer = null;
+      if (!live()) return;
+      var polled = self.pollTicket;
+      var work;
+      try {
+        work = self.flush().then(function () { return self.pollTicket > polled ? self : self.poll(); });
+      } catch (e) {
+        work = Promise.reject(e);
+      }
+      work.then(null, function (e) { warn('loop', e); }).then(function () {
+        if (!live()) return;
+        if (self.status === 'expired' || self.status === 'gone' || !self.code) { self.running = false; return; }
         self.timer = self.setTimer(step, Math.max(1, self.retryAfter) * 1000);
       });
     }
@@ -321,23 +593,38 @@
 
   RoomClient.prototype.stopLoop = function () {
     this.running = false;
+    this.loopId++;
     if (this.timer) this.clearTimer(this.timer);
     this.timer = null;
   };
 
-  // Confirmed objects plus pending ops applied on copies: what the officer sees.
+  // Confirmed objects, then acked ops the next poll has not brought yet, then pending ops, applied on
+  // copies: what the officer sees. Memoized: the panel asks many times per render.
   RoomClient.prototype.merged = function () {
-    var objects = {}, id;
+    var m = this.memo;
+    if (m && m.room === this.room && m.seq === this.room.seq && m.changes === this.changes && m.me === this.me &&
+        m.pending === this.pending && m.pendingN === this.pending.length && m.acked === this.acked && m.ackedN === this.acked.length) {
+      return m.state;
+    }
+    var objects = {}, own = {}, id;
     for (id in this.room.objects) objects[id] = this.room.objects[id];
     var s = R.createState(this.room.seq);
     s.objects = objects;
     var at = this.serverNow();
     var me = this.me ? { client: this.me.client, post: this.me.post, squad: this.me.squad || null } : { client: this.client, post: null, squad: null };
-    this.pending.forEach(function (op) {
-      if (objects[op.id]) objects[op.id] = copy(objects[op.id]);
-      var res = R.applyOp(s, { seq: s.seq + 1, at: at, by: me, op: op.op, kind: op.kind, id: op.id, data: copy(op.data || {}), expectedStatus: op.expectedStatus });
-      if (res.ok && objects[op.id]) objects[op.id].pending = true;
-    });
+    function overlay(op, seq, mark) {
+      if (objects[op.id] && !own[op.id]) { objects[op.id] = copy(objects[op.id]); own[op.id] = true; }
+      var res = R.applyOp(s, { seq: seq, at: at, by: me, op: op.op, kind: op.kind, id: op.id, data: copy(op.data || {}), expectedStatus: op.expectedStatus });
+      if (res.ok && objects[op.id]) {
+        own[op.id] = true;
+        if (mark) objects[op.id].pending = true;
+      }
+    }
+    var room = this.room;
+    this.acked.forEach(function (a) { if (a.seq > room.seq) overlay(a.op, a.seq, false); });
+    this.pending.forEach(function (op) { overlay(op, s.seq + 1, true); });
+    this.memo = { room: this.room, seq: this.room.seq, changes: this.changes, me: this.me, pending: this.pending,
+      pendingN: this.pending.length, acked: this.acked, ackedN: this.acked.length, state: s };
     return s;
   };
 
@@ -386,14 +673,21 @@
   };
 
   // ── hook for tactical.js ─────────────────────────────────────
+  // A throwing panel stays inside the room: Series T keeps drawing and picking.
 
   root.TacRoom = {
     ROOM_URL: ROOM_URL,
     RoomClient: RoomClient,
     HttpTransport: HttpTransport,
     makeStorage: makeStorage,
-    attach: function (hooks) { if (root.TacRoomUI) root.TacRoomUI.mount(hooks, root.TacRoom); },
-    notify: function (event, payload) { if (root.TacRoomUI) root.TacRoomUI.notify(event, payload); },
-    consumePick: function (tile) { return !!(root.TacRoomUI && root.TacRoomUI.consumePick(tile)); }
+    attach: function (hooks) {
+      try { if (root.TacRoomUI) root.TacRoomUI.mount(hooks, root.TacRoom); } catch (e) { warn('attach', e); }
+    },
+    notify: function (event, payload) {
+      try { if (root.TacRoomUI) root.TacRoomUI.notify(event, payload); } catch (e) { warn('notify ' + event, e); }
+    },
+    consumePick: function (tile) {
+      try { return !!(root.TacRoomUI && root.TacRoomUI.consumePick(tile)); } catch (e) { warn('consumePick', e); return false; }
+    }
   };
 })(typeof window !== 'undefined' ? window : globalThis);
