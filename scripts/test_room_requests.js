@@ -1,7 +1,9 @@
 // scripts/test_room_requests.js — the requests module under Node: stored values stay escaped (tokenizer check),
 // recall labels, the strip button per status, shots against the taken target, the planet guard, repeat,
 // the mortar a «Deployed» moves, the request filter, digit keys and op shapes, and the request ping (who hears
-// it, the shared schedule, stop conditions, «Heard», patterns and volume, the audio unlock notice, the title badge).
+// it, the shared schedule, stop conditions, «Heard», patterns and volume, the audio unlock notice, the title badge),
+// and stage 2a: tasks without a point, the «To» list and addressed cards, the ping for the addressee only, «Share
+// position» with the crew's mortar, member markers and the mortar zone on a recording canvas, the zone switch.
 // Run: node scripts/test_room_requests.js
 'use strict';
 const fs = require('fs');
@@ -90,7 +92,8 @@ function world(objects, me, extra) {
     merged: () => ({ objects: all }),
     requests: () => Object.values(all).filter(o => o.kind === 'request' && !o.deleted),
     visible: () => Object.values(all).filter(o => !o.deleted),
-    member: c => Object.values(all).find(o => o.kind === 'member' && o.client === c) || null,
+    member: c => Object.values(all).find(o => o.kind === 'member' && !o.deleted && o.client === c) || null,
+    members: () => Object.values(all).filter(o => o.kind === 'member' && !o.deleted),
     calibration: () => null,
     queue: op => { queued.push(op); return Promise.resolve(ackWith(op)); }
   };
@@ -116,6 +119,27 @@ function withApi(over, fn) {
   restore();
   return out;
 }
+
+// ── stage 2a scaffolding ──
+// A canvas that records every call with the fill, stroke and alpha in force at that moment.
+function canvas() {
+  const c = { calls: [], fillStyle: '', strokeStyle: '', globalAlpha: 1, lineWidth: 1, stack: [] };
+  ['beginPath', 'arc', 'rect', 'moveTo', 'lineTo', 'closePath', 'fill', 'stroke', 'fillRect', 'setLineDash', 'strokeText', 'fillText'].forEach(name => {
+    c[name] = (...args) => { c.calls.push({ name, args, fill: c.fillStyle, stroke: c.strokeStyle, alpha: c.globalAlpha }); };
+  });
+  c.save = () => { c.stack.push({ fillStyle: c.fillStyle, strokeStyle: c.strokeStyle, globalAlpha: c.globalAlpha, lineWidth: c.lineWidth }); };
+  c.restore = () => { Object.assign(c, c.stack.pop()); };
+  c.of = name => c.calls.filter(x => x.name === name);
+  c.texts = () => c.of('fillText').map(x => x.args[0]);
+  return c;
+}
+const view = { scale: 10, worldToScreen: (x, y) => [x * 10, y * 10] };
+// Stories with one squad post and one squad, for {post, squad} addressees.
+const squadPolicy = JSON.parse(JSON.stringify(policy));
+squadPolicy.squads = { alpha: { nameRu: 'Альфа', nameEn: 'Alpha', color: '#ff0000' } };
+squadPolicy.posts.push({ id: 'sl', nameRu: 'Командир отделения', nameEn: 'Squad Leader', level: 'squad', max: 4 });
+// A task without a map point, addressed to the mortar post by the staff officer.
+const task = over => { const r = req(Object.assign({ id: 't1', type: 'task', note: 'hold the north gate', to: { post: 'mortar' } }, over)); if (!over || !('target' in over)) delete r.target; return r; };
 
 // ── request ping scaffolding ──
 const PREFS = 'chemdb-tactical:room-prefs';
@@ -517,10 +541,11 @@ async function t(name, fn) { await fn(); n++; console.log('ok', name); }
 
   await t('digit keys: 1..TYPES.length, no modifiers, not in fields, only while in the room', () => {
     const key = (k, over) => Object.assign({ key: k, ctrlKey: false, altKey: false, metaKey: false, shiftKey: false }, over);
-    assert.strictEqual(H.TYPES.length, 2);
+    assert.strictEqual(H.TYPES.length, 3);
     assert.strictEqual(H.typeForKey(key('1'), null, 'in'), 'mortar');
     assert.strictEqual(H.typeForKey(key('2'), { tagName: 'BUTTON' }, 'in'), 'position');
-    ['0', '3', '6', '9', '12', 'a', 'Enter', undefined].forEach(k => assert.strictEqual(H.typeForKey(key(k), null, 'in'), null, String(k)));
+    assert.strictEqual(H.typeForKey(key('3'), null, 'in'), 'task');
+    ['0', '4', '6', '9', '12', 'a', 'Enter', undefined].forEach(k => assert.strictEqual(H.typeForKey(key(k), null, 'in'), null, String(k)));
     ['ctrlKey', 'altKey', 'metaKey', 'shiftKey'].forEach(m => assert.strictEqual(H.typeForKey(key('1', { [m]: true }), null, 'in'), null, m));
     ['INPUT', 'SELECT', 'TEXTAREA'].forEach(tag => assert.strictEqual(H.typeForKey(key('1'), { tagName: tag }, 'in'), null, tag));
     assert.strictEqual(H.typeForKey(key('1'), { tagName: 'DIV', isContentEditable: true }, 'in'), null, 'contentEditable');
@@ -976,9 +1001,332 @@ async function t(name, fn) { await fn(); n++; console.log('ok', name); }
     assert.strictEqual(titleDoc.writes, 0);
   }));
 
+  await t('a task without a point: valid, «no point» on the card, no take, place or ring, and nothing that reads a target throws', async () => {
+    assert.strictEqual(H.validReq(task()), true);
+    assert.strictEqual(H.validReq(task({ target: null })), true);
+    assert.strictEqual(H.validReq(Object.assign(req(), { target: undefined })), false, 'a strike still needs its point');
+    assert.strictEqual(H.validReq(task({ target: { x: '<i>', y: 1 } })), false, 'a point that is there must be finite');
+    assert.strictEqual(H.hasTarget(task()), false);
+    assert.strictEqual(H.shotMatches(task(), [[1, 1]], { target: [1, 1] }), false);
+    const flows = { requested: {}, accepted: { acceptedBy: by(crew) }, done: { acceptedBy: by(crew) }, denied: { deniedBy: by(crew), reason: 'busy' } };
+    for (const status of Object.keys(flows)) for (const me of [so, crew, so2]) {
+      const r = task(Object.assign({ status }, flows[status]));
+      const name = status + ' / ' + me.client;
+      world([r, so, crew, so2], me);
+      const panel = mod.panel('requests', api), html = panel + mod.strip(api) + mod.chips(api) + mod.tools(api);
+      assertSafe(html, name);
+      assert.ok(panel.includes('<span class="tac-room-nopoint">no point</span>'), name + ': no point');
+      assert.ok(!/data-room-action="req-(take|place|fire|load)"/.test(html), name + ': no take, place, fire or load');
+      const acts = [...panel.matchAll(/data-room-action="req-([a-z]+)"/g)].map(m => m[1]);
+      assert.deepStrictEqual(acts, R.requestActions(policy, me, r, { claimed: [] }), name + ': the card offers what requestActions does');
+      const c = canvas();
+      assert.doesNotThrow(() => mod.draw(c, view, api), name + ': draw');
+      assert.strictEqual(c.of('arc').length + c.of('rect').length, 0, name + ': no ring');
+      let centred = 0;
+      api.ui.hooks.view.centerOn = () => { centred++; };
+      ['req-take', 'req-place', 'reqShoot', 'reqFocus', 'req-done', 'req-repeat', 'req-accept', 'req-cancel'].forEach(a =>
+        assert.doesNotThrow(() => mod.actions[a](el({ 'data-id': 't1' }), api), name + ': ' + a));
+      await tick();
+      assert.strictEqual(centred, 0, name + ': focus does not centre on a missing point');
+      assert.strictEqual(H.state.taken, null, name + ': nothing taken');
+      H.state.taken = 't1';
+      assert.doesNotThrow(() => mod.notify('shot', { target: [1, 1] }, api), name + ': shot');
+      assert.ok(!queued.some(o => o.data && o.data.status === 'firing'), name + ': a shot never fires a task');
+      assert.doesNotThrow(() => mod.tick(api), name + ': tick');
+    }
+    world([task({ status: 'done', acceptedBy: by(crew), to: { client: 'c-crew', post: 'so' } })], so);
+    mod.actions['req-repeat'](el({ 'data-id': 't1' }), api);
+    assert.deepStrictEqual(queued.map(o => o.data), [{ type: 'task', note: 'hold the north gate', priority: 'normal', flags: [], level: 0, h: 'h1', to: { client: 'c-crew' } }],
+      'a repeat keeps no point and the addressee, rebuilt from its own keys');
+    assert.strictEqual(R.validateData(policy, 'request', queued[0].data), null, 'the contract takes the repeat');
+    const ru = load('ru').api.T();
+    assert.deepStrictEqual([ru.types.task, ru.reqNoPoint, ru.taskText, ru.reqTo, ru.reqToAll, ru.posShare, ru.posFromFire, ru.posClear, ru.zoneToggle],
+      ['Задача', 'без точки', 'Текст задачи', 'Кому', 'Всем по типу', 'Передать позицию', 'Позиция из панели огня', 'Убрать позицию', 'Зона миномётов']);
+  });
+
+  await t('«To»: a strike offers everyone, the mortar post and its members; a task swaps everyone for a pick and offers every answering post and member but me', () => {
+    const observer = { id: 'mem-obs', kind: 'member', client: 'c-obs', post: 'observer', confirmed: true };
+    const knocking = { id: 'mem-k', kind: 'member', client: 'c-k', post: 'mortar', confirmed: false };
+    const evil = '<img src=x onerror=1>';
+    world([so, so2, Object.assign({}, crew, { callsign: 'Бекас' }), Object.assign({}, crew2, { callsign: evil }), observer, knocking], so);
+    const opts = type => H.toOptions(api, type).map(o => [o.value, o.label, o.to]);
+    assert.deepStrictEqual(opts('mortar'), [
+      ['', 'Everyone by type', null], ['post:mortar', 'Mortar crew', { post: 'mortar' }],
+      ['client:c-crew', 'Бекас · Mortar crew', { client: 'c-crew' }], ['client:c-crew2', evil + ' · Mortar crew', { client: 'c-crew2' }]]);
+    assert.deepStrictEqual(opts('task'), [
+      ['', '— pick —', null], ['post:so', 'Staff Officer', { post: 'so' }], ['post:mortar', 'Mortar crew', { post: 'mortar' }],
+      ['client:c-so2', 'Staff Officer', { client: 'c-so2' }], ['client:c-crew', 'Бекас · Mortar crew', { client: 'c-crew' }],
+      ['client:c-crew2', evil + ' · Mortar crew', { client: 'c-crew2' }]]);
+    assert.deepStrictEqual(opts('position').map(o => o[0]), opts('task').map(o => o[0]), 'a position request may go to any post');
+    assert.strictEqual(opts('position')[0][1], 'Everyone by type');
+    const base = { note: 'go', priority: 'normal', flags: [], level: 0, h: '' };
+    ['mortar', 'position', 'task'].forEach(type => H.toOptions(api, type).filter(o => o.to).forEach(o => {
+      const data = Object.assign({ type, to: o.to }, base, type === 'task' ? {} : { target: { x: 1, y: 1 } });
+      assert.strictEqual(R.validateData(policy, 'request', data), null, type + ' ' + o.value);
+    }));
+    api.ui.policy = squadPolicy;
+    assert.deepStrictEqual(opts('task').slice(0, 5), [
+      ['', '— pick —', null], ['post:so', 'Staff Officer', { post: 'so' }], ['post:mortar', 'Mortar crew', { post: 'mortar' }],
+      ['post:sl', 'Squad Leader', { post: 'sl' }], ['squad:sl:alpha', 'Squad Leader · Alpha', { post: 'sl', squad: 'alpha' }]]);
+    assert.strictEqual(R.validateData(squadPolicy, 'request', Object.assign({ type: 'task', to: { post: 'sl', squad: 'alpha' } }, base)), null);
+    assert.deepStrictEqual(opts('mortar').map(o => o[0]).slice(0, 2), ['', 'post:mortar'], 'a strike never offers a squad post');
+
+    world([so, Object.assign({}, crew, { callsign: evil })], so);
+    H.state.form = true;
+    H.state.target = null;
+    api.ui.drafts['request.type'] = 'task';
+    let html = mod.panel('requests', api);
+    assertSafe(html, 'task form');
+    assert.ok(html.includes('data-room-action="reqType" data-type="task">3 Task</button>'), '«3 Task» in the type row');
+    assert.ok(html.includes('<select class="tac-select" name="to"><option value="" selected>— pick —</option><option value="post:so">Staff Officer</option>'), html);
+    assert.ok(html.includes('Task text<input class="tac-input" name="note"'), 'the note is the task text');
+    assert.ok(html.includes('<span class="tac-item-coords">no point (optional)</span>'), 'the point is optional');
+    api.ui.drafts['request.to'] = 'client:c-crew';
+    html = mod.panel('requests', api);
+    assert.ok(html.includes('<option value="client:c-crew" selected>&lt;img src=x onerror=1&gt; · Mortar crew</option>'), 'the draft stays chosen, the callsign escaped');
+    api.ui.drafts['request.type'] = 'mortar';
+    assert.ok(mod.panel('requests', api).includes('<option value="client:c-crew" selected>'), 'a crew member is still offered for a strike');
+    api.ui.drafts['request.to'] = 'post:so';
+    html = mod.panel('requests', api);
+    assert.ok(html.includes('<option value="" selected>Everyone by type</option>') && !html.includes('post:so'), 'a strike never offers staff: back to everyone');
+    assert.ok(html.includes('Note<input class="tac-input" name="note"') && html.includes('<span class="tac-item-coords">—</span>'));
+    api.clearDrafts('request');
+    H.state.form = false;
+  });
+
+  await t('submit: a task needs its text and an addressee, not a point; the addressee goes out as {post}, {post, squad} or {client}; a vanished one is refused', () => {
+    const toasts = [];
+    withApi({ toast: s => toasts.push(s) }, () => {
+      const send = (type, to, note, target) => {
+        H.state.form = true;
+        H.state.target = target || null;
+        api.ui.drafts['request.type'] = type;
+        toasts.length = 0;
+        queued = [];
+        mod.submits.request({ elements: { coords: { value: '' }, note: { value: note }, urgent: { checked: false }, to: { value: to } } }, api);
+        return { toast: toasts.slice(), data: queued.map(o => o.data), open: H.state.form };
+      };
+      world([so, crew], so);
+      const T = api.T();
+      assert.deepStrictEqual(send('task', 'post:mortar', '   '), { toast: [T.taskNeedText], data: [], open: true });
+      assert.deepStrictEqual(send('task', '', 'hold the gate'), { toast: [T.reqToNeed], data: [], open: true });
+      assert.deepStrictEqual(send('task', 'client:c-gone', 'hold the gate'), { toast: [T.reqToStale], data: [], open: true });
+      assert.deepStrictEqual(send('mortar', '', 'x'), { toast: [T.needTarget], data: [], open: true });
+      assert.deepStrictEqual([T.taskNeedText, T.reqToNeed, T.reqToStale], ['Write the task text.', 'Pick who the task is for.', 'That addressee is gone: pick again.']);
+      const plain = send('task', 'post:mortar', 'hold the gate');
+      assert.deepStrictEqual(plain, { toast: [], data: [{ type: 'task', note: 'hold the gate', priority: 'normal', flags: [], level: 0, h: 'h1', to: { post: 'mortar' } }], open: false });
+      assert.strictEqual(R.validateData(policy, 'request', plain.data[0]), null, 'the contract takes a task without a point');
+      const pointed = send('task', 'client:c-crew', 'check here', [5, 6]);
+      assert.deepStrictEqual([pointed.data[0].target, pointed.data[0].to], [{ x: 5, y: 6 }, { client: 'c-crew' }]);
+      assert.strictEqual(R.validateData(policy, 'request', pointed.data[0]), null);
+      const everyone = send('mortar', '', 'x', [62, -62]);
+      assert.ok(everyone.data.length === 1 && !('to' in everyone.data[0]), 'everyone by type sends no addressee');
+      const toCrew = send('mortar', 'client:c-crew', 'x', [62, -62]);
+      assert.deepStrictEqual(toCrew.data[0].to, { client: 'c-crew' });
+      assert.strictEqual(R.validateData(policy, 'request', toCrew.data[0]), null);
+      assert.deepStrictEqual(send('mortar', 'post:so', 'x', [62, -62]).toast, [T.reqToStale], 'a forged staff addressee on a strike is refused');
+      api.ui.policy = squadPolicy;
+      const squad = send('task', 'squad:sl:alpha', 'go');
+      assert.deepStrictEqual(squad.data[0].to, { post: 'sl', squad: 'alpha' });
+      assert.strictEqual(R.validateData(squadPolicy, 'request', squad.data[0]), null);
+    });
+    api.clearDrafts('request');
+    H.state.form = false;
+    H.state.target = null;
+  });
+
+  await t('card: «→ addressee» after the type; the addressee or staff accept, the asset owner and a claimed crew do not; a task has its own deny reasons', () => {
+    const named = Object.assign({}, crew2, { callsign: 'Бекас' });
+    const r = req({ to: { client: 'c-crew2' } });
+    const acts = me => {
+      world([r, mortarAsset({ claimedBy: 'c-crew' }), so, so2, crew, named], me);
+      return [...mod.panel('requests', api).matchAll(/data-room-action="req-([a-z]+)"/g)].map(m => m[1]);
+    };
+    assert.deepStrictEqual([so, so2, crew, named].map(acts), [['cancel'], ['accept', 'deny'], [], ['accept', 'deny']]);
+    world([r, so, named], so);
+    const head = '<b>Mortar</b> <span class="tac-room-to">→ Бекас · Mortar crew</span> <span class="tac-item-coords">';
+    assert.ok(mod.panel('requests', api).includes(head) && mod.strip(api).includes(head), 'panel and strip');
+    const headFor = to => { world([req({ to })], so); const html = mod.panel('requests', api) + mod.strip(api); assertSafe(html, JSON.stringify(to)); return html.match(/<span class="tac-room-to">(.*?)<\/span>/)[1]; };
+    assert.strictEqual(headFor({ post: 'mortar' }), '→ Mortar crew');
+    assert.strictEqual(headFor({ client: 'c-left' }), '→ left the room');
+    assert.strictEqual(headFor({ post: '<img src=x onerror=1>' }), '→ &lt;img src=x onerror=1&gt;');
+    world([req()], so);
+    assert.ok(!mod.panel('requests', api).includes('tac-room-to'), 'no addressee: no arrow');
+    world([task(), so, crew], crew);
+    mod.actions['req-deny'](el({ 'data-id': 't1' }), api);
+    const reasons = [...mod.panel('requests', api).matchAll(/data-room-action="reqDenyReason" data-id="t1" data-reason="([^"]+)"/g)].map(m => m[1]);
+    assert.deepStrictEqual(reasons, ['busy', 'not possible', 'not my job']);
+    mod.actions.reqDenyReason(el({ 'data-id': 't1', 'data-reason': 'no ammo' }), api);
+    mod.actions.reqDenyReason(el({ 'data-id': 't1', 'data-reason': 'busy' }), api);
+    assert.deepStrictEqual(queued.map(o => o.data), [{ status: 'denied', reason: 'busy' }]);
+  });
+
+  await t('ping: a request with an addressee sounds only for the addressee; without one, as in stage 1', () => withClock(() => {
+    const hears = (r, me) => { const w = pingWorld([r, mortarAsset(), so, so2, crew, crew2], me); tickAt(0); return patterns(w.ac).length > 0; };
+    const all = [so, so2, crew, crew2];
+    assert.deepStrictEqual(all.map(m => hears(req({ to: { client: 'c-crew2' } }), m)), [false, false, false, true], 'a strike for one crew member');
+    assert.deepStrictEqual(all.map(m => hears(req({ to: { post: 'mortar' } }), m)), [false, false, true, true], 'a strike for the mortar post');
+    assert.deepStrictEqual(all.map(m => hears(task({ by: by(crew), to: { post: 'so' } }), m)), [true, true, false, false], 'a task for staff; its author hears nothing');
+    assert.deepStrictEqual(all.map(m => hears(req(), m)), [false, false, true, true], 'no addressee: the mortar crew, as before');
+    const objects = { 'asset-mortar-1': mortarAsset({ claimedBy: 'c-so2' }) };
+    assert.strictEqual(H.aimedAtMine(policy, objects, so2, req()), true, 'a claimed seat without an addressee');
+    assert.strictEqual(H.aimedAtMine(policy, objects, so2, req({ to: { post: 'mortar' } })), false, 'a claimed seat is no addressee');
+    assert.strictEqual(H.aimedAtMine(policy, objects, crew, req({ to: 'mortar' })), false, 'a broken addressee aims at nobody');
+  }));
+
+  await t('ownMortarRow: the mortar I claimed, else the first of my post; none for staff without a seat or a level that cannot write assets', () => {
+    const rows = [1, 2].map(n => ({ id: 'asset-mortar-' + n, def: { type: 'mortar', owner: 'mortar' }, n, obj: { claimedBy: n === 2 ? 'c-crew' : null } }));
+    assert.strictEqual(H.ownMortarRow(rows, policy, crew).id, 'asset-mortar-2', 'claimed');
+    assert.strictEqual(H.ownMortarRow(rows, policy, crew2).id, 'asset-mortar-1', 'first of my post');
+    assert.strictEqual(H.ownMortarRow(rows, policy, so), null, 'staff without a seat');
+    assert.strictEqual(H.ownMortarRow([rows[0], Object.assign({}, rows[1], { obj: { claimedBy: 'c-so2' } })], policy, so2).id, 'asset-mortar-2', 'a staff officer in a crew seat');
+    assert.strictEqual(H.ownMortarRow(rows.map(x => Object.assign({}, x, { obj: null })), policy, crew), null, 'no asset object yet');
+    assert.strictEqual(H.ownMortarRow([{ id: 'asset-ob-1', def: { type: 'ob', owner: 'mortar' }, n: 1, obj: {} }], policy, crew), null, 'mortars only');
+    assert.strictEqual(H.ownMortarRow(rows, policy, { client: 'c-obs', post: 'observer', confirmed: true }), null, 'observer');
+    assert.strictEqual(H.ownMortarRow(rows, policy, null), null);
+  });
+
+  await t('«Share position»: a map pick patches my member and deploys my mortar in one click; staff moves none; «From the Fire panel» and «Clear position»', () => {
+    const ops = () => queued.map(o => [o.op, o.kind, o.id, o.data]);
+    let picked = null, cancels = 0;
+    withApi({ setPick: (mode, fn, hint) => { picked = { mode, fn, hint }; }, cancelPick: () => { cancels++; } }, () => {
+      api.ui.pick = null;
+      world([so, crew, mortarAsset({ state: 'moving', tile: null })], crew, { level: 2 });
+      let tools = mod.tools(api);
+      assertSafe(tools, 'tools');
+      assert.ok(tools.includes('<button type="button" class="btn-small tac-room-btn big" data-room-action="posShare">Share position</button>'), tools);
+      assert.ok(!tools.includes('posFromFire') && !tools.includes('posClear'), 'no Fire panel mortar, no position yet');
+      mod.actions.posShare(el({}), api);
+      assert.deepStrictEqual([picked.mode, picked.hint], ['position', 'Click the tile you stand on']);
+      picked.fn([30.7, -89.6]);   // a fractional tile floors: 30, -90
+      assert.deepStrictEqual(ops(), [
+        ['patch', 'member', 'mem-crew', { pos: { x: 30, y: -90, level: 2 } }],
+        ['patch', 'asset', 'asset-mortar-1', { tile: [30, -90], state: 'deployed' }]]);
+      assert.strictEqual(R.validateMemberPatch(policy, crew, queued[0].data), null, 'the member patch fits the contract');
+      assert.strictEqual(R.validatePatch(policy, 'asset', queued[1].data, mortarAsset()), null, 'the asset patch fits the contract');
+      assert.ok(R.canWrite(policy, crew, queued[1], mortarAsset()).ok, 'the crew may move its mortar');
+      api.ui.pick = { mode: 'position' };
+      assert.ok(mod.tools(api).includes('class="btn-small tac-room-btn on big" data-room-action="posShare"'), 'on while picking');
+      mod.actions.posShare(el({}), api);
+      assert.strictEqual(cancels, 1, 'a second press leaves pick mode');
+      api.ui.pick = null;
+
+      world([so, crew, mortarAsset()], so);
+      mod.actions.posShare(el({}), api);
+      picked.fn([1, 2]);
+      assert.deepStrictEqual(ops(), [['patch', 'member', 'mem-so', { pos: { x: 1, y: 2, level: 0 } }]], 'staff moves no mortar');
+
+      world([so, crew, mortarAsset()], crew, { mortar: { tile: [20, -98], mode: 'coordinates', level: 1 } });
+      tools = mod.tools(api);
+      assert.ok(tools.includes('data-room-action="posFromFire">From the Fire panel</button>'), tools);
+      mod.actions.posFromFire(el({}), api);
+      assert.deepStrictEqual(ops(), [
+        ['patch', 'member', 'mem-crew', { pos: { x: 20, y: -98, level: 1 } }],
+        ['patch', 'asset', 'asset-mortar-1', { tile: [20, -98], state: 'deployed' }]]);
+
+      const placed = Object.assign({}, crew, { pos: { x: 20, y: -98, level: 1 }, posAt: NOW });
+      world([so, placed, mortarAsset()], placed);
+      assert.ok(mod.tools(api).includes('data-room-action="posClear">Clear position</button>'));
+      mod.actions.posClear(el({}), api);
+      assert.deepStrictEqual(ops(), [['patch', 'member', 'mem-crew', { pos: null }]], 'clear sends pos: null and leaves the mortar');
+      assert.strictEqual(R.validateMemberPatch(policy, placed, queued[0].data), null);
+
+      const observer = { id: 'mem-obs', kind: 'member', client: 'c-obs', post: 'observer', confirmed: true };
+      world([observer], observer, { mortar: { tile: [1, 1] } });
+      assert.ok(!/pos(Share|FromFire|Clear)/.test(mod.tools(api)), 'an observer post shares nothing');
+      world([crew], Object.assign({}, crew, { confirmed: false }));
+      assert.ok(!/posShare/.test(mod.tools(api)), 'a knocking member neither');
+    });
+    const toasts = [];
+    withApi({ planetOk: () => false, toast: s => toasts.push(s), setPick: () => { throw new Error('no pick off the room planet'); } }, () => {
+      world([crew, mortarAsset()], crew, { mortar: { tile: [20, -98] } });
+      const tools = mod.tools(api);
+      assert.ok(/<button disabled [^>]*data-room-action="posShare"/.test(tools) && /<button disabled [^>]*data-room-action="posFromFire"/.test(tools), tools);
+      mod.actions.posShare(el({}), api);
+      mod.actions.posFromFire(el({}), api);
+      assert.deepStrictEqual([queued.length, toasts], [0, [api.T().reqWrongPlanet, api.T().reqWrongPlanet]]);
+    });
+  });
+
+  await t('map: member diamonds in the level colour with «callsign · N min», faded after 5 min, only for confirmed members in the room on this level', () => {
+    const crewPos = Object.assign({}, crew, { callsign: 'Бекас', pos: { x: 30, y: -90, level: 0 }, posAt: NOW - 2 * 60000 });
+    const soPos = Object.assign({}, so, { pos: { x: 10, y: 10 }, posAt: NOW - 6 * 60000 });
+    const gone = Object.assign({}, so2, { deleted: true, pos: { x: 1, y: 1 }, posAt: NOW });
+    const knocking = Object.assign({}, crew2, { confirmed: false, pos: { x: 2, y: 2 }, posAt: NOW });
+    const upstairs = { id: 'mem-up', kind: 'member', client: 'c-up', post: 'mortar', confirmed: true, callsign: 'Верх', pos: { x: 3, y: 3, level: 1 }, posAt: NOW };
+    const broken = { id: 'mem-b', kind: 'member', client: 'c-b', post: 'so', confirmed: true, pos: { x: '<i>', y: 3 }, posAt: NOW };
+    world([crewPos, soPos, gone, knocking, upstairs, broken], so);
+    let c = canvas();
+    mod.draw(c, view, api);
+    assert.deepStrictEqual(c.texts(), ['Бекас · 2 min', 'Staff Officer · 6 min']);
+    assert.deepStrictEqual(c.of('fill').map(x => [x.fill, x.alpha]), [['#5ad1e6', 1], ['#f5f5f5', 0.45]], 'the service colour fresh, the staff colour faded');
+    assert.deepStrictEqual(c.of('fillText').map(x => x.alpha), [1, 0.45]);
+    assert.deepStrictEqual(c.of('moveTo').map(x => x.args), [[305, -901], [105, 99]], 'a diamond tip above each tile centre');
+    assert.strictEqual(c.of('lineTo').length, 6);
+    ctx.level = 1;
+    c = canvas();
+    mod.draw(c, view, api);
+    assert.deepStrictEqual(c.texts(), ['Staff Officer · 6 min', 'Верх · 0 min'], 'level 1: a position without a level and the one up there');
+    const mine = Object.assign({}, crew, { callsign: 'Я', pos: { x: 5, y: 5, level: 0 }, posAt: NOW - 30 * 60000, pending: true });
+    world([mine], crew);
+    c = canvas();
+    mod.draw(c, view, api);
+    assert.deepStrictEqual(c.of('fillText').map(x => [x.args[0], x.alpha]), [['Я · 0 min', 1]], 'my position not yet acked is fresh');
+    withApi({ planetOk: () => false }, () => {
+      const off = canvas();
+      mod.draw(off, view, api);
+      assert.strictEqual(off.calls.length, 0, 'another planet on the page: nothing');
+    });
+  });
+
+  await t('map: a deployed mortar gets a green annulus, a red disc inside minRange and both outlines; «Mortar zones» off keeps only the square and its label', () => {
+    const store = {};
+    world([Object.assign({}, crew, { callsign: 'Бекас' }), mortarAsset({ tile: [30, -90], claimedBy: 'c-crew' })], so);
+    api.ui.storage = { read: k => (store[k] ? JSON.parse(JSON.stringify(store[k])) : null), write: (k, v) => { store[k] = JSON.parse(JSON.stringify(v)); } };
+    const M = [305, -895];
+    let c = canvas();
+    mod.draw(c, view, api);
+    assert.deepStrictEqual(c.of('arc').map(x => x.args.slice(0, 3)), [M.concat(650), M.concat(150), M.concat(150), M.concat(650), M.concat(150)],
+      'annulus 65 and 15 tiles, the dead disc, then both outlines');
+    assert.strictEqual(c.of('arc')[1].args[5], true, 'the inner edge of the annulus runs the other way');
+    assert.deepStrictEqual(c.of('fill').map(x => [x.args[0], x.fill]), [['evenodd', H.ZONE.ring], [undefined, H.ZONE.dead]]);
+    assert.deepStrictEqual(c.of('stroke').map(x => x.stroke), [H.ZONE.ringLine, H.ZONE.deadLine]);
+    assert.deepStrictEqual(c.of('fillRect').map(x => x.args), [[299, -901, 12, 12]], 'the mortar square');
+    assert.deepStrictEqual(c.texts(), ['Mortar 1 · Бекас']);
+    let html = mod.panel('assets', api);
+    assertSafe(html, 'assets with the zone switch');
+    assert.ok(html.includes('<label class="tac-room-check"><input type="checkbox" data-room-change="reqZone" checked> Mortar zones</label>'), 'on by default');
+    mod.changes.reqZone({ checked: false }, api);
+    assert.deepStrictEqual(store[PREFS], { zone: false });
+    assert.ok(mod.panel('assets', api).includes('data-room-change="reqZone"> Mortar zones'), 'unchecked once off');
+    c = canvas();
+    mod.draw(c, view, api);
+    assert.deepStrictEqual([c.of('arc').length, c.of('fill').length, c.of('stroke').length, c.of('fillRect').length, c.texts()], [0, 0, 0, 1, ['Mortar 1 · Бекас']]);
+    mod.changes.reqZone({ checked: true }, api);
+    c = canvas();
+    mod.draw(c, view, api);
+    assert.strictEqual(c.of('arc').length, 5, 'back on');
+    const labels = objects => { world(objects, so); const cv = canvas(); mod.draw(cv, view, api); return cv.texts(); };
+    assert.deepStrictEqual(labels([mortarAsset({ tile: [30, -90] })]), ['Mortar 1'], 'nobody serves it');
+    assert.deepStrictEqual(labels([crew, mortarAsset({ tile: [30, -90] })]), ['Mortar 1 · Mortar crew'], 'the post without a callsign');
+    world([mortarAsset({ tile: [30, -90], state: 'moving' })], so);
+    c = canvas();
+    mod.draw(c, view, api);
+    assert.strictEqual(c.calls.length, 0, 'a mortar on the move draws nothing');
+    assert.deepStrictEqual(labels([Object.assign({}, crew, { pos: { x: 30, y: -90, level: 1 }, posAt: NOW }), mortarAsset({ tile: [30, -90] })]), [],
+      'shared from level 1 while the page shows level 0: neither the crew nor its mortar');
+    world([mortarAsset({ tile: [30, -90] })], so);
+    ctx.fork.constants = { shells: [] };
+    c = canvas();
+    mod.draw(c, view, api);
+    assert.deepStrictEqual([c.of('arc').length, c.of('fillRect').length], [0, 1], 'no mortar constants: the square without a zone');
+    ctx.fork.constants = constants;
+  });
+
   await t('room.css: pinging pulses, reduced motion keeps a still highlight, braces balance', () => {
     const css = read('tactical/room.css');
     assert.strictEqual((css.match(/\{/g) || []).length, (css.match(/\}/g) || []).length, 'braces');
+    assert.ok(/\/\* Stage 2a: requests, positions, mortar zone \*\/[^]*\.tac-room-to \{[^]*\.tac-room-nopoint \{/.test(css), 'the stage 2a block');
     assert.ok(/\.tac-room-card\.pinging, \.tac-room-req\.pinging, \.tac-room-chip\.pinging \{[^}]*animation: tac-room-ping/.test(css), 'pulse');
     const rm = css.match(/@media \(prefers-reduced-motion: reduce\) \{([\s\S]*?\})\s*\}/);
     assert.ok(rm && /\.pinging[^{]*\{[^}]*animation: none;[^}]*box-shadow/.test(rm[1]), 'reduced motion');

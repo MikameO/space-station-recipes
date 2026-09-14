@@ -10,8 +10,9 @@
 // quiet while the room is frozen (radio silence), locked or closed.
 // Registers into tactical/room-ui.js.
 //
-// Stage 1: only two request types are offered, mortar strikes and mortar
-// position requests, for the staff officer / mortar crew pair.
+// Stage 1 offered mortar strikes and mortar position requests for the staff officer / mortar crew pair.
+// Stage 2a (docs/design/2026-09-14-tactical-tablet-stage2a.md) adds tasks that may come without a map point,
+// an addressee on new requests, «Share position» for every confirmed member and the mortar zone on the map.
 //
 // Every stored value is room data written by other officers: strings go through
 // api.esc, numbers through fmtNum, table lookups through pick (own keys only).
@@ -21,7 +22,7 @@
 
   var R = root.TacticalRoomLogic;
   var PREFS_KEY = 'chemdb-tactical:room-prefs';
-  var TYPES = ['mortar', 'position'];
+  var TYPES = ['mortar', 'position', 'task'];
   // State ids match the write whitelist /^[a-z_]{1,20}$/: no camelCase.
   var ASSET_STATES = {
     mortar: ['deployed', 'moving', 'destroyed'], ob: ['ready', 'loading', 'cooldown'],
@@ -29,8 +30,13 @@
   };
   var STATE_CLASS = { deployed: 'ready', ready: 'ready', available: 'ready', on_lz: 'ready', ship: 'ready', moving: 'busy', loading: 'busy',
     to_lz: 'busy', flyby: 'busy', cooldown: 'cooldown', offline: 'down', destroyed: 'down', unavailable: 'down' };
-  var TYPE_COLOUR = { mortar: '#ffb627', ob: '#ff3d5a', cas: '#00e5ff', supply: '#39ff85', medevac: '#c17aff', other: '#e8ecf4', position: '#00e5ff' };
+  var TYPE_COLOUR = { mortar: '#ffb627', ob: '#ff3d5a', cas: '#00e5ff', supply: '#39ff85', medevac: '#c17aff', other: '#e8ecf4', position: '#00e5ff', task: '#9fb4ff' };
   var DEFAULT_COLOUR = '#e8ecf4';
+  // Member positions fade once older than this. Mortar zone fills stay faint so the map reads through them.
+  var POS_FADE_MS = 5 * 60000;
+  var ZONE = { ring: 'rgba(57, 255, 133, 0.12)', ringLine: 'rgba(57, 255, 133, 0.7)', dead: 'rgba(255, 61, 90, 0.16)', deadLine: 'rgba(255, 61, 90, 0.75)' };
+  var LABEL_FONT = '600 11px system-ui, sans-serif';
+  var LABEL_HALO = 'rgba(6, 9, 15, 0.95)';
   var BIG_ACTIONS = ['take', 'place', 'accept', 'fire', 'load', 'done', 'deny', 'cancel', 'repeat'];
   // These hand a tile of the room's planet to this page or create a request on it.
   var PLANET_ACTIONS = ['take', 'place', 'repeat'];
@@ -57,7 +63,7 @@
       note: 'Note', urgent: 'Urgent', beacon: 'Beacon placed', send: 'Send', empty: 'No requests', min: 'min',
       needTarget: 'Pick a target first.', noCalibration: 'No calibration: pick the target on the map.',
       reqWrongPlanet: 'The map shows another planet — switch to the room\'s planet.',
-      types: { mortar: 'Mortar', ob: 'OB', cas: 'CAS', supply: 'Supply drop', medevac: 'Medevac', other: 'Other', position: 'Position' },
+      types: { mortar: 'Mortar', ob: 'OB', cas: 'CAS', supply: 'Supply drop', medevac: 'Medevac', other: 'Other', position: 'Position', task: 'Task' },
       statuses: { requested: 'requested', accepted: 'accepted', loaded: 'loaded', firing: 'firing', done: 'done', denied: 'denied' },
       firingBy: { mortar: 'shell in the air', ob: 'OB inbound', cas: 'fly-by', supply: 'crate inbound', medevac: 'en route', other: 'started' },
       actions: { accept: 'Accept', deny: 'Deny', cancel: 'Withdraw', take: 'Take target', load: 'Loaded', done: 'Done', repeat: 'Repeat', place: 'Set position',
@@ -79,7 +85,13 @@
       assetClaim: 'Crew', assetUnclaim: 'Release', shell: 'Shell', sounds: 'Sound for requests to my assets',
       chipMortar: 'Mortars', chipNames: { ob: 'OB', dropship: 'CAS', supply: 'Supply' }, chipRequests: 'Requests {n}',
       pingHeard: 'Heard', pingBlocked: 'Sound is blocked by the browser — click the panel',
-      pingVolume: 'Volume', pingVolumes: { quiet: 'quiet', normal: 'normal', loud: 'loud' }
+      pingVolume: 'Volume', pingVolumes: { quiet: 'quiet', normal: 'normal', loud: 'loud' },
+      reqTo: 'To', reqToAll: 'Everyone by type', reqToPick: '— pick —', reqToLeft: 'left the room',
+      reqToNeed: 'Pick who the task is for.', reqToStale: 'That addressee is gone: pick again.',
+      taskText: 'Task text', taskNeedText: 'Write the task text.', reqNoPoint: 'no point', reqPointOptional: 'no point (optional)',
+      taskDenyReasons: ['busy', 'not possible', 'not my job'],
+      posShare: 'Share position', posPickHint: 'Click the tile you stand on', posFromFire: 'From the Fire panel', posClear: 'Clear position',
+      zoneToggle: 'Mortar zones'
     },
     ru: {
       tabs: { requests: 'Запросы', assets: 'Ресурсы' },
@@ -87,7 +99,7 @@
       note: 'Заметка', urgent: 'Срочно', beacon: 'Маяк поставлен', send: 'Отправить', empty: 'Запросов нет', min: 'мин',
       needTarget: 'Сначала укажите цель.', noCalibration: 'Нет калибровки: укажите цель на карте.',
       reqWrongPlanet: 'Карта другой планеты — переключитесь на планету комнаты.',
-      types: { mortar: 'Миномёт', ob: 'ОБ', cas: 'КАС', supply: 'Поставка', medevac: 'Эвакуация', other: 'Прочее', position: 'Позиция' },
+      types: { mortar: 'Миномёт', ob: 'ОБ', cas: 'КАС', supply: 'Поставка', medevac: 'Эвакуация', other: 'Прочее', position: 'Позиция', task: 'Задача' },
       statuses: { requested: 'запрошен', accepted: 'принят', loaded: 'заряжено', firing: 'огонь', done: 'выполнен', denied: 'отклонён' },
       firingBy: { mortar: 'снаряд в полёте', ob: 'ОБ летит', cas: 'облёт', supply: 'ящик летит', medevac: 'в пути', other: 'начато' },
       actions: { accept: 'Принять', deny: 'Отклонить', cancel: 'Снять', take: 'Взять цель', load: 'Заряжено', done: 'Выполнено', repeat: 'Повторить', place: 'Встать сюда',
@@ -109,7 +121,13 @@
       assetClaim: 'Расчёт', assetUnclaim: 'Отпустить', shell: 'Снаряд', sounds: 'Звук на запросы к моим ресурсам',
       chipMortar: 'Миномёты', chipNames: { ob: 'ОБ', dropship: 'КАС', supply: 'Поставка' }, chipRequests: 'Запросы {n}',
       pingHeard: 'Услышал', pingBlocked: 'Звук заблокирован браузером — нажмите в панели',
-      pingVolume: 'Громкость', pingVolumes: { quiet: 'тихо', normal: 'обычно', loud: 'громко' }
+      pingVolume: 'Громкость', pingVolumes: { quiet: 'тихо', normal: 'обычно', loud: 'громко' },
+      reqTo: 'Кому', reqToAll: 'Всем по типу', reqToPick: '— выберите —', reqToLeft: 'вне комнаты',
+      reqToNeed: 'Выберите, кому задача.', reqToStale: 'Этого адресата уже нет: выберите заново.',
+      taskText: 'Текст задачи', taskNeedText: 'Напишите текст задачи.', reqNoPoint: 'без точки', reqPointOptional: 'без точки (необязательно)',
+      taskDenyReasons: ['занят', 'невозможно', 'не моя задача'],
+      posShare: 'Передать позицию', posPickHint: 'Кликните тайл, где вы стоите', posFromFire: 'Позиция из панели огня', posClear: 'Убрать позицию',
+      zoneToggle: 'Зона миномётов'
     }
   };
 
@@ -123,9 +141,21 @@
   function validTile(t) { return Array.isArray(t) && t.length === 2 && isNum(t[0]) && isNum(t[1]); }
   function disable(html) { return html.replace('<button ', '<button disabled '); }
 
-  // Requests that fail this are skipped everywhere: cards, strip, chips, rings, actions.
+  function hasTarget(req) { return !!(req && req.target && isNum(req.target.x) && isNum(req.target.y)); }
+  // Requests that fail this are skipped everywhere: cards, strip, chips, rings, actions. A task may come
+  // without a map point; every other type needs one, and a target that is there must be finite.
   function validReq(req) {
-    return !!(req && req.target && isNum(req.target.x) && isNum(req.target.y) && own(R.REQUEST_FLOW, req.status));
+    if (!req || !own(R.REQUEST_FLOW, req.status)) return false;
+    return hasTarget(req) || (req.type === 'task' && (req.target === undefined || req.target === null));
+  }
+  function denyReasons(T, req) { return req && req.type === 'task' ? T.taskDenyReasons : T.denyReasons; }
+
+  // An addressee rebuilt from its own string keys only: {client}, {post} or {post, squad}; null otherwise.
+  function cleanTo(to) {
+    if (!to || typeof to !== 'object') return null;
+    if (typeof to.client === 'string' && to.client) return { client: to.client };
+    if (typeof to.post !== 'string' || !to.post) return null;
+    return typeof to.squad === 'string' && to.squad ? { post: to.post, squad: to.squad } : { post: to.post };
   }
   function isOpen(r) { return r.status !== 'done' && r.status !== 'denied'; }
   // An object carrying a level shows only on that level; one without shows on every level.
@@ -161,10 +191,13 @@
     return i < TYPES.length ? TYPES[i] : null;
   }
 
-  // A request aimed at an asset whose post I hold or whose crew seat I claimed.
+  // A request aimed at me. With an addressee: only when I am it. Without one: aimed at an asset whose post
+  // I hold or whose crew seat I claimed.
   function aimedAtMine(policy, objects, me, req) {
+    if (!me || !req) return false;
+    if (req.to !== undefined && req.to !== null) return typeof req.to === 'object' && !!R.isAddressee(req, me);
     var type = R.assetTypeOf(req);
-    if (!me || typeof type !== 'string') return false;
+    if (typeof type !== 'string') return false;
     if (R.assetOwnerPost(policy, type) === me.post) return true;
     return !!me.client && R.claimants(objects, req).indexOf(me.client) >= 0;
   }
@@ -241,6 +274,7 @@
   // A Series T shot belongs to the taken request when its game target lies within a tile of the
   // request's target under one of the known calibration offsets. With no offset known, any shot counts.
   function shotMatches(req, offsets, shot) {
+    if (!hasTarget(req)) return false;
     var games = (offsets || []).filter(validTile).map(function (o) { return [req.target.x + o[0], req.target.y + o[1]]; });
     if (!games.length) return true;
     var t = shot && shot.target;
@@ -258,7 +292,11 @@
   // ── data ─────────────────────────────────────────────
 
   function claimsFor(api, req) { return { claimed: R.claimants(api.ui.client.merged().objects, req) }; }
-  function actionsFor(api, req) { return R.requestActions(api.ui.policy, api.me(), req, claimsFor(api, req)); }
+  // Take and place hand a tile to the Fire panel: a request without a point never offers them.
+  function actionsFor(api, req) {
+    var acts = R.requestActions(api.ui.policy, api.me(), req, claimsFor(api, req));
+    return hasTarget(req) ? acts : acts.filter(function (a) { return a !== 'take' && a !== 'place'; });
+  }
   function constants(api) { var ctx = api.ui.hooks.getContext(); return ctx.fork ? ctx.fork.constants : null; }
   // The page shows the room's planet: the shell's api.planetOk, else the same comparison made here.
   function planetOk(api) {
@@ -342,13 +380,110 @@
     return best;
   }
 
-  // A deployed mortar's level: its own, else that of the position request that put it on its tile.
+  // A deployed mortar's level: its own, else that of a member position shared on its tile, else that of the
+  // position request that put it there.
   function mortarLevel(api, o) {
     if (isNum(o.level)) return o.level;
+    var shared = memberPositions(api).filter(function (e) { return e.pos.x === o.tile[0] && e.pos.y === o.tile[1] && isNum(e.pos.level); })[0];
+    if (shared) return shared.pos.level;
     var src = requests(api).filter(function (r) {
-      return r.type === 'position' && r.status === 'done' && r.target.x === o.tile[0] && r.target.y === o.tile[1];
+      return r.type === 'position' && r.status === 'done' && hasTarget(r) && r.target.x === o.tile[0] && r.target.y === o.tile[1];
     }).pop();
     return src && isNum(src.level) ? src.level : null;
+  }
+
+  function roomMembers(api) {
+    var c = api.ui.client;
+    return c && typeof c.members === 'function' ? c.members() : [];
+  }
+  // «Callsign · Post · Squad» for a member; without a callsign the post leads.
+  function memberLabel(api, m) {
+    var post = api.postName(m.post) + (typeof m.squad === 'string' && m.squad ? ' · ' + api.squadName(m.squad) : '');
+    return typeof m.callsign === 'string' && m.callsign ? m.callsign + ' · ' + post : post;
+  }
+  // Who an addressed request is for, as plain text for api.esc; '' without an addressee.
+  function addresseeText(api, to) {
+    if (!to || typeof to !== 'object') return '';
+    if (typeof to.client === 'string' && to.client) {
+      var m = typeof api.ui.client.member === 'function' ? api.ui.client.member(to.client) : null;
+      return m ? memberLabel(api, m) : api.T().reqToLeft;
+    }
+    if (typeof to.post !== 'string' || !to.post) return '';
+    return api.postName(to.post) + (typeof to.squad === 'string' && to.squad ? ' · ' + api.squadName(to.squad) : '');
+  }
+
+  // The «To» list for a request type: everyone by type (a task gets a «pick» placeholder instead), the posts
+  // that may answer (no observer; a squad post also once per squad), then the confirmed members but me as
+  // «callsign · post». A mortar strike goes only to the mortar's owner post and its members. The submit looks
+  // the chosen value up here again, so a value is never parsed and a member who left is never addressed.
+  function toOptions(api, type) {
+    var T = api.T(), P = api.ui.policy, me = api.me(), out = [];
+    var owner = type === 'mortar' ? R.assetOwnerPost(P, 'mortar') : null;
+    var squads = P.squads && typeof P.squads === 'object' ? Object.keys(P.squads) : [];
+    out.push({ value: '', label: type === 'task' ? T.reqToPick : T.reqToAll, to: null });
+    P.posts.forEach(function (p) {
+      if (!p || typeof p.id !== 'string' || !p.level || p.level === 'observer' || (type === 'mortar' && p.id !== owner)) return;
+      out.push({ value: 'post:' + p.id, label: api.postName(p.id), to: { post: p.id } });
+      if (p.level === 'squad') squads.forEach(function (s) {
+        out.push({ value: 'squad:' + p.id + ':' + s, label: api.postName(p.id) + ' · ' + api.squadName(s), to: { post: p.id, squad: s } });
+      });
+    });
+    roomMembers(api).forEach(function (m) {
+      var level = m ? R.levelOf(P, m.post) : null;
+      if (!m || !m.confirmed || typeof m.client !== 'string' || !m.client || (me && m.client === me.client)) return;
+      if (!level || level === 'observer' || (type === 'mortar' && m.post !== owner)) return;
+      out.push({ value: 'client:' + m.client, label: memberLabel(api, m), to: { client: m.client } });
+    });
+    return out;
+  }
+
+  // My member object as the page shows it: the merged copy carries a position not yet acked.
+  function myMember(api) {
+    var me = api.me();
+    if (!me || typeof me.id !== 'string') return null;
+    var o = objectOf(api, me.id);
+    return o && o.kind === 'member' && !o.deleted ? o : me;
+  }
+  // Confirmed members still in the room with a position: [{member, pos, at, pending}]. The merged copy wins,
+  // so my own position shows before the server has it; a member removed meanwhile shows nothing.
+  function memberPositions(api) {
+    var out = [];
+    roomMembers(api).forEach(function (m) {
+      if (!m || !m.confirmed || typeof m.id !== 'string') return;
+      var o = objectOf(api, m.id) || m;
+      if (o.kind !== 'member' || o.deleted) return;
+      var p = o.pos;
+      if (!p || typeof p !== 'object' || !isNum(p.x) || !isNum(p.y)) return;
+      out.push({ member: o, pos: p, at: isNum(o.posAt) ? o.posAt : null, pending: !!o.pending });
+    });
+    return out;
+  }
+  // The mortar «Share position» moves: the one I claimed, else the first mortar of my post. None for anyone
+  // else, or when my level may not write the assets layer.
+  function ownMortarRow(rows, policy, me) {
+    if (!me || !R.layerWritable(policy, me, 'assets')) return null;
+    var mortars = rows.filter(function (row) { return row.def.type === 'mortar' && row.obj; });
+    var claimed = me.client ? mortars.filter(function (row) { return row.obj.claimedBy === me.client; })[0] : null;
+    return claimed || mortars.filter(function (row) { return row.def.owner === me.post; })[0] || null;
+  }
+  // Who serves a mortar: the member in its crew seat, else the first confirmed member of its owner post.
+  function crewOf(api, row) {
+    var c = api.ui.client, o = row.obj || {};
+    var seat = typeof o.claimedBy === 'string' && o.claimedBy && typeof c.member === 'function' ? c.member(o.claimedBy) : null;
+    return seat || roomMembers(api).filter(function (m) { return m && m.confirmed && m.post === row.def.owner; })[0] || null;
+  }
+
+  // My position on a tile of the room's planet and, for a mortar crew, my mortar deployed there: a member
+  // patch and, queued right behind it, an asset patch. The server stamps posAt; a refusal (radio silence)
+  // lands in client.rejected, which the shell toasts once.
+  function sharePosition(api, tile, level) {
+    var me = api.me(), c = api.ui.client;
+    if (!me || !me.confirmed || typeof me.id !== 'string' || c.status !== 'in' || !validTile(tile) || offPlanet(api)) return false;
+    var pos = { x: Math.floor(tile[0]), y: Math.floor(tile[1]), level: isNum(level) ? Math.floor(level) : 0 };
+    c.queue({ op: 'patch', kind: 'member', id: me.id, data: { pos: pos } });
+    var row = ownMortarRow(assetRows(api), api.ui.policy, me);
+    if (row) c.queue({ op: 'patch', kind: 'asset', id: row.id, data: { tile: [pos.x, pos.y], state: 'deployed' } });
+    return true;
   }
 
   // Request patches carry only status and, for a crew denial, reason.
@@ -358,16 +493,17 @@
     return api.ui.client.queue({ op: 'patch', kind: 'request', id: req.id, expectedStatus: req.status, data: d });
   }
 
-  // `where` = {level, h} of an existing request (repeat); a new request takes the page's.
-  function queueRequest(api, type, target, note, urgent, flags, where) {
+  // `where` = {level, h} of an existing request (repeat); a new request takes the page's. `target` is a tile
+  // or null (a task without a point); `to` an addressee from toOptions or cleanTo, or null.
+  function queueRequest(api, type, target, note, urgent, flags, where, to) {
     var ctx = api.ui.hooks.getContext(), limit = api.ui.policy.limits.note;
     var w = where || { level: ctx.level, h: ctx.meta ? ctx.meta.h : '' };
-    return api.ui.client.queue({
-      op: 'put', kind: 'request', id: 'q' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5),
-      data: { type: type, target: { x: target[0], y: target[1] }, note: String(note || '').slice(0, isNum(limit) ? limit : 80),
-        priority: urgent ? 'urgent' : 'normal', flags: Array.isArray(flags) ? flags.slice(0, 8) : [],
-        level: isNum(w.level) ? w.level : 0, h: typeof w.h === 'string' ? w.h : '' }
-    });
+    var data = { type: type, note: String(note || '').slice(0, isNum(limit) ? limit : 80),
+      priority: urgent ? 'urgent' : 'normal', flags: Array.isArray(flags) ? flags.slice(0, 8) : [],
+      level: isNum(w.level) ? w.level : 0, h: typeof w.h === 'string' ? w.h : '' };
+    if (validTile(target)) data.target = { x: target[0], y: target[1] };
+    if (to) data.to = to;
+    return api.ui.client.queue({ op: 'put', kind: 'request', id: 'q' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5), data: data });
   }
 
   // ── HTML ─────────────────────────────────────────────
@@ -415,7 +551,10 @@
     var who = by && typeof by.post === 'string' ? api.postName(by.post) + (typeof by.squad === 'string' && by.squad ? ' · ' + api.squadName(by.squad) : '') : '';
     var age = isNum(req.at) ? Math.max(0, Math.round((c.serverNow() - req.at) / 60000)) : null;
     var dl = deadlineOf(api, req);
-    var head = '<b>' + esc(pick(T.types, req.type, req.type)) + '</b> <span class="tac-item-coords">' + esc(api.gameText(req.target.x, req.target.y)) + '</span> · ' +
+    var to = addresseeText(api, req.to);
+    var where = hasTarget(req) ? '<span class="tac-item-coords">' + esc(api.gameText(req.target.x, req.target.y)) + '</span>'
+      : '<span class="tac-room-nopoint">' + esc(T.reqNoPoint) + '</span>';
+    var head = '<b>' + esc(pick(T.types, req.type, req.type)) + '</b>' + (to ? ' <span class="tac-room-to">→ ' + esc(to) + '</span>' : '') + ' ' + where + ' · ' +
       '<span class="tac-room-status">' + esc(statusText(T, P, req)) + '</span>';
     var countdown = dl !== null ? esc(req.type === 'cas' ? T.readyIn : T.impactIn) + ' <span data-deadline="' + fmtNum(dl) + '"></span>' : '';
     var meta = joinDot([esc(who), age !== null ? fmtNum(age) + ' ' + esc(T.min) : '']);
@@ -435,26 +574,36 @@
       req.reason && denial(P, req) === 'denied' ? esc(req.reason) : '']);
     var heard = ping ? api.btn('reqHeard', T.pingHeard, { id: req.id }, 'big heard') : '';
     var actionsHtml = rq.denyAsk === req.id && acts.indexOf('deny') >= 0
-      ? '<div class="tac-room-actions">' + T.denyReasons.map(function (r) { return api.btn('reqDenyReason', r, { id: req.id, reason: r }, 'big'); }).join('') +
+      ? '<div class="tac-room-actions">' + denyReasons(T, req).map(function (r) { return api.btn('reqDenyReason', r, { id: req.id, reason: r }, 'big'); }).join('') +
         api.btn('reqDenyCancel', T.denyCancel) + heard + '</div>'
       : '<div class="tac-room-actions">' + acts.map(function (a) { return actionButton(api, a, req); }).join('') + heard + '</div>';
     // The fire card lives only while this officer may still take the target.
-    var fire = rq.taken === req.id && acts.indexOf('take') >= 0 ? fireCardHtml(api, req) : '';
+    var fire = rq.taken === req.id && acts.indexOf('take') >= 0 && hasTarget(req) ? fireCardHtml(api, req) : '';
     return '<div class="tac-room-req st-' + esc(req.status) + (req.priority === 'urgent' ? ' urgent' : '') + (req.pending ? ' faded' : '') + (ping ? ' pinging' : '') +
       '" style="--req:' + pick(TYPE_COLOUR, req.type, DEFAULT_COLOUR) + '">' +
       '<div>' + joinDot([head, countdown]) + '</div><div class="tac-muted">' + details + '</div>' + actionsHtml + fire + '</div>';
   }
 
+  // The chosen «To» value: the draft while the list still offers it, else the first entry.
+  function toChosen(api, options) {
+    var v = api.draft('request', 'to', '');
+    return options.some(function (o) { return o.value === v; }) ? v : '';
+  }
+
   function formHtml(api) {
-    var T = api.T(), esc = api.esc, type = draftType(api), t = rq.target, ok = planetOk(api);
+    var T = api.T(), esc = api.esc, type = draftType(api), task = type === 'task', t = rq.target, ok = planetOk(api);
     var pickBtn = api.btn('reqPick', T.pickTarget, null, 'big');
+    var options = toOptions(api, type), chosen = toChosen(api, options);
     return '<section class="tac-section tac-room-reqform"><h2>' + esc(T.newRequest) + '</h2>' +
       '<div class="tac-room-types">' + TYPES.map(function (k, i) { return api.btn('reqType', (i + 1) + ' ' + T.types[k], { type: k }, k === type ? 'on' : ''); }).join('') + '</div>' +
       '<form data-room-form="request" class="tac-room-form">' +
+      '<label class="tac-input-label">' + esc(T.reqTo) + '<select class="tac-select" name="to">' + options.map(function (o) {
+        return '<option value="' + esc(o.value) + '"' + (o.value === chosen ? ' selected' : '') + '>' + esc(o.label) + '</option>';
+      }).join('') + '</select></label>' +
       '<div class="tac-room-target">' + (ok ? pickBtn : disable(pickBtn)) +
-      '<span class="tac-item-coords">' + (t ? esc(api.gameText(t[0], t[1])) : '—') + '</span></div>' +
+      '<span class="tac-item-coords">' + (t ? esc(api.gameText(t[0], t[1])) : task ? esc(T.reqPointOptional) : '—') + '</span></div>' +
       '<label class="tac-input-label">' + esc(T.coordsHint) + '<input class="tac-input" name="coords" autocomplete="off" value="' + esc(api.draft('request', 'coords', '')) + '"></label>' +
-      '<label class="tac-input-label">' + esc(T.note) + '<input class="tac-input" name="note" maxlength="' + fmtNum(api.ui.policy.limits.note) + '" value="' + esc(api.draft('request', 'note', '')) + '"></label>' +
+      '<label class="tac-input-label">' + esc(task ? T.taskText : T.note) + '<input class="tac-input" name="note" maxlength="' + fmtNum(api.ui.policy.limits.note) + '" value="' + esc(api.draft('request', 'note', '')) + '"></label>' +
       '<label class="tac-room-check"><input type="checkbox" name="urgent"' + (api.draft('request', 'urgent', false) ? ' checked' : '') + '> ' + esc(T.urgent) + '</label>' +
       (type === 'supply' ? '<label class="tac-room-check"><input type="checkbox" name="beacon"' + (api.draft('request', 'beacon', false) ? ' checked' : '') + '> ' + esc(T.beacon) + '</label>' : '') +
       '<button type="submit" class="btn-small tac-room-btn big"' + (ok ? '' : ' disabled') + '>' + esc(T.send) + '</button></form></section>';
@@ -496,7 +645,9 @@
         '</span><span class="tac-room-actions">' + stateButtons + claim + shellSelect + '</span></div>';
     }).join('');
     var p = prefs(api), vol = volumeOf(p);
-    return rows + '<label class="tac-room-check"><input type="checkbox" data-room-change="reqSounds"' + (soundsOn(p) ? ' checked' : '') + '> ' + esc(T.sounds) + '</label>' +
+    var zone = assetRows(api).some(function (row) { return row.def.type === 'mortar'; })
+      ? '<label class="tac-room-check"><input type="checkbox" data-room-change="reqZone"' + (zoneOn(p) ? ' checked' : '') + '> ' + esc(T.zoneToggle) + '</label>' : '';
+    return rows + zone + '<label class="tac-room-check"><input type="checkbox" data-room-change="reqSounds"' + (soundsOn(p) ? ' checked' : '') + '> ' + esc(T.sounds) + '</label>' +
       '<div class="tac-room-volume"><span class="tac-muted">' + esc(T.pingVolume) + '</span>' +
       VOLUME_KEYS.map(function (k) { return api.btn('reqVolume', T.pingVolumes[k], { volume: k }, k === vol ? 'on' : ''); }).join('') + '</div>';
   }
@@ -525,6 +676,19 @@
     return rq.blocked ? api.btn('reqUnlock', api.T().pingBlocked, null, 'tac-room-ping-blocked') : '';
   }
 
+  // «Share position» for every confirmed member who may write one (an observer post may not), «From the Fire
+  // panel» while that panel has a mortar tile, «Clear position» while mine is on the map. Off the room's
+  // planet the first two are disabled.
+  function positionTools(api) {
+    var T = api.T(), me = api.me(), level = me ? R.levelOf(api.ui.policy, me.post) : null, ok = planetOk(api);
+    if (!level || level === 'observer') return '';
+    var ctx = api.ui.hooks.getContext(), picking = !!(api.ui.pick && api.ui.pick.mode === 'position'), mine = myMember(api);
+    var share = api.btn('posShare', T.posShare, null, picking ? 'on big' : 'big');
+    var fire = ctx && ctx.mortar && validTile(ctx.mortar.tile) ? api.btn('posFromFire', T.posFromFire, null, 'big') : '';
+    return (ok ? share : disable(share)) + (fire && !ok ? disable(fire) : fire) +
+      (mine && mine.pos && typeof mine.pos === 'object' ? api.btn('posClear', T.posClear, null, 'big') : '');
+  }
+
   function stripHtml(api) {
     var open = requests(api).filter(isOpen).slice(0, 6);
     return blockedHtml(api) + (open.length ? open.map(function (r) { return cardHtml(api, r, true); }).join('') : '<span class="tac-muted">' + api.esc(api.T().empty) + '</span>');
@@ -532,11 +696,111 @@
 
   // ── map, sound, keyboard ────────────────────────────────────────
 
+  function safeColour(c) { return typeof c === 'string' && /^#[0-9A-Fa-f]{3,8}$/.test(c) ? c : DEFAULT_COLOUR; }
+  // Map text as Series T draws it: light on a dark halo, left-aligned beside a mark.
+  function drawLabel(ctx, text, x, y) {
+    ctx.font = LABEL_FONT;
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'middle';
+    ctx.lineJoin = 'round';
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = LABEL_HALO;
+    ctx.fillStyle = DEFAULT_COLOUR;
+    ctx.strokeText(text, x, y);
+    ctx.fillText(text, x, y);
+  }
+
+  // Deployed mortars with a tile on the current level.
+  function mapMortars(api, level) {
+    return assetRows(api).filter(function (row) {
+      var o = row.obj;
+      return row.def.type === 'mortar' && !!o && validTile(o.tile) && o.state === 'deployed' && levelOk(mortarLevel(api, o), level);
+    });
+  }
+
+  // Where each deployed mortar reaches: a faint green annulus between minRange and maxRange, a faint red disc
+  // inside minRange, and both radii outlined. The «Mortar zones» switch hides all of it.
+  function drawZones(ctx, v, api, mortars) {
+    var mc = constants(api) ? constants(api).mortar : null;
+    if (!mc || !zoneOn(prefs(api))) return;
+    var min = isNum(mc.minRange) && mc.minRange > 0 ? mc.minRange * v.scale : null;
+    var max = isNum(mc.maxRange) && mc.maxRange > 0 ? mc.maxRange * v.scale : null;
+    mortars.forEach(function (row) {
+      var m = v.worldToScreen(row.obj.tile[0] + 0.5, row.obj.tile[1] + 0.5);
+      ctx.save();
+      if (max !== null) {
+        ctx.beginPath();
+        ctx.arc(m[0], m[1], max, 0, Math.PI * 2);
+        if (min !== null && min < max) { ctx.moveTo(m[0] + min, m[1]); ctx.arc(m[0], m[1], min, 0, Math.PI * 2, true); }
+        ctx.fillStyle = ZONE.ring;
+        ctx.fill('evenodd');
+      }
+      if (min !== null) {
+        ctx.beginPath();
+        ctx.arc(m[0], m[1], min, 0, Math.PI * 2);
+        ctx.fillStyle = ZONE.dead;
+        ctx.fill();
+      }
+      ctx.lineWidth = 1.5;
+      [[max, ZONE.ringLine], [min, ZONE.deadLine]].forEach(function (edge) {
+        if (edge[0] === null) return;
+        ctx.strokeStyle = edge[1];
+        ctx.beginPath();
+        ctx.arc(m[0], m[1], edge[0], 0, Math.PI * 2);
+        ctx.stroke();
+      });
+      ctx.restore();
+    });
+  }
+
+  // The mortar square with «Mortar N · callsign» (the crew post without a callsign); stays with the zones off.
+  function drawMortars(ctx, v, api, mortars) {
+    var T = api.T();
+    mortars.forEach(function (row) {
+      var o = row.obj, m = v.worldToScreen(o.tile[0] + 0.5, o.tile[1] + 0.5), s = Math.max(5, v.scale * 0.6), crew = crewOf(api, row);
+      var name = api.fmt(pick(T.assetNames, 'mortar', 'Mortar {n}'), { n: row.n });
+      if (crew) name += ' · ' + (typeof crew.callsign === 'string' && crew.callsign ? crew.callsign : api.postName(crew.post));
+      ctx.save();
+      ctx.fillStyle = TYPE_COLOUR.mortar;
+      ctx.fillRect(m[0] - s, m[1] - s, s * 2, s * 2);
+      drawLabel(ctx, name, m[0] + s + 4, m[1]);
+      ctx.restore();
+    });
+  }
+
+  // Member positions: a diamond in the level colour and «callsign · N min» (the post without a callsign),
+  // faded once older than five minutes. My own position not yet acked counts as fresh.
+  function drawMembers(ctx, v, api, level) {
+    var T = api.T(), P = api.ui.policy, now = api.ui.client.serverNow();
+    memberPositions(api).forEach(function (e) {
+      if (!levelOk(e.pos.level, level)) return;
+      var m = e.member, p = v.worldToScreen(e.pos.x + 0.5, e.pos.y + 0.5), s = Math.max(6, v.scale * 0.6);
+      var age = e.pending ? 0 : e.at === null ? null : Math.max(0, now - e.at);
+      var name = typeof m.callsign === 'string' && m.callsign ? m.callsign : api.postName(m.post);
+      ctx.save();
+      if (age !== null && age > POS_FADE_MS) ctx.globalAlpha = 0.45;
+      ctx.beginPath();
+      ctx.moveTo(p[0], p[1] - s);
+      ctx.lineTo(p[0] + s, p[1]);
+      ctx.lineTo(p[0], p[1] + s);
+      ctx.lineTo(p[0] - s, p[1]);
+      ctx.closePath();
+      ctx.fillStyle = safeColour(R.levelStyle(P, m).color);
+      ctx.fill();
+      ctx.lineWidth = 1.5;
+      ctx.strokeStyle = LABEL_HALO;
+      ctx.stroke();
+      drawLabel(ctx, name + (age !== null ? ' · ' + Math.round(age / 60000) + ' ' + T.min : ''), p[0] + s + 4, p[1]);
+      ctx.restore();
+    });
+  }
+
   function drawRings(ctx, v, api) {
     if (!planetOk(api)) return;   // room tiles belong to the room's planet, not the one on the page
-    var level = api.ui.hooks.getContext().level || 0, radius = mortarRadius(api);
+    var level = api.ui.hooks.getContext().level || 0, radius = mortarRadius(api), mortars = mapMortars(api, level);
+    drawZones(ctx, v, api, mortars);
     requests(api).forEach(function (r) {
-      if (!isOpen(r) || !levelOk(r.level, level)) return;
+      if (!isOpen(r) || !hasTarget(r) || !levelOk(r.level, level)) return;
       var p = v.worldToScreen(r.target.x + 0.5, r.target.y + 0.5), rad = Math.max(9, v.scale * 0.9);
       ctx.save();
       ctx.setLineDash([4, 3]);
@@ -554,27 +818,8 @@
       }
       ctx.restore();
     });
-    var consts = constants(api);
-    assetRows(api).forEach(function (row) {
-      var o = row.obj;
-      if (row.def.type !== 'mortar' || !o || !validTile(o.tile) || o.state !== 'deployed' || !levelOk(mortarLevel(api, o), level)) return;
-      var m = v.worldToScreen(o.tile[0] + 0.5, o.tile[1] + 0.5), s = Math.max(5, v.scale * 0.6);
-      ctx.save();
-      ctx.fillStyle = TYPE_COLOUR.mortar;
-      ctx.fillRect(m[0] - s, m[1] - s, s * 2, s * 2);
-      if (consts && consts.mortar) {
-        ctx.setLineDash([6, 6]);
-        ctx.globalAlpha = 0.5;
-        ctx.strokeStyle = TYPE_COLOUR.mortar;
-        [consts.mortar.minRange, consts.mortar.maxRange].forEach(function (tiles) {
-          if (!isNum(tiles)) return;
-          ctx.beginPath();
-          ctx.arc(m[0], m[1], tiles * v.scale, 0, Math.PI * 2);
-          ctx.stroke();
-        });
-      }
-      ctx.restore();
-    });
+    drawMortars(ctx, v, api, mortars);
+    drawMembers(ctx, v, api, level);
     if (rq.target) {
       var q = v.worldToScreen(rq.target[0] + 0.5, rq.target[1] + 0.5);
       ctx.save();
@@ -594,6 +839,7 @@
     return p && typeof p === 'object' ? p : {};
   }
   function soundsOn(p) { return p.sounds !== false; }
+  function zoneOn(p) { return p.zone !== false; }
   function volumeOf(p) { return own(VOLUMES, p.volume) ? p.volume : DEFAULT_VOLUME; }
 
   // «Heard» ids per room code and client in this tab's sessionStorage; memory when that is off.
@@ -754,7 +1000,9 @@
     helpers: {
       TYPES: TYPES, BIG_ACTIONS: BIG_ACTIONS, fmtNum: fmtNum, validReq: validReq, recalled: recalled, denial: denial, pickMortarRow: pickMortarRow,
       typeForKey: typeForKey, aimedAtMine: aimedAtMine, levelOk: levelOk, shotMatches: shotMatches, state: rq,
-      pingTargets: pingTargets, pingDue: pingDue, titleWithBadge: titleWithBadge, playPattern: playPattern, unlockAudio: unlockAudio
+      pingTargets: pingTargets, pingDue: pingDue, titleWithBadge: titleWithBadge, playPattern: playPattern, unlockAudio: unlockAudio,
+      hasTarget: hasTarget, cleanTo: cleanTo, toOptions: toOptions, addresseeText: addresseeText, ownMortarRow: ownMortarRow,
+      memberPositions: memberPositions, sharePosition: sharePosition, POS_FADE_MS: POS_FADE_MS, ZONE: ZONE
     },
     // The dot on the room entry's «Комната» tab: a crew working the fire panel still sees a request arrive.
     entryBadge: function () { return rq.pinging.length; },
@@ -765,7 +1013,8 @@
     // The sound notice leads the tools row, so it shows above every tab of the panel.
     tools: function (api) {
       var me = api.me();
-      return blockedHtml(api) + (me && me.confirmed && api.ui.client.status === 'in' ? api.btn('reqNew', api.T().toolRequest, null, rq.form ? 'on big' : 'big') : '');
+      return blockedHtml(api) + (me && me.confirmed && api.ui.client.status === 'in'
+        ? api.btn('reqNew', api.T().toolRequest, null, rq.form ? 'on big' : 'big') + positionTools(api) : '');
     },
     panel: function (id, api) { return id === 'assets' ? assetsHtml(api) : requestsHtml(api); },
     chips: chipsHtml,
@@ -803,7 +1052,7 @@
       reqDenyReason: function (el, api) {
         var r = getReq(api, el), reason = el.getAttribute('data-reason');
         rq.denyAsk = null;
-        if (r && api.T().denyReasons.indexOf(reason) >= 0) patchStatus(api, r, 'denied', reason);
+        if (r && denyReasons(api.T(), r).indexOf(reason) >= 0) patchStatus(api, r, 'denied', reason);
         api.render();
       },
       reqDenyCancel: function (el, api) { rq.denyAsk = null; api.render(); },
@@ -811,7 +1060,7 @@
       'req-cancel': function (el, api) { var r = getReq(api, el); if (r) patchStatus(api, r, 'denied'); },
       'req-take': function (el, api) {
         var r = getReq(api, el);
-        if (!r || offPlanet(api)) return;
+        if (!r || !hasTarget(r) || offPlanet(api)) return;
         rq.taken = r.id;
         api.ui.hooks.takeTarget([r.target.x, r.target.y]);
         api.ui.tab = 'requests';   // from the strip too: the fire card is on the Requests tab
@@ -822,14 +1071,14 @@
       'req-fire': function (el, api) { var r = getReq(api, el); if (r) patchStatus(api, r, 'firing'); },
       'req-place': function (el, api) {
         var r = getReq(api, el);
-        if (!r || offPlanet(api)) return;
+        if (!r || !hasTarget(r) || offPlanet(api)) return;
         api.ui.hooks.takePosition([r.target.x, r.target.y]);
         api.toast(api.T().placed);
       },
       'req-done': function (el, api) {
         var r = getReq(api, el);
         if (!r) return;
-        var tile = [Math.floor(r.target.x), Math.floor(r.target.y)], position = r.type === 'position';
+        var position = r.type === 'position' && hasTarget(r), tile = position ? [Math.floor(r.target.x), Math.floor(r.target.y)] : null;
         if (rq.taken === r.id) rq.taken = null;
         // The asset moves only once the server has the request done. A refusal lands in client.rejected,
         // which the shell toasts once; the mortar stays where it was.
@@ -840,15 +1089,15 @@
           if (row) api.ui.client.queue({ op: 'patch', kind: 'asset', id: row.id, data: { tile: tile, state: 'deployed' } });
         });
       },
-      // A repeat keeps the original request's level and map hash: it is the same place on the room's planet.
+      // A repeat keeps the original request's level, map hash and addressee: the same place on the room's planet.
       'req-repeat': function (el, api) {
         var r = getReq(api, el);
         if (!r || offPlanet(api)) return;
-        queueRequest(api, r.type, [r.target.x, r.target.y], r.note, r.priority === 'urgent', r.flags, { level: r.level, h: r.h });
+        queueRequest(api, r.type, hasTarget(r) ? [r.target.x, r.target.y] : null, r.note, r.priority === 'urgent', r.flags, { level: r.level, h: r.h }, cleanTo(r.to));
       },
       reqShoot: function (el, api) {
         var r = getReq(api, el), ctx = api.ui.hooks.getContext();
-        if (!r || rq.taken !== r.id || r.status !== 'accepted' || !ctx.calibration || !ctx.mortar || !planetOk(api)) return;
+        if (!r || !hasTarget(r) || rq.taken !== r.id || r.status !== 'accepted' || !ctx.calibration || !ctx.mortar || !planetOk(api)) return;
         if (api.ui.client.status !== 'in' || actionsFor(api, r).indexOf('take') < 0) return;
         var game = root.TacticalLogic.worldToGame(ctx.calibration.offset, r.target.x, r.target.y);
         api.ui.hooks.fire(game, [0, 0]);   // tactical.js records the shot and calls roomNotify('shot')
@@ -856,8 +1105,26 @@
       reqFocus: function (el, api) {
         var r = getReq(api, el), v = api.ui.hooks.view;
         if (!r) return;
-        v.centerOn(r.target.x + 0.5, r.target.y + 0.5, Math.max(v.scale, 8));
+        if (hasTarget(r)) v.centerOn(r.target.x + 0.5, r.target.y + 0.5, Math.max(v.scale, 8));
         api.ui.tab = 'requests';
+        api.render();
+      },
+      // «Share position»: the next map click is my tile; a second press leaves pick mode.
+      posShare: function (el, api) {
+        if (api.ui.pick && api.ui.pick.mode === 'position') { api.cancelPick(); return; }
+        if (offPlanet(api)) return;
+        api.setPick('position', function (tile) { sharePosition(api, tile, api.ui.hooks.getContext().level); api.render(); }, api.T().posPickHint);
+      },
+      posFromFire: function (el, api) {
+        var ctx = api.ui.hooks.getContext(), m = ctx.mortar;
+        if (!m || !validTile(m.tile)) return;
+        sharePosition(api, m.tile, isNum(m.level) ? m.level : ctx.level);
+        api.render();
+      },
+      posClear: function (el, api) {
+        var me = api.me();
+        if (!me || !me.confirmed || typeof me.id !== 'string' || api.ui.client.status !== 'in') return;
+        api.ui.client.queue({ op: 'patch', kind: 'member', id: me.id, data: { pos: null } });
         api.render();
       },
       assetState: function (el, api) {
@@ -909,6 +1176,14 @@
         api.ui.storage.write(PREFS_KEY, p);
         pingTick(api, Date.now(), false);
         api.render();
+      },
+      // «Mortar zones» off hides the zone fills and circles; the mortar square stays.
+      reqZone: function (el, api) {
+        var p = prefs(api), view = api.ui.hooks && api.ui.hooks.view;
+        p.zone = !!el.checked;
+        api.ui.storage.write(PREFS_KEY, p);
+        if (view && typeof view.requestDraw === 'function') view.requestDraw();
+        api.render();
       }
     },
     submits: {
@@ -921,9 +1196,15 @@
           if (!w) { api.toast(T.noCalibration); return; }
           target = w;
         }
-        if (!target) { api.toast(T.needTarget); return; }
-        var type = draftType(api);
-        queueRequest(api, type, target, f.note.value, f.urgent.checked, type === 'supply' && f.beacon && f.beacon.checked ? ['beacon'] : []);
+        // A task needs its text and an addressee, not a point; every other type needs the point.
+        var type = draftType(api), task = type === 'task', note = String((f.note && f.note.value) || '');
+        if (!target && !task) { api.toast(T.needTarget); return; }
+        if (task && !note.trim()) { api.toast(T.taskNeedText); return; }
+        var chosen = f.to ? String(f.to.value || '') : '';
+        var option = toOptions(api, type).filter(function (o) { return o.value === chosen; })[0];
+        if (!option) { api.toast(T.reqToStale); return; }
+        if (task && !option.to) { api.toast(T.reqToNeed); return; }
+        queueRequest(api, type, target, note, !!(f.urgent && f.urgent.checked), type === 'supply' && f.beacon && f.beacon.checked ? ['beacon'] : [], null, option.to);
         rq.form = false;
         rq.target = null;
         cancelRequestPick(api);
