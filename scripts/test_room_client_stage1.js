@@ -179,7 +179,7 @@ const req = (id, extra) => ({ cid: 'c-' + id, op: 'put', kind: 'request', id, da
       { cid: 'e3', op: 'patch', kind: 'member', id: mo.me.id, data: { callsign: 'X' } },
       { cid: 'e4', op: 'put', kind: 'member', id: mo.me.id, data: { presentAt: 1 } },
       { cid: 'e5', op: 'patch', kind: 'member', id: mo.me.id, data: { presentAt: 1 } }
-    ]), ['exists', 'kind', 'right', 'right', 'ok']);
+    ]), ['exists', 'kind', 'fields', 'right', 'ok'], 'changed in stage 2a: an own member patch goes through R.validateMemberPatch');
 
     clock.t += 1100;
     assert.deepStrictEqual(await send(so, [

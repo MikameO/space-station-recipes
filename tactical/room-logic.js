@@ -15,7 +15,7 @@
   var ID_RE = /^[A-Za-z0-9][A-Za-z0-9_-]{0,39}$/;
   // Object ids that name Object.prototype members: stored as keys of state.objects they would change its prototype.
   var RESERVED_IDS = ['__proto__', 'constructor', 'prototype'];
-  var REQUEST_TYPES = ['mortar', 'position', 'ob', 'cas', 'supply', 'medevac', 'other'];
+  var REQUEST_TYPES = ['mortar', 'position', 'ob', 'cas', 'supply', 'medevac', 'other', 'task'];
   var REQUEST_FLOW = {
     requested: ['accepted', 'denied'],
     accepted: ['loaded', 'firing', 'done', 'denied'],
@@ -37,12 +37,12 @@
   var MAX_COORD = 4096;
   // Write allowlists: any other key in op.data is refused with 'fields'.
   var FIELDS = {
-    requestPut: ['type', 'target', 'note', 'priority', 'flags', 'level', 'h', 'markerId'],
+    requestPut: ['type', 'target', 'note', 'priority', 'flags', 'level', 'h', 'markerId', 'to'],
     requestPatch: ['status', 'reason', 'note', 'priority', 'flags', 'relayed'],
     asset: ['tile', 'state', 'claimedBy', 'shell', 'radius', 'notes', 'label'],
     shape: ['cat', 'label', 'x', 'y', 'points', 'smooth', 'level', 'h', 'layer', 'ttl', 'relayed', 'confirmedAt'],
-    calibration: ['offset'],
-    member: ['presentAt']
+    calibration: ['offset', 'tile', 'reading'],
+    member: ['presentAt', 'pos', 'cal']
   };
   // Keys a client never sets: object bookkeeping, server stamps and prototype names.
   var RESERVED = ['id', 'kind', 'seq', 'at', 'by', 'deleted', 'deletedAt', 'pending', 'cid',
@@ -79,12 +79,21 @@
   }
   function assetOwnerPost(policy, type) { var d = assetDef(policy, type); return d ? d.owner : null; }
   function assetTypeOf(obj) { return obj.kind === 'request' ? (REQUEST_ASSET[obj.type] || null) : obj.type; }
+  // A request with `to` belongs to its addressee: a client, or a post and, when given, its squad.
+  function isAddressee(req, member) {
+    var to = req && isObj(req.to) ? req.to : null;
+    if (!to || !member) return false;
+    if (has(to, 'client')) return !!member.client && to.client === member.client;
+    return typeof to.post === 'string' && to.post === member.post && (!has(to, 'squad') || to.squad === member.squad);
+  }
 
   // extra.claimed: clients holding a claim on an asset of obj's type (see claimants()).
   function hasRight(policy, member, right, obj, extra) {
     var who = policy.rights[right] || [];
     var level = levelOf(policy, member.post);
     if (who.indexOf(level) >= 0) return true;
+    // An addressed request is its addressee's to accept: asset owners and claimed crews of its type do not act on it.
+    if (obj && isObj(obj.to)) return right === 'acceptRequest' && isAddressee(obj, member);
     if (who.indexOf('asset-owner') >= 0 && obj) {
       var type = assetTypeOf(obj);
       if (type && assetOwnerPost(policy, type) === member.post) return true;
@@ -272,6 +281,57 @@
   }
 
   function validOffset(v) { return Array.isArray(v) && v.length === 2 && isNum(v[0]) && isNum(v[1]); }
+  function isPair(v) { return Array.isArray(v) && v.length === 2 && isCoord(v[0]) && isCoord(v[1]); }
+  function pickKeys(o, keys) {
+    var out = {};
+    keys.forEach(function (k) { if (has(o, k)) out[k] = o[k]; });
+    return out;
+  }
+  // `to` on a new request: {client}, {post} or {post, squad}; a mortar strike goes to the mortar's own post only.
+  function toField(policy, data) {
+    if (!has(data, 'to')) return null;
+    var to = data.to;
+    if (!isObj(to)) return 'to';
+    if (has(to, 'client')) return Object.keys(to).length === 1 && typeof to.client === 'string' && to.client.length >= 1 && to.client.length <= 64 ? null : 'to';
+    if (unknownKey(to, ['post', 'squad']) || typeof to.post !== 'string') return 'to';
+    var level = levelOf(policy, to.post);
+    if (!level || level === 'observer') return 'to';
+    if (has(to, 'squad') && !(typeof to.squad === 'string' && isObj(policy.squads) && has(policy.squads, to.squad))) return 'to';
+    if (data.type === 'mortar' && to.post !== assetOwnerPost(policy, 'mortar')) return 'to';
+    return null;
+  }
+  // A room calibration: the offset, plus the tile and rangefinder reading it came from, both or neither, and they agree.
+  function calibrationFields(data) {
+    if (unknownKey(data, FIELDS.calibration)) return 'fields';
+    if (!validOffset(data.offset)) return 'offset';
+    var tile = has(data, 'tile'), reading = has(data, 'reading');
+    if (!tile && !reading) return null;
+    if (!tile || !isPair(data.tile)) return 'tile';
+    if (!reading || !isPair(data.reading)) return 'reading';
+    return data.reading[0] - data.tile[0] === data.offset[0] && data.reading[1] - data.tile[1] === data.offset[1] ? null : 'offset';
+  }
+  // A member's own patch: presence, a shared position ({x, y, level} or null) and the calibration offset in use.
+  // `member`, when given, is the writer: an observer shares neither a position nor a calibration.
+  function validateMemberPatch(policy, member, data) {
+    if (!isObj(data)) return 'data';
+    if (!Object.keys(data).length || unknownKey(data, FIELDS.member)) return 'fields';
+    if (member && (has(data, 'pos') || has(data, 'cal'))) {
+      var level = levelOf(policy, member.post);
+      if (!level || level === 'observer') return 'level';
+    }
+    if (has(data, 'pos') && data.pos !== null) {
+      var p = data.pos;
+      if (!isObj(p) || unknownKey(p, ['x', 'y', 'level']) || !isCoord(p.x) || !isCoord(p.y) ||
+          (has(p, 'level') && !(isNum(p.level) && Math.floor(p.level) === p.level))) return 'pos';
+    }
+    if (has(data, 'cal') && data.cal !== null && !isPair(data.cal)) return 'cal';
+    return null;
+  }
+  // A presence heartbeat passes an idle lock and radio silence; a position or calibration write does not.
+  function isHeartbeat(op) {
+    return !!op && op.kind === 'member' && op.op === 'patch' && isObj(op.data) &&
+      Object.keys(op.data).length === 1 && has(op.data, 'presentAt');
+  }
   function validFlags(v) {
     if (!Array.isArray(v) || v.length > 8) return false;
     for (var i = 0; i < v.length; i++) if (REQUEST_FLAGS.indexOf(v[i]) < 0) return false;
@@ -343,12 +403,17 @@
     if (kind === 'request') {
       if (unknownKey(data, FIELDS.requestPut)) return 'fields';
       if (REQUEST_TYPES.indexOf(data.type) < 0) return 'type';
-      if (data.type !== 'other' && !assetDef(policy, REQUEST_ASSET[data.type])) return 'type';
-      if (!isObj(data.target) || !isCoord(data.target.x) || !isCoord(data.target.y)) return 'target';
+      if (data.type !== 'other' && data.type !== 'task' && !assetDef(policy, REQUEST_ASSET[data.type])) return 'type';
+      var to = toField(policy, data);
+      if (to) return to;
+      // A task names its addressee and says what to do; its map point is optional.
+      if (data.type === 'task' && !has(data, 'to')) return 'to';
+      if (data.type === 'task' && !(typeof data.note === 'string' && data.note.trim())) return 'note';
+      if ((data.type !== 'task' || has(data, 'target')) && (!isObj(data.target) || !isCoord(data.target.x) || !isCoord(data.target.y))) return 'target';
       return requestFields(policy, data);
     }
     if (kind === 'marker' || kind === 'line' || kind === 'area') return shapeFields(policy, kind, data, true);
-    if (kind === 'calibration') return unknownKey(data, FIELDS.calibration) ? 'fields' : validOffset(data.offset) ? null : 'offset';
+    if (kind === 'calibration') return calibrationFields(data);
     if (kind === 'asset') return unknownKey(data, FIELDS.asset.concat(['type', 'n'])) ? 'fields' : assetFields(policy, data, data.type);
     return 'kind';
   }
@@ -364,8 +429,8 @@
       return assetFields(policy, data, existing ? existing.type : null);
     }
     if (kind === 'marker' || kind === 'line' || kind === 'area') return shapeFields(policy, kind, data, false);
-    if (kind === 'calibration') return unknownKey(data, FIELDS.calibration) ? 'fields' : validOffset(data.offset) ? null : 'offset';
-    if (kind === 'member') return unknownKey(data, FIELDS.member) ? 'fields' : null;
+    if (kind === 'calibration') return calibrationFields(data);
+    if (kind === 'member') return validateMemberPatch(policy, null, data);
     return 'kind';
   }
 
@@ -384,6 +449,8 @@
     var texts = { label: L.label, note: L.note, reason: L.note, notes: L.note, callsign: L.callsign };
     for (var t in texts) if (has(texts, t) && typeof data[t] === 'string') data[t] = cleanText(data[t], texts[t]);
     if (kind === 'request' && isObj(data.target)) data.target = { x: data.target.x, y: data.target.y };
+    if (kind === 'request' && isObj(data.to)) data.to = pickKeys(data.to, ['client', 'post', 'squad']);
+    if (kind === 'member' && isObj(data.pos)) data.pos = pickKeys(data.pos, ['x', 'y', 'level']);
     return data;
   }
 
@@ -398,6 +465,7 @@
     }
     if (has(data, 'confirmedAt')) data.confirmedAt = now;
     if (kind === 'member' && has(data, 'presentAt')) data.presentAt = now;
+    if (kind === 'member' && has(data, 'pos')) data.posAt = now;
     if (kind === 'marker' && op === 'put' && data.cat === 'enemy' && data.relayed === undefined) data.relayed = false;
     return data;
   }
@@ -456,7 +524,7 @@
       if (req.type === 'mortar' && crew) out.push('take');
       if (req.type === 'position' && crew) out.push('place');
       if (req.type === 'ob' && loader) out.push('load');
-      if (['mortar', 'ob', 'position'].indexOf(req.type) < 0 && crew) out.push('fire');
+      if (['mortar', 'ob', 'position', 'task'].indexOf(req.type) < 0 && crew) out.push('fire');
       if (crew) out.push('done', 'deny');
       if (author) out.push('cancel');
     } else if (req.status === 'loaded') {
@@ -515,13 +583,14 @@
   root.TacticalRoomLogic = {
     CODE_ALPHABET: CODE_ALPHABET, REQUEST_TYPES: REQUEST_TYPES, REQUEST_FLOW: REQUEST_FLOW, REQUEST_ASSET: REQUEST_ASSET,
     ASSET_STATES: ASSET_STATES,
-    assetDef: assetDef, assetTypeOf: assetTypeOf, claimants: claimants, requestActions: requestActions,
+    assetDef: assetDef, assetTypeOf: assetTypeOf, claimants: claimants, requestActions: requestActions, isAddressee: isAddressee,
     simplify: simplify, smoothSegments: smoothSegments, snapPoints: snapPoints,
     createState: createState, postDef: postDef, levelOf: levelOf, isStaff: isStaff, hasRight: hasRight,
     assetOwnerPost: assetOwnerPost, layerWritable: layerWritable, canWrite: canWrite, applyOp: applyOp, idError: idError,
     markerAge: markerAge, expired: expired, enemyAlpha: enemyAlpha, visibleObjects: visibleObjects,
     clockOffset: clockOffset, serverNowEst: serverNowEst, countdown: countdown, deadlines: deadlines,
     cleanText: cleanText, validateData: validateData, validatePatch: validatePatch, cleanData: cleanData, stampData: stampData,
+    validateMemberPatch: validateMemberPatch, isHeartbeat: isHeartbeat,
     parseEntry: parseEntry, randomCode: randomCode,
     levelStyle: levelStyle, markerShape: markerShape, retryAfter: retryAfter, roomDeadlines: roomDeadlines,
     idleLocked: idleLocked, memberStale: memberStale, mergePending: mergePending

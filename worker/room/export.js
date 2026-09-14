@@ -4,9 +4,10 @@
 // number, game coordinates when the room is calibrated. Times are UTC; the
 // export puts CHRONOLOGY_HEADER above the lines. A line that cannot be read
 // becomes «операция <kind> (не разобрана)» instead of failing the export.
+// Which calibration a member works by (`cal`) makes no line.
 export const CHRONOLOGY_HEADER = 'Хронология комнаты. Время UTC.';
 
-const TYPE_RU = { mortar: 'удар миномёта', position: 'позиция миномёта', ob: 'ОБ', cas: 'КАС', supply: 'снабжение', medevac: 'эвакуация', other: 'прочее' };
+const TYPE_RU = { mortar: 'удар миномёта', position: 'позиция миномёта', ob: 'ОБ', cas: 'КАС', supply: 'снабжение', medevac: 'эвакуация', other: 'прочее', task: 'задача' };
 const STATUS_RU = { requested: 'запрошен', accepted: 'принят', loaded: 'заряжен', firing: 'огонь', done: 'выполнен', denied: 'отклонён' };
 const PRIORITY_RU = { urgent: 'срочно', normal: 'обычный' };
 const FLAG_RU = { beacon: 'маяк' };
@@ -20,14 +21,20 @@ const EVENT_RU = {
 // The stop link acts through the room as the system, but the journal names who pulled the switch.
 const EVENT_WHO = { stop: 'Администрация', start: 'Администрация' };
 
-const own = (o, k) => (o && typeof o === 'object' && Object.prototype.hasOwnProperty.call(o, k) ? o[k] : undefined);
+const has = (o, k) => !!o && typeof o === 'object' && Object.prototype.hasOwnProperty.call(o, k);
+const own = (o, k) => (has(o, k) ? o[k] : undefined);
 const isNum = v => typeof v === 'number' && Number.isFinite(v);
+const isPair = v => Array.isArray(v) && v.length === 2 && isNum(v[0]) && isNum(v[1]);
 const quote = s => '«' + String(s) + '»';
 const label = (table, key) => own(table, key) || String(key);
+// As the fire panel writes a shift: +243 -218.
+const signed = n => (n > 0 ? '+' + n : String(n));
 
 // objects: the room state, for requests and members whose opening op is not in `ops`.
+// offset: the room calibration now, for the stage 1 lines. A position line takes the calibration the log held
+// at its own point instead (the offset argument throughout when `ops` carry no calibration op).
 export function chronology(ops, policy, offset, objects) {
-  const off = Array.isArray(offset) && offset.length === 2 && isNum(offset[0]) && isNum(offset[1]) ? offset : null;
+  const off = isPair(offset) ? offset : null;
   const postDef = post => policy.posts.find(p => p.id === post);
   const postName = post => { const d = postDef(post); return d ? d.nameRu : String(post); };
   const squadName = sq => (own(policy.squads, sq) || {}).nameRu || '';
@@ -37,7 +44,33 @@ export function chronology(ops, policy, offset, objects) {
 
   const requests = new Map();
   const members = new Map();
+  const byClient = new Map();   // client → the latest member put in the log
   let numbered = 0;
+  let calNow = (Array.isArray(ops) ? ops : []).some(op => op && op.kind === 'calibration') ? null : off;
+  const trackCalibration = op => {
+    if (!op || op.kind !== 'calibration') return;
+    if (op.op === 'del') calNow = null;
+    else if (op.data && isPair(op.data.offset)) calNow = op.data.offset;
+  };
+  const position = p => (p && isNum(p.x) && isNum(p.y)
+    ? (calNow ? `${p.x + calNow[0]} ${p.y + calNow[1]}` : `${p.x} ${p.y} (мир)`) : '(неверная)');
+  const memberByClient = client => {
+    if (byClient.has(client)) return byClient.get(client);
+    const all = objects && typeof objects === 'object' ? Object.values(objects).filter(o => o && o.kind === 'member' && o.client === client) : [];
+    return all.find(o => !o.deleted) || all[0] || null;
+  };
+  // A member by callsign and post; a client the log never saw by its id.
+  const personOf = by => {
+    if (!by) return '';
+    const m = memberByClient(by.client);
+    return m ? person(m) : postName(by.post) + (by.squad ? ' ' + squadName(by.squad) : '');
+  };
+  const addressee = to => {
+    if (!to || typeof to !== 'object') return '';
+    if (typeof to.client === 'string') { const m = memberByClient(to.client); return m ? person(m) : 'участник ' + to.client; }
+    if (typeof to.post === 'string') return postName(to.post) + (to.squad ? ' ' + squadName(to.squad) : '');
+    return '';
+  };
   const requestOf = id => {
     if (requests.has(id)) return requests.get(id);
     const o = own(objects, id);
@@ -61,7 +94,10 @@ export function chronology(ops, policy, offset, objects) {
     if (op.op === 'put') {
       const n = ++numbered;
       requests.set(op.id, { n, type: d.type, target: d.target, by: op.by, status: 'requested', acceptedBy: null });
-      return `запрос №${n} ${quote(label(TYPE_RU, d.type))} ${coords(d.target)}`.trim();
+      // A task may have no point; the addressee follows the point, a task's text comes last.
+      const to = addressee(d.to);
+      const text = [`запрос №${n}`, quote(label(TYPE_RU, d.type)), coords(d.target), to ? '→ ' + to : ''].filter(Boolean).join(' ');
+      return d.type === 'task' && typeof d.note === 'string' && d.note ? text + ': ' + d.note : text;
     }
     const r = requestOf(op.id);
     const head = r ? `${r.n ? '№' + r.n + ' ' : ''}${quote(label(TYPE_RU, r.type))} ${coords(r.target)}`.trim() : op.id;
@@ -82,14 +118,18 @@ export function chronology(ops, policy, offset, objects) {
 
   function memberLine(op, d) {
     if (op.op === 'put') {
-      members.set(op.id, { post: d.post, squad: d.squad, callsign: d.callsign });
+      const m = { client: d.client, post: d.post, squad: d.squad, callsign: d.callsign };
+      members.set(op.id, m);
+      if (typeof d.client === 'string') byClient.set(d.client, m);
       return 'вход: ' + person(d);
     }
     const target = person(memberOf(op.id)) || op.id;
     if (op.op === 'del') return 'снят с должности: ' + target;
     if (d.confirmed) return 'подтвердил: ' + target;
+    if (has(d, 'pos')) return d.pos === null ? 'позиция снята: ' + target : 'позиция: ' + target + ' ' + position(d.pos);
     if (d.presentAt) return 'на месте';
     if (Array.isArray(d.functions)) return 'ярлыки ' + target + ': ' + (d.functions.map(fnName).join(', ') || 'нет');
+    if (has(d, 'cal')) return null;
     return 'участник изменён: ' + target;
   }
 
@@ -113,13 +153,17 @@ export function chronology(ops, policy, offset, objects) {
     if (op.op === 'del') return 'удалил ' + op.id;
     if (op.kind === 'marker') return ('метка «' + (d.label || d.cat || '') + '» ' + (d.x !== undefined ? coords(d) : '')).trim();
     if (op.kind === 'calibration') {
-      const o = d.offset;
-      return 'калибровка ' + (Array.isArray(o) && o.length === 2 && isNum(o[0]) && isNum(o[1]) ? o.join(' ') : '(неверная)');
+      if (!isPair(d.offset)) return 'калибровка (неверная)';
+      const parts = ['привязка комнаты: ' + personOf(op.by), 'сдвиг ' + signed(d.offset[0]) + ' ' + signed(d.offset[1])];
+      if (isPair(d.reading)) parts.push(`показание дальномера ${d.reading[0]} ${d.reading[1]}`);
+      if (isPair(d.tile)) parts.push(`тайл ${d.tile[0]} ${d.tile[1]} (мир)`);
+      return parts.join(', ');
     }
     return (op.kind === 'line' ? 'линия' : 'область') + ' «' + (d.label || '') + '»';
   }
 
-  return ops.map(op => {
+  const out = [];
+  for (const op of ops) {
     let t = '--:--:--', who = '?', what;
     try {
       t = new Date(op.at).toISOString().slice(11, 19);
@@ -129,6 +173,8 @@ export function chronology(ops, policy, offset, objects) {
     } catch (e) {
       what = `операция ${op && op.kind} (не разобрана)`;
     }
-    return `${t}  ${who}  ${what}`;
-  }).join('\n');
+    trackCalibration(op);
+    if (what !== null) out.push(`${t}  ${who}  ${what}`);
+  }
+  return out.join('\n');
 }

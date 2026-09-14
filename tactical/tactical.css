@@ -255,6 +255,20 @@ body.tac-body {
   color: var(--phosphor);
 }
 
+/* A checked calibration folded into one line, its button at the right. */
+.tac-cal-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--text-bright);
+}
+
+.tac-cal-summary > span { min-width: 0; }
+.tac-cal-summary .ok { color: var(--phosphor); white-space: nowrap; }
+.tac-cal-summary .btn-small { flex: none; padding: 4px 10px; font-size: 0.72rem; }
+
 .tac-check {
   border: 1px solid rgba(255, 182, 39, 0.45);
   border-radius: 6px;

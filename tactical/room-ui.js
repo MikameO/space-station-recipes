@@ -18,6 +18,8 @@
   var DEV_KEY = PREFIX + 'room-dev';
   var KEY_PREFIX = PREFIX + 'room-key:';
   var DEMO_KEY = PREFIX + 'room-demo';   // sessionStorage: the demo survives a reload of this tab
+  var CAL_KEEP_PREFIX = PREFIX + 'room-cal-keep:';   // sessionStorage per room code: the `at` of the room calibration kept aside
+  var MAX_COORD = 4096;
   var PROD_SITE = 'https://mikameo.github.io/space-station-recipes/tactical.html';
   var SITE = siteUrl(root.location);
   var YM = 108585248;
@@ -57,6 +59,11 @@
       close: 'Close the room', closeAsk: 'Close for sure?', exportLog: 'Download log', exportJson: 'Download JSON', continueRound: 'Continue this round',
       present: 'I am here', presentAsk: 'No actions from you for 8 minutes: the room drops you at 10.',
       newCode: 'New post code: {code}', pickHint: '{hint} · Esc cancels',
+      roomCalBanner: 'Room calibration: {who}, {t}, offset {offset}', roomCalApply: 'Apply here', roomCalKeep: 'Keep mine',
+      roomCalApplied: 'Room calibration applied', roomCalApplyFail: 'The room calibration could not be applied.',
+      roomCalPublish: 'Publish my calibration', roomCalPublishHint: 'refine it with my own reading', roomCalPublished: 'Your calibration is now the room’s',
+      rosterCalRoom: '✓ room calibration', rosterCalOwn: 'own calibration', rosterCalNone: 'no calibration',
+      rosterPos: 'position {xy}', rosterPosAge: ' · {n} min',
       levelNames: { staff: 'Staff', squad: 'Squads', service: 'Services', observer: 'Observers' },
       banners: {
         silence: 'Radio silence (staff). Data frozen since {t}.',
@@ -118,6 +125,11 @@
       close: 'Закрыть комнату', closeAsk: 'Точно закрыть?', exportLog: 'Скачать журнал', exportJson: 'Скачать JSON', continueRound: 'Продолжить раунд',
       present: 'На месте', presentAsk: 'От вас 8 минут нет действий: через 10 комната снимет вас с должности.',
       newCode: 'Новый код должности: {code}', pickHint: '{hint} · Esc — отмена',
+      roomCalBanner: 'Привязка комнаты: {who}, {t}, сдвиг {offset}', roomCalApply: 'Применить у себя', roomCalKeep: 'Оставить свою',
+      roomCalApplied: 'Привязка комнаты применена', roomCalApplyFail: 'Привязку комнаты не удалось применить.',
+      roomCalPublish: 'Опубликовать мою привязку', roomCalPublishHint: 'уточнить своим замером', roomCalPublished: 'Ваша привязка теперь привязка комнаты',
+      rosterCalRoom: '✓ привязка комнаты', rosterCalOwn: 'своя привязка', rosterCalNone: 'нет привязки',
+      rosterPos: 'позиция {xy}', rosterPosAge: ' · {n} мин',
       levelNames: { staff: 'Штаб', squad: 'Отряды', service: 'Службы', observer: 'Наблюдатели' },
       banners: {
         silence: 'Радиомолчание (штаб). Данные заморожены с {t}.',
@@ -164,7 +176,8 @@
     html: {}, deferred: {}, keyReplace: false, errorForm: null, exporting: false,
     keyMessage: null, available: false, policyMissing: {}, policyFails: 0, retryAt: 0,
     editAt: 0, selectOpen: false, selectEl: null, deferTimer: 0,
-    lastError: null, narrow: false, fixtureLoading: null, toastEl: null, toastTimer: 0
+    lastError: null, narrow: false, fixtureLoading: null, toastEl: null, toastTimer: 0,
+    calKeep: {}, calSync: null   // «Оставить свою» per room code (memory copy of sessionStorage); the `cal` sync state
   };
 
   // ── helpers ─────────────────────────────────────────────
@@ -263,6 +276,116 @@
     var o = offset();
     return o ? [gx - o[0], gy - o[1]] : null;
   }
+
+  // ── stage 2a: the room calibration (docs/design/2026-09-14-tactical-tablet-stage2a.md §3.4) ──
+
+  function isInt(v) { return typeof v === 'number' && isFinite(v) && Math.floor(v) === v && Math.abs(v) <= MAX_COORD; }
+  function isPair(v) { return Array.isArray(v) && v.length === 2 && isInt(v[0]) && isInt(v[1]); }
+  function samePair(a, b) { return isPair(a) && isPair(b) && a[0] === b[0] && a[1] === b[1]; }
+  function signed(n) { return n > 0 ? '+' + n : String(n); }   // as the Fire panel writes an offset
+  // The Fire panel's calibration for the planet on the map, or null.
+  function fireCal() {
+    var ctx = ui.hooks ? ui.hooks.getContext() : null, c = ctx && ctx.calibration;
+    return c && isPair(c.offset) ? c : null;
+  }
+  function roomCal() {
+    var c = ui.client && typeof ui.client.calibration === 'function' ? ui.client.calibration() : null;
+    return c && isPair(c.offset) ? c : null;
+  }
+  // «Орлов (Офицер штаба)»: the callsign lives on the member object; without one, or once that member is gone, the post alone.
+  function publisherName(by) {
+    if (!by) return '';
+    var m = ui.client.members().filter(function (x) { return x.client === by.client; })[0];
+    var post = postName((m && m.post) || by.post);
+    return m && m.callsign ? m.callsign + ' (' + post + ')' : post;
+  }
+  // «Оставить свою» holds per room code until the room calibration's `at` changes; memory answers when sessionStorage throws.
+  function calKept(code) {
+    var k = CAL_KEEP_PREFIX + code;
+    if (has(ui.calKeep, k)) return ui.calKeep[k];
+    try { return root.sessionStorage.getItem(k); } catch (e) { return null; }
+  }
+  function keepCal(code, at) {
+    var k = CAL_KEEP_PREFIX + code;
+    ui.calKeep[k] = String(at);
+    try { root.sessionStorage.setItem(k, String(at)); } catch (e) { /* memory keeps it for this page */ }
+  }
+  // Tile and reading travel only when they agree with the offset (offset = reading − tile), as the contract demands.
+  function calPublishData(cal) {
+    var data = { offset: cal.offset.slice() };
+    if (isPair(cal.tile) && isPair(cal.reading) && samePair([cal.reading[0] - cal.tile[0], cal.reading[1] - cal.tile[1]], cal.offset)) {
+      data.tile = cal.tile.slice();
+      data.reading = cal.reading.slice();
+    }
+    return data;
+  }
+  function calKey(v) { return isPair(v) ? v[0] + ',' + v[1] : 'none'; }
+
+  // The room calibration differs from mine, or I have none: apply it (the Fire panel hook, only with tile and reading) or keep mine.
+  function calBannerHtml() {
+    var c = ui.client, rc = roomCal(), mine = fireCal();
+    if (c.status !== 'in' || !rc || !planetOk() || (mine && samePair(mine.offset, rc.offset))) return '';
+    if (calKept(c.code) === String(rc.at)) return '';
+    var text = fmt(T.roomCalBanner, { who: publisherName(rc.by), t: hhmm(rc.at), offset: signed(rc.offset[0]) + ' ' + signed(rc.offset[1]) });
+    var apply = isPair(rc.tile) && isPair(rc.reading) && typeof ui.hooks.applyCalibration === 'function' ? btn('calApply', T.roomCalApply) : '';
+    return banner(text, 'warn cal', apply + btn('calKeep', T.roomCalKeep, { at: rc.at }));
+  }
+
+  // «Опубликовать мою привязку» in the tools row: my calibration differs from the room's, or the room has none.
+  function calToolsHtml() {
+    var c = ui.client, mine = fireCal(), rc = roomCal();
+    if (c.status !== 'in' || !mine || !can('publishCalibration') || !planetOk() || (rc && samePair(rc.offset, mine.offset))) return '';
+    return '<button type="button" class="btn-small tac-room-btn tac-room-cal-publish" data-room-action="calPublish">' +
+      esc(T.roomCalPublish) + '<small>' + esc(T.roomCalPublishHint) + '</small></button>';
+  }
+
+  // Roster marks of a confirmed member: which calibration they work by (nothing without the field) and their last position.
+  function rosterMarks(m) {
+    if (!m.confirmed) return '';
+    var out = '';
+    if (has(m, 'cal')) {
+      var rc = roomCal();
+      var kind = m.cal === null ? 'none' : rc && samePair(m.cal, rc.offset) ? 'room' : 'own';
+      out += '<span class="tac-room-mark tac-room-mark-cal-' + kind + '">' +
+        esc(kind === 'room' ? T.rosterCalRoom : kind === 'own' ? T.rosterCalOwn : T.rosterCalNone) + '</span>';
+    }
+    var p = m.pos;
+    if (p && isInt(p.x) && isInt(p.y)) {
+      var age = typeof m.posAt === 'number' ? fmt(T.rosterPosAge, { n: Math.max(0, Math.floor((ui.client.serverNow() - m.posAt) / 60000)) }) : '';
+      out += '<span class="tac-room-mark tac-room-mark-pos">' + esc(fmt(T.rosterPos, { xy: gameText(p.x, p.y) }) + age) + '</span>';
+    }
+    return out ? '<span class="tac-room-marks">' + out + '</span>' : '';
+  }
+
+  // My Fire panel offset follows me into my member object, so the roster shows who works by which calibration.
+  // One write per change and none while one is out. A write refused by a frozen or locked room (423) goes again once it
+  // thaws; any other refusal waits for the next change. Nothing is sent while the room is frozen: radio silence refuses
+  // a whole batch, and a heartbeat queued beside the patch would go down with it.
+  function syncCal() {
+    var c = ui.client, mine = me();
+    if (!c || c.status !== 'in' || !mine || !mine.confirmed || !mine.id || !ui.policy) return;
+    var s = ui.calSync;
+    if (!s || s.client !== c || s.code !== c.code || s.member !== mine.id) {
+      s = ui.calSync = { client: c, code: c.code, member: mine.id, sent: has(mine, 'cal') ? calKey(mine.cal) : '', busy: false, cid: null };
+    }
+    var meta = c.meta || {};
+    if (s.busy || meta.frozen || meta.locked || meta.closed || !planetOk()) return;   // another planet on the map: not the room's calibration
+    var cal = fireCal(), want = cal ? cal.offset.slice() : null, key = calKey(want);
+    if (key === s.sent) return;
+    var data = { cal: want };
+    if (R.validateMemberPatch(ui.policy, mine, data)) { s.sent = key; return; }   // the observer level: the room would refuse it
+    var op = { op: 'patch', kind: 'member', id: mine.id, data: data };
+    s.busy = true;
+    var answer = c.queue(op);
+    s.cid = op.cid || null;
+    Promise.resolve(answer).then(function (r) {
+      s.busy = false;
+      s.cid = null;
+      if (!(r && !r.ok && (r.status === 423 || r.error === 'reset'))) s.sent = key;
+    });
+  }
+  // The sync writes in the background: nobody clicked, so its refusals never toast.
+  function quietOp(op) { return !!(op && ui.calSync && ui.calSync.cid && op.cid === ui.calSync.cid); }
   function me() { return ui.client ? ui.client.me : null; }
   function can(right, obj) { var m = me(); return !!(m && m.confirmed && ui.policy && R.hasRight(ui.policy, m, right, obj)); }
   function isStaff() { var m = me(); return !!(m && m.confirmed && R.isStaff(ui.policy, m)); }
@@ -455,7 +578,10 @@
   // room_confirm is counted by the confirmer (actions.confirm), never again by the joiner.
   function onClientUpdate(c) {
     var shown = {};   // a refused batch (for example 423) must not stack one toast per op
-    while (c.rejected.length) { var r = c.rejected.shift(), msg = errorText(r.error); if (!shown[msg]) { shown[msg] = true; toast(msg); } }
+    while (c.rejected.length) {
+      var r = c.rejected.shift(), msg = errorText(r.error);
+      if (!quietOp(r.op) && !shown[msg]) { shown[msg] = true; toast(msg); }
+    }
     if (shownError(c) && c.error !== ui.lastError) toast(errorText(c.error));
     ui.lastError = c.error;
     syncTick();
@@ -678,7 +804,7 @@
       ui.tab = list.some(function (t) { return t.id === 'requests'; }) ? 'requests' : list[0].id;
     }
     return bannersHtml() + headHtml() +
-      (c.status === 'in' ? '<div class="tac-room-tools">' + collect('tools') + '</div>' : '') +
+      (c.status === 'in' ? '<div class="tac-room-tools">' + collect('tools') + calToolsHtml() + '</div>' : '') +
       '<div class="tac-room-tabs" role="tablist">' + list.map(function (t) {
         return '<button type="button" role="tab" class="tac-seg' + (t.id === ui.tab ? ' on' : '') + '" aria-selected="' + (t.id === ui.tab) + '" data-room-action="tab" data-tab="' + esc(t.id) + '">' + esc(t.label) + '</button>';
       }).join('') + '</div>' +
@@ -785,6 +911,7 @@
     if (m.closed) out.push(banner(T.banners.closed, 'warn', exportButtons()));
     if (!m.closed && m.warnAt && now >= m.warnAt) out.push(banner(fmt(T.banners.warn, { t: hhmm(m.maxAt) }), 'warn', canExtend() ? btn('extend', T.extend) : ''));
     if (m.planet && !planetOk()) out.push(banner(fmt(T.banners.planet, { planet: planetName(m.planet) })));
+    out.push(calBannerHtml());
     if (c.status === 'in' && presenceDue(now)) out.push(banner(T.presentAsk, 'warn', btn('present', T.present)));
     return out.join('');
   }
@@ -840,7 +967,7 @@
     var waiting = m.confirmed ? '' : ' <em>' + esc(T.knocking) + (knocking.length < 2 && m.word ? ' · ' + esc(m.word) : '') + '</em>';
     return '<div class="tac-room-row' + (faded ? ' faded' : '') + (self ? ' me' : '') + '">' +
       '<span class="tac-room-sig tac-room-sig-' + cls(style.level) + '" style="--sig:' + esc(safeColor(style.color)) + '"></span>' +
-      '<span class="tac-room-name">' + esc(name) + tags + waiting + '</span>' +
+      '<span class="tac-room-name">' + esc(name) + tags + waiting + rosterMarks(m) + '</span>' +
       '<span class="tac-room-actions">' + actions + '</span></div>';
   }
 
@@ -1033,6 +1160,29 @@
     present: function () {
       var mine = me();
       if (mine) ui.client.queue({ op: 'patch', kind: 'member', id: mine.id, data: { presentAt: 1 } });
+    },
+    calApply: function () {
+      var rc = roomCal(), ok = false;
+      if (!rc || !isPair(rc.tile) || !isPair(rc.reading) || typeof ui.hooks.applyCalibration !== 'function') return;
+      try {
+        ok = planetOk() && ui.hooks.applyCalibration({ tile: rc.tile.slice(), reading: rc.reading.slice(), offset: rc.offset.slice() }) === true;
+      } catch (e) { warn('applyCalibration hook', e); }
+      toast(ok ? T.roomCalApplied : T.roomCalApplyFail);
+      queueRender();
+    },
+    // The `at` shown on the banner, not the latest: a calibration published meanwhile is never kept unseen.
+    calKeep: function (el) {
+      if (!ui.client || !ui.client.code) return;
+      keepCal(ui.client.code, el.getAttribute('data-at'));
+      queueRender();
+    },
+    calPublish: function () {
+      var c = ui.client, mine = fireCal();
+      if (!c || c.status !== 'in' || !mine || !can('publishCalibration') || !planetOk()) return;
+      c.queue({ op: 'put', kind: 'calibration', id: 'calibration', data: calPublishData(mine) }).then(function (r) {
+        if (r && r.ok) toast(T.roomCalPublished);
+        queueRender();
+      });
     }
   };
 
@@ -1187,6 +1337,7 @@
       if (planet !== ui.planetId) { ui.planetId = planet; if (ui.on) queueRender(); }
       updateCountdowns();
     } catch (e) { warn('tick', e); return; }
+    try { syncCal(); } catch (e) { warn('cal sync', e); }
     eachModule('tick', function (m) { m.tick(api); });
     syncTick();
   }

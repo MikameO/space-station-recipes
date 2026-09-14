@@ -480,8 +480,9 @@ export class Room {
     const list = Array.isArray(body.ops) ? body.ops.slice(0, 64) : [];
     const cidOf = raw => (raw && typeof raw === 'object' && typeof raw.cid === 'string' ? raw.cid.slice(0, 40) : '');
     const resent = raw => this.acked(actor.client, cidOf(raw));
-    // Presence heartbeats pass a lock and radio silence, so a quiet room keeps its members.
-    const heartbeat = raw => !!raw && raw.kind === 'member' && raw.op === 'patch';
+    // Presence heartbeats (a member patch of presentAt alone) pass a lock and radio silence, so a quiet room keeps
+    // its members; a position or calibration patch is a write like any other.
+    const heartbeat = raw => !!raw && typeof raw === 'object' && R.isHeartbeat(raw);
     const blocked = m.closed ? 'closed'
       : m.locked && !list.every(heartbeat) ? 'locked'
       : m.frozen && !(m.frozen.reason === 'silence' && list.every(heartbeat)) ? m.frozen.reason
@@ -514,8 +515,11 @@ export class Room {
       const data = R.cleanData(P, raw.kind, raw.op, raw.data);
       const expectedStatus = typeof raw.expectedStatus === 'string' ? raw.expectedStatus : undefined;
       if (raw.kind === 'member') {
+        // A member object is its holder's own and only patched: presence, position, the calibration in use.
         const self = existing && !existing.deleted && existing.client === actor.client;
-        if (raw.op !== 'patch' || !self || Object.keys(data).join() !== 'presentAt') { acks.push({ cid, error: 'right' }); continue; }
+        if (raw.op !== 'patch' || !self) { acks.push({ cid, error: 'right' }); continue; }
+        const bad = R.validateMemberPatch(P, actor, data);
+        if (bad) { acks.push({ cid, error: bad }); continue; }
       } else {
         const bad = raw.op === 'put' ? R.validateData(P, raw.kind, data)
           : raw.op === 'patch' ? R.validatePatch(P, raw.kind, data, existing) : null;
