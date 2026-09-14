@@ -6313,6 +6313,20 @@ In Step 2 the shelf check expects at least 3 roster rows.
 2. README row text: «A per-round room on the tactical map. Stage 1: a staff officer sends the mortar crew strike and position requests; the crew answers with statuses and the officer sees the mortar and its range. Off on every server until its administration sanctions it; nothing is read from the game».
 3. CHANGELOG section title: `## Series V, stage 1 — 2026-09-13 (Officers' room: staff officer and mortar crew; hidden until a server sanctions it)`, and its first sentence says the room serves two roles in Stage 1.
 4. Step 8 `whatsNew`: `{"en": "Officers' room on Space Stories Core: strike and position requests from the staff officer to the mortar crew", "ru": "Командный планшет на Space Stories Core: запросы на удар и на позицию от офицера штаба миномётному расчёту"}`; the `inside` item is `{"en": "Staff officer and mortar crew", "ru": "Офицер штаба и расчёт"}`.
+### Fix round after the code reviews (2026-09-14)
+
+Quality reviews of the parallel tracks found plan-level defects; the fix round changed these contracts, and they override the task texts above:
+
+- **K1 queue.** `client.queue(op)` resolves per op: `{ok:true, seq}` on an ack (or when its `cid` shows up in polled ops after a network failure), `{ok:false, error, status}` on a rejection; 0, 429 and 5xx keep the op pending; stale responses after `reset`/`rotate` are dropped.
+- **K2 author.** The author of a request only withdraws it: `cancel` on `requested` and on `accepted` (a recall with no reason, labelled «отозвано штабом»). Accept, take, place, done and deny belong to the crew.
+- **K3 planet.** `api.planetOk()`; rings, take, place and request creation are disabled on another planet.
+- **K4 writes.** `R.validatePatch` whitelists: request patch `{status, reason, note, priority, flags, relayed}`, asset patch `{tile, state, claimedBy, shell, radius, notes, label}` with typed checks. The Worker normalises put and patch before `canWrite`, stamps server fields itself, de-duplicates by `cid` (a resent op gets its original ack with `dup: true`) and refuses a put over another member's live object (`exists`) and a status change by the author (`author`). Status conflicts come back inside the batch ack with HTTP 200, not as 409.
+- **K5 styles.** `tactical/room.css` has one owner; the panel and requests blocks live there.
+- **Entry and admin.** Re-entry into a confirmed slot needs the member's own `X-Room-Session` (else 409 `member`); knocking members get no presence; stale knocks expire after `wordSec`; «Выбыл» refuses the last member who can confirm joins; «Продолжить» after an idle lock no longer evicts the room; silence cannot lift an administration stop.
+- **Observer and export.** Off by default, as Decision 3 says: creation returns no observer token, staff mint it with the `observer` action, rotation clears it, and only staff and the observer export. The observer token is stripped from the address bar right after it is read; the panel adds «Скачать JSON» for `scripts/room_pilot_stats.py`.
+- **Sanction token.** `keyId` must be an own key of `ROOM_KEYS` (inherited keys such as `constructor` were accepted before).
+- **Listings.** Dropship asset states are `to_lz` and `on_lz` (not `toLz`/`onLz` as in the Task 7 listing); the compact strip card is 54 px inside the 64 px strip (Task 8 listing says 52 px).
+- **KT-B.** `scripts/room_pilot_stats.py --stage so-mortar` (default) counts confirmed posts `so` and `mortar`, needs a request done by the crew post, counts the owner as one identity outside the creators, de-duplicates exports and prints accepted, denied, withdrawn and unanswered requests.
 
 ---
 
