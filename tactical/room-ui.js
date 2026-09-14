@@ -550,7 +550,7 @@
   function fixtureReady() {
     if (!ui.demo || root.TacRoomFixture) return Promise.resolve();
     if (!ui.fixtureLoading) {
-      ui.fixtureLoading = loadScript('tactical/room-fixtures.js?v=2').then(null, function (e) { ui.fixtureLoading = null; throw e; });
+      ui.fixtureLoading = loadScript('tactical/room-fixtures.js?v=3').then(null, function (e) { ui.fixtureLoading = null; throw e; });
     }
     return ui.fixtureLoading;
   }
