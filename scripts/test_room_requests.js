@@ -1198,7 +1198,7 @@ async function t(name, fn) { await fn(); n++; console.log('ok', name); }
       assert.ok(!tools.includes('posFromFire') && !tools.includes('posClear'), 'no Fire panel mortar, no position yet');
       mod.actions.posShare(el({}), api);
       assert.deepStrictEqual([picked.mode, picked.hint], ['position', 'Click the tile you stand on']);
-      picked.fn([30.7, -90.2]);
+      picked.fn([30.7, -89.6]);   // a fractional tile floors: 30, -90
       assert.deepStrictEqual(ops(), [
         ['patch', 'member', 'mem-crew', { pos: { x: 30, y: -90, level: 2 } }],
         ['patch', 'asset', 'asset-mortar-1', { tile: [30, -90], state: 'deployed' }]]);
