@@ -7,6 +7,8 @@
 #        -> paste a fine-grained PAT: this repository only, permission "Issues: Read and write"
 #   3. npx wrangler secret put ROOM_KEYS
 #        -> paste JSON printed by `node scripts/room_token.mjs`, e.g. {"stories-k1":"<secret>"}
+#           (secrets of at least 24 characters; {"stories-k1":{"secret":"<secret>","minIat":<unix s>}}
+#           refuses tokens issued before minIat without changing the secret)
 #   4. npx wrangler secret put ROOM_STOP_SECRET
 #        -> any long random string; stop/start links are signed with it
 #   5. Workers Paid plan (5 USD/month) in the Cloudflare dashboard: the room ceilings below
@@ -21,6 +23,8 @@
 
 name = "chemdb-feedback"
 main = "index.js"
+# Keep this date. A local `wrangler dev` 4.78 does not know it yet and falls back to 2026-03-17;
+# that is expected and does not change the deployed Worker.
 compatibility_date = "2026-09-01"
 
 [vars]
@@ -28,6 +32,14 @@ ALLOWED_ORIGINS = "https://mikameo.github.io"
 ROOMS_ENABLED = "1"
 ROOMS_MAX_CONCURRENT = "6"
 ROOMS_MAX_DAILY = "30"
+# Rooms open at once under one server key (locked and closed rooms do not count).
+ROOMS_MAX_PER_KEY = "3"
+
+# Every /room/<code>/* request: 120 per minute per IP, before the room is looked up.
+[[ratelimits]]
+name = "ROOM_RL"
+namespace_id = "1004"
+simple = { limit = 120, period = 60 }
 
 # 5 submissions per minute per IP (Workers Rate Limiting binding).
 [[ratelimits]]
@@ -54,6 +66,7 @@ class_name = "Room"
 name = "REGISTRY"
 class_name = "Registry"
 
+# Never edit a migration after its first deploy; changes go into a new tag.
 [[migrations]]
 tag = "v1"
 new_sqlite_classes = ["Room", "Registry"]

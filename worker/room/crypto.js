@@ -47,16 +47,30 @@ export async function signServerToken(secret, payload) {
   return body + '.' + await hmac(secret, body);
 }
 
+export const KEY_ID_RE = /^[A-Za-z0-9_-]{1,40}$/;
+export const MIN_SECRET_LENGTH = 24;
+
+// Own properties only: a key id or fork named `constructor` or `__proto__` must not reach Object.prototype.
+export function own(obj, key) {
+  return obj !== null && typeof obj === 'object' && typeof key === 'string' && Object.prototype.hasOwnProperty.call(obj, key) ? obj[key] : undefined;
+}
+
 // Payload {fork, server, keyId, iat} when the signature matches ROOM_KEYS[keyId], else null.
+// A ROOM_KEYS entry is the secret string, or {secret, minIat} to retire tokens issued before minIat.
 export async function verifyServerToken(keysJson, token) {
-  if (typeof token !== 'string') return null;
+  if (typeof token !== 'string' || token.length > 2048) return null;
   const parts = token.split('.');
   if (parts.length !== 2) return null;
   let payload, keys;
   try { payload = JSON.parse(fromB64url(parts[0])); } catch { return null; }
   try { keys = JSON.parse(keysJson || '{}'); } catch { return null; }
-  const secret = payload && typeof payload.keyId === 'string' ? keys[payload.keyId] : null;
-  if (!secret) return null;
+  if (!payload || typeof payload !== 'object' || !keys || typeof keys !== 'object') return null;
+  if (typeof payload.keyId !== 'string' || !KEY_ID_RE.test(payload.keyId)) return null;
+  const entry = own(keys, payload.keyId);
+  const secret = typeof entry === 'string' ? entry : own(entry, 'secret');
+  if (typeof secret !== 'string' || secret.length < MIN_SECRET_LENGTH) return null;
+  const minIat = own(entry, 'minIat');
+  if (typeof minIat === 'number' && !(typeof payload.iat === 'number' && payload.iat >= minIat)) return null;
   return safeEqual(await hmac(secret, parts[0]), parts[1]) ? payload : null;
 }
 

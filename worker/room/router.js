@@ -1,18 +1,23 @@
 // SPDX-License-Identifier: GPL-3.0-only
 // Copyright (C) 2026 MikameO
-// HTTP entry for the officers' room: CORS, sanction token, ceilings, stop links,
-// code → Room object resolution with a 60 s per-isolate cache.
+// HTTP entry for the officers' room: CORS, per-address limits, body caps, the
+// sanction token, ceilings, stop links, and code → Room object resolution with
+// a bounded 60 s per-isolate cache.
 import '../../tactical/room-logic.js';
 import POLICIES from './policies.js';
-import { verifyServerToken, stopSig, safeEqual, rng } from './crypto.js';
+import { verifyServerToken, stopSig, safeEqual, rng, own } from './crypto.js';
 
-const policiesOf = env => env.POLICIES || POLICIES;
+const policyOf = (env, fork) => own(env.POLICIES || POLICIES, fork);
 
 const R = globalThis.TacticalRoomLogic;
 const cache = new Map();
+const CACHE_MAX = 1000;
 const CODE = '[ABCDEFGHJKMNPQRSTUVWXYZ23456789]';
 const ROOM_RE = new RegExp('^/room/(' + CODE + '{6})/(join|ops|snapshot|export|admin)$');
 const PASS_HEADERS = ['Content-Type', 'X-Room-Session', 'X-Room-Observer'];
+// Bodies in UTF-8 bytes: 64 ops at the per-op message limit fit in 300 KB; join and admin bodies are a few fields.
+const BODY_MAX = { ops: 300 * 1024, join: 2 * 1024, admin: 2 * 1024 };
+const bytes = s => new TextEncoder().encode(s).length;
 
 export function isRoomPath(p) {
   return p === '/room' || p.startsWith('/room/') || p.startsWith('/policy/') || p === '/health' ||
@@ -49,8 +54,16 @@ async function cached(key, now, load) {
   const hit = cache.get(key);
   if (hit && now - hit.t < 60000) return hit.v;
   const v = await load();
+  cache.delete(key);
+  if (cache.size >= CACHE_MAX) cache.delete(cache.keys().next().value);
   cache.set(key, { v, t: now });
   return v;
+}
+
+async function limited(limiter, request) {
+  if (!limiter) return false;
+  const { success } = await limiter.limit({ key: request.headers.get('CF-Connecting-IP') || 'unknown' });
+  return !success;
 }
 
 async function stopLink(request, env, path) {
@@ -72,18 +85,15 @@ async function stopLink(request, env, path) {
 }
 
 async function createRoom(request, env, origin, now) {
-  const ip = request.headers.get('CF-Connecting-IP') || 'unknown';
-  if (env.ROOM_CREATE_RL) {
-    const { success } = await env.ROOM_CREATE_RL.limit({ key: ip });
-    if (!success) return reply(429, { error: 'rate' }, origin);
-  }
+  if (await limited(env.ROOM_CREATE_RL, request)) return reply(429, { error: 'rate' }, origin);
   let b;
   try { b = await request.json(); } catch { return reply(400, { error: 'bad-json' }, origin); }
+  if (!b || typeof b !== 'object') return reply(400, { error: 'bad-json' }, origin);
   const keyId = request.headers.get('X-Room-Key-Id') || '';
-  const tok = await verifyServerToken(env.ROOM_KEYS, b && b.token);
-  if (!tok || tok.keyId !== keyId || !policiesOf(env)[tok.fork]) return reply(403, { error: 'sanction' }, origin);
-  const policy = policiesOf(env)[tok.fork];
-  const creator = (b && b.creator) || {};
+  const tok = await verifyServerToken(env.ROOM_KEYS, b.token);
+  const policy = tok ? policyOf(env, tok.fork) : undefined;
+  if (!tok || tok.keyId !== keyId || !policy) return reply(403, { error: 'sanction' }, origin);
+  const creator = b.creator && typeof b.creator === 'object' ? b.creator : {};
   if (!/^[A-Za-z0-9_-]{8,40}$/.test(String(creator.client || ''))) return reply(400, { error: 'client' }, origin);
   if (R.levelOf(policy, creator.post) !== 'staff') return reply(400, { error: 'creator' }, origin);
   if (typeof b.planet !== 'string' || !/^[a-z0-9_.-]{1,40}$/i.test(b.planet)) return reply(400, { error: 'planet' }, origin);
@@ -93,17 +103,27 @@ async function createRoom(request, env, origin, now) {
     const name = 'r-' + code + '-' + now.toString(36) + '-' + attempt;
     const res = await (await registry(env, '/reserve', {
       code, name, keyId, horizonMs,
-      maxConcurrent: Number(env.ROOMS_MAX_CONCURRENT) || 6, maxDaily: Number(env.ROOMS_MAX_DAILY) || 30
+      maxConcurrent: Number(env.ROOMS_MAX_CONCURRENT) || 6, maxDaily: Number(env.ROOMS_MAX_DAILY) || 30,
+      maxPerKey: Number(env.ROOMS_MAX_PER_KEY) || 3
     })).json();
     if (!res.ok && res.reason === 'collision') continue;
     if (!res.ok) return reply(res.reason === 'stopped' ? 403 : 429, { error: res.reason }, origin);
-    const stub = env.ROOMS.get(env.ROOMS.idFromName(name));
-    const init = await stub.fetch(new Request('https://room/init', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, code, fork: tok.fork, server: tok.server, keyId, planet: b.planet, h: String(b.h || ''), creator })
-    }));
-    const data = await init.json();
-    if (!init.ok) return reply(init.status, data, origin);
+    let init, data;
+    try {
+      const stub = env.ROOMS.get(env.ROOMS.idFromName(name));
+      init = await stub.fetch(new Request('https://room/init', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, code, fork: tok.fork, server: tok.server, keyId, planet: b.planet, h: String(b.h || '').slice(0, 40), creator })
+      }));
+      data = await init.json();
+    } catch {
+      init = null;
+    }
+    if (!init || !init.ok) {
+      // The reservation goes back: a failed room never holds a ceiling slot or a code.
+      await registry(env, '/release', { name, code });
+      return init ? reply(init.status, data, origin) : reply(503, { error: 'init' }, origin);
+    }
     return reply(200, Object.assign({ code, fork: tok.fork, server: tok.server }, data), origin);
   }
   return reply(503, { error: 'collision' }, origin);
@@ -120,7 +140,7 @@ export async function routeRoom(request, env) {
   const now = env.NOW ? env.NOW() : Date.now();
 
   if (path.startsWith('/policy/')) {
-    const policy = policiesOf(env)[path.slice('/policy/'.length)];
+    const policy = policyOf(env, path.slice('/policy/'.length));
     return policy ? reply(200, policy, origin, { 'Cache-Control': 'max-age=60' }) : reply(404, { error: 'fork' }, origin);
   }
   if (path === '/health') return reply(200, await (await registry(env, '/health')).json(), origin);
@@ -129,20 +149,23 @@ export async function routeRoom(request, env) {
 
   const m = path.match(ROOM_RE);
   if (!m) return reply(404, { error: 'path' }, origin);
-  if (m[2] === 'join' && env.ROOM_JOIN_RL) {
-    const { success } = await env.ROOM_JOIN_RL.limit({ key: request.headers.get('CF-Connecting-IP') || 'unknown' });
-    if (!success) return reply(429, { error: 'rate' }, origin);
+  if (await limited(env.ROOM_RL, request)) return reply(429, { error: 'rate' }, origin);
+  if (m[2] === 'join' && await limited(env.ROOM_JOIN_RL, request)) return reply(429, { error: 'rate' }, origin);
+  let body;
+  if (request.method === 'POST') {
+    const max = BODY_MAX[m[2]] || BODY_MAX.admin;
+    if (Number(request.headers.get('Content-Length') || 0) > max) return reply(413, { error: 'size' }, origin);
+    body = await request.text();
+    if (bytes(body) > max) return reply(413, { error: 'size' }, origin);
   }
-  const name = await cached('code:' + m[1], now, async () => (await (await registry(env, '/resolve?code=' + m[1])).json()).name);
-  if (!name) return reply(404, { error: 'room' }, origin);
+  const found = await cached('code:' + m[1], now, async () => (await registry(env, '/resolve?code=' + m[1])).json());
+  if (!found.name) return found.rotated ? reply(401, { error: 'rotated' }, origin) : reply(404, { error: 'room' }, origin);
   const headers = {};
   for (const h of PASS_HEADERS) if (request.headers.get(h)) headers[h] = request.headers.get(h);
   const params = new URLSearchParams(url.search);
   params.set('code', m[1]);
-  const inner = new Request('https://room/' + m[2] + '?' + params.toString(), {
-    method: request.method, headers, body: request.method === 'POST' ? await request.text() : undefined
-  });
-  const res = await env.ROOMS.get(env.ROOMS.idFromName(name)).fetch(inner);
+  const inner = new Request('https://room/' + m[2] + '?' + params.toString(), { method: request.method, headers, body });
+  const res = await env.ROOMS.get(env.ROOMS.idFromName(found.name)).fetch(inner);
   const out = new Response(res.body, res);
   for (const [k, v] of Object.entries(corsHeaders(origin))) out.headers.set(k, v);
   return out;
