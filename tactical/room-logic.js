@@ -4,14 +4,15 @@
 // See LICENSE for details.
 //
 // Room semantics shared by tactical/room.js (browser) and worker/room/*.js
-// (Cloudflare Worker): the op log, rights by policy, expiry, clocks and codes.
-// No DOM, no fetch. Contract: docs/design/2026-09-13-tactical-tablet.md,
+// (Cloudflare Worker): the op log, rights by policy, write validation, expiry,
+// clocks and codes. No DOM, no fetch. Contract: docs/design/2026-09-13-tactical-tablet.md,
 // section «Поправки по итогам war-room». Tests: scripts/test_room_logic.js.
 (function (root) {
   'use strict';
 
   var CODE_ALPHABET = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
   var CODE_RE = /^[ABCDEFGHJKMNPQRSTUVWXYZ23456789]+$/;
+  var ID_RE = /^[A-Za-z0-9_-]{1,40}$/;
   var REQUEST_TYPES = ['mortar', 'position', 'ob', 'cas', 'supply', 'medevac', 'other'];
   var REQUEST_FLOW = {
     requested: ['accepted', 'denied'],
@@ -24,6 +25,40 @@
   var KIND_LAYER = { request: 'requests', asset: 'assets', calibration: 'shared' };
   // Which asset a request type is aimed at: CAS requests belong to the dropship pilot.
   var REQUEST_ASSET = { mortar: 'mortar', position: 'mortar', ob: 'ob', cas: 'dropship', supply: 'supply', medevac: 'medevac' };
+  // Manual asset states per asset type, as the board in tactical/room-requests.js offers them.
+  var ASSET_STATES = {
+    mortar: ['deployed', 'moving', 'destroyed'], ob: ['ready', 'loading', 'cooldown'],
+    dropship: ['offline', 'ship', 'to_lz', 'on_lz', 'flyby', 'cooldown'], supply: ['ready', 'cooldown'], medevac: ['available', 'unavailable']
+  };
+  var PRIORITIES = ['urgent', 'normal'];
+  var REQUEST_FLAGS = ['beacon'];
+  var MAX_COORD = 4096;
+  // Write allowlists: any other key in op.data is refused with 'fields'.
+  var FIELDS = {
+    requestPut: ['type', 'target', 'note', 'priority', 'flags', 'level', 'h', 'markerId'],
+    requestPatch: ['status', 'reason', 'note', 'priority', 'flags', 'relayed'],
+    asset: ['tile', 'state', 'claimedBy', 'shell', 'radius', 'notes', 'label'],
+    shape: ['cat', 'label', 'x', 'y', 'points', 'smooth', 'level', 'h', 'layer', 'ttl', 'relayed', 'confirmedAt'],
+    calibration: ['offset'],
+    member: ['presentAt']
+  };
+  // Keys a client never sets: object bookkeeping, server stamps and prototype names.
+  var RESERVED = ['id', 'kind', 'seq', 'at', 'by', 'deleted', 'deletedAt', 'pending', 'cid',
+    'acceptedBy', 'deniedBy', 'firedAt', 'doneAt', '__proto__', 'constructor', 'prototype'];
+
+  function has(o, k) { return Object.prototype.hasOwnProperty.call(o, k); }
+  function isObj(v) { return v !== null && typeof v === 'object' && !Array.isArray(v); }
+  function isNum(v) { return typeof v === 'number' && isFinite(v); }
+  function isCoord(v) { return isNum(v) && Math.floor(v) === v && Math.abs(v) <= MAX_COORD; }
+  function codePoints(s) { return String(s).match(/[\ud800-\udbff][\udc00-\udfff]|[\s\S]/g) || []; }
+  function isText(v, max) { return typeof v === 'string' && codePoints(v).length <= max; }
+  function unknownKey(data, allowed) {
+    var keys = Object.keys(data);
+    for (var i = 0; i < keys.length; i++) if (allowed.indexOf(keys[i]) < 0) return true;
+    return false;
+  }
+  var OK = { ok: true };
+  function no(reason) { return { ok: false, reason: reason }; }
 
   function createState(seq) {
     return { seq: seq || 0, objects: {}, members: {}, epoch: 0, locked: false, closed: false, frozenAt: null };
@@ -51,8 +86,9 @@
     if (who.indexOf('asset-owner') >= 0 && obj) {
       var type = assetTypeOf(obj);
       if (type && assetOwnerPost(policy, type) === member.post) return true;
+      if (!member.client) return false;
       if (extra && extra.claimed && extra.claimed.indexOf(member.client) >= 0) return true;
-      if (obj.claimedBy && obj.claimedBy === member.client) return true;
+      if (obj.kind === 'asset' && obj.claimedBy === member.client) return true;
     }
     return false;
   }
@@ -70,68 +106,72 @@
   function layerWritable(policy, member, layer) {
     var level = levelOf(policy, member.post);
     var key = layer.indexOf('squad:') === 0 ? 'squad:*' : layer;
-    var def = policy.layers[key];
+    var def = has(policy.layers, key) ? policy.layers[key] : null;
     if (!def || def.write.indexOf(level) < 0) return false;
     if (key === 'squad:*' && layer !== 'squad:' + member.squad) return false;
     return true;
   }
 
-  // {ok:true} or {ok:false, reason}. `existing` is the current object for patch/del;
+  // {ok:true} or {ok:false, reason}. `existing` is the current object for the op's id;
   // `extra` is {claimed: claimants(objects, existing)} for request patches.
+  // Validate the data first (validateData for put, validatePatch for patch).
   function canWrite(policy, member, op, existing, extra) {
-    if (!member || !member.confirmed) return { ok: false, reason: 'unconfirmed' };
+    if (!member || !member.confirmed) return no('unconfirmed');
     var level = levelOf(policy, member.post);
-    if (!level || level === 'observer') return { ok: false, reason: 'level' };
-    var kind = op.kind;
-    if (kind === 'calibration') return hasRight(policy, member, 'publishCalibration') ? { ok: true } : { ok: false, reason: 'right' };
-    if (op.op === 'del') {
-      if (!existing) return { ok: false, reason: 'missing' };
-      if (existing.by && existing.by.client === member.client) return { ok: true };
-      return hasRight(policy, member, 'kick') ? { ok: true } : { ok: false, reason: 'right' };
-    }
+    if (!level || level === 'observer') return no('level');
+    var kind = op.kind, d = op.data || {}, keys = Object.keys(d);
+    var mine = !!(member.client && existing && existing.by && existing.by.client === member.client);
+    if (kind === 'calibration') return hasRight(policy, member, 'publishCalibration') ? OK : no('right');
+    // A put never replaces a live object: the same client repeating it is a duplicate, anyone else clashes.
+    if (op.op === 'put' && existing) return no(existing.deleted ? 'deleted' : mine ? 'duplicate' : 'exists');
+    if (op.op !== 'put' && !existing) return no('missing');
+    if (op.op === 'del') return mine || hasRight(policy, member, 'kick') ? OK : no('right');
     if (kind === 'request') {
-      if (op.op === 'put') return layerWritable(policy, member, 'requests') ? { ok: true } : { ok: false, reason: 'layer' };
-      if (!existing) return { ok: false, reason: 'missing' };
-      var d = op.data || {};
-      var author = existing.by && existing.by.client === member.client;
-      if (d.status === 'denied' && existing.status === 'requested' && author) return { ok: true };
-      if (d.status === 'loaded') {
-        var def = assetDef(policy, assetTypeOf(existing));
-        return (def && def.loader === member.post) || isStaff(policy, member) ? { ok: true } : { ok: false, reason: 'right' };
+      if (op.op === 'put') return layerWritable(policy, member, 'requests') ? OK : no('layer');
+      if (!keys.length) return no('fields');
+      if (d.status !== undefined) {
+        if (unknownKey(d, ['status', 'reason'])) return no('fields');
+        // The author withdraws a waiting request and recalls an accepted one; carrying it out is the crew's.
+        if (mine && d.status !== 'denied') return no('author');
+        if (mine && (existing.status === 'requested' || existing.status === 'accepted')) return OK;
+        if (d.status === 'loaded') {
+          if (existing.type !== 'ob') return no('transition');
+          var def = assetDef(policy, assetTypeOf(existing));
+          return (def && def.loader === member.post) || isStaff(policy, member) ? OK : no('right');
+        }
+        return hasRight(policy, member, 'acceptRequest', existing, extra) ? OK : no('right');
       }
-      if (d.status !== undefined) return hasRight(policy, member, 'acceptRequest', existing, extra) ? { ok: true } : { ok: false, reason: 'right' };
-      if (d.flags !== undefined || d.note !== undefined || d.relayed !== undefined) return { ok: true };
-      return author ? { ok: true } : { ok: false, reason: 'right' };
+      if (unknownKey(d, ['note', 'flags', 'priority', 'relayed'])) return no('fields');
+      if (keys.length === 1 && keys[0] === 'relayed') return OK;
+      return mine || isStaff(policy, member) ? OK : no('right');
     }
     if (kind === 'asset') {
-      // Claiming a crew seat: staff, services, or a squad member labelled «mortar crew».
-      var claimOnly = op.op === 'patch' && op.data && Object.keys(op.data).join() === 'claimedBy';
-      if (claimOnly) {
+      if (op.op === 'put') return no('right');   // assets come from the policy, seeded when the room opens
+      if (has(d, 'claimedBy')) {
+        // Claiming a crew seat: only claimable assets, only for oneself; staff may also clear a claim.
+        var adef = assetDef(policy, existing.type);
+        if (keys.length !== 1) return no('fields');
         var crew = (member.functions || []).indexOf('mortar') >= 0 || level !== 'squad';
-        return crew ? { ok: true } : { ok: false, reason: 'right' };
+        if (!adef || !adef.claimable || !crew || !member.client) return no('right');
+        if (d.claimedBy === null) return existing.claimedBy === member.client || isStaff(policy, member) ? OK : no('right');
+        return d.claimedBy === member.client ? OK : no('right');
       }
-      if (!layerWritable(policy, member, 'assets')) return { ok: false, reason: 'layer' };
-      if (op.op === 'put') return { ok: true };
-      var owner = existing && ((existing.owner && existing.owner.post === member.post) || existing.claimedBy === member.client);
-      return owner || isStaff(policy, member) ? { ok: true } : { ok: false, reason: 'right' };
+      if (!layerWritable(policy, member, 'assets')) return no('layer');
+      var owner = (existing.owner && existing.owner.post === member.post) || (!!member.client && existing.claimedBy === member.client);
+      return owner || isStaff(policy, member) ? OK : no('right');
     }
     // marker / line / area: anyone confirmed may mark an enemy still there or relayed
-    if (op.op === 'patch' && existing) {
-      var keys = Object.keys(op.data || {});
-      if (keys.length && keys.every(function (k) { return k === 'confirmedAt' || k === 'relayed'; })) return { ok: true };
-    }
-    var layer = (op.data && op.data.layer) || (existing && existing.layer);
-    if (!layer || !layerWritable(policy, member, layer)) return { ok: false, reason: 'layer' };
-    if (op.op === 'patch' && existing && existing.by && existing.by.client !== member.client && !isStaff(policy, member)) {
-      return { ok: false, reason: 'right' };
-    }
-    return { ok: true };
+    if (op.op === 'patch' && keys.length && keys.every(function (k) { return k === 'confirmedAt' || k === 'relayed'; })) return OK;
+    var layer = d.layer || (existing && existing.layer);
+    if (!layer || !layerWritable(policy, member, layer)) return no('layer');
+    if (op.op === 'patch' && !mine && !isStaff(policy, member)) return no('right');
+    return OK;
   }
 
   // Applies a server-stamped op {seq, at, by, op, kind, id, data, expectedStatus}.
   function applyOp(state, op) {
     if (state.closed) return { ok: false, reason: 'closed' };
-    var cur = state.objects[op.id];
+    var cur = has(state.objects, op.id) ? state.objects[op.id] : undefined;
     if (op.op === 'put') {
       if (cur && cur.deleted) return { ok: false, reason: 'deleted' };
       var obj = {};
@@ -191,44 +231,165 @@
 
   // Hints only: nothing switches state by itself. impactAt/readyAt in ms of server time.
   function deadlines(type, firedAt, constants, policy) {
-    var c = constants || {};
-    if (type === 'mortar') return { impactAt: firedAt + ((c.mortar.travelDelay + c.mortar.impactDelay) * 1000), readyAt: null };
-    if (type === 'ob') return { impactAt: firedAt + c.ob.timeline.impact * 1000, readyAt: firedAt + (c.ob.timeline.impact + c.ob.cooldown) * 1000 };
+    var c = constants || {}, none = { impactAt: null, readyAt: null };
+    if (type === 'mortar') return c.mortar ? { impactAt: firedAt + ((c.mortar.travelDelay + c.mortar.impactDelay) * 1000), readyAt: null } : none;
+    if (type === 'ob') {
+      if (!c.ob || !c.ob.timeline) return none;
+      return { impactAt: firedAt + c.ob.timeline.impact * 1000, readyAt: firedAt + (c.ob.timeline.impact + c.ob.cooldown) * 1000 };
+    }
     var asset = null;
     for (var i = 0; i < policy.assets.length; i++) if (policy.assets[i].type === type) asset = policy.assets[i];
     if (type === 'supply') return { impactAt: null, readyAt: asset ? firedAt + asset.cooldownSec * 1000 : null };
     if (type === 'dropship') return { impactAt: null, readyAt: asset ? firedAt + asset.flyBySec * 1000 : null };
-    return { impactAt: null, readyAt: null };
+    return none;
   }
 
+  // One line of plain text: line breaks become spaces, control and invisible
+  // format characters go, runs of spaces collapse; cut at `max` code points.
   function cleanText(s, max) {
-    return String(s == null ? '' : s).replace(/[\u0000-\u001f\u007f]/g, '').replace(/\s+/g, ' ').trim().slice(0, max);
+    var t = String(s == null ? '' : s).replace(/[\t\r\n]/g, ' ')
+      .replace(/[\u0000-\u001f\u007f-\u009f\u200b-\u200f\u202a-\u202e\u2066-\u2069\ufeff]/g, '')
+      .replace(/\s+/g, ' ').trim();
+    var cps = codePoints(t);
+    return cps.length > max ? cps.slice(0, max).join('').replace(/\s+$/, '') : t;
   }
-  // null when acceptable, otherwise the failing field name.
-  function validateData(policy, kind, data) {
+
+  function validOffset(v) { return Array.isArray(v) && v.length === 2 && isNum(v[0]) && isNum(v[1]); }
+  function validFlags(v) {
+    if (!Array.isArray(v) || v.length > 8) return false;
+    for (var i = 0; i < v.length; i++) if (REQUEST_FLAGS.indexOf(v[i]) < 0) return false;
+    return true;
+  }
+  function validPoints(v, max, min) {
+    if (!Array.isArray(v) || v.length > max || v.length < min) return false;
+    for (var i = 0; i < v.length; i++) if (!Array.isArray(v[i]) || v[i].length !== 2 || !isNum(v[i][0]) || !isNum(v[i][1])) return false;
+    return true;
+  }
+  function validState(v, type) {
+    if (typeof v !== 'string') return false;
+    if (type && has(ASSET_STATES, type)) return ASSET_STATES[type].indexOf(v) >= 0;
+    for (var t in ASSET_STATES) if (has(ASSET_STATES, t) && ASSET_STATES[t].indexOf(v) >= 0) return true;
+    return false;
+  }
+
+  function requestFields(policy, data) {
     var L = policy.limits;
-    if (!data || typeof data !== 'object') return 'data';
-    if (data.label !== undefined && String(data.label).length > L.label) return 'label';
-    if (data.note !== undefined && String(data.note).length > L.note) return 'note';
-    if (data.callsign !== undefined && String(data.callsign).length > L.callsign) return 'callsign';
-    if (kind === 'line' || kind === 'area') {
-      if (!Array.isArray(data.points) || data.points.length > L.points) return 'points';
-      if (data.points.length < (kind === 'area' ? 3 : 2)) return 'points';
-    }
-    if (kind === 'marker' && (typeof data.x !== 'number' || typeof data.y !== 'number')) return 'xy';
-    if (kind === 'request') {
-      if (REQUEST_TYPES.indexOf(data.type) < 0) return 'type';
-      if (!data.target || typeof data.target.x !== 'number' || typeof data.target.y !== 'number') return 'target';
-      if (data.flags !== undefined && !Array.isArray(data.flags)) return 'flags';
-    }
+    if (has(data, 'status') && !(typeof data.status === 'string' && has(REQUEST_FLOW, data.status))) return 'status';
+    if (has(data, 'reason') && !isText(data.reason, L.note)) return 'reason';
+    if (has(data, 'note') && !isText(data.note, L.note)) return 'note';
+    if (has(data, 'priority') && PRIORITIES.indexOf(data.priority) < 0) return 'priority';
+    if (has(data, 'flags') && !validFlags(data.flags)) return 'flags';
+    if (has(data, 'level') && !isNum(data.level)) return 'level';
+    if (has(data, 'h') && !isText(data.h, 40)) return 'h';
+    if (has(data, 'markerId') && data.markerId !== null && !(typeof data.markerId === 'string' && ID_RE.test(data.markerId))) return 'markerId';
+    if (has(data, 'relayed') && typeof data.relayed !== 'boolean') return 'relayed';
     return null;
+  }
+
+  function assetFields(policy, data, type) {
+    var L = policy.limits;
+    if (has(data, 'tile') && data.tile !== null && !(Array.isArray(data.tile) && data.tile.length === 2 && isCoord(data.tile[0]) && isCoord(data.tile[1]))) return 'tile';
+    if (has(data, 'state') && data.state !== null && !validState(data.state, type)) return 'state';
+    if (has(data, 'claimedBy') && data.claimedBy !== null && !(typeof data.claimedBy === 'string' && data.claimedBy.length <= 64)) return 'claimedBy';
+    if (has(data, 'shell') && data.shell !== null && !(typeof data.shell === 'string' && data.shell.length <= 40)) return 'shell';
+    if (has(data, 'radius') && data.radius !== null && !(isNum(data.radius) && data.radius > 0 && data.radius <= 100)) return 'radius';
+    if (has(data, 'notes') && data.notes !== null && !isText(data.notes, L.note)) return 'notes';
+    if (has(data, 'label') && data.label !== null && !isText(data.label, L.label)) return 'label';
+    return null;
+  }
+
+  function shapeFields(policy, kind, data, isPut) {
+    var L = policy.limits;
+    if (unknownKey(data, FIELDS.shape)) return 'fields';
+    if (has(data, 'cat') && !(typeof data.cat === 'string' && /^[a-z_]{1,20}$/.test(data.cat))) return 'cat';
+    if (has(data, 'label') && !isText(data.label, L.label)) return 'label';
+    if ((kind === 'marker' && isPut) || has(data, 'x') || has(data, 'y')) {
+      if (!isNum(data.x) || !isNum(data.y)) return 'xy';
+    }
+    if (kind === 'line' || kind === 'area') {
+      if ((isPut || has(data, 'points')) && !validPoints(data.points, L.points, kind === 'area' ? 3 : 2)) return 'points';
+    } else if (has(data, 'points')) {
+      return 'points';
+    }
+    if (has(data, 'smooth') && typeof data.smooth !== 'boolean') return 'smooth';
+    if (has(data, 'level') && !isNum(data.level)) return 'level';
+    if (has(data, 'h') && data.h !== null && !isText(data.h, 40)) return 'h';
+    if (has(data, 'layer') && !(typeof data.layer === 'string' && /^[a-z]{1,20}(:[a-z0-9_-]{1,20})?$/.test(data.layer))) return 'layer';
+    if (has(data, 'ttl') && !(isNum(data.ttl) && data.ttl > 0 && data.ttl <= 86400)) return 'ttl';
+    if (has(data, 'relayed') && typeof data.relayed !== 'boolean') return 'relayed';
+    return null;
+  }
+
+  // Put data: null when acceptable, otherwise the failing field ('fields' for a key off the allowlist).
+  function validateData(policy, kind, data) {
+    if (!isObj(data)) return 'data';
+    if (kind === 'request') {
+      if (unknownKey(data, FIELDS.requestPut)) return 'fields';
+      if (REQUEST_TYPES.indexOf(data.type) < 0) return 'type';
+      if (data.type !== 'other' && !assetDef(policy, REQUEST_ASSET[data.type])) return 'type';
+      if (!isObj(data.target) || !isCoord(data.target.x) || !isCoord(data.target.y)) return 'target';
+      return requestFields(policy, data);
+    }
+    if (kind === 'marker' || kind === 'line' || kind === 'area') return shapeFields(policy, kind, data, true);
+    if (kind === 'calibration') return unknownKey(data, FIELDS.calibration) ? 'fields' : validOffset(data.offset) ? null : 'offset';
+    if (kind === 'asset') return unknownKey(data, FIELDS.asset.concat(['type', 'n'])) ? 'fields' : assetFields(policy, data, data.type);
+    return 'kind';
+  }
+
+  // Patch data, the same answer shape. `existing` (optional) narrows asset states to its type.
+  function validatePatch(policy, kind, data, existing) {
+    if (!isObj(data)) return 'data';
+    if (!Object.keys(data).length) return 'fields';
+    if (kind === 'request') return unknownKey(data, FIELDS.requestPatch) ? 'fields' : requestFields(policy, data);
+    if (kind === 'asset') {
+      if (unknownKey(data, FIELDS.asset)) return 'fields';
+      if (has(data, 'claimedBy') && Object.keys(data).length > 1) return 'fields';
+      return assetFields(policy, data, existing ? existing.type : null);
+    }
+    if (kind === 'marker' || kind === 'line' || kind === 'area') return shapeFields(policy, kind, data, false);
+    if (kind === 'calibration') return unknownKey(data, FIELDS.calibration) ? 'fields' : validOffset(data.offset) ? null : 'offset';
+    if (kind === 'member') return unknownKey(data, FIELDS.member) ? 'fields' : null;
+    return 'kind';
+  }
+
+  // Client op data as the server accepts it, before validation: reserved and
+  // server-stamped keys dropped, texts cleaned, the request target rebuilt as {x, y}.
+  function cleanData(policy, kind, op, raw) {
+    var L = policy.limits, data = {};
+    if (op === 'del' || !isObj(raw)) return data;
+    var keys = Object.keys(raw);
+    for (var i = 0; i < keys.length; i++) {
+      var k = keys[i];
+      if (RESERVED.indexOf(k) >= 0) continue;
+      if (kind === 'request' && op === 'put' && (k === 'status' || k === 'layer')) continue;
+      data[k] = raw[k];
+    }
+    var texts = { label: L.label, note: L.note, reason: L.note, notes: L.note, callsign: L.callsign };
+    for (var t in texts) if (has(texts, t) && typeof data[t] === 'string') data[t] = cleanText(data[t], texts[t]);
+    if (kind === 'request' && isObj(data.target)) data.target = { x: data.target.x, y: data.target.y };
+    return data;
+  }
+
+  // Server fields, set only after validation and rights: who accepted or denied, when fired or done.
+  function stampData(kind, op, data, by, now) {
+    if (kind === 'request' && op === 'put') data.status = 'requested';
+    if (kind === 'request' && op === 'patch') {
+      if (data.status === 'accepted') data.acceptedBy = by;
+      if (data.status === 'firing') data.firedAt = now;
+      if (data.status === 'done') data.doneAt = now;
+      if (data.status === 'denied') data.deniedBy = by;
+    }
+    if (has(data, 'confirmedAt')) data.confirmedAt = now;
+    if (kind === 'member' && has(data, 'presentAt')) data.presentAt = now;
+    if (kind === 'marker' && op === 'put' && data.cat === 'enemy' && data.relayed === undefined) data.relayed = false;
+    return data;
   }
 
   function parseEntry(str) {
     var s = String(str || '').trim().toUpperCase().replace(/\s+/g, '');
     var parts = s.split('-');
-    if (parts.length > 2 || !parts[0]) return null;
-    if (!CODE_RE.test(parts[0]) || (parts[1] !== undefined && !CODE_RE.test(parts[1]))) return null;
+    if (parts.length > 2 || parts[0].length !== 6 || !CODE_RE.test(parts[0])) return null;
+    if (parts[1] !== undefined && (parts[1].length !== 4 || !CODE_RE.test(parts[1]))) return null;
     return { code: parts[0], postCode: parts[1] || null };
   }
   function randomCode(len, rng) {
@@ -260,13 +421,16 @@
   }
 
   // Buttons a member gets on a request card, by state and rights. `extra` as in hasRight.
+  // The crew (an owner who is not the author) carries a request out; the author only
+  // withdraws it while it waits, recalls it once accepted, and repeats a closed one.
   function requestActions(policy, member, req, extra) {
-    if (!member || !member.confirmed || req.deleted) return [];
-    var owner = hasRight(policy, member, 'acceptRequest', req, extra);
-    var author = !!(req.by && req.by.client === member.client);
-    var crew = owner && !author;   // whoever carries it out, never whoever asked
+    if (!member || !member.confirmed || !req || req.deleted) return [];
+    var level = levelOf(policy, member.post);
+    if (!level || level === 'observer') return [];
+    var author = !!(member.client && req.by && req.by.client === member.client);
+    var crew = !author && hasRight(policy, member, 'acceptRequest', req, extra);
     var def = assetDef(policy, assetTypeOf(req));
-    var loader = !!(def && def.loader === member.post) || isStaff(policy, member);
+    var loader = !author && (!!(def && def.loader === member.post) || isStaff(policy, member));
     var out = [];
     if (req.status === 'requested') {
       if (crew) out.push('accept', 'deny');
@@ -275,13 +439,14 @@
       if (req.type === 'mortar' && crew) out.push('take');
       if (req.type === 'position' && crew) out.push('place');
       if (req.type === 'ob' && loader) out.push('load');
-      if (['mortar', 'ob', 'position'].indexOf(req.type) < 0 && owner) out.push('fire');
-      if (owner) out.push('done', 'deny');
+      if (['mortar', 'ob', 'position'].indexOf(req.type) < 0 && crew) out.push('fire');
+      if (crew) out.push('done', 'deny');
+      if (author) out.push('cancel');
     } else if (req.status === 'loaded') {
-      if (owner) out.push('fire', 'deny');
+      if (crew) out.push('fire', 'deny');
     } else if (req.status === 'firing') {
-      if (owner) out.push('done');
-    } else if (author) {
+      if (crew) out.push('done');
+    } else if (author && (req.status === 'done' || req.status === 'denied')) {
       out.push('repeat');
     }
     return out;
@@ -332,13 +497,15 @@
 
   root.TacticalRoomLogic = {
     CODE_ALPHABET: CODE_ALPHABET, REQUEST_TYPES: REQUEST_TYPES, REQUEST_FLOW: REQUEST_FLOW, REQUEST_ASSET: REQUEST_ASSET,
+    ASSET_STATES: ASSET_STATES,
     assetDef: assetDef, assetTypeOf: assetTypeOf, claimants: claimants, requestActions: requestActions,
     simplify: simplify, smoothSegments: smoothSegments, snapPoints: snapPoints,
     createState: createState, postDef: postDef, levelOf: levelOf, isStaff: isStaff, hasRight: hasRight,
     assetOwnerPost: assetOwnerPost, layerWritable: layerWritable, canWrite: canWrite, applyOp: applyOp,
     markerAge: markerAge, expired: expired, enemyAlpha: enemyAlpha, visibleObjects: visibleObjects,
     clockOffset: clockOffset, serverNowEst: serverNowEst, countdown: countdown, deadlines: deadlines,
-    cleanText: cleanText, validateData: validateData, parseEntry: parseEntry, randomCode: randomCode,
+    cleanText: cleanText, validateData: validateData, validatePatch: validatePatch, cleanData: cleanData, stampData: stampData,
+    parseEntry: parseEntry, randomCode: randomCode,
     levelStyle: levelStyle, markerShape: markerShape, retryAfter: retryAfter, roomDeadlines: roomDeadlines,
     idleLocked: idleLocked, memberStale: memberStale, mergePending: mergePending
   };

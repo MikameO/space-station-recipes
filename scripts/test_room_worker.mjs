@@ -7,9 +7,11 @@ import { Registry } from '../worker/room/registry.js';
 import { signServerToken, stopSig } from '../worker/room/crypto.js';
 import { chronology } from '../worker/room/export.js';
 import FULL from './fixtures/room_policy_full.json' with { type: 'json' };
+import STAGE1 from '../tactical/policy/stories_cm.json' with { type: 'json' };
 
 const ORIGIN = 'https://mikameo.github.io';
-const SECRET = 'test-key-secret';
+// Server key secrets are at least 24 characters since the sanction hardening (crypto.js MIN_SECRET_LENGTH).
+const SECRET = 'test-key-secret-0123456789';
 const STOP = 'test-stop-secret';
 const clone = v => (v === undefined ? undefined : structuredClone(v));
 
@@ -20,10 +22,16 @@ class FakeStorage {
     return clone(this.map.get(k));
   }
   async put(k, v) {
-    if (typeof k === 'object') { for (const [kk, vv] of Object.entries(k)) { this.map.set(kk, clone(vv)); this.writes++; } return; }
+    if (typeof k === 'object') {
+      // Durable Object storage takes at most 128 keys per call.
+      if (Object.keys(k).length > 128) throw new Error('put: more than 128 keys');
+      for (const [kk, vv] of Object.entries(k)) { this.map.set(kk, clone(vv)); this.writes++; }
+      return;
+    }
     this.map.set(k, clone(v)); this.writes++;
   }
   async delete(k) {
+    if (Array.isArray(k) && k.length > 128) throw new Error('delete: more than 128 keys');
     const keys = Array.isArray(k) ? k : [k]; let n = 0;
     for (const x of keys) { if (this.map.delete(x)) n++; this.writes++; }
     return Array.isArray(k) ? n : n > 0;
@@ -70,12 +78,12 @@ function makeEnv(over = {}) {
   return env;
 }
 
-function call(env, method, path, { body, session, observer, keyId, origin = ORIGIN } = {}) {
+function call(env, method, path, { body, raw, session, observer, keyId, origin = ORIGIN } = {}) {
   const headers = { Origin: origin, 'Content-Type': 'application/json' };
   if (session) headers['X-Room-Session'] = session;
   if (observer) headers['X-Room-Observer'] = observer;
   if (keyId) headers['X-Room-Key-Id'] = keyId;
-  return routeRoom(new Request('https://w.example' + path, { method, headers, body: body ? JSON.stringify(body) : undefined }), env);
+  return routeRoom(new Request('https://w.example' + path, { method, headers, body: raw !== undefined ? raw : body ? JSON.stringify(body) : undefined }), env);
 }
 
 const token = await signServerToken(SECRET, { fork: 'stories_cm', server: 'Space Stories - Marine Corps Core', keyId: 'stories-k1', iat: 1 });
@@ -139,10 +147,11 @@ let coSession = created.session;
 const codeOf = (post, squad) => sheet.find(s => s.post === post && s.squad === (squad || null)).code;
 let slSession, ftlSession;
 
-await t('create returns a code, a session, an observer token and the briefing sheet', async () => {
+await t('create returns a code, a session and the briefing sheet; no observer link yet', async () => {
   assert.match(code, /^[ABCDEFGHJKMNPQRSTUVWXYZ23456789]{6}$/);
   assert.strictEqual(sheet.length, 1 + 1 + 3 + 2 + 5 + 20 + 2 + 2 + 2);
-  assert.ok(created.observerToken.length >= 20);
+  // Changed: the observer link is off by default; staff mint it with the `observer` admin action.
+  assert.strictEqual(created.observerToken, undefined);
   const r = await call(env, 'GET', `/room/${code}/ops?since=0`, { session: coSession });
   assert.strictEqual(r.status, 200);
   const body = await r.json();
@@ -166,8 +175,9 @@ await t('post code joins as knocking; knocking reads nothing and writes nothing'
 
 await t('a used post code refuses another client', async () => {
   const r = await call(env, 'POST', `/room/${code}/join`, { body: { client: 'client-xeno-01', postCode: codeOf('sl', 'bravo') } });
-  assert.strictEqual(r.status, 409);
-  assert.strictEqual((await r.json()).error, 'used');
+  // Changed: a used code answers like an unknown one (404 postCode), so codes cannot be probed.
+  assert.strictEqual(r.status, 404);
+  assert.strictEqual((await r.json()).error, 'postCode');
 });
 
 await t('any confirmed member confirms one knock with a single click', async () => {
@@ -265,9 +275,11 @@ await t('export: no sessions or words, chronology in game coordinates', async ()
   assert.ok(!/sess:|"hash"|"word":"[^"]/.test(raw));
   const body = JSON.parse(raw);
   assert.match(body.text, /метка «ксено» 253 -198/);
-  const obs = await call(env, 'GET', `/room/${code}/export`, { observer: created.observerToken });
+  // Changed: the observer token is minted by staff, not returned at create.
+  const observerToken = (await (await call(env, 'POST', `/room/${code}/admin`, { session: coSession, body: { action: 'observer' } })).json()).observerToken;
+  const obs = await call(env, 'GET', `/room/${code}/export`, { observer: observerToken });
   assert.strictEqual(obs.status, 200);
-  const obsWrite = await call(env, 'POST', `/room/${code}/ops`, { observer: created.observerToken, body: { ops: [] } });
+  const obsWrite = await call(env, 'POST', `/room/${code}/ops`, { observer: observerToken, body: { ops: [] } });
   assert.strictEqual(obsWrite.status, 403);
 });
 
@@ -299,6 +311,291 @@ await t('lifetime: close at max, export during grace, delete after grace', async
 await t('chronology names posts and squads', () => {
   const text = chronology([{ seq: 1, at: Date.UTC(2026, 8, 13, 18, 5, 7), by: { client: 'c', post: 'sl', squad: 'bravo' }, op: 'put', kind: 'marker', id: 'm', data: { label: 'ксено', x: 1, y: 2 } }], FULL, [10, 20]);
   assert.strictEqual(text, '18:05:07  Командир отряда Браво  метка «ксено» 11 22');
+});
+
+// ── Stage 1 rooms on the shipping policy: write contract v2 and the Worker review ─────────
+const stage1Env = (over = {}) => makeEnv(Object.assign({ POLICIES: { stories_cm: STAGE1 } }, over));
+const SO = { client: 'client-so-0001', post: 'so', callsign: 'Орлов' };
+const createStage1 = env => call(env, 'POST', '/room', { keyId: 'stories-k1', body: { token, planet: 'lv624', h: 'ee8dd1d6d4a4', creator: SO } });
+async function stage1Room(env) {
+  const res = await createStage1(env);
+  const c = await res.json();
+  assert.strictEqual(res.status, 200, JSON.stringify(c));
+  return { c, code: c.code, so: c.session, room: [...env.ROOMS.instances.values()].at(-1), mortarCode: c.sheet.find(s => s.post === 'mortar').code };
+}
+const send = (env, r, session, ops) => call(env, 'POST', `/room/${r.code}/ops`, { session, body: { ops } }).then(res => res.json());
+const pollRoom = (env, r, session) => call(env, 'GET', `/room/${r.code}/ops?since=0`, { session });
+const adminAs = (env, r, session, body) => call(env, 'POST', `/room/${r.code}/admin`, { session, body });
+async function joinMortar(env, r, client = 'client-mortar-01') {
+  const j = await (await call(env, 'POST', `/room/${r.code}/join`, { body: { client, postCode: r.mortarCode, callsign: 'Сидоров' } })).json();
+  assert.strictEqual((await adminAs(env, r, r.so, { action: 'confirm', client, word: j.word })).status, 200);
+  return j.session;
+}
+const errorOf = async res => [res.status, (await res.json()).error];
+
+await t('sanction: inherited key ids, short secrets and retired tokens are refused; /policy/constructor is 404', async () => {
+  const env = stage1Env();
+  for (const [keyId, secret] of [['constructor', String(Object)], ['__proto__', String(Object.prototype)], ['toString', String(Object.prototype.toString)]]) {
+    const forged = await signServerToken(secret, { fork: 'stories_cm', server: 'FORGED', keyId, iat: 1 });
+    assert.strictEqual((await call(env, 'POST', '/room', { keyId, body: { token: forged, planet: 'lv624', creator: SO } })).status, 403, keyId);
+  }
+  for (const p of ['constructor', '__proto__', 'toString', 'hasOwnProperty']) assert.strictEqual((await call(env, 'GET', '/policy/' + p)).status, 404, p);
+  const short = stage1Env({ ROOM_KEYS: JSON.stringify({ 'stories-k1': 'short-secret' }) });
+  const shortToken = await signServerToken('short-secret', { fork: 'stories_cm', server: 'S', keyId: 'stories-k1', iat: 1 });
+  assert.strictEqual((await call(short, 'POST', '/room', { keyId: 'stories-k1', body: { token: shortToken, planet: 'lv624', creator: SO } })).status, 403);
+  const retired = stage1Env({ ROOM_KEYS: JSON.stringify({ 'stories-k1': { secret: SECRET, minIat: 5 } }) });
+  assert.strictEqual((await createStage1(retired)).status, 403, 'iat 1 is before minIat 5');
+  const reissued = await signServerToken(SECRET, { fork: 'stories_cm', server: 'S', keyId: 'stories-k1', iat: 5 });
+  assert.strictEqual((await call(retired, 'POST', '/room', { keyId: 'stories-k1', body: { token: reissued, planet: 'lv624', creator: SO } })).status, 200);
+});
+
+await t('re-entry as a confirmed member needs that member\'s session; a knock learns nothing about the room', async () => {
+  const env = stage1Env();
+  const r = await stage1Room(env);
+  const crew = await joinMortar(env, r);
+  const knock = await (await call(env, 'POST', `/room/${r.code}/join`, { body: { client: 'attacker-client-1', post: 'so' } })).json();
+  const seen = await (await pollRoom(env, r, knock.session)).json();
+  assert.deepStrictEqual(seen.presence, {});
+  assert.strictEqual(seen.meta.lastOpAt, undefined);
+  assert.deepStrictEqual(await errorOf(await call(env, 'POST', `/room/${r.code}/join`, { body: { client: 'client-mortar-01', postCode: r.mortarCode } })), [409, 'member']);
+  assert.deepStrictEqual(await errorOf(await call(env, 'POST', `/room/${r.code}/join`, { body: { client: 'client-mortar-01', post: 'mortar' } })), [409, 'member']);
+  assert.strictEqual((await pollRoom(env, r, crew)).status, 200, 'the real crew keeps its session');
+  const back = await (await call(env, 'POST', `/room/${r.code}/join`, { session: crew, body: { client: 'client-mortar-01', postCode: r.mortarCode } })).json();
+  assert.strictEqual(back.status, 'confirmed', 'with its own session the crew re-enters without a knock');
+});
+
+await t('writes: validation before rights, server fields only from stamps, puts never replace', async () => {
+  const env = stage1Env();
+  const r = await stage1Room(env);
+  const crew = await joinMortar(env, r);
+  const mortar = () => r.room.state.objects['asset-mortar-1'];
+  assert.strictEqual((await send(env, r, crew, [{ cid: 'r', op: 'patch', kind: 'asset', id: 'asset-mortar-1', data: { radius: '<img src=x onerror=alert(1)>', state: 'deployed' } }])).acks[0].error, 'radius');
+  assert.strictEqual(mortar().radius, undefined);
+  assert.ok((await send(env, r, crew, [{ cid: 'r2', op: 'patch', kind: 'asset', id: 'asset-mortar-1', data: { shell: 'RMCMortarShellHE', radius: 5.35 } }])).acks[0].seq);
+  const put = await send(env, r, r.so, [{ cid: 'q', op: 'put', kind: 'request', id: 'q8', data: { type: 'mortar', target: { x: 1, y: 1, extra: '<b>' },
+    note: 'гнездо', priority: 'urgent', flags: [], level: 0, h: 'ee8dd1d6d4a4', acceptedBy: { post: 'so', client: 'x' }, firedAt: 5, status: 'done' } }]);
+  assert.ok(put.acks[0].seq, JSON.stringify(put.acks));
+  const q8 = () => r.room.state.objects.q8;
+  assert.deepStrictEqual([q8().target, q8().acceptedBy, q8().firedAt, q8().status], [{ x: 1, y: 1 }, undefined, undefined, 'requested']);
+  assert.strictEqual((await send(env, r, r.so, [{ cid: 'n', op: 'patch', kind: 'request', id: 'q8', data: { note: 'ближе', target: { x: 9, y: 9 } } }])).acks[0].error, 'fields');
+  assert.strictEqual((await send(env, r, r.so, [{ cid: 'd', op: 'put', kind: 'request', id: 'q9', data: { type: 'mortar', target: { x: 1, y: 1 }, deadlineAt: 'soon' } }])).acks[0].error, 'fields');
+  assert.strictEqual((await send(env, r, r.so, [{ cid: 'o', op: 'put', kind: 'request', id: 'q10', data: { type: 'ob', target: { x: 1, y: 1 } } }])).acks[0].error, 'type');
+  assert.strictEqual((await send(env, r, r.so, [{ cid: 'oa', op: 'patch', kind: 'request', id: 'q8', expectedStatus: 'requested', data: { status: 'accepted' } }])).acks[0].error, 'author');
+  assert.strictEqual((await send(env, r, crew, [{ cid: 'st', op: 'put', kind: 'request', id: 'q8', data: { type: 'mortar', target: { x: 99, y: 99 } } }])).acks[0].error, 'exists');
+  assert.deepStrictEqual(q8().target, { x: 1, y: 1 });
+  assert.strictEqual((await send(env, r, crew, [{ cid: 'as', op: 'put', kind: 'asset', id: 'asset-mortar-1', data: { type: 'mortar', state: 'deployed' } }])).acks[0].error, 'exists');
+  assert.strictEqual((await send(env, r, r.so, [{ cid: 'cl', op: 'patch', kind: 'asset', id: 'asset-mortar-1', data: { claimedBy: 'somebody-else-01' } }])).acks[0].error, 'right');
+  assert.strictEqual(mortar().claimedBy, null);
+  const accept = await send(env, r, crew, [{ cid: 'a', op: 'patch', kind: 'request', id: 'q8', expectedStatus: 'requested', data: { status: 'accepted', acceptedBy: { client: 'forged' } } }]);
+  assert.ok(accept.acks[0].seq);
+  assert.deepStrictEqual(q8().acceptedBy, { client: 'client-mortar-01', post: 'mortar', squad: null });
+  const recall = await send(env, r, r.so, [{ cid: 'rc', op: 'patch', kind: 'request', id: 'q8', expectedStatus: 'accepted', data: { status: 'denied' } }]);
+  assert.ok(recall.acks[0].seq, 'the author recalls an accepted request');
+  assert.deepStrictEqual(q8().deniedBy, { client: SO.client, post: 'so', squad: null });
+});
+
+await t('a resent op gets its original ack and writes nothing, also after the room object reloads', async () => {
+  const env = stage1Env();
+  const r = await stage1Room(env);
+  const crew = await joinMortar(env, r);
+  const put = { cid: 'q-1', op: 'put', kind: 'request', id: 'q1', data: { type: 'mortar', target: { x: 30, y: 40 } } };
+  const first = await send(env, r, r.so, [put]);
+  let rows = r.room.s.writes;
+  assert.deepStrictEqual((await send(env, r, r.so, [put])).acks[0], { cid: 'q-1', seq: first.acks[0].seq, dup: true });
+  assert.strictEqual(r.room.s.writes, rows, 'no row for a resent put');
+  const accept = { cid: 'a-1', op: 'patch', kind: 'request', id: 'q1', expectedStatus: 'requested', data: { status: 'accepted' } };
+  const accepted = await send(env, r, crew, [accept]);
+  rows = r.room.s.writes;
+  assert.deepStrictEqual((await send(env, r, crew, [accept])).acks[0], { cid: 'a-1', seq: accepted.acks[0].seq, dup: true }, 'a resent accept is no status conflict');
+  assert.strictEqual(r.room.s.writes, rows);
+  const del = { cid: 'd-1', op: 'del', kind: 'request', id: 'q1' };
+  assert.ok((await send(env, r, r.so, [del])).acks[0].seq);
+  rows = r.room.s.writes;
+  assert.strictEqual((await send(env, r, r.so, [Object.assign({}, del, { cid: 'd-2' })])).acks[0].dup, true, 'a del on a deleted object is a dup');
+  assert.strictEqual(r.room.s.writes, rows);
+  const noCid = { cid: '', op: 'patch', kind: 'asset', id: 'asset-mortar-1', data: { state: 'moving' } };
+  const once = (await send(env, r, crew, [noCid])).acks[0];
+  const twice = (await send(env, r, crew, [noCid])).acks[0];
+  assert.ok(twice.seq > once.seq && !twice.dup, 'an empty cid is never de-duplicated');
+  const name = [...env.ROOMS.instances.keys()].at(-1);
+  env.ROOMS.instances.set(name, new Room({ storage: r.room.s, id: { name } }, env));   // evicted and woken again
+  const woken = env.ROOMS.instances.get(name);
+  rows = woken.s.writes;
+  assert.deepStrictEqual((await send(env, r, crew, [accept])).acks[0], { cid: 'a-1', seq: accepted.acks[0].seq, dup: true });
+  assert.strictEqual(woken.s.writes, rows);
+  assert.strictEqual((await pollRoom(env, r, r.so)).headers.get('Retry-After'), '2', 'the request clock is rebuilt too');
+  env.clock += 9 * 60 * 1000;
+  assert.strictEqual((await (await pollRoom(env, r, r.so)).json()).meta.locked, true);
+  assert.deepStrictEqual((await send(env, r, crew, [accept])).acks[0], { cid: 'a-1', seq: accepted.acks[0].seq, dup: true }, 'a locked room still answers a resend');
+});
+
+await t('chronology: numbered requests in Russian, the recall, the withdrawal, and bad input never breaks it', async () => {
+  const env = stage1Env();
+  const r = await stage1Room(env);
+  const crew = await joinMortar(env, r);
+  assert.ok((await send(env, r, crew, [{ cid: 'c', op: 'put', kind: 'calibration', id: 'calibration', data: { offset: [243, -218] } }])).acks[0].seq);
+  env.clock += 1000;
+  await send(env, r, r.so, [{ cid: 'q1', op: 'put', kind: 'request', id: 'q1', data: { type: 'mortar', target: { x: 10, y: 20 }, note: 'гнездо' } }]);
+  await send(env, r, crew, [{ cid: 'a1', op: 'patch', kind: 'request', id: 'q1', expectedStatus: 'requested', data: { status: 'accepted' } }]);
+  await send(env, r, r.so, [{ cid: 'n1', op: 'patch', kind: 'request', id: 'q1', data: { note: 'ближе к воротам' } }]);
+  await send(env, r, r.so, [{ cid: 'r1', op: 'patch', kind: 'request', id: 'q1', expectedStatus: 'accepted', data: { status: 'denied' } }]);
+  await send(env, r, r.so, [{ cid: 'q2', op: 'put', kind: 'request', id: 'q2', data: { type: 'position', target: { x: 11, y: 21 } } }]);
+  await send(env, r, r.so, [{ cid: 'w2', op: 'patch', kind: 'request', id: 'q2', expectedStatus: 'requested', data: { status: 'denied' } }]);
+  await send(env, r, r.so, [{ cid: 'q3', op: 'put', kind: 'request', id: 'q3', data: { type: 'mortar', target: { x: 12, y: 22 } } }]);
+  await send(env, r, crew, [{ cid: 'd3', op: 'patch', kind: 'request', id: 'q3', expectedStatus: 'requested', data: { status: 'denied', reason: 'нет снарядов' } }]);
+  const res = await call(env, 'GET', `/room/${r.code}/export`, { session: r.so });
+  assert.strictEqual(res.status, 200);
+  const lines = (await res.json()).text.split('\n');
+  assert.strictEqual(lines[0], 'Хронология комнаты. Время UTC.');
+  for (const expected of [
+    '18:00:00  Офицер штаба  подтвердил: Миномётный расчёт «Сидоров»',
+    '18:00:01  Офицер штаба  запрос №1 «удар миномёта» 253 -198',
+    '18:00:01  Миномётный расчёт  №1 «удар миномёта» 253 -198: принят',
+    '18:00:01  Офицер штаба  №1 «удар миномёта» 253 -198: примечание «ближе к воротам»',
+    '18:00:01  Офицер штаба  №1 «удар миномёта» 253 -198: отозвано штабом',
+    '18:00:01  Офицер штаба  запрос №2 «позиция миномёта» 254 -197',
+    '18:00:01  Офицер штаба  №2 «позиция миномёта» 254 -197: снят автором',
+    '18:00:01  Миномётный расчёт  №3 «удар миномёта» 255 -196: отклонён — нет снарядов'
+  ]) assert.ok(lines.includes(expected), 'missing: ' + expected + '\n' + lines.join('\n'));
+  // The W3 line shapes; a patch whose put is not in the log takes type and target from the room state.
+  const by = post => ({ client: 'c-' + post, post, squad: null });
+  const objects = { q7: { id: 'q7', kind: 'request', type: 'mortar', target: { x: 10, y: 20 }, by: by('so') } };
+  assert.strictEqual(chronology([{ seq: 1, at: Date.UTC(2026, 8, 13, 18, 5, 7), by: by('so'), op: 'put', kind: 'request', id: 'q7', data: { type: 'mortar', target: { x: 10, y: 20 } } }], STAGE1, [243, -218]),
+    '18:05:07  Офицер штаба  запрос №1 «удар миномёта» 253 -198');
+  const at = Date.UTC(2026, 8, 13, 18, 5, 21);
+  assert.strictEqual(chronology([{ seq: 9, at, by: by('mortar'), op: 'patch', kind: 'request', id: 'q7', data: { status: 'accepted' } }], STAGE1, [243, -218], objects),
+    '18:05:21  Миномётный расчёт  «удар миномёта» 253 -198: принят');
+  assert.deepStrictEqual(chronology([
+    { seq: 2, at, by: by('so'), op: 'patch', kind: 'request', id: 'nope', data: { note: 'x' } },
+    { seq: 3, at, by: by('so'), op: 'put', kind: 'calibration', id: 'calibration', data: { offset: 'abc' } },
+    { seq: 4, at: 'never', by: null, op: 'put', kind: 'marker', id: 'm', data: null }
+  ], STAGE1, 'abc').split('\n'), ['18:05:21  Офицер штаба  nope: примечание «x»', '18:05:21  Офицер штаба  калибровка (неверная)', '--:--:--  ?  операция marker (не разобрана)']);
+});
+
+await t('unlock keeps everyone who was in the room; a heartbeat passes the lock; the last confirmer never idles out', async () => {
+  const env = stage1Env();
+  const r = await stage1Room(env);
+  const crew = await joinMortar(env, r);
+  env.clock += 11 * 60 * 1000;
+  assert.strictEqual((await (await pollRoom(env, r, r.so)).json()).meta.locked, true);
+  const mine = Object.values(r.room.state.objects).find(o => o.kind === 'member' && o.client === 'client-mortar-01');
+  assert.ok((await send(env, r, crew, [{ cid: 'hb', op: 'patch', kind: 'member', id: mine.id, data: { presentAt: 1 } }])).acks[0].seq, 'heartbeat while locked');
+  assert.strictEqual(r.room.state.objects[mine.id].presentAt, env.clock);
+  assert.strictEqual((await adminAs(env, r, r.so, { action: 'unlock' })).status, 200);
+  assert.strictEqual((await pollRoom(env, r, r.so)).status, 200, 'the officer who pressed «Продолжить раунд» stays');
+  assert.strictEqual((await pollRoom(env, r, crew)).status, 200);
+  const alone = stage1Env();
+  const a = await stage1Room(alone);
+  alone.clock += 7 * 60 * 1000;
+  const k = await (await call(alone, 'POST', `/room/${a.code}/join`, { body: { client: 'knock-client-01', post: 'mortar' } })).json();
+  alone.clock += 4 * 60 * 1000;   // the officer is 11 minutes quiet, the room is not locked
+  assert.strictEqual((await pollRoom(alone, a, k.session)).status, 200);
+  assert.strictEqual((await pollRoom(alone, a, a.so)).status, 200, 'the only member who can confirm joins stays');
+});
+
+await t('knocks expire after the word time and at most four wait; the last confirmer cannot be released', async () => {
+  const env = makeEnv();
+  const room = await (await create(env)).json();
+  const knock = (client, post, squad) => call(env, 'POST', `/room/${room.code}/join`, { body: { client, post, squad } });
+  for (let i = 0; i < 4; i++) assert.strictEqual((await knock('flood-client-' + i, 'ftl', 'alpha')).status, 200);
+  assert.deepStrictEqual(await errorOf(await knock('flood-client-4', 'ftl', 'bravo')), [429, 'knocks']);
+  env.clock += 301 * 1000;
+  assert.strictEqual((await call(env, 'GET', `/room/${room.code}/ops?since=0`, { session: room.session })).status, 200);
+  assert.strictEqual([...env.ROOMS.instances.values()].at(-1).activeMembers().filter(m => !m.confirmed).length, 0, 'stale knocks are released');
+  assert.strictEqual((await knock('late-client-01', 'ftl', 'alpha')).status, 200);
+  env.clock += 30 * 60 * 1000;   // the room idles into a lock; the stale knock still goes
+  assert.strictEqual((await (await call(env, 'GET', `/room/${room.code}/ops?since=0`, { session: room.session })).json()).meta.locked, true);
+  assert.strictEqual([...env.ROOMS.instances.values()].at(-1).activeMembers().filter(m => !m.confirmed).length, 0, 'released from a locked room too');
+  const env2 = stage1Env();
+  const r = await stage1Room(env2);
+  await joinMortar(env2, r);
+  assert.strictEqual((await adminAs(env2, r, r.so, { action: 'release', client: 'client-mortar-01' })).status, 200);
+  assert.strictEqual((await call(env2, 'POST', `/room/${r.code}/join`, { body: { client: 'client-mortar-02', postCode: r.mortarCode } })).status, 200,
+    'a released post code works for the next crew');
+  assert.deepStrictEqual(await errorOf(await adminAs(env2, r, r.so, { action: 'release', client: SO.client })), [409, 'last']);
+});
+
+await t('radio silence cannot lift an administration stop; a closed room refuses admin; extend waits for the warning', async () => {
+  const env = stage1Env();
+  const r = await stage1Room(env);
+  await routeRoom(new Request('https://w.example/stop/stories-k1/' + await stopSig(STOP, 'stop', 'stories-k1'), { method: 'POST' }), env);
+  env.clock += 61000;
+  assert.strictEqual((await (await pollRoom(env, r, r.so)).json()).meta.frozen.reason, 'stopped');
+  assert.deepStrictEqual(await errorOf(await adminAs(env, r, r.so, { action: 'silence', on: false })), [423, 'stopped']);
+  assert.deepStrictEqual(await errorOf(await call(env, 'POST', `/room/${r.code}/join`, { body: { client: 'late-client-01', post: 'mortar' } })), [423, 'stopped']);
+  await routeRoom(new Request('https://w.example/start/stories-k1/' + await stopSig(STOP, 'start', 'stories-k1'), { method: 'POST' }), env);
+  env.clock += 61000;
+  assert.strictEqual((await (await pollRoom(env, r, r.so)).json()).meta.frozen, null, 'the stop lifts with the flag');
+  assert.deepStrictEqual(await errorOf(await adminAs(env, r, r.so, { action: 'extend' })), [409, 'early']);
+  assert.strictEqual((await adminAs(env, r, r.so, { action: 'close' })).status, 200);
+  assert.deepStrictEqual(await errorOf(await adminAs(env, r, r.so, { action: 'close' })), [423, 'closed']);
+  assert.strictEqual((await (await call(env, 'GET', '/health')).json()).active, 0, 'a closed room leaves the ceilings');
+});
+
+await t('observer link: off until staff mint it, export for staff or observer only, no knock words, gone after rotate', async () => {
+  const env = stage1Env();
+  const r = await stage1Room(env);
+  const crew = await joinMortar(env, r);
+  assert.strictEqual((await call(env, 'GET', `/room/${r.code}/ops?since=0`, { observer: 'guessed-token-000000' })).status, 401);
+  assert.deepStrictEqual(await errorOf(await call(env, 'GET', `/room/${r.code}/export`, { session: crew })), [403, 'right']);
+  await call(env, 'POST', `/room/${r.code}/join`, { body: { client: 'knock-client-01', post: 'so' } });
+  assert.strictEqual((await adminAs(env, r, crew, { action: 'observer' })).status, 403, 'only staff mint the link');
+  const { observerToken } = await (await adminAs(env, r, r.so, { action: 'observer' })).json();
+  const seen = await (await call(env, 'GET', `/room/${r.code}/ops?since=0`, { observer: observerToken })).json();
+  assert.ok(seen.ops.some(o => o.kind === 'member' && o.data.confirmed === false), 'the knock is in the log');
+  assert.ok(!seen.ops.some(o => o.kind === 'member' && o.data && 'word' in o.data), 'without its word');
+  const snap = await (await call(env, 'GET', `/room/${r.code}/snapshot`, { observer: observerToken })).json();
+  assert.ok(snap.objects.length && !snap.objects.some(o => 'word' in o));
+  assert.strictEqual((await call(env, 'GET', `/room/${r.code}/export`, { observer: observerToken })).status, 200);
+  const rotated = await (await adminAs(env, r, r.so, { action: 'rotate' })).json();
+  assert.strictEqual((await call(env, 'GET', `/room/${rotated.code}/ops?since=0`, { observer: observerToken })).status, 401, 'rotate retires the observer link');
+});
+
+await t('rotate: the old code answers 401 rotated, unused sheet codes change, every alias leaves with the room', async () => {
+  const env = stage1Env();
+  const r = await stage1Room(env);
+  await joinMortar(env, r);
+  const res = await (await adminAs(env, r, r.so, { action: 'rotate' })).json();
+  assert.deepStrictEqual(await errorOf(await call(env, 'GET', `/room/${r.code}/ops?since=0`, { session: res.session })), [401, 'rotated']);
+  env.clock += 61000;   // past the router's code cache: the registry tombstone answers
+  assert.deepStrictEqual(await errorOf(await call(env, 'GET', `/room/${r.code}/ops?since=0`, { session: res.session })), [401, 'rotated']);
+  const slot = s => s.post + ':' + s.squad;
+  assert.deepStrictEqual(res.sheet.map(slot), r.c.sheet.map(slot), 'the same posts on the new sheet');
+  const unused = r.c.sheet.find(s => s.code !== r.mortarCode);
+  assert.ok(!res.sheet.some(s => s.code === unused.code), 'an unused code changed');
+  assert.ok(res.sheet.some(s => s.code === r.mortarCode), 'a bound code stays with its holder');
+  assert.deepStrictEqual(await errorOf(await call(env, 'POST', `/room/${res.code}/join`, { body: { client: 'leaked-sheet-01', postCode: unused.code } })), [404, 'postCode']);
+  assert.strictEqual((await call(env, 'POST', `/room/${res.code}/join`, { body: { client: 'client-mortar-01', postCode: r.mortarCode } })).status, 200,
+    'the evicted crew knocks again with its own code');
+  const registry = env.REGISTRY.instances.get('main').ctx.storage;
+  assert.ok(await registry.get('rotated:' + r.code));
+  env.clock += 4 * 3600 * 1000;
+  await r.room.alarm();
+  env.clock += 3600 * 1000;
+  await r.room.alarm();
+  assert.strictEqual(await registry.get('rotated:' + r.code), undefined);
+  assert.strictEqual(await registry.get('code:' + res.code), undefined);
+});
+
+await t('abandoned rooms lock on their alarm and free the ceiling; per-key cap; limiter, body and JSON bounds', async () => {
+  const env = stage1Env({ ROOMS_MAX_CONCURRENT: '1' });
+  const r = await stage1Room(env);
+  assert.strictEqual(r.room.s.alarmAt, env.clock + 480 * 1000, 'the first alarm is the idle lock');
+  env.clock += 9 * 60 * 1000;
+  await r.room.alarm();
+  assert.strictEqual(r.room.meta.locked, true);
+  assert.strictEqual((await createStage1(env)).status, 200, 'the locked room left the ceiling');
+  const keyed = stage1Env({ ROOMS_MAX_PER_KEY: '1' });
+  await stage1Room(keyed);
+  assert.deepStrictEqual(await errorOf(await createStage1(keyed)), [429, 'ceiling']);
+  const limited = stage1Env({ ROOM_RL: { limit: async () => ({ success: false }) } });
+  const lr = await stage1Room(limited);
+  assert.deepStrictEqual(await errorOf(await pollRoom(limited, lr, lr.so)), [429, 'rate']);
+  const big = JSON.stringify({ client: 'big-client-001', post: 'mortar', callsign: 'x'.repeat(3000) });
+  assert.deepStrictEqual(await errorOf(await call(env, 'POST', `/room/${r.code}/join`, { raw: big })), [413, 'size']);
+  const bad = await call(env, 'POST', `/room/${r.code}/ops`, { session: r.so, raw: '{not json' });
+  assert.strictEqual(bad.headers.get('Access-Control-Allow-Origin'), ORIGIN);
+  assert.deepStrictEqual(await errorOf(bad), [400, 'json']);
 });
 
 console.log('OK', passed, 'cases');
