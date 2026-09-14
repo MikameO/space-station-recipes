@@ -130,7 +130,9 @@ t('ordnance loader, claimed crews, CAS pilot, anyone confirms an enemy mark', ()
   const ob = { id: 'q9', kind: 'request', type: 'ob', status: 'accepted', by: { client: 'c-slb', post: 'sl', squad: 'bravo' } };
   const load = { cid: 'l', op: 'patch', kind: 'request', id: 'q9', expectedStatus: 'accepted', data: { status: 'loaded' } };
   assert.strictEqual(R.canWrite(policy, ot, load, ob).ok, true, 'OT loads the OB');
-  assert.strictEqual(R.canWrite(policy, slB, load, ob).reason, 'right');
+  // slB wrote this request: since the v2 write contract the author gets 'author', a squad leader who is not gets 'right'.
+  assert.strictEqual(R.canWrite(policy, slB, load, ob).reason, 'author');
+  assert.strictEqual(R.canWrite(policy, slA, load, ob).reason, 'right');
   const crew = { client: 'c-ftl', post: 'ftl', squad: 'alpha', confirmed: true, functions: ['mortar'] };
   const mortarReq = { id: 'q8', kind: 'request', type: 'mortar', status: 'requested', by: { client: 'c-slb', post: 'sl', squad: 'bravo' } };
   const accept = { cid: 'a', op: 'patch', kind: 'request', id: 'q8', expectedStatus: 'requested', data: { status: 'accepted' } };
@@ -177,6 +179,225 @@ t('stage 1: position requests go to the mortar owner; the author never accepts t
   assert.deepStrictEqual(R.requestActions(policy, ot, pos), ['accept', 'deny']);
   assert.deepStrictEqual(R.requestActions(policy, staff, pos), ['cancel']);
   assert.deepStrictEqual(R.requestActions(policy, ot, Object.assign({}, pos, { status: 'accepted' })), ['place', 'done', 'deny']);
-  assert.deepStrictEqual(R.requestActions(policy, staff, Object.assign({}, pos, { type: 'mortar', status: 'accepted' })), ['done', 'deny']);
+  // Changed with the v2 write contract (K2): the staff author no longer carries out an accepted request, only recalls it.
+  assert.deepStrictEqual(R.requestActions(policy, staff, Object.assign({}, pos, { type: 'mortar', status: 'accepted' })), ['cancel']);
+});
+
+// ── v2 write contract on the shipping Stage 1 policy ─────────────────────
+const stage1 = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'tactical', 'policy', 'stories_cm.json'), 'utf8'));
+const soAuthor = { client: 'c-so-author', post: 'so', confirmed: true };
+const soOther = { client: 'c-so-other', post: 'so', confirmed: true };
+const crewM = { client: 'c-mortar', post: 'mortar', confirmed: true };
+const watcher = { client: 'c-watch', post: 'observer', confirmed: true };
+const byOf = m => ({ client: m.client, post: m.post, squad: m.squad || null });
+const ch = String.fromCharCode;
+
+// A Stage 1 room: the seeded mortar and one request by the authoring staff officer, forced into `status`.
+function stage1State(type, status) {
+  const s = R.createState();
+  R.applyOp(s, { seq: 1, at: 1000, by: { client: 'room', post: 'system', squad: null }, op: 'put', kind: 'asset', id: 'asset-mortar-1',
+    data: { type: 'mortar', n: 1, owner: { post: 'mortar' }, state: null, notes: '', claimedBy: null } });
+  const put = { type, target: { x: 62, y: -62 }, note: 'гнездо', priority: 'urgent', flags: [], level: 0, h: 'ee8dd1d6d4a4' };
+  R.applyOp(s, { seq: 2, at: 2000, by: byOf(soAuthor), op: 'put', kind: 'request', id: 'q1', data: R.stampData('request', 'put', put, byOf(soAuthor), 2000) });
+  s.objects.q1.status = status;
+  return s;
+}
+
+// The ops tactical/room-requests.js sends for each button; «Развёрнут» on a position request also moves the mortar.
+function buttonOps(action, req) {
+  const patch = data => ({ op: 'patch', kind: 'request', id: req.id, expectedStatus: req.status, data });
+  switch (action) {
+    case 'accept': return [patch({ status: 'accepted' })];
+    case 'deny': return [patch({ status: 'denied', reason: 'нет снарядов' })];
+    case 'cancel': return [patch({ status: 'denied' })];
+    case 'take': case 'fire': return [patch({ status: 'firing' })];
+    case 'load': return [patch({ status: 'loaded' })];
+    case 'done': return [patch({ status: 'done' })];
+    case 'place': return [patch({ status: 'done' }), { op: 'patch', kind: 'asset', id: 'asset-mortar-1', data: { tile: [req.target.x, req.target.y], state: 'deployed' } }];
+    case 'repeat': return [{ op: 'put', kind: 'request', id: req.id + 'again', data: { type: req.type, target: { x: req.target.x, y: req.target.y },
+      note: req.note, priority: req.priority, flags: req.flags, level: 0, h: 'ee8dd1d6d4a4' } }];
+  }
+  throw new Error('no op for button ' + action);
+}
+
+t('stage 1 property: every button a member gets is an op the room validates, allows and applies', () => {
+  let pressed = 0;
+  for (const member of [soAuthor, soOther, crewM, watcher]) {
+    for (const type of ['mortar', 'position']) {
+      for (const status of Object.keys(R.REQUEST_FLOW)) {
+        const card = stage1State(type, status);
+        for (const action of R.requestActions(stage1, member, card.objects.q1, { claimed: R.claimants(card.objects, card.objects.q1) })) {
+          const s = stage1State(type, status);
+          for (const raw of buttonOps(action, s.objects.q1)) {
+            const where = `${member.client} ${type}/${status} ${action} ${raw.kind}`;
+            const existing = s.objects[raw.id];
+            const data = R.cleanData(stage1, raw.kind, raw.op, raw.data);
+            assert.strictEqual(raw.op === 'put' ? R.validateData(stage1, raw.kind, data) : R.validatePatch(stage1, raw.kind, data, existing), null, where + ' validates');
+            assert.deepStrictEqual(R.canWrite(stage1, member, Object.assign({}, raw, { data }), existing, { claimed: R.claimants(s.objects, existing) }), { ok: true }, where + ' is allowed');
+            R.stampData(raw.kind, raw.op, data, byOf(member), 5000);
+            assert.deepStrictEqual(R.applyOp(s, Object.assign({}, raw, { seq: s.seq + 1, at: 5000, by: byOf(member), data })), { ok: true }, where + ' applies');
+            pressed++;
+          }
+        }
+      }
+    }
+  }
+  // author 4 + 4 (cancel ×2, repeat ×2 per type); other staff officer and crew 8 + 9 each («Развёрнут» is two ops); observer 0.
+  assert.strictEqual(pressed, 42, 'ops sent across the grid');
+});
+
+t('stage 1 buttons by role: the author withdraws or recalls, the crew carries out, the observer has none', () => {
+  const card = (type, status) => stage1State(type, status).objects.q1;
+  assert.deepStrictEqual(R.requestActions(stage1, soAuthor, card('mortar', 'requested')), ['cancel']);
+  assert.deepStrictEqual(R.requestActions(stage1, soAuthor, card('mortar', 'accepted')), ['cancel']);
+  assert.deepStrictEqual(R.requestActions(stage1, soAuthor, card('mortar', 'firing')), []);
+  assert.deepStrictEqual(R.requestActions(stage1, soAuthor, card('position', 'done')), ['repeat']);
+  assert.deepStrictEqual(R.requestActions(stage1, soOther, card('mortar', 'accepted')), ['take', 'done', 'deny']);
+  assert.deepStrictEqual(R.requestActions(stage1, crewM, card('position', 'requested')), ['accept', 'deny']);
+  assert.deepStrictEqual(R.requestActions(stage1, crewM, card('position', 'accepted')), ['place', 'done', 'deny']);
+  assert.deepStrictEqual(R.requestActions(stage1, crewM, card('mortar', 'firing')), ['done']);
+  for (const status of Object.keys(R.REQUEST_FLOW)) assert.deepStrictEqual(R.requestActions(stage1, watcher, card('mortar', status)), []);
+  const nameless = { post: 'mortar', confirmed: true };
+  assert.deepStrictEqual(R.requestActions(stage1, nameless, Object.assign(card('mortar', 'accepted'), { by: { post: 'so' } })), ['take', 'done', 'deny'],
+    'a member without a client id is never taken for the author');
+  const accept = { op: 'patch', kind: 'request', id: 'q1', expectedStatus: 'requested', data: { status: 'accepted' } };
+  assert.strictEqual(R.canWrite(stage1, soAuthor, accept, card('mortar', 'requested')).reason, 'author');
+  assert.strictEqual(R.canWrite(stage1, watcher, accept, card('mortar', 'requested')).reason, 'level');
+});
+
+t('validatePatch: allowlists and typed values for requests, assets, calibration and members', () => {
+  const asset = { id: 'asset-mortar-1', kind: 'asset', type: 'mortar' };
+  for (const data of [{ tile: [20, -98], state: 'deployed' }, { state: 'moving' }, { state: null }, { claimedBy: 'c-mortar' }, { claimedBy: null },
+    { shell: 'RMCMortarShellHE', radius: 5.35 }, { shell: null, radius: null }, { notes: 'у ворот' }, { label: 'М-1' }]) {
+    assert.strictEqual(R.validatePatch(stage1, 'asset', data, asset), null, JSON.stringify(data));
+  }
+  assert.strictEqual(R.validatePatch(stage1, 'asset', { radius: '<img src=x onerror=alert(1)>' }, asset), 'radius');
+  assert.strictEqual(R.validatePatch(stage1, 'asset', { radius: 0 }, asset), 'radius');
+  assert.strictEqual(R.validatePatch(stage1, 'asset', { radius: 101 }, asset), 'radius');
+  assert.strictEqual(R.validatePatch(stage1, 'asset', { tile: 'nope' }, asset), 'tile');
+  assert.strictEqual(R.validatePatch(stage1, 'asset', { tile: [1.5, 2] }, asset), 'tile');
+  assert.strictEqual(R.validatePatch(stage1, 'asset', { state: 'on_lz' }, asset), 'state', 'a dropship state is not a mortar state');
+  assert.strictEqual(R.validatePatch(stage1, 'asset', { state: 'on_lz' }), null, 'without the object any known state passes');
+  assert.strictEqual(R.validatePatch(stage1, 'asset', { state: '<b>' }), 'state');
+  assert.strictEqual(R.validatePatch(stage1, 'asset', { shell: 'x'.repeat(41) }, asset), 'shell');
+  assert.strictEqual(R.validatePatch(stage1, 'asset', { claimedBy: 'c-mortar', state: 'deployed' }, asset), 'fields', 'a claim travels alone');
+  assert.strictEqual(R.validatePatch(stage1, 'asset', { owner: { post: 'so' } }, asset), 'fields');
+  for (const data of [{ status: 'accepted' }, { status: 'denied', reason: 'нет снарядов' }, { note: 'ближе' }, { flags: ['beacon'] }, { priority: 'normal' }, { relayed: true }]) {
+    assert.strictEqual(R.validatePatch(stage1, 'request', data), null, JSON.stringify(data));
+  }
+  assert.strictEqual(R.validatePatch(stage1, 'request', { note: 'ближе', target: { x: 1, y: 1 } }), 'fields', 'a note patch never moves the target');
+  assert.strictEqual(R.validatePatch(stage1, 'request', { status: 'exploded' }), 'status');
+  assert.strictEqual(R.validatePatch(stage1, 'request', { reason: 'y'.repeat(81) }), 'reason');
+  assert.strictEqual(R.validatePatch(stage1, 'request', { flags: ['beacon', '<i>'] }), 'flags');
+  assert.strictEqual(R.validatePatch(stage1, 'request', { priority: '<i>' }), 'priority');
+  assert.strictEqual(R.validatePatch(stage1, 'request', {}), 'fields');
+  assert.strictEqual(R.validatePatch(stage1, 'calibration', { offset: [212, -148] }), null);
+  assert.strictEqual(R.validatePatch(stage1, 'calibration', { offset: 'abc' }), 'offset');
+  assert.strictEqual(R.validateData(stage1, 'calibration', { offset: [1, NaN] }), 'offset');
+  assert.strictEqual(R.validatePatch(stage1, 'member', { presentAt: 1 }), null);
+  assert.strictEqual(R.validatePatch(stage1, 'member', { confirmed: true }), 'fields');
+});
+
+t('validateData and cleanData: the Stage 1 request put, server fields and stamps', () => {
+  const put = { type: 'mortar', target: { x: 62, y: -62 }, note: 'гнездо', priority: 'urgent', flags: [], level: 0, h: 'ee8dd1d6d4a4' };
+  const variant = over => R.validateData(stage1, 'request', Object.assign({}, put, over));
+  assert.strictEqual(variant({}), null);
+  assert.strictEqual(variant({ type: 'position' }), null);
+  assert.strictEqual(variant({ type: 'other' }), null);
+  assert.strictEqual(variant({ type: 'ob' }), 'type', 'no OB asset in Stage 1');
+  assert.strictEqual(variant({ target: { x: 1.5, y: 2 } }), 'target');
+  assert.strictEqual(variant({ target: { x: 5000, y: 2 } }), 'target');
+  assert.strictEqual(variant({ priority: '<i>' }), 'priority');
+  assert.strictEqual(variant({ flags: new Array(9).fill('beacon') }), 'flags');
+  assert.strictEqual(variant({ level: 'x' }), 'level');
+  assert.strictEqual(variant({ h: 'h'.repeat(41) }), 'h');
+  assert.strictEqual(variant({ deadlineAt: 'soon' }), 'fields');
+  const raw = Object.assign({}, put, { status: 'done', layer: 'shared', acceptedBy: { client: 'x' }, firedAt: 5,
+    target: { x: 62, y: -62, extra: '<b>' }, note: ' гнездо\nу ворот' + ch(0x200b) + ' ' });
+  const clean = R.cleanData(stage1, 'request', 'put', raw);
+  assert.deepStrictEqual(clean.target, { x: 62, y: -62 });
+  assert.strictEqual(clean.note, 'гнездо у ворот');
+  for (const k of ['status', 'layer', 'acceptedBy', 'firedAt']) assert.ok(!(k in clean), k + ' is dropped');
+  assert.strictEqual(R.validateData(stage1, 'request', clean), null);
+  assert.strictEqual(R.stampData('request', 'put', clean, byOf(soAuthor), 7000).status, 'requested');
+  const polluted = R.cleanData(stage1, 'request', 'put', JSON.parse('{"__proto__":{"polluted":1},"constructor":1,"type":"mortar"}'));
+  assert.strictEqual(Object.getPrototypeOf(polluted), Object.prototype);
+  assert.deepStrictEqual(Object.keys(polluted), ['type']);
+  const accept = R.stampData('request', 'patch', R.cleanData(stage1, 'request', 'patch', { status: 'accepted', acceptedBy: { client: 'forged' } }), byOf(crewM), 8000);
+  assert.deepStrictEqual(accept, { status: 'accepted', acceptedBy: byOf(crewM) });
+  const confirm = R.stampData('marker', 'patch', R.cleanData(stage1, 'marker', 'patch', { confirmedAt: 99999999999 }), byOf(soAuthor), 9000);
+  assert.deepStrictEqual(confirm, { confirmedAt: 9000 }, 'confirmedAt is the server time whatever the client sent');
+});
+
+t('a put over a live object: duplicate for its author, exists for anyone else; calibration is re-published', () => {
+  const s = stage1State('mortar', 'requested');
+  const again = { op: 'put', kind: 'request', id: 'q1', data: { type: 'mortar', target: { x: 1, y: 1 } } };
+  assert.strictEqual(R.canWrite(stage1, soAuthor, again, s.objects.q1).reason, 'duplicate');
+  assert.strictEqual(R.canWrite(stage1, crewM, again, s.objects.q1).reason, 'exists');
+  assert.strictEqual(R.canWrite(stage1, soOther, { op: 'put', kind: 'asset', id: 'asset-mortar-1', data: { type: 'mortar' } }, s.objects['asset-mortar-1']).reason, 'exists');
+  R.applyOp(s, { seq: 3, at: 3000, by: byOf(soAuthor), op: 'del', kind: 'request', id: 'q1' });
+  assert.strictEqual(R.canWrite(stage1, soAuthor, again, s.objects.q1).reason, 'deleted');
+  const cal = { op: 'put', kind: 'calibration', id: 'calibration', data: { offset: [212, -148] } };
+  R.applyOp(s, Object.assign({ seq: 4, at: 4000, by: byOf(crewM) }, cal));
+  assert.deepStrictEqual(R.canWrite(stage1, soAuthor, cal, s.objects.calibration), { ok: true });
+  assert.strictEqual(R.applyOp(s, Object.assign({ seq: 5, at: 5000, by: byOf(soAuthor) }, cal, { data: { offset: [213, -148] } })).ok, true);
+  assert.deepStrictEqual(s.objects.calibration.offset, [213, -148]);
+  // applyOp itself still replays a put over a live object: the log stays the truth.
+  assert.strictEqual(R.applyOp(s, { seq: 6, at: 6000, by: byOf(soAuthor), op: 'put', kind: 'marker', id: 'mk', data: { x: 1, y: 1 } }).ok, true);
+  assert.strictEqual(R.applyOp(s, { seq: 7, at: 7000, by: byOf(soAuthor), op: 'put', kind: 'marker', id: 'mk', data: { x: 2, y: 2 } }).ok, true);
+  assert.strictEqual(R.applyOp(s, { seq: 8, at: 8000, by: byOf(soAuthor), op: 'patch', kind: 'marker', id: 'constructor', data: { x: 1 } }).reason, 'missing',
+    'object ids never reach Object.prototype');
+});
+
+t('request patches: relayed by anyone, note, flags and priority by the author or staff, other keys refused', () => {
+  const req = stage1State('mortar', 'accepted').objects.q1;
+  const p = data => ({ op: 'patch', kind: 'request', id: 'q1', data });
+  assert.deepStrictEqual(R.canWrite(stage1, crewM, p({ relayed: true }), req), { ok: true });
+  assert.strictEqual(R.canWrite(stage1, crewM, p({ note: 'x' }), req).reason, 'right');
+  assert.deepStrictEqual(R.canWrite(stage1, soAuthor, p({ note: 'x', priority: 'normal' }), req), { ok: true });
+  assert.deepStrictEqual(R.canWrite(stage1, soOther, p({ flags: ['beacon'] }), req), { ok: true });
+  assert.strictEqual(R.canWrite(stage1, soAuthor, p({ reason: 'x' }), req).reason, 'fields');
+  assert.strictEqual(R.canWrite(stage1, soAuthor, p({ status: 'denied', note: 'x' }), req).reason, 'fields');
+  assert.strictEqual(R.canWrite(stage1, crewM, p({ status: 'loaded' }), req).reason, 'transition', 'only an OB is loaded');
+  assert.deepStrictEqual(R.canWrite(stage1, soAuthor, p({ status: 'denied' }), req), { ok: true }, 'the author recalls an accepted request');
+  assert.strictEqual(R.canWrite(stage1, soAuthor, p({ status: 'done' }), req).reason, 'author');
+  assert.strictEqual(R.hasRight(policy, slB, 'acceptRequest', { kind: 'request', type: 'mortar', claimedBy: slB.client }), false, 'a claim counts on the asset only');
+  assert.strictEqual(R.hasRight(policy, slB, 'acceptRequest', { kind: 'asset', type: 'mortar', claimedBy: slB.client }), true);
+});
+
+t('claims: only on claimable assets, only for oneself, cleared by the holder or staff', () => {
+  const crew = { client: 'c-ftl', post: 'ftl', squad: 'alpha', confirmed: true, functions: ['mortar'] };
+  const asset = { id: 'm', kind: 'asset', type: 'mortar', owner: { post: 'ot' }, claimedBy: null };
+  const claim = v => ({ op: 'patch', kind: 'asset', id: 'm', data: { claimedBy: v } });
+  assert.deepStrictEqual(R.canWrite(policy, crew, claim('c-ftl'), asset), { ok: true });
+  assert.strictEqual(R.canWrite(policy, crew, claim('c-other'), asset).reason, 'right');
+  const held = Object.assign({}, asset, { claimedBy: 'c-ftl' });
+  assert.deepStrictEqual(R.canWrite(policy, crew, claim(null), held), { ok: true });
+  assert.strictEqual(R.canWrite(policy, ot, claim(null), held).reason, 'right');
+  assert.deepStrictEqual(R.canWrite(policy, staff, claim(null), held), { ok: true });
+  assert.strictEqual(R.canWrite(policy, crew, { op: 'patch', kind: 'asset', id: 'm', data: { claimedBy: 'c-ftl', state: 'deployed' } }, asset).reason, 'fields');
+  const mortar1 = stage1State('mortar', 'requested').objects['asset-mortar-1'];
+  assert.strictEqual(R.canWrite(stage1, crewM, { op: 'patch', kind: 'asset', id: 'asset-mortar-1', data: { claimedBy: crewM.client } }, mortar1).reason, 'right',
+    'the Stage 1 mortar is not claimable');
+  assert.strictEqual(R.canWrite(stage1, soOther, { op: 'put', kind: 'asset', id: 'asset-mortar-9', data: { type: 'mortar' } }).reason, 'right', 'assets come from the policy');
+});
+
+t('cleanText, parseEntry and deadlines at their edges', () => {
+  assert.strictEqual(R.cleanText('первая\nвторая\r\nтретья\tчетвёртая', 80), 'первая вторая третья четвёртая');
+  assert.strictEqual(R.cleanText('a' + ch(0x85) + 'b' + ch(0x200b) + 'c' + ch(0x202e) + 'd' + ch(0x2066) + 'e' + ch(0xfeff) + 'f' + ch(0) + 'g', 80), 'abcdefg');
+  const smile = ch(0xd83d, 0xde00);
+  assert.strictEqual(R.cleanText(smile.repeat(5), 3), smile.repeat(3), 'cut by code points, never inside a pair');
+  assert.strictEqual(R.cleanText('ab cd', 3), 'ab');
+  assert.strictEqual(R.validateData(stage1, 'marker', { label: smile.repeat(40), x: 1, y: 1 }), null, '40 code points fit a 40-character label');
+  assert.strictEqual(R.parseEntry('K7M4Q'), null, 'a room code is six characters');
+  assert.strictEqual(R.parseEntry('K7M4Q2X'), null);
+  assert.strictEqual(R.parseEntry('K7M4Q2-SKB'), null, 'a post code is four characters');
+  assert.strictEqual(R.parseEntry('K7M4Q2-SKB77'), null);
+  assert.strictEqual(R.parseEntry('K7M4Q2-'), null);
+  assert.deepStrictEqual(R.parseEntry('k7m4q2-skb7'), { code: 'K7M4Q2', postCode: 'SKB7' });
+  const none = { impactAt: null, readyAt: null };
+  assert.deepStrictEqual(R.deadlines('mortar', 10000, {}, stage1), none);
+  assert.deepStrictEqual(R.deadlines('mortar', 10000, null, stage1), none);
+  assert.deepStrictEqual(R.deadlines('ob', 10000, { mortar: { travelDelay: 1, impactDelay: 1 } }, stage1), none);
 });
 console.log('OK', n, 'groups');
