@@ -438,6 +438,7 @@ body.tac-body {
 .tac-shell-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 .tac-shell-row .tac-select { width: 100%; max-width: none; font-size: 13px; padding: 6px 8px; }
 .tac-shell-row .tac-input { font-size: 14px; }
+.tac-weapon .tac-shell-row { margin-top: 10px; }
 
 /* The right-hand column: the officers' room entry (tactical/room.css) above the panel, which scrolls on its own. */
 .tac-side {

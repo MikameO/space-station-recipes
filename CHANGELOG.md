@@ -3,6 +3,17 @@
 `data.json` schema version is in `meta.schemaVersion`. Consumers reading this file
 should pin on a compatible range (semver: breaking changes bump major).
 
+## Tactical map and room follow-ups — 2026-09-14 (evening)
+
+- The strike size sits right under the Mortar / OB / Supply buttons: the mortar
+  shell and hit radius with the zone legend, the OB warhead and its radius.
+- An incendiary mortar shell draws the fire diamond around the aim point and
+  under the cursor, like the incendiary OB warhead; its hint names the range.
+- Room: «Передать позицию» sends the position and the mortar move in one write
+  (`client.queueAll`); an addressee who leaves while the request form is open
+  stays named «вне комнаты» and sending asks to pick again; «Применить у себя»
+  keeps the room calibration's real age.
+
 ## Series V, stage 2a — 2026-09-14 (Officers' room: positions, mortar zone, addressed requests, room calibration; still hidden)
 
 - Any confirmed member shares a position picked on the map (or the Fire panel's

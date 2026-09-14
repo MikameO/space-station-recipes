@@ -1390,8 +1390,10 @@
   function drawWeaponZone(ctx, v, tile, faint) {
     var wp = weapon();
     if (wp === 'mortar') {
-      var info = fireInfo(tile);
+      var info = fireInfo(tile), shell = currentShell();
       drawHitZone(ctx, v, tile, info && info.box, hitRadius(), faint);
+      // An incendiary shell lights the same fire diamond as an incendiary OB warhead.
+      if (shell && shell.fireRange) drawFireDiamond(ctx, v, tile, shell.fireRange, faint);
     } else if (wp === 'ob') {
       // A cluster's blasts scatter a further ±spread around the landing point.
       var w = currentWarhead(), r = obRadius();
@@ -1768,18 +1770,7 @@
 
   function obHtml(cs) {
     var h = '<h2 id="tacTargetTitle">' + esc(T.obTitle) + '</h2>';
-    var w = currentWarhead(), t = target();
-    if (w) {
-      var r = obRadius(), own = typeof state.prefs.hitRadius[w.id] === 'number';
-      h += '<div class="tac-shell-row"><label class="tac-input-label" for="tacWarhead">' + esc(T.warhead) +
-        '<select id="tacWarhead" class="tac-select">' + warheads().map(function (x) {
-          return '<option value="' + esc(x.id) + '"' + (x.id === w.id ? ' selected' : '') + '>' + esc(x.name) + '</option>';
-        }).join('') + '</select></label>' +
-        '<label class="tac-input-label" for="tacObRadius">' + esc(T.radius) +
-        '<span class="tac-find-row"><input id="tacObRadius" class="tac-input" type="number" min="0" max="60" step="0.5" value="' + (r == null ? '' : r) + '">' +
-        (own ? button('resetObRadius', T.radiusReset) : '') + '</span></label></div>' +
-        '<p class="tac-hint">' + esc(warheadNote(w)) + '</p>';
-    }
+    var w = currentWarhead(), t = target();   // the warhead and its radius sit under the weapon buttons
     if (!cs.calibrated) return h + '<p class="tac-muted">' + esc(T.mortarNeedsCal) + '</p>';
     if (!t) {
       h += '<p class="tac-muted">' + esc(T.targetNone) + '</p>';
@@ -1855,8 +1846,18 @@
       var d = Logic.rulerDistance(r.a, r.b);
       h += '<p class="tac-ruler">' + esc(fmt(T.rulerText, { d: d.tiles.toFixed(1), dx: signed(d.dx), dy: signed(d.dy) })) + '</p>';
     }
-    if (wp !== 'mortar') return h;
-    var list = shells(), s = currentShell();
+    return h;
+  }
+
+  // The strike size right under the weapon buttons, so nobody scrolls between the choice and its size: the
+  // mortar's shell and hit radius with the zone legend, the OB warhead and its radius; the supply drop has none.
+  function strikeSizeHtml() {
+    var wp = weapon();
+    return wp === 'mortar' ? mortarShellHtml() : wp === 'ob' ? obWarheadHtml() : '';
+  }
+
+  function mortarShellHtml() {
+    var list = shells(), s = currentShell(), h = '';
     if (s) {
       var r = hitRadius(), own = typeof state.prefs.hitRadius[s.id] === 'number';
       h += '<div class="tac-shell-row"><label class="tac-input-label" for="tacShell">' + esc(T.shell) +
@@ -1867,9 +1868,24 @@
         '<span class="tac-find-row"><input id="tacRadius" class="tac-input" type="number" min="0" max="' + MAX_RADIUS + '" step="0.5" value="' + (r == null ? '' : r) + '">' +
         (own ? button('resetRadius', T.radiusReset) : '') + '</span></label></div>' +
         '<p class="tac-hint">' + esc(s.kind === 'flare' && typeof s.radius !== 'number' ? T.radiusFlare : fmt(T.radiusDefault, { r: s.radius == null ? '—' : s.radius })) +
-        (s.shards ? ' · ' + esc(fmt(T.shardsNote, { n: s.shards })) : '') + '</p>';
+        (s.shards ? ' · ' + esc(fmt(T.shardsNote, { n: s.shards })) : '') +
+        (s.fireRange ? ' · ' + esc(fmt(T.warheadFire, { r: s.fireRange })) : '') + '</p>';
     }
     return h + '<p class="tac-hint">' + esc(T.zoneHint) + '</p>';
+  }
+
+  function obWarheadHtml() {
+    var w = currentWarhead();
+    if (!w) return '';
+    var r = obRadius(), own = typeof state.prefs.hitRadius[w.id] === 'number';
+    return '<div class="tac-shell-row"><label class="tac-input-label" for="tacWarhead">' + esc(T.warhead) +
+      '<select id="tacWarhead" class="tac-select">' + warheads().map(function (x) {
+        return '<option value="' + esc(x.id) + '"' + (x.id === w.id ? ' selected' : '') + '>' + esc(x.name) + '</option>';
+      }).join('') + '</select></label>' +
+      '<label class="tac-input-label" for="tacObRadius">' + esc(T.radius) +
+      '<span class="tac-find-row"><input id="tacObRadius" class="tac-input" type="number" min="0" max="60" step="0.5" value="' + (r == null ? '' : r) + '">' +
+      (own ? button('resetObRadius', T.radiusReset) : '') + '</span></label></div>' +
+      '<p class="tac-hint">' + esc(warheadNote(w)) + '</p>';
   }
 
   function eventName(ev) { return T.events[ev] || ev; }
@@ -1999,7 +2015,7 @@
       (storage.ok ? '' : msg({ text: T.noStorage, kind: 'warn' })) +
       (cs.askSameRound ? sameRoundHtml(cs) : '') +
       '<section class="tac-section" aria-labelledby="tacCalTitle">' + calibrationHtml(cs) + '</section>' +
-      '<section class="tac-section tac-weapon">' + weaponHtml() + '</section>' +
+      '<section class="tac-section tac-weapon">' + weaponHtml() + strikeSizeHtml() + '</section>' +
       (weapon() === 'mortar' ? '<section class="tac-section" aria-labelledby="tacMortarTitle">' + mortarHtml(cs) + '</section>' : '') +
       '<section class="tac-section" aria-labelledby="tacTargetTitle">' +
         (weapon() === 'ob' ? obHtml(cs) : weapon() === 'supply' ? supplyHtml(cs) : targetHtml(cs)) + '</section>' +
