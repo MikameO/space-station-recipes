@@ -97,29 +97,47 @@ async function t(name, fn) { await fn(); n++; console.log('ok', name); }
     assert.strictEqual(again.visible({ kinds: ['request'] }).length, 2);
   });
 
-  await t('a revoked session turns into expired', async () => {
-    await transport.admin(co.code, { action: 'revoke', client: sl.client }, { session: co.session });
+  // Was 'revoke', a fixture-only action: the Worker answers 400 action. Release is the Worker's way.
+  await t('a released member\'s session turns into expired, and the secret leaves storage', async () => {
+    const r = await co.admin('release', { client: sl.client });
+    assert.strictEqual(r.status, 200);
     await sl.poll();
     assert.strictEqual(sl.status, 'expired');
+    assert.strictEqual(sl.error, 'session');
+    assert.strictEqual(sl.session, null);
+    assert.strictEqual(makeStorage(lsSl).read(sl.key()).session, null);
   });
 
+  // Used to pin a phantom pending op that could never be sent; queue() now refuses at once.
+  // The Worker no longer hands out an observer token at create: staff mint it with the observer action.
   await t('observer reads but cannot write', async () => {
+    assert.strictEqual(co.observerToken, null);
+    await co.admin('observer');
+    assert.ok(co.observerToken);
     const obs = new RoomClient({ transport, storage: makeStorage(fakeLocalStorage()), policy, fork: 'stories_cm', planet: 'lv624', h: 'h1', now });
     await obs.observe(co.code, co.observerToken);
     assert.strictEqual(obs.status, 'observer');
     assert.ok(obs.visible({ kinds: ['marker'] }).length >= 1);
-    await obs.queue({ op: 'put', kind: 'marker', id: 'o1', data: { cat: 'plan', x: 1, y: 1, layer: 'shared' } });
-    assert.strictEqual(obs.pending.length, 1, 'observer never sends');
+    const res = await obs.queue({ op: 'put', kind: 'marker', id: 'o1', data: { cat: 'plan', x: 1, y: 1, layer: 'shared' } });
+    assert.deepStrictEqual(res, { ok: false, error: 'observer' });
+    assert.strictEqual(obs.pending.length, 0, 'nothing queued');
   });
 
-  await t('the demo script plays members, a request and an asset over time', async () => {
+  await t('the demo script plays members, a request and an asset over time, every step allowed', async () => {
     const demo = new FixtureTransport(policy, { now, script: window.TacRoomFixture.demoScript(policy) });
     const c = new RoomClient({ transport: demo, storage: makeStorage(fakeLocalStorage()), policy, fork: 'stories_cm', planet: 'lv624', h: 'h1', now });
     await c.createRoom({ token: 'demo', keyId: 'demo', post: 'co' });
     clock += 30000;
     await c.poll();
+    assert.deepStrictEqual(demo.scriptErrors, []);
     assert.ok(c.members().length >= 3);
-    assert.ok(c.visible({ kinds: ['request'] }).length >= 2);
+    const reqs = c.visible({ kinds: ['request'] });
+    assert.strictEqual(reqs.length, 2);
+    reqs.forEach(r => {
+      assert.strictEqual(r.status, 'accepted');
+      assert.strictEqual(r.acceptedBy.client, 'demo-crew-0001', 'the crew accepts, never the author');
+      assert.notStrictEqual(r.by.client, r.acceptedBy.client);
+    });
     assert.ok(c.visible({ kinds: ['asset'] }).length >= 1);
   });
 
