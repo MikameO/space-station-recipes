@@ -133,7 +133,9 @@
     if (!level || level === 'observer') return no('level');
     var kind = op.kind, d = op.data || {}, keys = Object.keys(d);
     var mine = !!(member.client && existing && existing.by && existing.by.client === member.client);
-    if (kind === 'calibration') return hasRight(policy, member, 'publishCalibration') ? OK : no('right');
+    // The room calibration is only ever published whole: a patch would keep a tile and reading that no longer agree
+    // with the offset, and a delete would leave a tombstone that refuses every later publish.
+    if (kind === 'calibration') return op.op !== 'put' ? no('op') : hasRight(policy, member, 'publishCalibration') ? OK : no('right');
     // A put never replaces a live object: the same client repeating it is a duplicate, anyone else clashes.
     if (op.op === 'put' && existing) return no(existing.deleted ? 'deleted' : mine ? 'duplicate' : 'exists');
     if (op.op !== 'put' && !existing) return no('missing');
@@ -145,6 +147,7 @@
         if (unknownKey(d, ['status', 'reason'])) return no('fields');
         // The author withdraws a waiting request and recalls an accepted one, nothing later; carrying it out is the crew's.
         if (mine) return d.status === 'denied' && (existing.status === 'requested' || existing.status === 'accepted') ? OK : no('author');
+        if (existing.type === 'task' && (d.status === 'loaded' || d.status === 'firing')) return no('transition');   // a task is done, not fired
         if (d.status === 'loaded') {
           if (existing.type !== 'ob') return no('transition');
           var def = assetDef(policy, assetTypeOf(existing));
@@ -292,11 +295,12 @@
     if (!has(data, 'to')) return null;
     var to = data.to;
     if (!isObj(to)) return 'to';
-    if (has(to, 'client')) return Object.keys(to).length === 1 && typeof to.client === 'string' && to.client.length >= 1 && to.client.length <= 64 ? null : 'to';
+    // The client id shape the Worker issues sessions for: nothing else reaches the moderator log as an addressee.
+    if (has(to, 'client')) return Object.keys(to).length === 1 && typeof to.client === 'string' && /^[A-Za-z0-9_-]{8,40}$/.test(to.client) ? null : 'to';
     if (unknownKey(to, ['post', 'squad']) || typeof to.post !== 'string') return 'to';
     var level = levelOf(policy, to.post);
     if (!level || level === 'observer') return 'to';
-    if (has(to, 'squad') && !(typeof to.squad === 'string' && isObj(policy.squads) && has(policy.squads, to.squad))) return 'to';
+    if (has(to, 'squad') && !(typeof to.squad === 'string' && isObj(policy.squads) && has(policy.squads, to.squad) && postDef(policy, to.post).perSquad)) return 'to';
     if (data.type === 'mortar' && to.post !== assetOwnerPost(policy, 'mortar')) return 'to';
     return null;
   }
@@ -322,7 +326,7 @@
     if (has(data, 'pos') && data.pos !== null) {
       var p = data.pos;
       if (!isObj(p) || unknownKey(p, ['x', 'y', 'level']) || !isCoord(p.x) || !isCoord(p.y) ||
-          (has(p, 'level') && !(isNum(p.level) && Math.floor(p.level) === p.level))) return 'pos';
+          (has(p, 'level') && !(isNum(p.level) && Math.floor(p.level) === p.level && Math.abs(p.level) <= 64))) return 'pos';
     }
     if (has(data, 'cal') && data.cal !== null && !isPair(data.cal)) return 'cal';
     return null;

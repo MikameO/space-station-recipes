@@ -179,7 +179,7 @@
     var mortars = rows.filter(function (row) { return row.def.type === 'mortar' && editable(row); });
     var client = me && me.client;
     var mine = client ? mortars.filter(function (row) { return row.obj && row.obj.claimedBy === client; })[0] : null;
-    return mine || mortars[0] || null;
+    return mine || mortars.filter(function (row) { return !(row.obj && row.obj.claimedBy); })[0] || null;
   }
 
   // Digit n picks the n-th request type while the form is open; null when the key is not ours.
@@ -424,7 +424,7 @@
     P.posts.forEach(function (p) {
       if (!p || typeof p.id !== 'string' || !p.level || p.level === 'observer' || (type === 'mortar' && p.id !== owner)) return;
       out.push({ value: 'post:' + p.id, label: api.postName(p.id), to: { post: p.id } });
-      if (p.level === 'squad') squads.forEach(function (s) {
+      if (p.level === 'squad' && p.perSquad) squads.forEach(function (s) {   // the contract takes a squad only for squad posts
         out.push({ value: 'squad:' + p.id + ':' + s, label: api.postName(p.id) + ' · ' + api.squadName(s), to: { post: p.id, squad: s } });
       });
     });
@@ -464,7 +464,8 @@
     if (!me || !R.layerWritable(policy, me, 'assets')) return null;
     var mortars = rows.filter(function (row) { return row.def.type === 'mortar' && row.obj; });
     var claimed = me.client ? mortars.filter(function (row) { return row.obj.claimedBy === me.client; })[0] : null;
-    return claimed || mortars.filter(function (row) { return row.def.owner === me.post; })[0] || null;
+    // Without a claim of my own, the first mortar of my post that nobody else has claimed: never another crew's.
+    return claimed || mortars.filter(function (row) { return row.def.owner === me.post && !row.obj.claimedBy; })[0] || null;
   }
   // Who serves a mortar: the member in its crew seat, else the first confirmed member of its owner post.
   function crewOf(api, row) {

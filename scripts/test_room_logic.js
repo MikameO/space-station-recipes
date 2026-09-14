@@ -526,6 +526,24 @@ t('stage 2a: member position and calibration, the heartbeat, addressed requests 
   assert.strictEqual(R.canWrite(stage1, watcher, { op: 'put', kind: 'calibration', id: 'calibration', data: calData() }, cs.objects.calibration).reason, 'level');
   assert.strictEqual(R.applyOp(cs, publish(2, crewM, [2, 2])).ok, true);
   assert.deepStrictEqual([cs.objects.calibration.offset, cs.objects.calibration.by.client], [[2, 2], 'c-mortar'], 'the freshest publish replaces the room calibration');
+
+  // Review fixes: addressee ids, squads only for squad posts, whole calibrations, no firing tasks, bounded levels.
+  const forged = 'ghost' + String.fromCharCode(10) + '18:30:00  Администрация  комната закрыта';
+  for (const client of [forged, 'short', 'a b c d e f', '<b>crew</b>xx', 'x'.repeat(41)]) {
+    assert.strictEqual(R.validateData(stage1, 'request', req({ type: 'position', to: { client } })), 'to', 'client ' + JSON.stringify(client));
+  }
+  assert.strictEqual(R.validateData(stage1, 'request', req({ type: 'position', to: { client: 'e2ecrew01' } })), null);
+  assert.strictEqual(R.validateData(policy, 'request', req({ type: 'position', to: { post: 'ot', squad: 'bravo' } })), 'to', 'the ordnance post has no squads');
+  for (const opName of ['patch', 'del']) {
+    assert.strictEqual(R.canWrite(stage1, soAuthor, { op: opName, kind: 'calibration', id: 'calibration', data: { offset: [7, -3] } }, cs.objects.calibration).reason, 'op', opName + ' of the room calibration');
+  }
+  const taskAccepted = Object.assign(stage1State('task', 'accepted').objects.q1, { to: { post: 'mortar' } });
+  for (const status of ['firing', 'loaded']) {
+    assert.strictEqual(R.canWrite(stage1, crewM, { op: 'patch', kind: 'request', id: 'q1', expectedStatus: 'accepted', data: { status } }, taskAccepted, { claimed: [] }).reason, 'transition', 'a task never goes ' + status);
+  }
+  assert.deepStrictEqual(R.canWrite(stage1, crewM, { op: 'patch', kind: 'request', id: 'q1', expectedStatus: 'accepted', data: { status: 'done' } }, taskAccepted, { claimed: [] }), { ok: true });
+  assert.strictEqual(R.validateMemberPatch(stage1, crewM, { pos: { x: 1, y: 2, level: 64 } }), null);
+  assert.strictEqual(R.validateMemberPatch(stage1, crewM, { pos: { x: 1, y: 2, level: 1e300 } }), 'pos');
 });
 
 console.log('OK', n, 'groups');

@@ -63,10 +63,10 @@ function assertSafe(html, label) {
   assert.deepStrictEqual(p, [], label + ': ' + p.join('; '));
 }
 
-const so = { id: 'mem-so', kind: 'member', client: 'c-so', post: 'so', confirmed: true };
-const so2 = { id: 'mem-so2', kind: 'member', client: 'c-so2', post: 'so', confirmed: true };
-const crew = { id: 'mem-crew', kind: 'member', client: 'c-crew', post: 'mortar', confirmed: true };
-const crew2 = { id: 'mem-crew2', kind: 'member', client: 'c-crew2', post: 'mortar', confirmed: true };
+const so = { id: 'mem-so', kind: 'member', client: 'c-so-0001', post: 'so', confirmed: true };
+const so2 = { id: 'mem-so2', kind: 'member', client: 'c-so2-0001', post: 'so', confirmed: true };
+const crew = { id: 'mem-crew', kind: 'member', client: 'c-crew-0001', post: 'mortar', confirmed: true };
+const crew2 = { id: 'mem-crew2', kind: 'member', client: 'c-crew2-0001', post: 'mortar', confirmed: true };
 const by = m => ({ client: m.client, post: m.post, squad: null });
 const NOW = 5000000;
 const constants = { mortar: { travelDelay: 2, impactDelay: 3, minRange: 15, maxRange: 65, tilesPerOffset: 10 }, shells: [{ id: 'he', name: 'HE', radius: 3 }] };
@@ -137,7 +137,7 @@ const view = { scale: 10, worldToScreen: (x, y) => [x * 10, y * 10] };
 // Stories with one squad post and one squad, for {post, squad} addressees.
 const squadPolicy = JSON.parse(JSON.stringify(policy));
 squadPolicy.squads = { alpha: { nameRu: 'Альфа', nameEn: 'Alpha', color: '#ff0000' } };
-squadPolicy.posts.push({ id: 'sl', nameRu: 'Командир отделения', nameEn: 'Squad Leader', level: 'squad', max: 4 });
+squadPolicy.posts.push({ id: 'sl', nameRu: 'Командир отделения', nameEn: 'Squad Leader', level: 'squad', max: 4, perSquad: true });
 // A task without a map point, addressed to the mortar post by the staff officer.
 const task = over => { const r = req(Object.assign({ id: 't1', type: 'task', note: 'hold the north gate', to: { post: 'mortar' } }, over)); if (!over || !('target' in over)) delete r.target; return r; };
 
@@ -293,7 +293,7 @@ async function t(name, fn) { await fn(); n++; console.log('ok', name); }
   });
 
   await t('asset board: a radius of "<img onerror>" renders nothing, a number renders', () => {
-    world([mortarAsset({ radius: '<img onerror=1>', state: 'constructor', shell: '"><img onerror=1>', claimedBy: 'c-crew' }), crew], crew);
+    world([mortarAsset({ radius: '<img onerror=1>', state: 'constructor', shell: '"><img onerror=1>', claimedBy: 'c-crew-0001' }), crew], crew);
     let html = mod.panel('assets', api) + mod.chips(api);
     assertSafe(html, 'hostile asset');
     assert.ok(!html.includes('· r '), 'no radius text');
@@ -491,13 +491,14 @@ async function t(name, fn) { await fn(); n++; console.log('ok', name); }
     assert.strictEqual(H.state.taken, null, 'and the taken request is dropped');
   });
 
-  await t('pickMortarRow: the mortar I crew, else the first I may edit', () => {
+  await t('pickMortarRow: the mortar I crew, else the first I may edit that no other crew has claimed', () => {
     const row = (k, claimedBy, type) => ({ id: 'asset-' + (type || 'mortar') + '-' + k, def: { type: type || 'mortar' }, n: k, obj: { claimedBy } });
-    const rows = [row(1, null, 'ob'), row(1, 'c-other'), row(2, 'c-crew'), row(3, null)];
+    const rows = [row(1, null, 'ob'), row(1, 'c-other'), row(2, 'c-crew-0001'), row(3, null)];
     const all = () => true;
     assert.strictEqual(H.pickMortarRow(rows, crew, all).id, 'asset-mortar-2');
-    assert.strictEqual(H.pickMortarRow(rows, crew, r => r.id !== 'asset-mortar-2').id, 'asset-mortar-1');
-    assert.strictEqual(H.pickMortarRow(rows, so, all).id, 'asset-mortar-1');
+    assert.strictEqual(H.pickMortarRow(rows, crew, r => r.id !== 'asset-mortar-2').id, 'asset-mortar-3', 'never the mortar another crew claimed');
+    assert.strictEqual(H.pickMortarRow(rows, so, all).id, 'asset-mortar-3', 'staff do not move a claimed mortar implicitly either');
+    assert.strictEqual(H.pickMortarRow([row(1, 'c-other')], crew, all), null, 'only claimed by someone else: none');
     assert.strictEqual(H.pickMortarRow(rows, crew, () => false), null);
     assert.strictEqual(H.pickMortarRow([row(1, undefined), row(2, undefined)], {}, all).id, 'asset-mortar-1', 'no undefined === undefined match');
     assert.strictEqual(H.pickMortarRow([row(1, null, 'ob')], crew, all), null, 'mortars only');
@@ -561,7 +562,7 @@ async function t(name, fn) { await fn(); n++; console.log('ok', name); }
   });
 
   await t('the sound is for requests aimed at an asset I own or crew', () => {
-    const objects = { 'asset-mortar-1': mortarAsset({ claimedBy: 'c-so2' }) };
+    const objects = { 'asset-mortar-1': mortarAsset({ claimedBy: 'c-so2-0001' }) };
     const r = req();
     assert.strictEqual(H.aimedAtMine(policy, objects, crew, r), true, 'mortar post owns the mortar');
     assert.strictEqual(H.aimedAtMine(policy, objects, so, r), false, 'staff hears nothing for the crew');
@@ -620,7 +621,7 @@ async function t(name, fn) { await fn(); n++; console.log('ok', name); }
     const objects = { 'asset-mortar-1': mortarAsset() };
     assert.deepStrictEqual(H.pingTargets(policy, crew, [req()], objects, []).map(r => r.id), ['q1']);
     [so, so2, observer, knocking, null].forEach(me => assert.deepStrictEqual(H.pingTargets(policy, me, [req()], objects, []), [], String(me && me.id)));
-    assert.deepStrictEqual(H.pingTargets(policy, so2, [req()], { 'asset-mortar-1': mortarAsset({ claimedBy: 'c-so2' }) }, []).map(r => r.id), ['q1'],
+    assert.deepStrictEqual(H.pingTargets(policy, so2, [req()], { 'asset-mortar-1': mortarAsset({ claimedBy: 'c-so2-0001' }) }, []).map(r => r.id), ['q1'],
       'a staff officer in the crew seat is the crew');
     assert.deepStrictEqual(H.pingTargets(policy, crew, [req({ type: 'position', by: by(crew) })], objects, []), [], 'the crew\'s own request: no accept, no ping');
     const w = pingWorld([req(), mortarAsset()], crew);
@@ -791,7 +792,7 @@ async function t(name, fn) { await fn(); n++; console.log('ok', name); }
     assert.strictEqual(w.ac.groups.length, 1, 'the click itself plays nothing, even when a ping is due');
     assert.deepStrictEqual(H.state.pinging, ['q2']);
     assert.strictEqual(queued.length, 0, 'nothing sent to the room');
-    assert.deepStrictEqual(JSON.parse(session[HEARD + 'c-crew']), ['q1']);
+    assert.deepStrictEqual(JSON.parse(session[HEARD + 'c-crew-0001']), ['q1']);
     const strip = mod.strip(api);
     assert.ok(!strip.includes('data-room-action="reqHeard" data-id="q1"') && strip.includes('data-room-action="reqHeard" data-id="q2"'), strip);
     tickAt(10000);
@@ -801,7 +802,7 @@ async function t(name, fn) { await fn(); n++; console.log('ok', name); }
     tickAt(20000);
     assert.strictEqual(w.ac.groups.length, 2, 'all heard: silence');
     mod.actions.reqHeard(el({ 'data-id': 'q9' }), api);
-    assert.deepStrictEqual(JSON.parse(session[HEARD + 'c-crew']), ['q1', 'q2'], 'an id that does not ping is not stored');
+    assert.deepStrictEqual(JSON.parse(session[HEARD + 'c-crew-0001']), ['q1', 'q2'], 'an id that does not ping is not stored');
     w.all.q3 = req({ id: 'q3' });
     tickAt(21000);
     assert.strictEqual(w.ac.groups.length, 3, 'a new request pings again');
@@ -1034,9 +1035,10 @@ async function t(name, fn) { await fn(); n++; console.log('ok', name); }
       assert.ok(!queued.some(o => o.data && o.data.status === 'firing'), name + ': a shot never fires a task');
       assert.doesNotThrow(() => mod.tick(api), name + ': tick');
     }
-    world([task({ status: 'done', acceptedBy: by(crew), to: { client: 'c-crew', post: 'so' } })], so);
+    // A real client id (8–40 of [A-Za-z0-9_-]), the only shape the contract takes as an addressee.
+    world([task({ status: 'done', acceptedBy: by(crew), to: { client: 'c-crew-0001', post: 'so' } })], so);
     mod.actions['req-repeat'](el({ 'data-id': 't1' }), api);
-    assert.deepStrictEqual(queued.map(o => o.data), [{ type: 'task', note: 'hold the north gate', priority: 'normal', flags: [], level: 0, h: 'h1', to: { client: 'c-crew' } }],
+    assert.deepStrictEqual(queued.map(o => o.data), [{ type: 'task', note: 'hold the north gate', priority: 'normal', flags: [], level: 0, h: 'h1', to: { client: 'c-crew-0001' } }],
       'a repeat keeps no point and the addressee, rebuilt from its own keys');
     assert.strictEqual(R.validateData(policy, 'request', queued[0].data), null, 'the contract takes the repeat');
     const ru = load('ru').api.T();
@@ -1052,11 +1054,11 @@ async function t(name, fn) { await fn(); n++; console.log('ok', name); }
     const opts = type => H.toOptions(api, type).map(o => [o.value, o.label, o.to]);
     assert.deepStrictEqual(opts('mortar'), [
       ['', 'Everyone by type', null], ['post:mortar', 'Mortar crew', { post: 'mortar' }],
-      ['client:c-crew', 'Бекас · Mortar crew', { client: 'c-crew' }], ['client:c-crew2', evil + ' · Mortar crew', { client: 'c-crew2' }]]);
+      ['client:c-crew-0001', 'Бекас · Mortar crew', { client: 'c-crew-0001' }], ['client:c-crew2-0001', evil + ' · Mortar crew', { client: 'c-crew2-0001' }]]);
     assert.deepStrictEqual(opts('task'), [
       ['', '— pick —', null], ['post:so', 'Staff Officer', { post: 'so' }], ['post:mortar', 'Mortar crew', { post: 'mortar' }],
-      ['client:c-so2', 'Staff Officer', { client: 'c-so2' }], ['client:c-crew', 'Бекас · Mortar crew', { client: 'c-crew' }],
-      ['client:c-crew2', evil + ' · Mortar crew', { client: 'c-crew2' }]]);
+      ['client:c-so2-0001', 'Staff Officer', { client: 'c-so2-0001' }], ['client:c-crew-0001', 'Бекас · Mortar crew', { client: 'c-crew-0001' }],
+      ['client:c-crew2-0001', evil + ' · Mortar crew', { client: 'c-crew2-0001' }]]);
     assert.deepStrictEqual(opts('position').map(o => o[0]), opts('task').map(o => o[0]), 'a position request may go to any post');
     assert.strictEqual(opts('position')[0][1], 'Everyone by type');
     const base = { note: 'go', priority: 'normal', flags: [], level: 0, h: '' };
@@ -1081,11 +1083,11 @@ async function t(name, fn) { await fn(); n++; console.log('ok', name); }
     assert.ok(html.includes('<select class="tac-select" name="to"><option value="" selected>— pick —</option><option value="post:so">Staff Officer</option>'), html);
     assert.ok(html.includes('Task text<input class="tac-input" name="note"'), 'the note is the task text');
     assert.ok(html.includes('<span class="tac-item-coords">no point (optional)</span>'), 'the point is optional');
-    api.ui.drafts['request.to'] = 'client:c-crew';
+    api.ui.drafts['request.to'] = 'client:c-crew-0001';
     html = mod.panel('requests', api);
-    assert.ok(html.includes('<option value="client:c-crew" selected>&lt;img src=x onerror=1&gt; · Mortar crew</option>'), 'the draft stays chosen, the callsign escaped');
+    assert.ok(html.includes('<option value="client:c-crew-0001" selected>&lt;img src=x onerror=1&gt; · Mortar crew</option>'), 'the draft stays chosen, the callsign escaped');
     api.ui.drafts['request.type'] = 'mortar';
-    assert.ok(mod.panel('requests', api).includes('<option value="client:c-crew" selected>'), 'a crew member is still offered for a strike');
+    assert.ok(mod.panel('requests', api).includes('<option value="client:c-crew-0001" selected>'), 'a crew member is still offered for a strike');
     api.ui.drafts['request.to'] = 'post:so';
     html = mod.panel('requests', api);
     assert.ok(html.includes('<option value="" selected>Everyone by type</option>') && !html.includes('post:so'), 'a strike never offers staff: back to everyone');
@@ -1116,13 +1118,13 @@ async function t(name, fn) { await fn(); n++; console.log('ok', name); }
       const plain = send('task', 'post:mortar', 'hold the gate');
       assert.deepStrictEqual(plain, { toast: [], data: [{ type: 'task', note: 'hold the gate', priority: 'normal', flags: [], level: 0, h: 'h1', to: { post: 'mortar' } }], open: false });
       assert.strictEqual(R.validateData(policy, 'request', plain.data[0]), null, 'the contract takes a task without a point');
-      const pointed = send('task', 'client:c-crew', 'check here', [5, 6]);
-      assert.deepStrictEqual([pointed.data[0].target, pointed.data[0].to], [{ x: 5, y: 6 }, { client: 'c-crew' }]);
+      const pointed = send('task', 'client:c-crew-0001', 'check here', [5, 6]);
+      assert.deepStrictEqual([pointed.data[0].target, pointed.data[0].to], [{ x: 5, y: 6 }, { client: 'c-crew-0001' }]);
       assert.strictEqual(R.validateData(policy, 'request', pointed.data[0]), null);
       const everyone = send('mortar', '', 'x', [62, -62]);
       assert.ok(everyone.data.length === 1 && !('to' in everyone.data[0]), 'everyone by type sends no addressee');
-      const toCrew = send('mortar', 'client:c-crew', 'x', [62, -62]);
-      assert.deepStrictEqual(toCrew.data[0].to, { client: 'c-crew' });
+      const toCrew = send('mortar', 'client:c-crew-0001', 'x', [62, -62]);
+      assert.deepStrictEqual(toCrew.data[0].to, { client: 'c-crew-0001' });
       assert.strictEqual(R.validateData(policy, 'request', toCrew.data[0]), null);
       assert.deepStrictEqual(send('mortar', 'post:so', 'x', [62, -62]).toast, [T.reqToStale], 'a forged staff addressee on a strike is refused');
       api.ui.policy = squadPolicy;
@@ -1137,9 +1139,9 @@ async function t(name, fn) { await fn(); n++; console.log('ok', name); }
 
   await t('card: «→ addressee» after the type; the addressee or staff accept, the asset owner and a claimed crew do not; a task has its own deny reasons', () => {
     const named = Object.assign({}, crew2, { callsign: 'Бекас' });
-    const r = req({ to: { client: 'c-crew2' } });
+    const r = req({ to: { client: 'c-crew2-0001' } });
     const acts = me => {
-      world([r, mortarAsset({ claimedBy: 'c-crew' }), so, so2, crew, named], me);
+      world([r, mortarAsset({ claimedBy: 'c-crew-0001' }), so, so2, crew, named], me);
       return [...mod.panel('requests', api).matchAll(/data-room-action="req-([a-z]+)"/g)].map(m => m[1]);
     };
     assert.deepStrictEqual([so, so2, crew, named].map(acts), [['cancel'], ['accept', 'deny'], [], ['accept', 'deny']]);
@@ -1164,22 +1166,23 @@ async function t(name, fn) { await fn(); n++; console.log('ok', name); }
   await t('ping: a request with an addressee sounds only for the addressee; without one, as in stage 1', () => withClock(() => {
     const hears = (r, me) => { const w = pingWorld([r, mortarAsset(), so, so2, crew, crew2], me); tickAt(0); return patterns(w.ac).length > 0; };
     const all = [so, so2, crew, crew2];
-    assert.deepStrictEqual(all.map(m => hears(req({ to: { client: 'c-crew2' } }), m)), [false, false, false, true], 'a strike for one crew member');
+    assert.deepStrictEqual(all.map(m => hears(req({ to: { client: 'c-crew2-0001' } }), m)), [false, false, false, true], 'a strike for one crew member');
     assert.deepStrictEqual(all.map(m => hears(req({ to: { post: 'mortar' } }), m)), [false, false, true, true], 'a strike for the mortar post');
     assert.deepStrictEqual(all.map(m => hears(task({ by: by(crew), to: { post: 'so' } }), m)), [true, true, false, false], 'a task for staff; its author hears nothing');
     assert.deepStrictEqual(all.map(m => hears(req(), m)), [false, false, true, true], 'no addressee: the mortar crew, as before');
-    const objects = { 'asset-mortar-1': mortarAsset({ claimedBy: 'c-so2' }) };
+    const objects = { 'asset-mortar-1': mortarAsset({ claimedBy: 'c-so2-0001' }) };
     assert.strictEqual(H.aimedAtMine(policy, objects, so2, req()), true, 'a claimed seat without an addressee');
     assert.strictEqual(H.aimedAtMine(policy, objects, so2, req({ to: { post: 'mortar' } })), false, 'a claimed seat is no addressee');
     assert.strictEqual(H.aimedAtMine(policy, objects, crew, req({ to: 'mortar' })), false, 'a broken addressee aims at nobody');
   }));
 
   await t('ownMortarRow: the mortar I claimed, else the first of my post; none for staff without a seat or a level that cannot write assets', () => {
-    const rows = [1, 2].map(n => ({ id: 'asset-mortar-' + n, def: { type: 'mortar', owner: 'mortar' }, n, obj: { claimedBy: n === 2 ? 'c-crew' : null } }));
+    const rows = [1, 2].map(n => ({ id: 'asset-mortar-' + n, def: { type: 'mortar', owner: 'mortar' }, n, obj: { claimedBy: n === 2 ? 'c-crew-0001' : null } }));
     assert.strictEqual(H.ownMortarRow(rows, policy, crew).id, 'asset-mortar-2', 'claimed');
     assert.strictEqual(H.ownMortarRow(rows, policy, crew2).id, 'asset-mortar-1', 'first of my post');
+    assert.strictEqual(H.ownMortarRow([Object.assign({}, rows[0], { obj: { claimedBy: 'c-other' } }), rows[1]], policy, crew2), null, 'never a mortar another crew claimed');
     assert.strictEqual(H.ownMortarRow(rows, policy, so), null, 'staff without a seat');
-    assert.strictEqual(H.ownMortarRow([rows[0], Object.assign({}, rows[1], { obj: { claimedBy: 'c-so2' } })], policy, so2).id, 'asset-mortar-2', 'a staff officer in a crew seat');
+    assert.strictEqual(H.ownMortarRow([rows[0], Object.assign({}, rows[1], { obj: { claimedBy: 'c-so2-0001' } })], policy, so2).id, 'asset-mortar-2', 'a staff officer in a crew seat');
     assert.strictEqual(H.ownMortarRow(rows.map(x => Object.assign({}, x, { obj: null })), policy, crew), null, 'no asset object yet');
     assert.strictEqual(H.ownMortarRow([{ id: 'asset-ob-1', def: { type: 'ob', owner: 'mortar' }, n: 1, obj: {} }], policy, crew), null, 'mortars only');
     assert.strictEqual(H.ownMortarRow(rows, policy, { client: 'c-obs', post: 'observer', confirmed: true }), null, 'observer');
@@ -1281,7 +1284,7 @@ async function t(name, fn) { await fn(); n++; console.log('ok', name); }
 
   await t('map: a deployed mortar gets a green annulus, a red disc inside minRange and both outlines; «Mortar zones» off keeps only the square and its label', () => {
     const store = {};
-    world([Object.assign({}, crew, { callsign: 'Бекас' }), mortarAsset({ tile: [30, -90], claimedBy: 'c-crew' })], so);
+    world([Object.assign({}, crew, { callsign: 'Бекас' }), mortarAsset({ tile: [30, -90], claimedBy: 'c-crew-0001' })], so);
     api.ui.storage = { read: k => (store[k] ? JSON.parse(JSON.stringify(store[k])) : null), write: (k, v) => { store[k] = JSON.parse(JSON.stringify(v)); } };
     const M = [305, -895];
     let c = canvas();
