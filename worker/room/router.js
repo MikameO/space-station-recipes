@@ -80,6 +80,10 @@ async function stopLink(request, env, path) {
       '<p>Ключ сервера: <b>' + keyId.replace(/[^A-Za-z0-9_-]/g, '') + '</b></p>' +
       '<form method="post"><button type="submit">' + label + '</button></form>', { status: 200, headers: html });
   }
+  // Only the page this link opens may press its button: a POST from another site (an auto-submitted form on a page
+  // that learned the link) is refused. A request without an Origin (curl by the key holder) still works.
+  const from = request.headers.get('Origin');
+  if (from && from !== new URL(request.url).origin) return new Response('forbidden', { status: 403 });
   await registry(env, '/stop', { keyId, on: action === 'stop' });
   const text = action === 'stop'
     ? 'Командный планшет отключён: новые комнаты не создаются, идущие переходят в «Радиомолчание» в течение минуты.'

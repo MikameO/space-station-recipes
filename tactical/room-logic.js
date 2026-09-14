@@ -283,7 +283,8 @@
     return cps.length > max ? cps.slice(0, max).join('').replace(/\s+$/, '') : t;
   }
 
-  function validOffset(v) { return Array.isArray(v) && v.length === 2 && isNum(v[0]) && isNum(v[1]); }
+  // A calibration offset is a pair of whole tiles within the map bound, like every other coordinate in the room.
+  function validOffset(v) { return isPair(v); }
   function isPair(v) { return Array.isArray(v) && v.length === 2 && isCoord(v[0]) && isCoord(v[1]); }
   function pickKeys(o, keys) {
     var out = {};

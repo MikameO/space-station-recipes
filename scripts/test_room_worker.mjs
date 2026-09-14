@@ -128,6 +128,10 @@ await t('stop link: GET shows a form, POST stops, start re-enables', async () =>
   assert.match(await page.text(), /<form method="post">/);
   assert.strictEqual((await create(env)).status, 200, 'GET alone does not stop');
   assert.strictEqual((await routeRoom(new Request('https://w.example/stop/stories-k1/wrong', { method: 'POST' }), env)).status, 403);
+  assert.strictEqual((await routeRoom(new Request('https://w.example/stop/stories-k1/' + sig, { method: 'POST', headers: { Origin: 'https://evil.example' } }), env)).status, 403,
+    'an auto-submitted POST from another site is refused');
+  assert.strictEqual((await routeRoom(new Request('https://w.example/stop/stories-k1/' + sig, { method: 'POST', headers: { Origin: 'https://w.example' } }), env)).status, 200,
+    'the button on the link page works');
   assert.strictEqual((await routeRoom(new Request('https://w.example/stop/stories-k1/' + sig, { method: 'POST' }), env)).status, 200);
   const refused = await create(env);
   assert.strictEqual(refused.status, 403);

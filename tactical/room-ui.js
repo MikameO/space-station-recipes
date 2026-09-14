@@ -514,14 +514,24 @@
     if (value === 'off') ui.storage.remove(DEV_KEY); else ui.storage.write(DEV_KEY, { url: 'http://127.0.0.1:' + value });
     return true;
   }
+  // The room server a dev flag may name: on a local host only a local Worker, anywhere else only the project's own
+  // Worker. A pasted «enable the room» line with any other address is ignored, so it can never carry the server key,
+  // the sessions or the room to someone else's server.
+  var PROD_WORKER = 'https://chemdb-feedback.chemdb-feedback-worker.workers.dev';
+  function devRoomUrl() {
+    var d = devFlags(), url = d && typeof d.url === 'string' ? d.url.replace(/\/+$/, '') : '';
+    if (!url) return '';
+    var host = root.location ? root.location.hostname : '';
+    if (host === '127.0.0.1' || host === 'localhost') return /^http:\/\/(127\.0\.0\.1|localhost):[0-9]{2,5}$/.test(url) ? url : '';
+    return url === PROD_WORKER ? url : '';
+  }
   function roomUrl() {
-    var d = devFlags();
-    return (d && d.url) || (ui.root && ui.root.ROOM_URL) || '';
+    return devRoomUrl() || (ui.root && ui.root.ROOM_URL) || '';
   }
   function available(policy) {
     if (ui.demo) return !!policy;
     if (!policy || !roomUrl()) return false;
-    return !!devFlags() || policy.sanction.some(function (s) { return s.status !== 'none'; });
+    return !!devRoomUrl() || policy.sanction.some(function (s) { return s.status !== 'none'; });
   }
   function validPolicy(p) {
     return !!(p && Array.isArray(p.posts) && Array.isArray(p.sanction) && Array.isArray(p.functions) && Array.isArray(p.assets) &&
@@ -571,7 +581,7 @@
       : new ui.root.HttpTransport(roomUrl());
     ui.client = new ui.root.RoomClient({
       transport: transport, storage: ui.storage, policy: ui.policy, fork: ctx.fork.key,
-      clientId: devFlags() && ui.clientHash ? ui.clientHash : undefined,
+      clientId: devRoomUrl() && ui.clientHash ? ui.clientHash : undefined,
       planet: ctx.meta ? ctx.meta.id : null, h: ctx.meta ? ctx.meta.h : '', onUpdate: onClientUpdate
     });
   }
@@ -1400,7 +1410,7 @@
     ui.narrow = !!(mq && mq.matches);
     if (mq && mq.addEventListener) mq.addEventListener('change', function (e) { ui.narrow = e.matches; if (!ui.narrow) ui.shelf = false; queueRender(); });
     ui.toastEl = document.createElement('div');
-    ui.toastEl.className = 'tac-room-toast tac-hide';
+    ui.toastEl.className = 'tac-room-toast tac-hide ym-hide-content';   // room texts stay out of session recordings
     ui.toastEl.setAttribute('role', 'status');
     document.body.appendChild(ui.toastEl);
     hooks.view.addLayer(function drawRoom(ctx, v) {

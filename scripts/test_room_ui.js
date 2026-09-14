@@ -1133,6 +1133,26 @@ async function t(name, fn) { await fn(); n++; console.log('ok', name); }
     assert.strictEqual(ui.toastEl.textContent, '', 'whatever the room answered, the sync stays quiet');
   });
 
+  await t('a dev flag counts only for a local Worker on a local host and the project Worker elsewhere: a pasted foreign address is ignored', async () => {
+    const run = async (hostname, url) => {
+      const ls = fakeStorage();
+      ls.setItem('chemdb-tactical:room-dev', JSON.stringify({ url }));
+      const w = world({ localStorage: ls, fetch: answer(policyWith('none')) });
+      w.win.location.hostname = hostname;
+      w.attach();
+      await settle();
+      return { fetches: w.fetches.slice(), hidden: w.els.tacRoomEntry.classList.contains('tac-hide') };
+    };
+    const prod = 'https://chemdb-feedback.chemdb-feedback-worker.workers.dev';
+    assert.deepStrictEqual(await run('mikameo.github.io', prod), { fetches: [prod + '/policy/stories_cm'], hidden: false });
+    assert.deepStrictEqual(await run('mikameo.github.io', prod + '/'), { fetches: [prod + '/policy/stories_cm'], hidden: false }, 'a trailing slash is fine');
+    assert.deepStrictEqual(await run('mikameo.github.io', 'https://evil.example'), { fetches: [], hidden: true }, 'a phishing snippet is ignored on production');
+    assert.deepStrictEqual(await run('mikameo.github.io', prod + '.evil.example'), { fetches: [], hidden: true }, 'a look-alike host too');
+    assert.deepStrictEqual(await run('mikameo.github.io', 'http://127.0.0.1:8787'), { fetches: [], hidden: true }, 'production never talks to a local address');
+    assert.deepStrictEqual(await run('127.0.0.1', 'http://127.0.0.1:8787'), { fetches: ['http://127.0.0.1:8787/policy/stories_cm'], hidden: false });
+    assert.deepStrictEqual(await run('127.0.0.1', 'https://evil.example'), { fetches: [], hidden: true }, 'a local page only talks to a local Worker');
+  });
+
   notes.forEach(x => console.log('note:', x));
   console.log('OK', n, 'cases');
   process.exit(0);
