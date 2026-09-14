@@ -161,12 +161,38 @@ input.tac-room-code { text-transform: uppercase; font-family: ui-monospace, "Cas
 
 .tac-room-banner p { margin: 0 0 6px; }
 .tac-room-banner.frozen { border-color: var(--cyan); background: var(--cyan-dim); }
-.tac-room-banner.warn { border-color: var(--amber); }
+/* Warn banners carry actions — a knock holds a confirm button or three word choices: the text on its
+   own row, buttons in a wrapping row of 44 px targets, the banner never taller than 120 px. */
+.tac-room-banner.warn {
+  border-color: var(--amber);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  max-height: 120px;
+  overflow-y: auto;
+}
+.tac-room-banner.warn > p { flex: 1 1 100%; margin: 0; }
+.tac-room-banner.warn > .tac-room-btn { flex: none; min-height: 44px; }
+.tac-room-banner.warn > .tac-room-btn.big { min-width: 64px; }
+
+/* «key saved · replace · forget key» in the create form: one muted row that wraps, buttons inline. */
+.tac-room-keyline {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
+  margin: 2px 0;
+  font-size: 12px;
+}
+.tac-room-keyline .tac-room-btn { flex: none; font-size: 12px; }
 
 .tac-room-btn.on { border-color: var(--cyan); color: var(--cyan); }
 
-/* Above Series T's .toast (style.css: bottom 20px, z-index 10001), so both stay readable. */
+/* Above Series T's .toast (style.css: bottom 20px, z-index 10001), so both stay readable.
+   It never takes taps: the buttons under it keep working while it shows. */
 .tac-room-toast {
+  pointer-events: none;
   position: fixed;
   bottom: 64px;
   left: 50%;

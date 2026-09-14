@@ -29,7 +29,9 @@
     to_lz: 'busy', flyby: 'busy', cooldown: 'cooldown', offline: 'down', destroyed: 'down', unavailable: 'down' };
   var TYPE_COLOUR = { mortar: '#ffb627', ob: '#ff3d5a', cas: '#00e5ff', supply: '#39ff85', medevac: '#c17aff', other: '#e8ecf4', position: '#00e5ff' };
   var DEFAULT_COLOUR = '#e8ecf4';
-  var BIG_ACTIONS = ['take', 'place', 'accept', 'fire', 'load', 'done', 'deny'];
+  var BIG_ACTIONS = ['take', 'place', 'accept', 'fire', 'load', 'done', 'deny', 'cancel', 'repeat'];
+  // These hand a tile of the room's planet to this page or create a request on it.
+  var PLANET_ACTIONS = ['take', 'place', 'repeat'];
   var rq = { form: false, taken: null, target: null, denyAsk: null, seenMine: null, seenAll: null, flash: {}, audio: null, mounted: false };
 
   var l10n = {
@@ -38,6 +40,7 @@
       toolRequest: 'Request', newRequest: 'New request', pickTarget: 'Pick on the map', coordsHint: 'or type X Y from the rangefinder',
       note: 'Note', urgent: 'Urgent', beacon: 'Beacon placed', send: 'Send', empty: 'No requests', min: 'min',
       needTarget: 'Pick a target first.', noCalibration: 'No calibration: pick the target on the map.',
+      reqWrongPlanet: 'The map shows another planet — switch to the room\'s planet.',
       types: { mortar: 'Mortar', ob: 'OB', cas: 'CAS', supply: 'Supply drop', medevac: 'Medevac', other: 'Other', position: 'Position' },
       statuses: { requested: 'requested', accepted: 'accepted', loaded: 'loaded', firing: 'firing', done: 'done', denied: 'denied' },
       firingBy: { mortar: 'shell in the air', ob: 'OB inbound', cas: 'fly-by', supply: 'crate inbound', medevac: 'en route', other: 'started' },
@@ -65,6 +68,7 @@
       toolRequest: 'Запрос', newRequest: 'Новый запрос', pickTarget: 'Указать на карте', coordsHint: 'или введите X Y с дальномера',
       note: 'Заметка', urgent: 'Срочно', beacon: 'Маяк поставлен', send: 'Отправить', empty: 'Запросов нет', min: 'мин',
       needTarget: 'Сначала укажите цель.', noCalibration: 'Нет калибровки: укажите цель на карте.',
+      reqWrongPlanet: 'Карта другой планеты — переключитесь на планету комнаты.',
       types: { mortar: 'Миномёт', ob: 'ОБ', cas: 'КАС', supply: 'Поставка', medevac: 'Эвакуация', other: 'Прочее', position: 'Позиция' },
       statuses: { requested: 'запрошен', accepted: 'принят', loaded: 'заряжено', firing: 'огонь', done: 'выполнен', denied: 'отклонён' },
       firingBy: { mortar: 'снаряд в полёте', ob: 'ОБ летит', cas: 'облёт', supply: 'ящик летит', medevac: 'в пути', other: 'начато' },
@@ -97,6 +101,7 @@
   // A number for markup, or nothing.
   function fmtNum(v) { return isNum(v) ? String(v) : ''; }
   function validTile(t) { return Array.isArray(t) && t.length === 2 && isNum(t[0]) && isNum(t[1]); }
+  function disable(html) { return html.replace('<button ', '<button disabled '); }
 
   // Requests that fail this are skipped everywhere: cards, strip, chips, rings, actions.
   function validReq(req) {
@@ -144,14 +149,21 @@
     return !!me.client && R.claimants(objects, req).indexOf(me.client) >= 0;
   }
 
+  // A Series T shot belongs to the taken request when its game target lies within a tile of the
+  // request's target under one of the known calibration offsets. With no offset known, any shot counts.
+  function shotMatches(req, offsets, shot) {
+    var games = (offsets || []).filter(validTile).map(function (o) { return [req.target.x + o[0], req.target.y + o[1]]; });
+    if (!games.length) return true;
+    var t = shot && shot.target;
+    if (!validTile(t)) return false;
+    return games.some(function (g) { return Math.abs(g[0] - t[0]) <= 1 && Math.abs(g[1] - t[1]) <= 1; });
+  }
+
   // client.queue resolves {ok:true, seq} once the server acks the op and {ok:false, error} when it
   // refuses it; a network error keeps it pending. Anything else is unknown: act on nothing.
-  function whenAcked(promise, onOk, onFail) {
+  function whenAcked(promise, onOk) {
     if (!promise || typeof promise.then !== 'function') return;
-    promise.then(function (res) {
-      if (res && res.ok === true) onOk(res);
-      else if (res && res.ok === false && onFail) onFail(res);
-    }, function () { /* stays pending */ });
+    promise.then(function (res) { if (res && res.ok === true) onOk(res); }, function () { /* stays pending */ });
   }
 
   // ── data ─────────────────────────────────────────────
@@ -159,8 +171,24 @@
   function claimsFor(api, req) { return { claimed: R.claimants(api.ui.client.merged().objects, req) }; }
   function actionsFor(api, req) { return R.requestActions(api.ui.policy, api.me(), req, claimsFor(api, req)); }
   function constants(api) { var ctx = api.ui.hooks.getContext(); return ctx.fork ? ctx.fork.constants : null; }
-  // The page shows the room's planet (the shell's api.planetOk; absent means no check yet).
-  function planetOk(api) { return !(api.planetOk && !api.planetOk()); }
+  // The page shows the room's planet: the shell's api.planetOk, else the same comparison made here.
+  function planetOk(api) {
+    if (typeof api.planetOk === 'function') return !!api.planetOk();
+    var m = api.ui.client && api.ui.client.meta;
+    if (!m || !m.planet) return true;   // meta not loaded yet
+    var ctx = api.ui.hooks ? api.ui.hooks.getContext() : null;
+    return !!(ctx && ctx.meta && ctx.meta.id === m.planet);
+  }
+  // True (after a toast) when the page shows another planet than the room's.
+  function offPlanet(api) {
+    if (planetOk(api)) return false;
+    api.toast(api.T().reqWrongPlanet);
+    return true;
+  }
+  function calibrationOffsets(api) {
+    var room = api.ui.client.calibration ? api.ui.client.calibration() : null, ctx = api.ui.hooks.getContext();
+    return [room && room.offset, ctx.calibration && ctx.calibration.offset];
+  }
   function requests(api) { return api.ui.client.requests().filter(validReq); }
   function objectOf(api, id) {
     var objects = api.ui.client.merged().objects;
@@ -241,13 +269,15 @@
     return api.ui.client.queue({ op: 'patch', kind: 'request', id: req.id, expectedStatus: req.status, data: d });
   }
 
-  function queueRequest(api, type, target, note, urgent, flags) {
+  // `where` = {level, h} of an existing request (repeat); a new request takes the page's.
+  function queueRequest(api, type, target, note, urgent, flags, where) {
     var ctx = api.ui.hooks.getContext(), limit = api.ui.policy.limits.note;
+    var w = where || { level: ctx.level, h: ctx.meta ? ctx.meta.h : '' };
     return api.ui.client.queue({
       op: 'put', kind: 'request', id: 'q' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5),
       data: { type: type, target: { x: target[0], y: target[1] }, note: String(note || '').slice(0, isNum(limit) ? limit : 80),
         priority: urgent ? 'urgent' : 'normal', flags: Array.isArray(flags) ? flags.slice(0, 8) : [],
-        level: isNum(ctx.level) ? ctx.level : 0, h: ctx.meta && typeof ctx.meta.h === 'string' ? ctx.meta.h : '' }
+        level: isNum(w.level) ? w.level : 0, h: typeof w.h === 'string' ? w.h : '' }
     });
   }
 
@@ -258,9 +288,7 @@
     var label = action === 'fire' ? pick(T.actions.fire, req.type, T.actions.fire.other)
       : action === 'done' && own(T.doneBy, req.type) ? T.doneBy[req.type] : pick(T.actions, action, action);
     var html = api.btn('req-' + action, label, { id: req.id }, BIG_ACTIONS.indexOf(action) >= 0 ? 'big' : '');
-    // take and place hand the request's tile to this page's Fire panel: only while it shows the room's planet
-    if ((action === 'take' || action === 'place') && !planetOk(api)) html = html.replace('<button ', '<button disabled ');
-    return html;
+    return PLANET_ACTIONS.indexOf(action) >= 0 && !planetOk(api) ? disable(html) : html;
   }
 
   function fireCardHtml(api, req) {
@@ -289,27 +317,31 @@
     return T.statuses[req.status];
   }
 
+  function joinDot(parts) { return parts.filter(function (p) { return !!p; }).join(' · '); }
+
   function cardHtml(api, req, compact) {
     var T = api.T(), c = api.ui.client, esc = api.esc, P = api.ui.policy;
     var acts = c.status === 'in' ? actionsFor(api, req) : [];
-    var who = req.by ? api.postName(req.by.post) + (req.by.squad ? ' · ' + api.squadName(req.by.squad) : '') : '';
+    var by = req.by && typeof req.by === 'object' ? req.by : null;
+    var who = by && typeof by.post === 'string' ? api.postName(by.post) + (typeof by.squad === 'string' && by.squad ? ' · ' + api.squadName(by.squad) : '') : '';
     var age = isNum(req.at) ? Math.max(0, Math.round((c.serverNow() - req.at) / 60000)) : null;
     var dl = deadlineOf(api, req);
     var head = '<b>' + esc(pick(T.types, req.type, req.type)) + '</b> <span class="tac-item-coords">' + esc(api.gameText(req.target.x, req.target.y)) + '</span> · ' +
-      '<span class="tac-room-status">' + esc(statusText(T, P, req)) + '</span>' +
-      (dl !== null ? ' · ' + esc(req.type === 'cas' ? T.readyIn : T.impactIn) + ' <span data-deadline="' + fmtNum(dl) + '"></span>' : '');
-    var meta = esc(who) + (age !== null ? ' · ' + fmtNum(age) + ' ' + esc(T.min) : '');
+      '<span class="tac-room-status">' + esc(statusText(T, P, req)) + '</span>';
+    var countdown = dl !== null ? esc(req.type === 'cas' ? T.readyIn : T.impactIn) + ' <span data-deadline="' + fmtNum(dl) + '"></span>' : '';
+    var meta = joinDot([esc(who), age !== null ? fmtNum(age) + ' ' + esc(T.min) : '']);
     if (compact) {
-      // One line: text on the left, the next step on the right. Withdraw and deny stay on the full card.
+      // One row: two text lines on the left, the next step on the right. The countdown leads the second
+      // line so the ellipsis trims the author, never the time. Withdraw and deny stay on the full card.
       var next = acts.filter(function (a) { return a !== 'cancel' && a !== 'deny'; })[0];
       var flash = own(rq.flash, req.id) && rq.flash[req.id] > Date.now() ? ' flash' : '';
       return '<div class="tac-room-card' + (req.priority === 'urgent' ? ' urgent' : '') + flash + '" data-room-action="reqFocus" data-id="' + esc(req.id) + '">' +
-        '<div class="tac-room-card-text"><div>' + head + '</div><div class="tac-muted">' + meta + '</div></div>' +
+        '<div class="tac-room-card-text"><div>' + head + '</div><div class="tac-muted">' + joinDot([countdown, meta]) + '</div></div>' +
         (next ? actionButton(api, next, req) : '') + '</div>';
     }
-    var details = meta + (req.note ? ' · ' + esc(req.note) : '') +
-      (Array.isArray(req.flags) && req.flags.indexOf('beacon') >= 0 ? ' · ' + esc(T.beacon) : '') +
-      (req.reason && denial(P, req) === 'denied' ? ' · ' + esc(req.reason) : '');
+    var details = joinDot([meta, req.note ? esc(req.note) : '',
+      Array.isArray(req.flags) && req.flags.indexOf('beacon') >= 0 ? esc(T.beacon) : '',
+      req.reason && denial(P, req) === 'denied' ? esc(req.reason) : '']);
     var actionsHtml = rq.denyAsk === req.id && acts.indexOf('deny') >= 0
       ? '<div class="tac-room-actions">' + T.denyReasons.map(function (r) { return api.btn('reqDenyReason', r, { id: req.id, reason: r }, 'big'); }).join('') +
         api.btn('reqDenyCancel', T.denyCancel) + '</div>'
@@ -318,21 +350,22 @@
     var fire = rq.taken === req.id && acts.indexOf('take') >= 0 ? fireCardHtml(api, req) : '';
     return '<div class="tac-room-req st-' + esc(req.status) + (req.priority === 'urgent' ? ' urgent' : '') + (req.pending ? ' faded' : '') +
       '" style="--req:' + pick(TYPE_COLOUR, req.type, DEFAULT_COLOUR) + '">' +
-      '<div>' + head + '</div><div class="tac-muted">' + details + '</div>' + actionsHtml + fire + '</div>';
+      '<div>' + joinDot([head, countdown]) + '</div><div class="tac-muted">' + details + '</div>' + actionsHtml + fire + '</div>';
   }
 
   function formHtml(api) {
-    var T = api.T(), esc = api.esc, type = draftType(api), t = rq.target;
+    var T = api.T(), esc = api.esc, type = draftType(api), t = rq.target, ok = planetOk(api);
+    var pickBtn = api.btn('reqPick', T.pickTarget, null, 'big');
     return '<section class="tac-section tac-room-reqform"><h2>' + esc(T.newRequest) + '</h2>' +
       '<div class="tac-room-types">' + TYPES.map(function (k, i) { return api.btn('reqType', (i + 1) + ' ' + T.types[k], { type: k }, k === type ? 'on' : ''); }).join('') + '</div>' +
       '<form data-room-form="request" class="tac-room-form">' +
-      '<div class="tac-room-target">' + api.btn('reqPick', T.pickTarget, null, 'big') +
+      '<div class="tac-room-target">' + (ok ? pickBtn : disable(pickBtn)) +
       '<span class="tac-item-coords">' + (t ? esc(api.gameText(t[0], t[1])) : '—') + '</span></div>' +
       '<label class="tac-input-label">' + esc(T.coordsHint) + '<input class="tac-input" name="coords" autocomplete="off" value="' + esc(api.draft('request', 'coords', '')) + '"></label>' +
       '<label class="tac-input-label">' + esc(T.note) + '<input class="tac-input" name="note" maxlength="' + fmtNum(api.ui.policy.limits.note) + '" value="' + esc(api.draft('request', 'note', '')) + '"></label>' +
       '<label class="tac-room-check"><input type="checkbox" name="urgent"' + (api.draft('request', 'urgent', false) ? ' checked' : '') + '> ' + esc(T.urgent) + '</label>' +
       (type === 'supply' ? '<label class="tac-room-check"><input type="checkbox" name="beacon"' + (api.draft('request', 'beacon', false) ? ' checked' : '') + '> ' + esc(T.beacon) + '</label>' : '') +
-      '<button type="submit" class="btn-small tac-room-btn big">' + esc(T.send) + '</button></form></section>';
+      '<button type="submit" class="btn-small tac-room-btn big"' + (ok ? '' : ' disabled') + '>' + esc(T.send) + '</button></form></section>';
   }
 
   function requestsHtml(api) {
@@ -504,8 +537,8 @@
     id: 'requests',
     l10n: l10n,
     helpers: {
-      TYPES: TYPES, fmtNum: fmtNum, validReq: validReq, recalled: recalled, denial: denial, pickMortarRow: pickMortarRow,
-      typeForKey: typeForKey, aimedAtMine: aimedAtMine, levelOk: levelOk, state: rq
+      TYPES: TYPES, BIG_ACTIONS: BIG_ACTIONS, fmtNum: fmtNum, validReq: validReq, recalled: recalled, denial: denial, pickMortarRow: pickMortarRow,
+      typeForKey: typeForKey, aimedAtMine: aimedAtMine, levelOk: levelOk, shotMatches: shotMatches, state: rq
     },
     tabs: function (api) {
       var T = api.T();
@@ -523,8 +556,11 @@
     notify: function (event, payload, api) {
       if (event !== 'shot' || !rq.taken) return;
       var r = objectOf(api, rq.taken);
+      if (!r || r.kind !== 'request' || r.deleted || !validReq(r) || (r.status !== 'accepted' && r.status !== 'loaded')) { rq.taken = null; return; }
+      // A shot on another planet or at another target leaves the request taken.
+      if (!planetOk(api) || !shotMatches(r, calibrationOffsets(api), payload)) return;
       rq.taken = null;
-      if (r && r.kind === 'request' && !r.deleted && validReq(r) && (r.status === 'accepted' || r.status === 'loaded') && planetOk(api)) patchStatus(api, r, 'firing');
+      patchStatus(api, r, 'firing');
     },
     actions: {
       reqNew: function (el, api) {
@@ -539,7 +575,10 @@
         if (TYPES.indexOf(type) >= 0) api.ui.drafts['request.type'] = type;
         api.render();
       },
-      reqPick: function (el, api) { api.setPick('request', function (tile) { rq.target = tile.slice(); api.render(); }, api.T().pickTarget); },
+      reqPick: function (el, api) {
+        if (offPlanet(api)) return;
+        api.setPick('request', function (tile) { rq.target = tile.slice(); api.render(); }, api.T().pickTarget);
+      },
       'req-accept': function (el, api) { var r = getReq(api, el); if (r) patchStatus(api, r, 'accepted'); },
       'req-deny': function (el, api) { rq.denyAsk = el.getAttribute('data-id'); api.render(); },
       reqDenyReason: function (el, api) {
@@ -553,7 +592,7 @@
       'req-cancel': function (el, api) { var r = getReq(api, el); if (r) patchStatus(api, r, 'denied'); },
       'req-take': function (el, api) {
         var r = getReq(api, el);
-        if (!r || !planetOk(api)) return;
+        if (!r || offPlanet(api)) return;
         rq.taken = r.id;
         api.ui.hooks.takeTarget([r.target.x, r.target.y]);
         api.ui.tab = 'requests';   // from the strip too: the fire card is on the Requests tab
@@ -564,7 +603,7 @@
       'req-fire': function (el, api) { var r = getReq(api, el); if (r) patchStatus(api, r, 'firing'); },
       'req-place': function (el, api) {
         var r = getReq(api, el);
-        if (!r || !planetOk(api)) return;
+        if (!r || offPlanet(api)) return;
         api.ui.hooks.takePosition([r.target.x, r.target.y]);
         api.toast(api.T().placed);
       },
@@ -573,17 +612,20 @@
         if (!r) return;
         var tile = [Math.floor(r.target.x), Math.floor(r.target.y)], position = r.type === 'position';
         if (rq.taken === r.id) rq.taken = null;
-        // The asset moves only once the server has the request done: a refused «Deployed» leaves the mortar where it was.
+        // The asset moves only once the server has the request done. A refusal lands in client.rejected,
+        // which the shell toasts once; the mortar stays where it was.
         whenAcked(patchStatus(api, r, 'done'), function () {
           api.track('room_request_done');
           if (!position) return;
           var row = pickMortarRow(assetRows(api), api.me(), function (x) { return canEdit(api, x); });
           if (row) api.ui.client.queue({ op: 'patch', kind: 'asset', id: row.id, data: { tile: tile, state: 'deployed' } });
-        }, function (res) { api.toast(api.errorText(res.error || 'status')); });
+        });
       },
+      // A repeat keeps the original request's level and map hash: it is the same place on the room's planet.
       'req-repeat': function (el, api) {
         var r = getReq(api, el);
-        if (r) queueRequest(api, r.type, [r.target.x, r.target.y], r.note, r.priority === 'urgent', r.flags);
+        if (!r || offPlanet(api)) return;
+        queueRequest(api, r.type, [r.target.x, r.target.y], r.note, r.priority === 'urgent', r.flags, { level: r.level, h: r.h });
       },
       reqShoot: function (el, api) {
         var r = getReq(api, el), ctx = api.ui.hooks.getContext();
@@ -628,6 +670,7 @@
     },
     submits: {
       request: function (form, api) {
+        if (offPlanet(api)) return;
         var T = api.T(), f = form.elements, target = rq.target;
         var typed = String(f.coords.value || '').trim().match(/^(-?\d+)[\s,;]+(-?\d+)$/);
         if (typed) {
