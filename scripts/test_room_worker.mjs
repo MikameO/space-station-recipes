@@ -808,4 +808,150 @@ await t('final review 7: the author withdraws a request only while it waits or i
   assert.ok((await status('d', crew, 'firing', 'done')).acks[0].seq, 'the crew finishes it');
 });
 
+// ── Stage 2a, 2026-09-14: positions, the calibration in use, tasks, addressed requests, the room calibration ─────────
+const memberIdOf = (r, client) => Object.values(r.room.state.objects).find(o => o.kind === 'member' && !o.deleted && o.client === client).id;
+// The second sheet seat of a post, confirmed by the creating officer.
+async function joinSecond(env, r, post, client, callsign) {
+  const postCode = r.c.sheet.filter(s => s.post === post)[1].code;
+  const j = await (await call(env, 'POST', `/room/${r.code}/join`, { body: { client, postCode, callsign } })).json();
+  assert.strictEqual((await adminAs(env, r, r.so, { action: 'confirm', client, word: j.word })).status, 200);
+  return j.session;
+}
+const errorsOf = (env, r) => async (session, ops) => (await send(env, r, session, ops)).acks.map(a => a.error || (a.seq ? 'ok' : JSON.stringify(a)));
+
+await t('stage 2a members: own position and calibration only, never an observer; posAt from the server; a lock and radio silence pass presentAt alone', async () => {
+  const env = stage1Env();
+  const r = await stage1Room(env);
+  const crew = await joinMortar(env, r);
+  const errors = errorsOf(env, r);
+  const crewId = memberIdOf(r, 'client-mortar-01'), soId = memberIdOf(r, SO.client);
+  const me = () => r.room.state.objects[crewId];
+  const patch = (cid, data, id = crewId) => ({ cid, op: 'patch', kind: 'member', id, data });
+  const frozen = async ops => errorOf(await call(env, 'POST', `/room/${r.code}/ops`, { session: crew, body: { ops } }));
+  env.clock += 1000;
+  assert.deepStrictEqual(await errors(crew, [patch('p1', { pos: { x: 10, y: -20, level: 0, extra: '<b>' } })]), ['ok']);
+  assert.deepStrictEqual([me().pos, me().posAt], [{ x: 10, y: -20, level: 0 }, env.clock], 'pos rebuilt from x, y, level; posAt stamped');
+  env.clock += 1000;
+  assert.deepStrictEqual(await errors(crew, [patch('c1', { cal: [243, -218] })]), ['ok']);
+  assert.deepStrictEqual(me().cal, [243, -218]);
+  assert.deepStrictEqual(await errors(crew, [patch('p2', { pos: null }), patch('c2', { cal: null, presentAt: 1 })]), ['ok', 'ok']);
+  assert.deepStrictEqual([me().pos, me().posAt, me().cal, me().presentAt], [null, env.clock, null, env.clock]);
+  env.clock += 1100;
+  assert.deepStrictEqual(await errors(crew, [
+    patch('f1', { pos: { x: 1, y: 1 }, posAt: 5 }), patch('f2', { pos: { x: 1.5, y: 1 } }), patch('f3', { pos: { x: 4097, y: 1 } }),
+    patch('f4', { pos: [1, 1] }), patch('f5', { cal: [1] }), patch('f6', { cal: [0.5, 1] }), patch('f7', {}), patch('f8', { callsign: 'X' }),
+    patch('f9', { pos: { x: 1, y: 1 } }, soId), { cid: 'f10', op: 'put', kind: 'member', id: crewId, data: { pos: { x: 1, y: 1 } } }
+  ]), ['fields', 'pos', 'pos', 'pos', 'cal', 'cal', 'fields', 'fields', 'right', 'right']);
+  assert.strictEqual(r.room.state.objects[soId].pos, undefined, 'someone else\'s member is untouched');
+  // No one joins an observer post; the member is moved there in memory only, and the refused ops write no row.
+  env.clock += 1100;
+  me().post = 'observer';
+  try {
+    assert.deepStrictEqual(await errors(crew, [patch('o1', { pos: { x: 1, y: 1 } }), patch('o2', { cal: [1, 1] })]), ['level', 'level']);
+  } finally {
+    me().post = 'mortar';
+  }
+  env.clock += 1100;
+  assert.strictEqual((await adminAs(env, r, r.so, { action: 'silence', on: true })).status, 200);
+  assert.deepStrictEqual(await errors(crew, [patch('h1', { presentAt: 1 })]), ['ok'], 'a heartbeat passes radio silence');
+  for (const ops of [[patch('h2', { pos: { x: 2, y: 2 } })], [patch('h3', { cal: [243, -218] })],
+    [patch('h4', { presentAt: 1 }), patch('h5', { pos: null })], [patch('h6', { presentAt: 1, pos: null })]]) {
+    assert.deepStrictEqual(await frozen(ops), [423, 'silence'], JSON.stringify(ops));
+  }
+  assert.strictEqual((await adminAs(env, r, r.so, { action: 'silence', on: false })).status, 200);
+  env.clock += 9 * 60 * 1000;
+  assert.strictEqual((await (await pollRoom(env, r, r.so)).json()).meta.locked, true);
+  assert.deepStrictEqual(await frozen([patch('l1', { pos: { x: 3, y: 3 } })]), [423, 'locked']);
+  assert.deepStrictEqual(await errors(crew, [patch('l2', { presentAt: 1 })]), ['ok'], 'a heartbeat passes the lock');
+  assert.deepStrictEqual([me().pos, me().cal], [null, null], 'nothing was written while frozen');
+});
+
+await t('stage 2a requests: a task names its addressee and text; an addressed request is its addressee\'s or staff\'s, never the asset owner\'s', async () => {
+  const env = stage1Env();
+  const r = await stage1Room(env);
+  const crew = await joinMortar(env, r);
+  const crew2 = await joinSecond(env, r, 'mortar', 'client-mortar-02', 'Кузнецов');
+  const so2 = await joinSecond(env, r, 'so', 'client-so-0002', 'Павлов');
+  const errors = errorsOf(env, r);
+  const put = (cid, id, data) => ({ cid, op: 'put', kind: 'request', id, data });
+  const status = (cid, id, from, to) => ({ cid, op: 'patch', kind: 'request', id, expectedStatus: from, data: { status: to } });
+  const req = id => r.room.state.objects[id];
+  env.clock += 1000;
+  assert.deepStrictEqual(await errors(r.so, [
+    put('t0a', 't0', { type: 'task', note: 'без адресата' }),
+    put('t0b', 't0', { type: 'task', to: { post: 'mortar' } }),
+    put('t0c', 't0', { type: 'task', to: { post: 'mortar' }, note: '   ' }),
+    put('t0d', 't0', { type: 'task', to: { post: 'observer' }, note: 'x' }),
+    put('t0e', 't0', { type: 'task', to: { post: 'mortar', squad: 'alpha' }, note: 'x' }),
+    put('t0f', 't0', { type: 'task', to: { client: 'client-mortar-01', post: 'mortar' }, note: 'x' }),
+    put('t0g', 't0', { type: 'mortar', target: { x: 1, y: 1 }, to: { post: 'so' } }),
+    put('t0h', 't0', { type: 'task', to: { post: 'mortar' }, note: 'x', target: { x: 1.5, y: 1 } })
+  ]), ['to', 'note', 'note', 'to', 'to', 'to', 'to', 'target']);
+  assert.strictEqual(req('t0'), undefined);
+  env.clock += 1100;
+  assert.deepStrictEqual(await errors(r.so, [
+    put('t1', 't1', { type: 'task', to: { post: 'mortar', extra: '<b>' }, note: 'сменить позицию' }),
+    put('a1', 'a1', { type: 'position', target: { x: 30, y: -90 }, to: { client: 'client-mortar-02' } }),
+    put('a2', 'a2', { type: 'mortar', target: { x: 40, y: -80 }, to: { client: 'client-mortar-02' } }),
+    { cid: 'tp', op: 'patch', kind: 'request', id: 't1', data: { to: { post: 'so' } } }
+  ]), ['ok', 'ok', 'ok', 'fields']);
+  assert.deepStrictEqual([req('t1').to, req('t1').target, req('t1').status], [{ post: 'mortar' }, undefined, 'requested'], 'to rebuilt from its allowed keys');
+  env.clock += 1100;
+  assert.deepStrictEqual(await errors(crew, [status('o1', 'a1', 'requested', 'accepted'), status('o2', 'a2', 'requested', 'denied')]), ['right', 'right'],
+    'the mortar owner by post acts on no request addressed to another crew');
+  assert.deepStrictEqual(await errors(crew2, [status('x1', 'a1', 'requested', 'accepted')]), ['ok']);
+  assert.deepStrictEqual(req('a1').acceptedBy, { client: 'client-mortar-02', post: 'mortar', squad: null });
+  assert.deepStrictEqual(await errors(so2, [status('s1', 'a2', 'requested', 'accepted')]), ['ok'], 'staff accept an addressed request');
+  assert.deepStrictEqual(await errors(crew, [status('t1a', 't1', 'requested', 'accepted'), status('t1d', 't1', 'accepted', 'done')]), ['ok', 'ok'],
+    'the addressee by post takes the task and finishes it');
+  assert.deepStrictEqual([req('t1').status, req('t1').acceptedBy.client, typeof req('t1').doneAt], ['done', 'client-mortar-01', 'number']);
+  env.clock += 1100;
+  assert.deepStrictEqual(await errors(crew, [put('t2', 't2', { type: 'task', target: { x: 5, y: 6 }, to: { post: 'so' }, note: 'нужна цель' }),
+    status('t2a', 't2', 'requested', 'accepted')]), ['ok', 'author']);
+  assert.deepStrictEqual(await errors(r.so, [status('t2b', 't2', 'requested', 'accepted')]), ['ok']);
+  assert.deepStrictEqual(req('t2').target, { x: 5, y: 6 });
+});
+
+await t('stage 2a room calibration and journal: tile and reading agree with the offset, a fresh one replaces it; positions, addressees and tasks in the export, no cal line', async () => {
+  const env = stage1Env();
+  const r = await stage1Room(env);
+  const crew = await joinMortar(env, r);
+  const errors = errorsOf(env, r);
+  const crewId = memberIdOf(r, 'client-mortar-01');
+  const cal = (cid, data) => ({ cid, op: 'put', kind: 'calibration', id: 'calibration', data });
+  const patch = (cid, data) => ({ cid, op: 'patch', kind: 'member', id: crewId, data });
+  const room = () => r.room.state.objects.calibration;
+  env.clock += 1000;
+  assert.deepStrictEqual(await errors(crew, [
+    cal('w1', { offset: [1, 1], tile: [20, 20], reading: [263, -198] }), cal('w2', { offset: [243, -218], tile: [20, 20] }),
+    cal('w3', { offset: [243, -218], reading: [263, -198] }), cal('w4', { offset: [243, -218], tile: [20.5, 20], reading: [263, -198] }),
+    cal('w5', { offset: [243, -218], tile: [20, 20], reading: [263, -198], note: 'x' })
+  ]), ['offset', 'reading', 'tile', 'tile', 'fields']);
+  assert.strictEqual(room(), undefined);
+  env.clock += 1000;
+  const when = hhmmssOf(env.clock);
+  assert.deepStrictEqual(await errors(crew, [patch('p1', { pos: { x: 10, y: 20, level: 0 } }),
+    cal('c1', { offset: [243, -218], tile: [20, 20], reading: [263, -198] }),
+    patch('p2', { pos: { x: 10, y: 20, level: 0 } }), patch('k1', { cal: [243, -218] }), patch('p3', { pos: null })]), ['ok', 'ok', 'ok', 'ok', 'ok']);
+  assert.deepStrictEqual([room().offset, room().tile, room().reading, room().by.client], [[243, -218], [20, 20], [263, -198], 'client-mortar-01']);
+  assert.deepStrictEqual(await errors(r.so, [
+    { cid: 't1', op: 'put', kind: 'request', id: 't1', data: { type: 'task', to: { post: 'mortar' }, note: 'сменить позицию' } },
+    { cid: 'q1', op: 'put', kind: 'request', id: 'q1', data: { type: 'mortar', target: { x: 10, y: 20 }, to: { client: 'client-mortar-01' } } }
+  ]), ['ok', 'ok']);
+  const body = await (await call(env, 'GET', `/room/${r.code}/export`, { session: r.so })).json();
+  const lines = body.text.split('\n');
+  assert.deepStrictEqual(lines.slice(-6), [
+    `${when}  Миномётный расчёт  позиция: Миномётный расчёт «Сидоров» 10 20 (мир)`,
+    `${when}  Миномётный расчёт  привязка комнаты: Миномётный расчёт «Сидоров», сдвиг +243 -218, показание дальномера 263 -198, тайл 20 20 (мир)`,
+    `${when}  Миномётный расчёт  позиция: Миномётный расчёт «Сидоров» 253 -198`,
+    `${when}  Миномётный расчёт  позиция снята: Миномётный расчёт «Сидоров»`,
+    `${when}  Офицер штаба  запрос №1 «задача» → Миномётный расчёт: сменить позицию`,
+    `${when}  Офицер штаба  запрос №2 «удар миномёта» 253 -198 → Миномётный расчёт «Сидоров»`
+  ], lines.join('\n'));
+  assert.strictEqual(lines.length, body.ops.length, 'the header plus one line per op, less the cal patch');
+  env.clock += 1000;
+  assert.deepStrictEqual(await errors(r.so, [cal('c2', { offset: [0, 7] })]), ['ok'], 'a fresh room calibration replaces the old one');
+  assert.deepStrictEqual([room().offset, room().tile, room().reading, room().by.client], [[0, 7], undefined, undefined, SO.client]);
+});
+
 console.log('OK', passed, 'cases');
