@@ -861,6 +861,278 @@ async function t(name, fn) { await fn(); n++; console.log('ok', name); }
     assert.strictEqual(prod.fetches.length, 0, 'and fetches nothing');
   });
 
+  // ── Stage 2a: room calibration banner, publishing, roster marks, cal sync (docs/design/2026-09-14-tactical-tablet-stage2a.md §3.4) ──
+
+  const NOW = Date.UTC(2026, 8, 14, 18, 30);
+  const hm = ms => { const d = new Date(ms); return ('0' + d.getHours()).slice(-2) + ':' + ('0' + d.getMinutes()).slice(-2); };
+  const KEEP = 'chemdb-tactical:room-cal-keep:ABCD23';
+  const roomCal = (extra = {}) => Object.assign({ id: 'calibration', kind: 'calibration', offset: [20, -70], tile: [100, 200], reading: [120, 130],
+    at: NOW - 5 * 60000, by: { client: 'c-crew', post: 'mortar', squad: null } }, extra);
+  const fireCal = (offset, tile = [100, 200]) => ({ tile, reading: [tile[0] + offset[0], tile[1] + offset[1]], offset, at: NOW - 60000, check: null });
+  // A staff officer and the mortar crew in room ABCD23 on a stub client: queue records ops and answers when the test says so.
+  async function calRoom(opt = {}) {
+    const w = world(opt);
+    w.attach();
+    await settle();
+    const ui = w.ui();
+    ui.policy = clone(basePolicy);
+    const me = Object.assign({ id: 'm-so', kind: 'member', client: 'c-so', post: 'so', squad: null, callsign: 'Орлов', confirmed: true, at: NOW - 60000 }, opt.me);
+    const crew = Object.assign({ id: 'm-crew', kind: 'member', client: 'c-crew', post: 'mortar', squad: null, callsign: 'Сид<b>', confirmed: true, at: NOW - 60000 }, opt.crew);
+    const extra = opt.extra || [];
+    const queued = [], answers = [];
+    const c = stubClient({ code: 'ABCD23', meta: { planet: 'lv624' }, me, presence: {}, lastOwnOpAt: 0, offset: 0, rejected: [], sheet: null, error: null,
+      room: null, serverNow: () => NOW });
+    c.members = () => [me, crew].concat(extra);
+    c.calibration = () => c.room;
+    c.queue = op => { op.cid = 'cid' + (queued.length + 1); queued.push(op); return new Promise(r => answers.push(r)); };
+    ui.client = c;
+    ui.on = true;
+    return Object.assign(w, {
+      c, me, crew, queued, answers,
+      html: () => { w.api().render(); return w.els.tacRoom.innerHTML; },
+      calBanner: () => bannersOf((w.api().render(), w.els.tacRoom.innerHTML)).filter(b => b.indexOf('Привязка комнаты:') >= 0)[0] || null,
+      tick: () => w.intervals[0](),
+      row: text => (w.html().split('<div class="tac-room-row').slice(1).filter(r => r.indexOf(text) >= 0)[0] || '')   // slice: banners come first
+    });
+  }
+  const strip = op => { const o = Object.assign({}, op); delete o.cid; return o; };
+
+  await t('2a: the room calibration banner shows when mine differs or is missing, never for equal offsets; names are escaped', async () => {
+    const w = await calRoom();
+    assert.strictEqual(w.calBanner(), null, 'no room calibration: no banner');
+    w.c.room = roomCal();
+    let b = w.calBanner();
+    assert.ok(b, 'no calibration of my own: the banner shows');
+    assert.ok(b.indexOf('Привязка комнаты: Сид&lt;b&gt; (Миномётный расчёт), ' + hm(NOW - 5 * 60000) + ', сдвиг +20 -70') >= 0, b);
+    assert.ok(b.indexOf('<b>') < 0, 'the callsign is escaped');
+    assert.ok(b.indexOf('data-room-action="calKeep"') >= 0 && b.indexOf('data-at="' + (NOW - 5 * 60000) + '"') >= 0, b);
+    w.ctx.calibration = fireCal([20, -70], [5, 6]);
+    assert.strictEqual(w.calBanner(), null, 'equal offsets: no banner, whatever tile each measured');
+    w.ctx.calibration = fireCal([21, -70]);
+    assert.ok(w.calBanner(), 'a different offset: the banner shows');
+    w.c.room = roomCal({ by: { client: 'c-gone', post: 'so', squad: null } });
+    assert.ok(w.calBanner().indexOf('Привязка комнаты: Офицер штаба, ') >= 0, 'a publisher no longer in the room: the post name only');
+    w.ctx.meta = { id: 'bigred', h: 'h2' };
+    assert.strictEqual(w.calBanner(), null, 'the map shows another planet: its calibration is not the room’s');
+    const en = await calRoom({ lang: 'en' });
+    en.c.room = roomCal();
+    const panel = (en.api().render(), en.els.tacRoom.innerHTML);
+    assert.ok(panel.indexOf('Room calibration: Сид&lt;b&gt; (Mortar crew), ') >= 0 && panel.indexOf('>Keep mine<') >= 0, 'English strings');
+  });
+
+  await t('2a: «Оставить свою» hides the banner until the room calibration changes; sessionStorage keeps it for the tab, memory when it throws', async () => {
+    const w = await calRoom();
+    w.c.room = roomCal();
+    click(w, 'calKeep', { at: String(NOW - 5 * 60000) });
+    assert.strictEqual(w.calBanner(), null, 'kept');
+    assert.strictEqual(w.ui().calKeep[KEEP], String(NOW - 5 * 60000), 'sessionStorage throws: kept in memory');
+    w.c.room = roomCal({ offset: [22, -71], reading: [122, 129], at: NOW - 1000 });
+    assert.ok(w.calBanner(), 'a new room calibration brings it back');
+    const ss = fakeStorage();
+    const a = await calRoom({ sessionStorage: ss });
+    a.c.room = roomCal();
+    click(a, 'calKeep', { at: String(NOW - 5 * 60000) });
+    assert.strictEqual(ss.getItem(KEEP), String(NOW - 5 * 60000), 'written to sessionStorage');
+    const reload = await calRoom({ sessionStorage: ss });
+    reload.c.room = roomCal();
+    assert.strictEqual(reload.calBanner(), null, 'a reload of the tab still keeps mine');
+    reload.c.room = roomCal({ at: NOW });
+    assert.ok(reload.calBanner(), 'until the calibration changes');
+  });
+
+  await t('2a: «Применить у себя» calls the Fire panel hook and toasts; hidden without tile and reading or without the hook', async () => {
+    const w = await calRoom();
+    w.c.room = roomCal();
+    assert.ok(w.calBanner().indexOf('data-room-action="calApply"') < 0, 'no hook: no apply button');
+    const applied = [];
+    let answer = true;
+    w.hooks.applyCalibration = cal => { applied.push(cal); if (answer === 'throw') throw new Error('hook'); if (answer) w.ctx.calibration = fireCal(cal.offset, cal.tile); return answer; };
+    assert.ok(w.calBanner().indexOf('data-room-action="calApply"') >= 0, 'the hook and tile with reading: the button shows');
+    w.c.room = roomCal({ tile: undefined, reading: undefined });
+    assert.ok(w.calBanner().indexOf('data-room-action="calApply"') < 0, 'a calibration without tile and reading: no apply button');
+    assert.ok(w.calBanner().indexOf('data-room-action="calKeep"') >= 0, 'keep stays');
+    w.c.room = roomCal();
+    answer = false;
+    click(w, 'calApply');
+    assert.deepStrictEqual(applied, [{ tile: [100, 200], reading: [120, 130], offset: [20, -70] }]);
+    assert.strictEqual(w.ui().toastEl.textContent, 'Привязку комнаты не удалось применить.');
+    answer = 'throw';
+    click(w, 'calApply');
+    assert.strictEqual(w.ui().toastEl.textContent, 'Привязку комнаты не удалось применить.', 'a throwing hook is a failure');
+    assert.ok(w.warnings.some(x => x.indexOf('applyCalibration') >= 0), 'and warned');
+    answer = true;
+    click(w, 'calApply');
+    assert.strictEqual(w.ui().toastEl.textContent, 'Привязка комнаты применена');
+    assert.strictEqual(w.calBanner(), null, 'applied: the offsets agree, the banner goes');
+  });
+
+  await t('2a: «Опубликовать мою привязку» for the publishCalibration right while mine differs from the room; the queued put', async () => {
+    const w = await calRoom();
+    const tools = () => { const h = w.html(); return h.slice(h.indexOf('<div class="tac-room-tools">'), h.indexOf('<div class="tac-room-tabs"')); };
+    assert.ok(tools().indexOf('calPublish') < 0, 'no calibration of mine: nothing to publish');
+    w.ctx.calibration = fireCal([21, -70]);
+    assert.ok(tools().indexOf('data-room-action="calPublish"') >= 0 && tools().indexOf('Опубликовать мою привязку') >= 0, 'the room has none: publish');
+    assert.ok(tools().indexOf('уточнить своим замером') >= 0, 'the button explains itself');
+    w.c.room = roomCal();
+    assert.ok(tools().indexOf('calPublish') >= 0, 'mine differs from the room');
+    click(w, 'calPublish');
+    assert.deepStrictEqual(w.queued.map(strip), [{ op: 'put', kind: 'calibration', id: 'calibration', data: { offset: [21, -70], tile: [100, 200], reading: [121, 130] } }]);
+    w.answers[0]({ ok: true, seq: 5 });
+    await settle();
+    assert.strictEqual(w.ui().toastEl.textContent, 'Ваша привязка теперь привязка комнаты');
+    w.ctx.calibration = fireCal([20, -70]);
+    assert.ok(tools().indexOf('calPublish') < 0, 'equal to the room: no button');
+    w.ctx.calibration = { tile: [1, 2], reading: [9, 9], offset: [30, -70], at: 1 };
+    click(w, 'calPublish');
+    assert.deepStrictEqual(strip(w.queued[1]).data, { offset: [30, -70] }, 'tile and reading that disagree with the offset stay home');
+    w.me.post = 'mortar';
+    assert.ok(tools().indexOf('calPublish') >= 0, 'the mortar crew (service) holds the right in Stories');
+    w.ui().policy.rights.publishCalibration = ['staff'];
+    assert.ok(tools().indexOf('calPublish') < 0, 'a post without the right: no button');
+    click(w, 'calPublish');
+    assert.strictEqual(w.queued.length, 2, 'and a stale click queues nothing');
+  });
+
+  await t('2a: roster marks: room calibration, own, none, nothing without the field; position in game or world numbers with its age', async () => {
+    const knock = { id: 'm-k', kind: 'member', client: 'c-k', post: 'mortar', squad: null, confirmed: false, word: 'КЕДР', cal: null, pos: { x: 1, y: 1 }, posAt: NOW, at: NOW };
+    const w = await calRoom({ extra: [knock] });
+    const crewRow = () => w.row('Миномётный расчёт «Сид&lt;b&gt;»');
+    assert.ok(crewRow() && crewRow().indexOf('tac-room-mark') < 0, 'no cal field, no pos: no marks');
+    w.c.room = roomCal();
+    w.crew.cal = [20, -70];
+    assert.ok(crewRow().indexOf('✓ привязка комнаты') >= 0, crewRow());
+    w.crew.cal = [1, 2];
+    assert.ok(crewRow().indexOf('>своя привязка<') >= 0, crewRow());
+    w.c.room = null;
+    assert.ok(crewRow().indexOf('>своя привязка<') >= 0, 'a calibration while the room has none is its own');
+    w.crew.cal = null;
+    assert.ok(crewRow().indexOf('>нет привязки<') >= 0, crewRow());
+    w.crew.pos = { x: 10, y: -20, level: 0 };
+    w.crew.posAt = NOW - 3 * 60000 - 5000;
+    assert.ok(crewRow().indexOf('позиция 10 -20 (мир) · 3 мин') >= 0, 'no calibration known: world numbers ' + crewRow());
+    w.c.room = roomCal();
+    assert.ok(crewRow().indexOf('позиция 30 -90 · 3 мин') >= 0, 'the room calibration: game numbers ' + crewRow());
+    delete w.crew.posAt;
+    assert.ok(crewRow().indexOf('позиция 30 -90<') >= 0, 'no posAt: no age');
+    const knockRow = w.row('КЕДР');
+    assert.ok(knockRow && knockRow.indexOf('tac-room-mark') < 0, 'a member still knocking gets no marks');
+  });
+
+  await t('2a: cal sync queues my Fire panel offset once per change, never twice in flight, and retries a 423 once the room thaws', async () => {
+    const w = await calRoom();
+    const ops = () => w.queued.map(strip);
+    const patch = cal => ({ op: 'patch', kind: 'member', id: 'm-so', data: { cal } });
+    w.tick();
+    assert.deepStrictEqual(ops(), [patch(null)], 'no calibration yet: cal null');
+    w.tick();
+    assert.strictEqual(w.queued.length, 1, 'in flight: nothing more');
+    w.answers[0]({ ok: true, seq: 1 });
+    await settle();
+    w.tick();
+    assert.strictEqual(w.queued.length, 1, 'unchanged: nothing more');
+    w.ctx.calibration = fireCal([20, -70]);
+    w.tick();
+    w.tick();
+    assert.deepStrictEqual(ops().slice(1), [patch([20, -70])], 'a change: one patch');
+    w.answers[1]({ ok: true, seq: 2 });
+    await settle();
+    w.tick();
+    assert.strictEqual(w.queued.length, 2);
+    w.ctx.calibration = fireCal([21, -70]);
+    w.tick();
+    w.c.meta = { planet: 'lv624', frozen: { reason: 'silence', at: NOW } };
+    w.answers[2]({ ok: false, error: 'silence', status: 423 });
+    await settle();
+    w.tick();
+    w.tick();
+    assert.strictEqual(w.queued.length, 3, 'radio silence: no writes while frozen');
+    w.c.meta = { planet: 'lv624' };
+    w.tick();
+    w.tick();
+    assert.deepStrictEqual(ops().slice(3), [patch([21, -70])], 'thawed: the refused value goes again, once');
+    w.answers[3]({ ok: true, seq: 3 });
+    await settle();
+    w.tick();
+    assert.strictEqual(w.queued.length, 4);
+    w.ctx.calibration = fireCal([22, -70]);
+    w.tick();
+    w.answers[4]({ ok: false, error: 'fields', status: 400 });
+    await settle();
+    w.tick();
+    assert.strictEqual(w.queued.length, 5, 'a refusal a thaw cannot fix is not repeated');
+    w.ctx.calibration = fireCal([23, -70]);
+    w.tick();
+    assert.deepStrictEqual(ops().slice(5), [patch([23, -70])], 'the next change goes again');
+    w.answers[5]({ ok: true, seq: 4 });
+    await settle();
+    w.ctx.meta = { id: 'bigred', h: 'h2' };
+    w.ctx.calibration = fireCal([50, 50]);
+    w.tick();
+    assert.strictEqual(w.queued.length, 6, 'the map on another planet: its calibration is not sent');
+  });
+
+  await t('2a: cal sync waits for confirmation and the room, skips a value the member already holds and the observer level', async () => {
+    const w = await calRoom({ me: { confirmed: false, cal: [20, -70] } });
+    w.ctx.calibration = fireCal([20, -70]);
+    w.tick();
+    assert.strictEqual(w.queued.length, 0, 'not confirmed yet');
+    w.me.confirmed = true;
+    w.c.status = 'knocking';
+    w.tick();
+    assert.strictEqual(w.queued.length, 0, 'not in the room');
+    w.c.status = 'in';
+    w.tick();
+    assert.strictEqual(w.queued.length, 0, 'the member object already holds this offset: nothing to send');
+    w.ctx.calibration = null;
+    w.tick();
+    assert.deepStrictEqual(strip(w.queued[0]).data, { cal: null }, 'a cleared calibration goes as null');
+    const obs = await calRoom({ me: { post: 'observer' } });
+    obs.tick();
+    assert.strictEqual(obs.queued.length, 0, 'the observer level writes no cal');
+    const locked = await calRoom();
+    locked.c.meta = { planet: 'lv624', locked: true };
+    locked.tick();
+    assert.strictEqual(locked.queued.length, 0, 'a locked room is not written to');
+  });
+
+  await t('2a: cal sync on the real client: a refused write shows no toast, waits out radio silence, then goes again', async () => {
+    const w = world({ hash: '#room=demo', sessionStorage: fakeStorage(), fixtures: true, fetch: answer(basePolicy) });
+    w.attach();
+    await settle();
+    submit(w, 'create', { post: 'so', callsign: 'Орлов' });
+    await settle();
+    const ui = w.ui(), c = ui.client;
+    c.stopLoop();
+    let frozen = true;
+    const sent = [];
+    const poll0 = c.transport.poll.bind(c.transport);
+    c.transport.poll = (...a) => Promise.resolve(poll0(...a)).then(r => {
+      if (frozen && r && r.body && r.body.meta) r.body.meta = Object.assign({}, r.body.meta, { frozen: { reason: 'silence', at: c.serverNow() } });
+      return r;
+    });
+    const send0 = c.transport.send.bind(c.transport);
+    c.transport.send = (code, batch, auth) => {
+      sent.push(batch.map(op => op.data));
+      return frozen ? Promise.resolve({ status: 423, body: { error: 'silence' }, retryAfter: null }) : send0(code, batch, auth);
+    };
+    ui.toastEl.textContent = '';
+    w.ctx.calibration = fireCal([20, -70]);
+    w.intervals[0]();
+    await settle();
+    assert.deepStrictEqual(sent, [[{ cal: [20, -70] }]]);
+    assert.ok(c.meta && c.meta.frozen, 'the poll after the refusal brought the freeze');
+    assert.strictEqual(ui.toastEl.textContent, '', 'a background write refused by radio silence does not toast');
+    w.intervals[0]();
+    await settle();
+    assert.strictEqual(sent.length, 1, 'frozen: nothing sent');
+    frozen = false;
+    await c.poll();
+    w.intervals[0]();
+    await settle();
+    assert.deepStrictEqual(sent.slice(1), [[{ cal: [20, -70] }]], 'thawed: sent again');
+    assert.strictEqual(ui.toastEl.textContent, '', 'whatever the room answered, the sync stays quiet');
+  });
+
   notes.forEach(x => console.log('note:', x));
   console.log('OK', n, 'cases');
   process.exit(0);
