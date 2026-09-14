@@ -12,8 +12,10 @@ while the officer sees the mortar and its range rings. The room is layered over
 `tactical.html`: a Cloudflare Worker with a Registry and one Room Durable Object
 per room (op log in SQLite-backed storage, polling with `Retry-After`, no
 repeating timers), one-time post codes from the briefing sheet confirmed by a
-live member, an admin-signed server token as the only gate, radio silence, an
-observer link and a log export for moderators. Policy per fork in
+live member, an admin-signed server token as the only gate, radio silence, a
+repeating request ping for the mortar crew (audible over combat, silent while
+the room is frozen, locked or closed), an observer link that staff mint on
+demand (off by default) and a log export for moderators. Policy per fork in
 `tactical/policy/*.json`; the full multi-role policy stays a test fixture for
 the next stage. Every server starts at `"status": "none"` and the deployed
 page keeps `ROOM_URL` empty, so the room is invisible until an administration
