@@ -1,6 +1,7 @@
 // scripts/test_room_requests.js — the requests module under Node: stored values stay escaped (tokenizer check),
 // recall labels, the strip button per status, shots against the taken target, the planet guard, repeat,
-// the mortar a «Deployed» moves, the request filter, digit keys and op shapes.
+// the mortar a «Deployed» moves, the request filter, digit keys and op shapes, and the request ping (who hears
+// it, the shared schedule, stop conditions, «Heard», patterns and volume, the audio unlock notice, the title badge).
 // Run: node scripts/test_room_requests.js
 'use strict';
 const fs = require('fs');
@@ -114,6 +115,71 @@ function withApi(over, fn) {
   if (out && typeof out.then === 'function') return out.then(v => { restore(); return v; }, e => { restore(); throw e; });
   restore();
   return out;
+}
+
+// ── request ping scaffolding ──
+const PREFS = 'chemdb-tactical:room-prefs';
+const HEARD = 'chemdb-tactical:room-heard:K7M4Q2:';
+const ORIG_TITLE = 'Tactical map — NanoTrasen ChemDB';
+// A recording AudioContext: each pattern opens a group with its low-pass filter; oscillators keep type, pitch
+// and times; gains keep their automation. resume() starts it only while `allow` is true.
+function fakeAudio(state) {
+  const ac = { state: state || 'running', currentTime: 10, destination: {}, groups: [], gains: [], resumes: 0, allow: true };
+  const param = v => ({ value: v, events: [],
+    setValueAtTime(x, at) { this.events.push(['set', x, at]); },
+    linearRampToValueAtTime(x, at) { this.events.push(['lin', x, at]); },
+    exponentialRampToValueAtTime(x, at) { this.events.push(['exp', x, at]); } });
+  ac.createBiquadFilter = () => { const f = { type: '', frequency: param(350), connect() {}, oscillators: [] }; ac.groups.push(f); return f; };
+  ac.createGain = () => { const g = { gain: param(1), connect() {} }; ac.gains.push(g); return g; };
+  ac.createOscillator = () => {
+    const o = { type: 'sine', frequency: param(440), connect() {}, start(at) { o.startAt = at; }, stop(at) { o.stopAt = at; } };
+    ac.groups[ac.groups.length - 1].oscillators.push(o);
+    return o;
+  };
+  // `hold`: the promise answers only when the test calls the functions in `held`.
+  ac.hold = false;
+  ac.held = [];
+  ac.resume = () => {
+    ac.resumes++;
+    if (ac.hold) return new Promise(res => ac.held.push(res));
+    if (ac.allow) ac.state = 'running';
+    return Promise.resolve();
+  };
+  return ac;
+}
+const pitches = g => g.oscillators.filter(o => o.type === 'triangle').map(o => o.frequency.value);
+const patterns = ac => ac.groups.map(g => (pitches(g).length === 2 ? 'normal' : pitches(g).length === 6 ? 'urgent' : '?'));
+const peakOf = ac => Math.max(0, ...ac.gains.map(g => Math.max(0, ...g.gain.events.filter(e => e[0] === 'lin').map(e => e[1]))));
+// document.title with a write counter.
+const titleDoc = { value: '', writes: 0 };
+Object.defineProperty(global.document, 'title', { configurable: true, get: () => titleDoc.value, set: v => { titleDoc.writes++; titleDoc.value = String(v); } });
+// Date.now under test control; tickAt(ms) runs the module tick at T0 + ms.
+const T0 = 1.8e12;
+const realNow = Date.now;
+let clock = T0;
+async function withClock(fn) { Date.now = () => clock; try { return await fn(); } finally { Date.now = realNow; } }
+const tickAt = ms => { clock = T0 + ms; mod.tick(api); };
+const audioMade = { n: 0 };
+let session = {};
+// A room with prefs in a store, a fresh recording AudioContext, an empty sessionStorage and the page title.
+function pingWorld(objects, me, opts) {
+  opts = opts || {};
+  const all = world(objects, me);
+  api.ui.client.code = 'K7M4Q2';
+  api.ui.client.client = me ? me.client : 'c-none';
+  const store = { [PREFS]: opts.prefs ? JSON.parse(JSON.stringify(opts.prefs)) : null };
+  api.ui.storage = { read: k => (store[k] ? JSON.parse(JSON.stringify(store[k])) : null), write: (k, v) => { store[k] = JSON.parse(JSON.stringify(v)); } };
+  const ac = fakeAudio(opts.audio);
+  audioMade.n = 0;
+  Object.assign(H.state, { audio: null, makeAudio: () => { audioMade.n++; return ac; }, ping: { lastAt: null, seen: [] }, pinging: [], blocked: false,
+    heard: { key: null, ids: [] }, heardMem: {}, title: null, seenAll: null });
+  session = {};
+  delete window.sessionStorage;
+  window.sessionStorage = { getItem: k => (Object.prototype.hasOwnProperty.call(session, k) ? session[k] : null), setItem: (k, v) => { session[k] = String(v); } };
+  titleDoc.value = ORIG_TITLE;
+  titleDoc.writes = 0;
+  clock = T0;
+  return { all, ac, store };
 }
 
 let n = 0;
@@ -513,6 +579,364 @@ async function t(name, fn) { await fn(); n++; console.log('ok', name); }
       '{"status":"accepted"}', '{"status":"denied","reason":"no ammo"}', '{"status":"denied"}', '{"status":"loaded"}',
       '{"status":"firing"}', '{"status":"done"}', '{"status":"firing"}'
     ]);
+  });
+
+  await t('ping: the crew hears a new request on their mortar at once; the author, a second staff officer, an observer and a knocking member do not', () => withClock(() => {
+    const observer = { id: 'mem-obs', kind: 'member', client: 'c-obs', post: 'observer', confirmed: true };
+    const knocking = Object.assign({}, crew2, { confirmed: false });
+    const who = me => {
+      const w = pingWorld([req(), mortarAsset(), so, crew], me);
+      tickAt(0);
+      return { patterns: patterns(w.ac), pinging: H.state.pinging.slice() };
+    };
+    assert.deepStrictEqual(who(crew), { patterns: ['normal'], pinging: ['q1'] }, 'crew');
+    [['author', so], ['second staff officer', so2], ['observer', observer], ['knocking', knocking]].forEach(([name, me]) =>
+      assert.deepStrictEqual(who(me), { patterns: [], pinging: [] }, name));
+    const objects = { 'asset-mortar-1': mortarAsset() };
+    assert.deepStrictEqual(H.pingTargets(policy, crew, [req()], objects, []).map(r => r.id), ['q1']);
+    [so, so2, observer, knocking, null].forEach(me => assert.deepStrictEqual(H.pingTargets(policy, me, [req()], objects, []), [], String(me && me.id)));
+    assert.deepStrictEqual(H.pingTargets(policy, so2, [req()], { 'asset-mortar-1': mortarAsset({ claimedBy: 'c-so2' }) }, []).map(r => r.id), ['q1'],
+      'a staff officer in the crew seat is the crew');
+    assert.deepStrictEqual(H.pingTargets(policy, crew, [req({ type: 'position', by: by(crew) })], objects, []), [], 'the crew\'s own request: no accept, no ping');
+    const w = pingWorld([req(), mortarAsset()], crew);
+    api.ui.client.status = 'observer';
+    tickAt(0);
+    assert.deepStrictEqual(patterns(w.ac), [], 'an observer session');
+  }));
+
+  await t('ping: the pinging request pulses on its strip card, panel card and the Requests chip, with «Heard» on both cards', () => withClock(() => {
+    pingWorld([req(), req({ id: 'q2', status: 'accepted', acceptedBy: by(crew) }), mortarAsset()], crew);
+    tickAt(0);
+    const strip = mod.strip(api), panel = mod.panel('requests', api), chips = mod.chips(api);
+    [['strip', strip], ['panel', panel], ['chips', chips]].forEach(([name, html]) => assertSafe(html, name));
+    assert.ok(/class="tac-room-card pinging" data-room-action="reqFocus" data-id="q1"/.test(strip), strip);
+    assert.ok(/class="tac-room-card" data-room-action="reqFocus" data-id="q2"/.test(strip), 'the accepted one does not pulse');
+    assert.strictEqual((strip.match(/data-room-action="reqHeard" data-id="q1"/g) || []).length, 1);
+    assert.ok(!strip.includes('data-room-action="reqHeard" data-id="q2"'));
+    assert.ok(/class="tac-room-req st-requested pinging"/.test(panel), panel);
+    assert.ok(/class="btn-small tac-room-btn big heard" data-room-action="reqHeard" data-id="q1"/.test(panel));
+    assert.strictEqual((panel.match(/data-room-action="reqHeard"/g) || []).length, 1);
+    assert.ok(/class="tac-room-chip busy pinging" data-room-action="tab"/.test(chips), chips);
+    api.ui.client.me = so;
+    const staff = mod.strip(api) + mod.panel('requests', api) + mod.chips(api);
+    assert.ok(!staff.includes('pinging') && !staff.includes('reqHeard'), 'the staff officer sees no pulse');
+    api.ui.client.me = crew;
+    api.ui.client.status = 'closed';
+    const closed = mod.strip(api) + mod.chips(api);
+    assert.ok(!closed.includes('pinging') && !closed.includes('reqHeard'), 'a closed room pulses for nobody');
+  }));
+
+  await t('ping: every 10 s (normal) and 5 s (urgent) on one shared schedule; urgent wins; a new request plays at once', () => withClock(() => {
+    const run = (objects, seconds) => {
+      const w = pingWorld(objects.concat([mortarAsset()]), crew);
+      const at = [];
+      for (let s = 0; s <= seconds; s++) { const before = w.ac.groups.length; tickAt(s * 1000); if (w.ac.groups.length > before) at.push(s); }
+      return { at, patterns: patterns(w.ac) };
+    };
+    assert.deepStrictEqual(run([req()], 25).at, [0, 10, 20], 'normal');
+    assert.strictEqual(audioMade.n, 1, 'one AudioContext for every ping');
+    assert.deepStrictEqual(run([req({ priority: 'urgent' })], 12).at, [0, 5, 10], 'urgent');
+    assert.deepStrictEqual(run([req(), req({ id: 'q2' })], 20).at, [0, 10, 20], 'two pending: one ping per interval');
+    const mixed = run([req(), req({ id: 'q2', priority: 'urgent' })], 10);
+    assert.deepStrictEqual(mixed.at, [0, 5, 10], 'the urgent interval');
+    assert.deepStrictEqual(mixed.patterns, ['urgent', 'urgent', 'urgent'], 'the urgent pattern');
+    const w = pingWorld([req(), mortarAsset()], crew);
+    tickAt(0);
+    tickAt(3000);
+    w.all.q2 = req({ id: 'q2' });
+    tickAt(4000);
+    assert.strictEqual(w.ac.groups.length, 2, 'a request arriving mid-interval plays at once');
+    tickAt(10000);
+    assert.strictEqual(w.ac.groups.length, 2, 'and restarts the shared interval');
+    tickAt(14000);
+    assert.strictEqual(w.ac.groups.length, 3);
+  }));
+
+  await t('pingDue: first at once, a fresh request after the gap, the interval otherwise; a clock that went back plays', () => {
+    const N = [req()], U = [req({ priority: 'urgent' })];
+    assert.strictEqual(H.pingDue({ lastAt: null, seen: [] }, 0, []), null);
+    assert.deepStrictEqual(H.pingDue({ lastAt: null, seen: [] }, 0, N), { ping: true, pattern: 'normal', interval: 10000 });
+    assert.deepStrictEqual(H.pingDue(null, 0, U), { ping: true, pattern: 'urgent', interval: 5000 });
+    const seen = { lastAt: 100000, seen: ['q1'] };
+    assert.strictEqual(H.pingDue(seen, 109999, N).ping, false);
+    assert.strictEqual(H.pingDue(seen, 110000, N).ping, true);
+    assert.strictEqual(H.pingDue(seen, 104999, U).ping, false);
+    assert.strictEqual(H.pingDue(seen, 105000, U).ping, true);
+    const fresh = [req(), req({ id: 'q2' })];
+    assert.strictEqual(H.pingDue(seen, 100999, fresh).ping, false, 'never inside the gap');
+    assert.strictEqual(H.pingDue(seen, 101000, fresh).ping, true, 'a fresh request after the gap');
+    assert.strictEqual(H.pingDue(seen, 99000, N).ping, true, 'the clock went back');
+  });
+
+  await t('ping: stops once accepted, denied, withdrawn, deleted or with the sound off; each target guard stands on its own', () => withClock(() => {
+    const cases = [
+      ['accepted', r => { r.status = 'accepted'; r.acceptedBy = by(crew); }],
+      ['denied by the crew', r => { r.status = 'denied'; r.deniedBy = by(crew); r.reason = 'no ammo'; }],
+      ['withdrawn by the author', r => { r.status = 'denied'; r.deniedBy = by(so); }],
+      ['deleted', r => { r.deleted = true; }],
+      ['sound off', (r, w) => { w.store[PREFS] = { sounds: false }; }]
+    ];
+    cases.forEach(([name, change]) => {
+      const w = pingWorld([req(), mortarAsset()], crew);
+      tickAt(0);
+      assert.strictEqual(w.ac.groups.length, 1, name + ': first ping');
+      assert.strictEqual(document.title, '● ' + ORIG_TITLE, name + ': badge');
+      change(w.all.q1, w);
+      for (let s = 1; s <= 30; s++) tickAt(s * 1000);
+      assert.strictEqual(w.ac.groups.length, 1, name + ': silent after');
+      assert.deepStrictEqual(H.state.pinging, [], name + ': nothing pinging');
+      assert.strictEqual(document.title, ORIG_TITLE, name + ': title back');
+    });
+    const back = pingWorld([req(), mortarAsset()], crew);
+    tickAt(0);
+    back.store[PREFS] = { sounds: false };
+    tickAt(1000);
+    back.store[PREFS] = { sounds: true };
+    tickAt(5000);
+    assert.strictEqual(back.ac.groups.length, 2, 'the sound back on plays at once, not at the next interval');
+    const w = pingWorld([req(), mortarAsset()], crew);
+    tickAt(0);
+    mod.changes.reqSounds({ checked: false }, api);
+    assert.deepStrictEqual(w.store[PREFS], { sounds: false });
+    assert.strictEqual(document.title, ORIG_TITLE, 'the sound switch clears the badge at once');
+    const real = R.requestActions;
+    R.requestActions = () => ['accept'];
+    try {
+      const objects = { 'asset-mortar-1': mortarAsset() };
+      const ids = (list, heard) => H.pingTargets(policy, crew, list, objects, heard || []).map(r => r.id);
+      assert.deepStrictEqual(ids([req({ status: 'accepted' })]), [], 'status');
+      assert.deepStrictEqual(ids([req({ deleted: true })]), [], 'deleted');
+      assert.deepStrictEqual(ids([req({ target: { x: 'a', y: 1 } })]), [], 'invalid');
+      assert.deepStrictEqual(ids([req({ type: 'ob' })]), [], 'not aimed at my asset');
+      assert.deepStrictEqual(ids([req(), req({ id: 'q2' })], ['q1']), ['q2'], 'heard');
+    } finally { R.requestActions = real; }
+  }));
+
+  await t('«Heard» silences only that request, only in this browser, per room code and client; a new request pings again', () => withClock(() => {
+    const w = pingWorld([req(), req({ id: 'q2' }), mortarAsset()], crew);
+    tickAt(0);
+    assert.strictEqual(w.ac.groups.length, 1);
+    clock = T0 + 10000;
+    mod.actions.reqHeard(el({ 'data-id': 'q1' }), api);
+    assert.strictEqual(w.ac.groups.length, 1, 'the click itself plays nothing, even when a ping is due');
+    assert.deepStrictEqual(H.state.pinging, ['q2']);
+    assert.strictEqual(queued.length, 0, 'nothing sent to the room');
+    assert.deepStrictEqual(JSON.parse(session[HEARD + 'c-crew']), ['q1']);
+    const strip = mod.strip(api);
+    assert.ok(!strip.includes('data-room-action="reqHeard" data-id="q1"') && strip.includes('data-room-action="reqHeard" data-id="q2"'), strip);
+    tickAt(10000);
+    assert.strictEqual(w.ac.groups.length, 2, 'the other request still pings');
+    mod.actions.reqHeard(el({ 'data-id': 'q2' }), api);
+    assert.strictEqual(document.title, ORIG_TITLE, 'all heard: the badge goes');
+    tickAt(20000);
+    assert.strictEqual(w.ac.groups.length, 2, 'all heard: silence');
+    mod.actions.reqHeard(el({ 'data-id': 'q9' }), api);
+    assert.deepStrictEqual(JSON.parse(session[HEARD + 'c-crew']), ['q1', 'q2'], 'an id that does not ping is not stored');
+    w.all.q3 = req({ id: 'q3' });
+    tickAt(21000);
+    assert.strictEqual(w.ac.groups.length, 3, 'a new request pings again');
+    H.state.heard = { key: null, ids: [] };
+    H.state.heardMem = {};
+    tickAt(22000);
+    assert.deepStrictEqual(H.state.pinging, ['q3'], 'a reload of the tab reads the heard ids back');
+    api.ui.client.code = 'Z9Z9Z9';
+    tickAt(23000);
+    assert.deepStrictEqual(H.state.pinging, ['q1', 'q2', 'q3'], 'another room code has its own list');
+    delete window.sessionStorage;
+    Object.defineProperty(window, 'sessionStorage', { configurable: true, get() { throw new Error('blocked'); } });
+    mod.actions.reqHeard(el({ 'data-id': 'q3' }), api);
+    H.state.heard = { key: null, ids: [] };
+    tickAt(24000);
+    assert.deepStrictEqual(H.state.pinging, ['q1', 'q2'], 'storage off: memory keeps it');
+    delete window.sessionStorage;
+  }));
+
+  await t('pattern: two rising tones, or an urgent triple played twice, inside 1.2–2 kHz; the volume step sets the peak gain', () => withClock(() => {
+    const near = (a, b) => Math.abs(a - b) < 1e-9;
+    const band = ac => ac.groups.forEach(g => g.oscillators.forEach(o => assert.ok(o.frequency.value >= 1200 && o.frequency.value <= 2000, 'band ' + o.frequency.value)));
+    const ac = fakeAudio();
+    H.playPattern(ac, 'normal', 'quiet');
+    const g = ac.groups[0];
+    assert.strictEqual(ac.groups.length, 1);
+    assert.strictEqual(g.type, 'lowpass');
+    assert.deepStrictEqual(pitches(g), [1320, 1760]);
+    assert.deepStrictEqual(g.oscillators.map(o => o.type), ['triangle', 'square', 'triangle', 'square']);
+    band(ac);
+    g.oscillators.forEach(o => assert.ok(near(o.stopAt - o.startAt, 0.09), 'a 90 ms tone'));
+    const tri = g.oscillators.filter(o => o.type === 'triangle');
+    assert.ok(near(tri[0].startAt, 10.02));
+    assert.ok(near(tri[1].startAt - tri[0].stopAt, 0.04), 'a 40 ms gap');
+    const env = ac.gains.filter(x => x.gain.events.length);
+    assert.strictEqual(env.length, 2);
+    assert.deepStrictEqual(env[0].gain.events.map(e => e[0]), ['set', 'lin', 'exp']);
+    assert.ok(near(env[0].gain.events[1][2] - tri[0].startAt, 0.005), '5 ms attack');
+    assert.ok(near(env[0].gain.events[2][2] - env[0].gain.events[1][2], 0.08), '80 ms decay');
+    const peak = v => { const a = fakeAudio(); H.playPattern(a, 'normal', v); return peakOf(a); };
+    assert.deepStrictEqual(['quiet', 'normal', 'loud', 'constructor', undefined].map(peak), [0.15, 0.3, 0.55, 0.55, 0.55]);
+    const u = fakeAudio();
+    H.playPattern(u, 'urgent', 'loud');
+    assert.deepStrictEqual(pitches(u.groups[0]), [1320, 1568, 1976, 1320, 1568, 1976]);
+    band(u);
+    const ut = u.groups[0].oscillators.filter(o => o.type === 'triangle');
+    assert.ok(ut[3].startAt - ut[2].stopAt > 0.1, 'a pause between the two rises');
+    assert.ok(ut[5].stopAt - 10 < 1, 'the whole pattern ends inside the 1 s gap');
+    const quiet = pingWorld([req(), mortarAsset()], crew, { prefs: { volume: 'quiet' } });
+    tickAt(0);
+    assert.strictEqual(peakOf(quiet.ac), 0.15, 'the stored volume');
+    const loud = pingWorld([req(), mortarAsset()], crew);
+    tickAt(0);
+    assert.strictEqual(peakOf(loud.ac), 0.55, 'loud by default');
+  }));
+
+  await t('volume: «quiet / normal / loud» on the asset board, loud by default; a pick is stored and previewed', () => withClock(async () => {
+    const sus = pingWorld([mortarAsset()], crew, { audio: 'suspended' });
+    mod.actions.reqVolume(el({ 'data-volume': 'normal' }), api);
+    assert.strictEqual(sus.ac.groups.length, 0, 'a suspended context: nothing scheduled before the resume');
+    await tick();
+    assert.strictEqual(sus.ac.groups.length, 1, 'the preview plays once resumed');
+    const busy = pingWorld([req(), mortarAsset()], crew);
+    tickAt(0);
+    clock = T0 + 9500;
+    mod.actions.reqVolume(el({ 'data-volume': 'loud' }), api);
+    tickAt(10000);
+    assert.strictEqual(busy.ac.groups.length, 2, 'the preview counts as a ping: none right after it');
+    const w = pingWorld([mortarAsset()], crew);
+    let html = mod.panel('assets', api);
+    assertSafe(html, 'asset board with volume');
+    const steps = html => [...html.matchAll(/class="btn-small tac-room-btn( on)?" data-room-action="reqVolume" data-volume="([a-z]+)"/g)].map(m => m[2] + (m[1] ? '*' : ''));
+    assert.deepStrictEqual(steps(html), ['quiet', 'normal', 'loud*']);
+    mod.actions.reqVolume(el({ 'data-volume': 'quiet' }), api);
+    assert.deepStrictEqual(w.store[PREFS], { volume: 'quiet' });
+    assert.strictEqual(peakOf(w.ac), 0.15, 'the preview plays at the new level');
+    mod.actions.reqVolume(el({ 'data-volume': 'constructor' }), api);
+    assert.strictEqual(w.store[PREFS].volume, 'quiet');
+    assert.strictEqual(w.ac.groups.length, 1, 'no preview for a forged step');
+    assert.deepStrictEqual(steps(mod.panel('assets', api)), ['quiet*', 'normal', 'loud']);
+    const ru = load('ru').api.T();
+    assert.deepStrictEqual([ru.pingHeard, ru.pingBlocked, ru.pingVolume, ru.pingVolumes],
+      ['Услышал', 'Звук заблокирован браузером — нажмите в панели', 'Громкость', { quiet: 'тихо', normal: 'обычно', loud: 'громко' }]);
+  }));
+
+  await t('a suspended context shows the notice in the panel and strip; a click in the room UI resumes it, hides it and plays what pends', () => withClock(async () => {
+    const w = pingWorld([req(), mortarAsset()], crew, { audio: 'suspended' });
+    w.ac.allow = false;
+    tickAt(0);
+    await tick();
+    assert.strictEqual(w.ac.groups.length, 0, 'nothing scheduled on a suspended context');
+    assert.strictEqual(H.state.blocked, true);
+    const notice = /data-room-action="reqUnlock">Sound is blocked by the browser — click the panel</;
+    assert.ok(notice.test(mod.strip(api)), 'strip');
+    assert.ok(notice.test(mod.tools(api)), 'the panel tools row');
+    assertSafe(mod.strip(api) + mod.tools(api), 'notice');
+    const boxes = {};
+    ['tacRoom', 'tacRoomStrip', 'tacRoomChips', 'tacRoomShelf', 'tacRoomToggle'].forEach(id => {
+      boxes[id] = { on: {}, addEventListener(type, fn) { (this.on[type] = this.on[type] || []).push(fn); } };
+    });
+    document.getElementById = id => boxes[id] || null;
+    mod.mount(api);
+    Object.keys(boxes).forEach(id => assert.ok(boxes[id].on.click && boxes[id].on.keydown, id));
+    const fire = (id, type) => boxes[id].on[type].forEach(fn => fn({}));
+    fire('tacRoom', 'keydown');
+    await tick();
+    assert.strictEqual(w.ac.resumes, 2, 'a key asks for a resume too');
+    assert.strictEqual(H.state.blocked, true, 'still refused: the notice stays');
+    w.ac.allow = true;
+    clock = T0 + 9500;
+    fire('tacRoomStrip', 'click');
+    await tick();
+    assert.strictEqual(w.ac.state, 'running');
+    assert.strictEqual(H.state.blocked, false);
+    assert.ok(!mod.strip(api).includes('reqUnlock') && !mod.tools(api).includes('reqUnlock'), 'the notice is gone');
+    assert.deepStrictEqual(patterns(w.ac), ['normal'], 'the pending ping plays once resumed');
+    tickAt(10000);
+    assert.strictEqual(w.ac.groups.length, 1, 'and the schedule counts it: no second ping half a second later');
+    const resumes = w.ac.resumes;
+    fire('tacRoomStrip', 'click');
+    assert.strictEqual(w.ac.resumes, resumes, 'a running context is left alone');
+    const late = pingWorld([req(), mortarAsset()], crew, { audio: 'suspended' });
+    late.ac.hold = true;
+    tickAt(0);
+    fire('tacRoom', 'click');
+    late.ac.state = 'running';
+    late.ac.held.forEach(res => res());
+    await tick();
+    assert.deepStrictEqual(patterns(late.ac), ['normal'], 'two resumes answering together play one ping');
+    const gone = pingWorld([req(), mortarAsset()], crew, { audio: 'suspended' });
+    gone.ac.allow = false;
+    tickAt(0);
+    gone.all.q1.status = 'accepted';
+    gone.all.q1.acceptedBy = by(crew);
+    tickAt(1000);
+    gone.ac.state = 'running';
+    gone.all.q2 = req({ id: 'q2' });
+    tickAt(2000);
+    assert.strictEqual(gone.ac.groups.length, 1, 'a running context plays');
+    assert.ok(!mod.strip(api).includes('reqUnlock'), 'no stale notice once nothing was left pinging');
+    const again = pingWorld([req(), mortarAsset()], crew, { audio: 'suspended' });
+    again.ac.allow = false;
+    tickAt(0);
+    again.ac.allow = true;
+    mod.actions.reqUnlock(el({}), api);
+    await tick();
+    assert.strictEqual(H.state.blocked, false, 'the notice button itself resumes');
+    const out = pingWorld([req(), mortarAsset()], crew);
+    api.ui.client.status = 'knocking';
+    fire('tacRoom', 'click');
+    assert.strictEqual(audioMade.n, 0, 'no audio outside the room');
+    api.ui.client.status = 'in';
+    out.store[PREFS] = { sounds: false };
+    fire('tacRoom', 'click');
+    assert.strictEqual(audioMade.n, 0, 'no audio with the sound off');
+  }));
+
+  await t('title badge: added once while something pings, the exact title back when handled, on leaving or unmount; the page\'s own title wins', () => withClock(() => {
+    assert.strictEqual(H.titleWithBadge('x', true), '● x');
+    assert.strictEqual(H.titleWithBadge('● ● x', true), '● x');
+    assert.strictEqual(H.titleWithBadge('● x', false), 'x');
+    const w = pingWorld([req(), mortarAsset()], crew);
+    tickAt(0);
+    tickAt(1000);
+    tickAt(2000);
+    assert.strictEqual(document.title, '● ' + ORIG_TITLE);
+    assert.strictEqual(titleDoc.writes, 1, 'written once, never stacked');
+    w.all.q1.status = 'accepted';
+    w.all.q1.acceptedBy = by(crew);
+    tickAt(3000);
+    assert.strictEqual(document.title, ORIG_TITLE);
+    tickAt(4000);
+    assert.strictEqual(titleDoc.writes, 2, 'nothing pinging: the title is left alone');
+    const RU = 'Тактическая карта — NanoTrasen ChemDB';
+    w.all.q2 = req({ id: 'q2' });
+    tickAt(5000);
+    titleDoc.value = RU;
+    tickAt(6000);
+    assert.strictEqual(document.title, '● ' + RU, 'the page renamed itself: its title is the base');
+    api.ui.client.status = 'idle';
+    tickAt(7000);
+    assert.strictEqual(document.title, RU, 'left the room');
+    api.ui.client.status = 'in';
+    tickAt(8000);
+    assert.strictEqual(document.title, '● ' + RU);
+    mod.unmount(api);
+    assert.strictEqual(document.title, RU, 'unmount');
+    assert.deepStrictEqual(H.state.pinging, []);
+    const badged = pingWorld([req(), mortarAsset()], crew);
+    titleDoc.value = '● Live';
+    tickAt(0);
+    assert.strictEqual(document.title, '● Live');
+    badged.all.q1.status = 'accepted';
+    badged.all.q1.acceptedBy = by(crew);
+    tickAt(1000);
+    assert.strictEqual(document.title, '● Live', 'an original that starts with the badge comes back exactly');
+    assert.strictEqual(titleDoc.writes, 0);
+  }));
+
+  await t('room.css: pinging pulses, reduced motion keeps a still highlight, braces balance', () => {
+    const css = read('tactical/room.css');
+    assert.strictEqual((css.match(/\{/g) || []).length, (css.match(/\}/g) || []).length, 'braces');
+    assert.ok(/\.tac-room-card\.pinging, \.tac-room-req\.pinging, \.tac-room-chip\.pinging \{[^}]*animation: tac-room-ping/.test(css), 'pulse');
+    const rm = css.match(/@media \(prefers-reduced-motion: reduce\) \{([\s\S]*?\})\s*\}/);
+    assert.ok(rm && /\.pinging[^{]*\{[^}]*animation: none;[^}]*box-shadow/.test(rm[1]), 'reduced motion');
   });
 
   console.log('OK', n, 'cases');
