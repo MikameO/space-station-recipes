@@ -205,12 +205,57 @@ async function evening(transport, token, keyId) {
   note('observer', [guess.status, guess.error, crewExport.status, crewExport.body.error, minted.status, Object.keys(minted.body).sort(),
     !!so.observerToken, obs.status, obs.error, obs.requests().length, ex.status, !!(ex.body && ex.body.ops.length), /"word"/.test(JSON.stringify(ex.body))]);
 
+  // Stage 2a: a member shares its own position and the calibration it uses, never someone else's; the server stamps posAt.
+  tick();
+  const pos = await mo.queue({ op: 'patch', kind: 'member', id: mo.me.id, data: { pos: { x: 20, y: -98, level: 0, extra: 1 } } });
+  const calInUse = await mo.queue({ op: 'patch', kind: 'member', id: mo.me.id, data: { cal: [212, -148] } });
+  const forgedAt = await mo.queue({ op: 'patch', kind: 'member', id: mo.me.id, data: { pos: { x: 1, y: 1 }, posAt: 5 } });
+  const badPos = await mo.queue({ op: 'patch', kind: 'member', id: mo.me.id, data: { pos: { x: 1.5, y: 1 } } });
+  const badCal = await mo.queue({ op: 'patch', kind: 'member', id: mo.me.id, data: { cal: [1] } });
+  const others = await mo.queue({ op: 'patch', kind: 'member', id: so.me.id, data: { pos: { x: 1, y: 1 } } });
+  await mo.poll();
+  const mine = mo.member(mo.client);
+  note('member position and calibration', [pos.ok, calInUse.ok, forgedAt, badPos, badCal, others, mine.pos, mine.cal, typeof mine.posAt, so.me.pos]);
+
+  // Stage 2a: a task names its addressee and text; an addressed request is its addressee's or staff's, never the asset owner's.
+  tick();
+  const noTo = await so.queue({ op: 'put', kind: 'request', id: 'qt0', data: { type: 'task', note: 'сменить позицию' } });
+  const noText = await so.queue({ op: 'put', kind: 'request', id: 'qt0', data: { type: 'task', to: { post: 'mortar' } } });
+  const strikeToStaff = await so.queue({ op: 'put', kind: 'request', id: 'qt0', data: { type: 'mortar', target: { x: 1, y: 1 }, to: { post: 'so' } } });
+  const task = await so.queue({ op: 'put', kind: 'request', id: 'qt1', data: { type: 'task', to: { post: 'mortar', extra: 1 }, note: 'сменить позицию' } });
+  tick();
+  const addressed = await so.queue({ op: 'put', kind: 'request', id: 'qa1', data: { type: 'position', target: { x: 30, y: -90 }, to: { client: mo2.client } } });
+  tick();
+  const ownerTries = await mo.queue({ op: 'patch', kind: 'request', id: 'qa1', expectedStatus: 'requested', data: { status: 'accepted' } });
+  const addresseeTakes = await mo2.queue({ op: 'patch', kind: 'request', id: 'qa1', expectedStatus: 'requested', data: { status: 'accepted' } });
+  tick();
+  const taskTaken = await mo.queue({ op: 'patch', kind: 'request', id: 'qt1', expectedStatus: 'requested', data: { status: 'accepted' } });
+  const taskDone = await mo.queue({ op: 'patch', kind: 'request', id: 'qt1', expectedStatus: 'accepted', data: { status: 'done' } });
+  await so.poll();
+  const qt1 = byId(so, 'qt1'), qa1 = byId(so, 'qa1');
+  note('tasks and addressed requests', [noTo, noText, strikeToStaff, task.ok, addressed.ok, ownerTries, addresseeTakes.ok, taskTaken.ok, taskDone.ok,
+    qt1 && [qt1.to, qt1.target, qt1.status], qa1 && [qa1.to, qa1.status, qa1.acceptedBy]]);
+
+  // Stage 2a: the room calibration may carry its tile and rangefinder reading, which must agree with the offset.
+  tick();
+  const calTile = await mo.queue({ op: 'put', kind: 'calibration', id: 'calibration', data: { offset: [243, -218], tile: [20, 20], reading: [263, -198] } });
+  const calWrong = await mo.queue({ op: 'put', kind: 'calibration', id: 'calibration', data: { offset: [1, 1], tile: [20, 20], reading: [263, -198] } });
+  const calHalf = await mo.queue({ op: 'put', kind: 'calibration', id: 'calibration', data: { offset: [243, -218], tile: [20, 20] } });
+  const roomCal = mo.calibration();
+  note('room calibration with tile and reading', [calTile.ok, calWrong, calHalf, roomCal.offset, roomCal.tile, roomCal.reading]);
+
   await so.admin('silence', { on: true });
   tick();
   const hush = await mo.queue({ op: 'put', kind: 'request', id: 'q2', data: { type: 'position', target: { x: 30, y: -90 }, priority: 'normal', flags: [] } });
   // v2: a batch of presence heartbeats passes radio silence.
   const beat = await mo.queue({ op: 'patch', kind: 'member', id: mo.me.id, data: { presentAt: 1 } });
   note('op during radio silence', [hush, beat.ok, mo.pending.length, mo.meta.frozen && mo.meta.frozen.reason]);
+  // Stage 2a: only a presentAt-only heartbeat passes radio silence; a position or calibration write, alone or beside one, is refused.
+  const hushPos = await mo.queue({ op: 'patch', kind: 'member', id: mo.me.id, data: { pos: { x: 21, y: -98 } } });
+  const hushCal = await mo.queue({ op: 'patch', kind: 'member', id: mo.me.id, data: { cal: null } });
+  const mixed = await transport.send(so.code, [{ cid: 'mx1', op: 'patch', kind: 'member', id: mo.me.id, data: { presentAt: 1 } },
+    { cid: 'mx2', op: 'patch', kind: 'member', id: mo.me.id, data: { pos: null } }], mo.auth());
+  note('member writes under radio silence', [hushPos, hushCal, [mixed.status, mixed.body], mo.pending.length, mo.member(mo.client).pos]);
   await so.admin('silence', { on: false });
   // Final review: radio silence leaves journal events; clients move past them and never show them.
   const hushLog = await so.exportRoom();
@@ -326,6 +371,15 @@ assert.deepStrictEqual(step(worker, 're-join with the session').slice(0, 4), ['i
 assert.deepStrictEqual(step(worker, 'observer'), ['expired', 'observer', 403, 'right', 200, ['observerToken', 'ok', 'seq', 'serverNow'],
   true, 'observer', null, 3, 200, true, false]);
 assert.deepStrictEqual(step(worker, 'op during radio silence'), [{ ok: false, error: 'silence', status: 423 }, true, 0, 'silence']);
+assert.deepStrictEqual(step(worker, 'member position and calibration'), [true, true, { ok: false, error: 'fields' }, { ok: false, error: 'pos' },
+  { ok: false, error: 'cal' }, { ok: false, error: 'right' }, { x: 20, y: -98, level: 0 }, [212, -148], 'number', null]);
+assert.deepStrictEqual(step(worker, 'tasks and addressed requests'), [{ ok: false, error: 'to' }, { ok: false, error: 'note' }, { ok: false, error: 'to' },
+  true, true, { ok: false, error: 'right' }, true, true, true,
+  [{ post: 'mortar' }, null, 'done'], [{ client: 'client-mortar-02' }, 'accepted', { client: 'client-mortar-02', post: 'mortar', squad: null }]]);
+assert.deepStrictEqual(step(worker, 'room calibration with tile and reading'),
+  [true, { ok: false, error: 'offset' }, { ok: false, error: 'reading' }, [243, -218], [20, 20], [263, -198]]);
+assert.deepStrictEqual(step(worker, 'member writes under radio silence'),
+  [{ ok: false, error: 'silence', status: 423 }, { ok: false, error: 'silence', status: 423 }, [423, { error: 'silence' }], 0, { x: 20, y: -98, level: 0 }]);
 assert.deepStrictEqual(step(worker, 'crew tries rotate'), [403, 'right', 'in']);
 assert.deepStrictEqual(step(worker, 'extend before the warning'), [409, 'early', 'early']);
 const rotated = step(worker, 'so rotates');

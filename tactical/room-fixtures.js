@@ -398,8 +398,9 @@
     // The ops as the Worker reads them: through JSON, at most 64.
     var list = Array.isArray(ops) ? copy(ops).slice(0, 64) : [];
     var resent = function (raw) { return self.acked(actor.client, cidOf(raw)); };
-    // Presence heartbeats pass a lock and radio silence, so a quiet room keeps its members.
-    var heartbeat = function (raw) { return !!raw && raw.kind === 'member' && raw.op === 'patch'; };
+    // Presence heartbeats (a member patch of presentAt alone) pass a lock and radio silence, so a quiet room keeps
+    // its members; a position or calibration patch is a write like any other.
+    var heartbeat = function (raw) { return !!raw && typeof raw === 'object' && R.isHeartbeat(raw); };
     var blocked = m.closed ? 'closed'
       : m.locked && !list.every(heartbeat) ? 'locked'
       : m.frozen && !(m.frozen.reason === 'silence' && list.every(heartbeat)) ? m.frozen.reason
@@ -438,8 +439,11 @@
     var data = R.cleanData(P, raw.kind, raw.op, raw.data);
     var expectedStatus = typeof raw.expectedStatus === 'string' ? raw.expectedStatus : undefined;
     if (raw.kind === 'member') {
+      // A member object is its holder's own and only patched: presence, position, the calibration in use.
       var mine = existing && !existing.deleted && existing.client === actor.client;
-      if (raw.op !== 'patch' || !mine || Object.keys(data).join() !== 'presentAt') return { cid: cid, error: 'right' };
+      if (raw.op !== 'patch' || !mine) return { cid: cid, error: 'right' };
+      var badMember = R.validateMemberPatch(P, actor, data);
+      if (badMember) return { cid: cid, error: badMember };
     } else {
       var bad = raw.op === 'put' ? R.validateData(P, raw.kind, data)
         : raw.op === 'patch' ? R.validatePatch(P, raw.kind, data, existing) : null;
