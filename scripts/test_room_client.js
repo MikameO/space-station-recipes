@@ -80,6 +80,24 @@ async function t(name, fn) { await fn(); n++; console.log('ok', name); }
     sl.pending = [];
   });
 
+  await t('queueAll: ops that belong together leave in one write and resolve in order', async () => {
+    const sends = [];
+    const send = transport.send;
+    transport.send = function (code, ops, auth) { sends.push(ops.map(o => o.id)); return send.call(this, code, ops, auth); };
+    try {
+      const results = await sl.queueAll([
+        { op: 'put', kind: 'marker', id: 'qa1', data: { cat: 'enemy', label: 'один', x: 61, y: -61, layer: 'squad:bravo' } },
+        { op: 'put', kind: 'marker', id: 'qa2', data: { cat: 'enemy', label: 'два', x: 62, y: -62, layer: 'squad:bravo' } }]);
+      assert.deepStrictEqual(sends, [['qa1', 'qa2']], 'one write carries both ops');
+      assert.strictEqual(results.length, 2);
+      assert.ok(results.every(r => r && r.ok !== false), JSON.stringify(results));
+      assert.strictEqual(sl.pending.length, 0, 'both acked');
+      assert.deepStrictEqual(await sl.queueAll([]), [], 'nothing to send');
+    } finally {
+      transport.send = send;
+    }
+  });
+
   await t('requests sort open first, urgent first, then by age', async () => {
     clock += 1000;
     await sl.queue({ op: 'put', kind: 'request', id: 'q1', data: { type: 'mortar', target: { x: 62, y: -62 }, priority: 'normal' } });

@@ -141,6 +141,12 @@ assert.deepStrictEqual([applied.st.draft, applied.st.calMessage, applied.st.sele
   [{ x: '', y: '' }, null, null, null, false]);
 assert.deepStrictEqual(applied.calls, ['saveStore', 'renderAll']);
 assert.strictEqual(calHarness({}).apply({ tile: [1, 2], reading: [13, -3] }), true, 'the offset may be left out');
+const aged = calHarness({});
+assert.strictEqual(aged.apply(Object.assign({ at: 3000 }, roomCal)), true);
+assert.strictEqual(aged.st.store.calibration.at, 3000, 'the room calibration keeps its own age');
+const ahead = calHarness({});
+assert.strictEqual(ahead.apply(Object.assign({ at: 9000 }, roomCal)), true);
+assert.strictEqual(ahead.st.store.calibration.at, 5000, 'a time ahead of the page clock counts as now');
 [null, 'cal', {}, { tile: [1, 2] }, { tile: ['1', 2], reading: [13, -3] }, { tile: [1, 2], reading: [13.5, -3] },
   { tile: [1, 2, 3], reading: [13, -3] }, { tile: [1, 2], reading: [13, -3], offset: [12, 5] },
   { tile: [1, 2], reading: [13, -3], offset: 'x' }].forEach(c => {

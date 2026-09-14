@@ -1164,8 +1164,11 @@
     calApply: function () {
       var rc = roomCal(), ok = false;
       if (!rc || !isPair(rc.tile) || !isPair(rc.reading) || typeof ui.hooks.applyCalibration !== 'function') return;
+      var cal = { tile: rc.tile.slice(), reading: rc.reading.slice(), offset: rc.offset.slice() };
+      // Its publish time on this page's clock, so the Fire panel shows the calibration's real age.
+      if (typeof rc.at === 'number' && isFinite(rc.at)) cal.at = rc.at - (ui.client.offset || 0);
       try {
-        ok = planetOk() && ui.hooks.applyCalibration({ tile: rc.tile.slice(), reading: rc.reading.slice(), offset: rc.offset.slice() }) === true;
+        ok = planetOk() && ui.hooks.applyCalibration(cal) === true;
       } catch (e) { warn('applyCalibration hook', e); }
       toast(ok ? T.roomCalApplied : T.roomCalApplyFail);
       queueRender();

@@ -95,7 +95,8 @@ function world(objects, me, extra) {
     member: c => Object.values(all).find(o => o.kind === 'member' && !o.deleted && o.client === c) || null,
     members: () => Object.values(all).filter(o => o.kind === 'member' && !o.deleted),
     calibration: () => null,
-    queue: op => { queued.push(op); return Promise.resolve(ackWith(op)); }
+    queue: op => { queued.push(op); return Promise.resolve(ackWith(op)); },
+    queueAll: ops => { api.batches = (api.batches || []).concat([ops.length]); ops.forEach(op => queued.push(op)); return Promise.all(ops.map(op => Promise.resolve(ackWith(op)))); }
   };
   api.fired = 0;
   H.state.taken = null;
@@ -1096,6 +1097,34 @@ async function t(name, fn) { await fn(); n++; console.log('ok', name); }
     H.state.form = false;
   });
 
+  await t('«To»: a member chosen before they left stays chosen as «left the room» and sending is refused; a post the type does not offer still falls back', () => {
+    const toasts = [];
+    withApi({ toast: s => toasts.push(s) }, () => {
+      world([so], so);
+      H.state.form = true;
+      H.state.target = null;
+      api.ui.drafts['request.type'] = 'task';
+      api.ui.drafts['request.to'] = 'client:c-crew-0001';
+      let html = mod.panel('requests', api);
+      assertSafe(html, 'stale addressee');
+      assert.ok(html.includes('<option value="client:c-crew-0001" selected>addressee — left the room</option>'), html);
+      queued = [];
+      mod.submits.request({ elements: { coords: { value: '' }, note: { value: 'hold' }, urgent: { checked: false }, to: { value: 'client:c-crew-0001' } } }, api);
+      assert.deepStrictEqual([toasts[toasts.length - 1], queued.length], [api.T().reqToStale, 0], 'nothing goes out to everyone by type');
+      world([so, Object.assign({}, crew, { deleted: true, callsign: 'Бекас' })], so);
+      api.ui.drafts['request.type'] = 'task';
+      api.ui.drafts['request.to'] = 'client:c-crew-0001';
+      assert.ok(mod.panel('requests', api).includes('selected>Бекас · Mortar crew — left the room</option>'), 'the name of the member who left');
+      world([so, crew], so);
+      api.ui.drafts['request.type'] = 'mortar';
+      api.ui.drafts['request.to'] = 'post:so';
+      html = mod.panel('requests', api);
+      assert.ok(html.includes('<option value="" selected>Everyone by type</option>') && !html.includes('left the room'), 'a post the type does not offer falls back');
+      api.clearDrafts('request');
+      H.state.form = false;
+    });
+  });
+
   await t('submit: a task needs its text and an addressee, not a point; the addressee goes out as {post}, {post, squad} or {client}; a vanished one is refused', () => {
     const toasts = [];
     withApi({ toast: s => toasts.push(s) }, () => {
@@ -1195,6 +1224,7 @@ async function t(name, fn) { await fn(); n++; console.log('ok', name); }
     withApi({ setPick: (mode, fn, hint) => { picked = { mode, fn, hint }; }, cancelPick: () => { cancels++; } }, () => {
       api.ui.pick = null;
       world([so, crew, mortarAsset({ state: 'moving', tile: null })], crew, { level: 2 });
+      api.batches = [];
       let tools = mod.tools(api);
       assertSafe(tools, 'tools');
       assert.ok(tools.includes('<button type="button" class="btn-small tac-room-btn big" data-room-action="posShare">Share position</button>'), tools);
@@ -1202,6 +1232,7 @@ async function t(name, fn) { await fn(); n++; console.log('ok', name); }
       mod.actions.posShare(el({}), api);
       assert.deepStrictEqual([picked.mode, picked.hint], ['position', 'Click the tile you stand on']);
       picked.fn([30.7, -89.6]);   // a fractional tile floors: 30, -90
+      assert.deepStrictEqual(api.batches, [2], 'the member patch and the mortar move leave in one write');
       assert.deepStrictEqual(ops(), [
         ['patch', 'member', 'mem-crew', { pos: { x: 30, y: -90, level: 2 } }],
         ['patch', 'asset', 'asset-mortar-1', { tile: [30, -90], state: 'deployed' }]]);

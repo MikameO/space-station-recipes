@@ -583,6 +583,28 @@
     return result;
   };
 
+  // Several ops that belong together, queued before the flush starts: they leave in one write (up to the
+  // policy's per-second cap) and radio silence refuses them together. Resolves to the per-op results, in order.
+  RoomClient.prototype.queueAll = function (ops) {
+    var self = this, list = Array.isArray(ops) ? ops : [];
+    var refused = this.observer ? 'observer' : NO_WRITE.indexOf(this.status) >= 0 ? this.status : null;
+    if (refused) return Promise.resolve(list.map(function () { return { ok: false, error: refused }; }));
+    if (!list.length) return Promise.resolve([]);
+    var results = list.map(function (op) {
+      cidSeq += 1;
+      op.cid = Date.now().toString(36) + '-' + cidSeq.toString(36) + Math.random().toString(36).slice(2, 6);
+      var result = new Promise(function (resolve) { self.waiters[op.cid] = resolve; });
+      self.pending.push(op);
+      self.changes++;
+      return result;
+    });
+    this.lastOwnOpAt = this.clock();
+    this.persist();
+    this.emit();
+    this.flush();
+    return Promise.all(results);
+  };
+
   RoomClient.prototype.flush = function () {
     var self = this;
     if ((this.flushing && this.flushGen === this.gen) || !this.pending.length || !this.code || this.observer || this.status !== 'in') {

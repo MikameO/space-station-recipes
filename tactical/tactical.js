@@ -2072,11 +2072,13 @@
 
   // A calibration as the page stores it: the lased tile, its reading, the offset
   // and a check tile next to it. A saved offset and the room's one are built alike.
-  function makeCalibration(tile, reading) {
+  // `at` (optional, page clock): when the calibration was really made, e.g. a room calibration published
+  // earlier; a missing or future time is now.
+  function makeCalibration(tile, reading, at) {
     var offset = Logic.offsetFrom(tile, reading);
     var check = Logic.pickCheckTile(state.planet, tile, []);
     return {
-      tile: tile, reading: reading, offset: offset, at: now(),
+      tile: tile, reading: reading, offset: offset, at: typeof at === 'number' && isFinite(at) && at > 0 && at <= now() ? at : now(),
       check: check ? { tile: check, expect: Logic.worldToGame(offset, check[0], check[1]), result: null, tried: [] } : null
     };
   }
@@ -2087,7 +2089,7 @@
     if (!state.planet || !cal || typeof cal !== 'object' || !Logic.isTile(cal.tile) || !Logic.isTile(cal.reading)) return false;
     var offset = Logic.offsetFrom(cal.tile, cal.reading);
     if (cal.offset != null && !(Logic.isTile(cal.offset) && cal.offset[0] === offset[0] && cal.offset[1] === offset[1])) return false;
-    state.store.calibration = makeCalibration(cal.tile.slice(), cal.reading.slice());
+    state.store.calibration = makeCalibration(cal.tile.slice(), cal.reading.slice(), cal.at);   // keeps its real age
     Logic.confirmSameRound(state.session, now());
     state.draft = { x: '', y: '' };
     state.calMessage = null;

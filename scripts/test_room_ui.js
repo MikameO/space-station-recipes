@@ -954,7 +954,7 @@ async function t(name, fn) { await fn(); n++; console.log('ok', name); }
     w.c.room = roomCal();
     answer = false;
     click(w, 'calApply');
-    assert.deepStrictEqual(applied, [{ tile: [100, 200], reading: [120, 130], offset: [20, -70] }]);
+    assert.deepStrictEqual(applied, [{ tile: [100, 200], reading: [120, 130], offset: [20, -70], at: NOW - 5 * 60000 }], 'with its publish time on the page clock');
     assert.strictEqual(w.ui().toastEl.textContent, 'Привязку комнаты не удалось применить.');
     answer = 'throw';
     click(w, 'calApply');

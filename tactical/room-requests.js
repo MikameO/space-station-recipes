@@ -88,6 +88,7 @@
       pingVolume: 'Volume', pingVolumes: { quiet: 'quiet', normal: 'normal', loud: 'loud' },
       reqTo: 'To', reqToAll: 'Everyone by type', reqToPick: '— pick —', reqToLeft: 'left the room',
       reqToNeed: 'Pick who the task is for.', reqToStale: 'That addressee is gone: pick again.',
+      reqToGone: '{who} — left the room', reqToSomeone: 'addressee',
       taskText: 'Task text', taskNeedText: 'Write the task text.', reqNoPoint: 'no point', reqPointOptional: 'no point (optional)',
       taskDenyReasons: ['busy', 'not possible', 'not my job'],
       posShare: 'Share position', posPickHint: 'Click the tile you stand on', posFromFire: 'From the Fire panel', posClear: 'Clear position',
@@ -124,6 +125,7 @@
       pingVolume: 'Громкость', pingVolumes: { quiet: 'тихо', normal: 'обычно', loud: 'громко' },
       reqTo: 'Кому', reqToAll: 'Всем по типу', reqToPick: '— выберите —', reqToLeft: 'вне комнаты',
       reqToNeed: 'Выберите, кому задача.', reqToStale: 'Этого адресата уже нет: выберите заново.',
+      reqToGone: '{who} — вне комнаты', reqToSomeone: 'адресат',
       taskText: 'Текст задачи', taskNeedText: 'Напишите текст задачи.', reqNoPoint: 'без точки', reqPointOptional: 'без точки (необязательно)',
       taskDenyReasons: ['занят', 'невозможно', 'не моя задача'],
       posShare: 'Передать позицию', posPickHint: 'Кликните тайл, где вы стоите', posFromFire: 'Позиция из панели огня', posClear: 'Убрать позицию',
@@ -481,9 +483,11 @@
     var me = api.me(), c = api.ui.client;
     if (!me || !me.confirmed || typeof me.id !== 'string' || c.status !== 'in' || !validTile(tile) || offPlanet(api)) return false;
     var pos = { x: Math.floor(tile[0]), y: Math.floor(tile[1]), level: isNum(level) ? Math.floor(level) : 0 };
-    c.queue({ op: 'patch', kind: 'member', id: me.id, data: { pos: pos } });
+    var ops = [{ op: 'patch', kind: 'member', id: me.id, data: { pos: pos } }];
     var row = ownMortarRow(assetRows(api), api.ui.policy, me);
-    if (row) c.queue({ op: 'patch', kind: 'asset', id: row.id, data: { tile: [pos.x, pos.y], state: 'deployed' } });
+    if (row) ops.push({ op: 'patch', kind: 'asset', id: row.id, data: { tile: [pos.x, pos.y], state: 'deployed' } });
+    // One write for both: command never sees me on the new tile with my mortar still on the old one.
+    if (typeof c.queueAll === 'function') c.queueAll(ops); else ops.forEach(function (op) { c.queue(op); });
     return true;
   }
 
@@ -590,11 +594,26 @@
     var v = api.draft('request', 'to', '');
     return options.some(function (o) { return o.value === v; }) ? v : '';
   }
+  // A member chosen as the addressee who left while the form was open stays chosen and says so: sending then
+  // asks to pick again (reqToStale) instead of quietly going to everyone by type. A post the new type does not
+  // offer still falls back as before.
+  function withStale(api, options) {
+    var v = api.draft('request', 'to', ''), m = /^client:(.+)$/.exec(v || ''), c = api.ui.client;
+    if (!m || options.some(function (o) { return o.value === v; })) return options;
+    if (typeof c.member === 'function' && c.member(m[1])) return options;   // still here, just not offered for this type
+    var objects = (c.merged && c.merged().objects) || {}, gone = null;
+    Object.keys(objects).forEach(function (id) {
+      var o = objects[id];
+      if (o && o.kind === 'member' && o.client === m[1] && typeof o.post === 'string') gone = o;
+    });
+    var T = api.T();
+    return options.concat([{ value: v, label: api.fmt(T.reqToGone, { who: gone ? memberLabel(api, gone) : T.reqToSomeone }), to: null }]);
+  }
 
   function formHtml(api) {
     var T = api.T(), esc = api.esc, type = draftType(api), task = type === 'task', t = rq.target, ok = planetOk(api);
     var pickBtn = api.btn('reqPick', T.pickTarget, null, 'big');
-    var options = toOptions(api, type), chosen = toChosen(api, options);
+    var options = withStale(api, toOptions(api, type)), chosen = toChosen(api, options);
     return '<section class="tac-section tac-room-reqform"><h2>' + esc(T.newRequest) + '</h2>' +
       '<div class="tac-room-types">' + TYPES.map(function (k, i) { return api.btn('reqType', (i + 1) + ' ' + T.types[k], { type: k }, k === type ? 'on' : ''); }).join('') + '</div>' +
       '<form data-room-form="request" class="tac-room-form">' +
