@@ -6296,6 +6296,7 @@ In Step 2 the shelf check expects at least 3 roster rows.
 1. Section 1, third sentence: «На первом этапе комната рассчитана на двоих: офицер штаба выдаёт миномётному расчёту запросы на удар и на позицию, расчёт видит их на карте и отвечает статусами, а офицер видит, где стоит миномёт и куда он достаёт.»
 2. Section 7, third bullet: «**Участники пилота:** два-три офицера штаба и расчёта, названные администрацией или сообществом; владелец проекта в их число не входит.»
 3. Section 8, second bullet: «**Вспомогательное, по журналам:** не меньше шести полезных комнат (офицер штаба и расчёт подтверждены, хотя бы один запрос доведён до «выполнен»), из них три созданы разными офицерами и хотя бы одна без владельца проекта; три и больше участников в двух и больше раундах; медиана от запроса до «принят» меньше минуты.»
+   *Superseded by the fix-round docs pass:* the admin package §8 now requires both posts confirmed, at least one request done by the mortar crew post (not by its author), and at least 4 work ops from 2 browsers, matching `scripts/room_pilot_stats.py --stage so-mortar`.
 
 ### Task 10 overrides
 

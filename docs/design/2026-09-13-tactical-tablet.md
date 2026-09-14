@@ -147,7 +147,7 @@ tactical.html ── tactical/tactical.js (UI серии T) ── хук window
       ├── tactical/room-logic.js (чистая логика: журнал, слияние, политика,     │
       │       фильтры, отсчёты; Node-тесты через vm, как logic.js)               │
       ├── tactical/policy/<форк>.json (санкция, должности, уровни, права)       │
-      └── localStorage: chemdb-tactical:room/<код>, chemdb-tactical:room-prefs   │
+      └── localStorage: chemdb-tactical:room/<код>:<client>, room-current:<client> │
                                                                                  │
 worker/index.js (роутер) ── worker/room/ (Durable Object «Room»: WebSocket с    │
       Hibernation API, журнал и объекты в SQLite объекта, TTL, лимиты) ─────────┘
@@ -274,7 +274,7 @@ op, kind, id, data)`, `objects(id, kind, layer, data, deleted)`, `members`,
 adminSecretHash, observerTokenHash, codeGeneration)`. Alarm объекта
 удаляет комнату через `roomIdleSec` после `lastOpAt`.
 
-**Хранение на клиенте:** `chemdb-tactical:room/<code>` = `{code, fork, planet,
+**Хранение на клиенте:** `chemdb-tactical:room/<code>:<client>` = `{code, fork, planet,
 me:{client, post, squad, callsign, secret}, seq, objects, members,
 calibration, pending:[op…], locked}`; `chemdb-tactical:room-prefs` = `{sounds,
 filters, layout}`. Событие `storage` синхронизирует вкладки, как в T6.
@@ -511,8 +511,7 @@ filters, layout}`. Событие `storage` синхронизирует вкл�
   `ROOMS_ENABLED=0` в дашборде — глобальный
   backstop.
 - **Лимиты (разделы 3 и 7).** `INSERT ops` + `UPSERT objects` без лишних
-  индексов, ≤2 строки на операцию. Лимитер по источнику входа (адрес +
-  `sessionId`), никогда по коду комнаты. Байтовый бюджет 2 МБ и 2000 объектов
+  индексов, ≤2 строки на операцию. Лимитер по источнику входа (IP-адрес из `CF-Connecting-IP`), никогда по коду комнаты. Байтовый бюджет 2 МБ и 2000 объектов
   на комнату, сообщение до 4 КБ, снимок пачками по 200. Потолки в переменных:
   `ROOMS_MAX_CONCURRENT=6`, `ROOMS_MAX_DAILY=30` на платном плане Workers
   (решение владельца «больше сессий в день»; бесплатный тариф упирается в
