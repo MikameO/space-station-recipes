@@ -11,8 +11,8 @@
 #           refuses tokens issued before minIat without changing the secret)
 #   4. npx wrangler secret put ROOM_STOP_SECRET
 #        -> any long random string; stop/start links are signed with it
-#   5. Workers Paid plan (5 USD/month) in the Cloudflare dashboard: the room ceilings below
-#      exceed the Free plan (decision record, Owner overrides 2).
+#   5. Free plan for now (owner, 2026-09-14): ceilings 3 concurrent / 6 daily as computed in Decision 4.
+#      When switching to Workers Paid (5 USD/month), raise them to 6 / 30 (decision record, Owner overrides 2 and 8).
 #   6. npx wrangler deploy
 #        -> prints https://chemdb-feedback.<account>.workers.dev
 #   7. put that URL into FEEDBACK_URL in feedback.js and ROOM_URL in tactical/room.js, bump their ?v=, commit.
@@ -30,8 +30,8 @@ compatibility_date = "2026-09-01"
 [vars]
 ALLOWED_ORIGINS = "https://mikameo.github.io"
 ROOMS_ENABLED = "1"
-ROOMS_MAX_CONCURRENT = "6"
-ROOMS_MAX_DAILY = "30"
+ROOMS_MAX_CONCURRENT = "3"
+ROOMS_MAX_DAILY = "6"
 # Rooms open at once under one server key (locked and closed rooms do not count).
 ROOMS_MAX_PER_KEY = "3"
 
