@@ -16,7 +16,9 @@ const CODE = '[ABCDEFGHJKMNPQRSTUVWXYZ23456789]';
 const ROOM_RE = new RegExp('^/room/(' + CODE + '{6})/(join|ops|snapshot|export|admin)$');
 const PASS_HEADERS = ['Content-Type', 'X-Room-Session', 'X-Room-Observer'];
 // Bodies in UTF-8 bytes: 64 ops at the per-op message limit fit in 300 KB; join and admin bodies are a few fields.
-const BODY_MAX = { ops: 300 * 1024, join: 2 * 1024, admin: 2 * 1024 };
+// Creating a room sends a token and a few fields: 2 KB, refused before it is parsed or the token is checked.
+const BODY_MAX = { ops: 300 * 1024, join: 2 * 1024, admin: 2 * 1024, create: 2 * 1024 };
+const HEALTH_TTL = 30000;   // /health is numbers for a status page: one registry request per 30 s per isolate
 const bytes = s => new TextEncoder().encode(s).length;
 
 export function isRoomPath(p) {
@@ -50,9 +52,10 @@ function registry(env, path, body) {
     : undefined);
 }
 
-async function cached(key, now, load) {
+// A value younger than ttl; a clock that went back reloads rather than trusting a value from the future.
+async function cached(key, now, load, ttl = 60000) {
   const hit = cache.get(key);
-  if (hit && now - hit.t < 60000) return hit.v;
+  if (hit && now >= hit.t && now - hit.t < ttl) return hit.v;
   const v = await load();
   cache.delete(key);
   if (cache.size >= CACHE_MAX) cache.delete(cache.keys().next().value);
@@ -86,8 +89,11 @@ async function stopLink(request, env, path) {
 
 async function createRoom(request, env, origin, now) {
   if (await limited(env.ROOM_CREATE_RL, request)) return reply(429, { error: 'rate' }, origin);
+  if (Number(request.headers.get('Content-Length') || 0) > BODY_MAX.create) return reply(413, { error: 'size' }, origin);
+  const raw = await request.text();
+  if (bytes(raw) > BODY_MAX.create) return reply(413, { error: 'size' }, origin);
   let b;
-  try { b = await request.json(); } catch { return reply(400, { error: 'bad-json' }, origin); }
+  try { b = JSON.parse(raw); } catch { return reply(400, { error: 'bad-json' }, origin); }
   if (!b || typeof b !== 'object') return reply(400, { error: 'bad-json' }, origin);
   const keyId = request.headers.get('X-Room-Key-Id') || '';
   const tok = await verifyServerToken(env.ROOM_KEYS, b.token);
@@ -129,7 +135,19 @@ async function createRoom(request, env, origin, now) {
   return reply(503, { error: 'collision' }, origin);
 }
 
+// Whatever throws on the way (a Room or Registry object, their storage, the stop link) answers 503 internal,
+// with CORS for an allowed origin: the page reads a reason instead of a CORS-less 500.
 export async function routeRoom(request, env) {
+  try {
+    return await route(request, env);
+  } catch (e) {
+    try { console.error('room route failed', e && e.stack ? e.stack : e); } catch { /* nowhere left to report */ }
+    const origin = request.headers.get('Origin') || '';
+    return reply(503, { error: 'internal' }, allowedOrigins(env).includes(origin) ? origin : null);
+  }
+}
+
+async function route(request, env) {
   const url = new URL(request.url);
   const path = url.pathname;
   if (path.startsWith('/stop/') || path.startsWith('/start/')) return stopLink(request, env, path);
@@ -143,7 +161,7 @@ export async function routeRoom(request, env) {
     const policy = policyOf(env, path.slice('/policy/'.length));
     return policy ? reply(200, policy, origin, { 'Cache-Control': 'max-age=60' }) : reply(404, { error: 'fork' }, origin);
   }
-  if (path === '/health') return reply(200, await (await registry(env, '/health')).json(), origin);
+  if (path === '/health') return reply(200, await cached('health', now, async () => (await registry(env, '/health')).json(), HEALTH_TTL), origin);
   if (env.ROOMS_ENABLED !== '1') return reply(503, { error: 'disabled' }, origin);
   if (path === '/room' && request.method === 'POST') return createRoom(request, env, origin, now);
 

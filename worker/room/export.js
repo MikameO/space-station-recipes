@@ -10,6 +10,15 @@ const TYPE_RU = { mortar: 'удар миномёта', position: 'позиция
 const STATUS_RU = { requested: 'запрошен', accepted: 'принят', loaded: 'заряжен', firing: 'огонь', done: 'выполнен', denied: 'отклонён' };
 const PRIORITY_RU = { urgent: 'срочно', normal: 'обычный' };
 const FLAG_RU = { beacon: 'маяк' };
+// Journal events (kind `event`): the Worker writes them for radio silence, close, «Продолжить раунд», the idle lock
+// and the administration's stop and start.
+const EVENT_RU = {
+  silence_on: 'радиомолчание включено', silence_off: 'радиомолчание выключено', close: 'комната закрыта',
+  unlock: 'раунд продолжен после простоя', lock: 'комната заблокирована: 8 минут без действий',
+  stop: 'комната остановлена рубильником администрации', start: 'рубильник администрации снят'
+};
+// The stop link acts through the room as the system, but the journal names who pulled the switch.
+const EVENT_WHO = { stop: 'Администрация', start: 'Администрация' };
 
 const own = (o, k) => (o && typeof o === 'object' && Object.prototype.hasOwnProperty.call(o, k) ? o[k] : undefined);
 const isNum = v => typeof v === 'number' && Number.isFinite(v);
@@ -97,6 +106,7 @@ export function chronology(ops, policy, offset, objects) {
 
   function line(op) {
     const d = op.data || {};
+    if (op.kind === 'event') return own(EVENT_RU, d.event) || 'событие ' + quote(d.event);
     if (op.kind === 'member') return memberLine(op, d);
     if (op.kind === 'request') return requestLine(op, d);
     if (op.kind === 'asset') return assetLine(op, d);
@@ -113,7 +123,8 @@ export function chronology(ops, policy, offset, objects) {
     let t = '--:--:--', who = '?', what;
     try {
       t = new Date(op.at).toISOString().slice(11, 19);
-      who = !op.by || op.by.post === 'system' ? 'Система' : postName(op.by.post) + (op.by.squad ? ' ' + squadName(op.by.squad) : '');
+      const eventWho = op.kind === 'event' ? own(EVENT_WHO, (op.data || {}).event) : undefined;
+      who = eventWho || (!op.by || op.by.post === 'system' ? 'Система' : postName(op.by.post) + (op.by.squad ? ' ' + squadName(op.by.squad) : ''));
       what = line(op);
     } catch (e) {
       what = `операция ${op && op.kind} (не разобрана)`;
