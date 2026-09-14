@@ -124,6 +124,12 @@ GOALS: list[tuple[str, str]] = [
     ("tactical_ob_fire",        "Тактическая карта: ОБ отмечен"),
     ("tactical_marker_add",     "Тактическая карта: метка добавлена"),
     ("tactical_shape_add",      "Тактическая карта: линия или зона добавлена"),
+    # Series V — officers' room; ids next to track() in tactical/room-ui.js and
+    # tactical/room-requests.js; create on the counter only after the owner's «ок»
+    ("room_create",             "Командный планшет: комната создана"),
+    ("room_confirm",            "Командный планшет: должность подтверждена"),
+    ("room_request_done",       "Командный планшет: запрос выполнен"),
+    ("room_export",             "Командный планшет: журнал скачан"),
     ("ordnance_burn_window", "Взрывчатка: окно горения"),
     ("ordnance_surf_swap", "Взрывчатка: обмен высоты и цвета"),
     ("ordnance_req_exclude", "Взрывчатка: исключён реагент из поиска"),
