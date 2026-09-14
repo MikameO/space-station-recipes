@@ -437,4 +437,95 @@ t('final review: prototype and borrowed calibration ids are refused, loops read 
   }
 });
 
+t('stage 2a: member position and calibration, the heartbeat, addressed requests and tasks, the room calibration', () => {
+  // A member's own patch.
+  assert.strictEqual(R.validateMemberPatch(stage1, crewM, { pos: { x: 30, y: -90, level: 0 } }), null);
+  assert.strictEqual(R.validateMemberPatch(stage1, crewM, { pos: null, cal: [12, -5] }), null);
+  assert.strictEqual(R.validateMemberPatch(stage1, crewM, { cal: null, presentAt: 1 }), null);
+  assert.strictEqual(R.validateMemberPatch(stage1, crewM, {}), 'fields');
+  assert.strictEqual(R.validateMemberPatch(stage1, crewM, { posAt: 5 }), 'fields', 'the server stamps posAt');
+  assert.strictEqual(R.validateMemberPatch(stage1, crewM, { pos: { x: 1.5, y: 2 } }), 'pos');
+  assert.strictEqual(R.validateMemberPatch(stage1, crewM, { pos: { x: 1, y: 99999 } }), 'pos');
+  assert.strictEqual(R.validateMemberPatch(stage1, crewM, { pos: { x: 1, y: 2, level: 0.5 } }), 'pos');
+  assert.strictEqual(R.validateMemberPatch(stage1, crewM, { pos: [1, 2] }), 'pos');
+  assert.strictEqual(R.validateMemberPatch(stage1, crewM, { cal: [1] }), 'cal');
+  assert.strictEqual(R.validateMemberPatch(stage1, watcher, { pos: { x: 1, y: 2 } }), 'level', 'an observer shares no position');
+  assert.strictEqual(R.validateMemberPatch(stage1, watcher, { cal: [1, 2] }), 'level');
+  assert.strictEqual(R.validateMemberPatch(stage1, watcher, { presentAt: 1 }), null);
+  const cleaned = R.cleanData(stage1, 'member', 'patch', { pos: { x: 3, y: 4, colour: 'red' }, posAt: 1 });
+  assert.deepStrictEqual(cleaned.pos, { x: 3, y: 4 });
+  assert.strictEqual(R.validatePatch(stage1, 'member', cleaned), 'fields', 'posAt from a client is refused');
+  assert.strictEqual(R.stampData('member', 'patch', { pos: { x: 3, y: 4 } }, byOf(crewM), 7000).posAt, 7000);
+  assert.strictEqual(R.stampData('member', 'patch', { pos: null }, byOf(crewM), 7100).posAt, 7100, 'clearing is stamped too');
+  assert.strictEqual(R.stampData('member', 'patch', { cal: null }, byOf(crewM), 7200).posAt, undefined);
+  const hb = (op, kind, data) => R.isHeartbeat({ op, kind, id: 'm', data });
+  assert.deepStrictEqual([hb('patch', 'member', { presentAt: 1 }), hb('patch', 'member', { presentAt: 1, pos: null }), hb('patch', 'member', { cal: null }),
+    hb('put', 'member', { presentAt: 1 }), hb('patch', 'request', { presentAt: 1 }), R.isHeartbeat(null)], [true, false, false, false, false, false]);
+
+  // Requests with an addressee, and tasks.
+  const req = over => Object.assign({ target: { x: 1, y: 2 }, note: '', priority: 'normal', flags: [] }, over);
+  assert.strictEqual(R.validateData(stage1, 'request', req({ type: 'mortar', to: { post: 'mortar' } })), null);
+  assert.strictEqual(R.validateData(stage1, 'request', req({ type: 'mortar', to: { post: 'so' } })), 'to', 'a strike goes to the mortar post only');
+  assert.strictEqual(R.validateData(stage1, 'request', req({ type: 'mortar', to: { client: 'c-mortar' } })), null);
+  assert.strictEqual(R.validateData(stage1, 'request', req({ type: 'position', to: { post: 'so' } })), null);
+  for (const bad of [{ post: 'observer' }, { post: 'nobody' }, { client: '' }, { client: 'x'.repeat(65) }, { client: 'x', post: 'so' }, 'mortar', [], { post: 'mortar', squad: 'alpha' }]) {
+    assert.strictEqual(R.validateData(stage1, 'request', req({ type: 'position', to: bad })), 'to', JSON.stringify(bad));
+  }
+  assert.strictEqual(R.validateData(policy, 'request', req({ type: 'position', to: { post: 'sl', squad: 'alpha' } })), null, 'the full policy has squads');
+  assert.strictEqual(R.validateData(policy, 'request', req({ type: 'position', to: { post: 'sl', squad: 'zulu' } })), 'to');
+  const task = { type: 'task', note: 'держать мост', to: { post: 'mortar' }, priority: 'normal', flags: [] };
+  assert.strictEqual(R.validateData(stage1, 'request', task), null, 'a task needs no map point');
+  assert.strictEqual(R.validateData(stage1, 'request', Object.assign({}, task, { target: { x: 5, y: 6 } })), null);
+  assert.strictEqual(R.validateData(stage1, 'request', Object.assign({}, task, { target: { x: 5.5, y: 6 } })), 'target');
+  const { to: dropped, ...noAddressee } = task;
+  assert.ok(dropped);
+  assert.strictEqual(R.validateData(stage1, 'request', noAddressee), 'to', 'a task names its addressee');
+  assert.strictEqual(R.validateData(stage1, 'request', Object.assign({}, task, { note: '   ' })), 'note', 'and says what to do');
+  assert.strictEqual(R.validateData(stage1, 'request', { type: 'mortar', note: '', priority: 'normal', flags: [] }), 'target', 'other types still need a point');
+  assert.strictEqual(R.validatePatch(stage1, 'request', { to: { post: 'so' } }), 'fields', 'the addressee is set once, at creation');
+  assert.deepStrictEqual(R.cleanData(stage1, 'request', 'put', { type: 'task', to: { post: 'mortar', extra: 1 } }).to, { post: 'mortar' });
+
+  // Who acts on an addressed request.
+  const crew2 = { client: 'c-mortar-2', post: 'mortar', confirmed: true };
+  const toMember = Object.assign(stage1State('mortar', 'requested').objects.q1, { to: { client: 'c-mortar-2' } });
+  assert.deepStrictEqual([R.isAddressee(toMember, crew2), R.isAddressee(toMember, crewM), R.isAddressee({}, crew2), R.isAddressee(toMember, null)], [true, false, false, false]);
+  assert.deepStrictEqual(R.requestActions(stage1, crewM, toMember, { claimed: [] }), [], 'the mortar post is not the addressee of a request to one of its members');
+  assert.deepStrictEqual(R.requestActions(stage1, crew2, toMember, { claimed: [] }), ['accept', 'deny']);
+  assert.deepStrictEqual(R.requestActions(stage1, soOther, toMember, { claimed: [] }), ['accept', 'deny'], 'staff still act');
+  assert.deepStrictEqual(R.requestActions(stage1, soAuthor, toMember, { claimed: [] }), ['cancel'], 'the author never accepts');
+  const accept = { op: 'patch', kind: 'request', id: 'q1', expectedStatus: 'requested', data: { status: 'accepted' } };
+  assert.strictEqual(R.canWrite(stage1, crewM, accept, toMember, { claimed: ['c-mortar'] }).reason, 'right', 'a claimed crew does not take a request addressed elsewhere');
+  assert.deepStrictEqual(R.canWrite(stage1, crew2, accept, toMember, { claimed: [] }), { ok: true });
+  const toPost = Object.assign({}, toMember, { to: { post: 'mortar' } });
+  assert.deepStrictEqual([R.isAddressee(toPost, crewM), R.isAddressee(toPost, crew2), R.isAddressee(toPost, soOther)], [true, true, false]);
+  const toSquad = { to: { post: 'sl', squad: 'alpha' } };
+  assert.deepStrictEqual([R.isAddressee(toSquad, slA), R.isAddressee(toSquad, slB)], [true, false]);
+  assert.strictEqual(R.canWrite(policy, ot, accept, Object.assign({ kind: 'request', type: 'mortar', status: 'requested', by: byOf(staff) }, toSquad), { claimed: [] }).reason, 'right',
+    'the mortar owner post of the full policy does not accept a request addressed to a squad');
+  const t1 = Object.assign(stage1State('task', 'requested').objects.q1, { to: { post: 'mortar' } });
+  assert.deepStrictEqual(R.requestActions(stage1, crewM, t1, { claimed: [] }), ['accept', 'deny']);
+  t1.status = 'accepted';
+  assert.deepStrictEqual(R.requestActions(stage1, crewM, t1, { claimed: [] }), ['done', 'deny'], 'no fire, take or place for a task');
+  assert.deepStrictEqual(R.requestActions(stage1, soAuthor, t1, { claimed: [] }), ['cancel']);
+  t1.status = 'done';
+  assert.deepStrictEqual(R.requestActions(stage1, soAuthor, t1, { claimed: [] }), ['repeat']);
+
+  // The room calibration: tile and reading agree with the offset; the freshest publish replaces it.
+  const calData = over => Object.assign({ offset: [12, -5], tile: [10, 20], reading: [22, 15] }, over);
+  assert.strictEqual(R.validateData(stage1, 'calibration', { offset: [12, -5] }), null, 'the stage 1 shape stays valid');
+  assert.strictEqual(R.validateData(stage1, 'calibration', calData()), null);
+  assert.strictEqual(R.validateData(stage1, 'calibration', calData({ offset: [12, -4] })), 'offset');
+  assert.strictEqual(R.validateData(stage1, 'calibration', { offset: [12, -5], tile: [10, 20] }), 'reading');
+  assert.strictEqual(R.validateData(stage1, 'calibration', { offset: [12, -5], reading: [22, 15] }), 'tile');
+  assert.strictEqual(R.validateData(stage1, 'calibration', calData({ tile: [10.5, 20] })), 'tile');
+  assert.strictEqual(R.validatePatch(stage1, 'calibration', calData({ note: 'x' })), 'fields');
+  const cs = R.createState();
+  const publish = (seq, by, offset) => ({ seq, at: seq * 1000, by: byOf(by), op: 'put', kind: 'calibration', id: 'calibration', data: { offset } });
+  assert.strictEqual(R.applyOp(cs, publish(1, soAuthor, [1, 1])).ok, true);
+  assert.deepStrictEqual(R.canWrite(stage1, crewM, { op: 'put', kind: 'calibration', id: 'calibration', data: calData() }, cs.objects.calibration), { ok: true }, 'the crew refines it');
+  assert.strictEqual(R.canWrite(stage1, watcher, { op: 'put', kind: 'calibration', id: 'calibration', data: calData() }, cs.objects.calibration).reason, 'level');
+  assert.strictEqual(R.applyOp(cs, publish(2, crewM, [2, 2])).ok, true);
+  assert.deepStrictEqual([cs.objects.calibration.offset, cs.objects.calibration.by.client], [[2, 2], 'c-mortar'], 'the freshest publish replaces the room calibration');
+});
+
 console.log('OK', n, 'groups');
