@@ -308,19 +308,31 @@ body.tac-body {
   flex: 1;
   padding: 6px 8px;
   background: var(--hull);
-  border: 1px solid var(--border-subtle);
+  border: 1px solid var(--border-active);
   border-radius: 3px;
-  color: var(--text-sub);
+  color: var(--text-main);
   font: inherit;
   font-size: 13px;
   cursor: pointer;
 }
+.tac-seg:hover:not(:disabled):not(.on) { border-color: var(--phosphor-dim); color: var(--text-bright); }
 
 .tac-seg.on { border-color: var(--phosphor); color: var(--phosphor); background: var(--phosphor-glow); }
 .tac-seg:disabled { opacity: 0.45; cursor: not-allowed; }
 .tac-seg:focus-visible { outline: 2px solid var(--cyan); outline-offset: 1px; }
 
 .tac-panel .btn-small.on { border-color: var(--cyan); color: var(--cyan); }
+
+/* The site's .btn-small is a ghost button for dense lists; on the map page it read as grey on grey. Here every
+   working button gets a raised ground, a visible border and bright text. :where() keeps this at the specificity
+   of .btn-small itself, so the site hover and every .on / .ok / .bad state of the fire panel and the room still win. */
+:where(body.tac-body) .btn-small {
+  background: var(--panel-raised);
+  border-color: var(--border-active);
+  color: var(--text-bright);
+}
+:where(body.tac-body) .btn-small:disabled { opacity: 0.45; cursor: not-allowed; }
+:where(body.tac-body) .btn-small:disabled:hover { background: var(--panel-raised); border-color: var(--border-active); color: var(--text-bright); }
 
 .tac-target-fields {
   display: flex;
