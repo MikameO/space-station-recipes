@@ -76,6 +76,7 @@
         author: 'You cannot carry out your own request.', last: 'Cannot remove the last member who can confirm joins.',
         knocks: 'Too many people waiting, try again in a minute.', rotated: 'The room code was changed — ask staff for the new one.',
         json: 'The server could not read the request.', fields: 'Invalid fields in the change.', field: 'Invalid fields in the change.',
+        deleted: 'That object was already removed.', fork: 'This key belongs to another server fork.', reset: 'The room was reset; the change was not sent.',
         fallback: 'Error: {code}'
       }
     },
@@ -125,6 +126,7 @@
         author: 'Свой запрос нельзя принять или выполнить.', last: 'Нельзя снять последнего, кто может впускать в комнату.',
         knocks: 'Слишком много ожидающих входа, попробуйте через минуту.', rotated: 'Код комнаты сменили — возьмите новый у штаба.',
         json: 'Сервер не понял запрос.', fields: 'Недопустимые поля в изменении.', field: 'Недопустимые поля в изменении.',
+        deleted: 'Этот объект уже удалён.', fork: 'Этот ключ выдан для другого форка сервера.', reset: 'Комната перезапущена, изменение не отправлено.',
         fallback: 'Ошибка: {code}'
       }
     }
@@ -296,7 +298,7 @@
   function parseHash(hash) {
     var room = /[#&]room=([A-Za-z0-9]+)/.exec(hash || '');
     var observe = /[#&]observe=([A-Za-z0-9]+\.[A-Za-z0-9_-]+)/.exec(hash || '');
-    var client = /[#&]client=([A-Za-z0-9_-]{8,40})/.exec(hash || '');   // dev only: a second officer in the same browser
+    var client = /[#&]client=([A-Za-z0-9_-]{8,24})/.exec(hash || '');   // dev only: a second officer in the same browser
     return { room: room ? room[1] : null, observe: observe ? observe[1] : null, client: client ? client[1] : null };
   }
   // The observer token is a secret: it leaves the address bar (and history) as soon as the panel has read it.
@@ -408,7 +410,8 @@
   }
   // room_confirm is counted by the confirmer (actions.confirm), never again by the joiner.
   function onClientUpdate(c) {
-    while (c.rejected.length) { var r = c.rejected.shift(); toast(errorText(r.error)); }
+    var shown = {};   // a refused batch (for example 423) must not stack one toast per op
+    while (c.rejected.length) { var r = c.rejected.shift(), msg = errorText(r.error); if (!shown[msg]) { shown[msg] = true; toast(msg); } }
     if (c.error && c.error !== ui.lastError && c.error !== 'network') toast(errorText(c.error));
     ui.lastError = c.error;
     var current = CURRENT_KEY + ':' + c.client;

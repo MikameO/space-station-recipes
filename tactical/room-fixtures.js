@@ -322,7 +322,7 @@
     if (this.bytes > L.bytes) { this.meta.frozen = { at: now, reason: 'budget' }; return { cid: cid, error: 'budget' }; }
     var existing = this.state.objects[raw.id];
     if (existing && existing.kind !== raw.kind) return { cid: cid, error: 'kind' };
-    if (raw.op === 'put' && existing) {
+    if (raw.op === 'put' && existing && raw.kind !== 'calibration') {
       if (existing.deleted) return { cid: cid, error: 'deleted' };
       if (!existing.by || existing.by.client !== actor.client) return { cid: cid, error: 'exists' };
     }

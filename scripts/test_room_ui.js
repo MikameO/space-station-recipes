@@ -149,9 +149,9 @@ async function t(name, fn) { await fn(); n++; console.log('ok', name); }
     assert.strictEqual(cancelled, false, 'onCancel is not called for a used pick');
     assert.strictEqual(ui.pick, null);
     ['notify', 'draw', 'tick', 'pick'].forEach(k => assert.ok(w.warnings.some(x => x.indexOf(k) >= 0), k + ' is warned, not thrown'));
-    // room.js wraps TacRoom.notify itself (client track); until that lands a throwing shell would still escape.
+    // room.js wraps TacRoom.notify itself, so even a throwing shell never reaches Series T.
     w.win.TacRoomUI.notify = () => { throw new Error('shell'); };
-    try { w.win.TacRoom.notify('shot', {}); } catch (e) { notes.push('TacRoom.notify in room.js does not catch yet (client track)'); }
+    assert.doesNotThrow(() => w.win.TacRoom.notify('shot', {}), 'TacRoom.notify catches a throwing shell');
   });
 
   await t('K3: register warns when a module key collides with an existing key', async () => {
