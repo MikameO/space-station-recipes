@@ -13,7 +13,222 @@ const client = (transport, id, extra) => new T.RoomClient(Object.assign({ transp
   policy: STAGE1, fork: 'stories_cm', planet: 'lv624', h: 'h1', now: env.now, clientId: id }, extra || {}));
 const liveIds = s => Object.keys(s.objects).filter(id => !s.objects[id].deleted).sort();
 
+// Page timers that only record; a test fires them by hand through .pages.
+const pageHost = over => Object.assign({
+  pages: [], cleared: [],
+  setTimeout(fn, ms) { this.pages.push({ fn, ms, every: false }); return this.pages.length; },
+  clearTimeout(id) { this.cleared.push(id); },
+  setInterval(fn, ms) { this.pages.push({ fn, ms, every: true }); return this.pages.length; },
+  clearInterval(id) { this.cleared.push(id); }
+}, over || {});
+
+// A dedicated Worker stand-in: new Worker(objectURL) runs the script from that Blob against timers the test
+// fires by hand (wt.fire), and passes messages both ways.
+function workerHost() {
+  const blobs = {}, workers = [];
+  const wt = {
+    map: new Map(), id: 0,
+    set: (fn, ms, every) => { wt.map.set(++wt.id, { fn, ms, every: !!every }); return wt.id; },
+    clear: k => { wt.map.delete(k); },
+    fire: () => { [...wt.map].forEach(([k, x]) => { if (!x.every) wt.map.delete(k); x.fn(); }); }
+  };
+  function Blob(parts, opts) { this.text = parts.join(''); this.type = opts && opts.type; }
+  const URL = { createObjectURL: b => { const u = 'blob:test/' + (Object.keys(blobs).length + 1); blobs[u] = b; return u; } };
+  function Worker(url) {
+    const self = this;
+    this.source = blobs[url].text;
+    this.type = blobs[url].type;
+    this.sent = [];
+    this.terminated = false;
+    workers.push(this);
+    const scope = new Function('postMessage', 'setTimeout', 'clearTimeout', 'setInterval', 'clearInterval',
+      'var onmessage; ' + this.source + ' return function (data) { onmessage({ data: data }); };');
+    this.deliver = scope(id => self.onmessage({ data: id }), (fn, ms) => wt.set(fn, ms), wt.clear, (fn, ms) => wt.set(fn, ms, true), wt.clear);
+  }
+  Worker.prototype.postMessage = function (m) { this.sent.push(m); this.deliver(JSON.parse(JSON.stringify(m))); };
+  Worker.prototype.terminate = function () { this.terminated = true; };
+  return { host: pageHost({ Worker, Blob, URL }), workers, wt };
+}
+
+// A document for visibilitychange; show(state) sets visibilityState and fires the event.
+function fakeDocument() {
+  const d = {
+    visibilityState: 'visible', listeners: [],
+    addEventListener(type, fn) { if (type === 'visibilitychange') d.listeners.push(fn); },
+    removeEventListener(type, fn) { d.listeners = d.listeners.filter(x => x !== fn); },
+    show(state) { d.visibilityState = state; d.listeners.slice().forEach(fn => fn({ type: 'visibilitychange' })); }
+  };
+  return d;
+}
+
 (async () => {
+  await t('timers: without Worker the page timers run them; a Worker constructor that throws is tried once, then the page for good', async () => {
+    const host = pageHost();
+    const tm = T.makeTimers(host);
+    assert.strictEqual(tm.mode(), 'idle', 'nothing is made before the first timer');
+    const hits = [];
+    const a = tm.setTimeout(() => hits.push('a'), 250);
+    const b = tm.setInterval(() => hits.push('b'), 1000);
+    assert.deepStrictEqual([tm.mode(), host.pages.map(p => [p.ms, p.every])], ['page', [[250, false], [1000, true]]]);
+    host.pages[0].fn();
+    host.pages[1].fn();
+    host.pages[1].fn();
+    assert.deepStrictEqual(hits, ['a', 'b', 'b']);
+    tm.clearTimeout(a);
+    assert.deepStrictEqual(host.cleared, [], 'a timeout that fired has nothing left to clear');
+    tm.clearInterval(b);
+    assert.deepStrictEqual(host.cleared, [2]);
+    host.pages[1].fn();
+    assert.deepStrictEqual(hits, ['a', 'b', 'b'], 'a page callback arriving after its clear runs nothing');
+    host.Worker = workerHost().host.Worker;
+    tm.setTimeout(() => {}, 5);
+    assert.deepStrictEqual([tm.mode(), host.pages.length], ['page', 3], 'a Worker that shows up later is not tried');
+
+    let made = 0;
+    const refused = workerHost();
+    refused.host.Worker = function () { made++; throw new Error('SecurityError: refused by worker-src'); };
+    const tr = T.makeTimers(refused.host);
+    tr.setTimeout(() => {}, 10);
+    tr.setTimeout(() => {}, 20);
+    tr.setInterval(() => {}, 30);
+    assert.deepStrictEqual([made, tr.mode(), refused.host.pages.map(p => p.ms)], [1, 'page', [10, 20, 30]]);
+    const noBlob = workerHost();
+    delete noBlob.host.Blob;
+    const tb = T.makeTimers(noBlob.host);
+    tb.setTimeout(() => {}, 10);
+    assert.deepStrictEqual([tb.mode(), noBlob.workers.length, noBlob.host.pages.length], ['page', 0, 1], 'no Blob: no worker either');
+    assert.deepStrictEqual(['setTimeout', 'clearTimeout', 'setInterval', 'clearInterval', 'mode'].map(k => typeof T.timers[k]),
+      ['function', 'function', 'function', 'function', 'function'], 'TacRoom.timers is one of these');
+  });
+
+  await t('timers: one Worker made from a Blob runs every timer; callbacks fire, clears cancel, a throwing callback keeps its schedule', async () => {
+    const { host, workers, wt } = workerHost();
+    const tm = T.makeTimers(host);
+    const hits = [];
+    warned.length = 0;
+    tm.setTimeout(() => hits.push('a'), 1000);
+    const b = tm.setTimeout(() => hits.push('b'), 2000);
+    const c = tm.setInterval(() => { hits.push('c'); throw new Error('tick bug'); }, 500);
+    assert.deepStrictEqual([tm.mode(), workers.length, host.pages.length, wt.map.size], ['worker', 1, 0, 3], 'one worker for all, no page timers');
+    assert.strictEqual(workers[0].type, 'text/javascript');
+    assert.ok(!/[\\\x00-\x08\x0b\x0c\x0e-\x1f]/.test(workers[0].source) && workers[0].source.indexOf('//') < 0, 'no escape, control character or comment in the worker script');
+    assert.deepStrictEqual(workers[0].sent.map(m => [m.op, m.ms, m.every]), [['set', 1000, false], ['set', 2000, false], ['set', 500, true]]);
+    tm.clearTimeout(b);
+    assert.strictEqual(wt.map.size, 2, 'the clear reached the worker');
+    wt.fire();
+    wt.fire();
+    assert.deepStrictEqual(hits, ['a', 'c', 'c']);
+    assert.strictEqual(wt.map.size, 1, 'the interval stays on the worker');
+    assert.strictEqual(warned.filter(x => x[0] === '[room] timer').length, 2, 'each throw is logged');
+    tm.clearInterval(c);
+    wt.fire();
+    assert.deepStrictEqual([hits.length, wt.map.size], [3, 0]);
+
+    const d = tm.setTimeout(() => hits.push('d'), 10);
+    tm.clearTimeout(d);
+    workers[0].onmessage({ data: d });
+    assert.strictEqual(hits.length, 3, 'a timer cleared while its message is on the way runs nothing');
+
+    tm.setTimeout(() => { hits.push('e'); tm.setTimeout(() => hits.push('f'), 10); }, 10);
+    wt.fire();
+    wt.fire();
+    assert.deepStrictEqual([hits.slice(3), workers.length], [['e', 'f'], 1], 'a timer set in a callback goes to the same worker');
+
+    // The worker reports an error after it was made: what it held moves to page timers, for good.
+    tm.setTimeout(() => hits.push('g'), 3000);
+    tm.setInterval(() => hits.push('h'), 1000);
+    workers[0].onerror({ message: 'script refused' });
+    assert.deepStrictEqual([tm.mode(), workers[0].terminated, host.pages.map(p => [p.ms, p.every])], ['page', true, [[3000, false], [1000, true]]]);
+    wt.fire();
+    assert.strictEqual(hits.length, 5, 'a late message from the dropped worker runs nothing');
+    host.pages.forEach(p => p.fn());
+    assert.deepStrictEqual(hits.slice(5), ['g', 'h']);
+    tm.setTimeout(() => {}, 40);
+    assert.deepStrictEqual([workers.length, host.pages.length], [1, 3]);
+  });
+
+  await t('loop: injected timers are used when given; otherwise the loop and the HTTP timeout run on TacRoom.timers', async () => {
+    const saved = { set: T.timers.setTimeout, clear: T.timers.clearTimeout };
+    const used = [];
+    T.timers.setTimeout = (fn, ms) => { used.push(ms); return 99; };
+    T.timers.clearTimeout = id => { used.push('clear ' + id); };
+    try {
+      const T1 = K.fakeTimers();
+      const { so, mo } = await K.stage1Room(env, { so: { setTimeout: T1.set, clearTimeout: T1.clear } });
+      so.startLoop();
+      await drain();
+      assert.deepStrictEqual([T1.size(), used], [1, []], 'the fake timers took the step');
+      so.stopLoop();
+      mo.startLoop();
+      await drain();
+      assert.deepStrictEqual(used, [Math.max(1, mo.retryAfter) * 1000], 'the default is TacRoom.timers');
+      mo.stopLoop();
+      assert.deepStrictEqual(used.slice(1), ['clear 99']);
+      const http = new T.HttpTransport('https://x', async () => ({ status: 200, headers: { get: () => null }, text: async () => '{}' }));
+      used.length = 0;
+      await http.poll('ABCDEF', 0, {});
+      assert.deepStrictEqual(used, [15000, 'clear 99'], 'the request timeout too');
+    } finally {
+      T.timers.setTimeout = saved.set;
+      T.timers.clearTimeout = saved.clear;
+    }
+  });
+
+  await t('back in view: one poll at once instead of the Retry-After wait; none beside a poll in flight; none once stopped', async () => {
+    const T1 = K.fakeTimers(), doc = fakeDocument();
+    const { so, w } = await K.stage1Room(env, { so: { setTimeout: T1.set, clearTimeout: T1.clear, document: doc } });
+    so.startLoop();
+    await drain();
+    assert.deepStrictEqual([T1.size(), doc.listeners.length], [1, 1]);
+    let polls = w.count('poll');
+    doc.show('hidden');
+    await drain();
+    assert.strictEqual(w.count('poll'), polls, 'hiding polls nothing');
+    doc.show('visible');
+    await drain();
+    assert.strictEqual(w.count('poll'), polls + 1, 'one poll at once');
+    assert.strictEqual(T1.size(), 1, 'the waiting step was replaced, not doubled');
+
+    polls = w.count('poll');
+    const g = gate();
+    w.faults.poll.push(K.holdBefore(g));
+    T1.fireAll();
+    await g.reached;
+    doc.show('hidden');
+    doc.show('visible');
+    await drain();
+    assert.strictEqual(w.count('poll'), polls + 1, 'no second poll beside the step\'s own');
+    g.open();
+    await drain();
+    assert.strictEqual(T1.size(), 1);
+
+    polls = w.count('poll');
+    const g2 = gate();
+    w.faults.poll.push(K.holdBefore(g2));
+    const p = so.poll();
+    await g2.reached;
+    assert.strictEqual(so.polling, 1);
+    doc.show('visible');
+    await drain();
+    assert.deepStrictEqual([w.count('poll'), T1.size()], [polls + 1, 1], 'none beside a poll sent outside the loop; the step keeps waiting');
+    g2.open();
+    await p;
+    assert.strictEqual(so.polling, 0);
+    doc.show('visible');
+    await drain();
+    assert.strictEqual(w.count('poll'), polls + 2, 'with nothing in flight it polls again');
+
+    so.stopLoop();
+    assert.strictEqual(doc.listeners.length, 0, 'stopLoop drops the listener');
+    polls = w.count('poll');
+    doc.show('visible');
+    await drain();
+    assert.strictEqual(w.count('poll'), polls);
+    w.faults.poll.push({ before: () => { throw new Error('transport bug'); } });
+    assert.throws(() => so.poll());
+    assert.strictEqual(so.polling, 0, 'a poll that throws at once is not counted as out');
+  });
+
   await t('loop: a second startLoop adds no timer; every step schedules exactly one next', async () => {
     const T1 = K.fakeTimers();
     const { so } = await K.stage1Room(env, { so: { setTimeout: T1.set, clearTimeout: T1.clear } });
@@ -122,6 +337,32 @@ const liveIds = s => Object.keys(s.objects).filter(id => !s.objects[id].deleted)
     await again.poll();
     await again.flush();
     assert.deepStrictEqual([again.pending.length, w.count('send')], [0, 1]);
+  });
+
+  await t('restore never trusts the saved shape: acked {}, pending "x", seq -5 and junk objects give a working client', async () => {
+    const { so, mk } = await K.stage1Room(env);
+    const store = T.makeStorage(K.fakeLocalStorage());
+    const again = mk('client-so-00001', { storage: store });
+    const key = again.key(so.code);
+    const base = { code: so.code, fork: 'stories_cm', planet: 'lv624', session: so.session };
+    store.write(key, Object.assign({}, base, { seq: -5, objects: { junk: 'x', nul: null, list: [1] }, pending: 'x', acked: {} }));
+    assert.ok(again.restore(so.code));
+    assert.deepStrictEqual([again.room.seq, again.room.objects, again.pending, again.acked, again.unsure], [0, {}, [], [], false]);
+    assert.doesNotThrow(() => { again.merged(); again.visible(); again.requests(); again.calibration(); });
+    await again.poll();
+    assert.deepStrictEqual([again.status, again.error, !!again.me], ['in', null, true]);
+    assert.doesNotThrow(() => again.visible());
+
+    const good = Object.assign(reqOp('qZ1'), { cid: 'z1' }), late = Object.assign(reqOp('qZ2'), { cid: 'z2' });
+    store.write(key, Object.assign({}, base, { seq: 7.9, objects: [],
+      pending: [good, { op: 'put', kind: 'request' }, null, 'x', Object.assign({}, good, { id: 5 })],
+      acked: [{ seq: 9, op: late }, { seq: '9', op: late }, { seq: 9 }, 5, { seq: 9, op: 'x' }] }));
+    assert.ok(again.restore(so.code));
+    assert.deepStrictEqual([again.room.seq, again.room.objects, again.pending.map(o => o.cid), again.acked.map(a => a.op.cid), again.unsure],
+      [7, {}, ['z1'], ['z2'], true], 'only well-formed entries stay');
+    assert.doesNotThrow(() => { again.merged(); again.visible(); });
+    store.write(key, 'x');
+    assert.strictEqual(again.restore(so.code), false, 'an entry that is no object is not a room');
   });
 
   await t('a 503 with a non-JSON body keeps the op pending, backs off, and the op goes later', async () => {

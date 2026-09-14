@@ -130,6 +130,27 @@ async function t(name, fn) { await fn(); n++; console.log('ok', name); }
     assert.strictEqual(bare.layers.length, 0);
   });
 
+  await t('the 1 s tick runs on TacRoom.timers when room.js offers them, on the page setInterval otherwise', async () => {
+    const w = world();
+    const asked = [];
+    w.win.TacRoom.timers = { setInterval: (fn, ms) => { asked.push({ fn, ms }); return 7; }, clearInterval() {} };
+    w.attach();
+    assert.deepStrictEqual([asked.length, asked[0] && asked[0].ms, w.intervals.length], [1, 1000, 0], 'worker timers, no page interval');
+    assert.deepStrictEqual([w.ui().tickTimer.timers, w.ui().tickTimer.id], [w.win.TacRoom.timers, 7]);
+    assert.doesNotThrow(() => asked[0].fn(), 'the timer runs the shell tick');
+    w.attach();
+    assert.strictEqual(asked.length, 1, 'a second attach adds no tick');
+    const node = world();
+    node.attach();
+    assert.deepStrictEqual([node.win.TacRoom.timers.mode(), node.intervals.length], ['page', 1], 'no Worker under Node: TacRoom.timers lands on the page timer');
+    const bare = world();
+    delete bare.win.TacRoom.timers;
+    bare.attach();
+    assert.deepStrictEqual([bare.intervals.length, bare.ui().tickTimer.timers], [1, bare.win], 'a room.js without timers: the page setInterval');
+    assert.doesNotThrow(() => bare.intervals[0]());
+    await settle();
+  });
+
   await t('U2: a throwing module stays inside the shell (notify, draw, tick, pick) and a used pick is no cancel', async () => {
     const w = world();
     w.win.TacRoomUI.register({ id: 'boom', notify() { throw new Error('notify'); }, draw() { throw new Error('draw'); }, tick() { throw new Error('tick'); } });
