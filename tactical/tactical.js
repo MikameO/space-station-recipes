@@ -1409,8 +1409,12 @@
     }
   });
 
+  // Before the round is calibrated the picked tile stands in for the target (the panel reads it in world
+  // numbers). Blast circles need no offset, so they show from the first click and under the cursor.
+  function zoneTile() { return calibration() ? target() : state.selected; }
+
   view.addLayer(function drawTarget(ctx, v) {
-    var t = state.planet && calibration() && target();
+    var t = state.planet && zoneTile();
     if (!t) return;
     if (layerOn('zone')) drawWeaponZone(ctx, v, t, false);
     markTile(ctx, v, t, '#00e5ff', 2.5);
@@ -1418,9 +1422,9 @@
 
   view.addLayer(function drawHoverZone(ctx, v) {
     var t = state.hoverTile;
-    if (!t || !state.planet || !calibration() || weapon() === 'supply' || !layerOn('zone')) return;
-    if (pickMode() !== 'target') return;
-    var cur = target();
+    if (!t || !state.planet || weapon() === 'supply' || !layerOn('zone')) return;
+    if (pickMode() !== (calibration() ? 'target' : 'calibrate')) return;
+    var cur = zoneTile();
     if (cur && cur[0] === t[0] && cur[1] === t[1]) return;
     drawWeaponZone(ctx, v, t, true);
   });

@@ -413,8 +413,19 @@ body.tac-body {
 .tac-shell-row .tac-select { width: 100%; max-width: none; font-size: 13px; padding: 6px 8px; }
 .tac-shell-row .tac-input { font-size: 14px; }
 
+/* The right-hand column: the officers' room entry (tactical/room.css) above the panel, which scrolls on its own. */
+.tac-side {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+  min-height: 0;
+  max-height: calc(100vh - 120px);
+}
+.tac-side > .tac-panel { flex: 1 1 auto; min-height: 0; max-height: none; }
+
 @media (max-width: 900px) {
   .tac-layout { grid-template-columns: 1fr; padding: 0 8px 8px; }
   .tac-map-wrap { min-height: 60vh; }
-  .tac-panel { max-height: none; }
+  .tac-panel, .tac-side { max-height: none; }
 }

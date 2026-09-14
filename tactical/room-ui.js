@@ -31,7 +31,13 @@
 
   var L10N = {
     en: {
-      toggleRoom: 'Room', toggleFire: 'Fire',
+      toggleRoom: 'Room', toggleFire: 'Fire', entryAria: 'Fire panel or officers’ room',
+      entryLead: 'Officers’ room: staff sends strike and position requests, the crew answers with statuses.',
+      entryIn: 'You are in room {code} · {post}', entryKnock: 'Waiting to be let into room {code}',
+      keyHelp: 'The server’s administration gives this key to the officers who open rooms. Joining needs no key, only the code from the briefing sheet.',
+      keySavedHint: 'Leave the field empty to use the saved key.', keyEmpty: 'Paste the server key: a long line that starts with eyJ.',
+      keyNotToken: 'This is not a server key. The key is a long line that starts with eyJ; a code from the briefing sheet goes into the join form above.',
+      keyOtherFork: 'This key is for the {fork} fork, while the map shows {current}. Pick that fork above the map.',
       entryTitle: 'Join a room', entryLabel: 'Code from the briefing sheet', entryHint: 'K7M4Q2 or K7M4Q2-SK4B',
       callsign: 'Callsign (optional)', post: 'Post', squad: 'Squad', join: 'Join',
       createTitle: 'Create a room (staff)', serverKey: 'Server key', createPost: 'Your post', create: 'Create',
@@ -86,7 +92,13 @@
       }
     },
     ru: {
-      toggleRoom: 'Комната', toggleFire: 'Огонь',
+      toggleRoom: 'Комната', toggleFire: 'Огонь', entryAria: 'Панель огня или комната офицеров',
+      entryLead: 'Комната офицеров: штаб отправляет запросы на удар и позицию, расчёт отвечает статусами.',
+      entryIn: 'Вы в комнате {code} · {post}', entryKnock: 'Ждёте входа в комнату {code}',
+      keyHelp: 'Этот ключ администрация сервера выдаёт офицерам, которые открывают комнаты. Чтобы войти в комнату, ключ не нужен — только код с листа брифинга.',
+      keySavedHint: 'Оставьте поле пустым — будет использован сохранённый ключ.', keyEmpty: 'Вставьте ключ сервера: длинная строка, начинается с eyJ.',
+      keyNotToken: 'Это не ключ сервера. Ключ — длинная строка, начинается с eyJ; код с листа брифинга вводится в форму входа выше.',
+      keyOtherFork: 'Этот ключ выдан для форка {fork}, а на карте выбран {current}. Выберите этот форк над картой.',
       entryTitle: 'Войти в комнату', entryLabel: 'Код с листа брифинга', entryHint: 'K7M4Q2 или K7M4Q2-SK4B',
       callsign: 'Позывной (необязательно)', post: 'Должность', squad: 'Отряд', join: 'Войти',
       createTitle: 'Создать комнату (штаб)', serverKey: 'Ключ сервера', createPost: 'Ваша должность', create: 'Создать',
@@ -150,6 +162,7 @@
     forkKey: null, planetId: null, on: false, tab: null, shelf: false, pick: null, demo: false,
     pendingHash: {}, drafts: {}, confirming: null, sheetSquad: '', renderQueued: false, forceRender: false,
     html: {}, deferred: {}, keyReplace: false, errorForm: null, exporting: false,
+    keyMessage: null, available: false, policyMissing: {}, policyFails: 0, retryAt: 0,
     editAt: 0, selectOpen: false, selectEl: null, deferTimer: 0,
     lastError: null, narrow: false, fixtureLoading: null, toastEl: null, toastTimer: 0
   };
@@ -382,18 +395,24 @@
       p.squads && p.levels && p.rights && p.limits && p.ttl && p.layers &&
       p.posts.some(function (x) { return x && x.level === 'staff'; }));
   }
-  // Only a good policy is cached: after a failed load the toggle stays hidden and the next fork switch tries again.
+  // Only a good policy is cached. A fork the Worker has no policy for (404) stays without a room; any other failure
+  // is warned and retried from tick (retryPolicy), so one blip never hides the room entry until the next fork switch.
   function loadPolicy(forkKey) {
     if (has(ui.policies, forkKey)) return Promise.resolve(ui.policies[forkKey]);
     var url = ui.demo ? 'tactical/policy/' + forkKey + '.json?v=1' : roomUrl() ? roomUrl() + '/policy/' + forkKey : null;
     if (!url || typeof root.fetch !== 'function') return Promise.resolve(null);
     return new Promise(function (resolve) { resolve(root.fetch(url)); })
-      .then(function (r) { return r && r.ok ? r.json() : null; })
+      .then(function (r) {
+        if (r && r.status === 404) { ui.policyMissing[forkKey] = true; return null; }
+        if (!r || !r.ok) { warn('policy ' + forkKey + ': HTTP ' + (r ? r.status : 'no response')); return null; }
+        return r.json();
+      })
       .then(function (p) {
-        if (!validPolicy(p)) return null;
+        if (p === null) return null;
+        if (!validPolicy(p)) { warn('policy ' + forkKey + ': not a room policy'); return null; }
         ui.policies[forkKey] = p;
         return p;
-      }, function () { return null; });
+      }, function (e) { warn('policy ' + forkKey, e); return null; });
   }
   function fixtureReady() {
     if (!ui.demo || root.TacRoomFixture) return Promise.resolve();
@@ -445,16 +464,26 @@
     setOn(true);
   }
   function switchFork(key) {
+    if (key !== ui.forkKey) { ui.policyFails = 0; ui.keyReplace = false; ui.keyMessage = null; }
+    ui.retryAt = 0;
     ui.forkKey = key;
+    // A key typed for one fork never rides into another fork's form: writeBox carries the field's value over.
+    var typedKey = ui.els.panel && ui.els.panel.querySelector ? ui.els.panel.querySelector('input[name="token"]') : null;
+    if (typedKey) typedKey.value = '';
     if (ui.client) ui.client.stopLoop();
     ui.client = null;
     ui.policy = null;
     fixtureReady().then(function () { return loadPolicy(key); }).then(function (policy) {
       if (ui.forkKey !== key) return;
       ui.policy = policy;
-      var show = available(policy);
-      ui.els.toggle.classList.toggle('tac-hide', !show);
-      if (!show) { setOn(false); return; }
+      var show = ui.available = available(policy);
+      if (!show) {
+        // No policy although a room server is set and the fork has one: a blip, so try again after a pause.
+        if (!policy && roomUrl() && !ui.demo && !ui.policyMissing[key]) retryPolicy(key);
+        setOn(false);
+        return;
+      }
+      ui.policyFails = 0;
       ensureClient();
       var h = ui.pendingHash;
       ui.pendingHash = {};
@@ -467,15 +496,23 @@
       }
       queueRender();
     }).then(null, function (e) {
-      // A broken policy or fixture: no toggle, no half-drawn panel; the next fork switch tries again.
+      // A broken policy or fixture: no room entry, no half-drawn panel; tick tries again after a pause.
       if (ui.forkKey !== key) return;
       warn('fork ' + key, e);
       if (ui.client) ui.client.stopLoop();
       ui.client = null;
       ui.policy = null;
-      ui.els.toggle.classList.add('tac-hide');
-      if (ui.on) setOn(false);
+      ui.available = false;
+      retryPolicy(key);
+      setOn(false);
     });
+  }
+  // 5, 10, 20, 40 s, then once a minute while the fork stays: tick() calls switchFork again once retryAt passes.
+  function retryPolicy(key) {
+    ui.policyFails++;
+    var delay = Math.min(60000, 5000 * Math.pow(2, ui.policyFails - 1));
+    ui.retryAt = Date.now() + delay;
+    warn('policy ' + key + ': retry in ' + Math.round(delay / 1000) + ' s');
   }
 
   // ── rendering ────────────────────────────────────────────
@@ -490,6 +527,38 @@
     function once() { if (done) return; done = true; render(); }
     try { if (typeof root.requestAnimationFrame === 'function') root.requestAnimationFrame(once); } catch (e) { /* the timer renders */ }
     setTimeout(once, 100);   // the global timer: a bare window stub (Node module tests) has none of its own
+  }
+
+  // ── the room entry ─────────────────────────────────────────
+  // The switch between the fire panel and the room heads the right-hand column. It replaced a toolbar toggle whose
+  // label flipped between «Комната» and «Огонь», which officers read as a button that had vanished.
+  function entryHtml() {
+    var c = ui.client, inside = !!(c && c.code && (c.status === 'in' || c.status === 'knocking'));
+    var pings = 0;
+    eachModule('entryBadge', function (m) { pings += +m.entryBadge(api) || 0; });
+    function seg(on, target, label, extra) {
+      return '<button type="button" role="tab" class="tac-seg' + (on ? ' on' : '') + (extra ? ' ' + extra : '') + '" aria-selected="' + on +
+        '" data-room-entry="' + target + '">' + label + '</button>';
+    }
+    var roomLabel = (pings && !ui.on ? '<span class="tac-room-entry-dot" aria-hidden="true">●</span>' : '') +
+      esc(T.toggleRoom + (inside ? ' · ' + c.code : ''));
+    var lead = '';
+    if (!ui.on) {
+      var text = !inside ? T.entryLead : c.status === 'knocking' ? fmt(T.entryKnock, { code: c.code })
+        : fmt(T.entryIn, { code: c.code, post: c.me ? postName(c.me.post) : '' });
+      lead = '<p class="tac-room-entry-lead">' + esc(text) + '</p>';
+    }
+    return '<div class="tac-room-switch" role="tablist" aria-label="' + esc(T.entryAria) + '">' +
+      seg(!ui.on, 'fire', esc(T.toggleFire)) + seg(ui.on, 'room', roomLabel, 'tac-room-entry-room') + '</div>' + lead;
+  }
+  // Shown only where the room is available; the body class lets room.css retire Series T's beta notice there.
+  function renderEntry() {
+    var box = ui.els.entry, show = !!ui.available;
+    if (!box) return;
+    box.classList.toggle('tac-hide', !show);
+    if (document.body && document.body.classList) document.body.classList.toggle('tac-room-available', show);
+    var html = show ? entryHtml() : '';
+    if (html !== ui.html.entry) { box.innerHTML = html; ui.html.entry = html; }
   }
 
   function collect(part) {
@@ -530,6 +599,7 @@
     var force = ui.forceRender;
     ui.forceRender = false;
     if (!ui.els.panel) return;
+    renderEntry();
     var room = ui.on && inRoom();
     ui.els.chips.classList.toggle('tac-hide', !room);
     ui.els.strip.classList.toggle('tac-hide', !room);
@@ -627,6 +697,7 @@
       : savedKey && !ui.keyReplace
         ? '<p class="tac-muted tac-room-keyline">' + esc(T.keySaved) + ' · ' + btn('keyReplace', T.keyReplace) + ' ' + btn('keyForget', T.keyForget) + '</p>'
         : '<label class="tac-input-label">' + esc(T.serverKey) + '<input class="tac-input" type="password" name="token" autocomplete="new-password" spellcheck="false"></label>' +
+          '<p class="tac-muted tac-room-keyline">' + esc(savedKey ? T.keySavedHint : T.keyHelp) + '</p>' +
           (savedKey ? '<p class="tac-muted tac-room-keyline">' + btn('keyForget', T.keyForget) + '</p>' : '');
     return '<section class="tac-section"><h2>' + esc(T.entryTitle) + '</h2>' +
       '<form data-room-form="join" class="tac-room-form">' +
@@ -642,7 +713,8 @@
       '<form data-room-form="create" class="tac-room-form">' + keyField +
       selectHtml('create', 'post', T.createPost, staff, draft('create', 'post', staff[0][0])) +
       '<label class="tac-input-label">' + esc(T.callsign) + '<input class="tac-input" name="callsign" maxlength="' + callsignMax + '" value="' + esc(draft('create', 'callsign', '')) + '"></label>' +
-      '<button type="submit" class="btn-small tac-room-btn">' + esc(ui.demo ? T.demoCreate : T.create) + '</button>' + (inCreate ? error : '') +
+      '<button type="submit" class="btn-small tac-room-btn">' + esc(ui.demo ? T.demoCreate : T.create) + '</button>' +
+      (ui.keyMessage ? '<p class="tac-msg error">' + esc(ui.keyMessage) + '</p>' : inCreate ? error : '') +
       '</form></details></section>';
   }
 
@@ -847,8 +919,6 @@
     ui.on = !!on;
     document.body.classList.toggle('tac-room-on', ui.on);
     ui.els.panel.classList.toggle('tac-hide', !ui.on);
-    ui.els.toggle.setAttribute('aria-pressed', ui.on ? 'true' : 'false');
-    ui.els.toggle.textContent = ui.on ? T.toggleFire : T.toggleRoom;
     if (!ui.on) { cancelPick(); ui.shelf = false; }
     ui.forceRender = true;
     render();
@@ -942,10 +1012,11 @@
     continueRound: function () { adminThen('unlock'); },
     exportLog: function () { exportRoom(false); },
     exportJson: function () { exportRoom(true); },
-    keyReplace: function () { ui.keyReplace = true; queueRender(); },
+    keyReplace: function () { ui.keyReplace = true; ui.keyMessage = null; queueRender(); },
     keyForget: function () {
       ui.storage.remove(KEY_PREFIX + ui.forkKey);
       ui.keyReplace = false;
+      ui.keyMessage = null;
       toast(T.keyForgotten);
       queueRender();
     },
@@ -1028,14 +1099,27 @@
     }
   }
 
-  function tokenKeyId(token) {
+  // The claims half of a server token (base64url JSON, a dot, the signature). The page never checks the signature,
+  // only the shape and the fork, so a code from the briefing sheet or a key for another fork gets a plain answer.
+  function tokenClaims(token) {
     try {
-      var part = String(token).split('.')[0].replace(/-/g, '+').replace(/_/g, '/');
+      var parts = String(token).split('.');
+      if (parts.length !== 2 || !parts[1]) return null;
+      var part = parts[0].replace(/-/g, '+').replace(/_/g, '/');
       part += '==='.slice((part.length + 3) % 4);
       var bin = atob(part), bytes = new Uint8Array(bin.length);
       for (var i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
-      return JSON.parse(new TextDecoder().decode(bytes)).keyId || '';
-    } catch (e) { return ''; }
+      var claims = JSON.parse(new TextDecoder().decode(bytes));
+      return claims && typeof claims.fork === 'string' && typeof claims.keyId === 'string' ? claims : null;
+    } catch (e) { return null; }
+  }
+  function keyProblem(token, fork) {
+    if (!token) return T.keyEmpty;
+    var claims = tokenClaims(token);
+    if (!claims) return T.keyNotToken;
+    if (claims.fork === fork) return null;
+    var ctx = ui.hooks.getContext();
+    return fmt(T.keyOtherFork, { fork: claims.fork, current: ctx.fork && ctx.fork.label ? ctx.fork.label : fork });
   }
 
   function onSubmit(e) {
@@ -1065,8 +1149,10 @@
       var saved = ui.demo ? null : ui.storage.read(KEY_PREFIX + fork);
       var typed = !ui.demo && f.token ? String(f.token.value || '').trim() : '';
       var token = ui.demo ? 'demo' : typed || saved || '';
+      ui.keyMessage = ui.demo ? null : keyProblem(token, fork);
+      if (ui.keyMessage) { queueRender(true); return; }   // nothing leaves the page with a key that cannot fit
       var before = c.code;
-      c.createRoom({ token: token, keyId: ui.demo ? 'demo' : tokenKeyId(token), post: f.post.value, callsign: f.callsign.value }).then(function () {
+      c.createRoom({ token: token, keyId: ui.demo ? 'demo' : tokenClaims(token).keyId, post: f.post.value, callsign: f.callsign.value }).then(function () {
         // A restore poll can turn the status to `in` meanwhile: only a new room code proves this create worked.
         // A network blip on the first poll after it does not undo a created room.
         if (c.code && c.code !== before && (!c.error || c.error === 'network')) {
@@ -1086,6 +1172,7 @@
     try {
       var ctx = ui.hooks.getContext();
       if (ctx.fork && ui.forkKey !== ctx.fork.key) { switchFork(ctx.fork.key); syncTick(); return; }
+      if (ui.retryAt && Date.now() >= ui.retryAt) { switchFork(ui.forkKey); syncTick(); return; }
       var planet = ctx.meta ? ctx.meta.id : null;
       if (planet !== ui.planetId) { ui.planetId = planet; if (ui.on) queueRender(); }
       updateCountdowns();
@@ -1115,8 +1202,8 @@
     if (ui.hooks) return;                 // attach runs once
     ui.hooks = hooks;
     ui.root = apiRoot;
-    ui.els = { toggle: $('tacRoomToggle'), panel: $('tacRoom'), chips: $('tacRoomChips'), strip: $('tacRoomStrip'), shelf: $('tacRoomShelf'), draw: $('tacRoomDraw') };
-    if (!ui.els.panel || !ui.els.toggle || !ui.els.chips || !ui.els.strip || !ui.els.shelf) return;
+    ui.els = { entry: $('tacRoomEntry'), panel: $('tacRoom'), chips: $('tacRoomChips'), strip: $('tacRoomStrip'), shelf: $('tacRoomShelf'), draw: $('tacRoomDraw') };
+    if (!ui.els.panel || !ui.els.entry || !ui.els.chips || !ui.els.strip || !ui.els.shelf) return;
     ui.pendingHash = parseHash(root.location.hash);
     stripObserve();
     if (root.addEventListener) root.addEventListener('hashchange', onHashChange);
@@ -1125,8 +1212,12 @@
     var ls = null;
     try { ls = root.localStorage; } catch (e) { ls = null; }   // the getter itself throws when site data is blocked
     ui.storage = apiRoot.makeStorage(ui.demo ? null : ls);    // the demo keeps everything in memory
-    ui.els.toggle.textContent = T.toggleRoom;
-    ui.els.toggle.addEventListener('click', function () { setOn(!ui.on); });
+    ui.els.entry.addEventListener('click', function (e) {
+      var tab = e && e.target && e.target.closest ? e.target.closest('[data-room-entry]') : null;
+      if (!tab) return;
+      var want = tab.getAttribute('data-room-entry') === 'room';
+      if (want !== ui.on) setOn(want);
+    });
     [ui.els.panel, ui.els.chips, ui.els.strip, ui.els.shelf].forEach(function (box) {
       box.addEventListener('click', onClick);
       box.addEventListener('change', onChange);

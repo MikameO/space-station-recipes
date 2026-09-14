@@ -756,6 +756,8 @@
       typeForKey: typeForKey, aimedAtMine: aimedAtMine, levelOk: levelOk, shotMatches: shotMatches, state: rq,
       pingTargets: pingTargets, pingDue: pingDue, titleWithBadge: titleWithBadge, playPattern: playPattern, unlockAudio: unlockAudio
     },
+    // The dot on the room entry's «Комната» tab: a crew working the fire panel still sees a request arrive.
+    entryBadge: function () { return rq.pinging.length; },
     tabs: function (api) {
       var T = api.T();
       return [{ id: 'requests', label: T.tabs.requests, narrow: true }, { id: 'assets', label: T.tabs.assets, narrow: true }];
@@ -941,7 +943,7 @@
         e.preventDefault();
       });
       // Browsers hold audio back until a gesture: a click or key anywhere in the room UI resumes it.
-      ['tacRoom', 'tacRoomStrip', 'tacRoomChips', 'tacRoomShelf', 'tacRoomToggle'].forEach(function (id) {
+      ['tacRoom', 'tacRoomStrip', 'tacRoomChips', 'tacRoomShelf', 'tacRoomEntry'].forEach(function (id) {
         var box = typeof document.getElementById === 'function' ? document.getElementById(id) : null;
         if (!box) return;
         ['click', 'keydown'].forEach(function (type) {

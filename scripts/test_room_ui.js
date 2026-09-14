@@ -13,6 +13,9 @@ const settle = async (n = 30) => { for (let i = 0; i < n; i++) await new Promise
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 const KEY = 'chemdb-tactical:room-key:stories_cm';
 const DEMO = 'chemdb-tactical:room-demo';
+// Server keys shaped like the Worker's tokens: base64url JSON claims, a dot, a signature the page never checks.
+const tokenFor = (fork, keyId) => Buffer.from(JSON.stringify({ fork, server: 'Test', keyId, iat: 1 })).toString('base64url') + '.sig';
+const SAVED_KEY = tokenFor('stories_cm', 'saved'), WRONG_KEY = tokenFor('stories_cm', 'wrong'), GOOD_KEY = tokenFor('stories_cm', 'good');
 
 function policyWith(status) { const p = clone(basePolicy); p.sanction[0].status = status; return p; }
 const answer = p => () => Promise.resolve({ ok: true, json: () => Promise.resolve(clone(p)) });
@@ -44,7 +47,7 @@ function el(tag) {
 // opt: hash, localStorage ('throw' | storage), sessionStorage, fixtures, fetch, raf, nav, narrow, framed, missing
 function world(opt = {}) {
   const els = {};
-  ['tacRoom', 'tacRoomToggle', 'tacRoomChips', 'tacRoomStrip', 'tacRoomShelf', 'tacRoomDraw'].forEach(id => {
+  ['tacRoom', 'tacRoomEntry', 'tacRoomChips', 'tacRoomStrip', 'tacRoomShelf', 'tacRoomDraw'].forEach(id => {
     if (!(opt.missing || []).includes(id)) els[id] = el('div');
   });
   const document = {
@@ -114,7 +117,7 @@ async function t(name, fn) { await fn(); n++; console.log('ok', name); }
     assert.strictEqual(w.layers.length, 1, 'the room layer is added');
     assert.strictEqual(w.intervals.length, 1, 'the tick runs');
     await settle();
-    assert.ok(w.els.tacRoomToggle.classList.contains('tac-hide'), 'no room URL: the toggle stays hidden');
+    assert.ok(w.els.tacRoomEntry.classList.contains('tac-hide'), 'no room URL: the toggle stays hidden');
   });
 
   await t('U1: attach runs once, never inside a frame, and quits quietly without its elements', async () => {
@@ -257,7 +260,7 @@ async function t(name, fn) { await fn(); n++; console.log('ok', name); }
     w.attach();
     await settle();
     assert.strictEqual(storiesCalls, 1);
-    assert.ok(w.els.tacRoomToggle.classList.contains('tac-hide'));
+    assert.ok(w.els.tacRoomEntry.classList.contains('tac-hide'));
     assert.strictEqual(w.ui().client, null);
     w.ctx.fork = Object.assign({}, w.stories, { key: 'rmc14' });
     w.intervals[0]();
@@ -266,7 +269,7 @@ async function t(name, fn) { await fn(); n++; console.log('ok', name); }
     w.intervals[0]();
     await settle();
     assert.strictEqual(storiesCalls, 2, 'retried');
-    assert.ok(!w.els.tacRoomToggle.classList.contains('tac-hide'), 'the toggle shows once the policy loads');
+    assert.ok(!w.els.tacRoomEntry.classList.contains('tac-hide'), 'the toggle shows once the policy loads');
     assert.ok(w.ui().client);
   });
 
@@ -338,7 +341,7 @@ async function t(name, fn) { await fn(); n++; console.log('ok', name); }
 
   await t('U5: the server key is a password field, a saved key is only named, kept only after the room opens, and can be forgotten', async () => {
     const ls = fakeStorage();
-    ls.setItem(KEY, JSON.stringify('saved-key'));
+    ls.setItem(KEY, JSON.stringify(SAVED_KEY));
     const w = world({ hash: '#room=K7M4Q2', localStorage: ls, fixtures: true, fetch: answer(policyWith('pilot')) });
     w.win.TacRoom.ROOM_URL = 'https://room.example';
     w.attach();
@@ -346,15 +349,15 @@ async function t(name, fn) { await fn(); n++; console.log('ok', name); }
     const ui = w.ui(), panel = w.els.tacRoom;
     assert.strictEqual(ui.on, true);
     assert.ok(panel.innerHTML.indexOf('ключ сохранён') >= 0 && panel.innerHTML.indexOf('data-room-action="keyReplace"') >= 0);
-    assert.ok(panel.innerHTML.indexOf('saved-key') < 0, 'the saved key never enters the page');
+    assert.ok(panel.innerHTML.indexOf(SAVED_KEY) < 0, 'the saved key never enters the page');
     assert.ok(panel.innerHTML.indexOf('name="token"') < 0);
     click(w, 'keyReplace');
     assert.ok(/<input class="tac-input" type="password" name="token" autocomplete="new-password"[^>]*>/.test(panel.innerHTML), 'replace shows a password field');
     assert.ok(!/name="token"[^>]*value=/.test(panel.innerHTML), 'without a value attribute');
     ui.client.transport = { create: () => Promise.resolve({ status: 403, body: { error: 'sanction' }, retryAfter: null }) };
-    submit(w, 'create', { token: 'wrong-key', post: 'so', callsign: '' });
+    submit(w, 'create', { token: WRONG_KEY, post: 'so', callsign: '' });
     await settle();
-    assert.strictEqual(JSON.parse(ls.getItem(KEY)), 'saved-key', 'a refused key is not stored');
+    assert.strictEqual(JSON.parse(ls.getItem(KEY)), SAVED_KEY, 'a refused key is not stored');
     const html = panel.innerHTML, at = html.indexOf('data-room-form="create"');
     assert.ok(html.slice(at).indexOf('Ключ сервера не подходит') >= 0, 'the error shows inside the create form');
     assert.ok(html.slice(0, at).indexOf('tac-msg error') < 0, 'and not under the join form');
@@ -362,11 +365,11 @@ async function t(name, fn) { await fn(); n++; console.log('ok', name); }
     assert.strictEqual(ls.getItem(KEY), null);
     assert.ok(panel.innerHTML.indexOf('ключ сохранён') < 0 && panel.innerHTML.indexOf('name="token"') >= 0);
     ui.client.transport = new w.win.TacRoomFixture.FixtureTransport(ui.policy);
-    submit(w, 'create', { token: 'good-key', post: 'so', callsign: '' });
+    submit(w, 'create', { token: GOOD_KEY, post: 'so', callsign: '' });
     await settle();
     ui.client.stopLoop();
     assert.strictEqual(ui.client.status, 'in');
-    assert.strictEqual(JSON.parse(ls.getItem(KEY)), 'good-key', 'the key that opened a room is kept');
+    assert.strictEqual(JSON.parse(ls.getItem(KEY)), GOOD_KEY, 'the key that opened a room is kept');
     assert.ok(w.goals.indexOf('room_create') >= 0, 'a real room counts');
     const current = 'chemdb-tactical:room-current:' + ui.client.client;
     assert.ok(ls.getItem(current));
@@ -592,7 +595,7 @@ async function t(name, fn) { await fn(); n++; console.log('ok', name); }
 
   await t('a create refused while a saved session resumes stores no key, counts nothing and starts no loop; no create form while resuming', async () => {
     const ls = fakeStorage();
-    ls.setItem(KEY, JSON.stringify('good-key'));
+    ls.setItem(KEY, JSON.stringify(GOOD_KEY));
     const w = world({ hash: '#room=K7M4Q2', localStorage: ls, fetch: answer(policyWith('pilot')) });
     w.win.TacRoom.ROOM_URL = 'https://room.example';
     w.attach();
@@ -609,11 +612,11 @@ async function t(name, fn) { await fn(); n++; console.log('ok', name); }
       create: () => new Promise(r => setTimeout(() => { c.status = 'in'; r({ status: 403, body: { error: 'sanction' }, retryAfter: null }); }, 5)),
       poll: () => { loop = true; return Promise.resolve({ status: 0, body: { error: 'network' }, retryAfter: null }); }
     };
-    submit(w, 'create', { token: 'wrong-key', post: 'so', callsign: '' });   // a form sent just before the resume began
+    submit(w, 'create', { token: WRONG_KEY, post: 'so', callsign: '' });   // a form sent just before the resume began
     await sleep(30);
     await settle();
     c.stopLoop();
-    assert.strictEqual(JSON.parse(ls.getItem(KEY)), 'good-key', 'the refused key is not stored');
+    assert.strictEqual(JSON.parse(ls.getItem(KEY)), GOOD_KEY, 'the refused key is not stored');
     assert.deepStrictEqual(w.goals, [], 'no room_create');
     assert.strictEqual(loop, false, 'no loop started');
   });
@@ -729,6 +732,107 @@ async function t(name, fn) { await fn(); n++; console.log('ok', name); }
     await settle();
     assert.strictEqual(ui.toastEl.textContent, api.errorText('session'), 'outside the expired state the text shows');
     assert.strictEqual(api.esc('<a href=\'x\' title="y">&</a>'), '&lt;a href=&#39;x&#39; title=&quot;y&quot;&gt;&amp;&lt;/a&gt;');
+  });
+
+  await t('the room entry heads the right-hand column: hidden without a room, a fire | room switch with a line on the room, the beta notice retired', async () => {
+    const off = world({ localStorage: fakeStorage(), fetch: answer(policyWith('pilot')) });
+    off.attach();
+    await settle();
+    assert.ok(off.els.tacRoomEntry.classList.contains('tac-hide'), 'no room URL: no entry');
+    assert.ok(!off.document.body.classList.contains('tac-room-available'), 'the beta notice stays');
+    const w = world({ localStorage: fakeStorage(), fetch: answer(policyWith('pilot')) });
+    w.win.TacRoom.ROOM_URL = 'https://room.example';
+    w.attach();
+    await settle();
+    const entry = w.els.tacRoomEntry, ui = w.ui();
+    assert.ok(!entry.classList.contains('tac-hide'), 'the entry shows once the policy loads');
+    assert.ok(w.document.body.classList.contains('tac-room-available'), 'room.css retires the beta notice');
+    assert.ok(/data-room-entry="fire">Огонь</.test(entry.innerHTML) && entry.innerHTML.indexOf('Комната офицеров:') >= 0, entry.innerHTML);
+    const tab = name => { const el = { getAttribute: k => (k === 'data-room-entry' ? name : null) }; el.closest = () => el; entry.listeners.click[0]({ target: el }); };
+    tab('room');
+    assert.strictEqual(ui.on, true);
+    assert.ok(entry.innerHTML.indexOf('class="tac-seg on tac-room-entry-room"') >= 0, 'the room tab is on');
+    assert.ok(entry.innerHTML.indexOf('Комната офицеров:') < 0, 'no lead line while the room shows');
+    tab('fire');
+    assert.strictEqual(ui.on, false);
+    entry.listeners.click[0]({ target: { closest: () => null } });
+    assert.strictEqual(ui.on, false, 'a click beside the tabs changes nothing');
+  });
+
+  await t('a request pinging for me puts a dot on the Room tab while the fire panel shows, and not once the room is open', async () => {
+    let pings = 0;
+    const w = world({ localStorage: fakeStorage(), fetch: answer(policyWith('pilot')) });
+    w.win.TacRoom.ROOM_URL = 'https://room.example';
+    w.win.TacRoomUI.register({ id: 'pinger', entryBadge: () => pings });
+    w.attach();
+    await settle();
+    const entry = w.els.tacRoomEntry;
+    assert.ok(entry.innerHTML.indexOf('tac-room-entry-dot') < 0, 'no dot without a ping');
+    pings = 2;
+    w.api().render();
+    assert.ok(entry.innerHTML.indexOf('tac-room-entry-dot') >= 0, 'a dot while the fire panel shows');
+    const el = { getAttribute: k => (k === 'data-room-entry' ? 'room' : null) };
+    el.closest = () => el;
+    entry.listeners.click[0]({ target: el });
+    assert.strictEqual(w.ui().on, true);
+    assert.ok(entry.innerHTML.indexOf('tac-room-entry-dot') < 0, 'the open room shows the requests itself');
+  });
+
+  await t('the create form names a wrong key before anything is sent (empty, not a key, another fork); a typed key never follows a fork switch', async () => {
+    const w = world({ hash: '#room=K7M4Q2', localStorage: fakeStorage(), fetch: answer(policyWith('pilot')) });
+    w.win.TacRoom.ROOM_URL = 'https://room.example';
+    w.attach();
+    await settle();
+    const ui = w.ui(), panel = w.els.tacRoom;
+    let sent = 0;
+    ui.client.transport = { create: () => { sent++; return Promise.resolve({ status: 403, body: { error: 'sanction' }, retryAfter: null }); } };
+    assert.ok(panel.innerHTML.indexOf('администрация сервера выдаёт офицерам') >= 0, 'the key field says where keys come from');
+    submit(w, 'create', { token: '', post: 'so', callsign: '' });
+    await settle();
+    assert.ok(panel.innerHTML.indexOf('Вставьте ключ сервера') >= 0, 'empty');
+    submit(w, 'create', { token: 'K7M4Q2-SK4B', post: 'so', callsign: '' });
+    await settle();
+    assert.ok(panel.innerHTML.indexOf('Это не ключ сервера') >= 0, 'a code from the briefing sheet');
+    submit(w, 'create', { token: tokenFor('rmc14', 'rmc-k1'), post: 'so', callsign: '' });
+    await settle();
+    assert.ok(panel.innerHTML.indexOf('выдан для форка rmc14, а на карте выбран stories_cm') >= 0, 'another fork');
+    assert.strictEqual(sent, 0, 'nothing reached the server');
+    submit(w, 'create', { token: WRONG_KEY, post: 'so', callsign: '' });
+    await settle();
+    assert.strictEqual(sent, 1, 'a key of the right shape and fork goes to the Worker');
+    assert.ok(panel.innerHTML.indexOf('выдан для форка') < 0 && panel.innerHTML.indexOf('Ключ сервера не подходит') >= 0, 'the Worker answer replaces the page check');
+    const typed = { value: 'half-typed' };
+    panel.querySelector = sel => (sel.indexOf('token') >= 0 ? typed : null);
+    w.ctx.fork = Object.assign({}, w.stories, { key: 'rmc14' });
+    w.intervals[0]();
+    assert.strictEqual(typed.value, '', 'the typed key does not follow the fork switch');
+  });
+
+  await t('a failed policy load is warned and retried after a pause without a fork switch; a fork without a policy (404) is not retried', async () => {
+    let calls = 0;
+    const w = world({ localStorage: fakeStorage(), fetch: () => (++calls === 1 ? Promise.reject(new Error('offline')) : answer(policyWith('pilot'))()) });
+    w.win.TacRoom.ROOM_URL = 'https://room.example';
+    w.attach();
+    await settle();
+    const ui = w.ui();
+    assert.strictEqual(calls, 1);
+    assert.ok(w.els.tacRoomEntry.classList.contains('tac-hide'));
+    assert.ok(ui.retryAt > Date.now(), 'a retry is scheduled');
+    assert.ok(w.warnings.some(x => x.indexOf('policy stories_cm') >= 0), 'the failure is warned');
+    w.intervals[0]();
+    await settle();
+    assert.strictEqual(calls, 1, 'not before the pause');
+    ui.retryAt = Date.now() - 1;
+    w.intervals[0]();
+    await settle();
+    assert.strictEqual(calls, 2, 'retried on the tick after the pause');
+    assert.ok(!w.els.tacRoomEntry.classList.contains('tac-hide'), 'the entry comes back');
+    assert.strictEqual(ui.retryAt, 0);
+    const gone = world({ localStorage: fakeStorage(), fetch: () => Promise.resolve({ ok: false, status: 404 }) });
+    gone.win.TacRoom.ROOM_URL = 'https://room.example';
+    gone.attach();
+    await settle();
+    assert.strictEqual(gone.ui().retryAt, 0, 'no retry for a fork the Worker has no policy for');
   });
 
   notes.forEach(x => console.log('note:', x));

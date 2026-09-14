@@ -3,6 +3,22 @@
 `data.json` schema version is in `meta.schemaVersion`. Consumers reading this file
 should pin on a compatible range (semver: breaking changes bump major).
 
+## Tactical map and room entry fixes — 2026-09-14
+
+- Blast circles show before the round is calibrated: the picked tile and the tile
+  under the cursor get the mortar shell's blast radius or the OB warhead's scatter
+  in world tiles, the same way the target does after calibration.
+- The officers' room entry moved from the map toolbar to the top of the right-hand
+  column: a «Огонь | Комната» switch with one line on what the room is (or which
+  room you are in) and a dot while a request pings for you. Where the room is
+  available it takes the place of the beta notice. The old toolbar toggle renamed
+  itself «Огонь» while the room was open and read as a button that had vanished.
+- The create form checks the server key in the page before sending it (empty, not
+  a key, a key for another fork) and says who gives keys out; a key typed for one
+  fork is cleared on a fork switch; a failed policy load is warned in the console
+  and retried after 5 to 60 seconds instead of hiding the room until the next
+  fork switch. Production keeps the room hidden (`ROOM_URL` empty).
+
 ## Series V, stage 1 — 2026-09-14 (Officers' room: staff officer and mortar crew; hidden until a server sanctions it)
 
 In stage 1 the room serves two roles: a staff officer sends the mortar crew

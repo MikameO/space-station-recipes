@@ -24,8 +24,8 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=2">
 <link rel="manifest" href="manifest.json">
 <link rel="stylesheet" href="style.css?v=77">
-<link rel="stylesheet" href="tactical/tactical.css?v=8">
-<link rel="stylesheet" href="tactical/room.css?v=1">
+<link rel="stylesheet" href="tactical/tactical.css?v=9">
+<link rel="stylesheet" href="tactical/room.css?v=2">
 <!-- Yandex.Metrika counter (same counter as index.html) -->
 <script type="text/javascript">
     (function(m,e,t,r,i,k,a){
@@ -69,7 +69,6 @@
       <button type="button" class="btn-small tac-zoom" id="tacZoomOut" aria-label="Zoom out">&minus;</button>
       <button type="button" class="btn-small tac-zoom" id="tacZoomIn" aria-label="Zoom in">+</button>
       <button type="button" class="btn-small" id="tacFit">Fit</button>
-      <button type="button" class="btn-small tac-hide" id="tacRoomToggle" aria-pressed="false">Room</button>
     </div>
     <div class="tac-canvas-box">
       <canvas id="tacCanvas" class="tac-canvas" aria-label="Planet map" tabindex="0"></canvas>
@@ -81,8 +80,11 @@
     </div>
     <div id="tacRoomStrip" class="tac-room-strip tac-hide" aria-label="Requests"></div>
   </section>
-  <aside class="tac-panel" id="tacPanel" aria-label="Tactical panel"></aside>
-  <aside class="tac-panel tac-room-panel tac-hide" id="tacRoom" aria-label="Officers' room"></aside>
+  <div class="tac-side">
+    <div class="tac-room-entry tac-hide" id="tacRoomEntry"></div>
+    <aside class="tac-panel" id="tacPanel" aria-label="Tactical panel"></aside>
+    <aside class="tac-panel tac-room-panel tac-hide" id="tacRoom" aria-label="Officers' room"></aside>
+  </div>
 </main>
 
 <footer class="lib-footer">&copy; 2025 MikameO &middot; Not affiliated with or endorsed by the SS14 development team &middot; <a href="https://github.com/MikameO/space-station-recipes" target="_blank" rel="noopener noreferrer">GitHub</a> &middot; <a href="https://github.com/MikameO/space-station-recipes/issues" target="_blank" rel="noopener noreferrer">Feedback</a></footer>
@@ -92,9 +94,9 @@
 <script src="tactical/mapview.js?v=1" defer></script>
 <script src="tactical/room-logic.js?v=2" defer></script>
 <script src="tactical/room.js?v=2" defer></script>
-<script src="tactical/room-ui.js?v=2" defer></script>
-<script src="tactical/room-requests.js?v=1" defer></script>
-<script src="tactical/tactical.js?v=14" defer></script>
+<script src="tactical/room-ui.js?v=3" defer></script>
+<script src="tactical/room-requests.js?v=2" defer></script>
+<script src="tactical/tactical.js?v=15" defer></script>
 <script src="home.js?v=5" defer></script>
 <script src="feedback.js?v=4" defer></script>
 </body>

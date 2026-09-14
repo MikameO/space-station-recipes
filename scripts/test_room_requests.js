@@ -874,7 +874,7 @@ async function t(name, fn) { await fn(); n++; console.log('ok', name); }
     assert.ok(notice.test(mod.tools(api)), 'the panel tools row');
     assertSafe(mod.strip(api) + mod.tools(api), 'notice');
     const boxes = {};
-    ['tacRoom', 'tacRoomStrip', 'tacRoomChips', 'tacRoomShelf', 'tacRoomToggle'].forEach(id => {
+    ['tacRoom', 'tacRoomStrip', 'tacRoomChips', 'tacRoomShelf', 'tacRoomEntry'].forEach(id => {
       boxes[id] = { on: {}, addEventListener(type, fn) { (this.on[type] = this.on[type] || []).push(fn); } };
     });
     document.getElementById = id => boxes[id] || null;

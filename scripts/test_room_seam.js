@@ -19,11 +19,17 @@ for (let k = 1; k < at.length; k++) assert.ok(at[k - 1] < at[k], order[k - 1] + 
 assert.ok(html.includes('href="tactical/room.css?v='), 'room.css is linked');
 
 // Room elements exist, and the room panel is a sibling after the empty #tacPanel.
-['tacRoom', 'tacRoomToggle', 'tacRoomChips', 'tacRoomStrip', 'tacRoomShelf', 'tacRoomDraw'].forEach(id =>
+['tacRoom', 'tacRoomEntry', 'tacRoomChips', 'tacRoomStrip', 'tacRoomShelf', 'tacRoomDraw'].forEach(id =>
   assert.strictEqual(count(html, 'id="' + id + '"'), 1, id));
 const panelTag = '<aside class="tac-panel" id="tacPanel" aria-label="Tactical panel"></aside>';
 assert.ok(html.includes(panelTag), '#tacPanel is untouched and empty');
 assert.ok(html.indexOf('id="tacRoom"') > html.indexOf(panelTag), '#tacRoom sits after #tacPanel');
+// The room entry heads the right-hand column; the map toolbar carries no room button.
+const sideAt = html.indexOf('<div class="tac-side">');
+const side = sideAt >= 0 ? html.slice(sideAt, html.indexOf('</main>')) : '';
+assert.ok(side.indexOf('id="tacRoomEntry"') >= 0 && side.indexOf('id="tacRoomEntry"') < side.indexOf(panelTag), 'the entry sits above #tacPanel in .tac-side');
+const toolbar = html.slice(html.indexOf('<div class="tac-toolbar">'), html.indexOf('<div class="tac-canvas-box">'));
+assert.ok(toolbar.length > 0 && toolbar.indexOf('tacRoom') < 0, 'no room button on the map toolbar');
 
 // tactical.js: one attach, one consumePick, five notifications, nothing in renderPanel.
 assert.strictEqual(count(js, 'window.TacRoom.attach('), 1);
