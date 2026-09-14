@@ -39,6 +39,9 @@ recorded 2026-09-14 (controller decisions), second round:
     requires ops[0] to be the creator's member put (confirmedBy=='creator')
     as a guard against the export format silently drifting under us; any
     violation exits 2 with a message, never a traceback.
+  - Journal `event` ops (radio silence on/off, close, unlock, the idle lock,
+    the administration stop/start; review fix 2026-09-14) are type-checked —
+    a `put` with a known `data.event` — and never count as work ops or clients.
   - A directory argument expands to its `*.json` files (noted on stdout); a
     non-`.json` file is skipped (noted); if nothing is left afterward, the
     run exits 2 rather than silently reporting on zero rooms.
@@ -67,6 +70,10 @@ STAGES = {
     'full': {'min_posts': 3, 'done_by_posts': None, 'ops': 10, 'clients': 3,
              'rooms': 6, 'creators': 3, 'without_owner': 1, 'repeat': 5},
 }
+
+
+# Journal events the Worker writes (worker/room/room.js eventOp): no object, no work.
+EVENTS = ('silence_on', 'silence_off', 'close', 'unlock', 'lock', 'stop', 'start')
 
 
 def fail(path, reason):
@@ -110,6 +117,12 @@ def _check_op_shape(path, i, op):
         for key in ('client', 'post', 'squad'):
             if not _is_str_or_none(data.get(key)):
                 fail(path, f'op #{i}.data.{key} must be a string or null')
+    if op.get('kind') == 'event':
+        if op.get('op') != 'put':
+            fail(path, f"op #{i} is an event, so it must be a put (got {op.get('op')!r})")
+        event = data.get('event') if isinstance(data, dict) else None
+        if not isinstance(event, str) or event not in EVENTS:
+            fail(path, f"op #{i}.data.event must be one of {', '.join(EVENTS)} (got {event!r})")
 
 
 def load(path):
@@ -211,7 +224,7 @@ def room_stats(doc, owners, thresholds):
     else:
         posts_ok = len(confirmed_posts) >= thresholds['min_posts']
 
-    work = [op for op in ops if op.get('kind') not in ('member', 'asset')
+    work = [op for op in ops if op.get('kind') not in ('member', 'asset', 'event')
             or (op.get('kind') == 'asset' and (op.get('by') or {}).get('post') != 'system')]
     clients = {(op.get('by') or {}).get('client') for op in work
                if (op.get('by') or {}).get('post') != 'system'}

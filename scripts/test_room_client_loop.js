@@ -365,6 +365,43 @@ function fakeDocument() {
     assert.strictEqual(again.restore(so.code), false, 'an entry that is no object is not a room');
   });
 
+  await t('final review: restore keeps a sheet only as [{post, squad, code}] and never a prototype key; a logged __proto__ op leaves the client whole', async () => {
+    const { so, mk, fx } = await K.stage1Room(env);
+    const store = T.makeStorage(K.fakeLocalStorage());
+    const again = mk('client-so-00001', { storage: store });
+    const key = again.key(so.code);
+    const base = { code: so.code, fork: 'stories_cm', planet: 'lv624', session: so.session };
+    for (const junk of ['x', 5, { post: 'so', code: 'AB23' }, null]) {
+      store.write(key, Object.assign({}, base, { sheet: junk }));
+      assert.ok(again.restore(so.code));
+      assert.strictEqual(again.sheet, null, JSON.stringify(junk));
+    }
+    const objects = JSON.parse('{"__proto__": {"id": "__proto__", "kind": "member", "client": "ghost", "post": "so", "confirmed": true},' +
+      ' "constructor": {"kind": "marker"}, "calibration": {"kind": "request"}}');
+    store.write(key, Object.assign({}, base, { objects,
+      sheet: [{ post: 'so', squad: null, code: 'AB23', extra: '<b>' }, { post: 'mortar', code: 'CD45' }, { post: 'so', squad: 7, code: 'EF67' }, 'x', null, { post: 'so' }] }));
+    assert.ok(again.restore(so.code));
+    assert.deepStrictEqual(again.sheet, [{ post: 'so', squad: null, code: 'AB23' }, { post: 'mortar', squad: null, code: 'CD45' }]);
+    assert.deepStrictEqual([Object.getPrototypeOf(again.room.objects) === Object.prototype, Object.keys(again.room.objects)], [true, []]);
+    assert.doesNotThrow(() => { again.members(); again.merged(); again.visible(); again.requests(); });
+    // A saved pending op under such an id is dropped too: merged() never copies Object.prototype's `constructor`.
+    const ok = Object.assign(reqOp('qP1'), { cid: 'p1' });
+    store.write(key, Object.assign({}, base, { pending: [Object.assign(reqOp('constructor'), { cid: 'p0' }), ok,
+      Object.assign(reqOp('calibration'), { cid: 'p2' })] }));
+    assert.ok(again.restore(so.code));
+    assert.deepStrictEqual(again.pending.map(o => o.cid), ['p1']);
+    assert.doesNotThrow(() => again.merged());
+    // An op of that id already in the log (written before the Worker checked ids): applyOp refuses it, seq still moves on.
+    const seq = fx.state.seq + 1;
+    fx.log.push({ seq, at: env.now(), by: { client: so.client, post: 'so', squad: null }, op: 'put', kind: 'request', id: '__proto__',
+      data: { type: 'mortar', target: { x: 1, y: 1 }, markerId: null }, cid: '' });
+    fx.state.seq = seq;
+    await so.poll();
+    assert.deepStrictEqual([so.room.seq, Object.getPrototypeOf(so.room.objects) === Object.prototype, so.error], [seq, true, null]);
+    assert.doesNotThrow(() => { so.members(); so.merged(); so.requests(); });
+    assert.deepStrictEqual(so.members().map(m => m.post).sort(), ['mortar', 'so']);
+  });
+
   await t('a 503 with a non-JSON body keeps the op pending, backs off, and the op goes later', async () => {
     const fx = new F.FixtureTransport(STAGE1, { now: env.now });
     let replace = false;

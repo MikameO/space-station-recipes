@@ -166,7 +166,7 @@ const req = (id, extra) => ({ cid: 'c-' + id, op: 'put', kind: 'request', id, da
     assert.deepStrictEqual(await send(so, [
       req('q.1'), { cid: 'x', op: 'nope', kind: 'request', id: 'q2' }, { cid: 'y', op: 'put', kind: 'ghost', id: 'q3' },
       req('big', { note: 'я'.repeat(5000) }), req('bad', { type: 'nuke' }), req('q4', { note: bell + '  много   пробелов  ' + 'я'.repeat(100) })
-    ]), ['shape', 'shape', 'shape', 'size', 'type', 'ok']);
+    ]), ['id', 'shape', 'shape', 'size', 'type', 'ok'], 'changed in the final review: an id off the pattern answers id');
     assert.strictEqual(fx.state.objects.q4.note, R.cleanText(bell + '  много   пробелов  ' + 'я'.repeat(100), STAGE1.limits.note));
     assert.ok(fx.state.objects.q4.note.startsWith('много пробелов') && fx.state.objects.q4.note.length === STAGE1.limits.note);
     const again = await fx.send(code, [req('q4', { note: 'x' })], { session: so.session });

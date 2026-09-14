@@ -12,7 +12,9 @@
 
   var CODE_ALPHABET = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
   var CODE_RE = /^[ABCDEFGHJKMNPQRSTUVWXYZ23456789]+$/;
-  var ID_RE = /^[A-Za-z0-9_-]{1,40}$/;
+  var ID_RE = /^[A-Za-z0-9][A-Za-z0-9_-]{0,39}$/;
+  // Object ids that name Object.prototype members: stored as keys of state.objects they would change its prototype.
+  var RESERVED_IDS = ['__proto__', 'constructor', 'prototype'];
   var REQUEST_TYPES = ['mortar', 'position', 'ob', 'cas', 'supply', 'medevac', 'other'];
   var REQUEST_FLOW = {
     requested: ['accepted', 'denied'],
@@ -97,6 +99,7 @@
     var type = obj ? assetTypeOf(obj) : null, out = [];
     if (!type) return out;
     for (var id in objects) {
+      if (!has(objects, id)) continue;
       var o = objects[id];
       if (o.kind === 'asset' && !o.deleted && o.type === type && o.claimedBy) out.push(o.claimedBy);
     }
@@ -131,9 +134,8 @@
       if (!keys.length) return no('fields');
       if (d.status !== undefined) {
         if (unknownKey(d, ['status', 'reason'])) return no('fields');
-        // The author withdraws a waiting request and recalls an accepted one; carrying it out is the crew's.
-        if (mine && d.status !== 'denied') return no('author');
-        if (mine && (existing.status === 'requested' || existing.status === 'accepted')) return OK;
+        // The author withdraws a waiting request and recalls an accepted one, nothing later; carrying it out is the crew's.
+        if (mine) return d.status === 'denied' && (existing.status === 'requested' || existing.status === 'accepted') ? OK : no('author');
         if (d.status === 'loaded') {
           if (existing.type !== 'ob') return no('transition');
           var def = assetDef(policy, assetTypeOf(existing));
@@ -168,9 +170,23 @@
     return OK;
   }
 
+  // 'id' when an op may not use this id: not a string, a prototype name, or `calibration` for another kind.
+  function idError(kind, id) {
+    if (typeof id !== 'string' || RESERVED_IDS.indexOf(id) >= 0) return 'id';
+    return id === 'calibration' && kind !== 'calibration' ? 'id' : null;
+  }
+
   // Applies a server-stamped op {seq, at, by, op, kind, id, data, expectedStatus}.
+  // An `event` op (radio silence, close, lock, the administration stop…) is journal only: it moves seq, makes no object.
   function applyOp(state, op) {
     if (state.closed) return { ok: false, reason: 'closed' };
+    var bad = idError(op.kind, op.id);
+    if (bad) return { ok: false, reason: bad };
+    if (op.kind === 'event') {
+      if (op.op !== 'put') return { ok: false, reason: 'op' };
+      if (op.seq > state.seq) state.seq = op.seq;
+      return { ok: true };
+    }
     var cur = has(state.objects, op.id) ? state.objects[op.id] : undefined;
     if (op.op === 'put') {
       if (cur && cur.deleted) return { ok: false, reason: 'deleted' };
@@ -213,6 +229,7 @@
     var f = filters || {};
     var out = [];
     for (var id in state.objects) {
+      if (!has(state.objects, id)) continue;
       var o = state.objects[id];
       if (o.deleted || expired(o, policy, now)) continue;
       if (f.layers && f.layers.indexOf(o.layer) < 0) continue;
@@ -501,7 +518,7 @@
     assetDef: assetDef, assetTypeOf: assetTypeOf, claimants: claimants, requestActions: requestActions,
     simplify: simplify, smoothSegments: smoothSegments, snapPoints: snapPoints,
     createState: createState, postDef: postDef, levelOf: levelOf, isStaff: isStaff, hasRight: hasRight,
-    assetOwnerPost: assetOwnerPost, layerWritable: layerWritable, canWrite: canWrite, applyOp: applyOp,
+    assetOwnerPost: assetOwnerPost, layerWritable: layerWritable, canWrite: canWrite, applyOp: applyOp, idError: idError,
     markerAge: markerAge, expired: expired, enemyAlpha: enemyAlpha, visibleObjects: visibleObjects,
     clockOffset: clockOffset, serverNowEst: serverNowEst, countdown: countdown, deadlines: deadlines,
     cleanText: cleanText, validateData: validateData, validatePatch: validatePatch, cleanData: cleanData, stampData: stampData,

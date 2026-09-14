@@ -721,4 +721,29 @@ with tempfile.TemporaryDirectory() as tmp:
 
     t('near-PASS suite: only 2 distinct creators (need 3): NOT MET', t_near_pass_creators_below_3)
 
+    # ---- final review 2026-09-14: journal events ----
+
+    def t_events_are_not_work():
+        r = std('EVTOK1', 'so-e-000001', 'mo-e-000001')
+        so2 = 'so-e-000002'  # a staff officer who only switches radio silence: no work op, no client
+        system = by('room', 'system')
+        for at, who, name in [(BASE_T + 40000, by(so2, 'so'), 'silence_on'), (BASE_T + 41000, by(so2, 'so'), 'silence_off'),
+                              (BASE_T + 50000, system, 'stop'), (BASE_T + 60000, system, 'start'),
+                              (BASE_T + 600000, system, 'lock'), (BASE_T + 601000, by('so-e-000001', 'so'), 'unlock'),
+                              (BASE_T + 602000, by('so-e-000001', 'so'), 'close')]:
+            r.op(at, who, 'put', 'event', f'evt-{len(r.ops) + 1}', {'event': name})
+        code, out, err = run_main([write(tmp, uniq('events_ok'), r.doc())])
+        check('EVTOK1: useful=True' in out, out)
+        check('done=1 ops=4 clients=2' in out, out)
+        check(err == '', err)
+        for bad_op, bad_data, needle in [('patch', {'event': 'lock'}, 'must be a put'),
+                                         ('put', {'event': 'party'}, 'data.event must be one of'),
+                                         ('put', None, 'data.event must be one of')]:
+            b = std('EVTBAD', 'so-f-000001', 'mo-f-000001')
+            b.op(BASE_T + 40000, system, bad_op, 'event', 'evt-9', bad_data)
+            code, out, err = run_main([write(tmp, uniq('events_bad'), b.doc())])
+            check(code == 2 and needle in err, (bad_op, bad_data, code, err))
+
+    t('journal events: type-checked, never work ops or clients; a malformed event exits 2', t_events_are_not_work)
+
 print('OK', passed, 'cases')

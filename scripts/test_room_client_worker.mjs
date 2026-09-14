@@ -93,6 +93,8 @@ function echoing(transport) {
 }
 // Acks without their random cids: [cid type, seq, dup, error].
 const ackShape = r => r.body.acks.map(a => [typeof a.cid, a.seq, a.dup === true, a.error || null]);
+// Journal events in an export: [seq, id, event, who].
+const eventsOf = r => (r.body && Array.isArray(r.body.ops) ? r.body.ops : []).filter(o => o.kind === 'event').map(o => [o.seq, o.id, o.data.event, o.by.post]);
 
 // Stage 1, one evening; every observable outcome goes into the story as [step, JSON].
 async function evening(transport, token, keyId) {
@@ -210,6 +212,11 @@ async function evening(transport, token, keyId) {
   const beat = await mo.queue({ op: 'patch', kind: 'member', id: mo.me.id, data: { presentAt: 1 } });
   note('op during radio silence', [hush, beat.ok, mo.pending.length, mo.meta.frozen && mo.meta.frozen.reason]);
   await so.admin('silence', { on: false });
+  // Final review: radio silence leaves journal events; clients move past them and never show them.
+  const hushLog = await so.exportRoom();
+  await mo.poll();
+  note('radio silence in the journal', [hushLog.status, eventsOf(hushLog), so.room.seq, mo.room.seq,
+    [so, mo].map(c => c.visible({ kinds: ['event'] }).length + c.members().filter(m => m.kind !== 'member').length)]);
 
   const mr = await mo.admin('rotate');
   note('crew tries rotate', [mr.status, mo.error, mo.status]);
@@ -235,6 +242,19 @@ async function evening(transport, token, keyId) {
   // v2: a code bound to another client answers like an unknown one: 404 postCode ('used' is gone).
   await xeno.join({ entry: so.code + '-' + codes[1] });
   note('leaked or bound post codes after rotate', [leaked.status, leaked.error, xeno.status, xeno.error]);
+
+  // Final review: the idle lock, «Продолжить раунд» and close are journal events too, and the room reads the same around them.
+  clock.t += (STAGE1.ttl.roomIdleLockSec + 60) * 1000;
+  await so.poll();
+  const lockedSeen = !!(so.meta && so.meta.locked);
+  const kinds = c => c.visible().map(o => o.kind).sort().join();
+  const before = kinds(so);
+  const unlock = await so.admin('unlock');
+  tick();
+  const close = await so.admin('close');
+  const closedLog = await so.exportRoom();
+  note('lock, unlock and close in the journal', [lockedSeen, unlock.status, close.status, so.status, eventsOf(closedLog).slice(-3),
+    so.room.seq === closedLog.body.ops[closedLog.body.ops.length - 1].seq, kinds(so) === before, so.members().map(m => m.post)]);
   return story;
 }
 
@@ -314,6 +334,12 @@ assert.deepStrictEqual([rotated[0], rotated[1], ...rotated.slice(2, 6), ...rotat
 assert.deepStrictEqual(step(worker, 'crew after rotate'), ['expired', 'rotated', null]);
 assert.deepStrictEqual(step(worker, 'crew knocks at the new code'), ['knocking', null]);
 assert.deepStrictEqual(step(worker, 'leaked or bound post codes after rotate'), ['idle', 'postCode', 'idle', 'postCode']);
+const hushed = step(worker, 'radio silence in the journal');
+assert.deepStrictEqual([hushed[0], hushed[1].map(e => [e[2], e[3], e[1] === 'evt-' + e[0]]), hushed[2] === hushed[1][1][0], hushed[3] === hushed[2], hushed[4]],
+  [200, [['silence_on', 'so', true], ['silence_off', 'so', true]], true, true, [0, 0]]);
+const closing = step(worker, 'lock, unlock and close in the journal');
+assert.deepStrictEqual([closing.slice(0, 4), closing[4].map(e => [e[2], e[3], e[1] === 'evt-' + e[0]]), closing.slice(5)],
+  [[true, 200, 200, 'closed'], [['lock', 'system', true], ['unlock', 'so', true], ['close', 'so', true]], [true, true, ['so']]]);
 assert.deepStrictEqual(step(worker, 'crowd: the code of a full post'), ['idle', 'full']);
 assert.deepStrictEqual(step(worker, 'crowd: four knocks wait, the fifth is refused'),
   [['knocking', null, true], ['knocking', null, true], ['knocking', null, true], ['knocking', null, true], ['idle', 'knocks', false]]);

@@ -14,7 +14,7 @@ const policyOf = (env, fork) => own(env.POLICIES || POLICIES, fork);
 const R = globalThis.TacticalRoomLogic;
 const SYSTEM = { client: 'room', post: 'system', squad: null };
 const WRITE_KINDS = ['marker', 'line', 'area', 'request', 'asset', 'calibration', 'member'];
-const ID_RE = /^[A-Za-z0-9_-]{1,40}$/;
+const ID_RE = /^[A-Za-z0-9][A-Za-z0-9_-]{0,39}$/;
 const CLIENT_RE = /^[A-Za-z0-9_-]{8,40}$/;
 const CID_MEMORY = 500;          // resent ops answered from memory: the acks of the last 500 ops
 const KNOCKS_MAX = 4;            // fresh knocks per room
@@ -24,6 +24,9 @@ const pad = n => String(n).padStart(9, '0');
 const json = (status, body, headers) =>
   new Response(JSON.stringify(body), { status, headers: Object.assign({ 'Content-Type': 'application/json' }, headers || {}) });
 const byOf = m => ({ client: m.client, post: m.post, squad: m.squad || null });
+// A journal line with no object: radio silence, close, «Продолжить раунд», the idle lock, the administration stop and start.
+// applyAll gives it the id evt-<seq>; clients and R.applyOp only move seq past it.
+const eventOp = (event, by) => ({ op: 'put', kind: 'event', id: '', data: { event }, by });
 const has = (o, k) => Object.prototype.hasOwnProperty.call(o, k);
 const bytes = s => new TextEncoder().encode(s).length;
 
@@ -78,13 +81,18 @@ export class Room {
     if (this.meta) {
       this.policy = policyOf(this.env, this.meta.fork);
       for (const [, obj] of await this.s.list({ prefix: 'obj:' })) {
+        // A row under a prototype name or a borrowed `calibration` id (written before ids were checked) stays out:
+        // as a key of state.objects it would break every later write, and a reload would repeat it.
+        if (!obj || typeof obj !== 'object' || R.idError(obj.kind, obj.id)) continue;
         this.state.objects[obj.id] = obj;
         this.bytes += JSON.stringify(obj).length;
       }
       for (const [k, v] of await this.s.list({ prefix: 'sess:' })) this.sessions.set(k.slice(5), v);
       const recent = [...(await this.s.list({ prefix: 'op:', reverse: true, limit: CID_MEMORY })).values()];
       for (const op of recent) {
-        if (op.seq > this.state.seq) { this.state.seq = op.seq; this.lastOpAt = op.at; }
+        if (op.seq > this.state.seq) this.state.seq = op.seq;
+        // Journal events are no activity: the idle lock counts from the last real op.
+        if (op.kind !== 'event' && op.at > this.lastOpAt) this.lastOpAt = op.at;
         if (!this.memberOpAt.has(op.by.client)) this.memberOpAt.set(op.by.client, op.at);
         if (op.kind === 'request' && op.at > this.lastRequestOpAt) this.lastRequestOpAt = op.at;
       }
@@ -168,7 +176,7 @@ export class Room {
     const entries = Object.assign({}, extra || {});
     for (const op of ops) {
       entries['op:' + pad(op.seq)] = op;
-      entries['obj:' + op.id] = this.state.objects[op.id];
+      if (op.kind !== 'event') entries['obj:' + op.id] = this.state.objects[op.id];   // an event is one row, the op
       this.bytes += JSON.stringify(op).length;
     }
     if (Object.keys(entries).length) await this.putRows(entries);
@@ -177,7 +185,8 @@ export class Room {
   applyAll(ops) {
     const done = [];
     for (const op of ops) {
-      const fresh = this.stamp(op, op.by);
+      // An event takes its id from its own seq, so it stays unique whatever else the batch holds.
+      const fresh = this.stamp(op.kind === 'event' ? Object.assign({}, op, { id: 'evt-' + (this.state.seq + 1) }) : op, op.by);
       if (R.applyOp(this.state, fresh).ok) done.push(fresh);
     }
     return done;
@@ -239,10 +248,11 @@ export class Room {
     }
   }
 
+  // The idle lock, from a request's lifecycle or the alarm; the journal says so.
   async lock(now) {
     this.meta.locked = true;
     this.meta.lockedAt = now;
-    await this.s.put('meta', this.meta);
+    await this.commit(this.applyAll([eventOp('lock', SYSTEM)]), { meta: this.meta });
     await this.schedule();
     await this.setActive(false);
   }
@@ -252,10 +262,11 @@ export class Room {
     const m = this.meta;
     const r = await (await this.registry('/stopped?keyId=' + encodeURIComponent(m.keyId))).json();
     const reason = m.frozen ? m.frozen.reason : null;
-    if (r.stopped && reason !== 'stopped' && reason !== 'budget') m.frozen = { at: now, reason: 'stopped' };
-    else if (!r.stopped && reason === 'stopped') m.frozen = null;
+    let event;
+    if (r.stopped && reason !== 'stopped' && reason !== 'budget') { m.frozen = { at: now, reason: 'stopped' }; event = 'stop'; }
+    else if (!r.stopped && reason === 'stopped') { m.frozen = null; event = 'start'; }
     else return;
-    await this.s.put('meta', m);
+    await this.commit(this.applyAll([eventOp(event, SYSTEM)]), { meta: m });
   }
 
   async lifecycle(now) {
@@ -487,7 +498,9 @@ export class Room {
       const again = this.acked(actor.client, cid);
       if (again) { acks.push(again); continue; }
       if (!raw || typeof raw !== 'object' || !WRITE_KINDS.includes(raw.kind) || !['put', 'patch', 'del'].includes(raw.op) ||
-          typeof raw.id !== 'string' || !ID_RE.test(raw.id)) { acks.push({ cid, error: 'shape' }); continue; }
+          typeof raw.id !== 'string') { acks.push({ cid, error: 'shape' }); continue; }
+      // Ids start with a letter or digit, never name a prototype member, and `calibration` is the calibration's own.
+      if (!ID_RE.test(raw.id) || R.idError(raw.kind, raw.id)) { acks.push({ cid, error: 'id' }); continue; }
       if (bytes(JSON.stringify(raw)) > L.message) { acks.push({ cid, error: 'size' }); continue; }
       if (!this.allow(actor.client, now)) { acks.push({ cid, error: 'rate' }); continue; }
       if (this.bytes > L.bytes) {
@@ -584,7 +597,9 @@ export class Room {
       case 'purge': {
         if (!staff) return json(403, { error: 'right' });
         for (const o of Object.values(this.state.objects)) {
-          if (!o.deleted && o.kind !== 'member' && o.by && o.by.client === b.client) ops.push({ op: 'del', kind: o.kind, id: o.id, by: byOf(actor) });
+          // The policy's seeded assets belong to the room: no client name reaches them.
+          if (o.deleted || o.kind === 'member' || !o.by || o.by.client === SYSTEM.client) continue;
+          if (o.by.client === b.client) ops.push({ op: 'del', kind: o.kind, id: o.id, by: byOf(actor) });
         }
         break;
       }
@@ -602,6 +617,7 @@ export class Room {
         if (!staff) return json(403, { error: 'right' });
         if (!m.locked) return json(409, { error: 'state' });
         m.locked = false; m.lockedAt = null; m.unlockedAt = now; this.lastOpAt = now; metaChanged = true;
+        ops.push(eventOp('unlock', byOf(actor)));
         break;
       case 'extend':
         if (!R.hasRight(P, actor, 'extend')) return json(403, { error: 'right' });
@@ -611,11 +627,14 @@ export class Room {
         break;
       case 'silence':
         if (!R.hasRight(P, actor, 'radioSilence')) return json(403, { error: 'right' });
+        // The journal records a change only: a second «on» moves the frozen time, never a second line.
+        if (!!b.on !== !!m.frozen) ops.push(eventOp(b.on ? 'silence_on' : 'silence_off', byOf(actor)));
         m.frozen = b.on ? { at: now, reason: 'silence', by: actor.post } : null; metaChanged = true;
         break;
       case 'close':
         if (!staff) return json(403, { error: 'right' });
         m.closed = true; m.closedAt = now; metaChanged = true;
+        ops.push(eventOp('close', byOf(actor)));
         break;
       case 'observer': {
         if (!staff) return json(403, { error: 'right' });
@@ -673,7 +692,7 @@ export class Room {
     if (retired) {
       try { await this.registry('/retire', { old: retired, name: m.name }); } catch { /* the room itself answers 'rotated' */ }
     }
-    if (done.length) this.lastOpAt = now;
+    if (done.some(o => o.kind !== 'event')) this.lastOpAt = now;
     this.memberOpAt.set(actor.client, now);
     if (metaChanged) await this.schedule();
     if (action === 'close') await this.setActive(false);
@@ -717,14 +736,11 @@ export class Room {
     if (!m.closed && now >= maxAt) {
       m.closed = true;
       m.closedAt = now;
-      await this.s.put('meta', m);
+      await this.commit(this.applyAll([eventOp('close', SYSTEM)]), { meta: m });
       await this.setActive(false);
     } else if (!m.closed && !m.locked && R.idleLocked(P, this.lastOpAt, now)) {
       // An abandoned room locks on its own and frees its ceiling slot.
-      m.locked = true;
-      m.lockedAt = now;
-      await this.s.put('meta', m);
-      await this.setActive(false);
+      await this.lock(now);
     }
     await this.checkStop(now);
     await this.schedule();

@@ -16,7 +16,7 @@
   var WRITE_KINDS = ['marker', 'line', 'area', 'request', 'asset', 'calibration', 'member'];
   var OPS = ['put', 'patch', 'del'];
   var CLIENT_RE = /^[A-Za-z0-9_-]{8,40}$/;
-  var ID_RE = /^[A-Za-z0-9_-]{1,40}$/;
+  var ID_RE = /^[A-Za-z0-9][A-Za-z0-9_-]{0,39}$/;
   var CID_MEMORY = 500;          // resent ops are answered from the acks of the last 500 ops
   var KNOCKS_MAX = 4;            // fresh knocks per room
   var PAGE_BYTES = 256 * 1024;   // one poll page, besides the 500-op cap
@@ -87,9 +87,10 @@
     this.rotated = {};
   };
 
-  // Stamps and applies one op; {ok:true, seq} or applyOp's refusal.
+  // Stamps and applies one op; {ok:true, seq} or applyOp's refusal. An event takes the id evt-<seq>.
   FixtureTransport.prototype.apply = function (op, by, now) {
-    var stamped = { seq: this.state.seq + 1, at: now, by: by, op: op.op, kind: op.kind, id: op.id,
+    var seq = this.state.seq + 1;
+    var stamped = { seq: seq, at: now, by: by, op: op.op, kind: op.kind, id: op.kind === 'event' ? 'evt-' + seq : op.id,
       data: op.data, expectedStatus: op.expectedStatus, cid: op.cid || '' };
     var res = R.applyOp(this.state, stamped);
     if (!res.ok) return res;
@@ -114,9 +115,15 @@
     return cid && has(this.cids, key) ? { cid: cid, seq: this.cids[key], dup: true } : null;
   };
 
+  // The Worker's journal line with no object (radio silence, close, «Продолжить раунд», the idle lock).
+  FixtureTransport.prototype.event = function (name, by, now) {
+    return this.apply({ op: 'put', kind: 'event', id: '', data: { event: name } }, by, now);
+  };
+
   FixtureTransport.prototype.activeMembers = function () {
     var out = [];
     for (var id in this.state.objects) {
+      if (!has(this.state.objects, id)) continue;
       var o = this.state.objects[id];
       if (o.kind === 'member' && !o.deleted) out.push(o);
     }
@@ -129,7 +136,7 @@
 
   FixtureTransport.prototype.countObjects = function () {
     var n = 0;
-    for (var id in this.state.objects) if (!this.state.objects[id].deleted && this.state.objects[id].kind !== 'member') n++;
+    for (var id in this.state.objects) if (has(this.state.objects, id) && !this.state.objects[id].deleted && this.state.objects[id].kind !== 'member') n++;
     return n;
   };
   // A confirmed member, or a knock still within its word time.
@@ -198,7 +205,7 @@
     var m = this.meta, P = this.policy;
     var grace = P.ttl.exportGraceSec * 1000;
     if ((m.closed && now >= m.closedAt + grace) || (!m.closed && m.locked && now >= m.lockedAt + grace)) { this.wipe(); return; }
-    if (!m.closed && now >= R.roomDeadlines(P, m.createdAt, m.extended).maxAt) { m.closed = true; m.closedAt = now; }
+    if (!m.closed && now >= R.roomDeadlines(P, m.createdAt, m.extended).maxAt) { m.closed = true; m.closedAt = now; this.event('close', SYSTEM, now); }
     this.play(now);
     this.lifecycle(now);
   };
@@ -208,7 +215,7 @@
   FixtureTransport.prototype.lifecycle = function (now) {
     var m = this.meta, P = this.policy, self = this;
     if (m.closed) return;
-    if (!m.locked && R.idleLocked(P, this.lastOpAt, now)) { m.locked = true; m.lockedAt = now; }
+    if (!m.locked && R.idleLocked(P, this.lastOpAt, now)) { m.locked = true; m.lockedAt = now; this.event('lock', SYSTEM, now); }
     var members = this.activeMembers();
     var gone = members.filter(function (o) { return !o.confirmed && !self.fresh(o, now); });
     if (!m.locked) {
@@ -420,7 +427,9 @@
     var again = this.acked(actor.client, cid);
     if (again) return again;
     if (!raw || typeof raw !== 'object' || WRITE_KINDS.indexOf(raw.kind) < 0 || OPS.indexOf(raw.op) < 0 ||
-        typeof raw.id !== 'string' || !ID_RE.test(raw.id)) return { cid: cid, error: 'shape' };
+        typeof raw.id !== 'string') return { cid: cid, error: 'shape' };
+    // Ids start with a letter or digit, never name a prototype member, and `calibration` is the calibration's own.
+    if (!ID_RE.test(raw.id) || R.idError(raw.kind, raw.id)) return { cid: cid, error: 'id' };
     if (utf8Bytes(JSON.stringify(raw)) > L.message) return { cid: cid, error: 'size' };
     if (!this.allow(actor.client, now)) return { cid: cid, error: 'rate' };
     if (this.bytes > L.bytes) { this.meta.frozen = { at: now, reason: 'budget' }; return { cid: cid, error: 'budget' }; }
@@ -501,8 +510,11 @@
       case 'purge': {
         if (!staff) return fail(403, 'right');
         for (var oid in this.state.objects) {
+          if (!has(this.state.objects, oid)) continue;
           var o = this.state.objects[oid];
-          if (!o.deleted && o.kind !== 'member' && o.by && o.by.client === b.client) ops.push({ op: 'del', kind: o.kind, id: o.id });
+          // The policy's seeded assets belong to the room: no client name reaches them.
+          if (o.deleted || o.kind === 'member' || !o.by || o.by.client === SYSTEM.client) continue;
+          if (o.by.client === b.client) ops.push({ op: 'del', kind: o.kind, id: o.id });
         }
         break;
       }
@@ -519,6 +531,7 @@
         if (!staff) return fail(403, 'right');
         if (!m.locked) return fail(409, 'state');
         m.locked = false; m.lockedAt = null; m.unlockedAt = now; this.lastOpAt = now;
+        ops.push({ op: 'put', kind: 'event', id: '', data: { event: 'unlock' } });
         break;
       case 'extend':
         if (!R.hasRight(P, actor, 'extend')) return fail(403, 'right');
@@ -528,11 +541,14 @@
         break;
       case 'silence':
         if (!R.hasRight(P, actor, 'radioSilence')) return fail(403, 'right');
+        // The journal records a change only: a second «on» moves the frozen time, never a second line.
+        if (!!b.on !== !!m.frozen) ops.push({ op: 'put', kind: 'event', id: '', data: { event: b.on ? 'silence_on' : 'silence_off' } });
         m.frozen = b.on ? { at: now, reason: 'silence', by: actor.post } : null;
         break;
       case 'close':
         if (!staff) return fail(403, 'right');
         m.closed = true; m.closedAt = now;
+        ops.push({ op: 'put', kind: 'event', id: '', data: { event: 'close' } });
         break;
       case 'observer':
         if (!staff) return fail(403, 'right');
@@ -566,7 +582,8 @@
         return fail(400, 'action');
     }
     var applied = 0;
-    ops.forEach(function (op) { if (self.apply(op, byOf(actor), now).ok) applied++; });
+    // Journal events are no activity: only real ops move the idle-lock clock.
+    ops.forEach(function (op) { if (self.apply(op, byOf(actor), now).ok && op.kind !== 'event') applied++; });
     if (action === 'rotate') {
       this.sessions = {};
       out.session = this.newSession(actor.client);
@@ -590,6 +607,7 @@
     var members = this.activeMembers().map(function (x) { return objectWithoutWord(copy(x)); });
     var objects = [];
     for (var id in this.state.objects) {
+      if (!has(this.state.objects, id)) continue;
       var o = this.state.objects[id];
       if (!o.deleted && o.kind !== 'member') objects.push(copy(o));
     }

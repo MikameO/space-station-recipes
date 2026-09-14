@@ -345,7 +345,8 @@ t('a put over a live object: duplicate for its author, exists for anyone else; c
   // applyOp itself still replays a put over a live object: the log stays the truth.
   assert.strictEqual(R.applyOp(s, { seq: 6, at: 6000, by: byOf(soAuthor), op: 'put', kind: 'marker', id: 'mk', data: { x: 1, y: 1 } }).ok, true);
   assert.strictEqual(R.applyOp(s, { seq: 7, at: 7000, by: byOf(soAuthor), op: 'put', kind: 'marker', id: 'mk', data: { x: 2, y: 2 } }).ok, true);
-  assert.strictEqual(R.applyOp(s, { seq: 8, at: 8000, by: byOf(soAuthor), op: 'patch', kind: 'marker', id: 'constructor', data: { x: 1 } }).reason, 'missing',
+  // Changed: a prototype name is refused as an id before any lookup.
+  assert.strictEqual(R.applyOp(s, { seq: 8, at: 8000, by: byOf(soAuthor), op: 'patch', kind: 'marker', id: 'constructor', data: { x: 1 } }).reason, 'id',
     'object ids never reach Object.prototype');
 });
 
@@ -400,4 +401,40 @@ t('cleanText, parseEntry and deadlines at their edges', () => {
   assert.deepStrictEqual(R.deadlines('mortar', 10000, null, stage1), none);
   assert.deepStrictEqual(R.deadlines('ob', 10000, { mortar: { travelDelay: 1, impactDelay: 1 } }, stage1), none);
 });
+t('final review: prototype and borrowed calibration ids are refused, loops read own keys only, events make no object, the author stops at accepted', () => {
+  const put = id => ({ seq: 1, at: 1000, by: byOf(soAuthor), op: 'put', kind: 'request', id, data: { type: 'mortar', target: { x: 1, y: 1 }, markerId: null } });
+  for (const id of ['__proto__', 'constructor', 'prototype']) {
+    const s = R.createState();
+    assert.deepStrictEqual(R.applyOp(s, put(id)), { ok: false, reason: 'id' }, id);
+    assert.strictEqual(Object.getPrototypeOf(s.objects), Object.prototype, id + ' leaves the prototype alone');
+    assert.strictEqual(R.applyOp(s, { seq: 2, at: 1000, by: byOf(soAuthor), op: 'del', kind: 'request', id }).reason, 'id');
+    assert.deepStrictEqual([s.seq, Object.keys(s.objects)], [0, []]);
+    assert.doesNotThrow(() => R.claimants(s.objects, { kind: 'request', type: 'mortar' }));
+  }
+  assert.deepStrictEqual([R.idError('marker', 'calibration'), R.idError('request', 'calibration'), R.idError('calibration', 'calibration'), R.idError('request', 'q1'), R.idError('request', 5)],
+    ['id', 'id', null, null, 'id']);
+  const s = stage1State('mortar', 'requested');
+  assert.strictEqual(R.applyOp(s, Object.assign(put('calibration'), { seq: 3 })).reason, 'id', 'a request never takes the calibration id');
+  assert.strictEqual(s.objects.calibration, undefined);
+  // Own keys only: an enumerable key on Object.prototype adds no claimant and no visible object.
+  Object.prototype.ghost = { id: 'ghost', kind: 'asset', type: 'mortar', claimedBy: 'c-ghost', seq: 99, at: 0, layer: 'assets' };
+  try {
+    assert.deepStrictEqual(R.claimants(s.objects, s.objects.q1), []);
+    assert.deepStrictEqual(R.visibleObjects(s, stage1, 3000).map(o => o.id), ['asset-mortar-1', 'q1']);
+  } finally {
+    delete Object.prototype.ghost;
+  }
+  const keys = Object.keys(s.objects).join();
+  const SYS = { client: 'room', post: 'system', squad: null };
+  assert.deepStrictEqual(R.applyOp(s, { seq: 4, at: 4000, by: SYS, op: 'put', kind: 'event', id: 'evt-4', data: { event: 'lock' } }), { ok: true });
+  assert.deepStrictEqual([s.seq, Object.keys(s.objects).join(), R.visibleObjects(s, stage1, 4000).length], [4, keys, 2], 'an event moves seq and makes no object');
+  assert.strictEqual(R.applyOp(s, { seq: 5, at: 5000, by: SYS, op: 'patch', kind: 'event', id: 'evt-4', data: {} }).reason, 'op', 'events are puts only');
+  const deny = { op: 'patch', kind: 'request', id: 'q1', data: { status: 'denied' } };
+  for (const status of ['loaded', 'firing']) {
+    const req = stage1State('mortar', status).objects.q1;
+    assert.strictEqual(R.canWrite(stage1, soAuthor, deny, req, { claimed: [] }).reason, 'author', 'the author no longer withdraws a request that is ' + status);
+    assert.deepStrictEqual(R.canWrite(stage1, soOther, deny, req, { claimed: [] }), { ok: true }, 'another staff officer still recalls it when ' + status);
+  }
+});
+
 console.log('OK', n, 'groups');
