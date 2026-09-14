@@ -4,36 +4,59 @@
 // See LICENSE for details.
 //
 // A fake Worker for the officers' room: same transport interface as
-// HttpTransport, the rules of worker/room/room.js on top of tactical/room-logic.js,
-// and a scripted LV-624 round for the clickable demo (tactical.html#room=demo).
-// Never more permissive than the Worker. Loaded on demand.
+// HttpTransport, the rules of worker/room/room.js (write contract v2) on top of
+// tactical/room-logic.js, and a scripted LV-624 round for the clickable demo
+// (tactical.html#room=demo). Never more permissive than the Worker; the parity
+// test scripts/test_room_client_worker.mjs holds the two together. Loaded on demand.
 (function (root) {
   'use strict';
 
   var R = root.TacticalRoomLogic;
   var SYSTEM = { client: 'room', post: 'system', squad: null };
   var WRITE_KINDS = ['marker', 'line', 'area', 'request', 'asset', 'calibration', 'member'];
-  var RESERVED = ['id', 'kind', 'seq', 'at', 'by', 'deleted'];
+  var OPS = ['put', 'patch', 'del'];
   var CLIENT_RE = /^[A-Za-z0-9_-]{8,40}$/;
   var ID_RE = /^[A-Za-z0-9_-]{1,40}$/;
+  var CID_MEMORY = 500;          // resent ops are answered from the acks of the last 500 ops
+  var KNOCKS_MAX = 4;            // fresh knocks per room
+  var PAGE_BYTES = 256 * 1024;   // one poll page, besides the 500-op cap
   var WORDS = {
     ru: ['ФАЗАН', 'КЛЁН', 'РУБИН', 'ЯКОРЬ', 'ГРОМ', 'ЛИМОН', 'ТУМАН', 'КОМЕТА'],
     en: ['FALCON', 'MAPLE', 'ANCHOR', 'THUNDER', 'LEMON', 'HARBOR', 'COMET', 'SAPPHIRE']
   };
 
   function copy(v) { return v === undefined ? undefined : JSON.parse(JSON.stringify(v)); }
+  function has(o, k) { return Object.prototype.hasOwnProperty.call(o, k); }
+  function isObj(v) { return !!v && typeof v === 'object' && !Array.isArray(v); }
   function reply(status, body, retryAfter) { return Promise.resolve({ status: status, body: body, retryAfter: retryAfter === undefined ? null : retryAfter }); }
   function ok(body, retryAfter) { return reply(200, body, retryAfter); }
   function fail(status, error) { return reply(status, { error: error }); }
   function byOf(m) { return { client: m.client, post: m.post, squad: m.squad || null }; }
+  function cidOf(raw) { return raw && typeof raw === 'object' && typeof raw.cid === 'string' ? raw.cid.slice(0, 40) : ''; }
 
-  // R.validatePatch arrives with the logic track; before that, patches pass as they do in the Worker.
-  function patchProblem(policy, kind, data) {
-    if (!R.validatePatch) return null;
-    var v = R.validatePatch(policy, kind, data);
-    if (!v || v.ok === true) return null;
-    return typeof v === 'string' ? v : v.reason || 'patch';
+  // UTF-8 length as the Worker's TextEncoder counts it; a lone surrogate becomes U+FFFD, three bytes.
+  function utf8Bytes(s) {
+    var n = 0;
+    for (var i = 0; i < s.length; i++) {
+      var c = s.charCodeAt(i);
+      if (c < 0x80) n += 1;
+      else if (c < 0x800) n += 2;
+      else if (c >= 0xd800 && c <= 0xdbff && i + 1 < s.length && (s.charCodeAt(i + 1) & 0xfc00) === 0xdc00) { n += 4; i++; }
+      else n += 3;
+    }
+    return n;
   }
+
+  // A refusal as it arrives through JSON: a status the object never had is no key at all.
+  function refusal(cid, error, status) {
+    var a = { cid: cid, error: error };
+    if (status !== undefined) a.status = status;
+    return a;
+  }
+
+  // Knock words are for the members who confirm; the observer and the export never see them.
+  function opWithoutWord(op) { if (op.kind === 'member' && op.data) delete op.data.word; return op; }
+  function objectWithoutWord(o) { if (o.kind === 'member') delete o.word; return o; }
 
   function FixtureTransport(policy, opts) {
     opts = opts || {};
@@ -43,7 +66,6 @@
     this.script = (opts.script || []).slice();
     this.scriptErrors = [];
     this.rooms = 0;
-    this.rotated = {};
     this.wipe();
   }
 
@@ -60,19 +82,36 @@
     this.seen = {};
     this.memberOpAt = {};
     this.rate = {};
-    this.acks = {};
+    this.cids = {};
+    this.cidOrder = [];
     this.rotated = {};
   };
 
-  FixtureTransport.prototype.apply = function (op, by) {
-    var stamped = { seq: this.state.seq + 1, at: this.serverNow(), by: by, op: op.op, kind: op.kind, id: op.id,
-      data: copy(op.data), expectedStatus: op.expectedStatus, cid: op.cid || '' };
+  // Stamps and applies one op; {ok:true, seq} or applyOp's refusal.
+  FixtureTransport.prototype.apply = function (op, by, now) {
+    var stamped = { seq: this.state.seq + 1, at: now, by: by, op: op.op, kind: op.kind, id: op.id,
+      data: op.data, expectedStatus: op.expectedStatus, cid: op.cid || '' };
     var res = R.applyOp(this.state, stamped);
-    if (res.ok) {
-      this.log.push(copy(stamped));
-      this.bytes += JSON.stringify(stamped).length;
-    }
-    return res;
+    if (!res.ok) return res;
+    this.log.push(copy(stamped));
+    this.bytes += JSON.stringify(stamped).length;
+    return { ok: true, seq: stamped.seq };
+  };
+
+  // The ack of an accepted op, kept per client and cid so a resend is answered without a second row.
+  FixtureTransport.prototype.remember = function (client, cid, seq) {
+    var ack = { cid: cid || '', seq: seq, dup: true };
+    if (!cid || client === SYSTEM.client) return ack;
+    var key = client + '|' + cid, at = this.cidOrder.indexOf(key);
+    if (at >= 0) this.cidOrder.splice(at, 1);
+    this.cidOrder.push(key);
+    this.cids[key] = seq;
+    while (this.cidOrder.length > CID_MEMORY) delete this.cids[this.cidOrder.shift()];
+    return ack;
+  };
+  FixtureTransport.prototype.acked = function (client, cid) {
+    var key = client + '|' + cid;
+    return cid && has(this.cids, key) ? { cid: cid, seq: this.cids[key], dup: true } : null;
   };
 
   FixtureTransport.prototype.activeMembers = function () {
@@ -93,9 +132,40 @@
     for (var id in this.state.objects) if (!this.state.objects[id].deleted && this.state.objects[id].kind !== 'member') n++;
     return n;
   };
+  // A confirmed member, or a knock still within its word time.
+  FixtureTransport.prototype.fresh = function (o, now) {
+    return !!o.confirmed || now - (o.knockAt || o.at) < this.policy.ttl.wordSec * 1000;
+  };
+  FixtureTransport.prototype.confirmers = function () {
+    var P = this.policy;
+    return this.activeMembers().filter(function (x) { return x.confirmed && R.hasRight(P, x, 'confirmJoin'); });
+  };
+
+  FixtureTransport.prototype.slots = function () {
+    var P = this.policy, out = [];
+    P.posts.forEach(function (p) {
+      if (p.level === 'observer') return;
+      (p.perSquad ? Object.keys(P.squads) : [null]).forEach(function (squad) {
+        for (var i = 0; i < p.max; i++) out.push({ slot: p.id + ':' + (squad || '') + ':' + i, post: p.id, squad: squad });
+      });
+    });
+    return out;
+  };
+  FixtureTransport.prototype.newCode = function (codes, avoid) {
+    var c;
+    do c = R.randomCode(4); while (has(codes, c) || (avoid && has(avoid, c)));
+    return c;
+  };
+  // The briefing sheet: one line per slot that has a post code, in policy order.
+  FixtureTransport.prototype.sheet = function () {
+    var codes = this.meta.codes, bySlot = {};
+    Object.keys(codes).forEach(function (code) { bySlot[codes[code].slot] = code; });
+    return this.slots().filter(function (s) { return has(bySlot, s.slot); })
+      .map(function (s) { return { post: s.post, squad: s.squad, code: bySlot[s.slot] }; });
+  };
 
   FixtureTransport.prototype.newSession = function (client) {
-    var token = client + '.' + this.meta.epoch + '.' + R.randomCode(16);
+    var token = client + '.' + this.meta.epoch + '.' + R.randomCode(24);
     this.sessions[client] = token;
     return token;
   };
@@ -103,20 +173,23 @@
   FixtureTransport.prototype.authenticate = function (token) {
     var parts = String(token || '').split('.');
     if (parts.length !== 3 || !this.meta) return null;
-    if (this.sessions[parts[0]] !== token || Number(parts[1]) !== this.meta.epoch) return null;
+    if (!has(this.sessions, parts[0]) || this.sessions[parts[0]] !== token || Number(parts[1]) !== this.meta.epoch) return null;
     return this.memberOf(parts[0]);
   };
 
-  FixtureTransport.prototype.publicMeta = function () {
+  // A knocking member learns nothing about the room's activity: no lastOpAt.
+  FixtureTransport.prototype.publicMeta = function (full) {
     var m = this.meta, d = R.roomDeadlines(this.policy, m.createdAt, m.extended);
-    return { fork: m.fork, server: m.server, planet: m.planet, h: m.h, createdAt: m.createdAt, epoch: m.epoch,
+    var out = { fork: m.fork, server: m.server, planet: m.planet, h: m.h, createdAt: m.createdAt, epoch: m.epoch,
       locked: m.locked, closed: m.closed, frozen: m.frozen ? copy(m.frozen) : null, extended: m.extended,
-      maxAt: d.maxAt, warnAt: d.warnAt, lastOpAt: this.lastOpAt };
+      maxAt: d.maxAt, warnAt: d.warnAt };
+    if (full) out.lastOpAt = this.lastOpAt;
+    return out;
   };
 
   FixtureTransport.prototype.presence = function (now) {
     var out = {}, self = this;
-    this.activeMembers().forEach(function (m) { out[m.client] = self.seen[m.client] !== undefined ? now - self.seen[m.client] : null; });
+    this.activeMembers().forEach(function (m) { out[m.client] = has(self.seen, m.client) ? now - self.seen[m.client] : null; });
     return out;
   };
 
@@ -130,18 +203,27 @@
     this.lifecycle(now);
   };
 
-  // Idle lock, then release of idle members and of knocks older than the word.
+  // The idle lock; knocks past their word time go even from a locked room; confirmed members idle out
+  // of an open room only, and the last member who can confirm joins never does.
   FixtureTransport.prototype.lifecycle = function (now) {
     var m = this.meta, P = this.policy, self = this;
     if (m.closed) return;
-    if (!m.locked && R.idleLocked(P, this.lastOpAt, now)) { m.locked = true; m.lockedAt = now; return; }
-    if (m.locked) return;
-    var stale = this.activeMembers().filter(function (o) {
-      if (!o.confirmed) return now - (o.knockAt || o.at) >= P.ttl.wordSec * 1000;
-      return R.memberStale(P, Math.max(self.memberOpAt[o.client] || 0, o.presentAt || 0, o.confirmedAt || 0, o.at), now);
-    });
-    stale.forEach(function (o) {
-      self.apply({ op: 'del', kind: 'member', id: o.id, cid: 'auto' }, SYSTEM);
+    if (!m.locked && R.idleLocked(P, this.lastOpAt, now)) { m.locked = true; m.lockedAt = now; }
+    var members = this.activeMembers();
+    var gone = members.filter(function (o) { return !o.confirmed && !self.fresh(o, now); });
+    if (!m.locked) {
+      var base = Math.max(m.createdAt, m.unlockedAt || 0);
+      var activeAt = function (o) { return Math.max(base, self.memberOpAt[o.client] || 0, o.presentAt || 0, o.confirmedAt || 0, o.at); };
+      var stale = members.filter(function (o) { return o.confirmed && R.memberStale(P, activeAt(o), now); });
+      var confirmers = this.confirmers();
+      if (confirmers.length && confirmers.every(function (o) { return stale.indexOf(o) >= 0; })) {
+        var keep = confirmers.reduce(function (a, b) { return activeAt(b) > activeAt(a) ? b : a; });
+        stale.splice(stale.indexOf(keep), 1);
+      }
+      gone = gone.concat(stale);
+    }
+    gone.forEach(function (o) {
+      self.apply({ op: 'del', kind: 'member', id: o.id, cid: 'auto' }, SYSTEM, now);
       delete self.sessions[o.client];
     });
   };
@@ -149,7 +231,7 @@
   // The request gate: rotated or unknown code, lifecycle, then the observer token or the session.
   FixtureTransport.prototype.enter = function (code, auth) {
     var now = this.serverNow();
-    if (this.rotated[code]) return { fail: fail(401, 'rotated') };
+    if (has(this.rotated, code)) return { fail: fail(401, 'rotated') };
     if (!this.meta || code !== this.meta.code) return { fail: fail(404, 'room') };
     this.tick(now);
     if (!this.meta) return { fail: fail(404, 'room') };
@@ -160,132 +242,133 @@
     return actor ? { actor: actor, now: now } : { fail: fail(401, 'session') };
   };
 
+  // Answers {code, fork, server, session, sheet, epoch}: no observer token, staff mint it with the observer action.
   FixtureTransport.prototype.create = function (body) {
     var P = this.policy, self = this, now = this.serverNow();
-    body = body || {};
-    var c = body.creator || {};
+    if (!isObj(body)) return fail(400, 'bad-json');
+    var c = isObj(body.creator) ? body.creator : {};
     if (!CLIENT_RE.test(String(c.client || ''))) return fail(400, 'client');
     if (R.levelOf(P, c.post) !== 'staff') return fail(400, 'creator');
     if (typeof body.planet !== 'string' || !/^[a-z0-9_.-]{1,40}$/i.test(body.planet)) return fail(400, 'planet');
     this.wipe();
     this.rooms += 1;
-    var codes = {}, sheet = [];
-    P.posts.forEach(function (p) {
-      if (p.level === 'observer') return;
-      (p.perSquad ? Object.keys(P.squads) : [null]).forEach(function (sq) {
-        for (var i = 0; i < p.max; i++) {
-          var pc;
-          do pc = R.randomCode(4); while (codes[pc]);
-          codes[pc] = { slot: p.id + ':' + (sq || '') + ':' + i, post: p.id, squad: sq, usedAt: null, client: null };
-          sheet.push({ post: p.id, squad: sq, code: pc });
-        }
-      });
-    });
+    var codes = {};
+    this.slots().forEach(function (s) { codes[self.newCode(codes)] = { slot: s.slot, post: s.post, squad: s.squad, usedAt: null, client: null }; });
     this.meta = { code: this.rooms === 1 ? 'DEMA42' : R.randomCode(6),   // room codes use no O, I, 0 or 1
-      fork: P.fork, server: 'Demo', planet: body.planet, h: String(body.h || ''), createdAt: now, extended: false,
-      locked: false, lockedAt: null, unlockedAt: null, closed: false, closedAt: null, frozen: null, epoch: 1,
+      codeHistory: [], fork: P.fork, server: 'Demo', planet: body.planet, h: String(body.h || '').slice(0, 40), createdAt: now,
+      extended: false, locked: false, lockedAt: null, unlockedAt: null, closed: false, closedAt: null, frozen: null, epoch: 1,
       codes: codes, observerToken: null };
     this.lastOpAt = now;
     this.apply({ op: 'put', kind: 'member', id: 'mem-' + c.client + '-1',
       data: { client: c.client, post: c.post, squad: null, slot: c.post + '::creator', callsign: R.cleanText(c.callsign, P.limits.callsign),
-        confirmed: true, confirmedBy: 'creator', confirmedAt: now } }, byOf(c));
+        confirmed: true, confirmedBy: 'creator', confirmedAt: now } }, byOf(c), now);
+    // Assets exist from the start (state unknown), seeded from the policy: clients never put them.
     P.assets.forEach(function (def) {
       for (var n = 1; n <= (def.count || 1); n++) {
         self.apply({ op: 'put', kind: 'asset', id: 'asset-' + def.type + '-' + n,
-          data: { type: def.type, n: n, owner: { post: def.owner }, state: null, notes: '', claimedBy: null } }, SYSTEM);
+          data: { type: def.type, n: n, owner: { post: def.owner }, state: null, notes: '', claimedBy: null } }, SYSTEM, now);
       }
     });
-    // No observer token here: staff mint it with the observer action.
-    return ok({ code: this.meta.code, fork: P.fork, server: 'Demo', session: this.newSession(c.client), sheet: sheet, epoch: 1 });
+    return ok({ code: this.meta.code, fork: P.fork, server: 'Demo', session: this.newSession(c.client), sheet: this.sheet(), epoch: 1 });
   };
 
   FixtureTransport.prototype.join = function (code, body, auth) {
-    var P = this.policy, now = this.serverNow();
-    if (this.rotated[code]) return fail(401, 'rotated');
+    var P = this.policy, self = this, now = this.serverNow();
+    if (has(this.rotated, code)) return fail(401, 'rotated');
     if (!this.meta || code !== this.meta.code) return fail(404, 'room');
     this.tick(now);
     var m = this.meta;
     if (!m) return fail(404, 'room');
+    if (!isObj(body)) return fail(400, 'json');
     if (m.closed) return fail(423, 'closed');
     if (m.locked) return fail(423, 'locked');
     if (m.frozen && m.frozen.reason !== 'silence') return fail(423, m.frozen.reason);
-    body = body || {};
     if (!CLIENT_RE.test(String(body.client || ''))) return fail(400, 'client');
-    var existing = this.memberOf(body.client);
-    var post, squad, slot, entry = null;
+    var members = this.activeMembers();
+    var existing = members.filter(function (x) { return x.client === body.client; })[0] || null;
+    // A client id proves nothing: re-entering as a confirmed member takes that member's own session.
+    if (existing && existing.confirmed) {
+      var proof = this.authenticate(auth && auth.session);
+      if (!proof || proof.client !== body.client) return fail(409, 'member');
+    }
+    var post, squad, slot, entry = null, holder = null;
     if (body.postCode) {
-      entry = m.codes[String(body.postCode).toUpperCase()];
-      if (!entry) return fail(404, 'postCode');
-      if (entry.client && entry.client !== body.client) return fail(409, 'used');
+      var key = String(body.postCode).toUpperCase();
+      entry = has(m.codes, key) ? m.codes[key] : null;
+      // An unknown code and a code bound to someone else answer alike.
+      if (!entry || (entry.client && entry.client !== body.client)) return fail(404, 'postCode');
       post = entry.post; squad = entry.squad; slot = entry.slot;
+      // The first presentation of a code moves whoever still held its slot out.
+      if (!entry.client) holder = members.filter(function (x) { return x.slot === slot && x.client !== body.client; })[0] || null;
     } else {
       var def = R.postDef(P, body.post);
       if (!def || def.level === 'observer') return fail(400, 'post');
       squad = def.perSquad ? body.squad : null;
-      if (def.perSquad && !P.squads[squad]) return fail(400, 'squad');
+      if (def.perSquad && !(typeof squad === 'string' && has(P.squads, squad))) return fail(400, 'squad');
       post = def.id;
-      var taken = this.activeMembers().filter(function (x) { return x.post === post && (x.squad || null) === squad && x.client !== body.client; }).length;
-      if (taken >= def.max) return fail(409, 'full');
       slot = post + ':' + (squad || '') + ':word';
     }
-    // Re-entry over a confirmed member needs that member's current session; without it nobody is evicted.
-    var proof = this.authenticate(auth && auth.session);
-    if (existing && existing.confirmed && !(proof && proof.client === body.client)) return fail(409, 'member');
-    if (entry) { entry.usedAt = entry.usedAt || now; entry.client = body.client; }
     if (existing && existing.confirmed && existing.slot === slot) {
       return ok({ session: this.newSession(body.client), status: 'confirmed', post: post, squad: squad, epoch: m.epoch });
     }
-    var words = P.fork === 'stories_cm' ? WORDS.ru : WORDS.en;
+    var pdef = R.postDef(P, post);
+    var taken = members.filter(function (x) {
+      return x.post === post && (x.squad || null) === (squad || null) && x.client !== body.client && x !== holder && self.fresh(x, now);
+    }).length;
+    if (pdef && taken >= pdef.max) return fail(409, 'full');
+    var knocks = members.filter(function (x) { return !x.confirmed && x.client !== body.client && self.fresh(x, now); }).length;
+    if (knocks >= KNOCKS_MAX) return fail(429, 'knocks');
+    if (entry) { entry.usedAt = entry.usedAt || now; entry.client = body.client; }
+    var words = m.fork === 'stories_cm' ? WORDS.ru : WORDS.en;
     var word = words[Math.floor(Math.random() * words.length)];
     var id = 'mem-' + body.client + '-' + (this.state.seq + 1);
-    if (existing) this.apply({ op: 'del', kind: 'member', id: existing.id, cid: 'rejoin' }, SYSTEM);
+    if (existing) this.apply({ op: 'del', kind: 'member', id: existing.id, cid: 'rejoin' }, SYSTEM, now);
+    if (holder) this.apply({ op: 'del', kind: 'member', id: holder.id, cid: 'slot' }, SYSTEM, now);
     this.apply({ op: 'put', kind: 'member', id: id,
       data: { client: body.client, post: post, squad: squad, slot: slot, callsign: R.cleanText(body.callsign, P.limits.callsign),
-        confirmed: false, word: word, knockAt: now } }, { client: body.client, post: post, squad: squad });
+        confirmed: false, word: word, knockAt: now } }, { client: body.client, post: post, squad: squad }, now);
+    if (holder) delete this.sessions[holder.client];
+    var session = this.newSession(body.client);
     this.lastOpAt = now;
-    return ok({ session: this.newSession(body.client), status: 'knocking', word: word, post: post, squad: squad, epoch: m.epoch });
+    return ok({ session: session, status: 'knocking', word: word, post: post, squad: squad, epoch: m.epoch });
   };
 
   FixtureTransport.prototype.poll = function (code, since, auth) {
     var g = this.enter(code, auth);
     if (g.fail) return g.fail;
     var now = g.now, actor = g.actor;
-    since = Math.max(0, parseInt(since, 10) || 0);
+    since = Math.max(0, parseInt(since || '0', 10) || 0);
     var retryAfter = R.retryAfter(this.lastRequestOpAt, now);
     if (actor) this.seen[actor.client] = now;
-    var meta = this.publicMeta();
     if (actor && !actor.confirmed) {
-      delete meta.lastOpAt;   // a knock learns nothing about who is active
-      return ok({ serverNow: now, seq: this.state.seq, meta: meta, presence: {}, knocking: true, word: actor.word, ops: [] }, retryAfter);
+      return ok({ serverNow: now, seq: this.state.seq, meta: this.publicMeta(false), presence: {}, knocking: true, word: actor.word, ops: [] }, retryAfter);
     }
-    var ops = this.log.filter(function (op) { return op.seq > since; }).slice(0, 500);
-    return ok({ serverNow: now, seq: this.state.seq, meta: meta, presence: this.presence(now), ops: copy(ops), more: ops.length === 500 }, retryAfter);
+    var rows = this.log.filter(function (op) { return op.seq > since; }).slice(0, 500);
+    var ops = [], size = 0, more = rows.length === 500;
+    for (var i = 0; i < rows.length; i++) {
+      var op = copy(rows[i]);
+      if (!actor) opWithoutWord(op);
+      var n = JSON.stringify(op).length;
+      if (ops.length && size + n > PAGE_BYTES) { more = true; break; }
+      ops.push(op);
+      size += n;
+    }
+    return ok({ serverNow: now, seq: this.state.seq, meta: this.publicMeta(true), presence: this.presence(now), ops: ops, more: more }, retryAfter);
   };
 
   FixtureTransport.prototype.snapshot = function (code, cursor, auth) {
     var g = this.enter(code, auth);
     if (g.fail) return g.fail;
     if (g.actor && !g.actor.confirmed) return fail(403, 'unconfirmed');
-    var objects = this.state.objects;
-    var ids = Object.keys(objects).filter(function (id) { return !objects[id].deleted && id > (cursor || ''); }).sort();
-    return ok({ serverNow: g.now, seq: this.state.seq, objects: copy(ids.slice(0, 200).map(function (id) { return objects[id]; })),
-      cursor: ids.length > 200 ? ids[199] : null, meta: this.publicMeta() });
-  };
-
-  // null, or {status, error} when the room takes no writes from this member now.
-  FixtureTransport.prototype.writeGate = function (actor) {
-    var m = this.meta;
-    if (!actor.confirmed) return { status: 403, error: 'unconfirmed' };
-    if (m.closed) return { status: 423, error: 'closed' };
-    if (m.locked) return { status: 423, error: 'locked' };
-    if (m.frozen) return { status: 423, error: m.frozen.reason };
-    return null;
+    var objects = this.state.objects, after = cursor || '';
+    var ids = Object.keys(objects).filter(function (id) { return !objects[id].deleted && id > after; }).sort();
+    var page = ids.slice(0, 200).map(function (id) { var o = copy(objects[id]); return g.actor ? o : objectWithoutWord(o); });
+    return ok({ serverNow: g.now, seq: this.state.seq, objects: page, cursor: ids.length > 200 ? ids[199] : null, meta: this.publicMeta(true) });
   };
 
   FixtureTransport.prototype.allow = function (client, now) {
     var L = this.policy.limits;
-    var r = this.rate[client];
-    if (!r) r = this.rate[client] = { sec: now, secN: 0, min: now, minN: 0 };
+    var r = has(this.rate, client) ? this.rate[client] : (this.rate[client] = { sec: now, secN: 0, min: now, minN: 0 });
     if (now - r.sec >= 1000) { r.sec = now; r.secN = 0; }
     if (now - r.min >= 60000) { r.min = now; r.minN = 0; }
     if (r.secN >= L.opsPerSec || r.minN >= L.opsPerMin) return false;
@@ -293,124 +376,122 @@
     return true;
   };
 
-  FixtureTransport.prototype.sanitize = function (raw, src, actor, now) {
-    var L = this.policy.limits, data = {};
-    for (var k in src) if (Object.prototype.hasOwnProperty.call(src, k)) data[k] = src[k];
-    if (data.label !== undefined) data.label = R.cleanText(data.label, L.label);
-    if (data.note !== undefined) data.note = R.cleanText(data.note, L.note);
-    if (raw.kind === 'request' && raw.op === 'put') data.status = 'requested';
-    if (raw.kind === 'request' && raw.op === 'patch') {
-      if (data.status === 'accepted') data.acceptedBy = byOf(actor);
-      if (data.status === 'firing') data.firedAt = now;
-      if (data.status === 'done') data.doneAt = now;
-      if (data.status === 'denied') data.deniedBy = byOf(actor);
-    }
-    if (raw.kind === 'marker' && raw.op === 'put' && data.cat === 'enemy' && data.relayed === undefined) data.relayed = false;
-    return data;
-  };
-
-  // One op of a batch, the way the Worker's write() takes it; returns the ack.
-  FixtureTransport.prototype.writeOne = function (actor, raw, now) {
-    var P = this.policy, L = P.limits;
-    var cid = raw && typeof raw.cid === 'string' ? raw.cid.slice(0, 40) : '';
-    if (!raw || typeof raw !== 'object' || WRITE_KINDS.indexOf(raw.kind) < 0 || ['put', 'patch', 'del'].indexOf(raw.op) < 0 ||
-        typeof raw.id !== 'string' || !ID_RE.test(raw.id)) return { cid: cid, error: 'shape' };
-    var known = cid ? this.acks[actor.client + ' ' + cid] : 0;
-    if (known) return { cid: cid, seq: known, dup: true };
-    if (JSON.stringify(raw).length > L.message) return { cid: cid, error: 'size' };
-    if (!this.allow(actor.client, now)) return { cid: cid, error: 'rate' };
-    if (this.bytes > L.bytes) { this.meta.frozen = { at: now, reason: 'budget' }; return { cid: cid, error: 'budget' }; }
-    var existing = this.state.objects[raw.id];
-    if (existing && existing.kind !== raw.kind) return { cid: cid, error: 'kind' };
-    if (raw.op === 'put' && existing && raw.kind !== 'calibration') {
-      if (existing.deleted) return { cid: cid, error: 'deleted' };
-      if (!existing.by || existing.by.client !== actor.client) return { cid: cid, error: 'exists' };
-    }
-    var src = {}, given = raw.data && typeof raw.data === 'object' ? copy(raw.data) : {};
-    for (var k in given) if (RESERVED.indexOf(k) < 0) src[k] = given[k];
-    var data = this.sanitize(raw, src, actor, now);
-    if (raw.kind === 'member') {
-      var mine = existing && !existing.deleted && existing.client === actor.client;
-      if (raw.op !== 'patch' || !mine || Object.keys(data).join() !== 'presentAt') return { cid: cid, error: 'right' };
-      data.presentAt = now;
-    } else {
-      if (raw.op === 'put') {
-        var bad = R.validateData(P, raw.kind, data);
-        if (bad) return { cid: cid, error: bad };
-        if (this.countObjects() >= L.objects) return { cid: cid, error: 'objects' };
-      }
-      if (raw.op === 'patch') {
-        var badPatch = patchProblem(P, raw.kind, src);
-        if (badPatch) return { cid: cid, error: badPatch };
-        // Whoever asked never carries the request out: its author only withdraws it.
-        if (raw.kind === 'request' && existing && src.status !== undefined && src.status !== 'denied' &&
-            existing.by && existing.by.client === actor.client) return { cid: cid, error: 'author' };
-      }
-      var check = R.canWrite(P, actor, { op: raw.op, kind: raw.kind, id: raw.id, data: data, expectedStatus: raw.expectedStatus },
-        existing, { claimed: R.claimants(this.state.objects, existing) });
-      if (!check.ok) return { cid: cid, error: check.reason };
-    }
-    var res = this.apply({ op: raw.op, kind: raw.kind, id: raw.id, data: data, expectedStatus: raw.expectedStatus, cid: cid }, byOf(actor));
-    if (!res.ok) return existing && existing.status !== undefined ? { cid: cid, error: res.reason, status: existing.status } : { cid: cid, error: res.reason };
-    this.memberOpAt[actor.client] = now;
-    if (raw.kind === 'request') this.lastRequestOpAt = now;
-    if (cid) this.acks[actor.client + ' ' + cid] = this.state.seq;
-    return { cid: cid, seq: this.state.seq };
-  };
-
   FixtureTransport.prototype.send = function (code, ops, auth) {
     var g = this.enter(code, auth);
     if (g.fail) return g.fail;
     if (g.observer) return fail(403, 'observer');
-    var gate = this.writeGate(g.actor);
-    if (gate) return fail(gate.status, gate.error);
-    var list = Array.isArray(ops) ? ops.slice(0, 64) : [], acks = [], accepted = 0;
-    for (var i = 0; i < list.length; i++) {
-      var ack = this.writeOne(g.actor, list[i], g.now);
-      acks.push(ack);
-      if (ack.seq && !ack.dup) accepted++;
-      if (ack.error === 'budget') break;
+    var r = this.write(g.actor, ops, g.now);
+    return r.error ? fail(r.status, r.error) : ok(r.body);
+  };
+
+  // The Worker's write(): the batch gate, then each op in turn. {status, error} or {body}.
+  FixtureTransport.prototype.write = function (actor, ops, now) {
+    var self = this, m = this.meta;
+    if (!actor.confirmed) return { status: 403, error: 'unconfirmed' };
+    // The ops as the Worker reads them: through JSON, at most 64.
+    var list = Array.isArray(ops) ? copy(ops).slice(0, 64) : [];
+    var resent = function (raw) { return self.acked(actor.client, cidOf(raw)); };
+    // Presence heartbeats pass a lock and radio silence, so a quiet room keeps its members.
+    var heartbeat = function (raw) { return !!raw && raw.kind === 'member' && raw.op === 'patch'; };
+    var blocked = m.closed ? 'closed'
+      : m.locked && !list.every(heartbeat) ? 'locked'
+      : m.frozen && !(m.frozen.reason === 'silence' && list.every(heartbeat)) ? m.frozen.reason
+      : null;
+    if (blocked) {
+      if (list.length && list.every(resent)) return { body: { acks: list.map(resent), serverNow: now, seq: this.state.seq } };
+      return { status: 423, error: blocked };
     }
-    if (accepted) this.lastOpAt = g.now;
-    return ok({ acks: acks, serverNow: g.now, seq: this.state.seq });
+    var acks = [], accepted = 0;
+    for (var i = 0; i < list.length; i++) {
+      var ack = this.writeOne(actor, list[i], now);
+      acks.push(ack);
+      if (ack.error === 'budget') break;
+      if (!ack.error && !ack.dup) accepted++;
+    }
+    if (accepted) this.lastOpAt = now;
+    return { body: { acks: acks, serverNow: now, seq: this.state.seq } };
+  };
+
+  // One op, in the Worker's order: resend, shape, size, rate, budget, kind, R.cleanData,
+  // R.validateData / R.validatePatch, R.canWrite, R.stampData, R.applyOp. Returns the ack.
+  FixtureTransport.prototype.writeOne = function (actor, raw, now) {
+    var P = this.policy, L = P.limits;
+    var cid = cidOf(raw);
+    var again = this.acked(actor.client, cid);
+    if (again) return again;
+    if (!raw || typeof raw !== 'object' || WRITE_KINDS.indexOf(raw.kind) < 0 || OPS.indexOf(raw.op) < 0 ||
+        typeof raw.id !== 'string' || !ID_RE.test(raw.id)) return { cid: cid, error: 'shape' };
+    if (utf8Bytes(JSON.stringify(raw)) > L.message) return { cid: cid, error: 'size' };
+    if (!this.allow(actor.client, now)) return { cid: cid, error: 'rate' };
+    if (this.bytes > L.bytes) { this.meta.frozen = { at: now, reason: 'budget' }; return { cid: cid, error: 'budget' }; }
+    var existing = has(this.state.objects, raw.id) ? this.state.objects[raw.id] : undefined;
+    if (existing && existing.kind !== raw.kind) return { cid: cid, error: 'kind' };
+    var data = R.cleanData(P, raw.kind, raw.op, raw.data);
+    var expectedStatus = typeof raw.expectedStatus === 'string' ? raw.expectedStatus : undefined;
+    if (raw.kind === 'member') {
+      var mine = existing && !existing.deleted && existing.client === actor.client;
+      if (raw.op !== 'patch' || !mine || Object.keys(data).join() !== 'presentAt') return { cid: cid, error: 'right' };
+    } else {
+      var bad = raw.op === 'put' ? R.validateData(P, raw.kind, data)
+        : raw.op === 'patch' ? R.validatePatch(P, raw.kind, data, existing) : null;
+      if (bad) return { cid: cid, error: bad };
+      if (raw.op === 'put' && !existing && this.countObjects() >= L.objects) return { cid: cid, error: 'objects' };
+      var check = R.canWrite(P, actor, { op: raw.op, kind: raw.kind, id: raw.id, data: data, expectedStatus: expectedStatus },
+        existing, { claimed: R.claimants(this.state.objects, existing) });
+      // The author's own put already stands (its ack was lost beyond the cid memory): acknowledge, write nothing.
+      if (!check.ok && check.reason === 'duplicate') return this.remember(actor.client, cid, existing.seq);
+      if (!check.ok) return { cid: cid, error: check.reason };
+      if (raw.op === 'del' && existing.deleted) return this.remember(actor.client, cid, existing.seq);
+    }
+    R.stampData(raw.kind, raw.op, data, byOf(actor), now);
+    var done = this.apply({ op: raw.op, kind: raw.kind, id: raw.id, data: data, expectedStatus: expectedStatus, cid: cid }, byOf(actor), now);
+    if (!done.ok) return refusal(cid, done.reason, existing ? existing.status : undefined);
+    this.remember(actor.client, cid, done.seq);
+    this.memberOpAt[actor.client] = now;
+    if (raw.kind === 'request') this.lastRequestOpAt = now;
+    return { cid: cid, seq: done.seq };
   };
 
   FixtureTransport.prototype.admin = function (code, body, auth) {
     var g = this.enter(code, auth);
     if (g.fail) return g.fail;
     if (g.observer) return fail(403, 'observer');
-    var actor = g.actor, now = g.now, m = this.meta, P = this.policy, self = this;
+    if (!isObj(body)) return fail(400, 'json');
+    var b = body, actor = g.actor, now = g.now, m = this.meta, P = this.policy, self = this;
     if (!actor.confirmed) return fail(403, 'unconfirmed');
+    var action = typeof b.action === 'string' ? b.action : '';
     if (m.closed) return fail(423, 'closed');
-    if (m.frozen && m.frozen.reason !== 'silence') return fail(423, m.frozen.reason);
-    var b = body || {};
+    // Radio silence is the staff's own freeze; an administration stop or a spent budget holds every action but close and observer.
+    if (m.frozen && m.frozen.reason !== 'silence' && action !== 'close' && action !== 'observer') return fail(423, m.frozen.reason);
     var staff = R.isStaff(P, actor);
-    var target = b.client ? this.memberOf(b.client) : null;
-    var out = { ok: true }, ops = [], drop = [];
-    function canConfirm(x) { return x.confirmed && R.hasRight(P, x, 'confirmJoin'); }
-    switch (b.action) {
+    var target = typeof b.client === 'string' ? this.memberOf(b.client) : null;
+    var out = { ok: true }, ops = [], drop = [], k;
+    var lastConfirmer = function (x) { return x.confirmed && R.hasRight(P, x, 'confirmJoin') && self.confirmers().length <= 1; };
+    switch (action) {
       case 'confirm': {
         if (!R.hasRight(P, actor, 'confirmJoin')) return fail(403, 'right');
         if (!target || target.confirmed) return fail(404, 'member');
         if (now - target.knockAt > P.ttl.wordSec * 1000) return fail(409, 'expired');
-        var knocking = this.activeMembers().filter(function (x) { return !x.confirmed; }).length;
+        var knocking = this.activeMembers().filter(function (x) { return !x.confirmed && self.fresh(x, now); }).length;
         if (knocking >= 2 && b.word !== target.word) return fail(409, 'word');
         ops.push({ op: 'patch', kind: 'member', id: target.id, data: { confirmed: true, confirmedBy: actor.post, confirmedAt: now, word: null } });
         break;
       }
       case 'release': {
         if (!target) return fail(404, 'member');
-        if (canConfirm(target) && !this.activeMembers().some(function (x) { return x.client !== target.client && canConfirm(x); })) return fail(409, 'last');
+        if (lastConfirmer(target)) return fail(409, 'last');
         ops.push({ op: 'del', kind: 'member', id: target.id });
         drop.push(target.client);
+        // The post code goes back to the sheet: whoever holds it next knocks again.
+        for (k in m.codes) if (has(m.codes, k) && m.codes[k].client === target.client) m.codes[k].client = null;
         break;
       }
       case 'reissue': {
         if (!target) return fail(404, 'member');
         if (!staff && !(target.squad && actor.squad === target.squad)) return fail(403, 'right');
-        Object.keys(m.codes).forEach(function (k) { if (m.codes[k].slot === target.slot) delete m.codes[k]; });
-        var pc;
-        do pc = R.randomCode(4); while (m.codes[pc]);
+        if (lastConfirmer(target)) return fail(409, 'last');
+        Object.keys(m.codes).forEach(function (c) { if (m.codes[c].slot === target.slot) delete m.codes[c]; });
+        var pc = this.newCode(m.codes);
         m.codes[pc] = { slot: target.slot, post: target.post, squad: target.squad || null, usedAt: null, client: null };
         ops.push({ op: 'del', kind: 'member', id: target.id });
         drop.push(target.client);
@@ -442,6 +523,7 @@
       case 'extend':
         if (!R.hasRight(P, actor, 'extend')) return fail(403, 'right');
         if (m.extended) return fail(409, 'extended');
+        if (now < R.roomDeadlines(P, m.createdAt, false).warnAt) return fail(409, 'early');
         m.extended = true;
         break;
       case 'silence':
@@ -454,31 +536,44 @@
         break;
       case 'observer':
         if (!staff) return fail(403, 'right');
-        m.observerToken = 'obs' + R.randomCode(20);
+        m.observerToken = 'obs' + R.randomCode(24);
         out.observerToken = m.observerToken;
         break;
       case 'rotate': {
         if (!staff) return fail(403, 'right');
         var next;
-        do next = R.randomCode(6); while (next === m.code || this.rotated[next]);
+        do next = R.randomCode(6); while (next === m.code || has(this.rotated, next));
         this.rotated[m.code] = true;
+        m.codeHistory = m.codeHistory.concat(m.code);
         m.code = next; m.epoch += 1; m.observerToken = null;
+        // Post codes nobody used yet are on the leaked sheet too: they change; bound codes stay with their holders.
+        var old = {};
+        Object.keys(m.codes).forEach(function (c) { old[c] = true; });
+        Object.keys(old).forEach(function (c) {
+          if (m.codes[c].client) return;
+          var entry = m.codes[c];
+          delete m.codes[c];
+          m.codes[self.newCode(m.codes, old)] = entry;
+        });
         this.activeMembers().forEach(function (x) {
           if (x.client !== actor.client) { ops.push({ op: 'del', kind: 'member', id: x.id }); drop.push(x.client); }
         });
         out.code = next;
+        out.sheet = this.sheet();
         break;
       }
       default:
         return fail(400, 'action');
     }
-    ops.forEach(function (op) { self.apply(op, byOf(actor)); });
-    drop.forEach(function (client) { delete self.sessions[client]; });
-    if (b.action === 'rotate') {
+    var applied = 0;
+    ops.forEach(function (op) { if (self.apply(op, byOf(actor), now).ok) applied++; });
+    if (action === 'rotate') {
       this.sessions = {};
       out.session = this.newSession(actor.client);
     }
-    if (ops.length) this.lastOpAt = now;
+    drop.forEach(function (client) { delete self.sessions[client]; });
+    if (applied) this.lastOpAt = now;
+    this.memberOpAt[actor.client] = now;
     out.seq = this.state.seq;
     out.serverNow = now;
     return ok(out);
@@ -488,16 +583,17 @@
   FixtureTransport.prototype.exportRoom = function (code, auth) {
     var g = this.enter(code, auth);
     if (g.fail) return g.fail;
-    if (g.actor && !g.actor.confirmed) return fail(403, 'unconfirmed');
-    if (g.actor && !R.isStaff(this.policy, g.actor)) return fail(403, 'right');
-    var objects = [], members = [], id;
-    for (id in this.state.objects) {
-      var o = this.state.objects[id];
-      if (o.deleted) continue;
-      var c = copy(o);
-      if (o.kind === 'member') { delete c.word; members.push(c); } else objects.push(c);
+    if (!g.observer) {
+      if (!g.actor.confirmed) return fail(403, 'unconfirmed');
+      if (!R.isStaff(this.policy, g.actor)) return fail(403, 'right');
     }
-    var ops = copy(this.log).map(function (op) { if (op.kind === 'member' && op.data) delete op.data.word; return op; });
+    var members = this.activeMembers().map(function (x) { return objectWithoutWord(copy(x)); });
+    var objects = [];
+    for (var id in this.state.objects) {
+      var o = this.state.objects[id];
+      if (!o.deleted && o.kind !== 'member') objects.push(copy(o));
+    }
+    var ops = copy(this.log).map(opWithoutWord);
     var m = this.meta;
     return ok({ meta: { code: m.code, fork: m.fork, server: m.server, planet: m.planet, createdAt: m.createdAt, closedAt: m.closedAt,
       extended: m.extended, frozen: m.frozen ? copy(m.frozen) : null }, members: members, objects: objects, ops: ops, text: '' });
@@ -517,20 +613,23 @@
     due.forEach(function (step, i) {
       if (step.seat) { self.seat(step.by, step.seat, now); return; }
       var actor = self.memberOf(step.by.client);
-      var gate = actor ? self.writeGate(actor) : { error: 'member' };
+      if (!actor) { self.scriptErrors.push({ id: step.op.id, error: 'member' }); return; }
       var raw = copy(step.op);
       raw.cid = 'demo-' + self.log.length + '-' + i;
-      var ack = gate || self.writeOne(actor, raw, now);
+      var r = self.write(actor, [raw], now);
+      var ack = r.error ? r : r.body.acks[0];
       if (ack.error) self.scriptErrors.push({ id: step.op.id, error: ack.error });
-      else self.lastOpAt = now;
     });
   };
 
+  // A scripted officer sits in the last sheet seat of its post, as if it had come in before the sheet went out:
+  // whoever presents that seat's unused code takes the seat over, by the Worker's holder rule in join().
   FixtureTransport.prototype.seat = function (by, seat, now) {
     if (this.memberOf(by.client)) return;
+    var def = R.postDef(this.policy, by.post);
     this.apply({ op: 'put', kind: 'member', id: 'mem-' + by.client + '-' + (this.state.seq + 1),
-      data: { client: by.client, post: by.post, squad: by.squad || null, slot: by.post + ':' + (by.squad || '') + ':demo',
-        callsign: R.cleanText(seat.callsign, this.policy.limits.callsign), confirmed: true, confirmedBy: 'demo', confirmedAt: now } }, byOf(by));
+      data: { client: by.client, post: by.post, squad: by.squad || null, slot: by.post + ':' + (by.squad || '') + ':' + (def ? def.max - 1 : 'demo'),
+        callsign: R.cleanText(seat.callsign, this.policy.limits.callsign), confirmed: true, confirmedBy: 'demo', confirmedAt: now } }, byOf(by), now);
     this.seen[by.client] = now;
   };
 
