@@ -400,6 +400,30 @@ test('«same round?» after a reload, 20 idle minutes or an off-planet coordinat
   assert.strictEqual(after.ageMs, 3 * min);
 });
 
+test('the calibration block folds once the offset is checked and trusted', () => {
+  const t0 = 1_000_000, min = 60000;
+  const cal = { tile: [31, -78], reading: [243, -226], offset: [212, -148], at: t0,
+    check: { tile: [34, -77], expect: [246, -225], result: 'match', tried: [] } };
+  const withCheck = (result) => Object.assign({}, cal, { check: Object.assign({}, cal.check, { result }) });
+  const calm = L.calibrationState(cal, t0 + 3 * min, L.newSession(t0, false));
+  assert.strictEqual(L.calCollapsible(cal, calm, 500), true);
+  assert.strictEqual(L.calCollapsible(Object.assign({}, cal, { check: null }), calm, 500), true);   // no open floor to check against
+  assert.strictEqual(L.calCollapsible(withCheck(null), calm, 500), false);                          // the check is still unanswered
+  assert.strictEqual(L.calCollapsible(withCheck('mismatch'), calm, 500), false);
+  assert.strictEqual(L.calCollapsible(cal, calm, 200), false);                                      // -148 fits, 212 does not
+  const reloaded = L.calibrationState(cal, t0 + min, L.newSession(t0, true));
+  assert.strictEqual(L.calCollapsible(cal, reloaded, 500), false);                                  // «same round?» is open
+  assert.strictEqual(L.calCollapsible(null, calm, 500), false);
+  assert.strictEqual(L.calCollapsible({ at: t0, check: null }, calm, 500), false);
+  assert.strictEqual(L.calCollapsible(cal, null, 500), false);
+});
+
+test('isTile takes a pair of finite integers only', () => {
+  assert.strictEqual(L.isTile([3, -4]), true);
+  [null, [3], [3, 4, 5], [3.5, 4], [3, NaN], [3, Infinity], ['3', 4], { 0: 3, 1: 4, length: 2 }].forEach((p) =>
+    assert.strictEqual(L.isTile(p), false, JSON.stringify(p)));
+});
+
 test('T4: where the shell can land — aim error plus jitter, none in laser mode', () => {
   const mortar = [20, -98], target = [62, -62];               // mockup pair, 55 tiles apart
   const box = L.impactBox(mortar, target, MORTAR_RMC, 'coordinates');
