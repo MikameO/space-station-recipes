@@ -7,7 +7,6 @@
 /* Officers' room on the tactical map. Scoped to .tac-room-* and body.tac-room-on;
    tactical.css is never overridden outside these selectors. */
 
-.tac-room-panel { grid-column: 2; grid-row: 1; }
 body.tac-room-on #tacPanel { display: none; }
 
 .tac-room-draw {
@@ -33,7 +32,11 @@ body.tac-room-on #tacPanel { display: none; }
   z-index: 3;
   scrollbar-width: none;
 }
+.tac-room-chips::-webkit-scrollbar { display: none; }
 .tac-room-chips > * { pointer-events: auto; }
+
+/* Series T's status line (with its retry button) moves below the chips row and above the room layers. */
+body.tac-room-on .tac-status { top: 44px; z-index: 5; }
 
 .tac-room-chip {
   flex: none;
@@ -59,11 +62,13 @@ body.tac-room-on #tacPanel { display: none; }
   display: flex;
   gap: 8px;
   overflow-x: auto;
-  padding: 6px 8px;
+  padding: 4px 8px;
   border-top: 1px solid var(--border-subtle);
   min-height: 64px;
   background: var(--panel);
+  scrollbar-width: none;
 }
+.tac-room-strip::-webkit-scrollbar { display: none; }
 
 .tac-room-shelf {
   position: absolute;
@@ -87,7 +92,8 @@ body.tac-room-on #tacPanel { display: none; }
   flex-wrap: wrap;
   margin-bottom: 8px;
 }
-.tac-room-code {
+/* The room code: a large header label in .tac-room-head, a plain monospace field in the join form. */
+.tac-room-head .tac-room-code {
   font-family: ui-monospace, "Cascadia Mono", Consolas, monospace;
   font-size: 18px;
   letter-spacing: 0.08em;
@@ -101,7 +107,7 @@ body.tac-room-on #tacPanel { display: none; }
 .tac-room-form { display: flex; flex-direction: column; gap: 8px; }
 .tac-room-form .tac-select, .tac-room-form .tac-input { width: 100%; }
 .tac-room-postpick { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-.tac-room-code.tac-input { text-transform: uppercase; font-family: ui-monospace, "Cascadia Mono", Consolas, monospace; letter-spacing: 0.08em; }
+input.tac-room-code { text-transform: uppercase; font-family: ui-monospace, "Cascadia Mono", Consolas, monospace; letter-spacing: 0.08em; }
 
 .tac-room-word {
   font: 700 28px ui-monospace, "Cascadia Mono", Consolas, monospace;
@@ -155,13 +161,40 @@ body.tac-room-on #tacPanel { display: none; }
 
 .tac-room-banner p { margin: 0 0 6px; }
 .tac-room-banner.frozen { border-color: var(--cyan); background: var(--cyan-dim); }
-.tac-room-banner.warn { border-color: var(--amber); }
+/* Warn banners carry actions — a knock holds a confirm button or three word choices: the text on its
+   own row, buttons in a wrapping row of 44 px targets, the banner never taller than 120 px. */
+.tac-room-banner.warn {
+  border-color: var(--amber);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  max-height: 120px;
+  overflow-y: auto;
+}
+.tac-room-banner.warn > p { flex: 1 1 100%; margin: 0; }
+.tac-room-banner.warn > .tac-room-btn { flex: none; min-height: 44px; }
+.tac-room-banner.warn > .tac-room-btn.big { min-width: 64px; }
+
+/* «key saved · replace · forget key» in the create form: one muted row that wraps, buttons inline. */
+.tac-room-keyline {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
+  margin: 2px 0;
+  font-size: 12px;
+}
+.tac-room-keyline .tac-room-btn { flex: none; font-size: 12px; }
 
 .tac-room-btn.on { border-color: var(--cyan); color: var(--cyan); }
 
+/* Above Series T's .toast (style.css: bottom 20px, z-index 10001), so both stay readable.
+   It never takes taps: the buttons under it keep working while it shows. */
 .tac-room-toast {
+  pointer-events: none;
   position: fixed;
-  bottom: 16px;
+  bottom: 64px;
   left: 50%;
   transform: translateX(-50%);
   max-width: calc(100% - 32px);
@@ -171,7 +204,7 @@ body.tac-room-on #tacPanel { display: none; }
   background: rgba(6, 9, 15, 0.96);
   color: var(--text-bright);
   font-size: 14px;
-  z-index: 50;
+  z-index: 10002;
 }
 
 body.tac-room-picking .tac-canvas { cursor: cell; }
@@ -189,17 +222,27 @@ body.tac-room-picking .tac-canvas { cursor: cell; }
 .tac-room-req.st-done, .tac-room-req.st-denied, .tac-room-req.faded { opacity: 0.6; }
 .tac-room-req .tac-room-actions { margin-top: 6px; }
 .tac-room-status { color: var(--text-bright); }
+/* Strip card: one row, two ellipsised text lines on the left, one 44 px action at the right.
+   Height with border-box: 44 button + 2 x 4 padding + 2 x 1 border = 54. */
 .tac-room-card {
   flex: none;
-  width: 280px;
-  min-height: 52px;
-  padding: 6px 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 300px;
+  max-width: calc(100vw - 32px);
+  min-height: 54px;
+  padding: 4px 8px;
   border: 1px solid var(--border-subtle);
   border-radius: 6px;
   background: var(--panel-raised);
   cursor: pointer;
   font-size: 13px;
+  line-height: 1.35;
 }
+.tac-room-card-text { flex: 1; min-width: 0; }
+.tac-room-card-text > div { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tac-room-card .tac-room-btn { flex: none; white-space: nowrap; }
 .tac-room-card.urgent { border-color: var(--red-alert); }
 .tac-room-card.flash { animation: tac-room-flash 1s ease-in-out 3; }
 @keyframes tac-room-flash { 50% { border-color: var(--amber); box-shadow: 0 0 0 2px var(--amber-dim); } }
@@ -212,25 +255,33 @@ body.tac-room-picking .tac-canvas { cursor: cell; }
 .tac-room-state.cooldown { color: var(--text-ghost); }
 .tac-room-state.down { color: var(--red-alert); }
 
+/* Wide layout: the room panel takes the right-hand column of Series T's grid. */
+@media (min-width: 1101px) {
+  .tac-room-panel { grid-column: 2; grid-row: 1; }
+}
+
 /* Task 8: half-monitor (≤1100 px). The page never scrolls; map, strip and panel scroll on their own. */
 @media (max-width: 1100px) {
-  body.tac-room-on { height: 100vh; overflow: hidden; }
+  body.tac-room-on { height: 100vh; height: 100dvh; overflow: hidden; }
   body.tac-room-on .lib-footer { display: none; }
   body.tac-room-on .tac-layout {
     grid-template-columns: minmax(0, 1fr);
     grid-template-rows: minmax(0, 1fr) 300px;
+    grid-template-rows: minmax(0, 1fr) min(300px, 38vh);
     padding: 0 8px 8px;
     min-height: 0;
     overflow: hidden;
   }
   body.tac-room-on .tac-map-wrap { min-height: 0; grid-column: 1; grid-row: 1; }
   body.tac-room-on .tac-canvas-box { min-height: 0; }
+  /* 64 = 1 border + 2 x 4 padding + a 54 px card with 1 px to spare */
   body.tac-room-on .tac-room-strip { flex: none; height: 64px; min-height: 64px; overflow-y: hidden; }
-  body.tac-room-on .tac-room-strip .tac-room-card { height: 52px; overflow: hidden; }
+  body.tac-room-on .tac-room-strip .tac-room-card { height: 54px; overflow: hidden; }
   body.tac-room-on .tac-room-panel {
     grid-column: 1;
     grid-row: 2;
     max-height: 300px;
+    max-height: min(300px, 38vh);
     min-height: 0;
     overflow-y: auto;
   }
