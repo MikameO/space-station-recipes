@@ -255,6 +255,35 @@ body.tac-room-picking .tac-canvas { cursor: cell; }
 .tac-room-state.cooldown { color: var(--text-ghost); }
 .tac-room-state.down { color: var(--red-alert); }
 
+/* Request ping: the request pinging for this officer pulses on its strip card, its panel card and the
+   Requests chip until it is handled or heard; urgent pulses red. The shadow is inset so the strip's
+   own overflow never clips it. Reduced motion keeps the highlight and drops the pulse. */
+.tac-room-card.pinging, .tac-room-req.pinging, .tac-room-chip.pinging {
+  --ping: var(--amber);
+  box-shadow: inset 0 0 0 2px var(--ping);
+  animation: tac-room-ping 1.2s ease-in-out infinite;
+}
+.tac-room-card.pinging.urgent, .tac-room-req.pinging.urgent { --ping: var(--red-alert); }
+.tac-room-chip.pinging { color: var(--amber); }
+@keyframes tac-room-ping { 50% { box-shadow: inset 0 0 0 4px var(--ping); } }
+/* Room for «Heard» beside the next step on a pinging strip card. */
+.tac-room-card.pinging { width: 360px; }
+.tac-room-card .tac-room-btn.heard { min-height: 44px; padding: 0 10px; }
+.tac-room-btn.tac-room-ping-blocked {
+  flex: 1 1 100%;
+  min-height: 44px;
+  white-space: normal;
+  text-align: left;
+  border-color: var(--red-alert);
+  color: var(--red-alert);
+}
+.tac-room-strip .tac-room-btn.tac-room-ping-blocked { flex: none; width: 220px; font-size: 12px; }
+.tac-room-volume { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; margin-top: 6px; }
+.tac-room-volume .tac-muted { margin-right: 4px; }
+@media (prefers-reduced-motion: reduce) {
+  .tac-room-card.pinging, .tac-room-req.pinging, .tac-room-chip.pinging { animation: none; box-shadow: inset 0 0 0 3px var(--ping); }
+}
+
 /* Wide layout: the room panel takes the right-hand column of Series T's grid. */
 @media (min-width: 1101px) {
   .tac-room-panel { grid-column: 2; grid-row: 1; }

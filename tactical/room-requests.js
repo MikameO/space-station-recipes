@@ -5,8 +5,9 @@
 //
 // Officers' room — strike and support requests (form, cards, the Series T fire
 // card inside a taken mortar request), the manual asset board with cooldown
-// hints, chips over the map, the request strip, target rings and a one-time
-// sound for the asset owner. Registers into tactical/room-ui.js.
+// hints, chips over the map, the request strip, target rings and a ping for
+// the asset crew that repeats until the request is handled or heard.
+// Registers into tactical/room-ui.js.
 //
 // Stage 1: only two request types are offered, mortar strikes and mortar
 // position requests, for the staff officer / mortar crew pair.
@@ -32,7 +33,21 @@
   var BIG_ACTIONS = ['take', 'place', 'accept', 'fire', 'load', 'done', 'deny', 'cancel', 'repeat'];
   // These hand a tile of the room's planet to this page or create a request on it.
   var PLANET_ACTIONS = ['take', 'place', 'repeat'];
-  var rq = { form: false, taken: null, target: null, denyAsk: null, seenMine: null, seenAll: null, flash: {}, audio: null, mounted: false };
+  // Request ping. Peak gain per volume step (loud by default: it has to carry over a firefight); tone
+  // frequencies in Hz (normal rises once, urgent rises over three tones and plays that rise twice); the
+  // repeat interval per pattern; the tone envelope in seconds. Every oscillator stays inside 1.2–2 kHz.
+  var HEARD_PREFIX = 'chemdb-tactical:room-heard:';
+  var HEARD_MAX = 100;
+  var VOLUMES = { quiet: 0.15, normal: 0.3, loud: 0.55 };
+  var VOLUME_KEYS = ['quiet', 'normal', 'loud'];
+  var DEFAULT_VOLUME = 'loud';
+  var PATTERNS = { normal: [[1320, 1760]], urgent: [[1320, 1568, 1976], [1320, 1568, 1976]] };
+  var PING_EVERY = { normal: 10000, urgent: 5000 };
+  var PING_GAP_MS = 1000;   // the longest pattern lasts 0.84 s: a new one never starts over it
+  var TONE = { length: 0.09, gap: 0.04, groupGap: 0.12, attack: 0.005, decay: 0.08, lead: 0.02, square: 0.3, lowpass: 2400 };
+  var BADGE = '● ';
+  var rq = { form: false, taken: null, target: null, denyAsk: null, seenAll: null, flash: {}, audio: null, makeAudio: null, mounted: false,
+    ping: { lastAt: null, seen: [] }, pinging: [], blocked: false, heard: { key: null, ids: [] }, heardMem: {}, title: null };
 
   var l10n = {
     en: {
@@ -61,7 +76,9 @@
         supply: { ready: 'ready', cooldown: 'cooldown' }, medevac: { available: 'available', unavailable: 'unavailable' }
       },
       assetClaim: 'Crew', assetUnclaim: 'Release', shell: 'Shell', sounds: 'Sound for requests to my assets',
-      chipMortar: 'Mortars', chipNames: { ob: 'OB', dropship: 'CAS', supply: 'Supply' }, chipRequests: 'Requests {n}'
+      chipMortar: 'Mortars', chipNames: { ob: 'OB', dropship: 'CAS', supply: 'Supply' }, chipRequests: 'Requests {n}',
+      pingHeard: 'Heard', pingBlocked: 'Sound is blocked by the browser — click the panel',
+      pingVolume: 'Volume', pingVolumes: { quiet: 'quiet', normal: 'normal', loud: 'loud' }
     },
     ru: {
       tabs: { requests: 'Запросы', assets: 'Ресурсы' },
@@ -89,7 +106,9 @@
         supply: { ready: 'готова', cooldown: 'перезарядка' }, medevac: { available: 'доступна', unavailable: 'недоступна' }
       },
       assetClaim: 'Расчёт', assetUnclaim: 'Отпустить', shell: 'Снаряд', sounds: 'Звук на запросы к моим ресурсам',
-      chipMortar: 'Миномёты', chipNames: { ob: 'ОБ', dropship: 'КАС', supply: 'Поставка' }, chipRequests: 'Запросы {n}'
+      chipMortar: 'Миномёты', chipNames: { ob: 'ОБ', dropship: 'КАС', supply: 'Поставка' }, chipRequests: 'Запросы {n}',
+      pingHeard: 'Услышал', pingBlocked: 'Звук заблокирован браузером — нажмите в панели',
+      pingVolume: 'Громкость', pingVolumes: { quiet: 'тихо', normal: 'обычно', loud: 'громко' }
     }
   };
 
@@ -147,6 +166,75 @@
     if (!me || typeof type !== 'string') return false;
     if (R.assetOwnerPost(policy, type) === me.post) return true;
     return !!me.client && R.claimants(objects, req).indexOf(me.client) >= 0;
+  }
+
+  // The requests that ping for me: still requested, offered to me to accept, aimed at an asset I own or
+  // crew, and not heard in this browser. The author, a second staff officer, an observer and a knocking
+  // member never qualify: requestActions offers them no accept, or the asset is not theirs.
+  function pingTargets(policy, me, list, objects, heard) {
+    return (list || []).filter(function (r) {
+      if (!validReq(r) || r.deleted || r.status !== 'requested' || (heard || []).indexOf(r.id) >= 0) return false;
+      return R.requestActions(policy, me, r, { claimed: R.claimants(objects, r) }).indexOf('accept') >= 0 && aimedAtMine(policy, objects, me, r);
+    });
+  }
+
+  // One schedule for every pending request: a request not pinged yet plays at once, then one pattern per
+  // interval; an urgent one anywhere sets the urgent pattern and interval. Never two patterns inside
+  // PING_GAP_MS; a clock that went back plays rather than falling silent. Null when nothing pings.
+  function pingDue(state, now, targets) {
+    if (!targets || !targets.length) return null;
+    var kind = targets.some(function (r) { return r.priority === 'urgent'; }) ? 'urgent' : 'normal';
+    var last = state && isNum(state.lastAt) ? state.lastAt : null, seen = state && Array.isArray(state.seen) ? state.seen : [];
+    var fresh = targets.some(function (r) { return seen.indexOf(r.id) < 0; });
+    var ping = last === null || now < last || (now - last >= PING_GAP_MS && (fresh || now - last >= PING_EVERY[kind]));
+    return { ping: ping, pattern: kind, interval: PING_EVERY[kind] };
+  }
+
+  // The tab title with the ping badge on or off; a badge already there is never doubled.
+  function titleWithBadge(base, on) {
+    var b = String(base === null || base === undefined ? '' : base);
+    while (b.indexOf(BADGE) === 0) b = b.slice(BADGE.length);
+    return on ? BADGE + b : b;
+  }
+
+  // Tone pitches and start offsets (s) of a pattern.
+  function patternTones(kind) {
+    var out = [], t = 0;
+    pick(PATTERNS, kind, PATTERNS.normal).forEach(function (group, g) {
+      if (g) t += TONE.groupGap - TONE.gap;
+      group.forEach(function (f) { out.push({ f: f, at: t }); t += TONE.length + TONE.gap; });
+    });
+    return out;
+  }
+
+  // One pattern on an AudioContext. Per tone a triangle and a quieter square at the same pitch under a 5 ms
+  // attack and an 80 ms exponential decay, all through a low-pass that keeps the edge off the square.
+  // `volume` is a key of VOLUMES; anything else plays loud.
+  function playPattern(ac, kind, volume) {
+    var peak = pick(VOLUMES, volume, VOLUMES[DEFAULT_VOLUME]), start = ac.currentTime + TONE.lead, out = ac.destination;
+    if (typeof ac.createBiquadFilter === 'function') {
+      out = ac.createBiquadFilter();
+      out.type = 'lowpass';
+      out.frequency.value = TONE.lowpass;
+      out.connect(ac.destination);
+    }
+    patternTones(kind).forEach(function (tone) {
+      var t = start + tone.at, env = ac.createGain(), mix = ac.createGain();
+      env.gain.setValueAtTime(0.0001, t);
+      env.gain.linearRampToValueAtTime(peak, t + TONE.attack);
+      env.gain.exponentialRampToValueAtTime(0.0001, t + TONE.attack + TONE.decay);
+      mix.gain.value = TONE.square;
+      env.connect(out);
+      mix.connect(env);
+      [['triangle', env], ['square', mix]].forEach(function (voice) {
+        var o = ac.createOscillator();
+        o.type = voice[0];
+        o.frequency.value = tone.f;
+        o.connect(voice[1]);
+        o.start(t);
+        o.stop(t + TONE.length);
+      });
+    });
   }
 
   // A Series T shot belongs to the taken request when its game target lies within a tile of the
@@ -330,25 +418,28 @@
       '<span class="tac-room-status">' + esc(statusText(T, P, req)) + '</span>';
     var countdown = dl !== null ? esc(req.type === 'cas' ? T.readyIn : T.impactIn) + ' <span data-deadline="' + fmtNum(dl) + '"></span>' : '';
     var meta = joinDot([esc(who), age !== null ? fmtNum(age) + ' ' + esc(T.min) : '']);
+    // A request pinging for me pulses and carries «Heard» on both cards.
+    var ping = pingIds(api).indexOf(req.id) >= 0;
     if (compact) {
       // One row: two text lines on the left, the next step on the right. The countdown leads the second
       // line so the ellipsis trims the author, never the time. Withdraw and deny stay on the full card.
       var next = acts.filter(function (a) { return a !== 'cancel' && a !== 'deny'; })[0];
       var flash = own(rq.flash, req.id) && rq.flash[req.id] > Date.now() ? ' flash' : '';
-      return '<div class="tac-room-card' + (req.priority === 'urgent' ? ' urgent' : '') + flash + '" data-room-action="reqFocus" data-id="' + esc(req.id) + '">' +
+      return '<div class="tac-room-card' + (req.priority === 'urgent' ? ' urgent' : '') + flash + (ping ? ' pinging' : '') + '" data-room-action="reqFocus" data-id="' + esc(req.id) + '">' +
         '<div class="tac-room-card-text"><div>' + head + '</div><div class="tac-muted">' + joinDot([countdown, meta]) + '</div></div>' +
-        (next ? actionButton(api, next, req) : '') + '</div>';
+        (ping ? api.btn('reqHeard', T.pingHeard, { id: req.id }, 'heard') : '') + (next ? actionButton(api, next, req) : '') + '</div>';
     }
     var details = joinDot([meta, req.note ? esc(req.note) : '',
       Array.isArray(req.flags) && req.flags.indexOf('beacon') >= 0 ? esc(T.beacon) : '',
       req.reason && denial(P, req) === 'denied' ? esc(req.reason) : '']);
+    var heard = ping ? api.btn('reqHeard', T.pingHeard, { id: req.id }, 'big heard') : '';
     var actionsHtml = rq.denyAsk === req.id && acts.indexOf('deny') >= 0
       ? '<div class="tac-room-actions">' + T.denyReasons.map(function (r) { return api.btn('reqDenyReason', r, { id: req.id, reason: r }, 'big'); }).join('') +
-        api.btn('reqDenyCancel', T.denyCancel) + '</div>'
-      : '<div class="tac-room-actions">' + acts.map(function (a) { return actionButton(api, a, req); }).join('') + '</div>';
+        api.btn('reqDenyCancel', T.denyCancel) + heard + '</div>'
+      : '<div class="tac-room-actions">' + acts.map(function (a) { return actionButton(api, a, req); }).join('') + heard + '</div>';
     // The fire card lives only while this officer may still take the target.
     var fire = rq.taken === req.id && acts.indexOf('take') >= 0 ? fireCardHtml(api, req) : '';
-    return '<div class="tac-room-req st-' + esc(req.status) + (req.priority === 'urgent' ? ' urgent' : '') + (req.pending ? ' faded' : '') +
+    return '<div class="tac-room-req st-' + esc(req.status) + (req.priority === 'urgent' ? ' urgent' : '') + (req.pending ? ' faded' : '') + (ping ? ' pinging' : '') +
       '" style="--req:' + pick(TYPE_COLOUR, req.type, DEFAULT_COLOUR) + '">' +
       '<div>' + joinDot([head, countdown]) + '</div><div class="tac-muted">' + details + '</div>' + actionsHtml + fire + '</div>';
   }
@@ -403,8 +494,10 @@
         (crew ? '<br><span class="tac-muted">' + esc(T.assetClaim) + ': ' + esc(api.postName(crew.post) + (crew.callsign ? ' «' + crew.callsign + '»' : '')) + '</span>' : '') +
         '</span><span class="tac-room-actions">' + stateButtons + claim + shellSelect + '</span></div>';
     }).join('');
-    var p = api.ui.storage.read(PREFS_KEY) || {};
-    return rows + '<label class="tac-room-check"><input type="checkbox" data-room-change="reqSounds"' + (p.sounds !== false ? ' checked' : '') + '> ' + esc(T.sounds) + '</label>';
+    var p = prefs(api), vol = volumeOf(p);
+    return rows + '<label class="tac-room-check"><input type="checkbox" data-room-change="reqSounds"' + (soundsOn(p) ? ' checked' : '') + '> ' + esc(T.sounds) + '</label>' +
+      '<div class="tac-room-volume"><span class="tac-muted">' + esc(T.pingVolume) + '</span>' +
+      VOLUME_KEYS.map(function (k) { return api.btn('reqVolume', T.pingVolumes[k], { volume: k }, k === vol ? 'on' : ''); }).join('') + '</div>';
   }
 
   function chipsHtml(api) {
@@ -422,12 +515,18 @@
         esc(pick(T.chipNames, type, type) + ' ' + stateLabel(T, type, o.state)) + (ready !== null ? ' <span data-deadline="' + fmtNum(ready) + '"></span>' : '') + '</button>';
     });
     var open = requests(api).filter(isOpen).length;
-    return out + '<button type="button" class="tac-room-chip' + (open ? ' busy' : '') + '" data-room-action="tab" data-tab="requests">' + esc(api.fmt(T.chipRequests, { n: open })) + '</button>';
+    return out + '<button type="button" class="tac-room-chip' + (open ? ' busy' : '') + (pingIds(api).length ? ' pinging' : '') + '" data-room-action="tab" data-tab="requests">' +
+      esc(api.fmt(T.chipRequests, { n: open })) + '</button>';
+  }
+
+  // The notice while the browser holds the sound back; the button is itself a gesture that resumes it.
+  function blockedHtml(api) {
+    return rq.blocked ? api.btn('reqUnlock', api.T().pingBlocked, null, 'tac-room-ping-blocked') : '';
   }
 
   function stripHtml(api) {
     var open = requests(api).filter(isOpen).slice(0, 6);
-    return open.length ? open.map(function (r) { return cardHtml(api, r, true); }).join('') : '<span class="tac-muted">' + api.esc(api.T().empty) + '</span>';
+    return blockedHtml(api) + (open.length ? open.map(function (r) { return cardHtml(api, r, true); }).join('') : '<span class="tac-muted">' + api.esc(api.T().empty) + '</span>');
   }
 
   // ── map, sound, keyboard ────────────────────────────────────────
@@ -487,50 +586,158 @@
     }
   }
 
-  function beep(api) {
-    var p = api.ui.storage.read(PREFS_KEY) || {};
-    if (p.sounds === false) return;
+  // ── request ping ────────────────────────────────────────
+
+  function prefs(api) {
+    var p = api.ui.storage ? api.ui.storage.read(PREFS_KEY) : null;
+    return p && typeof p === 'object' ? p : {};
+  }
+  function soundsOn(p) { return p.sounds !== false; }
+  function volumeOf(p) { return own(VOLUMES, p.volume) ? p.volume : DEFAULT_VOLUME; }
+
+  // «Heard» ids per room code and client in this tab's sessionStorage; memory when that is off.
+  function heardKey(api) {
+    var c = api.ui.client || {};
+    return HEARD_PREFIX + String(c.code || '') + ':' + String(c.client || '');
+  }
+  function loadHeard(key) {
     try {
-      var AC = root.AudioContext || root.webkitAudioContext;
-      if (!AC) return;
-      var ac = rq.audio = rq.audio || new AC();
-      var play = function () {
-        try {
-          var o = ac.createOscillator(), g = ac.createGain();
-          o.frequency.value = 660;
-          g.gain.value = 0.06;
-          o.connect(g);
-          g.connect(ac.destination);
-          o.start();
-          o.stop(ac.currentTime + 0.15);
-        } catch (e) { /* no audio device */ }
-      };
-      // Created outside a click, the context starts suspended; the officer has clicked the page by now.
-      if (ac.state === 'suspended' && ac.resume) ac.resume().then(play, function () { /* autoplay refused */ });
-      else play();
-    } catch (e) { /* no audio device */ }
+      var v = JSON.parse(root.sessionStorage.getItem(key) || 'null');
+      if (Array.isArray(v)) return v.filter(function (id) { return typeof id === 'string'; }).slice(-HEARD_MAX);
+    } catch (e) { /* storage off: memory only */ }
+    return own(rq.heardMem, key) ? rq.heardMem[key].slice() : [];
+  }
+  function heardIds(api) {
+    var key = heardKey(api);
+    if (rq.heard.key !== key) rq.heard = { key: key, ids: loadHeard(key) };
+    return rq.heard.ids;
+  }
+  function addHeard(api, id) {
+    var ids = heardIds(api).concat([id]).slice(-HEARD_MAX);
+    rq.heard.ids = ids;
+    rq.heardMem[rq.heard.key] = ids.slice();
+    try { root.sessionStorage.setItem(rq.heard.key, JSON.stringify(ids)); } catch (e) { /* memory keeps it for this page */ }
   }
 
+  // The requests pinging for me now: none outside the room or with the sound off.
+  function pingList(api) {
+    var c = api.ui.client;
+    if (!c || c.status !== 'in' || !soundsOn(prefs(api))) return [];
+    return pingTargets(api.ui.policy, api.me(), requests(api), c.merged().objects, heardIds(api));
+  }
+  function pingIds(api) { return pingList(api).map(function (r) { return r.id; }); }
+
+  // One AudioContext for the page, made on first use (rq.makeAudio stands in for it under Node).
+  function audioContext() {
+    if (!rq.audio) {
+      try {
+        var AC = root.AudioContext || root.webkitAudioContext;
+        rq.audio = rq.makeAudio ? rq.makeAudio() : AC ? new AC() : null;
+      } catch (e) { rq.audio = null; }
+    }
+    return rq.audio || null;
+  }
+  // Callers play on a running context only: nodes scheduled on a suspended one would sound whenever it resumes.
+  function play(api, ac, kind) {
+    try { playPattern(ac, kind, volumeOf(prefs(api))); return true; } catch (e) { return false; }
+  }
+  // A due ping on a context the browser holds suspended raises the notice and asks for a resume.
+  function soundPing(api, kind) {
+    var ac = audioContext();
+    if (!ac) return;
+    if (ac.state === 'running') { play(api, ac, kind); return; }
+    if (!rq.blocked) { rq.blocked = true; api.render(); }
+    resumeAudio(api, ac);
+  }
+  // Once resumed the notice goes and what still pings plays at once, counted on the schedule; `then` runs
+  // when nothing played. Two resumes answering together play once: the first clears rq.blocked.
+  function resumeAudio(api, ac, then) {
+    try {
+      var p = typeof ac.resume === 'function' ? ac.resume() : null;
+      if (!p || typeof p.then !== 'function') return;
+      p.then(function () {
+        if (ac.state !== 'running') return;
+        var list = rq.blocked ? pingList(api) : [], played = false;
+        if (rq.blocked) { rq.blocked = false; api.render(); }
+        if (list.length) {
+          rq.ping = { lastAt: Date.now(), seen: list.map(function (r) { return r.id; }) };
+          played = play(api, ac, pingDue(null, Date.now(), list).pattern);
+        }
+        if (!played && then) then();
+      }, function () { /* autoplay refused: the notice stays */ });
+    } catch (e) { /* the notice stays */ }
+  }
+  // A click or key inside the room UI: the gesture a browser wants before a page may make sound.
+  function unlockAudio(api) {
+    var c = api.ui.client;
+    if (!c || c.status !== 'in' || !soundsOn(prefs(api))) return;
+    var ac = audioContext();
+    if (ac && ac.state !== 'running') resumeAudio(api, ac);
+  }
+
+  // «● » before the tab title while something pings. A title the page writes meanwhile becomes the base;
+  // the exact original comes back when the badge was the last thing written.
+  function syncTitle(on) {
+    var doc = typeof document !== 'undefined' ? document : null;
+    if (!doc || typeof doc.title !== 'string') return;
+    var t = rq.title, cur = doc.title;
+    if (t && cur !== t.shown) t.base = titleWithBadge(cur, false);
+    if (on) {
+      if (!t) t = rq.title = { base: cur, shown: null };
+      var want = titleWithBadge(t.base, true);
+      if (cur !== want) doc.title = want;
+      t.shown = doc.title;
+    } else if (t) {
+      rq.title = null;
+      var back = cur === t.shown ? t.base : titleWithBadge(cur, false);
+      if (back !== cur) doc.title = back;
+    }
+  }
+
+  // Which requests ping for me, the title badge and the shared schedule. `sound` is false for a refresh
+  // after a local change (heard, sound switch), which never plays.
+  function pingTick(api, now, sound) {
+    var list = pingList(api), ids = list.map(function (r) { return r.id; });
+    var changed = ids.join('\n') !== rq.pinging.join('\n');
+    rq.pinging = ids;
+    syncTitle(ids.length > 0);
+    if (!ids.length) {
+      rq.ping.seen = [];
+      if (rq.blocked) { rq.blocked = false; changed = true; }
+    } else if (sound) {
+      var due = pingDue(rq.ping, now, list);
+      if (due.ping) { rq.ping = { lastAt: now, seen: ids }; soundPing(api, due.pattern); }
+    }
+    if (changed) api.render();
+  }
+  function stopPing(api) {
+    var had = rq.pinging.length > 0 || rq.blocked;
+    rq.pinging = [];
+    rq.blocked = false;
+    rq.ping = { lastAt: null, seen: [] };
+    syncTitle(false);
+    if (had) api.render();
+  }
+
+  // The shell calls this about once a second from mount on, whether the panel is open or not.
   function tick(api) {
     var c = api.ui.client, me = api.me(), now = Date.now();
-    if (!c || c.status !== 'in' || !me) { rq.seenMine = null; rq.seenAll = null; rq.taken = null; return; }
+    if (!c || c.status !== 'in' || !me) { rq.seenAll = null; rq.taken = null; stopPing(api); return; }
     var objects = c.merged().objects;
     if (rq.taken) {
       var taken = own(objects, rq.taken) ? objects[rq.taken] : null;
       if (!taken || taken.deleted || taken.status !== 'accepted') { rq.taken = null; api.render(); }
     }
     Object.keys(rq.flash).forEach(function (id) { if (rq.flash[id] <= now) delete rq.flash[id]; });
-    var open = requests(api).filter(function (r) { return r.status === 'requested' && !(r.by && r.by.client === me.client); });
-    var all = open.map(function (r) { return r.id; });
-    var mine = open.filter(function (r) { return aimedAtMine(api.ui.policy, objects, me, r); }).map(function (r) { return r.id; });
+    var all = requests(api).filter(function (r) { return r.status === 'requested' && !(r.by && r.by.client === me.client); })
+      .map(function (r) { return r.id; });
     if (rq.seenAll) {
       var fresh = all.filter(function (id) { return rq.seenAll.indexOf(id) < 0; });
       fresh.forEach(function (id) { rq.flash[id] = now + 3000; });
       if (fresh.length) api.render();
     }
-    if (rq.seenMine && mine.some(function (id) { return rq.seenMine.indexOf(id) < 0; })) beep(api);
     rq.seenAll = all;
-    rq.seenMine = mine;
+    pingTick(api, now, true);
   }
 
   root.TacRoomUI.register({
@@ -538,15 +745,17 @@
     l10n: l10n,
     helpers: {
       TYPES: TYPES, BIG_ACTIONS: BIG_ACTIONS, fmtNum: fmtNum, validReq: validReq, recalled: recalled, denial: denial, pickMortarRow: pickMortarRow,
-      typeForKey: typeForKey, aimedAtMine: aimedAtMine, levelOk: levelOk, shotMatches: shotMatches, state: rq
+      typeForKey: typeForKey, aimedAtMine: aimedAtMine, levelOk: levelOk, shotMatches: shotMatches, state: rq,
+      pingTargets: pingTargets, pingDue: pingDue, titleWithBadge: titleWithBadge, playPattern: playPattern, unlockAudio: unlockAudio
     },
     tabs: function (api) {
       var T = api.T();
       return [{ id: 'requests', label: T.tabs.requests, narrow: true }, { id: 'assets', label: T.tabs.assets, narrow: true }];
     },
+    // The sound notice leads the tools row, so it shows above every tab of the panel.
     tools: function (api) {
       var me = api.me();
-      return me && me.confirmed && api.ui.client.status === 'in' ? api.btn('reqNew', api.T().toolRequest, null, rq.form ? 'on big' : 'big') : '';
+      return blockedHtml(api) + (me && me.confirmed && api.ui.client.status === 'in' ? api.btn('reqNew', api.T().toolRequest, null, rq.form ? 'on big' : 'big') : '');
     },
     panel: function (id, api) { return id === 'assets' ? assetsHtml(api) : requestsHtml(api); },
     chips: chipsHtml,
@@ -652,7 +861,29 @@
         if (!me || !me.client) return;
         api.ui.client.queue({ op: 'patch', kind: 'asset', id: el.getAttribute('data-id'), data: { claimedBy: el.getAttribute('data-release') ? null : me.client } });
       },
-      assetsTab: function (el, api) { api.ui.tab = 'assets'; api.ui.shelf = false; api.render(); }
+      assetsTab: function (el, api) { api.ui.tab = 'assets'; api.ui.shelf = false; api.render(); },
+      // «Heard»: silences that one request in this browser only; nothing goes to the room.
+      reqHeard: function (el, api) {
+        var id = el.getAttribute('data-id');
+        if (pingIds(api).indexOf(id) < 0) return;
+        addHeard(api, id);
+        pingTick(api, Date.now(), false);
+        api.render();
+      },
+      reqUnlock: function (el, api) { unlockAudio(api); },
+      // A volume pick is a click: it may start the context, and the officer hears the level chosen.
+      // The preview counts as a ping, so the schedule never plays over it.
+      reqVolume: function (el, api) {
+        var v = el.getAttribute('data-volume'), p = prefs(api);
+        if (!own(VOLUMES, v)) return;
+        p.volume = v;
+        api.ui.storage.write(PREFS_KEY, p);
+        var ac = soundsOn(p) ? audioContext() : null;
+        var preview = function () { if (play(api, ac, 'normal')) rq.ping.lastAt = Date.now(); };
+        if (ac && ac.state === 'running') preview();
+        else if (ac) resumeAudio(api, ac, preview);
+        api.render();
+      }
     },
     changes: {
       assetShell: function (el, api) {
@@ -663,9 +894,11 @@
         api.ui.client.queue({ op: 'patch', kind: 'asset', id: el.getAttribute('data-id'), data: { shell: shell, radius: radius } });
       },
       reqSounds: function (el, api) {
-        var p = api.ui.storage.read(PREFS_KEY) || {};
+        var p = prefs(api);
         p.sounds = el.checked;
         api.ui.storage.write(PREFS_KEY, p);
+        pingTick(api, Date.now(), false);
+        api.render();
       }
     },
     submits: {
@@ -699,6 +932,16 @@
         api.render();
         e.preventDefault();
       });
-    }
+      // Browsers hold audio back until a gesture: a click or key anywhere in the room UI resumes it.
+      ['tacRoom', 'tacRoomStrip', 'tacRoomChips', 'tacRoomShelf', 'tacRoomToggle'].forEach(function (id) {
+        var box = typeof document.getElementById === 'function' ? document.getElementById(id) : null;
+        if (!box) return;
+        ['click', 'keydown'].forEach(function (type) {
+          box.addEventListener(type, function () { try { unlockAudio(api); } catch (e) { /* never break a click */ } });
+        });
+      });
+    },
+    // The shell has no unmount call yet: whoever removes the room gets the tab title back and silence.
+    unmount: function (api) { stopPing(api); }
   });
 })(window);
