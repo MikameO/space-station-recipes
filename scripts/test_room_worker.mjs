@@ -472,6 +472,54 @@ await t('chronology: numbered requests in Russian, the recall, the withdrawal, a
   ], STAGE1, 'abc').split('\n'), ['18:05:21  Офицер штаба  nope: примечание «x»', '18:05:21  Офицер штаба  калибровка (неверная)', '--:--:--  ?  операция marker (не разобрана)']);
 });
 
+await t('stage 2a chronology: positions by the calibration of their moment, room calibration, addressees and tasks, no cal lines', () => {
+  const at = Date.UTC(2026, 8, 14, 19, 0, 0);
+  const by = (client, post) => ({ client, post, squad: null });
+  const CREW = by('c-mortar', 'mortar'), OFFICER = by('c-so', 'so');
+  const op = (seq, who, o) => Object.assign({ seq, at, by: who }, o);
+  const ops = [
+    op(1, OFFICER, { op: 'put', kind: 'member', id: 'mem-so', data: { client: 'c-so', post: 'so', squad: null, callsign: 'Орлов' } }),
+    op(2, CREW, { op: 'put', kind: 'member', id: 'mem-crew', data: { client: 'c-mortar', post: 'mortar', squad: null, callsign: 'Сидоров' } }),
+    op(3, CREW, { op: 'patch', kind: 'member', id: 'mem-crew', data: { pos: { x: 10, y: 20, level: 0 }, posAt: at } }),
+    op(4, OFFICER, { op: 'put', kind: 'calibration', id: 'calibration', data: { offset: [243, -218], tile: [20, 20], reading: [263, -198] } }),
+    op(5, CREW, { op: 'patch', kind: 'member', id: 'mem-crew', data: { pos: { x: 10, y: 20, level: 0 }, posAt: at } }),
+    op(6, CREW, { op: 'patch', kind: 'member', id: 'mem-crew', data: { cal: [243, -218] } }),
+    op(7, CREW, { op: 'patch', kind: 'member', id: 'mem-crew', data: { pos: null, posAt: at } }),
+    op(8, OFFICER, { op: 'put', kind: 'request', id: 't1', data: { type: 'task', to: { post: 'mortar' }, note: 'сменить позицию' } }),
+    op(9, OFFICER, { op: 'put', kind: 'request', id: 'q2', data: { type: 'mortar', target: { x: 10, y: 20 }, to: { client: 'c-mortar' } } }),
+    op(10, OFFICER, { op: 'put', kind: 'request', id: 't3', data: { type: 'task', target: { x: 10, y: 20 }, to: { client: 'c-gone' }, note: 'к воротам' } }),
+    op(11, CREW, { op: 'patch', kind: 'request', id: 't1', expectedStatus: 'requested', data: { status: 'accepted' } }),
+    op(12, CREW, { op: 'put', kind: 'calibration', id: 'calibration', data: { offset: [0, 7] } }),
+    op(13, OFFICER, { op: 'del', kind: 'calibration', id: 'calibration' }),
+    op(14, CREW, { op: 'patch', kind: 'member', id: 'mem-crew', data: { pos: { x: 1, y: 2 }, posAt: at } })
+  ];
+  assert.deepStrictEqual(chronology(ops, STAGE1, [243, -218]).split('\n'), [
+    '19:00:00  Офицер штаба  вход: Офицер штаба «Орлов»',
+    '19:00:00  Миномётный расчёт  вход: Миномётный расчёт «Сидоров»',
+    '19:00:00  Миномётный расчёт  позиция: Миномётный расчёт «Сидоров» 10 20 (мир)',
+    '19:00:00  Офицер штаба  привязка комнаты: Офицер штаба «Орлов», сдвиг +243 -218, показание дальномера 263 -198, тайл 20 20 (мир)',
+    '19:00:00  Миномётный расчёт  позиция: Миномётный расчёт «Сидоров» 253 -198',
+    '19:00:00  Миномётный расчёт  позиция снята: Миномётный расчёт «Сидоров»',
+    '19:00:00  Офицер штаба  запрос №1 «задача» → Миномётный расчёт: сменить позицию',
+    '19:00:00  Офицер штаба  запрос №2 «удар миномёта» 253 -198 → Миномётный расчёт «Сидоров»',
+    '19:00:00  Офицер штаба  запрос №3 «задача» 253 -198 → участник c-gone: к воротам',
+    '19:00:00  Миномётный расчёт  №1 «задача»: принят',
+    '19:00:00  Миномётный расчёт  привязка комнаты: Миномётный расчёт «Сидоров», сдвиг 0 +7',
+    '19:00:00  Офицер штаба  удалил calibration',
+    '19:00:00  Миномётный расчёт  позиция: Миномётный расчёт «Сидоров» 1 2 (мир)'
+  ]);
+  // Without a calibration op in the log the offset argument holds throughout; a squad post is named with its squad.
+  assert.strictEqual(chronology([ops[1], ops[4]], STAGE1, [243, -218]).split('\n')[1], '19:00:00  Миномётный расчёт  позиция: Миномётный расчёт «Сидоров» 253 -198');
+  assert.strictEqual(chronology([op(1, OFFICER, { op: 'put', kind: 'request', id: 't', data: { type: 'task', to: { post: 'sl', squad: 'bravo' }, note: 'x' } })], FULL, null),
+    '19:00:00  Офицер штаба  запрос №1 «задача» → Командир отряда Браво: x');
+  // A member whose put is not in the log comes from the room state, by id and by client.
+  const objects = { 'mem-crew': { id: 'mem-crew', kind: 'member', client: 'c-mortar', post: 'mortar', callsign: 'Сидоров' } };
+  assert.deepStrictEqual(chronology([ops[6], ops[8]], STAGE1, null, objects).split('\n'), [
+    '19:00:00  Миномётный расчёт  позиция снята: Миномётный расчёт «Сидоров»',
+    '19:00:00  Офицер штаба  запрос №1 «удар миномёта» 10 20 (мир) → Миномётный расчёт «Сидоров»'
+  ]);
+});
+
 await t('unlock keeps everyone who was in the room; a heartbeat passes the lock; the last confirmer never idles out', async () => {
   const env = stage1Env();
   const r = await stage1Room(env);
