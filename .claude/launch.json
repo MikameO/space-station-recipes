@@ -10,6 +10,24 @@
       ],
       "autoPort": true,
       "port": 8090
+    },
+    {
+      "name": "room-worker",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": [
+        "--no-install",
+        "wrangler",
+        "dev",
+        "--config",
+        "worker/wrangler.toml",
+        "--port",
+        "8787",
+        "--ip",
+        "127.0.0.1",
+        "--var",
+        "ALLOWED_ORIGINS:http://127.0.0.1:8090"
+      ],
+      "port": 8787
     }
   ]
 }
