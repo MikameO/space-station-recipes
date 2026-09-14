@@ -327,3 +327,8 @@ body.tac-room-available .tac-beta { display: none; }
   body.tac-room-on .tac-room-panel { min-height: 0; overflow-y: auto; }
   body.tac-room-on .tac-toolbar { flex-wrap: nowrap; overflow-x: auto; }
 }
+
+/* Stage 2a: requests, positions, mortar zone */
+.tac-room-to { color: var(--cyan); font-weight: 600; }
+.tac-room-nopoint { color: var(--text-ghost); font-style: italic; }
+.tac-room-reqform .tac-select[name="to"] { width: 100%; }
