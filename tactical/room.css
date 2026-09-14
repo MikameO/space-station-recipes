@@ -303,6 +303,16 @@ body.tac-room-available .tac-beta { display: none; }
 .tac-room-switch .tac-seg.on .tac-room-entry-dot { color: var(--hull); }
 .tac-room-entry-lead { margin: 8px 2px 0; font-size: 13px; line-height: 1.4; color: var(--text-main); }
 
+/* Stage 2a: room calibration and roster marks */
+.tac-room-banner.cal { border-color: var(--cyan); }
+.tac-room-cal-publish small { display: block; font-size: 11px; font-weight: 400; opacity: 0.75; }
+.tac-room-marks { display: block; margin-top: 2px; }
+.tac-room-mark { display: inline-block; margin-right: 8px; font-size: 11px; color: var(--text-sub); }
+.tac-room-mark-cal-room { color: var(--phosphor); }
+.tac-room-mark-cal-own { color: var(--amber); }
+.tac-room-mark-cal-none { color: var(--text-ghost); }
+.tac-room-mark-pos { color: var(--cyan); font-family: ui-monospace, "Cascadia Mono", Consolas, monospace; }
+
 /* Task 8: half-monitor (≤1100 px). The page never scrolls; map, strip and panel scroll on their own. */
 @media (max-width: 1100px) {
   body.tac-room-on { height: 100vh; height: 100dvh; overflow: hidden; }
