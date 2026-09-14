@@ -1123,7 +1123,10 @@
       });
     });
     eachModule('mount', function (m) { m.mount(api); });
-    root.setInterval(tick, 1000);
+    // Worker timers from room.js when there: the request ping keeps its pace in a window hidden behind the game.
+    // No unmount or leave path stops the tick (leaving the room still needs fork switches), so it runs for the page.
+    var clock = apiRoot.timers && typeof apiRoot.timers.setInterval === 'function' ? apiRoot.timers : root;
+    ui.tickTimer = { timers: clock, id: clock.setInterval(tick, 1000) };
     tick();
   }
 

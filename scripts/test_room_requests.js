@@ -712,6 +712,51 @@ async function t(name, fn) { await fn(); n++; console.log('ok', name); }
     } finally { R.requestActions = real; }
   }));
 
+  await t('ping: no sound, badge or pulse while the room is frozen (silence, stopped, budget), locked or closed; at once when that ends', () => withClock(() => {
+    const freezes = [
+      ['radio silence', m => { m.frozen = { at: T0, reason: 'silence', by: 'so' }; }],
+      ['stopped', m => { m.frozen = { at: T0, reason: 'stopped' }; }],
+      ['budget', m => { m.frozen = { at: T0, reason: 'budget' }; }],
+      ['locked', m => { m.locked = true; }],
+      ['closed', m => { m.closed = true; }]
+    ];
+    const quiet = name => {
+      assert.deepStrictEqual(H.state.pinging, [], name + ': nothing pinging');
+      assert.strictEqual(document.title, ORIG_TITLE, name + ': no badge');
+      const html = mod.strip(api) + mod.panel('requests', api) + mod.chips(api);
+      assert.ok(!html.includes('pinging') && !html.includes('reqHeard'), name + ': no pulse, no «Heard»');
+    };
+    freezes.forEach(([name, freeze]) => {
+      const w = pingWorld([req(), mortarAsset()], crew);
+      const thaw = () => { api.ui.client.meta = { planet: 'lv624' }; };
+      tickAt(0);
+      assert.strictEqual(w.ac.groups.length, 1, name + ': the first ping');
+      freeze(api.ui.client.meta);
+      for (let s = 1; s <= 25; s++) tickAt(s * 1000);
+      assert.strictEqual(w.ac.groups.length, 1, name + ': silent through two intervals');
+      quiet(name);
+      thaw();
+      tickAt(26000);
+      assert.strictEqual(w.ac.groups.length, 2, name + ': a ping when it ends');
+      assert.strictEqual(document.title, '● ' + ORIG_TITLE, name + ': the badge is back');
+      assert.ok(mod.strip(api).includes('tac-room-card pinging'), name + ': the pulse is back');
+      freeze(api.ui.client.meta);
+      tickAt(27000);
+      tickAt(28000);
+      thaw();
+      tickAt(29000);
+      assert.strictEqual(w.ac.groups.length, 3, name + ': at once, 3 s after the last ping, not at the next interval');
+    });
+    const cold = pingWorld([req(), mortarAsset()], crew);
+    api.ui.client.meta.frozen = { at: T0, reason: 'silence' };
+    tickAt(0);
+    assert.strictEqual(cold.ac.groups.length, 0, 'a request that arrives during silence stays quiet');
+    quiet('during silence');
+    delete api.ui.client.meta.frozen;
+    tickAt(1000);
+    assert.deepStrictEqual([cold.ac.groups.length, document.title], [1, '● ' + ORIG_TITLE], 'and pings the moment silence ends');
+  }));
+
   await t('«Heard» silences only that request, only in this browser, per room code and client; a new request pings again', () => withClock(() => {
     const w = pingWorld([req(), req({ id: 'q2' }), mortarAsset()], crew);
     tickAt(0);

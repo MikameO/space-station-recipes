@@ -5,7 +5,8 @@
 //
 // Officers' room client: transports (the Worker over HTTP, or the fixture for
 // the demo), session and storage, polling with Retry-After, pending ops with
-// optimistic apply, and window.TacRoom — the hook tactical.js attaches to.
+// optimistic apply, timers that survive a hidden window (TacRoom.timers), and
+// window.TacRoom — the hook tactical.js attaches to.
 // No DOM: tactical/room-ui.js renders. Tests: scripts/test_room_client*.js.
 (function (root) {
   'use strict';
@@ -50,7 +51,100 @@
   }
 
   function copy(v) { return v === undefined ? undefined : JSON.parse(JSON.stringify(v)); }
-  function assign(a, b) { for (var k in b) if (Object.prototype.hasOwnProperty.call(b, k)) a[k] = b[k]; return a; }
+  function has(o, k) { return Object.prototype.hasOwnProperty.call(o, k); }
+  function assign(a, b) { for (var k in b) if (has(b, k)) a[k] = b[k]; return a; }
+
+  // ── background-safe timers ────────────────────────────────────
+  // Chrome wakes chained page timers about once a minute in a window hidden for five minutes, and a
+  // browser covered by a full-screen game counts as hidden; a dedicated Worker's timers keep their pace.
+  // One worker, made from this script on first use, runs every timer and posts its id back; the callback
+  // runs here. Without Worker, Blob or an object URL (Node tests), when one throws (a CSP refusal) or
+  // when the worker reports an error, the page's own timers take over for good.
+  // The worker script: plain statements joined by spaces, so no escape sequence and no // comment.
+  var TIMER_WORKER = [
+    'var t = {};',
+    'onmessage = function (e) {',
+    'var d = e.data || {}, id = d.id;',
+    'if (d.op === "set") {',
+    't[id] = d.every ? setInterval(function () { postMessage(id); }, d.ms)',
+    ': setTimeout(function () { delete t[id]; postMessage(id); }, d.ms);',
+    '} else if (d.op === "clear" && t[id] !== undefined) {',
+    'clearTimeout(t[id]); clearInterval(t[id]); delete t[id];',
+    '}',
+    '};'
+  ].join(' ');
+
+  // host: the window (Worker, Blob, URL and the page timers, read when used). Ids are this object's own,
+  // so a timer cleared while its message is on the way finds nothing to run.
+  function makeTimers(host) {
+    var worker = null, failed = false, seq = 0, jobs = {};
+
+    // Only the side that holds the timer may run it: a late message from a dropped worker runs nothing twice.
+    function fired(id, where) {
+      if (!has(jobs, id) || jobs[id].where !== where) return;
+      var job = jobs[id];
+      if (!job.every) delete jobs[id];
+      try { job.fn(); } catch (e) { warn('timer', e); }   // a throwing callback never stops the schedule
+    }
+    function onPage(id, job) {
+      job.where = 'page';
+      var run = function () { fired(id, 'page'); };
+      job.page = job.every ? host.setInterval(run, job.ms) : host.setTimeout(run, job.ms);
+    }
+    // The worker broke after it was made: what it held moves to page timers.
+    function fallBack() {
+      var w = worker;
+      worker = null;
+      failed = true;
+      try { if (w && typeof w.terminate === 'function') w.terminate(); } catch (e) { /* already gone */ }
+      for (var id in jobs) if (has(jobs, id) && jobs[id].where === 'worker') onPage(id, jobs[id]);
+    }
+    function start() {
+      if (worker || failed) return worker;
+      try {
+        var W = host.Worker, B = host.Blob, U = host.URL;
+        if (typeof W !== 'function' || typeof B !== 'function' || !U || typeof U.createObjectURL !== 'function') throw new Error('no worker timers');
+        // The object URL lives as long as the page: revoking it at once can cancel the worker's load.
+        var w = new W(U.createObjectURL(new B([TIMER_WORKER], { type: 'text/javascript' })));
+        w.onmessage = function (e) { fired(e.data, 'worker'); };
+        w.onerror = function (e) { warn('timer worker', e); fallBack(); };
+        worker = w;
+      } catch (e) {
+        failed = true;
+      }
+      return worker;
+    }
+    function add(fn, ms, every) {
+      var id = ++seq, job = { fn: fn, ms: Math.max(0, +ms || 0), every: every, where: 'worker', page: null };
+      jobs[id] = job;
+      if (start()) {
+        try { worker.postMessage({ op: 'set', id: id, ms: job.ms, every: every }); } catch (e) { warn('timer worker', e); fallBack(); }
+      } else {
+        onPage(id, job);
+      }
+      return id;
+    }
+    function clear(id) {
+      if (id === null || id === undefined || !has(jobs, id)) return;
+      var job = jobs[id];
+      delete jobs[id];
+      if (job.where === 'page') {
+        if (job.every) host.clearInterval(job.page); else host.clearTimeout(job.page);
+      } else if (worker) {
+        try { worker.postMessage({ op: 'clear', id: id }); } catch (e) { /* its message finds no job */ }
+      }
+    }
+    return {
+      setTimeout: function (fn, ms) { return add(fn, ms, false); },
+      clearTimeout: clear,
+      setInterval: function (fn, ms) { return add(fn, ms, true); },
+      clearInterval: clear,
+      // 'idle' before the first timer, then 'worker' or 'page': for tests and a look from the console.
+      mode: function () { return worker ? 'worker' : failed ? 'page' : 'idle'; }
+    };
+  }
+
+  var timers = makeTimers(root);
 
   // No answer, a rate limit or a server error: the request may be retried later.
   function transient(status) { return status === 0 || status === 429 || status >= 500; }
@@ -68,8 +162,9 @@
     this.base = String(base || '').replace(/\/$/, '');
     this.fetchFn = fetchFn || (root.fetch ? root.fetch.bind(root) : null);
     this.timeoutMs = opts.timeoutMs || TIMEOUT_MS;
-    this.setTimer = opts.setTimeout || (root.setTimeout ? root.setTimeout.bind(root) : null);
-    this.clearTimer = opts.clearTimeout || (root.clearTimeout ? root.clearTimeout.bind(root) : function () {});
+    // The timeout of a request sent from a hidden window must not wait for the page's next wake-up either.
+    this.setTimer = opts.setTimeout || timers.setTimeout;
+    this.clearTimer = opts.clearTimeout || timers.clearTimeout;
     this.Abort = opts.AbortController || root.AbortController || (typeof AbortController !== 'undefined' ? AbortController : null);
   }
   // Always resolves {status, body, retryAfter}; status 0 for no answer, a failed body read or the timeout.
@@ -135,8 +230,10 @@
     this.h = opts.h || '';
     this.clock = opts.now || function () { return Date.now(); };
     this.onUpdate = opts.onUpdate || function () {};
-    this.setTimer = opts.setTimeout || (root.setTimeout ? root.setTimeout.bind(root) : function () { return 0; });
-    this.clearTimer = opts.clearTimeout || (root.clearTimeout ? root.clearTimeout.bind(root) : function () {});
+    // The loop and its back-off run on TacRoom.timers: a window behind the game keeps polling on time.
+    this.setTimer = opts.setTimeout || timers.setTimeout;
+    this.clearTimer = opts.clearTimeout || timers.clearTimeout;
+    this.doc = opts.document !== undefined ? opts.document : root.document || null;   // for visibilitychange
     if (opts.clientId) {
       this.client = String(opts.clientId).slice(0, CLIENT_MAX);
     } else {
@@ -149,8 +246,11 @@
     this.running = false;
     this.timer = null;
     this.loopId = 0;
+    this.stepNow = null;      // set by startLoop: runs the waiting step at once
+    this.onVisible = null;
     this.gen = 0;
     this.pollTicket = 0;
+    this.polling = 0;         // polls sent and not answered yet, of any room: never reset
     this.caughtUp = 0;
     this.waiters = {};
     this.reset();
@@ -258,9 +358,16 @@
     });
   };
 
+  function isObject(v) { return !!v && typeof v === 'object' && !Array.isArray(v); }
+  // A pending op as queue() stores it; anything else in storage is dropped.
+  function storedOp(op) {
+    return isObject(op) && typeof op.cid === 'string' && typeof op.op === 'string' && typeof op.kind === 'string' && typeof op.id === 'string';
+  }
+
+  // Storage is never trusted: an older format, a hand edit or a broken write must not break every render.
   RoomClient.prototype.restore = function (code) {
     var saved = this.store.read(this.key(code));
-    if (!saved || saved.fork !== this.fork) return false;
+    if (!isObject(saved) || saved.fork !== this.fork) return false;
     this.reset();
     this.code = saved.code;
     this.session = saved.session || null;
@@ -268,10 +375,14 @@
     this.word = saved.word || null;
     this.sheet = saved.sheet || null;
     this.observerToken = saved.observerToken || null;
-    this.room = R.createState(saved.seq || 0);
-    this.room.objects = saved.objects || {};
-    this.pending = saved.pending || [];
-    this.acked = saved.acked || [];
+    var seq = saved.seq, objects = {}, id;
+    this.room = R.createState(typeof seq === 'number' && isFinite(seq) && seq > 0 ? Math.floor(seq) : 0);
+    if (isObject(saved.objects)) for (id in saved.objects) if (has(saved.objects, id) && isObject(saved.objects[id])) objects[id] = saved.objects[id];
+    this.room.objects = objects;
+    this.pending = (Array.isArray(saved.pending) ? saved.pending : []).filter(storedOp);
+    this.acked = (Array.isArray(saved.acked) ? saved.acked : []).filter(function (a) {
+      return isObject(a) && typeof a.seq === 'number' && isFinite(a.seq) && storedOp(a.op);
+    });
     if (this.pending.length) this.markUnsure();   // they may have landed before the page closed
     this.status = this.observer ? 'observer' : this.session ? 'resuming' : 'expired';
     this.me = this.findMe();
@@ -362,11 +473,22 @@
     var gen = this.gen, holder = this.holder(), room = this.room, code = this.code, since = room.seq;
     var ticket = ++this.pollTicket;
     var sent = this.clock();
-    return this.transport.poll(code, since, this.auth()).then(function (r) {
-      // A reset, rotation, expiry or rebuild while this poll was out: its answer describes another room.
-      if (gen !== self.gen || holder !== self.holder() || room !== self.room || code !== self.code) return self;
-      return self.onPoll(r, sent, self.clock(), since, ticket);
-    }).then(null, function (e) { warn('poll', e); return self; });
+    var out = true, answer;
+    // Counted while out, so a wake-up never sends a second poll beside this one.
+    function back() { if (out) { out = false; self.polling -= 1; } }
+    this.polling += 1;
+    try {
+      answer = this.transport.poll(code, since, this.auth()).then(function (r) {
+        back();
+        // A reset, rotation, expiry or rebuild while this poll was out: its answer describes another room.
+        if (gen !== self.gen || holder !== self.holder() || room !== self.room || code !== self.code) return self;
+        return self.onPoll(r, sent, self.clock(), since, ticket);
+      }, function (e) { back(); throw e; });
+    } catch (e) {
+      back();
+      throw e;
+    }
+    return answer.then(null, function (e) { warn('poll', e); return self; });
   };
 
   RoomClient.prototype.onPoll = function (r, sent, got, since, ticket) {
@@ -588,18 +710,47 @@
       }
       work.then(null, function (e) { warn('loop', e); }).then(function () {
         if (!live()) return;
-        if (self.status === 'expired' || self.status === 'gone' || !self.code) { self.running = false; return; }
+        if (self.status === 'expired' || self.status === 'gone' || !self.code) { self.running = false; self.unwatch(); return; }
         self.timer = self.setTimer(step, Math.max(1, self.retryAfter) * 1000);
       });
     }
+    // The step waiting out Retry-After runs now; not while a step is at work or any poll is out.
+    this.stepNow = function () {
+      if (!live() || self.timer === null || self.polling > 0) return false;
+      self.clearTimer(self.timer);
+      step();
+      return true;
+    };
+    this.watch();
     step();
   };
 
   RoomClient.prototype.stopLoop = function () {
     this.running = false;
     this.loopId++;
+    this.stepNow = null;
+    this.unwatch();
     if (this.timer) this.clearTimer(this.timer);
     this.timer = null;
+  };
+
+  // The officer comes back from the game: the room shows what happened meanwhile at once.
+  RoomClient.prototype.watch = function () {
+    var self = this, doc = this.doc;
+    if (this.onVisible || !doc || typeof doc.addEventListener !== 'function') return;
+    this.onVisible = function () {
+      try {
+        if (doc.visibilityState ? doc.visibilityState !== 'visible' : doc.hidden) return;
+        if (self.running && self.stepNow) self.stepNow();
+      } catch (e) { warn('visibility', e); }
+    };
+    doc.addEventListener('visibilitychange', this.onVisible);
+  };
+
+  RoomClient.prototype.unwatch = function () {
+    var fn = this.onVisible, doc = this.doc;
+    this.onVisible = null;
+    try { if (fn && doc && typeof doc.removeEventListener === 'function') doc.removeEventListener('visibilitychange', fn); } catch (e) { /* the page is going */ }
   };
 
   // Confirmed objects, then acked ops the next poll has not brought yet, then pending ops, applied on
@@ -684,6 +835,8 @@
     RoomClient: RoomClient,
     HttpTransport: HttpTransport,
     makeStorage: makeStorage,
+    timers: timers,
+    makeTimers: makeTimers,
     attach: function (hooks) {
       try { if (root.TacRoomUI) root.TacRoomUI.mount(hooks, root.TacRoom); } catch (e) { warn('attach', e); }
     },

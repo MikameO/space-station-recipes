@@ -6,7 +6,8 @@
 // Officers' room — strike and support requests (form, cards, the Series T fire
 // card inside a taken mortar request), the manual asset board with cooldown
 // hints, chips over the map, the request strip, target rings and a ping for
-// the asset crew that repeats until the request is handled or heard.
+// the asset crew that repeats until the request is handled or heard, and stays
+// quiet while the room is frozen (radio silence), locked or closed.
 // Registers into tactical/room-ui.js.
 //
 // Stage 1: only two request types are offered, mortar strikes and mortar
@@ -619,10 +620,17 @@
     try { root.sessionStorage.setItem(rq.heard.key, JSON.stringify(ids)); } catch (e) { /* memory keeps it for this page */ }
   }
 
-  // The requests pinging for me now: none outside the room or with the sound off.
+  // Radio silence, a room the administration stopped or out of budget, a locked or a closed room: nothing
+  // can be answered there, so nothing pings. The first tick after it ends pings at once (seen is cleared).
+  function roomFrozen(c) {
+    var m = c.meta;
+    return !!(m && (m.frozen || m.locked || m.closed));
+  }
+
+  // The requests pinging for me now: none outside the room, in a frozen room or with the sound off.
   function pingList(api) {
     var c = api.ui.client;
-    if (!c || c.status !== 'in' || !soundsOn(prefs(api))) return [];
+    if (!c || c.status !== 'in' || roomFrozen(c) || !soundsOn(prefs(api))) return [];
     return pingTargets(api.ui.policy, api.me(), requests(api), c.merged().objects, heardIds(api));
   }
   function pingIds(api) { return pingList(api).map(function (r) { return r.id; }); }
