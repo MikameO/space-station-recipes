@@ -115,12 +115,16 @@ const req = (id, extra) => ({ cid: 'c-' + id, op: 'put', kind: 'request', id, da
     assert.deepStrictEqual([proven.status, proven.body.status], [200, 'confirmed']);
     assert.strictEqual(fx.activeMembers().filter(m => m.client === mo.client).length, 1);
     assert.strictEqual((await fx.poll(code, 0, { session: mo.session })).status, 401, 'the proof session is replaced');
-    assert.deepStrictEqual((await fx.join(code, { client: 'client-xeno-0001', postCode: moCode })).body, { error: 'used' });
+    // v2: a code bound to someone else answers like an unknown one, 404 postCode ('used' is gone).
+    assert.deepStrictEqual(await fx.join(code, { client: 'client-xeno-0001', postCode: moCode }).then(r => [r.status, r.body]), [404, { error: 'postCode' }]);
     assert.deepStrictEqual((await fx.join(code, { client: 'short', post: 'so' })).body, { error: 'client' });
 
     const k1 = await fx.join(code, { client: 'client-so-00002', post: 'so' });
     const k2 = await fx.join(code, { client: 'client-so-00003', post: 'so' });
     assert.deepStrictEqual((await fx.join(code, { client: 'client-so-00004', post: 'so' })).body, { error: 'full' });
+    // v2: the post-code path counts seats too: a sheet code for a full post is 409 full.
+    const soCode = so.sheet.find(s => s.post === 'so').code;
+    assert.deepStrictEqual(await fx.join(code, { client: 'client-so-00005', postCode: soCode }).then(r => [r.status, r.body]), [409, { error: 'full' }]);
     assert.deepStrictEqual((await fx.admin(code, { action: 'confirm', client: 'client-so-00002' }, { session: so.session })).body, { error: 'word' });
     assert.strictEqual((await fx.admin(code, { action: 'confirm', client: 'client-so-00002', word: k1.body.word }, { session: so.session })).status, 200);
     clock.t += STAGE1.ttl.wordSec * 1000;
@@ -135,13 +139,16 @@ const req = (id, extra) => ({ cid: 'c-' + id, op: 'put', kind: 'request', id, da
   });
 
   await t('fixture rotate: new code and session, old code answers 401 rotated, sessions and observer token die', async () => {
-    const { so, mo, fx } = await K.stage1Room(env);
+    const { so, mo, fx, moCode } = await K.stage1Room(env);
     await so.admin('observer');
-    const oldCode = so.code, oldSession = so.session, token = so.observerToken;
+    const oldCode = so.code, oldSession = so.session, token = so.observerToken, oldSheet = so.sheet;
     clock.t += 1100;
     assert.strictEqual((await so.admin('rotate')).status, 200);
     assert.deepStrictEqual([so.code !== oldCode, so.session !== oldSession, so.observerToken, so.status], [true, true, null, 'in']);
     assert.deepStrictEqual(so.members().map(m => m.client), [so.client]);
+    // v2: rotate answers a new sheet: unused post codes change, the bound one stays with its holder.
+    assert.deepStrictEqual(so.sheet.map(s => s.post), oldSheet.map(s => s.post));
+    assert.deepStrictEqual(so.sheet.filter(s => oldSheet.some(o => o.code === s.code)).map(s => s.code), [moCode]);
     assert.deepStrictEqual((await fx.poll(oldCode, 0, { session: oldSession })).body, { error: 'rotated' });
     assert.strictEqual((await fx.poll(so.code, 0, { session: oldSession })).status, 401);
     assert.strictEqual((await fx.poll(so.code, 0, { observer: token })).status, 401);
@@ -187,17 +194,19 @@ const req = (id, extra) => ({ cid: 'c-' + id, op: 'put', kind: 'request', id, da
     const burst = Array.from({ length: 12 }, (_, i) => ({ cid: 'r' + i, op: 'put', kind: 'request', id: 'qb' + i, data: { type: 'position', target: { x: i, y: i } } }));
     assert.deepStrictEqual((await send(so, burst)).slice(9), ['ok', 'rate', 'rate']);
 
-    const calls = [];
-    R.validatePatch = (policy, kind, data) => { calls.push([kind, Object.keys(data).sort().join()]); return kind === 'asset' && data.owner ? 'owner' : null; };
+    // v2: every patch goes through the shared R.validatePatch with the cleaned data and the existing object, before
+    // rights. The real function is put back afterwards: the fixture has no fallback without it.
+    const calls = [], validatePatch = R.validatePatch;
+    R.validatePatch = (policy, kind, data, existing) => { calls.push([kind, Object.keys(data).sort().join(), !!existing]); return kind === 'asset' && data.owner ? 'owner' : null; };
     try {
       clock.t += 1100;
       assert.deepStrictEqual(await send(mo, [
         { cid: 'v1', op: 'patch', kind: 'asset', id: 'asset-mortar-1', data: { owner: { post: 'so' } } },
         { cid: 'v2', op: 'patch', kind: 'asset', id: 'asset-mortar-1', data: { state: 'deployed', tile: [1, 2] } }
       ]), ['owner', 'ok']);
-      assert.deepStrictEqual(calls, [['asset', 'owner'], ['asset', 'state,tile']]);
+      assert.deepStrictEqual(calls, [['asset', 'owner', true], ['asset', 'state,tile', true]]);
     } finally {
-      delete R.validatePatch;
+      R.validatePatch = validatePatch;
     }
   });
 
@@ -237,6 +246,53 @@ const req = (id, extra) => ({ cid: 'c-' + id, op: 'put', kind: 'request', id, da
     assert.notStrictEqual(b.body.code, a.body.code);
     assert.strictEqual((await fx.poll(a.body.code, 0, { session: a.body.session })).status, 404);
     assert.ok(!(await fx.poll(b.body.code, 0, { session: b.body.session })).body.ops.some(o => o.id === 'q1'));
+  });
+
+  await t('fixture v2 gates: heartbeats pass a lock, acked batches answer dup, a second del is dup, no asset puts, extend waits, release frees the code', async () => {
+    const { so, mo, fx, moCode } = await K.stage1Room(env);
+    const code = so.code;
+    const send = (c, ops) => fx.send(code, ops, { session: c.session });
+    const heartbeat = cid => ({ cid, op: 'patch', kind: 'member', id: mo.me.id, data: { presentAt: 1 } });
+    clock.t += 1100;
+    const put = req('qv1');
+    assert.ok((await send(so, [put])).body.acks[0].seq);
+    // v2: assets are seeded from the policy; a client put is refused (a new id by rights, a seeded id exists).
+    const assets = await send(mo, [
+      { cid: 'ap1', op: 'put', kind: 'asset', id: 'asset-mortar-2', data: { type: 'mortar' } },
+      { cid: 'ap2', op: 'put', kind: 'asset', id: 'asset-mortar-1', data: { type: 'mortar' } }]);
+    assert.deepStrictEqual(assets.body.acks.map(a => a.error), ['right', 'exists']);
+
+    // v2: a locked room takes a batch of heartbeats, answers a batch it already acked, and refuses anything else with 423.
+    clock.t += STAGE1.ttl.roomIdleLockSec * 1000;
+    const beat = await send(mo, [heartbeat('hb1')]);
+    assert.deepStrictEqual([beat.status, !!beat.body.acks[0].seq, fx.meta.locked], [200, true, true]);
+    assert.deepStrictEqual((await send(so, [put])).body.acks, [{ cid: 'c-qv1', seq: fx.state.objects.qv1.seq, dup: true }]);
+    assert.deepStrictEqual(await send(mo, [heartbeat('hb2'), req('qv2')]).then(r => [r.status, r.body]), [423, { error: 'locked' }]);
+    assert.strictEqual((await so.admin('unlock')).status, 200);
+
+    // v2: a del of an object already deleted is acknowledged dup with the seq it has.
+    clock.t += 1100;
+    assert.ok((await send(so, [{ cid: 'd1', op: 'del', kind: 'request', id: 'qv1' }])).body.acks[0].seq);
+    assert.deepStrictEqual((await send(so, [{ cid: 'd2', op: 'del', kind: 'request', id: 'qv1' }])).body.acks,
+      [{ cid: 'd2', seq: fx.state.objects.qv1.seq, dup: true }]);
+    // v2: extend waits for the warning 20 minutes before the deadline.
+    assert.deepStrictEqual(await fx.admin(code, { action: 'extend' }, { session: so.session }).then(r => [r.status, r.body]), [409, { error: 'early' }]);
+    // v2: release gives the post code back to the sheet; the next crew knocks with it.
+    assert.strictEqual((await so.admin('release', { client: mo.client })).status, 200);
+    assert.strictEqual((await fx.join(code, { client: 'client-mortar-07', postCode: moCode })).body.status, 'knocking');
+  });
+
+  await t('demo seats sit in sheet slots: a crew presenting the scripted crew\'s code takes the seat over; the post stays capped', async () => {
+    const fx = new F.FixtureTransport(STAGE1, { now: env.now, script: F.demoScript(STAGE1) });
+    const c = client(fx, 'client-so-00001');
+    await c.createRoom({ token: 'demo', keyId: 'demo', post: 'so' });
+    assert.strictEqual(fx.memberOf('demo-crew-0001').post, 'mortar');
+    const [first, last] = c.sheet.filter(s => s.post === 'mortar').map(s => s.code);
+    const a = await fx.join(c.code, { client: 'client-mortar-01', postCode: first });
+    const b = await fx.join(c.code, { client: 'client-mortar-02', postCode: last });
+    const extra = await fx.join(c.code, { client: 'client-mortar-03', post: 'mortar' });
+    assert.deepStrictEqual([a.body.status, b.body.status, extra.status, extra.body.error], ['knocking', 'knocking', 409, 'full']);
+    assert.strictEqual(fx.memberOf('demo-crew-0001'), null, 'the Worker\'s holder rule moved the scripted crew out');
   });
 
   for (const fork of ['stories_cm', 'rmc14']) {

@@ -313,7 +313,8 @@
       self.code = r.body.code;
       self.session = r.body.session;
       self.sheet = r.body.sheet || null;
-      self.observerToken = r.body.observerToken || null;   // the Worker may leave it to the observer action
+      // Create answers {code, fork, server, session, sheet, epoch}: staff mint the observer link with the observer action.
+      self.observerToken = r.body.observerToken || null;
       self.status = 'in';
       self.persist();
       return self.poll();
@@ -512,7 +513,8 @@
         self.rejected.push({ op: op, error: a.error, status: a.status });
         self.answer(op.cid, a.status === undefined ? { ok: false, error: a.error } : { ok: false, error: a.error, status: a.status }, later);
       } else {
-        // dup:true is the Worker's original ack for a resent cid: accepted all the same.
+        // dup:true answers a resent cid, the author's own put that already stands, or a del of a deleted
+        // object (also from a locked or frozen room): accepted all the same, with the seq the Worker kept.
         if (a.seq > self.room.seq) self.acked.push({ op: op, seq: a.seq });
         self.answer(op.cid, { ok: true, seq: a.seq }, later);
       }
@@ -544,6 +546,8 @@
         self.gen += 1;
         self.code = r.body.code;
         self.session = r.body.session;
+        // Unused post codes changed with the room code; the old sheet would hand out dead ones.
+        self.sheet = Array.isArray(r.body.sheet) ? r.body.sheet : null;
         self.observerToken = null;
         self.room = R.createState();
         self.flushing = false;

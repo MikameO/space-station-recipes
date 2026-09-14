@@ -98,6 +98,18 @@ const liveIds = s => Object.keys(s.objects).filter(id => !s.objects[id].deleted)
     assert.strictEqual(fx.log.filter(o => o.id === 'qL2').length, 1);
   });
 
+  await t('a send the room already took answers dup: queue() resolves ok with the first seq, nothing is rejected', async () => {
+    const { so, w, fx } = await K.stage1Room(env);
+    clock.t += 1100;
+    // v2: the Worker answers a resent cid from memory with {cid, seq, dup: true} and writes nothing.
+    let second = null;
+    w.faults.send.push({ before: run => run().then(run).then(r => { second = r; return r; }) });
+    const res = await so.queue(reqOp('qD1'));
+    const seq = fx.log.find(o => o.id === 'qD1').seq;
+    assert.strictEqual(second.body.acks[0].dup, true);
+    assert.deepStrictEqual([res, so.pending.length, so.rejected, fx.log.filter(o => o.id === 'qD1').length], [{ ok: true, seq }, 0, [], 1]);
+  });
+
   await t('a restored page that saved an unanswered op finds it in the log and never resends it', async () => {
     const { so, w, mk } = await K.stage1Room(env);
     clock.t += 1100;
