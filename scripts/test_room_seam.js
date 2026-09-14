@@ -79,6 +79,35 @@ const notifyText = js.slice(notifyAt, blockEnd(js, notifyAt));
 assert.ok(/JSON\.parse\(JSON\.stringify\(/.test(notifyText), 'roomNotify passes a copy');
 assert.ok(/try\s*\{/.test(notifyText) && /catch\s*\(/.test(notifyText), 'roomNotify catches');
 
+// Executed: the attach block and the two start lines of tactical.js, with a throwing room, with no room, and the hooks it hands over.
+const startBlock = js.slice(attachBlock.start, js.indexOf('loadIndex();', attachBlock.end) + 'loadIndex();'.length);
+const seamNames = ['window', 'console', 'view', 'state', 'calibration', 'mortar', 'currentShell', 'hitRadius', 'LANG', 'weapon',
+  'savePrefs', 'setTarget', 'setMortar', 'recordShot', 'lastShot', 'renderAll', 'applyStaticText', 'loadIndex'];
+function runStart(TacRoom) {
+  const calls = [];
+  const win = { TacRoom, console: { warn: () => calls.push('warn') } };
+  new Function(...seamNames, startBlock)(win, win.console, {}, { prefs: {} }, () => null, () => null, () => null, () => 0, 'ru',
+    () => 'mortar', () => calls.push('savePrefs'), t => calls.push('setTarget ' + t), t => calls.push('setMortar ' + t),
+    () => calls.push('recordShot'), () => null, () => calls.push('renderAll'),
+    () => calls.push('applyStaticText'), () => calls.push('loadIndex'));
+  return calls;
+}
+assert.deepStrictEqual(runStart({ attach() { throw new Error('room'); } }), ['warn', 'applyStaticText', 'loadIndex'], 'a throwing attach never stops the map');
+assert.deepStrictEqual(runStart(undefined), ['applyStaticText', 'loadIndex'], 'without room scripts the map starts as before');
+let handed = null;
+const started = runStart({ attach(h) { handed = h; } });
+assert.deepStrictEqual(started, ['applyStaticText', 'loadIndex']);
+handed.takePosition([3, 4]);
+handed.takeTarget([5, 6]);
+assert.ok(started.includes('setMortar 3,4') && started.includes('setTarget 5,6'), 'takePosition and takeTarget reach the Fire panel');
+
+// Executed: roomNotify hands over a copy and swallows what the room throws.
+const roomNotify = new Function('window', 'console', notifyText + '\nreturn roomNotify;')(
+  { TacRoom: { notify(e, p) { p.tile[0] = 99; throw new Error('room'); } }, console: { warn() {} } }, { warn() {} });
+const shotPayload = { id: 's1', tile: [1, 2] };
+assert.doesNotThrow(() => roomNotify('shot', shotPayload), 'a throwing room stays out of Series T');
+assert.deepStrictEqual(shotPayload.tile, [1, 2], 'the room changed a copy, not Series T data');
+
 // Room scripts are deferred; the demo fixture is loaded on demand only.
 order.slice(0, 4).forEach(src => {
   const tag = (html.match(new RegExp('<script[^>]*src="' + src.replace(/\./g, '\\.') + '[^"]*"[^>]*>')) || [''])[0];

@@ -21,6 +21,7 @@
   var PROD_SITE = 'https://mikameo.github.io/space-station-recipes/tactical.html';
   var SITE = siteUrl(root.location);
   var YM = 108585248;
+  var EDIT_HOLD_MS = 4000;   // a text field without input this long no longer holds panel writes back
 
   // Links and the briefing sheet point at the page they were made on; a local preview never sends people to production.
   function siteUrl(loc) {
@@ -36,7 +37,7 @@
       createTitle: 'Create a room (staff)', serverKey: 'Server key', createPost: 'Your post', create: 'Create',
       keySaved: 'key saved', keyReplace: 'replace', keyForget: 'forget key', keyForgotten: 'The server key is forgotten.',
       demoCreate: 'Create a demo room', demoNote: 'Demo: the room lives in this tab only; the other officers are scripted.',
-      knockTitle: 'Waiting for confirmation',
+      knockTitle: 'Waiting for confirmation', resuming: 'Returning to the room…',
       knockText: 'Say this word on the radio. Anyone already in the room confirms you. The word lasts 5 minutes.',
       cancel: 'Cancel', leave: 'Leave', leaveAsk: 'Leave for sure?', observerBadge: 'Observer',
       tabs: { roster: 'Roster' }, shelf: 'Roster {n}', knockBadge: 'knock {n}',
@@ -85,7 +86,7 @@
       createTitle: 'Создать комнату (штаб)', serverKey: 'Ключ сервера', createPost: 'Ваша должность', create: 'Создать',
       keySaved: 'ключ сохранён', keyReplace: 'заменить', keyForget: 'забыть ключ', keyForgotten: 'Ключ сервера забыт.',
       demoCreate: 'Создать демо-комнату', demoNote: 'Демо: комната живёт только в этой вкладке, остальные офицеры сыграны сценарием.',
-      knockTitle: 'Ждём подтверждения',
+      knockTitle: 'Ждём подтверждения', resuming: 'Возвращаемся в комнату…',
       knockText: 'Назовите это слово по рации. Подтвердит любой участник, который уже в комнате. Слово действует 5 минут.',
       cancel: 'Отменить', leave: 'Выйти', leaveAsk: 'Точно выйти?', observerBadge: 'Наблюдатель',
       tabs: { roster: 'Реестр' }, shelf: 'Реестр {n}', knockBadge: 'стук {n}',
@@ -137,6 +138,7 @@
     forkKey: null, planetId: null, on: false, tab: null, shelf: false, pick: null, demo: false,
     pendingHash: {}, drafts: {}, confirming: null, sheetSquad: '', renderQueued: false, forceRender: false,
     html: {}, deferred: {}, keyReplace: false, errorForm: null, exporting: false,
+    editAt: 0, selectOpen: false, selectEl: null, deferTimer: 0,
     lastError: null, narrow: false, fixtureLoading: null, toastEl: null, toastTimer: 0
   };
 
@@ -168,14 +170,15 @@
   }
   function attrs(data) {
     var out = '';
-    for (var k in data) if (Object.prototype.hasOwnProperty.call(data, k)) out += ' data-' + k + '="' + esc(data[k]) + '"';
+    for (var k in data) if (Object.prototype.hasOwnProperty.call(data, k)) out += ' data-' + cls(k) + '="' + esc(data[k]) + '"';
     return out;
   }
-  function btn(action, label, data, cls) {
-    return '<button type="button" class="btn-small tac-room-btn' + (cls ? ' ' + cls : '') + '" data-room-action="' + action + '"' + attrs(data || {}) + '>' + esc(label) + '</button>';
+  function classes(s) { return String(s || '').split(/\s+/).map(cls).filter(Boolean).join(' '); }
+  function btn(action, label, data, extra) {
+    return '<button type="button" class="btn-small tac-room-btn' + (extra ? ' ' + classes(extra) : '') + '" data-room-action="' + cls(action) + '"' + attrs(data || {}) + '>' + esc(label) + '</button>';
   }
   function banner(text, kind, actions) {
-    return '<div class="tac-banner tac-room-banner' + (kind ? ' ' + kind : '') + '"><p>' + esc(text) + '</p>' + (actions || '') + '</div>';
+    return '<div class="tac-banner tac-room-banner' + (kind ? ' ' + classes(kind) : '') + '"><p>' + esc(text) + '</p>' + (actions || '') + '</div>';
   }
   function track(goal) {
     if (ui.demo) return;   // the demo never counts as a real room
@@ -194,7 +197,7 @@
     return d ? (LANG === 'ru' ? d.nameRu : d.nameEn) : id;
   }
   function squadName(id) {
-    var s = ui.policy && ui.policy.squads[id];
+    var s = ui.policy && has(ui.policy.squads, id) ? ui.policy.squads[id] : null;
     return s ? (LANG === 'ru' ? s.nameRu : s.nameEn) : (id || '');
   }
   function memberName(m) {
@@ -202,7 +205,7 @@
   }
   function fnName(id) {
     var f = ui.policy && ui.policy.functions.filter(function (x) { return x.id === id; })[0];
-    return f ? f.nameRu : id;
+    return f ? (LANG === 'en' && f.nameEn ? f.nameEn : f.nameRu) : id;
   }
   function planetName(id) {
     var ctx = ui.hooks ? ui.hooks.getContext() : null;
@@ -304,6 +307,17 @@
     var rest = String(loc.hash).replace(/^#/, '').split('&').filter(function (p) { return p && p.indexOf('observe=') !== 0; }).join('&');
     try { hist.replaceState(hist.state, '', (loc.pathname || '') + (loc.search || '') + (rest ? '#' + rest : '')); } catch (e) { /* keep going */ }
   }
+  // An observer link opened in a tab that already shows the map arrives as a hashchange: read it, strip it, follow it.
+  function onHashChange() {
+    try {
+      var h = parseHash(root.location ? root.location.hash : '');
+      stripObserve();
+      if (!h.observe) return;
+      var ctx = ui.hooks.getContext();
+      if (ui.policy && ui.client && !(ctx.fork && ctx.fork.key !== ui.forkKey)) startObserve(h.observe);
+      else ui.pendingHash.observe = h.observe;   // switchFork follows it once the policy is loaded
+    } catch (e) { warn('hashchange', e); }
+  }
 
   // ── pick mode ────────────────────────────────────────────
 
@@ -404,6 +418,13 @@
     }
     queueRender();
   }
+  // One path for an observer link, whether it came with the page load or a later hashchange.
+  function startObserve(token) {
+    var parts = String(token).split('.'), watcher = ui.client;
+    watcher.stopLoop();
+    watcher.observe(parts[0], parts[1]).then(function () { if (ui.client === watcher) watcher.startLoop(); });
+    setOn(true);
+  }
   function switchFork(key) {
     ui.forkKey = key;
     if (ui.client) ui.client.stopLoop();
@@ -419,9 +440,7 @@
       var h = ui.pendingHash;
       ui.pendingHash = {};
       if (h.observe) {
-        var parts = h.observe.split('.'), watcher = ui.client;
-        watcher.observe(parts[0], parts[1]).then(function () { if (ui.client === watcher) watcher.startLoop(); });
-        setOn(true);
+        startObserve(h.observe);
       } else {
         var cur = ui.storage.read(CURRENT_KEY + ':' + ui.client.client);
         if (!ui.demo && cur && cur.fork === key && ui.client.restore(cur.code)) ui.client.startLoop();
@@ -507,21 +526,37 @@
     ui.hooks.view.requestDraw();
   }
 
-  // Writes only what changed, and never under an officer who is typing or has a list open:
-  // that write waits for focusout or the next change event. Clicks and submits force it.
+  // Writes only what changed, and never under an officer who is typing (a text field with input in the
+  // last 4 s) or has a list open: that write waits for focusout, the next change event or the 4 s cap.
+  // Checkboxes, radios and buttons never hold it back. Clicks and submits force it.
   function writeBox(name, html, force) {
     var box = ui.els[name];
     if (html === ui.html[name]) { ui.deferred[name] = false; return; }
-    if (!force && editing(box)) { ui.deferred[name] = true; return; }
+    if (!force && editing(box)) { ui.deferred[name] = true; wakeDeferred(); return; }
     var focus = captureFocus(box);
+    // The server key lives only in the field's value property, never in markup or drafts: carry it over by hand.
+    var keyField = box.querySelector ? box.querySelector('input[name="token"]') : null;
+    var key = keyField ? keyField.value : '';
     box.innerHTML = html;
+    if (key) { var fresh = box.querySelector('input[name="token"]'); if (fresh) fresh.value = key; }
     ui.html[name] = html;
     ui.deferred[name] = false;
     restoreFocus(box, focus);
   }
   function editing(box) {
     var el = document.activeElement;
-    return !!(el && el !== box && box.contains(el) && /^(INPUT|SELECT|TEXTAREA)$/.test(el.tagName || ''));
+    if (!el || el === box || !box.contains(el) || Date.now() - ui.editAt >= EDIT_HOLD_MS) return false;
+    var tag = el.tagName || '';
+    if (tag === 'TEXTAREA') return true;
+    if (tag === 'INPUT') return /^(text|search|email|url|tel|password|number)?$/.test(String(el.type || '').toLowerCase());
+    return tag === 'SELECT' && ui.selectOpen;
+  }
+  function wakeDeferred() {
+    if (ui.deferTimer) return;
+    ui.deferTimer = setTimeout(function () {
+      ui.deferTimer = 0;
+      if (anyDeferred()) queueRender();
+    }, Math.max(50, EDIT_HOLD_MS - (Date.now() - ui.editAt) + 50));
   }
   function anyDeferred() {
     for (var k in ui.deferred) if (has(ui.deferred, k) && ui.deferred[k]) return true;
@@ -536,6 +571,7 @@
       if (c.status === 'expired') top = banner(T.banners.expired, 'warn');
       if (c.status === 'gone') top = banner(T.banners.gone, 'warn');
       if (!ui.storage.ok && !ui.demo) top += banner(T.banners.storage);
+      if (c.status === 'resuming') return top + resumingHtml();
       return top + (c.status === 'knocking' ? knockHtml() : homeHtml());
     }
     var list = tabs();
@@ -571,8 +607,8 @@
     var keyField = ui.demo ? '<p class="tac-muted">' + esc(T.demoNote) + '</p>'
       : savedKey && !ui.keyReplace
         ? '<p class="tac-muted tac-room-keyline">' + esc(T.keySaved) + ' · ' + btn('keyReplace', T.keyReplace) + ' ' + btn('keyForget', T.keyForget) + '</p>'
-        : '<label class="tac-input-label">' + esc(T.serverKey) + '<input class="tac-input" type="password" name="token" autocomplete="off" spellcheck="false" value="' +
-          esc(draft('create', 'token', '')) + '"></label>' + (savedKey ? '<p class="tac-muted tac-room-keyline">' + btn('keyForget', T.keyForget) + '</p>' : '');
+        : '<label class="tac-input-label">' + esc(T.serverKey) + '<input class="tac-input" type="password" name="token" autocomplete="new-password" spellcheck="false"></label>' +
+          (savedKey ? '<p class="tac-muted tac-room-keyline">' + btn('keyForget', T.keyForget) + '</p>' : '');
     return '<section class="tac-section"><h2>' + esc(T.entryTitle) + '</h2>' +
       '<form data-room-form="join" class="tac-room-form">' +
       '<label class="tac-input-label">' + esc(T.entryLabel) +
@@ -589,6 +625,13 @@
       '<label class="tac-input-label">' + esc(T.callsign) + '<input class="tac-input" name="callsign" maxlength="' + callsignMax + '" value="' + esc(draft('create', 'callsign', '')) + '"></label>' +
       '<button type="submit" class="btn-small tac-room-btn">' + esc(ui.demo ? T.demoCreate : T.create) + '</button>' + (inCreate ? error : '') +
       '</form></details></section>';
+  }
+
+  // A saved session is being checked: no join or create form, so nothing sent now can race the restore poll.
+  function resumingHtml() {
+    return (ui.client.error === 'network' ? banner(T.banners.network, 'warn') : '') +
+      '<section class="tac-section"><p class="tac-muted">' + esc(T.resuming) + '</p>' +
+      btn('leave', ui.confirming === 'leave' ? T.leaveAsk : T.leave) + '</section>';
   }
 
   function knockHtml() {
@@ -754,9 +797,8 @@
   }
 
   function shelfHtml() {
-    var layers = modules.filter(function (m) { return m.tabs && m.tabs(api).some(function (t) { return t.id === 'layers'; }); })[0];
-    return '<div class="tac-room-shelf-inner">' + btn('shelf', '×', null, 'tac-room-close') + rosterHtml() +
-      (layers ? layers.panel('layers', api) : '') + '</div>';
+    // tabPanel guards every module call: a throwing layers panel leaves the shelf with the roster only.
+    return '<div class="tac-room-shelf-inner">' + btn('shelf', '×', null, 'tac-room-close') + rosterHtml() + tabPanel('layers') + '</div>';
   }
 
   function updateCountdowns() {
@@ -864,9 +906,10 @@
       var c = ui.client;
       twoStep('rotate', function () {
         adminThen('rotate', null, function (b) {
-          c.observerToken = null;   // the new code ends the old moderator link
+          if (!b || !b.code) return;   // no new code came back: nothing changed, no toast
+          c.observerToken = null;      // the new code ends the old moderator link
           c.persist();
-          toast(fmt(T.rotated, { code: b && b.code }));
+          toast(fmt(T.rotated, { code: b.code }));
         });
       });
     },
@@ -882,7 +925,6 @@
     keyReplace: function () { ui.keyReplace = true; queueRender(); },
     keyForget: function () {
       ui.storage.remove(KEY_PREFIX + ui.forkKey);
-      delete ui.drafts['create.token'];
       ui.keyReplace = false;
       toast(T.keyForgotten);
       queueRender();
@@ -927,10 +969,26 @@
     } else {
       onInput(e);
     }
+    ui.selectOpen = false;
     if (ui.renderQueued || anyDeferred()) queueRender(true);
   }
 
-  function onFocusOut() { if (anyDeferred()) queueRender(); }
+  function onFocusOut() { ui.selectOpen = false; if (anyDeferred()) queueRender(); }
+
+  // A native list has no "open" event: a press on a SELECT (or its keyboard opener) counts as open
+  // until a change, focusout, a closing key, a second press or the 4 s cap.
+  function onPointerDown(e) {
+    var t = e.target, isSelect = !!(t && t.tagName === 'SELECT');
+    ui.selectOpen = isSelect && !(ui.selectOpen && ui.selectEl === t);
+    ui.selectEl = isSelect ? t : null;
+    if (ui.selectOpen) ui.editAt = Date.now();
+  }
+  function onFieldKey(e) {
+    var t = e.target;
+    if (!t || t.tagName !== 'SELECT') return;
+    if (e.key === ' ' || e.key === 'F4' || (e.altKey && (e.key === 'ArrowDown' || e.key === 'ArrowUp'))) { ui.selectOpen = true; ui.selectEl = t; ui.editAt = Date.now(); }
+    else if (e.key === 'Escape' || e.key === 'Enter' || e.key === 'Tab') { ui.selectOpen = false; if (anyDeferred()) queueRender(); }
+  }
 
   function onToggle(e) {
     var el = e.target, name = el && el.getAttribute ? el.getAttribute('data-room-details') : null;
@@ -940,6 +998,8 @@
   function onInput(e) {
     var el = e.target;
     if (!el.name || !el.form) return;
+    ui.editAt = Date.now();
+    if (el.type === 'password') return;   // the server key never enters drafts, so never markup
     var form = el.form.getAttribute('data-room-form');
     ui.drafts[form + '.' + el.name] = el.type === 'checkbox' ? el.checked : el.value;
     if (form === 'join' && el.name === 'entry') {
@@ -985,8 +1045,11 @@
       var saved = ui.demo ? null : ui.storage.read(KEY_PREFIX + fork);
       var typed = !ui.demo && f.token ? String(f.token.value || '').trim() : '';
       var token = ui.demo ? 'demo' : typed || saved || '';
+      var before = c.code;
       c.createRoom({ token: token, keyId: ui.demo ? 'demo' : tokenKeyId(token), post: f.post.value, callsign: f.callsign.value }).then(function () {
-        if (c.status === 'in') {
+        // A restore poll can turn the status to `in` meanwhile: only a new room code proves this create worked.
+        // A network blip on the first poll after it does not undo a created room.
+        if (c.code && c.code !== before && (!c.error || c.error === 'network')) {
           // Kept only once it has opened a room: a mistyped key never replaces a good one.
           if (typed && typed !== saved) ui.storage.write(KEY_PREFIX + fork, typed);
           ui.keyReplace = false;
@@ -1019,7 +1082,7 @@
     if (!ui.els.panel || !ui.els.toggle || !ui.els.chips || !ui.els.strip || !ui.els.shelf) return;
     ui.pendingHash = parseHash(root.location.hash);
     stripObserve();
-    if (root.addEventListener) root.addEventListener('hashchange', stripObserve);
+    if (root.addEventListener) root.addEventListener('hashchange', onHashChange);
     ui.clientHash = ui.pendingHash.client;
     ui.demo = demoMode(ui.pendingHash);
     var ls = null;
@@ -1033,6 +1096,8 @@
       box.addEventListener('input', onInput);
       box.addEventListener('submit', onSubmit);
       box.addEventListener('focusout', onFocusOut);
+      box.addEventListener('mousedown', onPointerDown);
+      box.addEventListener('keydown', onFieldKey);
       box.addEventListener('toggle', onToggle, true);   // toggle does not bubble; capture still reaches the box
     });
     document.addEventListener('keydown', function (e) {

@@ -51,7 +51,7 @@ function world(opt = {}) {
     body: el('body'), head: el('head'), activeElement: null,
     getElementById: id => els[id] || null, createElement: tag => el(tag), addEventListener() {}
   };
-  const w = { els, document, warnings: [], goals: [], fetches: [], intervals: [], layers: [], draws: 0, listeners: {} };
+  const w = { els, document, warnings: [], goals: [], fetches: [], intervals: [], layers: [], draws: 0, listeners: {}, copied: [] };
   const win = {
     I18N_LANG: opt.lang || 'ru',
     location: { hash: opt.hash || '', hostname: '127.0.0.1', origin: 'http://127.0.0.1:8000', pathname: '/tactical.html', search: '' },
@@ -63,6 +63,7 @@ function world(opt = {}) {
     matchMedia: () => ({ matches: !!opt.narrow, addEventListener() {} }),
     performance: { getEntriesByType: () => [{ type: opt.nav || 'navigate' }] },
     ym: (id, kind, goal) => w.goals.push(goal),
+    navigator: { clipboard: { writeText: t => { w.copied.push(t); return Promise.resolve(); } } },
     fetch: url => { w.fetches.push(url); return opt.fetch ? opt.fetch(url) : Promise.reject(new Error('offline')); },
     addEventListener: (type, fn) => { (w.listeners[type] = w.listeners[type] || []).push(fn); }
   };
@@ -234,7 +235,7 @@ async function t(name, fn) { await fn(); n++; console.log('ok', name); }
     assert.strictEqual(ss.getItem(DEMO), null);
   });
 
-  await t('U3: a knock shows as a banner at any width, words for two knocks, the count on the Roster tab; colours are checked', async () => {
+  await t('U3: a knock shows as a banner at any width and while a checkbox has focus, words for two knocks, the count on the Roster tab; colours are checked', async () => {
     const evil = clone(basePolicy);
     evil.levels.staff.color = '#fff" onmouseover="alert(1)';
     const w = world({ hash: '#room=demo', sessionStorage: fakeStorage(), fixtures: true, fetch: answer(evil), narrow: true });
@@ -245,6 +246,11 @@ async function t(name, fn) { await fn(); n++; console.log('ok', name); }
     const ui = w.ui(), c = ui.client;
     c.stopLoop();
     const codes = c.sheet.filter(s => s.post === 'mortar').map(s => s.code);
+    // The officer just ticked «Срочно»: a focused checkbox must never hold the panel back.
+    const urgent = { tagName: 'INPUT', type: 'checkbox', name: 'urgent' };
+    w.document.activeElement = urgent;
+    w.els.tacRoom.contains = x => x === urgent;
+    ui.editAt = Date.now();
     const joiner = () => new w.win.TacRoom.RoomClient({ transport: c.transport, storage: w.win.TacRoom.makeStorage(null), policy: ui.policy, fork: 'stories_cm', planet: 'lv624', h: 'h1' });
     const crew = joiner();
     await crew.join({ entry: c.code + '-' + codes[0], callsign: 'Сидоров' });
@@ -281,7 +287,8 @@ async function t(name, fn) { await fn(); n++; console.log('ok', name); }
     assert.ok(panel.innerHTML.indexOf('saved-key') < 0, 'the saved key never enters the page');
     assert.ok(panel.innerHTML.indexOf('name="token"') < 0);
     click(w, 'keyReplace');
-    assert.ok(/<input class="tac-input" type="password" name="token"[^>]*value=""/.test(panel.innerHTML), 'replace shows an empty password field');
+    assert.ok(/<input class="tac-input" type="password" name="token" autocomplete="new-password"[^>]*>/.test(panel.innerHTML), 'replace shows a password field');
+    assert.ok(!/name="token"[^>]*value=/.test(panel.innerHTML), 'without a value attribute');
     ui.client.transport = { create: () => Promise.resolve({ status: 403, body: { error: 'sanction' }, retryAfter: null }) };
     submit(w, 'create', { token: 'wrong-key', post: 'so', callsign: '' });
     await settle();
@@ -304,6 +311,12 @@ async function t(name, fn) { await fn(); n++; console.log('ok', name); }
     ui.client.status = 'gone';
     ui.client.onUpdate(ui.client);
     assert.strictEqual(ls.getItem(current), null, 'room-current is cleared after gone');
+    ui.client.status = 'in';
+    ui.client.onUpdate(ui.client);
+    assert.ok(ls.getItem(current), 'written again while in the room');
+    ui.client.status = 'expired';
+    ui.client.onUpdate(ui.client);
+    assert.strictEqual(ls.getItem(current), null, 'and cleared after expired');
   });
 
   await t('U6: unchanged markup is not rewritten; a focused field defers the write to focusout or the next change; details state is kept', async () => {
@@ -316,29 +329,66 @@ async function t(name, fn) { await fn(); n++; console.log('ok', name); }
     api.render();
     api.render();
     assert.strictEqual(panel.writes, start, 'same markup, no write');
-    const field = { tagName: 'INPUT' };
+    const field = { tagName: 'INPUT', type: 'text', name: 'callsign' };
     w.document.activeElement = field;
     panel.contains = x => x === field;
-    ui.drafts['join.callsign'] = 'Орлов';
+    panel.listeners.input[0]({ target: { name: 'callsign', type: 'text', value: 'Орлов', form: { getAttribute: () => 'join', querySelector: () => null } } });
     api.render();
-    assert.strictEqual(panel.writes, start, 'no write under a focused input');
+    assert.strictEqual(panel.writes, start, 'no write while the officer types');
     w.document.activeElement = null;
     panel.listeners.focusout[0]({});
     assert.strictEqual(panel.writes, start + 1, 'the write lands on focusout');
     assert.ok(panel.innerHTML.indexOf('value="Орлов"') >= 0);
-    const list = { tagName: 'SELECT' };
+    const list = { tagName: 'SELECT', name: 'post' };
     w.document.activeElement = list;
     panel.contains = x => x === list;
     ui.drafts['join.callsign'] = 'Петров';
     api.render();
-    assert.strictEqual(panel.writes, start + 1, 'no write under an open list');
+    assert.strictEqual(panel.writes, start + 2, 'a focused but closed list holds nothing back');
+    panel.listeners.mousedown[0]({ target: list });
+    ui.drafts['join.callsign'] = 'Сидоров';
+    api.render();
+    assert.strictEqual(panel.writes, start + 2, 'no write under an open list');
     panel.listeners.change[0]({ target: { name: 'post', value: 'so', form: { getAttribute: () => 'join' }, getAttribute: () => null } });
-    assert.strictEqual(panel.writes, start + 2, 'the next change event writes');
+    assert.strictEqual(panel.writes, start + 3, 'the next change event writes');
+    w.document.activeElement = field;
+    panel.contains = x => x === field;
+    ui.editAt = Date.now() - 5000;
+    ui.drafts['join.callsign'] = 'Орлова';
+    api.render();
+    assert.strictEqual(panel.writes, start + 4, 'a text field without input for 4 s holds nothing back');
     w.document.activeElement = null;
     assert.ok(panel.innerHTML.indexOf('data-room-details="create" open') >= 0, 'the demo opens the create form');
     panel.listeners.toggle[0]({ target: { getAttribute: k => (k === 'data-room-details' ? 'create' : null), open: false } });
     api.render();
     assert.ok(panel.innerHTML.indexOf('data-room-details="create" open') < 0, 'a closed create form stays closed');
+    panel.listeners.toggle[0]({ target: { getAttribute: k => (k === 'data-room-details' ? 'create' : null), open: true } });
+    ui.drafts['join.callsign'] = 'Иванов';
+    api.render();
+    assert.ok(panel.innerHTML.indexOf('data-room-details="create" open') >= 0, 'an opened create form stays open across rebuilds');
+  });
+
+  await t('U6: chips and strip are rewritten only when their markup changes', async () => {
+    const w = world({ hash: '#room=demo', sessionStorage: fakeStorage(), fixtures: true, fetch: answer(basePolicy) });
+    let mark = 'A';
+    w.win.TacRoomUI.register({ id: 'probe', chips: () => '<span>chip ' + mark + '</span>', strip: () => '<span>strip ' + mark + '</span>' });
+    w.attach();
+    await settle();
+    submit(w, 'create', { post: 'so', callsign: '' });
+    await settle();
+    w.ui().client.stopLoop();
+    const chips = w.els.tacRoomChips, strip = w.els.tacRoomStrip;
+    const c0 = chips.writes, s0 = strip.writes;
+    assert.ok(c0 >= 1 && s0 >= 1, 'written once in the room');
+    w.api().render();
+    w.api().render();
+    assert.strictEqual(chips.writes, c0, 'same chips, no write');
+    assert.strictEqual(strip.writes, s0, 'same strip, no write');
+    mark = 'B';
+    w.api().render();
+    assert.strictEqual(chips.writes, c0 + 1);
+    assert.strictEqual(strip.writes, s0 + 1);
+    assert.ok(chips.innerHTML.indexOf('chip B') >= 0 && strip.innerHTML.indexOf('strip B') >= 0);
   });
 
   await t('queueRender renders within 150 ms when animation frames never fire, and only once when both fire', async () => {
@@ -413,6 +463,179 @@ async function t(name, fn) { await fn(); n++; console.log('ok', name); }
     const en = world({ lang: 'en' });
     codes.forEach(code => assert.ok(en.api().errorText(code).indexOf('Error:') !== 0, 'en text for ' + code));
     ['silence', 'stopped', 'budget'].forEach(r => assert.ok(api.T().banners[r], 'frozen banner for ' + r));
+  });
+
+  await t('observer link opened in an open tab (hashchange): observer mode at once, or once the policy loads; the token leaves the URL', async () => {
+    const pollOk = { serverNow: Date.now(), meta: { planet: 'lv624' }, ops: [] };
+    const w = world({ hash: '#map=stories_cm/lv624', localStorage: fakeStorage(), fetch: answer(policyWith('pilot')) });
+    w.win.TacRoom.ROOM_URL = 'https://room.example';
+    w.attach();
+    await settle();
+    const c = w.ui().client;
+    assert.strictEqual(c.status, 'idle');
+    let polled = null;
+    c.transport.poll = (code, since, auth) => { polled = { code, auth }; return Promise.resolve({ status: 200, body: pollOk, retryAfter: 10 }); };
+    w.win.location.hash = '#map=stories_cm/lv624&observe=ABCD23.tok_en';
+    w.listeners.hashchange.forEach(fn => fn());
+    await settle();
+    c.stopLoop();
+    assert.strictEqual(w.replaced, '/tactical.html#map=stories_cm/lv624');
+    assert.strictEqual(w.ui().client.status, 'observer');
+    assert.deepStrictEqual(polled, { code: 'ABCD23', auth: { observer: 'tok_en' } });
+    assert.strictEqual(w.ui().on, true, 'the panel opens');
+
+    let release;
+    const gate = new Promise(r => { release = r; });
+    const late = world({
+      hash: '#map=stories_cm/lv624', localStorage: fakeStorage(),
+      fetch: url => (/\/policy\//.test(url)
+        ? gate.then(() => ({ ok: true, json: () => Promise.resolve(policyWith('pilot')) }))
+        : Promise.resolve({ status: 200, headers: { get: () => null }, text: () => Promise.resolve(JSON.stringify(pollOk)) }))
+    });
+    late.win.TacRoom.ROOM_URL = 'https://room.example';
+    late.attach();
+    await settle();
+    late.win.location.hash = '#map=stories_cm/lv624&observe=ABCD23.tok_en';
+    late.listeners.hashchange.forEach(fn => fn());
+    assert.strictEqual(late.ui().pendingHash.observe, 'ABCD23.tok_en', 'kept until the policy loads');
+    assert.strictEqual(late.win.location.hash, '#map=stories_cm/lv624', 'but already gone from the URL');
+    release();
+    await settle();
+    late.ui().client.stopLoop();
+    assert.strictEqual(late.ui().client.status, 'observer');
+    assert.strictEqual(late.ui().client.observer, 'tok_en');
+  });
+
+  await t('the typed server key never reaches markup, drafts or the HTML cache; a rebuild carries the field value', async () => {
+    const w = world({ hash: '#room=K7M4Q2', localStorage: fakeStorage(), fetch: answer(policyWith('pilot')) });
+    w.win.TacRoom.ROOM_URL = 'https://room.example';
+    w.attach();
+    await settle();
+    const panel = w.els.tacRoom, ui = w.ui();
+    assert.ok(panel.innerHTML.indexOf('name="token"') >= 0);
+    let html = panel.innerHTML;
+    const typedField = { value: 'S3CRET-KEY' };
+    let current = typedField;
+    Object.defineProperty(panel, 'innerHTML', { configurable: true, get: () => html, set: v => { html = v; panel.writes++; current = { value: '' }; } });
+    panel.querySelector = sel => (sel.indexOf('token') >= 0 ? current : null);
+    panel.listeners.input[0]({ target: { name: 'token', type: 'password', value: 'S3CRET-KEY', form: { getAttribute: () => 'create', querySelector: () => null } } });
+    ui.drafts['join.callsign'] = 'Орлов';   // any change rebuilds the home screen
+    w.api().render();
+    assert.ok(current !== typedField, 'the panel was rebuilt');
+    assert.strictEqual(current.value, 'S3CRET-KEY', 'the new field keeps what was typed');
+    assert.ok(panel.innerHTML.indexOf('S3CRET') < 0, 'not in markup');
+    assert.ok((ui.html.panel || '').indexOf('S3CRET') < 0, 'not in the HTML cache');
+    assert.ok(!Object.keys(ui.drafts).some(k => String(ui.drafts[k]).indexOf('S3CRET') >= 0), 'not in drafts');
+  });
+
+  await t('a create refused while a saved session resumes stores no key, counts nothing and starts no loop; no create form while resuming', async () => {
+    const ls = fakeStorage();
+    ls.setItem(KEY, JSON.stringify('good-key'));
+    const w = world({ hash: '#room=K7M4Q2', localStorage: ls, fetch: answer(policyWith('pilot')) });
+    w.win.TacRoom.ROOM_URL = 'https://room.example';
+    w.attach();
+    await settle();
+    const ui = w.ui(), c = ui.client;
+    c.status = 'resuming';
+    c.code = 'OLD234';
+    w.api().render();
+    const html = w.els.tacRoom.innerHTML;
+    assert.ok(html.indexOf('data-room-form="create"') < 0 && html.indexOf('data-room-form="join"') < 0, 'no forms while resuming');
+    assert.ok(html.indexOf('Возвращаемся в комнату') >= 0 && html.indexOf('data-room-action="leave"') >= 0);
+    let loop = false;
+    c.transport = {
+      create: () => new Promise(r => setTimeout(() => { c.status = 'in'; r({ status: 403, body: { error: 'sanction' }, retryAfter: null }); }, 5)),
+      poll: () => { loop = true; return Promise.resolve({ status: 0, body: { error: 'network' }, retryAfter: null }); }
+    };
+    submit(w, 'create', { token: 'wrong-key', post: 'so', callsign: '' });   // a form sent just before the resume began
+    await sleep(30);
+    await settle();
+    c.stopLoop();
+    assert.strictEqual(JSON.parse(ls.getItem(KEY)), 'good-key', 'the refused key is not stored');
+    assert.deepStrictEqual(w.goals, [], 'no room_create');
+    assert.strictEqual(loop, false, 'no loop started');
+  });
+
+  await t('a throwing layers panel on the narrow shelf stays inside render', async () => {
+    const w = world({ hash: '#room=demo', sessionStorage: fakeStorage(), fixtures: true, fetch: answer(basePolicy) });
+    w.attach();
+    await settle();
+    submit(w, 'create', { post: 'so', callsign: '' });
+    await settle();
+    const ui = w.ui();
+    ui.client.stopLoop();
+    w.win.TacRoomUI.register({ id: 'layersboom', tabs: () => [{ id: 'layers', label: 'L', narrow: true }], panel() { throw new Error('layers panel'); } });
+    ui.narrow = true;
+    ui.shelf = true;
+    const draws = w.draws;
+    assert.doesNotThrow(() => w.api().render());
+    assert.strictEqual(w.draws, draws + 1, 'render reaches requestDraw');
+    assert.ok(w.els.tacRoomShelf.innerHTML.indexOf('tac-room-shelf-inner') >= 0, 'the shelf still shows the roster');
+    assert.ok(w.warnings.some(x => x.indexOf('layersboom') >= 0), 'warned');
+  });
+
+  await t('moderator link: a missing token only toasts; a rotate without a code changes nothing; a rotate with one ends the link', async () => {
+    const w = world({ hash: '#room=demo', sessionStorage: fakeStorage(), fixtures: true, fetch: answer(basePolicy) });
+    w.attach();
+    await settle();
+    submit(w, 'create', { post: 'so', callsign: '' });
+    await settle();
+    const ui = w.ui(), c = ui.client;
+    c.stopLoop();
+    let token = null, rotateCode = null;
+    const asked = [];
+    c.admin = action => {
+      asked.push(action);
+      const body = action === 'observer' ? (token ? { ok: true, observerToken: token } : { ok: true })
+        : action === 'rotate' ? (rotateCode ? { ok: true, code: rotateCode } : { ok: true }) : { ok: true };
+      return Promise.resolve({ status: 200, body });
+    };
+    c.observerToken = null;
+    click(w, 'observerLink');
+    await settle();
+    assert.strictEqual(ui.toastEl.textContent, 'Ссылка для модератора не выдана: попробуйте ещё раз.');
+    assert.deepStrictEqual(w.copied, [], 'nothing copied');
+    assert.strictEqual(c.observerToken, null);
+    token = 'tok_en';
+    click(w, 'observerLink');
+    await settle();
+    assert.strictEqual(c.observerToken, 'tok_en');
+    assert.ok(w.copied[0].indexOf('&observe=' + c.code + '.tok_en') >= 0, w.copied[0]);
+    ui.toastEl.textContent = '';
+    click(w, 'rotate');
+    click(w, 'rotate');
+    await settle();
+    assert.strictEqual(ui.toastEl.textContent, '', 'no «Новый код» toast without a code');
+    assert.strictEqual(c.observerToken, 'tok_en', 'the link stays');
+    rotateCode = 'NEWC23';
+    click(w, 'rotate');
+    click(w, 'rotate');
+    await settle();
+    assert.ok(ui.toastEl.textContent.indexOf('NEWC23') >= 0, ui.toastEl.textContent);
+    assert.strictEqual(c.observerToken, null, 'a new code ends the moderator link');
+    const before = asked.filter(a => a === 'observer').length;
+    click(w, 'observerLink');
+    await settle();
+    assert.strictEqual(asked.filter(a => a === 'observer').length, before + 1, 'the next link is asked for again');
+  });
+
+  await t('markup helpers sanitise actions and classes; own-key squad lookup; English function names', async () => {
+    const w = world({ lang: 'en' });
+    const api = w.api(), ui = w.ui();
+    const b = api.btn('go" onclick="x', 'Label', { 'id" onfocus="z': 1 }, 'on big" onmouseover="y');
+    assert.ok(b.indexOf('data-room-action="goonclickx"') >= 0, b);
+    assert.ok(b.indexOf('class="btn-small tac-room-btn on big onmouseovery"') >= 0, b);
+    assert.ok(!/\s(onclick|onmouseover|onfocus)=/.test(b), b);
+    const bn = api.banner('text', 'warn" style="color:red');
+    assert.ok(bn.indexOf('class="tac-banner tac-room-banner warn stylecolorred"') >= 0, bn);
+    ui.policy = Object.assign(clone(basePolicy), {
+      squads: { bravo: { nameRu: 'Браво', nameEn: 'Bravo' } },
+      functions: [{ id: 'mortar', nameRu: 'Миномёт', nameEn: 'Mortar' }, { id: 'medic', nameRu: 'Медик' }]
+    });
+    assert.strictEqual(api.squadName('toString'), 'toString', 'no prototype lookups');
+    assert.strictEqual(api.squadName('bravo'), 'Bravo');
+    assert.strictEqual(api.fnName('mortar'), 'Mortar');
+    assert.strictEqual(api.fnName('medic'), 'Медик', 'falls back to the Russian name');
   });
 
   notes.forEach(x => console.log('note:', x));
