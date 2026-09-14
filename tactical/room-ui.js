@@ -77,6 +77,7 @@
         knocks: 'Too many people waiting, try again in a minute.', rotated: 'The room code was changed — ask staff for the new one.',
         json: 'The server could not read the request.', fields: 'Invalid fields in the change.', field: 'Invalid fields in the change.',
         deleted: 'That object was already removed.', fork: 'This key belongs to another server fork.', reset: 'The room was reset; the change was not sent.',
+        early: 'Too early: the round can be extended in its last 20 minutes.', size: 'The change is too large to send.',
         fallback: 'Error: {code}'
       }
     },
@@ -127,6 +128,7 @@
         knocks: 'Слишком много ожидающих входа, попробуйте через минуту.', rotated: 'Код комнаты сменили — возьмите новый у штаба.',
         json: 'Сервер не понял запрос.', fields: 'Недопустимые поля в изменении.', field: 'Недопустимые поля в изменении.',
         deleted: 'Этот объект уже удалён.', fork: 'Этот ключ выдан для другого форка сервера.', reset: 'Комната перезапущена, изменение не отправлено.',
+        early: 'Рано: продлить раунд можно в последние 20 минут.', size: 'Изменение слишком большое для отправки.',
         fallback: 'Ошибка: {code}'
       }
     }
