@@ -3,6 +3,27 @@
 `data.json` schema version is in `meta.schemaVersion`. Consumers reading this file
 should pin on a compatible range (semver: breaking changes bump major).
 
+## Series V, stage 2a — 2026-09-14 (Officers' room: positions, mortar zone, addressed requests, room calibration; still hidden)
+
+- Any confirmed member shares a position picked on the map (or the Fire panel's
+  mortar tile): command sees a diamond with the callsign and its age, and a mortar
+  crew's share also deploys its mortar on that tile.
+- Each deployed mortar draws a green reach ring between its minimum and maximum
+  range and a red disc inside the minimum; «Зона миномётов» on the Assets tab
+  hides them.
+- Requests take an addressee («Кому»: a post or a member). Only the addressee and
+  staff accept, only the addressee hears the ping, and a crew working the Fire
+  panel sees a dot on the «Комната» tab. New request type «Задача»: a required
+  text and an optional map point.
+- One room calibration with its tile and rangefinder reading: publish yours
+  (refine with your own reading), apply the room's to the Fire panel, or keep your
+  own. The roster shows who works by which, and positions read in game numbers.
+- Position and calibration writes are not presence heartbeats: radio silence and
+  the idle lock refuse them.
+- The Fire panel's calibration folds into one line once it is saved and checked.
+- The moderator log names addressees, tasks, shared positions and the room
+  calibration. Design: `docs/design/2026-09-14-tactical-tablet-stage2a.md`.
+
 ## Tactical map and room entry fixes — 2026-09-14
 
 - Blast circles show before the round is calibrated: the picked tile and the tile
