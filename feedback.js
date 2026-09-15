@@ -17,7 +17,7 @@
   var REPO_URL = 'https://github.com/MikameO/space-station-recipes';
   var ISSUE_URL_RE = /^https:\/\/github\.com\/MikameO\/space-station-recipes\/issues\/\d+$/;
   // Worker endpoint (origin only, no trailing slash). Empty = feature off.
-  var FEEDBACK_URL = '';
+  var FEEDBACK_URL = 'https://chemdb-feedback.chemdb-feedback-worker.workers.dev';
   var LIMITS = { text: [10, 2000], answer: [0, 2000], contact: [0, 80] };
   var MIN_OPEN_MS = 3000;                   // faster than this is a bot
   var COOLDOWN_MS = 60 * 1000;              // one submission per minute per mode

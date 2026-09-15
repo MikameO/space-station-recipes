@@ -3,6 +3,19 @@
 `data.json` schema version is in `meta.schemaVersion`. Consumers reading this file
 should pin on a compatible range (semver: breaking changes bump major).
 
+## Site idea form and survey switched on — 2026-09-15
+
+- The header feedback button and the ⊞ Sections card «Suggest an idea» open the
+  idea form on the site instead of GitHub: a few lines and an optional contact,
+  no account needed. The GitHub link stays under the Send button.
+- Returning visitors get the two-question survey: from the third visit, after
+  60 s of visible time, at most once per visit and never over another popup;
+  closing it twice turns it off.
+- Both post through the Cloudflare Worker `chemdb-feedback`, which files a public
+  GitHub issue labelled `idea` or `survey` plus `from-site` and first breaks
+  @mentions, issue references, GitHub links and image embeds. `feedback.js?v=5`,
+  service worker cache `chemdb-v109`.
+
 ## Tactical map and room follow-ups — 2026-09-14 (evening)
 
 - The strike size sits right under the Mortar / OB / Supply buttons: the mortar
